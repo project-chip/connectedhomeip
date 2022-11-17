@@ -292,7 +292,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRGroupsClusterAddGroupResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRGroupsClusterAddGroupResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, GroupsClusterAddGroupResponseCallbackType successCb,
                 MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -338,7 +343,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRGroupsClusterViewGroupResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRGroupsClusterViewGroupResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 GroupsClusterViewGroupResponseCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -383,7 +393,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRGroupsClusterGetGroupMembershipResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRGroupsClusterGetGroupMembershipResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 GroupsClusterGetGroupMembershipResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -450,7 +465,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRGroupsClusterRemoveGroupResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRGroupsClusterRemoveGroupResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 GroupsClusterRemoveGroupResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -762,7 +782,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRScenesClusterAddSceneResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRScenesClusterAddSceneResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, ScenesClusterAddSceneResponseCallbackType successCb,
                 MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -884,7 +909,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRScenesClusterViewSceneResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRScenesClusterViewSceneResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 ScenesClusterViewSceneResponseCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -930,7 +960,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRScenesClusterRemoveSceneResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRScenesClusterRemoveSceneResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 ScenesClusterRemoveSceneResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -977,7 +1012,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRScenesClusterRemoveAllScenesResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRScenesClusterRemoveAllScenesResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 ScenesClusterRemoveAllScenesResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -1023,7 +1063,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRScenesClusterStoreSceneResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRScenesClusterStoreSceneResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 ScenesClusterStoreSceneResponseCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -1128,7 +1173,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRScenesClusterGetSceneMembershipResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRScenesClusterGetSceneMembershipResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 ScenesClusterGetSceneMembershipResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -1174,7 +1224,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRScenesClusterEnhancedAddSceneResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRScenesClusterEnhancedAddSceneResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 ScenesClusterEnhancedAddSceneResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -1297,7 +1352,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRScenesClusterEnhancedViewSceneResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRScenesClusterEnhancedViewSceneResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 ScenesClusterEnhancedViewSceneResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -1344,7 +1404,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRScenesClusterCopySceneResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRScenesClusterCopySceneResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 ScenesClusterCopySceneResponseCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -5023,7 +5088,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 OtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -5111,7 +5181,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -6210,7 +6285,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 GeneralCommissioningClusterArmFailSafeResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -6257,7 +6337,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 GeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -6319,21 +6404,25 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge
-            = new MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(self.callbackQueue, completion,
-                ^(ExchangeManager & exchangeManager, const SessionHandle & session,
-                    GeneralCommissioningClusterCommissioningCompleteResponseCallbackType successCb, MTRErrorCallback failureCb,
-                    MTRCallbackBridgeBase * bridge) {
-                    chip::Optional<uint16_t> timedInvokeTimeoutMs;
-                    ListFreer listFreer;
-                    GeneralCommissioning::Commands::CommissioningComplete::Type request;
-                    if (timedInvokeTimeoutMsParam != nil) {
-                        timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
-                    }
+        auto * bridge = new MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session,
+                GeneralCommissioningClusterCommissioningCompleteResponseCallbackType successCb, MTRErrorCallback failureCb,
+                MTRCallbackBridgeBase * bridge) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                GeneralCommissioning::Commands::CommissioningComplete::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                }
 
-                    chip::Controller::GeneralCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
-                    return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
-                });
+                chip::Controller::GeneralCommissioningCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
+            });
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
@@ -6550,7 +6639,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 NetworkCommissioningClusterScanNetworksResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -6610,7 +6704,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 NetworkCommissioningClusterNetworkConfigResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -6661,7 +6760,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 NetworkCommissioningClusterNetworkConfigResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -6711,7 +6815,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 NetworkCommissioningClusterNetworkConfigResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -6761,7 +6870,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 NetworkCommissioningClusterConnectNetworkResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -6811,7 +6925,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 NetworkCommissioningClusterNetworkConfigResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -7105,7 +7224,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 DiagnosticLogsClusterRetrieveLogsResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -9306,7 +9430,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTROperationalCredentialsClusterAttestationResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTROperationalCredentialsClusterAttestationResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 OperationalCredentialsClusterAttestationResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -9352,7 +9481,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 OperationalCredentialsClusterCertificateChainResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -9398,7 +9532,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTROperationalCredentialsClusterCSRResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTROperationalCredentialsClusterCSRResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 OperationalCredentialsClusterCSRResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -9448,7 +9587,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 OperationalCredentialsClusterNOCResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -9502,7 +9646,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 OperationalCredentialsClusterNOCResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -9552,7 +9701,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 OperationalCredentialsClusterNOCResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -9598,7 +9752,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 OperationalCredentialsClusterNOCResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -10009,7 +10168,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 GroupKeyManagementClusterKeySetReadResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -10104,7 +10268,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 GroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -11016,7 +11185,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 DoorLockClusterGetWeekDayScheduleResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -11165,7 +11339,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 DoorLockClusterGetYearDayScheduleResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -11315,7 +11494,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 DoorLockClusterGetHolidayScheduleResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -11496,7 +11680,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRDoorLockClusterGetUserResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRDoorLockClusterGetUserResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 DoorLockClusterGetUserResponseCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
@@ -11593,7 +11782,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRDoorLockClusterSetCredentialResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRDoorLockClusterSetCredentialResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 DoorLockClusterSetCredentialResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -11668,7 +11862,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 DoorLockClusterGetCredentialStatusResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -14280,7 +14479,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 ThermostatClusterGetWeeklyScheduleResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -19128,7 +19332,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRChannelClusterChangeChannelResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRChannelClusterChangeChannelResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 ChannelClusterChangeChannelResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -19397,7 +19606,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 TargetNavigatorClusterNavigateTargetResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -19551,7 +19765,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -19603,7 +19822,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -19658,7 +19882,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -19713,7 +19942,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -19765,7 +19999,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -19817,7 +20056,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -19869,7 +20113,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -19924,7 +20173,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -19969,7 +20223,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -20015,7 +20274,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -20061,7 +20325,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 MediaPlaybackClusterPlaybackResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -20955,7 +21224,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRKeypadInputClusterSendKeyResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRKeypadInputClusterSendKeyResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 KeypadInputClusterSendKeyResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -21081,7 +21355,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRContentLauncherClusterLaunchResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRContentLauncherClusterLaunchResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 ContentLauncherClusterLaunchResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -21184,7 +21463,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRContentLauncherClusterLaunchResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRContentLauncherClusterLaunchResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 ContentLauncherClusterLaunchResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -21660,7 +21944,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 ApplicationLauncherClusterLauncherResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -21711,7 +22000,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 ApplicationLauncherClusterLauncherResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -21758,7 +22052,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 ApplicationLauncherClusterLauncherResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -22078,7 +22377,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRAccountLoginClusterGetSetupPINResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRAccountLoginClusterGetSetupPINResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 AccountLoginClusterGetSetupPINResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -23858,7 +24162,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRUnitTestingClusterTestSpecificResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRUnitTestingClusterTestSpecificResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 UnitTestingClusterTestSpecificResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -23960,7 +24269,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 UnitTestingClusterTestAddArgumentsResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -24007,7 +24321,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 UnitTestingClusterTestSimpleArgumentResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -24054,7 +24373,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 UnitTestingClusterTestStructArrayArgumentResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -24311,7 +24635,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 UnitTestingClusterBooleanResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -24364,7 +24693,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 UnitTestingClusterBooleanResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -24421,7 +24755,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 UnitTestingClusterBooleanResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -24497,7 +24836,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 UnitTestingClusterBooleanResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -24564,7 +24908,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 UnitTestingClusterBooleanResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -24719,7 +25068,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 UnitTestingClusterBooleanResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -24898,7 +25252,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 UnitTestingClusterTestListInt8UReverseResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -24965,7 +25324,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRUnitTestingClusterTestEnumsResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRUnitTestingClusterTestEnumsResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 UnitTestingClusterTestEnumsResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -25012,7 +25376,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 UnitTestingClusterTestNullableOptionalResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -25070,7 +25439,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 UnitTestingClusterTestComplexNullableOptionalResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -25285,7 +25659,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRUnitTestingClusterSimpleStructResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRUnitTestingClusterSimpleStructResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 UnitTestingClusterSimpleStructResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -25452,7 +25831,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 UnitTestingClusterTestEmitTestEventResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
@@ -25503,7 +25887,12 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge(self.callbackQueue, completion,
+        auto * bridge = new MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge(
+            self.callbackQueue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                completion(value, error);
+                [workItem endWork];
+            },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
                 UnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
