@@ -369,9 +369,10 @@ void AdvertiserMinMdns::Shutdown()
 
 CHIP_ERROR AdvertiserMinMdns::RemoveServices()
 {
-    // Advertising data changed. Send a TTL=0 for everything as a refresh,
-    // which will clear caches (including things we are about to remove). Once this is done
-    // we will re-advertise available records with a longer TTL again.
+    // Send a "goodbye" packet for each RR being removed, as defined in RFC 6762.
+    // This allows mDNS clients to remove stale cached records which may not be re-added with
+    // subsequent Advertise() calls. In the case the same records are re-added, this extra
+    // is not harmful though suboptimal, so this is a subject to improvement in the future.
     AdvertiseRecords(BroadcastAdvertiseType::kRemovingAll);
     ClearServices();
 
