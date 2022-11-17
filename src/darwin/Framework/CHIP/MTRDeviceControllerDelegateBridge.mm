@@ -62,11 +62,12 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
     NSLog(@"DeviceControllerDelegate status updated: %d", status);
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
-    if ([strongDelegate respondsToSelector:@selector(controller:statusUpdate:)]) {
-        if (strongDelegate && mQueue) {
+    MTRDeviceController * strongController = mController;
+    if (strongDelegate && mQueue && strongController) {
+        if ([strongDelegate respondsToSelector:@selector(controller:statusUpdate:)]) {
             MTRCommissioningStatus commissioningStatus = MapStatus(status);
             dispatch_async(mQueue, ^{
-                [strongDelegate controller:mController statusUpdate:commissioningStatus];
+                [strongDelegate controller:strongController statusUpdate:commissioningStatus];
             });
         }
     }
@@ -77,11 +78,12 @@ void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error)
     NSLog(@"DeviceControllerDelegate Pairing complete. Status %s", chip::ErrorStr(error));
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
-    if ([strongDelegate respondsToSelector:@selector(controller:commissioningSessionEstablishmentDone:)]) {
-        if (strongDelegate && mQueue) {
+    MTRDeviceController * strongController = mController;
+    if (strongDelegate && mQueue && strongController) {
+        if ([strongDelegate respondsToSelector:@selector(controller:commissioningSessionEstablishmentDone:)]) {
             dispatch_async(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
-                [strongDelegate controller:mController commissioningSessionEstablishmentDone:nsError];
+                [strongDelegate controller:strongController commissioningSessionEstablishmentDone:nsError];
             });
         }
     }
@@ -99,11 +101,12 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
     NSLog(@"DeviceControllerDelegate Commissioning complete. NodeId %llu Status %s", nodeId, chip::ErrorStr(error));
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
-    if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:)]) {
-        if (strongDelegate && mQueue) {
+    MTRDeviceController * strongController = mController;
+    if (strongDelegate && mQueue && strongController) {
+        if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:)]) {
             dispatch_async(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
-                [strongDelegate controller:mController commissioningComplete:nsError];
+                [strongDelegate controller:strongController commissioningComplete:nsError];
             });
         }
     }
