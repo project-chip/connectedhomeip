@@ -250,7 +250,8 @@ CHIP_ERROR ESP32Config::WriteConfigValue(Key key, bool val)
     // Commit the value to the persistent store.
     ReturnMappedErrorOnFailure(nvs_commit(handle));
 
-    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %s", key.Namespace, key.Name, val ? "true" : "false");
+    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %s", StringOrNullMarker(key.Namespace), StringOrNullMarker(key.Name),
+                    val ? "true" : "false");
     return CHIP_NO_ERROR;
 }
 
@@ -264,7 +265,8 @@ CHIP_ERROR ESP32Config::WriteConfigValue(Key key, uint32_t val)
     // Commit the value to the persistent store.
     ReturnMappedErrorOnFailure(nvs_commit(handle));
 
-    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu32 " (0x%" PRIX32 ")", key.Namespace, key.Name, val, val);
+    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu32 " (0x%" PRIX32 ")", StringOrNullMarker(key.Namespace),
+                    StringOrNullMarker(key.Name), val, val);
     return CHIP_NO_ERROR;
 }
 
@@ -278,7 +280,8 @@ CHIP_ERROR ESP32Config::WriteConfigValue(Key key, uint64_t val)
     // Commit the value to the persistent store.
     ReturnMappedErrorOnFailure(nvs_commit(handle));
 
-    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu64 " (0x%" PRIX64 ")", key.Namespace, key.Name, val, val);
+    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu64 " (0x%" PRIX64 ")", StringOrNullMarker(key.Namespace),
+                    StringOrNullMarker(key.Name), val, val);
     return CHIP_NO_ERROR;
 }
 
@@ -294,7 +297,8 @@ CHIP_ERROR ESP32Config::WriteConfigValueStr(Key key, const char * str)
         // Commit the value to the persistent store.
         ReturnMappedErrorOnFailure(nvs_commit(handle));
 
-        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = \"%s\"", key.Namespace, key.Name, str);
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = \"%s\"", StringOrNullMarker(key.Namespace), StringOrNullMarker(key.Name),
+                        str);
         return CHIP_NO_ERROR;
     }
 
@@ -326,7 +330,8 @@ CHIP_ERROR ESP32Config::WriteConfigValueBin(Key key, const uint8_t * data, size_
         // Commit the value to the persistent store.
         ReturnMappedErrorOnFailure(nvs_commit(handle));
 
-        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %" PRId32 ")", key.Namespace, key.Name, dataLen);
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %" PRId32 ")", StringOrNullMarker(key.Namespace),
+                        StringOrNullMarker(key.Name), dataLen);
         return CHIP_NO_ERROR;
     }
 
@@ -349,7 +354,7 @@ CHIP_ERROR ESP32Config::ClearConfigValue(Key key)
     // Commit the value to the persistent store.
     ReturnMappedErrorOnFailure(nvs_commit(handle));
 
-    ChipLogProgress(DeviceLayer, "NVS erase: %s/%s", key.Namespace, key.Name);
+    ChipLogProgress(DeviceLayer, "NVS erase: %s/%s", StringOrNullMarker(key.Namespace), StringOrNullMarker(key.Name));
     return CHIP_NO_ERROR;
 }
 

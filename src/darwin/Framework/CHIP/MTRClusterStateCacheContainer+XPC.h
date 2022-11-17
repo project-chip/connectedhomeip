@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,17 +17,14 @@
 
 #import <Foundation/Foundation.h>
 
-#import "AppParameters.h"
+#import "MTRClusterStateCacheContainer.h"
 
-@implementation AppParameters
+NS_ASSUME_NONNULL_BEGIN
 
-- (AppParameters *)initWithRotatingDeviceIdUniqueId:(NSData *)rotatingDeviceIdUniqueId
-{
-    self = [super init];
-    if (self) {
-        _rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueId;
-    }
-    return self;
-}
-
+@interface MTRClusterStateCacheContainer (XPC)
+- (void)setXPCConnection:(MTRDeviceControllerXPCConnection *)xpcConnection
+            controllerID:(id<NSCopying>)controllerID
+                deviceID:(NSNumber *)deviceID;
 @end
+
+NS_ASSUME_NONNULL_END

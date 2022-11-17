@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,14 +17,16 @@
 
 #import <Foundation/Foundation.h>
 
-#import "MTRAttributeCacheContainer.h"
+#import "AppParameters.h"
 
-NS_ASSUME_NONNULL_BEGIN
+@implementation AppParameters
 
-@interface MTRAttributeCacheContainer (XPC)
-- (void)setXPCConnection:(MTRDeviceControllerXPCConnection *)xpcConnection
-            controllerID:(id<NSCopying>)controllerID
-                deviceID:(NSNumber *)deviceID;
+/**
+ * Initialize with default values
+ */
+- (AppParameters *)init
+{
+    return [super init];
+}
+
 @end
-
-NS_ASSUME_NONNULL_END

@@ -132,12 +132,12 @@ CHIP_ERROR LogAsProtocolMessage(uint8_t protocolCode, const uint8_t * data, size
 
 CHIP_ERROR DecodeStatusResponse(TLV::TLVReader & reader, bool decode)
 {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
     if (decode)
     {
         app::StatusResponseMessage::Parser parser;
         ReturnErrorOnFailure(parser.Init(reader));
-        return parser.CheckSchemaValidity();
+        parser.PrettyPrint();
     }
 #endif
 
@@ -146,12 +146,12 @@ CHIP_ERROR DecodeStatusResponse(TLV::TLVReader & reader, bool decode)
 
 CHIP_ERROR DecodeReadRequest(TLV::TLVReader & reader, bool decode)
 {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
     if (decode)
     {
         app::ReadRequestMessage::Parser parser;
         ReturnErrorOnFailure(parser.Init(reader));
-        return parser.CheckSchemaValidity();
+        return parser.PrettyPrint();
     }
 #endif
 
@@ -160,12 +160,12 @@ CHIP_ERROR DecodeReadRequest(TLV::TLVReader & reader, bool decode)
 
 CHIP_ERROR DecodeSubscribeRequest(TLV::TLVReader & reader, bool decode)
 {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
     if (decode)
     {
         app::SubscribeRequestMessage::Parser parser;
         ReturnErrorOnFailure(parser.Init(reader));
-        return parser.CheckSchemaValidity();
+        return parser.PrettyPrint();
     }
 #endif
 
@@ -174,12 +174,12 @@ CHIP_ERROR DecodeSubscribeRequest(TLV::TLVReader & reader, bool decode)
 
 CHIP_ERROR DecodeSubscribeResponse(TLV::TLVReader & reader, bool decode)
 {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
     if (decode)
     {
         app::SubscribeResponseMessage::Parser parser;
         ReturnErrorOnFailure(parser.Init(reader));
-        return parser.CheckSchemaValidity();
+        parser.PrettyPrint();
     }
 #endif
 
@@ -190,12 +190,12 @@ CHIP_ERROR DecodeReportData(TLV::TLVReader & reader, bool decode)
 {
     ReturnErrorOnFailure(MaybeDecodeNestedReadResponse(reader.GetReadPoint(), reader.GetTotalLength()));
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
     if (decode)
     {
         app::ReportDataMessage::Parser parser;
         ReturnErrorOnFailure(parser.Init(reader));
-        return parser.CheckSchemaValidity();
+        parser.PrettyPrint();
     }
 #endif
 
@@ -204,12 +204,12 @@ CHIP_ERROR DecodeReportData(TLV::TLVReader & reader, bool decode)
 
 CHIP_ERROR DecodeWriteRequest(TLV::TLVReader & reader, bool decode)
 {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
     if (decode)
     {
         app::WriteRequestMessage::Parser parser;
         ReturnErrorOnFailure(parser.Init(reader));
-        return parser.CheckSchemaValidity();
+        return parser.PrettyPrint();
     }
 #endif
 
@@ -218,12 +218,12 @@ CHIP_ERROR DecodeWriteRequest(TLV::TLVReader & reader, bool decode)
 
 CHIP_ERROR DecodeWriteResponse(TLV::TLVReader & reader, bool decode)
 {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
     if (decode)
     {
         app::WriteResponseMessage::Parser parser;
         ReturnErrorOnFailure(parser.Init(reader));
-        return parser.CheckSchemaValidity();
+        return parser.PrettyPrint();
     }
 #endif
 
@@ -234,12 +234,12 @@ CHIP_ERROR DecodeInvokeCommandRequest(TLV::TLVReader & reader, bool decode)
 {
     ReturnErrorOnFailure(MaybeDecodeNestedCommandRequest(reader.GetReadPoint(), reader.GetTotalLength()));
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
     if (decode)
     {
         app::InvokeRequestMessage::Parser parser;
         ReturnErrorOnFailure(parser.Init(reader));
-        return parser.CheckSchemaValidity();
+        return parser.PrettyPrint();
     }
 #endif
 
@@ -250,12 +250,12 @@ CHIP_ERROR DecodeInvokeCommandResponse(TLV::TLVReader & reader, bool decode)
 {
     ReturnErrorOnFailure(MaybeDecodeNestedCommandResponse(reader.GetReadPoint(), reader.GetTotalLength()));
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
     if (decode)
     {
         app::InvokeResponseMessage::Parser parser;
         ReturnErrorOnFailure(parser.Init(reader));
-        return parser.CheckSchemaValidity();
+        parser.PrettyPrint();
     }
 #endif
 
@@ -264,12 +264,12 @@ CHIP_ERROR DecodeInvokeCommandResponse(TLV::TLVReader & reader, bool decode)
 
 CHIP_ERROR DecodeTimedRequest(TLV::TLVReader & reader, bool decode)
 {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
     if (decode)
     {
         app::TimedRequestMessage::Parser parser;
         ReturnErrorOnFailure(parser.Init(reader));
-        return parser.CheckSchemaValidity();
+        parser.PrettyPrint();
     }
 #endif
 

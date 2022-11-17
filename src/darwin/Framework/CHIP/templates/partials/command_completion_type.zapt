@@ -1,5 +1,12 @@
 {{#if command.hasSpecificResponse}}
-void (^)(MTR{{asUpperCamelCase command.parent.name}}Cluster{{asUpperCamelCase command.responseName}}Params * _Nullable data, NSError * _Nullable error)
+{{#*inline "clusterName"}}
+{{~#if compatRemapClusterName~}}
+{{compatClusterNameRemapping command.parent.name}}
+{{~else~}}
+{{asUpperCamelCase command.parent.name}}
+{{~/if~}}
+{{/inline}}
+void (^)(MTR{{> clusterName}}Cluster{{asUpperCamelCase command.responseName}}Params * _Nullable data, NSError * _Nullable error)
 {{else}}
 MTRStatusCompletion
 {{/if}}

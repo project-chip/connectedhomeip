@@ -304,8 +304,8 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     reader.Init(std::move(aPayload));
 
     ReturnErrorOnFailure(readRequestParser.Init(reader));
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnErrorOnFailure(readRequestParser.CheckSchemaValidity());
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    readRequestParser.PrettyPrint();
 #endif
 
     err = readRequestParser.GetAttributeRequests(&attributePathListParser);
@@ -557,8 +557,8 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
 
     SubscribeRequestMessage::Parser subscribeRequestParser;
     ReturnErrorOnFailure(subscribeRequestParser.Init(reader));
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnErrorOnFailure(subscribeRequestParser.CheckSchemaValidity());
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    subscribeRequestParser.PrettyPrint();
 #endif
 
     AttributePathIBs::Parser attributePathListParser;

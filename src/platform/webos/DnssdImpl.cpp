@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -570,7 +570,7 @@ DnssdServiceProtocol GetProtocolInType(const char * type)
 
     if (deliminator == nullptr)
     {
-        ChipLogError(Discovery, "Failed to find protocol in type: %s", type);
+        ChipLogError(Discovery, "Failed to find protocol in type: %s", StringOrNullMarker(type));
         return DnssdServiceProtocol::kDnssdProtocolUnknown;
     }
 
@@ -583,7 +583,7 @@ DnssdServiceProtocol GetProtocolInType(const char * type)
         return DnssdServiceProtocol::kDnssdProtocolUdp;
     }
 
-    ChipLogError(Discovery, "Unknown protocol in type: %s", type);
+    ChipLogError(Discovery, "Unknown protocol in type: %s", StringOrNullMarker(type));
     return DnssdServiceProtocol::kDnssdProtocolUnknown;
 }
 

@@ -24,10 +24,6 @@
 #include <string>
 #include <vector>
 
-using namespace chip;
-using namespace chip::Thread;
-using namespace chip::DeviceLayer::Internal;
-
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
@@ -137,8 +133,8 @@ void TizenWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
     ChipLogProgress(NetworkProvisioning, "TizenNetworkCommissioningDelegate: SSID: %.*s",
                     static_cast<int>(sizeof(mStagingNetwork.ssid)), reinterpret_cast<char *>(mStagingNetwork.ssid));
 
-    err = WiFiMgr().Connect(reinterpret_cast<char *>(mStagingNetwork.ssid), reinterpret_cast<char *>(mStagingNetwork.credentials),
-                            callback);
+    err = DeviceLayer::Internal::WiFiMgr().Connect(reinterpret_cast<char *>(mStagingNetwork.ssid),
+                                                   reinterpret_cast<char *>(mStagingNetwork.credentials), callback);
 
 exit:
     if (err != CHIP_NO_ERROR)

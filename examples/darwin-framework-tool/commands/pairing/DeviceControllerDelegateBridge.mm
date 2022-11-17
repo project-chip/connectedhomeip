@@ -16,35 +16,35 @@
  *
  */
 
-#include "PairingDelegateBridge.h"
+#include "DeviceControllerDelegateBridge.h"
 #import <Matter/Matter.h>
 
-@interface CHIPToolPairingDelegate ()
+@interface CHIPToolDeviceControllerDelegate ()
 @end
 
-@implementation CHIPToolPairingDelegate
-- (void)onStatusUpdate:(MTRPairingStatus)status
+@implementation CHIPToolDeviceControllerDelegate
+- (void)onStatusUpdate:(MTRCommissioningStatus)status
 {
     NSLog(@"Pairing Status Update: %tu", status);
     switch (status) {
-    case MTRPairingStatusSuccess:
+    case MTRCommissioningStatusSuccess:
         ChipLogProgress(chipTool, "Secure Pairing Success");
         ChipLogProgress(chipTool, "CASE establishment successful");
         break;
-    case MTRPairingStatusFailed:
+    case MTRCommissioningStatusFailed:
         ChipLogError(chipTool, "Secure Pairing Failed");
         _commandBridge->SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE);
         break;
-    case MTRPairingStatusDiscoveringMoreDevices:
+    case MTRCommissioningStatusDiscoveringMoreDevices:
         ChipLogProgress(chipTool, "Secure Pairing Discovering More Devices");
         break;
-    case MTRPairingStatusUnknown:
+    case MTRCommissioningStatusUnknown:
         ChipLogError(chipTool, "Uknown Pairing Status");
         break;
     }
 }
 
-- (void)onPairingComplete:(NSError *)error
+- (void)onCommissioningSessionEstablishmentDone:(NSError *)error
 {
     if (error != nil) {
         ChipLogProgress(chipTool, "PASE establishment failed");
@@ -59,11 +59,6 @@
         _commandBridge->SetCommandExitStatus(commissionError);
         return;
     }
-}
-
-- (void)onPairingDeleted:(NSError *)error
-{
-    _commandBridge->SetCommandExitStatus(error, "Pairing Delete");
 }
 
 - (void)onCommissioningComplete:(NSError *)error

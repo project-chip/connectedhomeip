@@ -289,19 +289,14 @@ CHIP_ERROR AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
+    UpdateLEDs();
+
     return err;
 }
 
 void AppTask::AppTaskMain(void * pvParameter)
 {
     AppEvent event;
-
-    CHIP_ERROR err = sAppTask.Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "AppTask.Init() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return;
-    }
 
     while (true)
     {
