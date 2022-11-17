@@ -58,7 +58,7 @@ int main(void)
 
     WindowApp & app = WindowApp::Instance();
 
-    EFR32_LOG("Starting App");
+    SILABS_LOG("Starting App");
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     err = app.Init();
     // Initialize device attestation config
@@ -71,14 +71,14 @@ int main(void)
 
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("App Init failed");
+        SILABS_LOG("App Init failed");
         appError(err);
     }
 
     err = app.Start();
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("App Start failed");
+        SILABS_LOG("App Start failed");
         appError(err);
     }
 

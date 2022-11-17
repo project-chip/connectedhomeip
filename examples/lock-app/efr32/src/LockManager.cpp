@@ -40,14 +40,14 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
 
     if (LockParams.numberOfUsers > kMaxUsers)
     {
-        EFR32_LOG("Max number of users is greater than %d, the maximum amount of users currently supported on this platform",
+        SILABS_LOG("Max number of users is greater than %d, the maximum amount of users currently supported on this platform",
                   kMaxUsers);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
     if (LockParams.numberOfCredentialsPerUser > kMaxCredentialsPerUser)
     {
-        EFR32_LOG("Max number of credentials per user is greater than %d, the maximum amount of users currently supported on this "
+        SILABS_LOG("Max number of credentials per user is greater than %d, the maximum amount of users currently supported on this "
                   "platform",
                   kMaxCredentialsPerUser);
         return APP_ERROR_ALLOCATION_FAILED;
@@ -55,7 +55,7 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
 
     if (LockParams.numberOfWeekdaySchedulesPerUser > kMaxWeekdaySchedulesPerUser)
     {
-        EFR32_LOG(
+        SILABS_LOG(
             "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
             kMaxWeekdaySchedulesPerUser);
         return APP_ERROR_ALLOCATION_FAILED;
@@ -63,7 +63,7 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
 
     if (LockParams.numberOfYeardaySchedulesPerUser > kMaxYeardaySchedulesPerUser)
     {
-        EFR32_LOG(
+        SILABS_LOG(
             "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
             kMaxYeardaySchedulesPerUser);
         return APP_ERROR_ALLOCATION_FAILED;
@@ -71,7 +71,7 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
 
     if (LockParams.numberOfHolidaySchedules > kMaxHolidaySchedules)
     {
-        EFR32_LOG(
+        SILABS_LOG(
             "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
             kMaxHolidaySchedules);
         return APP_ERROR_ALLOCATION_FAILED;
@@ -87,7 +87,7 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
 
     if (sLockTimer == NULL)
     {
-        EFR32_LOG("sLockTimer timer create failed");
+        SILABS_LOG("sLockTimer timer create failed");
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
@@ -219,7 +219,7 @@ void LockManager::StartTimer(uint32_t aTimeoutMs)
 {
     if (xTimerIsTimerActive(sLockTimer))
     {
-        EFR32_LOG("app timer already started!");
+        SILABS_LOG("app timer already started!");
         CancelTimer();
     }
 
@@ -228,7 +228,7 @@ void LockManager::StartTimer(uint32_t aTimeoutMs)
     // cannot immediately be sent to the timer command queue.
     if (xTimerChangePeriod(sLockTimer, (aTimeoutMs / portTICK_PERIOD_MS), 100) != pdPASS)
     {
-        EFR32_LOG("sLockTimer timer start() failed");
+        SILABS_LOG("sLockTimer timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
@@ -237,7 +237,7 @@ void LockManager::CancelTimer(void)
 {
     if (xTimerStop(sLockTimer, 0) == pdFAIL)
     {
-        EFR32_LOG("sLockTimer stop() failed");
+        SILABS_LOG("sLockTimer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 }
