@@ -1016,7 +1016,7 @@ class ChipDeviceController():
         typing.Tuple[int,
                      typing.Type[ClusterObjects.ClusterEvent], int]
     ]] = None,
-            returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None, fabricFiltered: bool = True, keepSubscriptions: bool = False):
+            eventNumberFilter: typing.Optional[int] = None, returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None, fabricFiltered: bool = True, keepSubscriptions: bool = False):
         '''
         Read a list of attributes and/or events from a target node
 
@@ -1046,6 +1046,8 @@ class ChipDeviceController():
             Clusters.ClusterA:                          Endpoint = *,           Cluster = specific,   Event = *, Urgent = True/False
             '*' or ():                                  Endpoint = *,           Cluster = *,          Event = *, Urgent = True/False
 
+        eventNumberFilter: Optional minimum event number filter.
+
         returnClusterObject: This returns the data as consolidated cluster objects, with all attributes for a cluster inside
                              a single cluster-wide cluster object.
 
@@ -1065,7 +1067,7 @@ class ChipDeviceController():
         eventPaths = [self._parseEventPathTuple(
             v) for v in events] if events else None
 
-        ClusterAttribute.Read(future=future, eventLoop=eventLoop, device=device.deviceProxy, devCtrl=self, attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths, returnClusterObject=returnClusterObject,
+        ClusterAttribute.Read(future=future, eventLoop=eventLoop, device=device.deviceProxy, devCtrl=self, attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths, eventNumberFilter=eventNumberFilter, returnClusterObject=returnClusterObject,
                               subscriptionParameters=ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None, fabricFiltered=fabricFiltered, keepSubscriptions=keepSubscriptions).raise_on_error()
         return await future
 
@@ -1124,7 +1126,7 @@ class ChipDeviceController():
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int],
         # Concrete path
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent], int]
-    ]], reportInterval: typing.Tuple[int, int] = None, keepSubscriptions: bool = False):
+    ]], eventNumberFilter: typing.Optional[int] = None, reportInterval: typing.Tuple[int, int] = None, keepSubscriptions: bool = False):
         '''
         Read a list of events from a target node, this is a wrapper of DeviceController.Read()
 
@@ -1144,10 +1146,11 @@ class ChipDeviceController():
             ReadEvent(1, [ Clusters.Basic ] ) -- case 5 above.
             ReadEvent(1, [ (1, Clusters.Basic.Events.Location ] ) -- case 1 above.
 
+        eventNumberFilter: Optional minimum event number filter.
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
         '''
-        res = await self.Read(nodeid=nodeid, events=events, reportInterval=reportInterval, keepSubscriptions=keepSubscriptions)
+        res = await self.Read(nodeid=nodeid, events=events, eventNumberFilter=eventNumberFilter, reportInterval=reportInterval, keepSubscriptions=keepSubscriptions)
         if isinstance(res, ClusterAttribute.SubscriptionTransaction):
             return res
         else:

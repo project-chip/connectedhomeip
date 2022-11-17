@@ -22,7 +22,7 @@ from asyncio import events
 from asyncio.futures import Future
 import ctypes
 from dataclasses import dataclass, field
-from typing import Tuple, Type, Union, List, Any, Callable, Dict, Set
+from typing import Tuple, Type, Union, List, Any, Callable, Dict, Set, Optional
 from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_void_p, c_uint64, c_uint32,  c_uint16, c_uint8, py_object, c_uint64
 import construct
 from rich.pretty import pprint
@@ -952,7 +952,7 @@ _ReadParams = construct.Struct(
 )
 
 
-def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributePath] = None, dataVersionFilters: List[DataVersionFilter] = None, events: List[EventPath] = None, returnClusterObject: bool = True, subscriptionParameters: SubscriptionParameters = None, fabricFiltered: bool = True, keepSubscriptions: bool = False) -> PyChipError:
+def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributePath] = None, dataVersionFilters: List[DataVersionFilter] = None, events: List[EventPath] = None, eventNumberFilter: Optional[int] = None, returnClusterObject: bool = True, subscriptionParameters: SubscriptionParameters = None, fabricFiltered: bool = True, keepSubscriptions: bool = False) -> PyChipError:
     if (not attributes) and dataVersionFilters:
         raise ValueError(
             "Must provide valid attribute list when data version filters is not null")
@@ -1032,6 +1032,9 @@ def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributeP
         params.KeepSubscriptions = keepSubscriptions
     params.IsFabricFiltered = fabricFiltered
     params = _ReadParams.build(params)
+    eventNumberFilterPtr = ctypes.POINTER(ctypes.c_ulonglong)()
+    if eventNumberFilter is not None:
+        eventNumberFilterPtr = ctypes.POINTER(ctypes.c_ulonglong)(ctypes.c_ulonglong(eventNumberFilter))
 
     res = builtins.chipStack.Call(
         lambda: handle.pychip_ReadClient_Read(
@@ -1044,6 +1047,7 @@ def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributeP
             ctypes.c_size_t(
                 0 if dataVersionFilters is None else len(dataVersionFilters)),
             ctypes.c_size_t(0 if events is None else len(events)),
+            eventNumberFilterPtr,
             *readargs))
 
     transaction.SetClientObjPointers(readClientObj, readCallbackObj)
@@ -1057,8 +1061,8 @@ def ReadAttributes(future: Future, eventLoop, device, devCtrl, attributes: List[
     return Read(future=future, eventLoop=eventLoop, device=device, devCtrl=devCtrl, attributes=attributes, dataVersionFilters=dataVersionFilters, events=None, returnClusterObject=returnClusterObject, subscriptionParameters=subscriptionParameters, fabricFiltered=fabricFiltered)
 
 
-def ReadEvents(future: Future, eventLoop, device, devCtrl, events: List[EventPath], returnClusterObject: bool = True, subscriptionParameters: SubscriptionParameters = None, fabricFiltered: bool = True) -> int:
-    return Read(future=future, eventLoop=eventLoop, device=device, devCtrl=devCtrl, attributes=None, dataVersionFilters=None, events=events, returnClusterObject=returnClusterObject, subscriptionParameters=subscriptionParameters, fabricFiltered=fabricFiltered)
+def ReadEvents(future: Future, eventLoop, device, devCtrl, events: List[EventPath], eventNumberFilter=None, returnClusterObject: bool = True, subscriptionParameters: SubscriptionParameters = None, fabricFiltered: bool = True) -> int:
+    return Read(future=future, eventLoop=eventLoop, device=device, devCtrl=devCtrl, attributes=None, dataVersionFilters=None, events=events, eventNumberFilter=eventNumberFilter, returnClusterObject=returnClusterObject, subscriptionParameters=subscriptionParameters, fabricFiltered=fabricFiltered)
 
 
 def Init():
