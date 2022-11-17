@@ -49,8 +49,7 @@ constexpr const char * kDefaultKey = "default";
 @property BOOL active; // Whether to pass on notifications to the commandBridge
 
 - (void)onStatusUpdate:(MTRCommissioningStatus)status;
-- (void)onPairingComplete:(NSError * _Nullable)error;
-- (void)onPairingDeleted:(NSError * _Nullable)error;
+- (void)onCommissioningSessionEstablishmentDone:(NSError * _Nullable)error;
 - (void)onCommissioningComplete:(NSError * _Nullable)error;
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -543,7 +542,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void)onPairingComplete:(NSError * _Nullable)error
+- (void)onCommissioningSessionEstablishmentDone:(NSError * _Nullable)error
 {
     if (_active) {
         if (error != nil) {
@@ -554,13 +553,6 @@ NS_ASSUME_NONNULL_BEGIN
         } else {
             _commandBridge->PairingComplete(_deviceId);
         }
-    }
-}
-
-- (void)onPairingDeleted:(NSError * _Nullable)error
-{
-    if (_active) {
-        _commandBridge->PairingDeleted();
     }
 }
 
