@@ -121,19 +121,16 @@ class DeviceProvisioningFragment : Fragment() {
 
       val deviceId = DeviceIdUtil.getNextAvailableId(requireContext())
       val connId = bluetoothManager.connectionId
-      val network = NetworkCredentials()
+      var network: NetworkCredentials? = null
       var networkParcelable = checkNotNull(networkCredentialsParcelable)
 
-      val wifi = networkParcelable.getWiFiCredentials()
-      if (wifi != null)
-      {
-        network.setWiFiCredentials(wifi.getSsid(), wifi.getPassword())
+      val wifi = networkParcelable.wiFiCredentials
+      if (wifi != null) {
+        network = NetworkCredentials.forWiFi(NetworkCredentials.WiFiCredentials(wifi.ssid, wifi.password))
       }
-
-      val thread = networkParcelable.getThreadCredentials()
-      if (thread != null)
-      {
-        network.setThreadCredentials(thread.getOperationalDataset())
+      val thread = networkParcelable.threadCredentials
+      if (thread != null) {
+        network = NetworkCredentials.forThread(NetworkCredentials.ThreadCredentials(thread.operationalDataset))
       }
 
       deviceController.pairDevice(gatt, connId, deviceId, deviceInfo.setupPinCode, network)

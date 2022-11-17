@@ -155,6 +155,8 @@ class {{filename}}: public TestCommandBridge
             {{asObjectiveCBasicType type}} {{asLowerCamelCase name}}Argument = {{asTypedLiteral definedValue type}};
           {{/chip_tests_item_parameters}}
           MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(minIntervalArgument) maxInterval:@(maxIntervalArgument)];
+          params.filterByFabric = {{#if fabricFiltered}}true{{else}}false{{/if}};
+          params.replaceExistingSubscriptions = {{#if keepSubscriptions}}false{{else}}true{{/if}};
           [cluster subscribeAttribute{{asUpperCamelCase attribute}}WithParams:params
                                                                    subscriptionEstablished:^{
               VerifyOrReturn(testSendCluster{{parent.filename}}_{{waitForReport.index}}_{{asUpperCamelCase waitForReport.command}}_Fulfilled, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));

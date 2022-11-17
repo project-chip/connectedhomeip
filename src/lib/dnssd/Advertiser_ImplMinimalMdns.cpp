@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -531,7 +531,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
     AdvertiseRecords(BroadcastAdvertiseType::kStarted);
 
-    ChipLogProgress(Discovery, "mDNS service published: %s.%s", instanceName.names[1], instanceName.names[2]);
+    ChipLogProgress(Discovery, "mDNS service published: %s.%s", StringOrNullMarker(instanceName.names[1]),
+                    StringOrNullMarker(instanceName.names[2]));
 
     return CHIP_NO_ERROR;
 }
@@ -725,17 +726,18 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
         ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Commissionable node device'; instance name: %s.",
-                        instanceName.names[0]);
+                        StringOrNullMarker(instanceName.names[0]));
     }
     else
     {
         ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Commissioner device'; instance name: %s.",
-                        instanceName.names[0]);
+                        StringOrNullMarker(instanceName.names[0]));
     }
 
     AdvertiseRecords(BroadcastAdvertiseType::kStarted);
 
-    ChipLogProgress(Discovery, "mDNS service published: %s.%s", instanceName.names[1], instanceName.names[2]);
+    ChipLogProgress(Discovery, "mDNS service published: %s.%s", StringOrNullMarker(instanceName.names[1]),
+                    StringOrNullMarker(instanceName.names[2]));
 
     return CHIP_NO_ERROR;
 }
