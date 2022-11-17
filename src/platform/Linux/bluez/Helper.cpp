@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -155,7 +155,7 @@ static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint
     serviceUUID = g_variant_builder_end(&serviceUUIDsBuilder);
 
     debugStr = g_variant_print(serviceData, TRUE);
-    ChipLogDetail(DeviceLayer, "SET service data to %s", debugStr);
+    ChipLogDetail(DeviceLayer, "SET service data to %s", StringOrNullMarker(debugStr));
     g_free(debugStr);
 
     bluez_leadvertisement1_set_type_(adv, (apEndpoint->mType & BLUEZ_ADV_TYPE_CONNECTABLE) ? "peripheral" : "broadcast");
@@ -463,7 +463,7 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
 #if CHIP_ERROR_LOGGING
         errStr = strerror(errno);
 #endif // CHIP_ERROR_LOGGING
-        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", errStr, __func__);
+        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(errStr), __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
         goto exit;
     }
@@ -544,7 +544,7 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
 #if CHIP_ERROR_LOGGING
         errStr = strerror(errno);
 #endif // CHIP_ERROR_LOGGING
-        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", errStr, __func__);
+        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(errStr), __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
         goto exit;
     }

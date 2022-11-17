@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -137,8 +137,8 @@ public:
 
     static void PrintHandle(const char * tag, const PacketBuffer * buffer)
     {
-        printf("%s %p ref=%u len=%-4u next=%p\n", tag, buffer, buffer ? buffer->ref : 0, buffer ? buffer->len : 0,
-               buffer ? buffer->next : nullptr);
+        printf("%s %p ref=%u len=%-4u next=%p\n", StringOrNullMarker(tag), buffer, buffer ? buffer->ref : 0,
+               buffer ? buffer->len : 0, buffer ? buffer->next : nullptr);
     }
     static void PrintHandle(const char * tag, const PacketBufferHandle & handle) { PrintHandle(tag, handle.mBuffer); }
 
@@ -163,8 +163,8 @@ private:
     static void PrintHandle(const char * tag, const BufferConfiguration & config) { PrintHandle(tag, config.handle); }
     static void PrintConfig(const char * tag, const BufferConfiguration & config)
     {
-        printf("%s pay=%-4zu len=%-4u res=%-4u:", tag, config.payload_ptr - config.start_buffer, config.init_len,
-               config.reserved_size);
+        printf("%s pay=%-4zu len=%-4u res=%-4u:", StringOrNullMarker(tag), config.payload_ptr - config.start_buffer,
+               config.init_len, config.reserved_size);
         PrintHandle("", config.handle);
     }
 
