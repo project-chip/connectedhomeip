@@ -35,12 +35,6 @@ matter_node_state_monitor::matter_node_state_monitor(
   const class device_translator &translator, UnifyEmberInterface &ember_interface) :
   matter_device_translator(translator), unify_ember_interface(ember_interface)
 {
-  // Disable last fixed endpoint, which is used as a placeholder for all of the
-  // supported clusters so that ZAP will generated the requisite code.
-  auto endpoints_count = unify_ember_interface.emberAfFixedEndpointCountUnify();
-  unify_ember_interface.emberAfEndpointEnableDisableUnify(
-    unify_ember_interface.emberAfEndpointFromIndexUnify(endpoints_count - 1),
-    false);
   unify::node_state_monitor::node_state_monitor::get_instance().set_interface(
     this);
 }

@@ -62,14 +62,8 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID:
         emberAfGroupKeyManagementClusterInitCallback(endpoint);
         break;
-    case ZCL_GROUPS_CLUSTER_ID:
-        emberAfGroupsClusterInitCallback(endpoint);
-        break;
     case ZCL_IDENTIFY_CLUSTER_ID:
         emberAfIdentifyClusterInitCallback(endpoint);
-        break;
-    case ZCL_LEVEL_CONTROL_CLUSTER_ID:
-        emberAfLevelControlClusterInitCallback(endpoint);
         break;
     case ZCL_LOCALIZATION_CONFIGURATION_CLUSTER_ID:
         emberAfLocalizationConfigurationClusterInitCallback(endpoint);
@@ -77,20 +71,11 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
         break;
-    case ZCL_ON_OFF_CLUSTER_ID:
-        emberAfOnOffClusterInitCallback(endpoint);
-        break;
     case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
         emberAfOperationalCredentialsClusterInitCallback(endpoint);
         break;
-    case ZCL_SCENES_CLUSTER_ID:
-        emberAfScenesClusterInitCallback(endpoint);
-        break;
     case ZCL_SOFTWARE_DIAGNOSTICS_CLUSTER_ID:
         emberAfSoftwareDiagnosticsClusterInitCallback(endpoint);
-        break;
-    case ZCL_SWITCH_CLUSTER_ID:
-        emberAfSwitchClusterInitCallback(endpoint);
         break;
     case ZCL_TIME_FORMAT_LOCALIZATION_CLUSTER_ID:
         emberAfTimeFormatLocalizationClusterInitCallback(endpoint);
@@ -162,17 +147,7 @@ void __attribute__((weak)) emberAfGroupKeyManagementClusterInitCallback(Endpoint
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfGroupsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
 void __attribute__((weak)) emberAfIdentifyClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfLevelControlClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -187,27 +162,12 @@ void __attribute__((weak)) emberAfNetworkCommissioningClusterInitCallback(Endpoi
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfOnOffClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
 void __attribute__((weak)) emberAfOperationalCredentialsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfScenesClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
 void __attribute__((weak)) emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfSwitchClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -231,10 +191,6 @@ void __attribute__((weak)) emberAfUserLabelClusterInitCallback(EndpointId endpoi
 //
 // Non-Cluster Related Callbacks
 //
-
-void __attribute__((weak)) emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
-
-void __attribute__((weak)) emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
 
 EmberAfAttributeWritePermission __attribute__((weak))
 emberAfAllowNetworkWriteAttributeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t * value,
@@ -283,11 +239,6 @@ emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, 
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
-uint32_t __attribute__((weak)) emberAfGetCurrentTimeCallback()
-{
-    return 0;
-}
-
 bool __attribute__((weak))
 emberAfGetEndpointInfoCallback(EndpointId endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo)
 {
@@ -295,12 +246,6 @@ emberAfGetEndpointInfoCallback(EndpointId endpoint, uint8_t * returnNetworkIndex
 }
 
 void __attribute__((weak)) emberAfRegistrationAbortCallback() {}
-
-EmberStatus __attribute__((weak))
-emberAfInterpanSendMessageCallback(EmberAfInterpanHeader * header, uint16_t messageLength, uint8_t * message)
-{
-    return EMBER_LIBRARY_NOT_PRESENT;
-}
 
 bool __attribute__((weak)) emberAfStartMoveCallback()
 {

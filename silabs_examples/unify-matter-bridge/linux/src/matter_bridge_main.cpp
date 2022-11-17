@@ -40,8 +40,6 @@ extern "C" {
 #include "uic_main_loop.h"
 }
 
-
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::Credentials;
@@ -57,16 +55,6 @@ constexpr const char * LOG_TAG = "unify_matter_bridge";
 
 static bool matter_running;
 static std::mutex unify_mutex;
-
-
-void init_ember_endpoints()
-{
-    PlatformMgr().ScheduleWork([](intptr_t) {
-        // Disable last fixed endpoint, which is used as a placeholder for all of the
-        // supported clusters so that ZAP will generated the requisite code.
-        emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
-    });
-}
 
 
 static void call_unify_event_queue(intptr_t)
@@ -172,7 +160,6 @@ int main(int argc, char * argv[])
 
     matter_running = true;
     auto handle    = run_unify();
-    init_ember_endpoints();
     ChipLinuxAppMainLoop();
     matter_running = false;
     handle.join();

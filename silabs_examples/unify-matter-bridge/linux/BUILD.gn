@@ -31,7 +31,7 @@ config("unify-config") {
     "src/matter_node_state_monitor",
     "src/matter_wrappers",
     "include",
-    "zap-handlers/gen"
+    "zap-generated/data_model_translator"
   ]
   ldflags = [ "-lboost_system" ] 
 }
@@ -60,10 +60,10 @@ static_library("unify-matter-bridge-lib") {
     "src/matter_node_state_monitor/matter_endpoint_builder.cpp",
     "src/matter_node_state_monitor/matter_node_state_monitor.cpp",
     "src/matter_wrappers/unify_mqtt_wrapper.cpp",
-    "zap-handlers/gen/attribute_translator.cpp",
-    "zap-handlers/gen/attribute_type_size.cpp",
-    "zap-handlers/gen/command_translator.cpp",
-    "zap-handlers/gen/unify_accessors.cpp"
+    "zap-generated/data_model_translator/attribute_translator.cpp",
+    "zap-generated/data_model_translator/attribute_type_size.cpp",
+    "zap-generated/data_model_translator/command_translator.cpp",
+    "zap-generated/data_model_translator/unify_accessors.cpp"
   ]
 
   public_deps = [

@@ -2,7 +2,7 @@
 pushd ../../../../
 
 ./scripts/tools/zap/generate.py -t silabs_examples/unify-matter-bridge/linux/zap-handlers/bridge-templates.json \
-  -o silabs_examples/unify-matter-bridge/linux/zap-handlers/gen \
+  -o silabs_examples/unify-matter-bridge/linux/zap-generated/data_model_translator \
   silabs_examples/unify-matter-bridge/unify-matter-bridge-common/unify-matter-bridge.zap 
 
 popd
