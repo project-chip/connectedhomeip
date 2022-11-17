@@ -26,7 +26,6 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/NetworkCommissioning.h>
 #include <platform/ThreadStackManager.h>
-#include <system/SystemConfig.h>
 
 #include "NetworkCommissioningDriver.h"
 #include "ThreadStackManagerImpl.h"

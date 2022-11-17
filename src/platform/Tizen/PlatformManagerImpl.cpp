@@ -35,7 +35,6 @@
 #include <platform/Tizen/DeviceInstanceInfoProviderImpl.h>
 
 #include "PosixConfig.h"
-#include "platform/internal/CHIPDeviceLayerInternal.h"
 #include "platform/internal/GenericPlatformManagerImpl.h"
 #include "platform/internal/GenericPlatformManagerImpl.ipp"
 #include "platform/internal/GenericPlatformManagerImpl_POSIX.h"

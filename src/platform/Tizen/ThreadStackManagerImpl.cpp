@@ -33,7 +33,6 @@
 
 #include <endian.h>
 
-#include <cstdint>
 #include <cstring>
 
 #include <thread.h>
@@ -52,7 +51,6 @@
 #include <platform/NetworkCommissioning.h>
 #include <platform/PlatformManager.h>
 
-#include "platform/internal/BLEManager.h"
 #include <platform/Tizen/ThreadStackManagerImpl.h>
 
 namespace chip {

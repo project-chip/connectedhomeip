@@ -29,9 +29,6 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/KeyValueStoreManager.h>
 
-#include "platform/internal/CHIPDeviceLayerInternal.h"
-#include "platform/internal/testing/ConfigUnitTest.h"
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {

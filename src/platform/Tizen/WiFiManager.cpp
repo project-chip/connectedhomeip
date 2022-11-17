@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <platform/Tizen/WiFiManager.h>
+#include "WiFiManager.h"
 
 #include <cstdio>
 #include <cstdlib>

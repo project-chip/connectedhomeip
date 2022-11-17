@@ -37,8 +37,6 @@
 #include <system/SystemConfig.h>
 #include <system/SystemError.h>
 
-#include "platform/internal/CHIPDeviceLayerInternal.h"
-
 namespace chip {
 namespace System {
 namespace Clock {

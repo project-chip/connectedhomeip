@@ -18,7 +18,6 @@
 
 #include <iterator>
 #include <memory>
-#include <type_traits>
 #include <utility>
 
 #include <lib/support/CodeUtils.h>

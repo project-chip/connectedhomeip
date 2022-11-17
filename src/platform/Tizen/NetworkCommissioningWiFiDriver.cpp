@@ -23,16 +23,13 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/Span.h>
-#include <lib/support/ThreadOperationalDataset.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/NetworkCommissioning.h>
-#include <system/SystemConfig.h>
 
 #include "NetworkCommissioningDriver.h"
 #include "WiFiManager.h"
-#include "platform/internal/CHIPDeviceLayerInternal.h"
-#include "platform/internal/DeviceNetworkInfo.h"
 
 namespace chip {
 namespace DeviceLayer {

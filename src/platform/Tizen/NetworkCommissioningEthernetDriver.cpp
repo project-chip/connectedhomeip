@@ -22,7 +22,6 @@
 #include <cstring>
 #include <iterator>
 #include <string>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -31,9 +30,6 @@
 #include <platform/NetworkCommissioning.h>
 #include <platform/Tizen/ConnectivityUtils.h>
 #include <platform/Tizen/NetworkCommissioningDriver.h>
-
-#include "platform/internal/CHIPDeviceLayerInternal.h"
-#include "platform/internal/DeviceNetworkInfo.h"
 
 namespace chip {
 namespace DeviceLayer {
