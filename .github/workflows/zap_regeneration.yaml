@@ -47,6 +47,8 @@ jobs:
             - name: Generate all
               timeout-minutes: 5
               run: scripts/tools/zap_regen_all.py
+            - name: Ensure git works in current working directory
+              run: git config --global --add safe.directory `pwd`
             - name: Add uncommitted changes
               run: git add .
             - name: Fix upstream
