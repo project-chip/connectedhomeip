@@ -510,9 +510,8 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     err = report.Init(reader);
     SuccessOrExit(err);
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    err = report.CheckSchemaValidity();
-    SuccessOrExit(err);
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    report.PrettyPrint();
 #endif
 
     err = report.GetSuppressResponse(&suppressResponse);
@@ -888,8 +887,8 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     SubscribeResponseMessage::Parser subscribeResponse;
     ReturnErrorOnFailure(subscribeResponse.Init(reader));
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnErrorOnFailure(subscribeResponse.CheckSchemaValidity());
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    subscribeResponse.PrettyPrint();
 #endif
 
     SubscriptionId subscriptionId = 0;

@@ -787,12 +787,11 @@ menu "CHIP Device Layer"
                 for the debug level events are disabled.
 
 
-	config CHIP_ENABLE_SCHEMA_CHECK
-	   bool "Enable Schema Check"
+	config CHIP_CONFIG_IM_PRETTY_PRINT
+	   bool "Enable IM Pretty Print"
 	   default y
 	   help
-	     If enabled, it checks incoming messages are following the expected schema,
-             and incoming message payloads are logged in detail.
+	     If enabled, incoming message payloads are logged in detail.
 	     To see detailed logging please set default log level to Debug.
 	     (Component config --> Log output --> Default log verbosity --> Debug)
 
