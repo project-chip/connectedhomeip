@@ -60,12 +60,13 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
             return;
         }
 
-        JNIEnv * env      = JniReferences::GetInstance().GetEnvForCurrentThread();
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         Json::Value value = json["value"];
-        UtfString jsonString(env, JsonToString(value).c_str());
+        std::string payload = JsonToString(value);
+        UtfString jsonString(env, payload.c_str());
 
         ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand send command being called with payload %s",
-                        JsonToString(json).c_str());
+                        payload.c_str());
 
         jstring resp = (jstring) env->CallObjectMethod(
             mContentAppEndpointManager, mSendCommandMethod, static_cast<jint>(handlerContext.mRequestPath.mEndpointId),
@@ -82,6 +83,8 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
         const char * respStr = env->GetStringUTFChars(resp, 0);
         ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand got response %s", respStr);
         FormatResponseData(handlerContext, respStr);
+        env->ReleaseStringUTFChars(resp, respStr);
+        env->DeleteLocalRef(resp);
     }
     else
     {
