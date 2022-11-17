@@ -125,7 +125,7 @@ def runArgumentsParser() -> CmdLineArgs:
     templates_file = getFilePath(args.templates)
     output_dir = getDirPath(output_dir)
 
-    return CmdLineArgs(zap_file, zcl_file, templates_file, output_dir, args.run_bootstrap)
+    return CmdLineArgs(zap_file, zcl_file, templates_file, output_dir)
 
 
 def extractGeneratedIdl(output_dir, zap_config_path):
