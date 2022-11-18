@@ -37,9 +37,8 @@ if [ -z "$ZAP_DEVELOPMENT_PATH" ]; then
     exit 1
 fi
 
-
 (
-    cd $ZAP_DEVELOPMENT_PATH
+    cd "$ZAP_DEVELOPMENT_PATH"
 
     if [ $# -eq 0 ]; then
         echo "Running ZAP bootstrap"

@@ -45,7 +45,7 @@ else
 fi
 
 (
-    cd "${WORKING_DIR}"
+    cd "$WORKING_DIR"
 
     echo "ARGS: ${ZAP_ARGS[@]}"
 
@@ -55,8 +55,11 @@ fi
         ZCL_FILE="$CHIP_ROOT/src/app/zap-templates/zcl/zcl.json"
     fi
 
-    ${ZAP_CMD} --logToStdout \
-        --gen "$CHIP_ROOT/src/app/zap-templates/app-templates.json" \
-        --zcl "$ZCL_FILE" \
-        "${ZAP_ARGS[@]}"
+    bash -c " \
+        $ZAP_CMD \
+        --logToStdout \
+        --gen \"$CHIP_ROOT/src/app/zap-templates/app-templates.json\" \
+        --zcl \"$ZCL_FILE\" \
+        ${ZAP_ARGS[@]} \
+    "
 )
