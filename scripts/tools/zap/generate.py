@@ -255,7 +255,7 @@ def main():
     cmdLineArgs = runArgumentsParser()
 
     if cmdLineArgs.runBootstrap:
-       subprocess.check_call(getFilePath("scripts/tools/zap/zap_bootstrap.sh"), shell=True)
+        subprocess.check_call(getFilePath("scripts/tools/zap/zap_bootstrap.sh"), shell=True)
 
     # The maximum memory usage is over 4GB (#15620)
     os.environ["NODE_OPTIONS"] = "--max-old-space-size=8192"
