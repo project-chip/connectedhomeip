@@ -22,6 +22,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <ble/BleConfig.h>
 #include <lib/core/ReferenceCounted.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <transport/CryptoContext.h>
@@ -167,9 +168,7 @@ public:
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
         case Transport::Type::kBle:
-            // TODO: Figure out what this should be, but zero is not the right
-            // answer.
-            return System::Clock::Seconds16(5);
+            return System::Clock::Milliseconds32(BTP_ACK_TIMEOUT_MS);
         default:
             break;
         }
