@@ -51,7 +51,7 @@ fi
 (
     cd "$WORKING_DIR"
 
-    echo "ARGS: ${ZAP_ARGS}"
+    echo "ARGS: $ZAP_ARGS"
 
     if [[ "${ZAP_ARGS[@]}" == *"/all-clusters-app.zap"* ]]; then
         ZCL_FILE="$CHIP_ROOT/src/app/zap-templates/zcl/zcl-with-test-extensions.json"
@@ -64,6 +64,6 @@ fi
         --logToStdout \
         --gen \"$CHIP_ROOT/src/app/zap-templates/app-templates.json\" \
         --zcl \"$ZCL_FILE\" \
-        ${ZAP_ARGS} \
+        $ZAP_ARGS \
     "
 )
