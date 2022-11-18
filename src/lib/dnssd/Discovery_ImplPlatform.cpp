@@ -466,7 +466,8 @@ void DiscoveryImplPlatform::HandleDnssdPublish(void * context, const char * type
 {
     if (CHIP_NO_ERROR == error)
     {
-        ChipLogProgress(Discovery, "mDNS service published: %s; instance name: %s", type, instanceName);
+        ChipLogProgress(Discovery, "mDNS service published: %s; instance name: %s", StringOrNullMarker(type),
+                        StringOrNullMarker(instanceName));
     }
     else
     {
@@ -520,12 +521,13 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
 
     for (size_t i = 0; i < textEntrySize; i++)
     {
-        printf(" entry [%u] : %s %s\n", static_cast<unsigned int>(i), textEntries[i].mKey, (char *) (textEntries[i].mData));
+        printf(" entry [%u] : %s %s\n", static_cast<unsigned int>(i), StringOrNullMarker(textEntries[i].mKey),
+               StringOrNullMarker((char *) (textEntries[i].mData)));
     }
 
     for (size_t i = 0; i < subTypeSize; i++)
     {
-        printf(" type [%u] : %s\n", static_cast<unsigned int>(i), subTypes[i]);
+        printf(" type [%u] : %s\n", static_cast<unsigned int>(i), StringOrNullMarker(subTypes[i]));
     }
 #endif
 

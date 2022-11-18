@@ -26,9 +26,6 @@
 #include <string>
 #include <vector>
 
-using namespace chip::app::Clusters::GeneralDiagnostics;
-using namespace chip::DeviceLayer::Internal;
-
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
@@ -40,7 +37,8 @@ TizenEthernetDriver::EthernetNetworkIterator::EthernetNetworkIterator(TizenEther
 
     for (const auto * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
     {
-        if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET)
+        if (DeviceLayer::Internal::ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) ==
+            app::Clusters::GeneralDiagnostics::InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET)
         {
             mInterfaces.push_back(ifa->ifa_name);
             if (mInterfaces.size() == mDriver->GetMaxNetworks())

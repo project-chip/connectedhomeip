@@ -26,6 +26,7 @@ static_library("telink") {
     "../Zephyr/ConfigurationManagerImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.h",
+    "../Zephyr/DiagnosticDataProviderImplGetter.cpp",
     "../Zephyr/KeyValueStoreManagerImpl.cpp",
     "../Zephyr/Logging.cpp",
     "../Zephyr/PlatformManagerImpl.cpp",

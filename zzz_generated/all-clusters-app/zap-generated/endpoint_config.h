@@ -73,7 +73,7 @@
             /* 54 - SeekRangeStart, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Test Cluster (server), big-endian */                                                          \
+            /* Endpoint: 1, Cluster: Unit Testing (server), big-endian */                                                          \
                                                                                                                                    \
             /* 62 - bitmap64, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
@@ -192,7 +192,7 @@
             /* 54 - SeekRangeStart, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Test Cluster (server), little-endian */                                                       \
+            /* Endpoint: 1, Cluster: Unit Testing (server), little-endian */                                                       \
                                                                                                                                    \
             /* 62 - bitmap64, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
@@ -354,7 +354,7 @@
             { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* ColorPointBY */                                              \
             { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* StartUpColorTemperatureMireds */                             \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Test Cluster (server) */                                                                      \
+            /* Endpoint: 1, Cluster: Unit Testing (server) */                                                                      \
             { (uint16_t) 0x46, (uint16_t) 0x14, (uint16_t) 0x64 },   /* range_restricted_int8u */                                  \
             { (uint16_t) -0x14, (uint16_t) -0x28, (uint16_t) 0x32 }, /* range_restricted_int8s */                                  \
             { (uint16_t) 0xC8, (uint16_t) 0x64, (uint16_t) 0x3E8 },  /* range_restricted_int16u */                                 \
@@ -1295,7 +1295,7 @@
             { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0) },        /* FeatureMap */                               \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },          /* ClusterRevision */                          \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Test Cluster (server) */                                                                      \
+            /* Endpoint: 1, Cluster: Unit Testing (server) */                                                                      \
             { 0x00000000, ZAP_TYPE(BOOLEAN), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(false) },    /* boolean */        \
             { 0x00000001, ZAP_TYPE(BITMAP8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) },        /* bitmap8 */        \
             { 0x00000002, ZAP_TYPE(BITMAP16), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) },       /* bitmap16 */       \
@@ -1832,7 +1832,7 @@
   /*   GeneratedCommandList (index=194)*/ \
   0x00000001 /* SendKeyResponse */, \
   chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 1, Cluster: Test Cluster (server) */\
+  /* Endpoint: 1, Cluster: Unit Testing (server) */\
   /*   AcceptedCommandList (index=196) */ \
   0x00000000 /* Test */, \
   0x00000001 /* TestNotHandled */, \
@@ -2690,7 +2690,7 @@
       .generatedCommandList = nullptr ,\
     },\
   { \
-      /* Endpoint: 1, Cluster: Test Cluster (server) */ \
+      /* Endpoint: 1, Cluster: Unit Testing (server) */ \
       .clusterId = 0xFFF1FC05,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(596), \
       .attributeCount = 83, \

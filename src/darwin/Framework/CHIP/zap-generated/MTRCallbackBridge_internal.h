@@ -113,30 +113,30 @@ typedef void (*ApplicationLauncherClusterLauncherResponseCallbackType)(
     void *, const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType &);
 typedef void (*AccountLoginClusterGetSetupPINResponseCallbackType)(
     void *, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &);
-typedef void (*TestClusterClusterTestSpecificResponseCallbackType)(
-    void *, const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType &);
-typedef void (*TestClusterClusterTestAddArgumentsResponseCallbackType)(
-    void *, const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType &);
-typedef void (*TestClusterClusterTestSimpleArgumentResponseCallbackType)(
-    void *, const chip::app::Clusters::TestCluster::Commands::TestSimpleArgumentResponse::DecodableType &);
-typedef void (*TestClusterClusterTestStructArrayArgumentResponseCallbackType)(
-    void *, const chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType &);
-typedef void (*TestClusterClusterTestListInt8UReverseResponseCallbackType)(
-    void *, const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType &);
-typedef void (*TestClusterClusterTestEnumsResponseCallbackType)(
-    void *, const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType &);
-typedef void (*TestClusterClusterTestNullableOptionalResponseCallbackType)(
-    void *, const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType &);
-typedef void (*TestClusterClusterTestComplexNullableOptionalResponseCallbackType)(
-    void *, const chip::app::Clusters::TestCluster::Commands::TestComplexNullableOptionalResponse::DecodableType &);
-typedef void (*TestClusterClusterBooleanResponseCallbackType)(
-    void *, const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType &);
-typedef void (*TestClusterClusterSimpleStructResponseCallbackType)(
-    void *, const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType &);
-typedef void (*TestClusterClusterTestEmitTestEventResponseCallbackType)(
-    void *, const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType &);
-typedef void (*TestClusterClusterTestEmitTestFabricScopedEventResponseCallbackType)(
-    void *, const chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestSpecificResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestAddArgumentsResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestSimpleArgumentResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestStructArrayArgumentResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestListInt8UReverseResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestEnumsResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestNullableOptionalResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestComplexNullableOptionalResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType &);
+typedef void (*UnitTestingClusterBooleanResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::BooleanResponse::DecodableType &);
+typedef void (*UnitTestingClusterSimpleStructResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestEmitTestEventResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType &);
+typedef void (*UnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackType)(
+    void *, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType &);
 
 typedef void (*IdentifyClusterIdentifyEffectIdentifierAttributeCallback)(void *,
                                                                          chip::app::Clusters::Identify::IdentifyEffectIdentifier);
@@ -527,9 +527,9 @@ typedef void (*ApplicationBasicClusterApplicationStatusEnumAttributeCallback)(
     void *, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum);
 typedef void (*NullableApplicationBasicClusterApplicationStatusEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum> &);
-typedef void (*TestClusterClusterSimpleEnumAttributeCallback)(void *, chip::app::Clusters::TestCluster::SimpleEnum);
-typedef void (*NullableTestClusterClusterSimpleEnumAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> &);
+typedef void (*UnitTestingClusterSimpleEnumAttributeCallback)(void *, chip::app::Clusters::UnitTesting::SimpleEnum);
+typedef void (*NullableUnitTestingClusterSimpleEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> &);
 typedef void (*FaultInjectionClusterFaultTypeAttributeCallback)(void *, chip::app::Clusters::FaultInjection::FaultType);
 typedef void (*NullableFaultInjectionClusterFaultTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::FaultInjection::FaultType> &);
@@ -1071,44 +1071,44 @@ typedef void (*ElectricalMeasurementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ElectricalMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*TestClusterBitmap8AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>);
-typedef void (*TestClusterBitmap16AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>);
-typedef void (*TestClusterBitmap32AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>);
-typedef void (*TestClusterBitmap64AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>);
-typedef void (*TestClusterListInt8uListAttributeCallback)(void * context,
+typedef void (*UnitTestingBitmap8AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>);
+typedef void (*UnitTestingBitmap16AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>);
+typedef void (*UnitTestingBitmap32AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>);
+typedef void (*UnitTestingBitmap64AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>);
+typedef void (*UnitTestingListInt8uListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<uint8_t> & data);
-typedef void (*TestClusterListOctetStringListAttributeCallback)(void * context,
+typedef void (*UnitTestingListOctetStringListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
-typedef void (*TestClusterListStructOctetStringListAttributeCallback)(
+typedef void (*UnitTestingListStructOctetStringListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestListStructOctet::DecodableType> &
         data);
-typedef void (*TestClusterListNullablesAndOptionalsStructListAttributeCallback)(
+typedef void (*UnitTestingListNullablesAndOptionalsStructListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & data);
-typedef void (*TestClusterStructAttrStructAttributeCallback)(
-    void *, const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType &);
-typedef void (*TestClusterListLongOctetStringListAttributeCallback)(
+        chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType> & data);
+typedef void (*UnitTestingStructAttrStructAttributeCallback)(
+    void *, const chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType &);
+typedef void (*UnitTestingListLongOctetStringListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
-typedef void (*TestClusterListFabricScopedListAttributeCallback)(
+typedef void (*UnitTestingListFabricScopedListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType> & data);
-typedef void (*TestClusterNullableBitmap8AttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> &);
-typedef void (*TestClusterNullableBitmap16AttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> &);
-typedef void (*TestClusterNullableBitmap32AttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> &);
-typedef void (*TestClusterNullableBitmap64AttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> &);
-typedef void (*TestClusterNullableStructStructAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> &);
-typedef void (*TestClusterGeneratedCommandListListAttributeCallback)(
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestFabricScoped::DecodableType> & data);
+typedef void (*UnitTestingNullableBitmap8AttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> &);
+typedef void (*UnitTestingNullableBitmap16AttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> &);
+typedef void (*UnitTestingNullableBitmap32AttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> &);
+typedef void (*UnitTestingNullableBitmap64AttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> &);
+typedef void (*UnitTestingNullableStructStructAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType> &);
+typedef void (*UnitTestingGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*TestClusterAcceptedCommandListListAttributeCallback)(
+typedef void (*UnitTestingAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*TestClusterAttributeListListAttributeCallback)(void * context,
+typedef void (*UnitTestingAttributeListListAttributeCallback)(void * context,
                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 
 class MTRDefaultSuccessCallbackBridge : public MTRCallbackBridge<DefaultSuccessCallback>
@@ -1156,7 +1156,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROctetStringAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROctetStringAttributeCallbackBridge::OnDone;
 
@@ -1186,7 +1186,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableOctetStringAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableOctetStringAttributeCallbackBridge::OnDone;
 
@@ -1215,7 +1215,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRCharStringAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRCharStringAttributeCallbackBridge::OnDone;
 
@@ -1244,7 +1244,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableCharStringAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableCharStringAttributeCallbackBridge::OnDone;
 
@@ -1273,7 +1273,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBooleanAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBooleanAttributeCallbackBridge::OnDone;
 
@@ -1302,7 +1302,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableBooleanAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableBooleanAttributeCallbackBridge::OnDone;
 
@@ -1331,7 +1331,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRInt8uAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRInt8uAttributeCallbackBridge::OnDone;
 
@@ -1360,7 +1360,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableInt8uAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableInt8uAttributeCallbackBridge::OnDone;
 
@@ -1389,7 +1389,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRInt8sAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRInt8sAttributeCallbackBridge::OnDone;
 
@@ -1418,7 +1418,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableInt8sAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableInt8sAttributeCallbackBridge::OnDone;
 
@@ -1447,7 +1447,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRInt16uAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRInt16uAttributeCallbackBridge::OnDone;
 
@@ -1476,7 +1476,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableInt16uAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableInt16uAttributeCallbackBridge::OnDone;
 
@@ -1505,7 +1505,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRInt16sAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRInt16sAttributeCallbackBridge::OnDone;
 
@@ -1534,7 +1534,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableInt16sAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableInt16sAttributeCallbackBridge::OnDone;
 
@@ -1563,7 +1563,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRInt32uAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRInt32uAttributeCallbackBridge::OnDone;
 
@@ -1592,7 +1592,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableInt32uAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableInt32uAttributeCallbackBridge::OnDone;
 
@@ -1621,7 +1621,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRInt32sAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRInt32sAttributeCallbackBridge::OnDone;
 
@@ -1650,7 +1650,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableInt32sAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableInt32sAttributeCallbackBridge::OnDone;
 
@@ -1679,7 +1679,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRInt64uAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRInt64uAttributeCallbackBridge::OnDone;
 
@@ -1708,7 +1708,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableInt64uAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableInt64uAttributeCallbackBridge::OnDone;
 
@@ -1737,7 +1737,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRInt64sAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRInt64sAttributeCallbackBridge::OnDone;
 
@@ -1766,7 +1766,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableInt64sAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableInt64sAttributeCallbackBridge::OnDone;
 
@@ -1795,7 +1795,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRFloatAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRFloatAttributeCallbackBridge::OnDone;
 
@@ -1824,7 +1824,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableFloatAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableFloatAttributeCallbackBridge::OnDone;
 
@@ -1853,7 +1853,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoubleAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoubleAttributeCallbackBridge::OnDone;
 
@@ -1882,7 +1882,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoubleAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoubleAttributeCallbackBridge::OnDone;
 
@@ -1911,7 +1911,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRVendorIdAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRVendorIdAttributeCallbackBridge::OnDone;
 
@@ -1940,7 +1940,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableVendorIdAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableVendorIdAttributeCallbackBridge::OnDone;
 
@@ -1973,7 +1973,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRIdentifyGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRIdentifyGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -2006,7 +2006,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRIdentifyAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRIdentifyAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -2036,7 +2036,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRIdentifyAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRIdentifyAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -2069,7 +2069,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGroupsGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGroupsGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -2102,7 +2102,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGroupsAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGroupsAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -2132,7 +2132,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGroupsAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGroupsAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -2165,7 +2165,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRScenesGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRScenesGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -2198,7 +2198,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRScenesAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRScenesAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -2228,7 +2228,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRScenesAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRScenesAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -2261,7 +2261,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROnOffGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROnOffGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -2293,7 +2293,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROnOffAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROnOffAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -2323,7 +2323,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROnOffAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROnOffAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -2356,7 +2356,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -2389,7 +2389,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -2422,7 +2422,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROnOffSwitchConfigurationAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROnOffSwitchConfigurationAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -2455,7 +2455,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRLevelControlGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRLevelControlGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -2488,7 +2488,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRLevelControlAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRLevelControlAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -2521,7 +2521,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRLevelControlAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRLevelControlAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -2554,7 +2554,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -2587,7 +2587,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -2620,7 +2620,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBinaryInputBasicAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBinaryInputBasicAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -2655,7 +2655,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDescriptorDeviceTypeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDescriptorDeviceTypeListListAttributeCallbackBridge::OnDone;
 
@@ -2685,7 +2685,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDescriptorServerListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDescriptorServerListListAttributeCallbackBridge::OnDone;
 
@@ -2715,7 +2715,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDescriptorClientListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDescriptorClientListListAttributeCallbackBridge::OnDone;
 
@@ -2745,7 +2745,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDescriptorPartsListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDescriptorPartsListListAttributeCallbackBridge::OnDone;
 
@@ -2778,7 +2778,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDescriptorGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDescriptorGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -2811,7 +2811,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDescriptorAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDescriptorAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -2842,7 +2842,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDescriptorAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDescriptorAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -2873,7 +2873,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBindingBindingListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBindingBindingListAttributeCallbackBridge::OnDone;
 
@@ -2906,7 +2906,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBindingGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBindingGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -2939,7 +2939,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBindingAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBindingAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -2969,7 +2969,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBindingAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBindingAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -3002,7 +3002,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAccessControlAclListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAccessControlAclListAttributeCallbackBridge::OnDone;
 
@@ -3035,7 +3035,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAccessControlExtensionListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAccessControlExtensionListAttributeCallbackBridge::OnDone;
 
@@ -3068,7 +3068,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAccessControlGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAccessControlGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -3101,7 +3101,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAccessControlAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAccessControlAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -3134,7 +3134,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAccessControlAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAccessControlAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -3166,7 +3166,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRActionsActionListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRActionsActionListListAttributeCallbackBridge::OnDone;
 
@@ -3199,7 +3199,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRActionsEndpointListsListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRActionsEndpointListsListAttributeCallbackBridge::OnDone;
 
@@ -3232,7 +3232,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRActionsGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRActionsGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -3265,7 +3265,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRActionsAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRActionsAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -3295,7 +3295,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRActionsAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRActionsAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -3327,7 +3327,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBasicCapabilityMinimaStructAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBasicCapabilityMinimaStructAttributeCallbackBridge::OnDone;
 
@@ -3360,7 +3360,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBasicGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBasicGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -3392,7 +3392,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBasicAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBasicAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -3422,7 +3422,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBasicAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBasicAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -3456,7 +3456,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -3489,7 +3489,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -3522,7 +3522,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -3558,7 +3558,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge::OnDone;
 
@@ -3592,7 +3592,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -3626,7 +3626,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -3659,7 +3659,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -3692,7 +3692,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge::OnDone;
 
@@ -3726,7 +3726,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -3759,7 +3759,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -3792,7 +3792,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRLocalizationConfigurationAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRLocalizationConfigurationAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -3827,7 +3827,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge::OnDone;
 
@@ -3860,7 +3860,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -3893,7 +3893,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -3926,7 +3926,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRTimeFormatLocalizationAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRTimeFormatLocalizationAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -3959,7 +3959,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRUnitLocalizationGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRUnitLocalizationGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -3992,7 +3992,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRUnitLocalizationAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRUnitLocalizationAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -4025,7 +4025,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRUnitLocalizationAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRUnitLocalizationAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -4058,7 +4058,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPowerSourceConfigurationSourcesListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceConfigurationSourcesListAttributeCallbackBridge::OnDone;
 
@@ -4091,7 +4091,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -4124,7 +4124,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -4157,7 +4157,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPowerSourceConfigurationAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceConfigurationAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -4191,7 +4191,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPowerSourceActiveWiredFaultsListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceActiveWiredFaultsListAttributeCallbackBridge::OnDone;
 
@@ -4225,7 +4225,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPowerSourceActiveBatFaultsListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceActiveBatFaultsListAttributeCallbackBridge::OnDone;
 
@@ -4259,7 +4259,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackBridge::OnDone;
 
@@ -4292,7 +4292,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPowerSourceGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -4325,7 +4325,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPowerSourceAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -4357,7 +4357,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPowerSourceAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -4392,7 +4392,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge::OnDone;
 
@@ -4425,7 +4425,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -4458,7 +4458,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -4491,7 +4491,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGeneralCommissioningAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGeneralCommissioningAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -4527,7 +4527,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNetworkCommissioningNetworksListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNetworkCommissioningNetworksListAttributeCallbackBridge::OnDone;
 
@@ -4560,7 +4560,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -4593,7 +4593,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -4626,7 +4626,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNetworkCommissioningAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNetworkCommissioningAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -4659,7 +4659,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -4692,7 +4692,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -4725,7 +4725,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDiagnosticLogsAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDiagnosticLogsAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -4760,7 +4760,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnDone;
 
@@ -4793,7 +4793,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge::OnDone;
 
@@ -4826,7 +4826,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge::OnDone;
 
@@ -4859,7 +4859,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge::OnDone;
 
@@ -4892,7 +4892,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -4925,7 +4925,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -4958,7 +4958,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGeneralDiagnosticsAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGeneralDiagnosticsAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -4994,7 +4994,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnDone;
 
@@ -5027,7 +5027,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -5060,7 +5060,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -5093,7 +5093,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRSoftwareDiagnosticsAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRSoftwareDiagnosticsAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -5128,7 +5128,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::OnDone;
 
@@ -5163,7 +5163,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::OnDone;
 
@@ -5198,7 +5198,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge::OnDone;
 
@@ -5238,7 +5238,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge::OnDone;
 
@@ -5274,7 +5274,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge::OnDone;
 
@@ -5307,7 +5307,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -5340,7 +5340,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -5373,7 +5373,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -5406,7 +5406,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -5439,7 +5439,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -5472,7 +5472,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -5506,7 +5506,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -5540,7 +5540,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -5573,7 +5573,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -5606,7 +5606,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -5639,7 +5639,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -5672,7 +5672,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -5705,7 +5705,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRSwitchGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRSwitchGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -5738,7 +5738,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRSwitchAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRSwitchAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -5768,7 +5768,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRSwitchAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRSwitchAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -5802,7 +5802,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -5836,7 +5836,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -5869,7 +5869,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAdministratorCommissioningAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAdministratorCommissioningAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -5905,7 +5905,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROperationalCredentialsNOCsListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROperationalCredentialsNOCsListAttributeCallbackBridge::OnDone;
 
@@ -5940,7 +5940,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROperationalCredentialsFabricsListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROperationalCredentialsFabricsListAttributeCallbackBridge::OnDone;
 
@@ -5974,7 +5974,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge::OnDone;
 
@@ -6007,7 +6007,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROperationalCredentialsGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROperationalCredentialsGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -6040,7 +6040,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROperationalCredentialsAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROperationalCredentialsAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -6073,7 +6073,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROperationalCredentialsAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROperationalCredentialsAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -6108,7 +6108,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGroupKeyManagementGroupKeyMapListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGroupKeyManagementGroupKeyMapListAttributeCallbackBridge::OnDone;
 
@@ -6143,7 +6143,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGroupKeyManagementGroupTableListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGroupKeyManagementGroupTableListAttributeCallbackBridge::OnDone;
 
@@ -6176,7 +6176,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -6209,7 +6209,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -6242,7 +6242,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGroupKeyManagementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGroupKeyManagementAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -6274,7 +6274,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRFixedLabelLabelListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRFixedLabelLabelListListAttributeCallbackBridge::OnDone;
 
@@ -6307,7 +6307,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRFixedLabelGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRFixedLabelGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -6340,7 +6340,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRFixedLabelAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRFixedLabelAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -6371,7 +6371,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRFixedLabelAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRFixedLabelAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -6403,7 +6403,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRUserLabelLabelListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRUserLabelLabelListListAttributeCallbackBridge::OnDone;
 
@@ -6436,7 +6436,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRUserLabelGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRUserLabelGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -6469,7 +6469,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRUserLabelAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRUserLabelAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -6499,7 +6499,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRUserLabelAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRUserLabelAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -6532,7 +6532,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBooleanStateGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBooleanStateGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -6565,7 +6565,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBooleanStateAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBooleanStateAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -6598,7 +6598,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBooleanStateAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBooleanStateAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -6633,7 +6633,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRModeSelectSupportedModesListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRModeSelectSupportedModesListAttributeCallbackBridge::OnDone;
 
@@ -6666,7 +6666,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRModeSelectGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRModeSelectGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -6699,7 +6699,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRModeSelectAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRModeSelectAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -6730,7 +6730,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRModeSelectAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRModeSelectAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -6763,7 +6763,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockCredentialRulesSupportAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockCredentialRulesSupportAttributeCallbackBridge::OnDone;
 
@@ -6796,7 +6796,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockSupportedOperatingModesAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockSupportedOperatingModesAttributeCallbackBridge::OnDone;
 
@@ -6829,7 +6829,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockDefaultConfigurationRegisterAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockDefaultConfigurationRegisterAttributeCallbackBridge::OnDone;
 
@@ -6862,7 +6862,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockLocalProgrammingFeaturesAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockLocalProgrammingFeaturesAttributeCallbackBridge::OnDone;
 
@@ -6895,7 +6895,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -6928,7 +6928,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -6958,7 +6958,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -6988,7 +6988,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWindowCoveringConfigStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWindowCoveringConfigStatusAttributeCallbackBridge::OnDone;
 
@@ -7021,7 +7021,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWindowCoveringOperationalStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWindowCoveringOperationalStatusAttributeCallbackBridge::OnDone;
 
@@ -7050,7 +7050,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWindowCoveringModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWindowCoveringModeAttributeCallbackBridge::OnDone;
 
@@ -7080,7 +7080,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWindowCoveringSafetyStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWindowCoveringSafetyStatusAttributeCallbackBridge::OnDone;
 
@@ -7113,7 +7113,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWindowCoveringGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWindowCoveringGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -7146,7 +7146,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWindowCoveringAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWindowCoveringAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -7179,7 +7179,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWindowCoveringAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWindowCoveringAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -7212,7 +7212,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBarrierControlGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBarrierControlGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -7245,7 +7245,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBarrierControlAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBarrierControlAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -7278,7 +7278,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBarrierControlAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBarrierControlAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -7311,7 +7311,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPumpConfigurationAndControlPumpStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPumpConfigurationAndControlPumpStatusAttributeCallbackBridge::OnDone;
 
@@ -7345,7 +7345,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -7379,7 +7379,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -7412,7 +7412,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPumpConfigurationAndControlAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPumpConfigurationAndControlAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -7445,7 +7445,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThermostatGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThermostatGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -7478,7 +7478,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThermostatAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThermostatAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -7509,7 +7509,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThermostatAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThermostatAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -7542,7 +7542,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRFanControlGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRFanControlGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -7575,7 +7575,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRFanControlAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRFanControlAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -7606,7 +7606,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRFanControlAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRFanControlAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -7643,7 +7643,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -7680,7 +7680,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -7715,7 +7715,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -7748,7 +7748,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRColorControlGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRColorControlGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -7781,7 +7781,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRColorControlAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRColorControlAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -7814,7 +7814,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRColorControlAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRColorControlAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -7847,7 +7847,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -7880,7 +7880,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -7913,7 +7913,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRBallastConfigurationAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRBallastConfigurationAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -7946,7 +7946,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -7979,7 +7979,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -8012,7 +8012,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRIlluminanceMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRIlluminanceMeasurementAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -8045,7 +8045,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -8078,7 +8078,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -8111,7 +8111,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRTemperatureMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRTemperatureMeasurementAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -8144,7 +8144,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPressureMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPressureMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -8177,7 +8177,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPressureMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPressureMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -8210,7 +8210,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPressureMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPressureMeasurementAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -8243,7 +8243,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRFlowMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRFlowMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -8276,7 +8276,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRFlowMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRFlowMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -8309,7 +8309,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRFlowMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRFlowMeasurementAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -8343,7 +8343,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -8377,7 +8377,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -8410,7 +8410,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -8443,7 +8443,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROccupancySensingGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROccupancySensingGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -8476,7 +8476,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROccupancySensingAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROccupancySensingAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -8509,7 +8509,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROccupancySensingAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROccupancySensingAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -8542,7 +8542,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWakeOnLanGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWakeOnLanGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -8575,7 +8575,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWakeOnLanAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWakeOnLanAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -8605,7 +8605,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWakeOnLanAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWakeOnLanAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -8637,7 +8637,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRChannelChannelListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRChannelChannelListListAttributeCallbackBridge::OnDone;
 
@@ -8669,7 +8669,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRChannelLineupStructAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRChannelLineupStructAttributeCallbackBridge::OnDone;
 
@@ -8702,7 +8702,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRChannelCurrentChannelStructAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRChannelCurrentChannelStructAttributeCallbackBridge::OnDone;
 
@@ -8735,7 +8735,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRChannelGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRChannelGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -8768,7 +8768,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRChannelAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRChannelAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -8798,7 +8798,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRChannelAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRChannelAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -8834,7 +8834,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRTargetNavigatorTargetListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRTargetNavigatorTargetListListAttributeCallbackBridge::OnDone;
 
@@ -8867,7 +8867,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRTargetNavigatorGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRTargetNavigatorGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -8900,7 +8900,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRTargetNavigatorAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRTargetNavigatorAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -8933,7 +8933,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRTargetNavigatorAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRTargetNavigatorAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -8968,7 +8968,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRMediaPlaybackSampledPositionStructAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRMediaPlaybackSampledPositionStructAttributeCallbackBridge::OnDone;
 
@@ -9001,7 +9001,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRMediaPlaybackGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRMediaPlaybackGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -9034,7 +9034,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRMediaPlaybackAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRMediaPlaybackAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -9067,7 +9067,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRMediaPlaybackAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRMediaPlaybackAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -9099,7 +9099,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRMediaInputInputListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRMediaInputInputListListAttributeCallbackBridge::OnDone;
 
@@ -9132,7 +9132,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRMediaInputGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRMediaInputGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -9165,7 +9165,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRMediaInputAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRMediaInputAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -9196,7 +9196,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRMediaInputAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRMediaInputAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -9229,7 +9229,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRLowPowerGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRLowPowerGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -9262,7 +9262,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRLowPowerAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRLowPowerAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -9292,7 +9292,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRLowPowerAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRLowPowerAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -9325,7 +9325,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRKeypadInputGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRKeypadInputGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -9358,7 +9358,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRKeypadInputAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRKeypadInputAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -9390,7 +9390,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRKeypadInputAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRKeypadInputAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -9423,7 +9423,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRContentLauncherAcceptHeaderListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRContentLauncherAcceptHeaderListAttributeCallbackBridge::OnDone;
 
@@ -9456,7 +9456,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRContentLauncherGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRContentLauncherGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -9489,7 +9489,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRContentLauncherAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRContentLauncherAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -9522,7 +9522,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRContentLauncherAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRContentLauncherAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -9554,7 +9554,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAudioOutputOutputListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAudioOutputOutputListListAttributeCallbackBridge::OnDone;
 
@@ -9587,7 +9587,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAudioOutputGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAudioOutputGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -9620,7 +9620,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAudioOutputAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAudioOutputAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -9652,7 +9652,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAudioOutputAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAudioOutputAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -9685,7 +9685,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRApplicationLauncherCatalogListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRApplicationLauncherCatalogListListAttributeCallbackBridge::OnDone;
 
@@ -9721,7 +9721,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge::OnDone;
 
@@ -9754,7 +9754,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRApplicationLauncherGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRApplicationLauncherGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -9787,7 +9787,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRApplicationLauncherAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRApplicationLauncherAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -9820,7 +9820,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRApplicationLauncherAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRApplicationLauncherAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -9855,7 +9855,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRApplicationBasicApplicationStructAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRApplicationBasicApplicationStructAttributeCallbackBridge::OnDone;
 
@@ -9888,7 +9888,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRApplicationBasicAllowedVendorListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRApplicationBasicAllowedVendorListListAttributeCallbackBridge::OnDone;
 
@@ -9921,7 +9921,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRApplicationBasicGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRApplicationBasicGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -9954,7 +9954,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRApplicationBasicAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRApplicationBasicAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -9987,7 +9987,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRApplicationBasicAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRApplicationBasicAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -10020,7 +10020,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAccountLoginGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAccountLoginGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -10053,7 +10053,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAccountLoginAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAccountLoginAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -10086,7 +10086,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAccountLoginAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAccountLoginAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -10119,7 +10119,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -10152,7 +10152,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
@@ -10185,7 +10185,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRElectricalMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRElectricalMeasurementAttributeListListAttributeCallbackBridge::OnDone;
 
@@ -10193,618 +10193,618 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterBitmap8AttributeCallbackBridge : public MTRCallbackBridge<TestClusterBitmap8AttributeCallback>
+class MTRUnitTestingBitmap8AttributeCallbackBridge : public MTRCallbackBridge<UnitTestingBitmap8AttributeCallback>
 {
 public:
-    MTRTestClusterBitmap8AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterBitmap8AttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingBitmap8AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingBitmap8AttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterBitmap8AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterBitmap8AttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRUnitTestingBitmap8AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<UnitTestingBitmap8AttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> value);
 };
 
-class MTRTestClusterBitmap8AttributeCallbackSubscriptionBridge : public MTRTestClusterBitmap8AttributeCallbackBridge
+class MTRUnitTestingBitmap8AttributeCallbackSubscriptionBridge : public MTRUnitTestingBitmap8AttributeCallbackBridge
 {
 public:
-    MTRTestClusterBitmap8AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+    MTRUnitTestingBitmap8AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterBitmap8AttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingBitmap8AttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterBitmap8AttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterBitmap8AttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingBitmap8AttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingBitmap8AttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterBitmap16AttributeCallbackBridge : public MTRCallbackBridge<TestClusterBitmap16AttributeCallback>
+class MTRUnitTestingBitmap16AttributeCallbackBridge : public MTRCallbackBridge<UnitTestingBitmap16AttributeCallback>
 {
 public:
-    MTRTestClusterBitmap16AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterBitmap16AttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingBitmap16AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingBitmap16AttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterBitmap16AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterBitmap16AttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRUnitTestingBitmap16AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<UnitTestingBitmap16AttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> value);
 };
 
-class MTRTestClusterBitmap16AttributeCallbackSubscriptionBridge : public MTRTestClusterBitmap16AttributeCallbackBridge
+class MTRUnitTestingBitmap16AttributeCallbackSubscriptionBridge : public MTRUnitTestingBitmap16AttributeCallbackBridge
 {
 public:
-    MTRTestClusterBitmap16AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingBitmap16AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                               MTRActionBlock action,
                                                               MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterBitmap16AttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingBitmap16AttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterBitmap16AttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterBitmap16AttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingBitmap16AttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingBitmap16AttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterBitmap32AttributeCallbackBridge : public MTRCallbackBridge<TestClusterBitmap32AttributeCallback>
+class MTRUnitTestingBitmap32AttributeCallbackBridge : public MTRCallbackBridge<UnitTestingBitmap32AttributeCallback>
 {
 public:
-    MTRTestClusterBitmap32AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterBitmap32AttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingBitmap32AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingBitmap32AttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterBitmap32AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterBitmap32AttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRUnitTestingBitmap32AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<UnitTestingBitmap32AttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> value);
 };
 
-class MTRTestClusterBitmap32AttributeCallbackSubscriptionBridge : public MTRTestClusterBitmap32AttributeCallbackBridge
+class MTRUnitTestingBitmap32AttributeCallbackSubscriptionBridge : public MTRUnitTestingBitmap32AttributeCallbackBridge
 {
 public:
-    MTRTestClusterBitmap32AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingBitmap32AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                               MTRActionBlock action,
                                                               MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterBitmap32AttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingBitmap32AttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterBitmap32AttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterBitmap32AttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingBitmap32AttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingBitmap32AttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterBitmap64AttributeCallbackBridge : public MTRCallbackBridge<TestClusterBitmap64AttributeCallback>
+class MTRUnitTestingBitmap64AttributeCallbackBridge : public MTRCallbackBridge<UnitTestingBitmap64AttributeCallback>
 {
 public:
-    MTRTestClusterBitmap64AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterBitmap64AttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingBitmap64AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingBitmap64AttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterBitmap64AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterBitmap64AttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRUnitTestingBitmap64AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<UnitTestingBitmap64AttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> value);
 };
 
-class MTRTestClusterBitmap64AttributeCallbackSubscriptionBridge : public MTRTestClusterBitmap64AttributeCallbackBridge
+class MTRUnitTestingBitmap64AttributeCallbackSubscriptionBridge : public MTRUnitTestingBitmap64AttributeCallbackBridge
 {
 public:
-    MTRTestClusterBitmap64AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingBitmap64AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                               MTRActionBlock action,
                                                               MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterBitmap64AttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingBitmap64AttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterBitmap64AttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterBitmap64AttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingBitmap64AttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingBitmap64AttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterListInt8uListAttributeCallbackBridge : public MTRCallbackBridge<TestClusterListInt8uListAttributeCallback>
+class MTRUnitTestingListInt8uListAttributeCallbackBridge : public MTRCallbackBridge<UnitTestingListInt8uListAttributeCallback>
 {
 public:
-    MTRTestClusterListInt8uListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterListInt8uListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingListInt8uListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingListInt8uListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterListInt8uListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterListInt8uListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRUnitTestingListInt8uListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<UnitTestingListInt8uListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
 };
 
-class MTRTestClusterListInt8uListAttributeCallbackSubscriptionBridge : public MTRTestClusterListInt8uListAttributeCallbackBridge
+class MTRUnitTestingListInt8uListAttributeCallbackSubscriptionBridge : public MTRUnitTestingListInt8uListAttributeCallbackBridge
 {
 public:
-    MTRTestClusterListInt8uListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingListInt8uListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                    MTRActionBlock action,
                                                                    MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterListInt8uListAttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingListInt8uListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterListInt8uListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterListInt8uListAttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingListInt8uListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingListInt8uListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterListOctetStringListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterListOctetStringListAttributeCallback>
+class MTRUnitTestingListOctetStringListAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingListOctetStringListAttributeCallback>
 {
 public:
-    MTRTestClusterListOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterListOctetStringListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingListOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingListOctetStringListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterListOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingListOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                              MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterListOctetStringListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<UnitTestingListOctetStringListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value);
 };
 
-class MTRTestClusterListOctetStringListAttributeCallbackSubscriptionBridge
-    : public MTRTestClusterListOctetStringListAttributeCallbackBridge
+class MTRUnitTestingListOctetStringListAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingListOctetStringListAttributeCallbackBridge
 {
 public:
-    MTRTestClusterListOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingListOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                          MTRActionBlock action,
                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterListOctetStringListAttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingListOctetStringListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterListOctetStringListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterListOctetStringListAttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingListOctetStringListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingListOctetStringListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterListStructOctetStringListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterListStructOctetStringListAttributeCallback>
+class MTRUnitTestingListStructOctetStringListAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingListStructOctetStringListAttributeCallback>
 {
 public:
-    MTRTestClusterListStructOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterListStructOctetStringListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingListStructOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingListStructOctetStringListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterListStructOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingListStructOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                    MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterListStructOctetStringListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<UnitTestingListStructOctetStringListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestListStructOctet::DecodableType> &
             value);
 };
 
-class MTRTestClusterListStructOctetStringListAttributeCallbackSubscriptionBridge
-    : public MTRTestClusterListStructOctetStringListAttributeCallbackBridge
+class MTRUnitTestingListStructOctetStringListAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingListStructOctetStringListAttributeCallbackBridge
 {
 public:
-    MTRTestClusterListStructOctetStringListAttributeCallbackSubscriptionBridge(
+    MTRUnitTestingListStructOctetStringListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterListStructOctetStringListAttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingListStructOctetStringListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterListStructOctetStringListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterListStructOctetStringListAttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingListStructOctetStringListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingListStructOctetStringListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterListNullablesAndOptionalsStructListAttributeCallback>
+class MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingListNullablesAndOptionalsStructListAttributeCallback>
 {
 public:
-    MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterListNullablesAndOptionalsStructListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingListNullablesAndOptionalsStructListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                              MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterListNullablesAndOptionalsStructListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<UnitTestingListNullablesAndOptionalsStructListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & value);
+                                chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType> & value);
 };
 
-class MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge
-    : public MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge
+class MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge
 {
 public:
-    MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge(
+    MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterStructAttrStructAttributeCallbackBridge : public MTRCallbackBridge<TestClusterStructAttrStructAttributeCallback>
+class MTRUnitTestingStructAttrStructAttributeCallbackBridge : public MTRCallbackBridge<UnitTestingStructAttrStructAttributeCallback>
 {
 public:
-    MTRTestClusterStructAttrStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterStructAttrStructAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingStructAttrStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingStructAttrStructAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterStructAttrStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterStructAttrStructAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRUnitTestingStructAttrStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<UnitTestingStructAttrStructAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType & value);
+    static void OnSuccessFn(void * context, const chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType & value);
 };
 
-class MTRTestClusterStructAttrStructAttributeCallbackSubscriptionBridge
-    : public MTRTestClusterStructAttrStructAttributeCallbackBridge
+class MTRUnitTestingStructAttrStructAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingStructAttrStructAttributeCallbackBridge
 {
 public:
-    MTRTestClusterStructAttrStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingStructAttrStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                       MTRActionBlock action,
                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterStructAttrStructAttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingStructAttrStructAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterStructAttrStructAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterStructAttrStructAttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingStructAttrStructAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingStructAttrStructAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterListLongOctetStringListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterListLongOctetStringListAttributeCallback>
+class MTRUnitTestingListLongOctetStringListAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingListLongOctetStringListAttributeCallback>
 {
 public:
-    MTRTestClusterListLongOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterListLongOctetStringListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingListLongOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingListLongOctetStringListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterListLongOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingListLongOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterListLongOctetStringListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<UnitTestingListLongOctetStringListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value);
 };
 
-class MTRTestClusterListLongOctetStringListAttributeCallbackSubscriptionBridge
-    : public MTRTestClusterListLongOctetStringListAttributeCallbackBridge
+class MTRUnitTestingListLongOctetStringListAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingListLongOctetStringListAttributeCallbackBridge
 {
 public:
-    MTRTestClusterListLongOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingListLongOctetStringListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                              MTRActionBlock action,
                                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterListLongOctetStringListAttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingListLongOctetStringListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterListLongOctetStringListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterListLongOctetStringListAttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingListLongOctetStringListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingListLongOctetStringListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterListFabricScopedListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterListFabricScopedListAttributeCallback>
+class MTRUnitTestingListFabricScopedListAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingListFabricScopedListAttributeCallback>
 {
 public:
-    MTRTestClusterListFabricScopedListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterListFabricScopedListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingListFabricScopedListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingListFabricScopedListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterListFabricScopedListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingListFabricScopedListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                               MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterListFabricScopedListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<UnitTestingListFabricScopedListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType> &
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestFabricScoped::DecodableType> &
             value);
 };
 
-class MTRTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge
-    : public MTRTestClusterListFabricScopedListAttributeCallbackBridge
+class MTRUnitTestingListFabricScopedListAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingListFabricScopedListAttributeCallbackBridge
 {
 public:
-    MTRTestClusterListFabricScopedListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingListFabricScopedListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                           MTRActionBlock action,
                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterListFabricScopedListAttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingListFabricScopedListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterListFabricScopedListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterListFabricScopedListAttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingListFabricScopedListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingListFabricScopedListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterNullableBitmap8AttributeCallbackBridge : public MTRCallbackBridge<TestClusterNullableBitmap8AttributeCallback>
+class MTRUnitTestingNullableBitmap8AttributeCallbackBridge : public MTRCallbackBridge<UnitTestingNullableBitmap8AttributeCallback>
 {
 public:
-    MTRTestClusterNullableBitmap8AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterNullableBitmap8AttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingNullableBitmap8AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingNullableBitmap8AttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterNullableBitmap8AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterNullableBitmap8AttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRUnitTestingNullableBitmap8AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<UnitTestingNullableBitmap8AttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value);
+                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> & value);
 };
 
-class MTRTestClusterNullableBitmap8AttributeCallbackSubscriptionBridge : public MTRTestClusterNullableBitmap8AttributeCallbackBridge
+class MTRUnitTestingNullableBitmap8AttributeCallbackSubscriptionBridge : public MTRUnitTestingNullableBitmap8AttributeCallbackBridge
 {
 public:
-    MTRTestClusterNullableBitmap8AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingNullableBitmap8AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                      MTRActionBlock action,
                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterNullableBitmap8AttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingNullableBitmap8AttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterNullableBitmap8AttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterNullableBitmap8AttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingNullableBitmap8AttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingNullableBitmap8AttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterNullableBitmap16AttributeCallbackBridge : public MTRCallbackBridge<TestClusterNullableBitmap16AttributeCallback>
+class MTRUnitTestingNullableBitmap16AttributeCallbackBridge : public MTRCallbackBridge<UnitTestingNullableBitmap16AttributeCallback>
 {
 public:
-    MTRTestClusterNullableBitmap16AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterNullableBitmap16AttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingNullableBitmap16AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingNullableBitmap16AttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterNullableBitmap16AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterNullableBitmap16AttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRUnitTestingNullableBitmap16AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<UnitTestingNullableBitmap16AttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value);
+                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> & value);
 };
 
-class MTRTestClusterNullableBitmap16AttributeCallbackSubscriptionBridge
-    : public MTRTestClusterNullableBitmap16AttributeCallbackBridge
+class MTRUnitTestingNullableBitmap16AttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingNullableBitmap16AttributeCallbackBridge
 {
 public:
-    MTRTestClusterNullableBitmap16AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingNullableBitmap16AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                       MTRActionBlock action,
                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterNullableBitmap16AttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingNullableBitmap16AttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterNullableBitmap16AttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterNullableBitmap16AttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingNullableBitmap16AttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingNullableBitmap16AttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterNullableBitmap32AttributeCallbackBridge : public MTRCallbackBridge<TestClusterNullableBitmap32AttributeCallback>
+class MTRUnitTestingNullableBitmap32AttributeCallbackBridge : public MTRCallbackBridge<UnitTestingNullableBitmap32AttributeCallback>
 {
 public:
-    MTRTestClusterNullableBitmap32AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterNullableBitmap32AttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingNullableBitmap32AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingNullableBitmap32AttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterNullableBitmap32AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterNullableBitmap32AttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRUnitTestingNullableBitmap32AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<UnitTestingNullableBitmap32AttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value);
+                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> & value);
 };
 
-class MTRTestClusterNullableBitmap32AttributeCallbackSubscriptionBridge
-    : public MTRTestClusterNullableBitmap32AttributeCallbackBridge
+class MTRUnitTestingNullableBitmap32AttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingNullableBitmap32AttributeCallbackBridge
 {
 public:
-    MTRTestClusterNullableBitmap32AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingNullableBitmap32AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                       MTRActionBlock action,
                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterNullableBitmap32AttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingNullableBitmap32AttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterNullableBitmap32AttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterNullableBitmap32AttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingNullableBitmap32AttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingNullableBitmap32AttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterNullableBitmap64AttributeCallbackBridge : public MTRCallbackBridge<TestClusterNullableBitmap64AttributeCallback>
+class MTRUnitTestingNullableBitmap64AttributeCallbackBridge : public MTRCallbackBridge<UnitTestingNullableBitmap64AttributeCallback>
 {
 public:
-    MTRTestClusterNullableBitmap64AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterNullableBitmap64AttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingNullableBitmap64AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingNullableBitmap64AttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterNullableBitmap64AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterNullableBitmap64AttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRUnitTestingNullableBitmap64AttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<UnitTestingNullableBitmap64AttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value);
+                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> & value);
 };
 
-class MTRTestClusterNullableBitmap64AttributeCallbackSubscriptionBridge
-    : public MTRTestClusterNullableBitmap64AttributeCallbackBridge
+class MTRUnitTestingNullableBitmap64AttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingNullableBitmap64AttributeCallbackBridge
 {
 public:
-    MTRTestClusterNullableBitmap64AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingNullableBitmap64AttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                       MTRActionBlock action,
                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterNullableBitmap64AttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingNullableBitmap64AttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterNullableBitmap64AttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterNullableBitmap64AttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingNullableBitmap64AttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingNullableBitmap64AttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterNullableStructStructAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterNullableStructStructAttributeCallback>
+class MTRUnitTestingNullableStructStructAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingNullableStructStructAttributeCallback>
 {
 public:
-    MTRTestClusterNullableStructStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterNullableStructStructAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingNullableStructStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingNullableStructStructAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterNullableStructStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingNullableStructStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                               MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterNullableStructStructAttributeCallback>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<UnitTestingNullableStructStructAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> & value);
+        const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType> & value);
 };
 
-class MTRTestClusterNullableStructStructAttributeCallbackSubscriptionBridge
-    : public MTRTestClusterNullableStructStructAttributeCallbackBridge
+class MTRUnitTestingNullableStructStructAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingNullableStructStructAttributeCallbackBridge
 {
 public:
-    MTRTestClusterNullableStructStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingNullableStructStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                           MTRActionBlock action,
                                                                           MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterNullableStructStructAttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingNullableStructStructAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterNullableStructStructAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterNullableStructStructAttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingNullableStructStructAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingNullableStructStructAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterGeneratedCommandListListAttributeCallback>
+class MTRUnitTestingGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingGeneratedCommandListListAttributeCallback>
 {
 public:
-    MTRTestClusterGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                   MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<UnitTestingGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class MTRTestClusterGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRTestClusterGeneratedCommandListListAttributeCallbackBridge
+class MTRUnitTestingGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRTestClusterGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+    MTRUnitTestingGeneratedCommandListListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterGeneratedCommandListListAttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterAcceptedCommandListListAttributeCallback>
+class MTRUnitTestingAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingAcceptedCommandListListAttributeCallback>
 {
 public:
-    MTRTestClusterAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<UnitTestingAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class MTRTestClusterAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRTestClusterAcceptedCommandListListAttributeCallbackBridge
+class MTRUnitTestingAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRTestClusterAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                              MTRActionBlock action,
                                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterAcceptedCommandListListAttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterAttributeListListAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterAttributeListListAttributeCallback>
+class MTRUnitTestingAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingAttributeListListAttributeCallback>
 {
 public:
-    MTRTestClusterAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRUnitTestingAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<UnitTestingAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-class MTRTestClusterAttributeListListAttributeCallbackSubscriptionBridge
-    : public MTRTestClusterAttributeListListAttributeCallbackBridge
+class MTRUnitTestingAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingAttributeListListAttributeCallbackBridge
 {
 public:
-    MTRTestClusterAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                        MTRActionBlock action,
                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterAttributeListListAttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingAttributeListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterAttributeListListAttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -11414,185 +11414,185 @@ public:
                             const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data);
 };
 
-class MTRTestClusterClusterTestSpecificResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterClusterTestSpecificResponseCallbackType>
+class MTRUnitTestingClusterTestSpecificResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestSpecificResponseCallbackType>
 {
 public:
-    MTRTestClusterClusterTestSpecificResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterClusterTestSpecificResponseCallbackType>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingClusterTestSpecificResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingClusterTestSpecificResponseCallbackType>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterClusterTestSpecificResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingClusterTestSpecificResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                             MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterClusterTestSpecificResponseCallbackType>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<UnitTestingClusterTestSpecificResponseCallbackType>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType & data);
+                            const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType & data);
 };
 
-class MTRTestClusterClusterTestAddArgumentsResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterClusterTestAddArgumentsResponseCallbackType>
+class MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestAddArgumentsResponseCallbackType>
 {
 public:
-    MTRTestClusterClusterTestAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterClusterTestAddArgumentsResponseCallbackType>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingClusterTestAddArgumentsResponseCallbackType>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterClusterTestAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterClusterTestAddArgumentsResponseCallbackType>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<UnitTestingClusterTestAddArgumentsResponseCallbackType>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType & data);
+                            const chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType & data);
 };
 
-class MTRTestClusterClusterTestSimpleArgumentResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterClusterTestSimpleArgumentResponseCallbackType>
+class MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestSimpleArgumentResponseCallbackType>
 {
 public:
-    MTRTestClusterClusterTestSimpleArgumentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterClusterTestSimpleArgumentResponseCallbackType>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingClusterTestSimpleArgumentResponseCallbackType>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterClusterTestSimpleArgumentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                   MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterClusterTestSimpleArgumentResponseCallbackType>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<UnitTestingClusterTestSimpleArgumentResponseCallbackType>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::TestCluster::Commands::TestSimpleArgumentResponse::DecodableType & data);
+                            const chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType & data);
 };
 
-class MTRTestClusterClusterTestStructArrayArgumentResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterClusterTestStructArrayArgumentResponseCallbackType>
+class MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestStructArrayArgumentResponseCallbackType>
 {
 public:
-    MTRTestClusterClusterTestStructArrayArgumentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterClusterTestStructArrayArgumentResponseCallbackType>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingClusterTestStructArrayArgumentResponseCallbackType>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterClusterTestStructArrayArgumentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                        MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterClusterTestStructArrayArgumentResponseCallbackType>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<UnitTestingClusterTestStructArrayArgumentResponseCallbackType>(queue, handler, action, OnSuccessFn){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType & data);
+                const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType & data);
 };
 
-class MTRTestClusterClusterTestListInt8UReverseResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterClusterTestListInt8UReverseResponseCallbackType>
+class MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestListInt8UReverseResponseCallbackType>
 {
 public:
-    MTRTestClusterClusterTestListInt8UReverseResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterClusterTestListInt8UReverseResponseCallbackType>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingClusterTestListInt8UReverseResponseCallbackType>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterClusterTestListInt8UReverseResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                     MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterClusterTestListInt8UReverseResponseCallbackType>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<UnitTestingClusterTestListInt8UReverseResponseCallbackType>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType & data);
+                            const chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType & data);
 };
 
-class MTRTestClusterClusterTestEnumsResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterClusterTestEnumsResponseCallbackType>
+class MTRUnitTestingClusterTestEnumsResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestEnumsResponseCallbackType>
 {
 public:
-    MTRTestClusterClusterTestEnumsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterClusterTestEnumsResponseCallbackType>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingClusterTestEnumsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingClusterTestEnumsResponseCallbackType>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterClusterTestEnumsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterClusterTestEnumsResponseCallbackType>(queue, handler, action, OnSuccessFn){};
+    MTRUnitTestingClusterTestEnumsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<UnitTestingClusterTestEnumsResponseCallbackType>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType & data);
+                            const chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType & data);
 };
 
-class MTRTestClusterClusterTestNullableOptionalResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterClusterTestNullableOptionalResponseCallbackType>
+class MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestNullableOptionalResponseCallbackType>
 {
 public:
-    MTRTestClusterClusterTestNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterClusterTestNullableOptionalResponseCallbackType>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingClusterTestNullableOptionalResponseCallbackType>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterClusterTestNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                     MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterClusterTestNullableOptionalResponseCallbackType>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<UnitTestingClusterTestNullableOptionalResponseCallbackType>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType & data);
+                            const chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType & data);
 };
 
-class MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterClusterTestComplexNullableOptionalResponseCallbackType>
+class MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestComplexNullableOptionalResponseCallbackType>
 {
 public:
-    MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterClusterTestComplexNullableOptionalResponseCallbackType>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingClusterTestComplexNullableOptionalResponseCallbackType>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                            MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterClusterTestComplexNullableOptionalResponseCallbackType>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<UnitTestingClusterTestComplexNullableOptionalResponseCallbackType>(queue, handler, action, OnSuccessFn){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::Clusters::TestCluster::Commands::TestComplexNullableOptionalResponse::DecodableType & data);
+                const chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType & data);
 };
 
-class MTRTestClusterClusterBooleanResponseCallbackBridge : public MTRCallbackBridge<TestClusterClusterBooleanResponseCallbackType>
+class MTRUnitTestingClusterBooleanResponseCallbackBridge : public MTRCallbackBridge<UnitTestingClusterBooleanResponseCallbackType>
 {
 public:
-    MTRTestClusterClusterBooleanResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterClusterBooleanResponseCallbackType>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingClusterBooleanResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingClusterBooleanResponseCallbackType>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterClusterBooleanResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterClusterBooleanResponseCallbackType>(queue, handler, action, OnSuccessFn){};
+    MTRUnitTestingClusterBooleanResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<UnitTestingClusterBooleanResponseCallbackType>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType & data);
+                            const chip::app::Clusters::UnitTesting::Commands::BooleanResponse::DecodableType & data);
 };
 
-class MTRTestClusterClusterSimpleStructResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterClusterSimpleStructResponseCallbackType>
+class MTRUnitTestingClusterSimpleStructResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterSimpleStructResponseCallbackType>
 {
 public:
-    MTRTestClusterClusterSimpleStructResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterClusterSimpleStructResponseCallbackType>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingClusterSimpleStructResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingClusterSimpleStructResponseCallbackType>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterClusterSimpleStructResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingClusterSimpleStructResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                             MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterClusterSimpleStructResponseCallbackType>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<UnitTestingClusterSimpleStructResponseCallbackType>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType & data);
+                            const chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType & data);
 };
 
-class MTRTestClusterClusterTestEmitTestEventResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterClusterTestEmitTestEventResponseCallbackType>
+class MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestEmitTestEventResponseCallbackType>
 {
 public:
-    MTRTestClusterClusterTestEmitTestEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterClusterTestEmitTestEventResponseCallbackType>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingClusterTestEmitTestEventResponseCallbackType>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterClusterTestEmitTestEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterClusterTestEmitTestEventResponseCallbackType>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<UnitTestingClusterTestEmitTestEventResponseCallbackType>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType & data);
+                            const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType & data);
 };
 
-class MTRTestClusterClusterTestEmitTestFabricScopedEventResponseCallbackBridge
-    : public MTRCallbackBridge<TestClusterClusterTestEmitTestFabricScopedEventResponseCallbackType>
+class MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackType>
 {
 public:
-    MTRTestClusterClusterTestEmitTestFabricScopedEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterClusterTestEmitTestFabricScopedEventResponseCallbackType>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackType>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterClusterTestEmitTestFabricScopedEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                              MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterClusterTestEmitTestFabricScopedEventResponseCallbackType>(queue, handler, action,
+        MTRCallbackBridge<UnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackType>(queue, handler, action,
                                                                                                OnSuccessFn){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & data);
+                const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & data);
 };
 
 class MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge
@@ -11620,7 +11620,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::OnDone;
 
@@ -11654,7 +11654,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::OnDone;
 
@@ -11687,7 +11687,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::OnDone;
 
@@ -11721,7 +11721,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::OnDone;
 
@@ -11754,7 +11754,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::OnDone;
 
@@ -11788,7 +11788,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::OnDone;
 
@@ -11821,7 +11821,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::OnDone;
 
@@ -11857,7 +11857,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::OnDone;
 
@@ -11890,7 +11890,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::OnDone;
 
@@ -11924,7 +11924,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::OnDone;
 
@@ -11957,7 +11957,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnDone;
 
@@ -11991,7 +11991,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnDone;
 
@@ -12024,7 +12024,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::OnDone;
 
@@ -12058,7 +12058,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::OnDone;
 
@@ -12089,7 +12089,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRLevelControlClusterMoveModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRLevelControlClusterMoveModeAttributeCallbackBridge::OnDone;
 
@@ -12123,7 +12123,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableLevelControlClusterMoveModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableLevelControlClusterMoveModeAttributeCallbackBridge::OnDone;
 
@@ -12154,7 +12154,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRLevelControlClusterStepModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRLevelControlClusterStepModeAttributeCallbackBridge::OnDone;
 
@@ -12188,7 +12188,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableLevelControlClusterStepModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableLevelControlClusterStepModeAttributeCallbackBridge::OnDone;
 
@@ -12220,7 +12220,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAccessControlClusterAuthModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAccessControlClusterAuthModeAttributeCallbackBridge::OnDone;
 
@@ -12254,7 +12254,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge::OnDone;
 
@@ -12287,7 +12287,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAccessControlClusterChangeTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnDone;
 
@@ -12321,7 +12321,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnDone;
 
@@ -12354,7 +12354,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAccessControlClusterPrivilegeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAccessControlClusterPrivilegeAttributeCallbackBridge::OnDone;
 
@@ -12388,7 +12388,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge::OnDone;
 
@@ -12421,7 +12421,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRActionsClusterActionErrorEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRActionsClusterActionErrorEnumAttributeCallbackBridge::OnDone;
 
@@ -12455,7 +12455,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge::OnDone;
 
@@ -12488,7 +12488,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRActionsClusterActionStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRActionsClusterActionStateEnumAttributeCallbackBridge::OnDone;
 
@@ -12522,7 +12522,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge::OnDone;
 
@@ -12554,7 +12554,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRActionsClusterActionTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRActionsClusterActionTypeEnumAttributeCallbackBridge::OnDone;
 
@@ -12588,7 +12588,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge::OnDone;
 
@@ -12621,7 +12621,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnDone;
 
@@ -12655,7 +12655,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnDone;
 
@@ -12690,7 +12690,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnDone;
 
@@ -12729,7 +12729,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnDone;
 
@@ -12763,7 +12763,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnDone;
 
@@ -12802,7 +12802,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnDone;
 
@@ -12835,7 +12835,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnDone;
 
@@ -12873,7 +12873,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnDone;
 
@@ -12909,7 +12909,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnDone;
 
@@ -12948,7 +12948,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnDone;
 
@@ -12983,7 +12983,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnDone;
 
@@ -13022,7 +13022,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnDone;
 
@@ -13056,7 +13056,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnDone;
 
@@ -13095,7 +13095,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnDone;
 
@@ -13128,7 +13128,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::OnDone;
 
@@ -13164,7 +13164,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::OnDone;
 
@@ -13197,7 +13197,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::OnDone;
 
@@ -13231,7 +13231,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::OnDone;
 
@@ -13264,7 +13264,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnDone;
 
@@ -13298,7 +13298,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnDone;
 
@@ -13331,7 +13331,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPowerSourceClusterBatChargeFaultAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceClusterBatChargeFaultAttributeCallbackBridge::OnDone;
 
@@ -13365,7 +13365,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackBridge::OnDone;
 
@@ -13398,7 +13398,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPowerSourceClusterBatChargeLevelAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnDone;
 
@@ -13432,7 +13432,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnDone;
 
@@ -13465,7 +13465,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPowerSourceClusterBatChargeStateAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceClusterBatChargeStateAttributeCallbackBridge::OnDone;
 
@@ -13499,7 +13499,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge::OnDone;
 
@@ -13529,7 +13529,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPowerSourceClusterBatFaultAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceClusterBatFaultAttributeCallbackBridge::OnDone;
 
@@ -13563,7 +13563,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullablePowerSourceClusterBatFaultAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullablePowerSourceClusterBatFaultAttributeCallbackBridge::OnDone;
 
@@ -13596,7 +13596,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPowerSourceClusterBatReplaceabilityAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnDone;
 
@@ -13630,7 +13630,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnDone;
 
@@ -13663,7 +13663,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPowerSourceClusterPowerSourceStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnDone;
 
@@ -13697,7 +13697,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnDone;
 
@@ -13730,7 +13730,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnDone;
 
@@ -13764,7 +13764,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnDone;
 
@@ -13796,7 +13796,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPowerSourceClusterWiredFaultAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPowerSourceClusterWiredFaultAttributeCallbackBridge::OnDone;
 
@@ -13830,7 +13830,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullablePowerSourceClusterWiredFaultAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullablePowerSourceClusterWiredFaultAttributeCallbackBridge::OnDone;
 
@@ -13863,7 +13863,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::OnDone;
 
@@ -13900,7 +13900,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableGeneralCommissioningClusterCommissioningErrorAttributeCallbackBridge::OnDone;
 
@@ -13934,7 +13934,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::OnDone;
 
@@ -13973,7 +13973,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::OnDone;
 
@@ -14008,7 +14008,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnDone;
 
@@ -14047,7 +14047,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnDone;
 
@@ -14080,7 +14080,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnDone;
 
@@ -14114,7 +14114,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnDone;
 
@@ -14147,7 +14147,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnDone;
 
@@ -14181,7 +14181,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnDone;
 
@@ -14214,7 +14214,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnDone;
 
@@ -14248,7 +14248,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnDone;
 
@@ -14281,7 +14281,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::OnDone;
 
@@ -14317,7 +14317,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::OnDone;
 
@@ -14350,7 +14350,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge::OnDone;
 
@@ -14384,7 +14384,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge::OnDone;
 
@@ -14417,7 +14417,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge::OnDone;
 
@@ -14453,7 +14453,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge::OnDone;
 
@@ -14486,7 +14486,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::OnDone;
 
@@ -14520,7 +14520,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::OnDone;
 
@@ -14553,7 +14553,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::OnDone;
 
@@ -14589,7 +14589,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::OnDone;
 
@@ -14622,7 +14622,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge::OnDone;
 
@@ -14656,7 +14656,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge::OnDone;
 
@@ -14689,7 +14689,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::OnDone;
 
@@ -14725,7 +14725,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::OnDone;
 
@@ -14758,7 +14758,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::OnDone;
 
@@ -14794,7 +14794,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::OnDone;
 
@@ -14829,7 +14829,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::OnDone;
 
@@ -14868,7 +14868,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::OnDone;
 
@@ -14903,7 +14903,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::OnDone;
 
@@ -14942,7 +14942,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::OnDone;
 
@@ -14975,7 +14975,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge::OnDone;
 
@@ -15011,7 +15011,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge::OnDone;
 
@@ -15045,7 +15045,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge::OnDone;
 
@@ -15084,7 +15084,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge::OnDone;
 
@@ -15117,7 +15117,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge::OnDone;
 
@@ -15154,7 +15154,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge::OnDone;
 
@@ -15187,7 +15187,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTREthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge::OnDone;
 
@@ -15224,7 +15224,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge::OnDone;
 
@@ -15257,7 +15257,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge::OnDone;
 
@@ -15293,7 +15293,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge::OnDone;
 
@@ -15326,7 +15326,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge::OnDone;
 
@@ -15360,7 +15360,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge::OnDone;
 
@@ -15397,7 +15397,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::OnDone;
 
@@ -15436,7 +15436,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::OnDone;
 
@@ -15469,7 +15469,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::OnDone;
 
@@ -15505,7 +15505,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::OnDone;
 
@@ -15539,7 +15539,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnDone;
 
@@ -15578,7 +15578,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnDone;
 
@@ -15611,7 +15611,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::OnDone;
 
@@ -15649,7 +15649,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::OnDone;
 
@@ -15679,7 +15679,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDlAlarmCodeAttributeCallbackBridge::OnDone;
 
@@ -15713,7 +15713,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge::OnDone;
 
@@ -15746,7 +15746,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDlCredentialRuleAttributeCallbackBridge::OnDone;
 
@@ -15780,7 +15780,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge::OnDone;
 
@@ -15813,7 +15813,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDlCredentialTypeAttributeCallbackBridge::OnDone;
 
@@ -15847,7 +15847,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge::OnDone;
 
@@ -15880,7 +15880,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnDone;
 
@@ -15914,7 +15914,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnDone;
 
@@ -15944,7 +15944,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDlDoorStateAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDlDoorStateAttributeCallbackBridge::OnDone;
 
@@ -15978,7 +15978,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDlDoorStateAttributeCallbackBridge::OnDone;
 
@@ -16011,7 +16011,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDlLockDataTypeAttributeCallbackBridge::OnDone;
 
@@ -16045,7 +16045,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge::OnDone;
 
@@ -16078,7 +16078,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::OnDone;
 
@@ -16112,7 +16112,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::OnDone;
 
@@ -16142,7 +16142,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDlLockStateAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDlLockStateAttributeCallbackBridge::OnDone;
 
@@ -16176,7 +16176,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDlLockStateAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDlLockStateAttributeCallbackBridge::OnDone;
 
@@ -16206,7 +16206,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDlLockTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDlLockTypeAttributeCallbackBridge::OnDone;
 
@@ -16240,7 +16240,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDlLockTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDlLockTypeAttributeCallbackBridge::OnDone;
 
@@ -16273,7 +16273,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDlOperatingModeAttributeCallbackBridge::OnDone;
 
@@ -16307,7 +16307,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge::OnDone;
 
@@ -16340,7 +16340,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDlOperationErrorAttributeCallbackBridge::OnDone;
 
@@ -16374,7 +16374,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge::OnDone;
 
@@ -16407,7 +16407,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDlOperationSourceAttributeCallbackBridge::OnDone;
 
@@ -16441,7 +16441,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge::OnDone;
 
@@ -16471,7 +16471,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDlStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDlStatusAttributeCallbackBridge::OnDone;
 
@@ -16504,7 +16504,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDlStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDlStatusAttributeCallbackBridge::OnDone;
 
@@ -16535,7 +16535,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDlUserStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDlUserStatusAttributeCallbackBridge::OnDone;
 
@@ -16569,7 +16569,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDlUserStatusAttributeCallbackBridge::OnDone;
 
@@ -16599,7 +16599,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDlUserTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDlUserTypeAttributeCallbackBridge::OnDone;
 
@@ -16633,7 +16633,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDlUserTypeAttributeCallbackBridge::OnDone;
 
@@ -16666,7 +16666,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::OnDone;
 
@@ -16702,7 +16702,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::OnDone;
 
@@ -16735,7 +16735,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::OnDone;
 
@@ -16771,7 +16771,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::OnDone;
 
@@ -16804,7 +16804,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::OnDone;
 
@@ -16838,7 +16838,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::OnDone;
 
@@ -16871,7 +16871,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::OnDone;
 
@@ -16905,7 +16905,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::OnDone;
 
@@ -16938,7 +16938,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::OnDone;
 
@@ -16972,7 +16972,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::OnDone;
 
@@ -17005,7 +17005,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWindowCoveringClusterEndProductTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWindowCoveringClusterEndProductTypeAttributeCallbackBridge::OnDone;
 
@@ -17039,7 +17039,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge::OnDone;
 
@@ -17069,7 +17069,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRWindowCoveringClusterTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRWindowCoveringClusterTypeAttributeCallbackBridge::OnDone;
 
@@ -17103,7 +17103,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableWindowCoveringClusterTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableWindowCoveringClusterTypeAttributeCallbackBridge::OnDone;
 
@@ -17137,7 +17137,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::OnDone;
 
@@ -17176,7 +17176,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::OnDone;
 
@@ -17210,7 +17210,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnDone;
 
@@ -17249,7 +17249,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnDone;
 
@@ -17282,7 +17282,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThermostatClusterSetpointAdjustModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThermostatClusterSetpointAdjustModeAttributeCallbackBridge::OnDone;
 
@@ -17316,7 +17316,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackBridge::OnDone;
 
@@ -17349,7 +17349,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThermostatClusterThermostatControlSequenceAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThermostatClusterThermostatControlSequenceAttributeCallbackBridge::OnDone;
 
@@ -17385,7 +17385,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackBridge::OnDone;
 
@@ -17418,7 +17418,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThermostatClusterThermostatRunningModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThermostatClusterThermostatRunningModeAttributeCallbackBridge::OnDone;
 
@@ -17452,7 +17452,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge::OnDone;
 
@@ -17485,7 +17485,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnDone;
 
@@ -17519,7 +17519,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnDone;
 
@@ -17552,7 +17552,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnDone;
 
@@ -17586,7 +17586,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableFanControlClusterFanModeSequenceTypeAttributeCallbackBridge::OnDone;
 
@@ -17618,7 +17618,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRFanControlClusterFanModeTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRFanControlClusterFanModeTypeAttributeCallbackBridge::OnDone;
 
@@ -17652,7 +17652,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableFanControlClusterFanModeTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableFanControlClusterFanModeTypeAttributeCallbackBridge::OnDone;
 
@@ -17685,7 +17685,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRColorControlClusterColorLoopActionAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRColorControlClusterColorLoopActionAttributeCallbackBridge::OnDone;
 
@@ -17719,7 +17719,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableColorControlClusterColorLoopActionAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableColorControlClusterColorLoopActionAttributeCallbackBridge::OnDone;
 
@@ -17752,7 +17752,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRColorControlClusterColorLoopDirectionAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRColorControlClusterColorLoopDirectionAttributeCallbackBridge::OnDone;
 
@@ -17786,7 +17786,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackBridge::OnDone;
 
@@ -17818,7 +17818,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRColorControlClusterColorModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRColorControlClusterColorModeAttributeCallbackBridge::OnDone;
 
@@ -17852,7 +17852,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableColorControlClusterColorModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableColorControlClusterColorModeAttributeCallbackBridge::OnDone;
 
@@ -17885,7 +17885,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRColorControlClusterHueDirectionAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRColorControlClusterHueDirectionAttributeCallbackBridge::OnDone;
 
@@ -17919,7 +17919,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableColorControlClusterHueDirectionAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableColorControlClusterHueDirectionAttributeCallbackBridge::OnDone;
 
@@ -17952,7 +17952,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRColorControlClusterHueMoveModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRColorControlClusterHueMoveModeAttributeCallbackBridge::OnDone;
 
@@ -17986,7 +17986,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableColorControlClusterHueMoveModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableColorControlClusterHueMoveModeAttributeCallbackBridge::OnDone;
 
@@ -18019,7 +18019,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRColorControlClusterHueStepModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRColorControlClusterHueStepModeAttributeCallbackBridge::OnDone;
 
@@ -18053,7 +18053,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableColorControlClusterHueStepModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableColorControlClusterHueStepModeAttributeCallbackBridge::OnDone;
 
@@ -18086,7 +18086,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRColorControlClusterSaturationMoveModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRColorControlClusterSaturationMoveModeAttributeCallbackBridge::OnDone;
 
@@ -18120,7 +18120,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackBridge::OnDone;
 
@@ -18153,7 +18153,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRColorControlClusterSaturationStepModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRColorControlClusterSaturationStepModeAttributeCallbackBridge::OnDone;
 
@@ -18187,7 +18187,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableColorControlClusterSaturationStepModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableColorControlClusterSaturationStepModeAttributeCallbackBridge::OnDone;
 
@@ -18220,7 +18220,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::OnDone;
 
@@ -18257,7 +18257,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::OnDone;
 
@@ -18290,7 +18290,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRChannelClusterChannelStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRChannelClusterChannelStatusEnumAttributeCallbackBridge::OnDone;
 
@@ -18324,7 +18324,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableChannelClusterChannelStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableChannelClusterChannelStatusEnumAttributeCallbackBridge::OnDone;
 
@@ -18357,7 +18357,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::OnDone;
 
@@ -18391,7 +18391,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::OnDone;
 
@@ -18424,7 +18424,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::OnDone;
 
@@ -18462,7 +18462,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::OnDone;
 
@@ -18495,7 +18495,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge::OnDone;
 
@@ -18531,7 +18531,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge::OnDone;
 
@@ -18564,7 +18564,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnDone;
 
@@ -18598,7 +18598,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnDone;
 
@@ -18631,7 +18631,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRMediaInputClusterInputTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRMediaInputClusterInputTypeEnumAttributeCallbackBridge::OnDone;
 
@@ -18665,7 +18665,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackBridge::OnDone;
 
@@ -18697,7 +18697,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRKeypadInputClusterCecKeyCodeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRKeypadInputClusterCecKeyCodeAttributeCallbackBridge::OnDone;
 
@@ -18731,7 +18731,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackBridge::OnDone;
 
@@ -18764,7 +18764,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::OnDone;
 
@@ -18798,7 +18798,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::OnDone;
 
@@ -18831,7 +18831,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::OnDone;
 
@@ -18868,7 +18868,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::OnDone;
 
@@ -18901,7 +18901,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::OnDone;
 
@@ -18935,7 +18935,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::OnDone;
 
@@ -18968,7 +18968,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRContentLauncherClusterParameterEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRContentLauncherClusterParameterEnumAttributeCallbackBridge::OnDone;
 
@@ -19002,7 +19002,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableContentLauncherClusterParameterEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableContentLauncherClusterParameterEnumAttributeCallbackBridge::OnDone;
 
@@ -19035,7 +19035,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::OnDone;
 
@@ -19069,7 +19069,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::OnDone;
 
@@ -19105,7 +19105,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnDone;
 
@@ -19144,7 +19144,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnDone;
 
@@ -19177,7 +19177,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::OnDone;
 
@@ -19214,7 +19214,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::OnDone;
 
@@ -19222,67 +19222,67 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRTestClusterClusterSimpleEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<TestClusterClusterSimpleEnumAttributeCallback>
+class MTRUnitTestingClusterSimpleEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingClusterSimpleEnumAttributeCallback>
 {
 public:
-    MTRTestClusterClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TestClusterClusterSimpleEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitTestingClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingClusterSimpleEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRTestClusterClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<TestClusterClusterSimpleEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRUnitTestingClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<UnitTestingClusterSimpleEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::TestCluster::SimpleEnum value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::UnitTesting::SimpleEnum value);
 };
 
-class MTRTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge
-    : public MTRTestClusterClusterSimpleEnumAttributeCallbackBridge
+class MTRUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingClusterSimpleEnumAttributeCallbackBridge
 {
 public:
-    MTRTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                        MTRActionBlock action,
                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRTestClusterClusterSimpleEnumAttributeCallbackBridge(queue, handler, action),
+        MTRUnitTestingClusterSimpleEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRTestClusterClusterSimpleEnumAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRTestClusterClusterSimpleEnumAttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingClusterSimpleEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingClusterSimpleEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableTestClusterClusterSimpleEnumAttributeCallback>
+class MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableUnitTestingClusterSimpleEnumAttributeCallback>
 {
 public:
-    MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableTestClusterClusterSimpleEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableUnitTestingClusterSimpleEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                    MTRActionBlock action) :
-        MTRCallbackBridge<NullableTestClusterClusterSimpleEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+        MTRCallbackBridge<NullableUnitTestingClusterSimpleEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> & value);
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> & value);
 };
 
-class MTRNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge
-    : public MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge
+class MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge(
+    MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge(queue, handler, action),
+        MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
-    using MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableTestClusterClusterSimpleEnumAttributeCallbackBridge::OnDone;
+    void OnSubscriptionEstablished();
+    using MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -19313,7 +19313,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRFaultInjectionClusterFaultTypeAttributeCallbackBridge::OnDone;
 
@@ -19347,7 +19347,7 @@ public:
         mEstablishedHandler(establishedHandler)
     {}
 
-    static void OnSubscriptionEstablished(void * context);
+    void OnSubscriptionEstablished();
     using MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableFaultInjectionClusterFaultTypeAttributeCallbackBridge::OnDone;
 

@@ -53,7 +53,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
     VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    TriggerFlashAction(FlashHandler::Action::WAKE_UP);
+    TriggerFlashAction(ExternalFlashManager::Action::WAKE_UP);
 
     return DeviceLayer::SystemLayer().ScheduleLambda([this] { mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
 }
@@ -104,7 +104,7 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
     CHIP_ERROR error = System::MapErrorZephyr(dfu_multi_image_done(false));
 
-    TriggerFlashAction(FlashHandler::Action::SLEEP);
+    TriggerFlashAction(ExternalFlashManager::Action::SLEEP);
 
     return error;
 }
@@ -114,7 +114,7 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
     // Schedule update of all images
     int err = dfu_target_schedule_update(-1);
 
-    TriggerFlashAction(FlashHandler::Action::SLEEP);
+    TriggerFlashAction(ExternalFlashManager::Action::SLEEP);
 
 #ifdef CONFIG_CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
     if (!err)
@@ -200,26 +200,12 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & aBlock)
     return CHIP_NO_ERROR;
 }
 
-void OTAImageProcessorImpl::TriggerFlashAction(FlashHandler::Action action)
+void OTAImageProcessorImpl::TriggerFlashAction(ExternalFlashManager::Action action)
 {
     if (mFlashHandler)
     {
         mFlashHandler->DoAction(action);
     }
-}
-
-// external flash power consumption optimization
-void FlashHandler::DoAction(Action aAction)
-{
-#if CONFIG_PM_DEVICE && CONFIG_NORDIC_QSPI_NOR
-    // utilize the QSPI driver sleep power mode
-    const auto * qspi_dev = DEVICE_DT_GET(DT_INST(0, nordic_qspi_nor));
-    if (device_is_ready(qspi_dev))
-    {
-        const auto requestedAction = Action::WAKE_UP == aAction ? PM_DEVICE_ACTION_RESUME : PM_DEVICE_ACTION_SUSPEND;
-        (void) pm_device_action_run(qspi_dev, requestedAction); // not much can be done in case of a failure
-    }
-#endif
 }
 
 } // namespace DeviceLayer

@@ -112,7 +112,7 @@ config CHIP_ENABLE_PAIRING_AUTOSTART
 
 config CHIP_ENABLE_DNSSD_SRP
 	bool "Enable support for service registration"
-	default y
+	default y if NET_L2_OPENTHREAD
 	imply OPENTHREAD_ECDSA
 	imply OPENTHREAD_SRP_CLIENT
 	help

@@ -90,7 +90,7 @@ CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
         {
             if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET)
             {
-                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", ifa->ifa_name);
+                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", StringOrNullMarker(ifa->ifa_name));
                 break;
             }
         }
@@ -154,7 +154,7 @@ CHIP_ERROR GetWiFiStatsCount(WiFiStatsCountType type, uint64_t & count)
         {
             if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI)
             {
-                ChipLogProgress(DeviceLayer, "Found the primary WiFi interface:%s", ifa->ifa_name);
+                ChipLogProgress(DeviceLayer, "Found the primary WiFi interface:%s", StringOrNullMarker(ifa->ifa_name));
                 break;
             }
         }
@@ -584,7 +584,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetEthNetworkDiagnosticsCounts()
         {
             if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET)
             {
-                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", ifa->ifa_name);
+                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", StringOrNullMarker(ifa->ifa_name));
                 break;
             }
         }
@@ -749,7 +749,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
         {
             if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI)
             {
-                ChipLogProgress(DeviceLayer, "Found the primary WiFi interface:%s", ifa->ifa_name);
+                ChipLogProgress(DeviceLayer, "Found the primary WiFi interface:%s", StringOrNullMarker(ifa->ifa_name));
                 break;
             }
         }

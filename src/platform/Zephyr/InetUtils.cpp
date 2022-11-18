@@ -1,4 +1,4 @@
-/**
+/*
  *
  *    Copyright (c) 2022 Project CHIP Authors
  *
@@ -15,23 +15,27 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+#include "InetUtils.h"
 
-#import "MTRAttributeCacheContainer.h"
-#import "MTRDeviceControllerOverXPC.h"
+namespace chip {
+namespace DeviceLayer {
+namespace InetUtils {
 
-#include <app/ClusterStateCache.h>
+in6_addr ToZephyrAddr(const chip::Inet::IPAddress & address)
+{
+    in6_addr zephyrAddr;
 
-NS_ASSUME_NONNULL_BEGIN
+    static_assert(sizeof(zephyrAddr.s6_addr) == sizeof(address.Addr), "Unexpected address size");
+    memcpy(zephyrAddr.s6_addr, address.Addr, sizeof(address.Addr));
 
-@interface MTRAttributeCacheContainer ()
+    return zephyrAddr;
+}
 
-@property (atomic, readwrite, nullable) chip::app::ClusterStateCache * cppAttributeCache;
-@property (nonatomic, readwrite, copy) NSNumber * deviceID;
-@property (nonatomic, readwrite, weak, nullable) MTRDeviceControllerXPCConnection * xpcConnection;
-@property (nonatomic, readwrite, strong, nullable) id<NSCopying> xpcControllerID;
-@property (atomic, readwrite) BOOL shouldUseXPC;
+net_if * GetInterface(chip::Inet::InterfaceId ifaceId)
+{
+    return ifaceId.IsPresent() ? net_if_get_by_index(ifaceId.GetPlatformInterface()) : net_if_get_default();
+}
 
-@end
-
-NS_ASSUME_NONNULL_END
+} // namespace InetUtils
+} // namespace DeviceLayer
+} // namespace chip

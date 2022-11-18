@@ -45,9 +45,6 @@
 &adc {
 	status = "disabled";
 };
-&gpio1 {
-	status = "disabled";
-};
 &i2c1 {
 	status = "disabled";
 };

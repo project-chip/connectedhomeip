@@ -534,8 +534,12 @@ exit:
 
 CHIP_ERROR ClusterStateCache::GetLastReportDataPath(ConcreteClusterPath & aPath)
 {
-    aPath = mLastReportDataPath;
-    return CHIP_NO_ERROR;
+    if (mLastReportDataPath.IsValidConcreteClusterPath())
+    {
+        aPath = mLastReportDataPath;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_INCORRECT_STATE;
 }
 } // namespace app
 } // namespace chip

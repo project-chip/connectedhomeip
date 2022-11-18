@@ -83,7 +83,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, ATTRIBUTE_MASK_WRITABLE)
     DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute2, ARRAY, 1, ATTRIBUTE_MASK_WRITABLE), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
-DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Clusters::UnitTesting::Id, testClusterAttrsOnEndpoint, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
@@ -126,7 +126,7 @@ class TestAttrAccess : public app::AttributeAccessInterface
 {
 public:
     // Register for the Test Cluster cluster on all endpoints.
-    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), TestCluster::Id) {}
+    TestAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id) {}
 
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder) override;
@@ -201,7 +201,7 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
 
-    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id, kTestListAttribute);
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
     //
     // We've empirically determined that by reserving 950 bytes in the packet buffer, we can fit 2
     // AttributeDataIBs into the packet. ~30-40 bytes covers a single write chunk, but let's 2-3x that
@@ -275,7 +275,7 @@ void TestWriteChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
 
-    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id, kTestListAttribute);
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
 
     for (int i = 850; i < static_cast<int>(chip::app::kMaxSecureSduLengthBytes); i++)
     {
@@ -356,7 +356,7 @@ void TestWriteChunking::TestConflictWrite(nlTestSuite * apSuite, void * apContex
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
 
-    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id, kTestListAttribute);
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
 
     TestWriteCallback writeCallback1;
     app::WriteClient writeClient1(
@@ -432,8 +432,8 @@ void TestWriteChunking::TestNonConflictWrite(nlTestSuite * apSuite, void * apCon
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
 
-    app::AttributePathParams attributePath1(kTestEndpointId, app::Clusters::TestCluster::Id, kTestListAttribute);
-    app::AttributePathParams attributePath2(kTestEndpointId, app::Clusters::TestCluster::Id, kTestListAttribute2);
+    app::AttributePathParams attributePath1(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
+    app::AttributePathParams attributePath2(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute2);
 
     TestWriteCallback writeCallback1;
     app::WriteClient writeClient1(
@@ -617,7 +617,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     ChipLogProgress(Zcl, "Test 1: we should receive transaction notifications");
     RunTest(apSuite, ctx,
             Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .expectedStatus = { true },
             });
 
@@ -625,7 +625,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     RunTest(
         apSuite, ctx,
         Instructions{
-            .paths                   = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+            .paths                   = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
             .onListWriteBeginActions = [&](const app::ConcreteAttributePath & aPath) { return Operations::kShutdownWriteClient; },
             .expectedStatus          = { false },
         });
@@ -633,16 +633,16 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     ChipLogProgress(Zcl, "Test 3: we should receive transaction notifications for every list in the transaction");
     RunTest(apSuite, ctx,
             Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute2) },
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
                 .expectedStatus = { true, true },
             });
 
     ChipLogProgress(Zcl, "Test 4: we should receive transaction notifications with the status of each list");
     RunTest(apSuite, ctx,
             Instructions{
-                .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute2) },
+                .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
                 .onListWriteBeginActions =
                     [&](const app::ConcreteAttributePath & aPath) {
                         if (aPath.mAttributeId == kTestListAttribute2)
@@ -659,8 +659,8 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
                     "null value before non null values");
     RunTest(apSuite, ctx,
             Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kNull, ListData::kList },
                 .expectedStatus = { true },
             });
@@ -670,8 +670,8 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
                     "null value after non null values");
     RunTest(apSuite, ctx,
             Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kList, ListData::kNull },
                 .expectedStatus = { true },
             });
@@ -681,9 +681,9 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
                     "null value between non null values");
     RunTest(apSuite, ctx,
             Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kList, ListData::kNull, ListData::kList },
                 .expectedStatus = { true },
             });
@@ -691,7 +691,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     ChipLogProgress(Zcl, "Test 8: transactional list callbacks will be called for nullable lists");
     RunTest(apSuite, ctx,
             Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kNull },
                 .expectedStatus = { true },
             });
@@ -701,7 +701,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
                     "during processing the requests");
     RunTest(apSuite, ctx,
             Instructions{
-                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::TestCluster::Id, kTestListAttribute) },
+                .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kBadValue },
                 .expectedStatus = { false },
             });

@@ -20,7 +20,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_OPTIONS(NSUInteger, MTRDiscoveryCapabilities) {
-    MTRDiscoveryCapabilitiesUnknown = 0, // Device capabilities are not known (e.g. all we have is a manual pairing code).
+    MTRDiscoveryCapabilitiesUnknown = 0, // Device capabilities are not known (e.g. all we have is a numeric code).
     MTRDiscoveryCapabilitiesNone MTR_NEWLY_DEPRECATED("Please use MTRDiscoveryCapabilitiesUnknown") = 0,
     MTRDiscoveryCapabilitiesSoftAP = 1 << 0, // Device supports WiFi softAP
     MTRDiscoveryCapabilitiesBLE = 1 << 1, // Device supports BLE
@@ -31,8 +31,8 @@ typedef NS_OPTIONS(NSUInteger, MTRDiscoveryCapabilities) {
 };
 
 typedef NS_ENUM(NSUInteger, MTRCommissioningFlow) {
-    MTRCommissioningFlowStandard = 0, // Device automatically enters pairing mode upon power-up
-    MTRCommissioningFlowUserActionRequired = 1, // Device requires a user interaction to enter pairing mode
+    MTRCommissioningFlowStandard = 0, // Device automatically enters commissioning mode upon power-up
+    MTRCommissioningFlowUserActionRequired = 1, // Device requires a user interaction to enter commissioning mode
     MTRCommissioningFlowCustom = 2, // Commissioning steps should be retrieved from the distributed compliance ledger
     MTRCommissioningFlowInvalid = 3,
 };
@@ -58,8 +58,10 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 @end
 
 /**
- * A setup payload that can be created from a pairing code and serialized to a
- * pairing code.
+ * A setup payload that can be created from a numeric code or QR code and
+ * serialized to a numeric code or QR code, though serializing to QR code after
+ * creating from numeric code will not work, because some required information
+ * will be missing.
  */
 @interface MTRSetupPayload : NSObject <NSSecureCoding>
 
