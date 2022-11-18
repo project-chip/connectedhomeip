@@ -158,7 +158,8 @@ static void SetupXPCQueue(void)
     // under here if we don't have a controller id aleady, so make sure we do
     // that.
     [self fetchControllerIdWithQueue:queue
-                          completion:^(id _Nullable controllerID, NSError * _Nullable error) {
+                          completion:^(id _Nullable controllerID, MTRDeviceControllerXPCProxyHandle * _Nullable handle,
+                              NSError * _Nullable error) {
                               if (error != nil) {
                                   completionHandler(nil, error);
                                   return;
@@ -172,6 +173,9 @@ static void SetupXPCQueue(void)
 
 - (void)fetchControllerIdWithQueue:(dispatch_queue_t)queue completion:(MTRFetchControllerIDCompletion)completion
 {
+    // Capture the proxy handle so that it won't be released prior to block call.
+    __block MTRDeviceControllerXPCProxyHandle * handleRetainer = nil;
+
     dispatch_async(_workQueue, ^{
         dispatch_group_t group = dispatch_group_create();
         if (!self.controllerID) {
@@ -184,10 +188,9 @@ static void SetupXPCQueue(void)
                             MTR_LOG_ERROR("Failed to fetch any shared remote controller");
                         } else {
                             self.controllerID = controller;
+                            handleRetainer = handle;
                         }
                         dispatch_group_leave(group);
-                        __auto_type handleRetainer = handle;
-                        (void) handleRetainer;
                     }];
                 } else {
                     MTR_LOG_ERROR("XPC disconnected while retrieving any shared remote controller");
@@ -197,9 +200,9 @@ static void SetupXPCQueue(void)
         }
         dispatch_group_notify(group, queue, ^{
             if (self.controllerID) {
-                completion(self.controllerID, nil);
+                completion(self.controllerID, handleRetainer, nil);
             } else {
-                completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+                completion(nil, nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
             }
         });
     });

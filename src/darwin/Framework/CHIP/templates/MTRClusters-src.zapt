@@ -62,19 +62,19 @@ using chip::SessionHandle;
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRBaseDevice *baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * bridge = new MTR{{>callbackName}}CallbackBridge(self.callbackQueue,
+          ^(id _Nullable value, NSError * _Nullable error) {
           {{#if hasSpecificResponse}}
             {{! This treats completion as taking an id for the data.  This is
                 not great from a type-safety perspective, of course. }}
-            completion,
+            completion(value, error);
           {{else}}
             {{! For now, don't change the bridge API; instead just use an adapter
                 to invoke our completion handler. This is not great from a
                 type-safety perspective, of course. }}
-            ^(id _Nullable value, NSError * _Nullable error) {
-              completion(error);
-                  [workItem endWork];
-            },
+            completion(error);
           {{/if}}
+            [workItem endWork];
+          },
           ^(ExchangeManager & exchangeManager, const SessionHandle & session, {{>callbackName}}CallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
             chip::Optional<uint16_t> timedInvokeTimeoutMs;
             ListFreer listFreer;
