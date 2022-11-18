@@ -196,7 +196,6 @@ bl602_executable("lighting_app") {
     sources += [ "${examples_plat_common_dir}/plat/OTAConfig.cpp" ]
   }
 
-  print(defines)
   ldscript = "${examples_plat_dir}/ldscripts/flash_rom.ld"
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
