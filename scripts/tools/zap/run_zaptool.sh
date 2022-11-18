@@ -37,7 +37,11 @@ if [ ! -z "$ZAP_DEVELOPMENT_PATH" ]; then
 
     "$CHIP_ROOT"/scripts/tools/zap/zap_bootstrap.sh
 elif [ ! -z "$ZAP_INSTALL_PATH" ]; then
-    ZAP_CMD="$ZAP_INSTALL_PATH/zap"
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        ZAP_CMD="$ZAP_INSTALL_PATH/zap.app/Contents/MacOS/zap"
+    else
+        ZAP_CMD="$ZAP_INSTALL_PATH/zap"
+    fi
     WORKING_DIR="$CHIP_ROOT"
 else
     ZAP_CMD="zap"
