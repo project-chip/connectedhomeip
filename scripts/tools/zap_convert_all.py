@@ -65,6 +65,10 @@ def runArgumentsParser():
 def main():
     args = runArgumentsParser()
     checkPythonVersion()
+
+    if args.run_bootstrap:
+        subprocess.check_call(os.path.join(CHIP_ROOT_DIR, "scripts/tools/zap/zap_bootstrap.sh"), shell=True)
+
     os.chdir(CHIP_ROOT_DIR)
 
     targets = getTargets()
