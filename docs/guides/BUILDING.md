@@ -149,13 +149,13 @@ dependencies than the `.deb` package.
 
 ZAP scripting uses the following detection, in order:
 
-- `$ZAP_DEVELOPMENT_PATH` to point to a zap checkout. Use this if you are
-  developing zap locally and would like to run zap with your changes
+-   `$ZAP_DEVELOPMENT_PATH` to point to a zap checkout. Use this if you are
+    developing zap locally and would like to run zap with your changes
 
-- `$ZAP_INSTALL_PATH` to point to where `zap-linux.zip`/`zap-mac.zip` was
-  unpacked. This allows you to not need to place zap/zap-cli in `$PATH`
+-   `$ZAP_INSTALL_PATH` to point to where `zap-linux.zip`/`zap-mac.zip` was
+    unpacked. This allows you to not need to place zap/zap-cli in `$PATH`
 
-- Otherwise scripts assume `zap-cli` or `zap` is available in `$PATH`
+-   Otherwise scripts assume `zap-cli` or `zap` is available in `$PATH`
 
 ## Prepare for building
 
