@@ -29,7 +29,7 @@ set -e
 
 SCRIPT_PATH="$(_get_fullpath "$0")"
 CHIP_ROOT="${SCRIPT_PATH%/scripts/tools/zap/run_zaptool.sh}"
-[[ -n "$1" ]] && ZAP_ARGS=(-i "$(_get_fullpath "$1")") || ZAP_ARGS=()
+[[ -n "$1" ]] && ZAP_ARGS="-i \"$(_get_fullpath "$1")\"" || ZAP_ARGS=""
 
 if [ ! -z "$ZAP_DEVELOPMENT_PATH" ]; then
     WORKING_DIR=$ZAP_DEVELOPMENT_PATH
@@ -51,7 +51,7 @@ fi
 (
     cd "$WORKING_DIR"
 
-    echo "ARGS: ${ZAP_ARGS[@]}"
+    echo "ARGS: ${ZAP_ARGS}"
 
     if [[ "${ZAP_ARGS[@]}" == *"/all-clusters-app.zap"* ]]; then
         ZCL_FILE="$CHIP_ROOT/src/app/zap-templates/zcl/zcl-with-test-extensions.json"
@@ -64,6 +64,6 @@ fi
         --logToStdout \
         --gen \"$CHIP_ROOT/src/app/zap-templates/app-templates.json\" \
         --zcl \"$ZCL_FILE\" \
-        ${ZAP_ARGS[@]} \
+        ${ZAP_ARGS} \
     "
 )
