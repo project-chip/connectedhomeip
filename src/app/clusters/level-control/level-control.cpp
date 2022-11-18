@@ -1064,7 +1064,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     }
 
     // if the OnOff feature is not supported, the effect on LevelControl is ignored
-    if(!HasFeature(endpoint, chip::app::Clusters::LevelControl::LevelControlFeature::kOnOff))
+    if (!HasFeature(endpoint, chip::app::Clusters::LevelControl::LevelControlFeature::kOnOff))
     {
         emberAfLevelControlClusterPrintln("OnOff feature not supported, ignore LevelControlEffect");
         return;
