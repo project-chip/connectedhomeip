@@ -28,6 +28,7 @@
 #include <platform/Zephyr/BLEManagerImpl.h>
 
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceInstanceInfoProvider.h>

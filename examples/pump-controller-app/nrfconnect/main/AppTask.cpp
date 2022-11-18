@@ -101,6 +101,7 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
+#if defined(CONFIG_NET_L2_OPENTHREAD)
     err = ThreadStackMgr().InitThreadStack();
     if (err != CHIP_NO_ERROR)
     {
@@ -114,6 +115,9 @@ CHIP_ERROR AppTask::Init()
         LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");
         return err;
     }
+#elif !defined(CONFIG_WIFI_NRF700X)
+    return CHIP_ERROR_INTERNAL;
+#endif
 
     // Initialize LEDs
     LEDWidget::InitGpio();

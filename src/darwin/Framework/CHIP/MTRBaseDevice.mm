@@ -15,12 +15,12 @@
  *    limitations under the License.
  */
 
-#import "MTRAttributeCacheContainer_Internal.h"
 #import "MTRAttributeTLVValueDecoder_Internal.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRBaseSubscriptionCallback.h"
 #import "MTRCallbackBridgeBase_internal.h"
 #import "MTRCluster.h"
+#import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRCluster_internal.h"
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
@@ -268,13 +268,13 @@ public:
 } // anonymous namespace
 
 - (void)subscribeWithQueue:(dispatch_queue_t)queue
-                     params:(MTRSubscribeParams *)params
-    attributeCacheContainer:(MTRAttributeCacheContainer * _Nullable)attributeCacheContainer
-     attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
-         eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
-               errorHandler:(void (^)(NSError * error))errorHandler
-    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-    resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled
+                        params:(MTRSubscribeParams *)params
+    clusterStateCacheContainer:(MTRClusterStateCacheContainer * _Nullable)clusterStateCacheContainer
+        attributeReportHandler:(MTRDeviceReportHandler _Nullable)attributeReportHandler
+            eventReportHandler:(MTRDeviceReportHandler _Nullable)eventReportHandler
+                  errorHandler:(void (^)(NSError * error))errorHandler
+       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+       resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled
 {
     if (self.isPASEDevice) {
         // We don't support subscriptions over PASE.
@@ -309,18 +309,18 @@ public:
                                       readParams.mpEventPathParamsList = eventPath.get();
                                       readParams.mEventPathParamsListSize = 1;
 
-                                      std::unique_ptr<ClusterStateCache> attributeCache;
+                                      std::unique_ptr<ClusterStateCache> clusterStateCache;
                                       ReadClient::Callback * callbackForReadClient = nullptr;
                                       OnDoneHandler onDoneHandler = nil;
 
-                                      if (attributeCacheContainer) {
-                                          __weak MTRAttributeCacheContainer * weakPtr = attributeCacheContainer;
+                                      if (clusterStateCacheContainer) {
+                                          __weak MTRClusterStateCacheContainer * weakPtr = clusterStateCacheContainer;
                                           onDoneHandler = ^{
                                               // This, like all manipulation of cppClusterStateCache, needs to run on the Matter
                                               // queue.
-                                              MTRAttributeCacheContainer * container = weakPtr;
+                                              MTRClusterStateCacheContainer * container = weakPtr;
                                               if (container) {
-                                                  container.cppAttributeCache = nullptr;
+                                                  container.cppClusterStateCache = nullptr;
                                               }
                                           };
                                       }
@@ -361,9 +361,9 @@ public:
                                           },
                                           onDoneHandler);
 
-                                      if (attributeCacheContainer) {
-                                          attributeCache = std::make_unique<ClusterStateCache>(*callback.get());
-                                          callbackForReadClient = &attributeCache->GetBufferedCallback();
+                                      if (clusterStateCacheContainer) {
+                                          clusterStateCache = std::make_unique<ClusterStateCache>(*callback.get());
+                                          callbackForReadClient = &clusterStateCache->GetBufferedCallback();
                                       } else {
                                           callbackForReadClient = &callback->GetBufferedCallback();
                                       }
@@ -389,14 +389,12 @@ public:
                                           return;
                                       }
 
-                                      if (attributeCacheContainer) {
-                                          attributeCacheContainer.cppAttributeCache = attributeCache.get();
-                                          // ClusterStateCache will be deleted when OnDone is called or an error is encountered as
-                                          // well.
-                                          callback->AdoptAttributeCache(std::move(attributeCache));
+                                      if (clusterStateCacheContainer) {
+                                          clusterStateCacheContainer.cppClusterStateCache = clusterStateCache.get();
+                                          // ClusterStateCache will be deleted when OnDone is called.
+                                          callback->AdoptClusterStateCache(std::move(clusterStateCache));
                                       }
-                                      // Callback and ReadClient will be deleted when OnDone is called or an error is
-                                      // encountered.
+                                      // Callback and ReadClient will be deleted when OnDone is called.
                                       callback->AdoptReadClient(std::move(readClient));
                                       callback.release();
                                   }];
@@ -1458,13 +1456,13 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
         subscribeParams.maxInterval = @(maxInterval);
     }
     [self subscribeWithQueue:queue
-                         params:subscribeParams
-        attributeCacheContainer:attributeCacheContainer
-         attributeReportHandler:attributeReportHandler
-             eventReportHandler:eventReportHandler
-                   errorHandler:errorHandler
-        subscriptionEstablished:subscriptionEstablishedHandler
-        resubscriptionScheduled:resubscriptionScheduledHandler];
+                            params:subscribeParams
+        clusterStateCacheContainer:attributeCacheContainer.realContainer
+            attributeReportHandler:attributeReportHandler
+                eventReportHandler:eventReportHandler
+                      errorHandler:errorHandler
+           subscriptionEstablished:subscriptionEstablishedHandler
+           resubscriptionScheduled:resubscriptionScheduledHandler];
 }
 
 - (void)readAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
