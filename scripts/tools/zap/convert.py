@@ -110,7 +110,7 @@ def runConversion(zap_file):
         working_directory = None
 
     try:
-        subprocess.check_call(convert_cmd + ['-z', zcl_file, '-g', templates_file, '-o', zap_file, zap_file])
+        subprocess.check_call(convert_cmd + ['-z', zcl_file, '-g', templates_file, '-o', zap_file, zap_file], cwd=working_directory)
     except FileNotFoundError as e:
         print(f'FAILED TO EXECUTE ZAP CONVERSION: {e.strerror} - "{e.filename}"')
         print('*'*80)
