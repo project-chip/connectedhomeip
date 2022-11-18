@@ -18,6 +18,7 @@ import("//build_overrides/pigweed.gni")
 
 import("$dir_pw_build/python.gni")
 import("${chip_root}/build/chip/chip_codegen.gni")
+import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
 chip_data_model("data_model") {
@@ -29,7 +30,7 @@ chip_data_model("data_model") {
   allow_circular_includes_from = [ "${chip_root}/src/controller" ]
 }
 
-if (current_os == "android") {
+if (current_os == "android" || build_java_matter_controller) {
   chip_codegen("java-jni-generate") {
     input = "controller-clusters.matter"
     generator = "java"
@@ -170,15 +171,21 @@ if (current_os == "android") {
 
   source_set("java-jni-sources") {
     sources = get_target_outputs(":java-jni-generate")
-    public_configs = [ "${chip_root}/src:includes" ]
 
+    public_configs = [ "${chip_root}/src:includes" ]
     deps = [
       ":data_model",
       ":java-jni-generate",
       "${chip_root}/src/inet",
       "${chip_root}/src/lib",
       "${chip_root}/src/platform",
-      "${chip_root}/src/platform/android",
     ]
+
+    if (build_java_matter_controller) {
+      include_dirs = java_matter_controller_dependent_paths
+      deps += [ "${chip_root}/src/platform/Linux" ]
+    } else {
+      deps += [ "${chip_root}/src/platform/android" ]
+    }
   }
 }

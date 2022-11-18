@@ -20,6 +20,7 @@ import("//build_overrides/nlio.gni")
 import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_version.gni")
+import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/lib/core/core.gni")
 
@@ -145,8 +146,12 @@ static_library("support") {
     "verhoeff/Verhoeff36.cpp",
   ]
 
-  # added JNI helper on android
-  if (current_os == "android") {
+  if (current_os == "android" || build_java_matter_controller) {
+    if (build_java_matter_controller) {
+      include_dirs = java_matter_controller_dependent_paths
+    }
+
+    # added JNI helper on android
     sources += [
       "CHIPJNIError.h",
       "JniReferences.cpp",
