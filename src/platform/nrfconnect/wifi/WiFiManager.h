@@ -164,6 +164,10 @@ public:
         }
     };
 
+    static constexpr uint16_t kRouterSolicitationIntervalMs        = 4000;
+    static constexpr uint16_t kMaxInitialRouterSolicitationDelayMs = 1000;
+    static constexpr uint8_t kRouterSolicitationMaxCount           = 3;
+
     CHIP_ERROR Init();
     CHIP_ERROR Scan(const ByteSpan & ssid, ScanResultCallback resultCallback, ScanDoneCallback doneCallback,
                     bool internalScan = false);
@@ -193,6 +197,7 @@ private:
     static void ConnectHandler(uint8_t * data);
     static void DisconnectHandler(uint8_t * data);
     static void PostConnectivityStatusChange(ConnectivityChange changeType);
+    static void SendRouterSolicitation(System::Layer * layer, void * param);
 
     ConnectionParams mWiFiParams{};
     ConnectionHandling mHandling;
@@ -202,6 +207,7 @@ private:
     ScanDoneCallback mScanDoneCallback{ nullptr };
     WiFiNetwork mWantedNetwork{};
     bool mInternalScan{ false };
+    uint8_t mRouterSolicitationCounter = 0;
     static const Map<wifi_iface_state, StationStatus, 10> sStatusMap;
     static const Map<uint32_t, NetEventHandler, 4> sEventHandlerMap;
 };

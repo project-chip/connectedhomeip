@@ -71,10 +71,6 @@ config MAIN_STACK_SIZE
 config INIT_STACKS
     default y
 
-# Disable certain parts of Zephyr IPv6 stack
-config NET_IPV6_NBR_CACHE
-    default n
-
 config NET_IPV6_MLD
     default y
 
@@ -190,6 +186,11 @@ config NET_L2_OPENTHREAD
     default y if !WIFI_NRF700X
 
 if NET_L2_OPENTHREAD
+
+# Disable certain parts of Zephyr IPv6 stack
+config NET_IPV6_NBR_CACHE
+    bool
+    default n
 
 # Increase the default RX stack size
 config IEEE802154_NRF5_RX_STACK_SIZE

@@ -22,15 +22,17 @@
 
 #include "WiFiManager.h"
 
+#include <crypto/RandUtils.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPointImplSockets.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Zephyr/InetUtils.h>
 
-#include <zephyr/net/net_stats.h>
 #include <zephyr/kernel.h>
 #include <zephyr/net/net_event.h>
+#include <zephyr/net/net_if.h>
+#include <zephyr/net/net_stats.h>
 
 extern "C" {
 #include <common/defs.h>
@@ -359,6 +361,25 @@ void WiFiManager::ScanDoneHandler(uint8_t * data)
     }
 }
 
+void WiFiManager::SendRouterSolicitation(System::Layer * layer, void * param)
+{
+    net_if * iface = InetUtils::GetInterface();
+    if (iface && iface->if_dev->link_addr.type == NET_LINK_ETHERNET)
+    {
+        net_if_start_rs(iface);
+        Instance().mRouterSolicitationCounter++;
+        if (Instance().mRouterSolicitationCounter < kRouterSolicitationMaxCount)
+        {
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kRouterSolicitationIntervalMs),
+                                                  SendRouterSolicitation, nullptr);
+        }
+        else
+        {
+            Instance().mRouterSolicitationCounter = 0;
+        }
+    }
+}
+
 void WiFiManager::ConnectHandler(uint8_t * data)
 {
     const wifi_status * status      = reinterpret_cast<const wifi_status *>(data);
@@ -375,6 +396,11 @@ void WiFiManager::ConnectHandler(uint8_t * data)
     }
     else
     {
+        // Workaround needed until sending Router Solicitation after connect will be done by the driver.
+        DeviceLayer::SystemLayer().StartTimer(
+            System::Clock::Milliseconds32(chip::Crypto::GetRandU16() % kMaxInitialRouterSolicitationDelayMs),
+            SendRouterSolicitation, nullptr);
+
         ChipLogDetail(DeviceLayer, "Connected to WiFi network");
         Instance().mWiFiState = WIFI_STATE_COMPLETED;
         if (Instance().mHandling.mOnConnectionSuccess)
