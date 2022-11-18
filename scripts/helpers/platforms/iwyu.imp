@@ -78,4 +78,15 @@
     { symbol: [ 'tm', private, '<sys/time.h>', public ] },
     { symbol: [ 'declval', 'private', '<utility>', 'public' ] },
 
+    ## Do not include some Impl headers directly
+    { include: [ '@"platform/.*/BLEManagerImpl.h"', "private", '<platform/internal/BLEManager.h>', "public" ] },
+    { include: [ '@"platform/.*/ConnectivityManagerImpl.h"', "private", '<platform/ConnectivityManager.h>', "public" ] },
+    { include: [ '@"platform/.*/PlatformManagerImpl.h"', "private", '<platform/PlatformManager.h>', "public" ] },
+    { include: [ '@"platform/.*/KeyValueStoreManagerImpl.h"', "private", '<platform/KeyValueStoreManager.h>', "public" ] },
+    { include: [ '@<platform/.*/ThreadStackManagerImpl.h>', "private", '<platform/ThreadStackManager.h>', "public" ] },
+
+    ## Config
+    { include: [ '@"platform/.*/CHIPDevicePlatformConfig.h"', "private", '<platform/CHIPDeviceConfig.h>', "public" ] },
+    { include: [ '@"platform/.*/SystemPlatformConfig.h"', "private", '<system/SystemConfig.h>', "public" ] },
+
 ]

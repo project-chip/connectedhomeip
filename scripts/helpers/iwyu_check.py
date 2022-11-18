@@ -156,7 +156,7 @@ def main(compile_commands_glob, scanning_destination, mapping_file_dir, iwyu_arg
             clang_args
         ]
 
-        logging.info("Start scanning include using IWYU for %s platform" % platform)
+        logging.info("Start scanning include using IWYU for %s platform", platform)
         status = subprocess.Popen(" ".join(command_arr),
                                   shell=True,
                                   text=True,
@@ -170,13 +170,13 @@ def main(compile_commands_glob, scanning_destination, mapping_file_dir, iwyu_arg
             line = status.stdout.readline().rstrip()
 
             if re.match(r"^.*([A-Za-z0-9]+(/[A-Za-z0-9]+)+)\.cpp should [a-zA-Z]+ these lines:$", line):
-                logging.warning("\n"+line)
+                logging.warning("\n%s", line)
 
             elif re.match(r"^.*([A-Za-z0-9]+(/[A-Za-z0-9]+)+)\.[a-zA-Z]+ has correct #includes/fwd-decls\)$", line):
-                logging.info("\n"+line)
+                logging.info("\n%s", line)
 
             elif re.match(r"^The full include-list for .*$", line):
-                logging.warning("\n"+line)
+                logging.warning("\n%s", line)
                 warning_in_files += 1
 
             else:
