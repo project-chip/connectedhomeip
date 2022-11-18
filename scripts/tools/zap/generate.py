@@ -112,7 +112,7 @@ def runArgumentsParser() -> CmdLineArgs:
     if args.output_dir:
         output_dir = args.output_dir
     elif args.templates == default_templates:
-        output_dir = os.path.join(Path(args.zap).parent, default_output_dir, args.run_bootstrap)
+        output_dir = os.path.join(Path(args.zap).parent, default_output_dir)
     else:
         output_dir = ''
 
