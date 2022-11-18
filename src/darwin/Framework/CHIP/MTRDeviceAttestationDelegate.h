@@ -39,10 +39,10 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Only one of the following delegate callbacks should be implemented.
  *
- * If -deviceAttestation:failedForDevice:error: is implemented, then it will be called when device
+ * If -deviceAttestationFailedForController:device:error: is implemented, then it will be called when device
  * attestation fails, and the client can decide to continue or stop the commissioning.
  *
- * If -deviceAttestation:completedForDevice:attestationDeviceInfo:error: is implemented, then it
+ * If -deviceAttestationCompletedForController:device:attestationDeviceInfo:error: is implemented, then it
  * will always be called when device attestation completes.
  */
 
@@ -58,10 +58,10 @@ NS_ASSUME_NONNULL_BEGIN
  * @param attestationDeviceInfo Attestation information for the device
  * @param error NSError representing the error code on attestation failure. Nil if success.
  */
-- (void)deviceAttestation:(MTRDeviceController *)controller
-       completedForDevice:(void *)device
-    attestationDeviceInfo:(MTRDeviceAttestationDeviceInfo *)attestationDeviceInfo
-                    error:(NSError * _Nullable)error;
+- (void)deviceAttestationCompletedForController:(MTRDeviceController *)controller
+                                         device:(void *)device
+                          attestationDeviceInfo:(MTRDeviceAttestationDeviceInfo *)attestationDeviceInfo
+                                          error:(NSError * _Nullable)error MTR_NEWLY_AVAILABLE;
 
 /**
  * Notify the delegate when device attestation fails
@@ -70,7 +70,20 @@ NS_ASSUME_NONNULL_BEGIN
  * @param device Handle of device being commissioned
  * @param error NSError representing the error code for the failure
  */
-- (void)deviceAttestation:(MTRDeviceController *)controller failedForDevice:(void *)device error:(NSError * _Nonnull)error;
+- (void)deviceAttestationFailedForController:(MTRDeviceController *)controller
+                                      device:(void *)device
+                                       error:(NSError * _Nonnull)error MTR_NEWLY_AVAILABLE;
+
+- (void)deviceAttestation:(MTRDeviceController *)controller
+       completedForDevice:(void *)device
+    attestationDeviceInfo:(MTRDeviceAttestationDeviceInfo *)attestationDeviceInfo
+                    error:(NSError * _Nullable)error
+    MTR_NEWLY_DEPRECATED("Please implement deviceAttestationCompletedForController:device:attestationDeviceInfo:error:");
+
+- (void)deviceAttestation:(MTRDeviceController *)controller
+          failedForDevice:(void *)device
+                    error:(NSError * _Nonnull)error
+    MTR_NEWLY_DEPRECATED("Please implement deviceAttestationFailedForController:device:error:");
 
 @end
 

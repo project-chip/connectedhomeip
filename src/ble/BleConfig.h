@@ -106,16 +106,6 @@
 #endif // BLE_CONNECTION_OBJECT
 
 /**
- *  @def BLE_CONFIG_BLUEZ_MTU_FEATURE
- *
- *  @brief
- *    This define if BLUEZ MTU FEATURE is enabled or not
- */
-#ifndef BLE_CONFIG_BLUEZ_MTU_FEATURE
-#define BLE_CONFIG_BLUEZ_MTU_FEATURE 0
-#endif // BLE_CONFIG_BLUEZ_MTU_FEATURE
-
-/**
  *  @def BLE_CONNECTION_UNINITIALIZED
  *
  *  @brief
@@ -206,6 +196,29 @@
 #ifndef BLE_CONFIG_ERROR
 #define BLE_CONFIG_ERROR(e) (BLE_CONFIG_ERROR_MIN + (e))
 #endif // BLE_CONFIG_ERROR
+
+
+/**
+ * @def BTP_CONN_RSP_TIMEOUT_MS
+ *
+ * @brief
+ *   Maximum amount of time, in milliseconds, after sending or receiving a BTP Session Handshake
+ *   request to wait for connection establishment.
+ */
+#ifndef BTP_CONN_RSP_TIMEOUT_MS
+#define BTP_CONN_RSP_TIMEOUT_MS 15000 // 15 seconds
+#endif // BTP_CONN_RSP_TIMEOUT_MS
+
+/**
+ * @def BTP_ACK_TIMEOUT_MS
+ *
+ * @brief
+ *   Maximum amount of time, in milliseconds, after sending a BTP packet to wait for
+ *   an acknowledgement. When the ack is not received within this period the BTP session is closed.
+ */
+#ifndef BTP_ACK_TIMEOUT_MS
+#define BTP_ACK_TIMEOUT_MS 15000 // 15 seconds
+#endif // BTP_ACK_TIMEOUT_MS
 
 // clang-format on
 
