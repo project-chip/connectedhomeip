@@ -47,7 +47,6 @@ template("chip_data_model") {
     # Assume that IDL name is the same as the zap file name, but instead of
     # '.zap' use '.matter' as extension. This is currently the case in the
     # sample apps, but may change in the future
-    print("AUTO-DETECTING input matter IDL file.")
     _idl = string_replace(invoker.zap_file, ".zap", ".matter")
   }
 
