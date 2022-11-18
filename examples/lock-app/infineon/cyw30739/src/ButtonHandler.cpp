@@ -75,7 +75,6 @@ void app_button_event_handler(const button_manager_button_t * button_mgr, button
     // state);
     bool initiated = false;
     LockManager::Action_t action;
-    int32_t actor;
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (button_mgr[0].configuration->button == PLATFORM_BUTTON_1 && event == BUTTON_CLICK_EVENT && state == BUTTON_STATE_RELEASED)
     {
@@ -87,7 +86,6 @@ void app_button_event_handler(const button_manager_button_t * button_mgr, button
         {
             action = LockManager::UNLOCK_ACTION;
         }
-        actor = AppEvent::kEventType_Button;
     }
     else
     {
