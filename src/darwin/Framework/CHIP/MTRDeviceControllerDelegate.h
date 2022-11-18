@@ -26,6 +26,8 @@ typedef NS_ENUM(NSInteger, MTRCommissioningStatus) {
     MTRCommissioningStatusDiscoveringMoreDevices = 3
 } MTR_NEWLY_AVAILABLE;
 
+@class MTRDeviceController;
+
 /**
  * The protocol definition for the MTRDeviceControllerDelegate.
  *
@@ -37,18 +39,18 @@ MTR_NEWLY_AVAILABLE
 /**
  * Notify the delegate when commissioning status gets updated.
  */
-- (void)onStatusUpdate:(MTRCommissioningStatus)status;
+- (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status;
 
 /**
  * Notify the delegate when a commissioning session is established or the
  * establishment has errored out.
  */
-- (void)onCommissioningSessionEstablishmentDone:(NSError * _Nullable)error;
+- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error;
 
 /**
  * Notify the delegate when commissioning is completed.
  */
-- (void)onCommissioningComplete:(NSError * _Nullable)error;
+- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error;
 
 @end
 

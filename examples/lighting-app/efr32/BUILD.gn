@@ -148,6 +148,10 @@ efr32_sdk("sdk") {
     "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
   ]
 
+  if (enable_heap_monitoring) {
+    defines += [ "HEAP_MONITORING" ]
+  }
+
   if (chip_enable_pw_rpc) {
     defines += [
       "HAL_VCOM_ENABLE=1",
