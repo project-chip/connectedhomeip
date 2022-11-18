@@ -445,7 +445,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestBytesToHex(void)
+int TestBytesToHex()
 {
     nlTestSuite theSuite = { "BytesToHex", sTests, nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

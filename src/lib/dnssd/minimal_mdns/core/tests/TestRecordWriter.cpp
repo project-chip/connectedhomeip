@@ -177,7 +177,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestRecordWriter(void)
+int TestRecordWriter()
 {
     // clang-format off
     nlTestSuite theSuite =

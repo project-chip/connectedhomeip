@@ -85,7 +85,7 @@ static void emberAfAttributeDecodeAndPrintCluster(ClusterId cluster)
 #endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ATTRIBUTES)
 }
 
-void emberAfPrintAttributeTable(void)
+void emberAfPrintAttributeTable()
 {
     uint8_t data[ATTRIBUTE_LARGEST];
     decltype(emberAfEndpointCount()) endpointIndex;

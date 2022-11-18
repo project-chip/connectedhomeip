@@ -241,20 +241,20 @@ static inline mbedtls_sha256_context * to_inner_hash_sha256_context(HashSHA256Op
     return SafePointerCast<mbedtls_sha256_context *>(context);
 }
 
-Hash_SHA256_stream::Hash_SHA256_stream(void)
+Hash_SHA256_stream::Hash_SHA256_stream()
 {
     mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
     mbedtls_sha256_init(context);
 }
 
-Hash_SHA256_stream::~Hash_SHA256_stream(void)
+Hash_SHA256_stream::~Hash_SHA256_stream()
 {
     mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
     mbedtls_sha256_free(context);
     Clear();
 }
 
-CHIP_ERROR Hash_SHA256_stream::Begin(void)
+CHIP_ERROR Hash_SHA256_stream::Begin()
 {
     mbedtls_sha256_context * const context = to_inner_hash_sha256_context(&mContext);
 
@@ -320,7 +320,7 @@ CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
     return CHIP_NO_ERROR;
 }
 
-void Hash_SHA256_stream::Clear(void)
+void Hash_SHA256_stream::Clear()
 {
     mbedtls_platform_zeroize(this, sizeof(*this));
 }
@@ -969,7 +969,7 @@ static inline Spake2p_Context * to_inner_spake2p_context(Spake2pOpaqueContext * 
     return SafePointerCast<Spake2p_Context *>(context);
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;

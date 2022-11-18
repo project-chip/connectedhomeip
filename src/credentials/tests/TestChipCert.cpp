@@ -2064,7 +2064,7 @@ static const nlTest sTests[] = {
 };
 // clang-format on
 
-int TestChipCert(void)
+int TestChipCert()
 {
     // clang-format off
     nlTestSuite theSuite =

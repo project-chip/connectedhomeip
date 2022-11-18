@@ -49,7 +49,7 @@ static void TestMemberOwner(nlTestSuite * inSuite, void * inContext)
  */
 static const nlTest sTests[] = { NL_TEST_DEF_FN(TestMemberOwner), NL_TEST_SENTINEL() };
 
-int TestOwnerOf(void)
+int TestOwnerOf()
 {
     nlTestSuite theSuite = { "CHIP OwnerOf tests", &sTests[0], nullptr, nullptr };
 

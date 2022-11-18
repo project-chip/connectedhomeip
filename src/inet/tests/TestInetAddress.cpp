@@ -1880,7 +1880,7 @@ int TestTeardown(void * inContext)
 
 } // namespace
 
-int TestInetAddress(void)
+int TestInetAddress()
 {
     // clang-format off
     nlTestSuite theSuite = {
