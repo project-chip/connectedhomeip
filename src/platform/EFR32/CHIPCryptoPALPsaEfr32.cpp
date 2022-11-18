@@ -56,6 +56,10 @@ extern "C" {
 #include <mbedtls/x509.h>
 #include <mbedtls/x509_csr.h>
 
+#if defined(MBEDTLS_ERROR_C)
+#include <mbedtls/error.h>
+#endif // defined(MBEDTLS_ERROR_C)
+
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>

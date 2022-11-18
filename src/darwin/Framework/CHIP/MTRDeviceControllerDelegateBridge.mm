@@ -16,6 +16,7 @@
  */
 
 #import "MTRDeviceControllerDelegateBridge.h"
+#import "MTRDeviceController.h"
 #import "MTRError_Internal.h"
 
 MTRDeviceControllerDelegateBridge::MTRDeviceControllerDelegateBridge(void)
@@ -25,12 +26,15 @@ MTRDeviceControllerDelegateBridge::MTRDeviceControllerDelegateBridge(void)
 
 MTRDeviceControllerDelegateBridge::~MTRDeviceControllerDelegateBridge(void) {}
 
-void MTRDeviceControllerDelegateBridge::setDelegate(id<MTRDeviceControllerDelegate> delegate, dispatch_queue_t queue)
+void MTRDeviceControllerDelegateBridge::setDelegate(
+    MTRDeviceController * controller, id<MTRDeviceControllerDelegate> delegate, dispatch_queue_t queue)
 {
     if (delegate && queue) {
+        mController = controller;
         mDelegate = delegate;
         mQueue = queue;
     } else {
+        mController = nil;
         mDelegate = nil;
         mQueue = nil;
     }
@@ -58,11 +62,12 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
     NSLog(@"DeviceControllerDelegate status updated: %d", status);
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
-    if ([strongDelegate respondsToSelector:@selector(onStatusUpdate:)]) {
-        if (strongDelegate && mQueue) {
+    MTRDeviceController * strongController = mController;
+    if (strongDelegate && mQueue && strongController) {
+        if ([strongDelegate respondsToSelector:@selector(controller:statusUpdate:)]) {
             MTRCommissioningStatus commissioningStatus = MapStatus(status);
             dispatch_async(mQueue, ^{
-                [strongDelegate onStatusUpdate:commissioningStatus];
+                [strongDelegate controller:strongController statusUpdate:commissioningStatus];
             });
         }
     }
@@ -73,11 +78,12 @@ void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error)
     NSLog(@"DeviceControllerDelegate Pairing complete. Status %s", chip::ErrorStr(error));
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
-    if ([strongDelegate respondsToSelector:@selector(onPairingComplete:)]) {
-        if (strongDelegate && mQueue) {
+    MTRDeviceController * strongController = mController;
+    if (strongDelegate && mQueue && strongController) {
+        if ([strongDelegate respondsToSelector:@selector(controller:commissioningSessionEstablishmentDone:)]) {
             dispatch_async(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
-                [strongDelegate onPairingComplete:nsError];
+                [strongDelegate controller:strongController commissioningSessionEstablishmentDone:nsError];
             });
         }
     }
@@ -87,15 +93,7 @@ void MTRDeviceControllerDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
 {
     NSLog(@"DeviceControllerDelegate Pairing deleted. Status %s", chip::ErrorStr(error));
 
-    id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
-    if ([strongDelegate respondsToSelector:@selector(onPairingDeleted:)]) {
-        if (strongDelegate && mQueue) {
-            dispatch_async(mQueue, ^{
-                NSError * nsError = [MTRError errorForCHIPErrorCode:error];
-                [strongDelegate onPairingDeleted:nsError];
-            });
-        }
-    }
+    // This is never actually called; just do nothing.
 }
 
 void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR error)
@@ -103,11 +101,12 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
     NSLog(@"DeviceControllerDelegate Commissioning complete. NodeId %llu Status %s", nodeId, chip::ErrorStr(error));
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
-    if ([strongDelegate respondsToSelector:@selector(onCommissioningComplete:)]) {
-        if (strongDelegate && mQueue) {
+    MTRDeviceController * strongController = mController;
+    if (strongDelegate && mQueue && strongController) {
+        if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:)]) {
             dispatch_async(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
-                [strongDelegate onCommissioningComplete:nsError];
+                [strongDelegate controller:strongController commissioningComplete:nsError];
             });
         }
     }

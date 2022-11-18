@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,7 +58,7 @@ bool HashIfLongKey(const char * key, char * keyHash)
     Encoding::BytesToHex(hashBuffer, NVS_KEY_NAME_MAX_SIZE / 2, keyHash, NVS_KEY_NAME_MAX_SIZE, flags);
     keyHash[NVS_KEY_NAME_MAX_SIZE - 1] = 0;
 
-    ChipLogDetail(DeviceLayer, "Using hash:%s for nvs key:%s", keyHash, key);
+    ChipLogDetail(DeviceLayer, "Using hash:%s for nvs key:%s", keyHash, StringOrNullMarker(key));
     return true;
 }
 } // namespace

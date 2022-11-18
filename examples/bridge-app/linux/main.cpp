@@ -420,9 +420,7 @@ void HandleDevicePowerSourceStatusChanged(DevicePowerSource * dev, DevicePowerSo
 
     if (itemChangedMask & DevicePowerSource::kChanged_BatLevel)
     {
-        uint8_t batChargeLevel = dev->GetBatChargeLevel();
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), PowerSource::Id, PowerSource::Attributes::BatChargeLevel::Id,
-                                               ZCL_INT8U_ATTRIBUTE_TYPE, &batChargeLevel);
+        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), PowerSource::Id, PowerSource::Attributes::BatChargeLevel::Id);
     }
 
     if (itemChangedMask & DevicePowerSource::kChanged_Description)

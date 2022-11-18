@@ -433,6 +433,8 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
             }
             BOOL shouldWaitAfterDeviceAttestation = NO;
             if ([commissioningParams.deviceAttestationDelegate
+                    respondsToSelector:@selector(deviceAttestationCompletedForController:device:attestationDeviceInfo:error:)]
+                || [commissioningParams.deviceAttestationDelegate
                     respondsToSelector:@selector(deviceAttestation:completedForDevice:attestationDeviceInfo:error:)]) {
                 shouldWaitAfterDeviceAttestation = YES;
             }
@@ -542,7 +544,7 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
     dispatch_async(_chipWorkQueue, ^{
         VerifyOrReturn([self checkIsRunning]);
 
-        self->_deviceControllerDelegateBridge->setDelegate(delegate, queue);
+        self->_deviceControllerDelegateBridge->setDelegate(self, delegate, queue);
     });
 }
 
@@ -843,39 +845,32 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
 
 - (BOOL)respondsToSelector:(SEL)selector
 {
-    // This logic will need to change a bit when the MTRDeviceControllerDelegate
-    // signatures change.  It's shaped the way it is to make those changes
-    // easier.
-    if (selector == @selector(onStatusUpdate:)) {
+    if (selector == @selector(controller:statusUpdate:)) {
         return [self.delegate respondsToSelector:@selector(onStatusUpdate:)];
     }
 
-    if (selector == @selector(onPairingComplete:)) {
+    if (selector == @selector(controller:commissioningSessionEstablishmentDone:)) {
         return [self.delegate respondsToSelector:@selector(onPairingComplete:)];
     }
 
-    if (selector == @selector(onCommissioningComplete:)) {
+    if (selector == @selector(controller:commissioningComplete:)) {
         return [self.delegate respondsToSelector:@selector(onCommissioningComplete:)];
-    }
-
-    if (selector == @selector(onPairingDeleted:)) {
-        return [self.delegate respondsToSelector:@selector(onPairingDeleted:)];
     }
 
     return [super respondsToSelector:selector];
 }
 
-- (void)onStatusUpdate:(MTRCommissioningStatus)status
+- (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status
 {
     [self.delegate onStatusUpdate:static_cast<MTRPairingStatus>(status)];
 }
 
-- (void)onPairingComplete:(NSError * _Nullable)error
+- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
 {
     [self.delegate onPairingComplete:error];
 }
 
-- (void)onCommissioningComplete:(NSError * _Nullable)error
+- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error
 {
     [self.delegate onCommissioningComplete:error];
 }

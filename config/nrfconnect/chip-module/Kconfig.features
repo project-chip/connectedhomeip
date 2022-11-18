@@ -19,6 +19,31 @@
 
 if CHIP
 
+config CHIP_WIFI
+	bool "Enable nrfconnect Wi-Fi support"
+	default y if SHIELD_NRF7002_EK || BOARD_NRF7002DK_NRF5340_CPUAPP
+	select WIFI_NRF700X
+	select WIFI
+	select WPA_SUPP
+	imply FLASH
+	imply SETTINGS
+	imply NVS
+	imply FLASH_MAP
+	imply NORDIC_SECURITY_BACKEND
+	imply MBEDTLS_ENTROPY_C
+	imply MBEDTLS_PSA_CRYPTO_C
+	imply NET_STATISTICS
+	imply NET_L2_ETHERNET
+	imply NET_PKT_TXTIME
+	imply NET_PKT_TIMESTAMP
+	imply MBEDTLS_PROMPTLESS
+	imply BUILD_OUTPUT_META
+	imply USE_DT_CODE_PARTITION # might be removed when the OTA is enabled
+	imply NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
+	imply NET_IPV6_NBR_CACHE
+	imply NET_STATISTICS_IPV6
+	imply NET_STATISTICS_USER_API
+
 config CHIP_QSPI_NOR
 	bool "Enable QSPI NOR feature set"
 	help

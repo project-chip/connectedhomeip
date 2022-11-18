@@ -15,11 +15,8 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${build_root}/config/android_abi.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/build/chip/tools.gni")
-
-build_java_matter_controller = true
 
 java_binary("java-matter-controller") {
   output_name = "java-matter-controller"

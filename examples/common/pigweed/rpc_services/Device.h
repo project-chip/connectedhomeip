@@ -270,14 +270,22 @@ public:
 
     virtual pw::Status SetPairingState(const chip_rpc_PairingState & request, pw_protobuf_Empty & response)
     {
-        if (request.pairing_enabled)
+        if (request.pairing_enabled && !chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
         {
-            DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-            DeviceLayer::ConnectivityMgr().SetBLEAdvertisingMode(DeviceLayer::ConnectivityMgr().kFastAdvertising);
+            DeviceLayer::StackLock lock;
+            chip::ChipError err = chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "RPC SetPairingState failed to open commissioning window: %" CHIP_ERROR_FORMAT,
+                             err.Format());
+                return pw::Status::Internal();
+            }
         }
-        else
+        else if (!request.pairing_enabled &&
+                 chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
         {
-            DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+            DeviceLayer::StackLock lock;
+            chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
         }
         return pw::OkStatus();
     }

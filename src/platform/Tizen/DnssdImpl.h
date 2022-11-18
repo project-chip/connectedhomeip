@@ -74,7 +74,7 @@ struct RegisterContext : public GenericContext
 struct BrowseContext : public GenericContext
 {
     char mType[kDnssdTypeAndProtocolMaxSize + 1];
-    DnssdServiceProtocol mProtocol;
+    Dnssd::DnssdServiceProtocol mProtocol;
     uint32_t mInterfaceId;
 
     DnssdBrowseCallback mCallback;
@@ -87,7 +87,7 @@ struct BrowseContext : public GenericContext
     std::vector<DnssdService> mServices;
     bool mIsBrowsing = false;
 
-    BrowseContext(DnssdTizen * instance, const char * type, DnssdServiceProtocol protocol, uint32_t interfaceId,
+    BrowseContext(DnssdTizen * instance, const char * type, Dnssd::DnssdServiceProtocol protocol, uint32_t interfaceId,
                   DnssdBrowseCallback callback, void * context);
     ~BrowseContext() override;
 };
@@ -121,7 +121,7 @@ public:
     CHIP_ERROR RegisterService(const DnssdService & service, DnssdPublishCallback callback, void * context);
     CHIP_ERROR UnregisterAllServices();
 
-    CHIP_ERROR Browse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
+    CHIP_ERROR Browse(const char * type, Dnssd::DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
                       chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context);
 
     CHIP_ERROR Resolve(const DnssdService & browseResult, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
@@ -138,7 +138,7 @@ private:
 
     RegisterContext * CreateRegisterContext(const char * type, const DnssdService & service, DnssdPublishCallback callback,
                                             void * context);
-    BrowseContext * CreateBrowseContext(const char * type, DnssdServiceProtocol protocol, uint32_t interfaceId,
+    BrowseContext * CreateBrowseContext(const char * type, Dnssd::DnssdServiceProtocol protocol, uint32_t interfaceId,
                                         DnssdBrowseCallback callback, void * context);
     ResolveContext * CreateResolveContext(const char * name, const char * type, uint32_t interfaceId, DnssdResolveCallback callback,
                                           void * context);
