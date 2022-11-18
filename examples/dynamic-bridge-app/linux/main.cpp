@@ -185,6 +185,108 @@ bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj
     return true;
 }
 
+EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                   uint16_t maxReadLength)
+{
+    uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
+
+    EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
+
+    if ((endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT) && (gDevices[endpointIndex] != nullptr))
+    {
+        DynamicDevice * dev = g_device_impls[endpointIndex].get();
+        CommonCluster * cluster = nullptr;
+        const std::vector<CommonCluster *> clusters = dev->clusters();
+        int clusters_count = (int) clusters.size();
+        for (int cluster_index = 0; cluster_index < clusters_count; cluster_index++)
+        {
+            if (clusters[cluster_index]->GetClusterId() == clusterId)
+            {
+                cluster = clusters[cluster_index];
+                break;
+            }
+        }
+
+        if (cluster == nullptr) return ret;
+
+        AttributeInterface * attribute = cluster->FindAttribute(attributeMetadata->attributeId);
+
+        if (clusterId == ZCL_ON_OFF_CLUSTER_ID)
+        {
+            ret = HandleReadOnOffAttribute(static_cast<Attribute<bool> *>(attribute), buffer, maxReadLength);
+        }
+    }
+
+    return ret;
+}
+
+EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+{
+    uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
+
+    EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
+
+    if ((endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT) && (gDevices[endpointIndex] != nullptr))
+    {
+        DynamicDevice * dev = g_device_impls[endpointIndex].get();
+        CommonCluster * cluster = nullptr;
+        const std::vector<CommonCluster *> clusters = dev->clusters();
+        int clusters_count = (int) clusters.size();
+        for (int cluster_index = 0; cluster_index < clusters_count; cluster_index++)
+        {
+            if (clusters[cluster_index]->GetClusterId() == clusterId)
+            {
+                cluster = clusters[cluster_index];
+                break;
+            }
+        }
+
+        if (cluster == nullptr) return ret;
+
+        AttributeInterface * attribute = cluster->FindAttribute(attributeMetadata->attributeId);
+
+        if (clusterId == ZCL_ON_OFF_CLUSTER_ID)
+        {
+            ret = HandleWriteOnOffAttribute(static_cast<Attribute<bool> *>(attribute), buffer);
+        }
+    }
+
+    return ret;
+}
+
+EmberAfStatus HandleReadOnOffAttribute(Attribute<bool> * attribute, uint8_t * buffer, uint16_t maxReadLength)
+{
+    if ((attribute->GetId() == ZCL_ON_OFF_ATTRIBUTE_ID) && (maxReadLength == 1))
+    {
+        *buffer = attribute->Peek() ? 1 : 0;
+    }
+    else if ((attribute->GetId() == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
+    {
+        *buffer = (uint16_t) ZCL_ON_OFF_CLUSTER_REVISION;
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus HandleWriteOnOffAttribute(Attribute<bool> * attribute, uint8_t * buffer)
+{
+    if (attribute->GetId() == ZCL_ON_OFF_ATTRIBUTE_ID)
+    {
+        *attribute = (*buffer) == 1;
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
 Device * FindDeviceEndpoint(chip::EndpointId id)
 {
     for (auto dev : gDevices)

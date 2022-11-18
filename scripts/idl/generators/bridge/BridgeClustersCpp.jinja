@@ -42,7 +42,7 @@ struct {{cluster.name}}Cluster : public GeneratedCluster
 
   {{cluster.name}}Cluster() :
   {%-  for attr in cluster.attributes %}
-      m{{attr.definition.name | capitalcase}}(chip::CharSpan("{{attr.definition.name}}"), {{attr.definition.code}}, {{attr | getMask(cluster, idl)}}, {{attr | getRawSizeAndType(cluster, idl)}}{{attr | getInit(cluster, idl)}}){{"," if not loop.last}}
+      m{{attr.definition.name | capitalcase}}(chip::CharSpan("{{attr.definition.name}}"), {{attr.definition.code}}, {{attr | getMask(cluster, idl)}} | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), {{attr | getRawSizeAndType(cluster, idl)}}{{attr | getInit(cluster, idl)}}){{"," if not loop.last}}
   {%-  endfor  %}
   {
   }
