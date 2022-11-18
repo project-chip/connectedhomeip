@@ -114,10 +114,10 @@ template("k32w0_sdk") {
     chip_with_high_power = 0
   }
 
-  print("device:", device)
-  print("board:", board)
-  print("ntag:", chip_with_ntag)
-  print("high power:", chip_with_high_power)
+  # print("device:", device)
+  # print("board:", board)
+  # print("ntag:", chip_with_ntag)
+  # print("high power:", chip_with_high_power)
   device_lowercase = string_replace(board, "dk6", "")
 
   sdk_target_name = target_name
