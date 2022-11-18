@@ -172,7 +172,7 @@ def runGeneration(zap_file, zcl_file, templates_file, output_dir):
     except FileNotFoundError as e:
         print(f'FAILED TO EXECUTE ZAP GENERATION: {e.strerror} - "{e.filename}"')
         print('*'*80)
-        print('* You may need to install zap. Please ensure one of these aplies:')
+        print('* You may need to install zap. Please ensure one of these applies:')
         print('* - `zap-cli` is in $PATH. Install from https://github.com/project-chip/zap/releases')
         print('*   see docs/guides/BUILDING.md for details')
         print('* - `zap-cli` is in $ZAP_INSTALL_PATH. Use this option if you')
