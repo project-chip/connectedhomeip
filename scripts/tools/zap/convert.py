@@ -99,6 +99,10 @@ def runConversion(zap_file):
 def main():
     checkPythonVersion()
     zap_file, run_bootstrap = runArgumentsParser()
+
+    if run_bootstrap:
+       subprocess.check_call(getFilePath("scripts/tools/zap/zap_bootstrap.sh"), shell=True)
+
     os.chdir(CHIP_ROOT_DIR)
 
     runConversion(zap_file)
