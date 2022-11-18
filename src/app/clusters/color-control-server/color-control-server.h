@@ -19,7 +19,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/reporting/reporting.h>
+#include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 
 /**********************************************************

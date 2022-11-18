@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <ble/BleConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/ReferenceCounted.h>
 #include <lib/support/CodeUtils.h>
@@ -91,6 +92,8 @@ public:
                                             GetLastPeerActivityTime(), kMinActiveTime);
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
+        case Transport::Type::kBle:
+            return System::Clock::Milliseconds32(BTP_ACK_TIMEOUT_MS);
         default:
             break;
         }
