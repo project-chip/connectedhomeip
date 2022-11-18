@@ -134,7 +134,7 @@ Finally, reboot your RPi.
 as
 [chip-build-vscode](https://hub.docker.com/r/connectedhomeip/chip-build-vscode).
 
-Zap generation and tooling relies that `zap-cli` is available on the current
+Zap generation and tooling relies on `zap-cli` being available on the current
 system. You can install it from the zap project
 [Releases](https://github.com/project-chip/zap/releases).
 
