@@ -3470,27 +3470,27 @@ inline std::optional<ApplicationBasic::ApplicationStatusEnum> from_json(const nl
 //
 
 //
-// template<> inline nlohmann::json to_json(const chip::BitFlags<TestCluster::Bitmap16MaskMap, uint8_t>& value) {
+// template<> inline nlohmann::json to_json(const chip::BitFlags<UnitTesting::Bitmap16MaskMap, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
 
 //
-// template<> inline nlohmann::json to_json(const chip::BitFlags<TestCluster::Bitmap32MaskMap, uint8_t>& value) {
+// template<> inline nlohmann::json to_json(const chip::BitFlags<UnitTesting::Bitmap32MaskMap, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
 
 //
-// template<> inline nlohmann::json to_json(const chip::BitFlags<TestCluster::Bitmap64MaskMap, uint8_t>& value) {
+// template<> inline nlohmann::json to_json(const chip::BitFlags<UnitTesting::Bitmap64MaskMap, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
 
 //
-// template<> inline nlohmann::json to_json(const chip::BitFlags<TestCluster::Bitmap8MaskMap, uint8_t>& value) {
+// template<> inline nlohmann::json to_json(const chip::BitFlags<UnitTesting::Bitmap8MaskMap, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
 
 //
-// template<> inline nlohmann::json to_json(const chip::BitFlags<TestCluster::SimpleBitmap, uint8_t>& value) {
+// template<> inline nlohmann::json to_json(const chip::BitFlags<UnitTesting::SimpleBitmap, uint8_t>& value) {
 //    return "{\"no bitmap support\"}";
 //}
 
@@ -3498,50 +3498,50 @@ inline std::optional<ApplicationBasic::ApplicationStatusEnum> from_json(const nl
 
 /***************************** Struct Converters **************/
 //
-// template<> inline nlohmann::json to_json(const TestCluster::Structs::SimpleStruct::Type& value) {
+// template<> inline nlohmann::json to_json(const UnitTesting::Structs::SimpleStruct::Type& value) {
 //    return "no struct support";
 //}
 //
 //
-// template<> inline nlohmann::json to_json(const TestCluster::Structs::TestFabricScoped::Type& value) {
+// template<> inline nlohmann::json to_json(const UnitTesting::Structs::TestFabricScoped::Type& value) {
 //    return "no struct support";
 //}
 //
 //
-// template<> inline nlohmann::json to_json(const TestCluster::Structs::NullablesAndOptionalsStruct::Type& value) {
+// template<> inline nlohmann::json to_json(const UnitTesting::Structs::NullablesAndOptionalsStruct::Type& value) {
 //    return "no struct support";
 //}
 //
 //
-// template<> inline nlohmann::json to_json(const TestCluster::Structs::NestedStruct::Type& value) {
+// template<> inline nlohmann::json to_json(const UnitTesting::Structs::NestedStruct::Type& value) {
 //    return "no struct support";
 //}
 //
 //
-// template<> inline nlohmann::json to_json(const TestCluster::Structs::NestedStructList::Type& value) {
+// template<> inline nlohmann::json to_json(const UnitTesting::Structs::NestedStructList::Type& value) {
 //    return "no struct support";
 //}
 //
 //
-// template<> inline nlohmann::json to_json(const TestCluster::Structs::DoubleNestedStructList::Type& value) {
+// template<> inline nlohmann::json to_json(const UnitTesting::Structs::DoubleNestedStructList::Type& value) {
 //    return "no struct support";
 //}
 //
 //
-// template<> inline nlohmann::json to_json(const TestCluster::Structs::TestListStructOctet::Type& value) {
+// template<> inline nlohmann::json to_json(const UnitTesting::Structs::TestListStructOctet::Type& value) {
 //    return "no struct support";
 //}
 //
 //
 
 template <>
-inline std::optional<TestCluster::SimpleEnum> from_json(const nlohmann::json & value)
+inline std::optional<UnitTesting::SimpleEnum> from_json(const nlohmann::json & value)
 {
-    const std::map<std::string, TestCluster::SimpleEnum> table = {
-        { "Unspecified", TestCluster::SimpleEnum::kUnspecified },
-        { "ValueA", TestCluster::SimpleEnum::kValueA },
-        { "ValueB", TestCluster::SimpleEnum::kValueB },
-        { "ValueC", TestCluster::SimpleEnum::kValueC },
+    const std::map<std::string, UnitTesting::SimpleEnum> table = {
+        { "Unspecified", UnitTesting::SimpleEnum::kUnspecified },
+        { "ValueA", UnitTesting::SimpleEnum::kValueA },
+        { "ValueB", UnitTesting::SimpleEnum::kValueB },
+        { "ValueC", UnitTesting::SimpleEnum::kValueC },
     };
 
     auto i = table.find(value);

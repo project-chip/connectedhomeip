@@ -4389,7 +4389,7 @@ EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint1
 } // namespace Attributes
 } // namespace ElectricalMeasurement
 
-namespace TestCluster {
+namespace UnitTesting {
 namespace Attributes {
 
 namespace Boolean {
@@ -4399,30 +4399,30 @@ EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const bool 
 
 namespace Bitmap8 {
 EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
-                  chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> & value);
+                  chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> & value);
 EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
-                  const chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> & value);
+                  const chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> & value);
 } // namespace Bitmap8
 
 namespace Bitmap16 {
 EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
-                  chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> & value);
+                  chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> & value);
 EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
-                  const chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> & value);
+                  const chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> & value);
 } // namespace Bitmap16
 
 namespace Bitmap32 {
 EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
-                  chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> & value);
+                  chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> & value);
 EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
-                  const chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> & value);
+                  const chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> & value);
 } // namespace Bitmap32
 
 namespace Bitmap64 {
 EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
-                  chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> & value);
+                  chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> & value);
 EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
-                  const chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> & value);
+                  const chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> & value);
 } // namespace Bitmap64
 
 namespace Int8u {
@@ -4561,8 +4561,8 @@ EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip:
 } // namespace VendorId
 
 namespace EnumAttr {
-EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::Clusters::TestCluster::SimpleEnum & value);
-EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::Clusters::TestCluster::SimpleEnum & value);
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::Clusters::UnitTesting::SimpleEnum & value);
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::Clusters::UnitTesting::SimpleEnum & value);
 } // namespace EnumAttr
 
 namespace RangeRestrictedInt8u {
@@ -4612,30 +4612,30 @@ EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip:
 
 namespace NullableBitmap8 {
 EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
-                  chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value);
+                  chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> & value);
 EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
-                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value);
+                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> & value);
 } // namespace NullableBitmap8
 
 namespace NullableBitmap16 {
 EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
-                  chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value);
+                  chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> & value);
 EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
-                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value);
+                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> & value);
 } // namespace NullableBitmap16
 
 namespace NullableBitmap32 {
 EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
-                  chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value);
+                  chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> & value);
 EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
-                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value);
+                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> & value);
 } // namespace NullableBitmap32
 
 namespace NullableBitmap64 {
 EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
-                  chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value);
+                  chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> & value);
 EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
-                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value);
+                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> & value);
 } // namespace NullableBitmap64
 
 namespace NullableInt8u {
@@ -4750,9 +4750,9 @@ EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip:
 
 namespace NullableEnumAttr {
 EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
-                  chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> & value);
+                  chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> & value);
 EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
-                  const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> & value);
+                  const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> & value);
 } // namespace NullableEnumAttr
 
 namespace NullableRangeRestrictedInt8u {
@@ -4791,7 +4791,7 @@ EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint1
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace TestCluster
+} // namespace UnitTesting
 
 namespace FaultInjection {
 namespace Attributes {

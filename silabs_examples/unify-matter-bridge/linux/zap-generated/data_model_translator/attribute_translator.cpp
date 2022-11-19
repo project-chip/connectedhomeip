@@ -95,6 +95,7 @@ constexpr uint16_t ZCL_APPLICATION_LAUNCHER_REVISION                    = 0;
 constexpr uint16_t ZCL_APPLICATION_BASIC_REVISION                       = 0;
 constexpr uint16_t ZCL_ACCOUNT_LOGIN_REVISION                           = 0;
 constexpr uint16_t ZCL_ELECTRICAL_MEASUREMENT_REVISION                  = 3;
+constexpr uint16_t ZCL_UNIT_TESTING_REVISION                            = 0;
 
 CHIP_ERROR
 IdentifyAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -220,8 +221,7 @@ void IdentifyAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "IdentifyTime attribute value is %s", unify_value.dump().c_str());
             UN::IdentifyTime::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Identify::Id, MN::IdentifyTime::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Identify::Id, MN::IdentifyTime::Id);
         }
         break;
     }
@@ -234,8 +234,7 @@ void IdentifyAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "IdentifyType attribute value is %s", unify_value.dump().c_str());
             UN::IdentifyType::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Identify::Id, MN::IdentifyType::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Identify::Id, MN::IdentifyType::Id);
         }
         break;
     }
@@ -248,8 +247,7 @@ void IdentifyAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Identify::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Identify::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -262,8 +260,7 @@ void IdentifyAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Identify::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Identify::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -406,8 +403,7 @@ void ScenesAttributeAccess::reported_updated(const bridged_endpoint * ep, const 
         {
             sl_log_debug(LOG_TAG, "SceneCount attribute value is %s", unify_value.dump().c_str());
             UN::SceneCount::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::SceneCount::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::SceneCount::Id);
         }
         break;
     }
@@ -420,8 +416,7 @@ void ScenesAttributeAccess::reported_updated(const bridged_endpoint * ep, const 
         {
             sl_log_debug(LOG_TAG, "CurrentScene attribute value is %s", unify_value.dump().c_str());
             UN::CurrentScene::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::CurrentScene::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::CurrentScene::Id);
         }
         break;
     }
@@ -434,8 +429,7 @@ void ScenesAttributeAccess::reported_updated(const bridged_endpoint * ep, const 
         {
             sl_log_debug(LOG_TAG, "CurrentGroup attribute value is %s", unify_value.dump().c_str());
             UN::CurrentGroup::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::CurrentGroup::Id,
-                                                   ZCL_GROUP_ID_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::CurrentGroup::Id);
         }
         break;
     }
@@ -448,8 +442,7 @@ void ScenesAttributeAccess::reported_updated(const bridged_endpoint * ep, const 
         {
             sl_log_debug(LOG_TAG, "SceneValid attribute value is %s", unify_value.dump().c_str());
             UN::SceneValid::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::SceneValid::Id,
-                                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::SceneValid::Id);
         }
         break;
     }
@@ -462,8 +455,7 @@ void ScenesAttributeAccess::reported_updated(const bridged_endpoint * ep, const 
         {
             sl_log_debug(LOG_TAG, "NameSupport attribute value is %s", unify_value.dump().c_str());
             UN::NameSupport::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::NameSupport::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::NameSupport::Id);
         }
         break;
     }
@@ -476,8 +468,7 @@ void ScenesAttributeAccess::reported_updated(const bridged_endpoint * ep, const 
         {
             sl_log_debug(LOG_TAG, "LastConfiguredBy attribute value is %s", unify_value.dump().c_str());
             UN::LastConfiguredBy::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::LastConfiguredBy::Id,
-                                                   ZCL_NODE_ID_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::LastConfiguredBy::Id);
         }
         break;
     }
@@ -490,8 +481,7 @@ void ScenesAttributeAccess::reported_updated(const bridged_endpoint * ep, const 
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -504,8 +494,7 @@ void ScenesAttributeAccess::reported_updated(const bridged_endpoint * ep, const 
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -667,8 +656,7 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "OnOff attribute value is %s", unify_value.dump().c_str());
             UN::OnOff::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::OnOff::Id,
-                                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::OnOff::Id);
         }
         break;
     }
@@ -681,8 +669,7 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "GlobalSceneControl attribute value is %s", unify_value.dump().c_str());
             UN::GlobalSceneControl::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::GlobalSceneControl::Id,
-                                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::GlobalSceneControl::Id);
         }
         break;
     }
@@ -695,8 +682,7 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "OnTime attribute value is %s", unify_value.dump().c_str());
             UN::OnTime::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::OnTime::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::OnTime::Id);
         }
         break;
     }
@@ -709,8 +695,7 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "OffWaitTime attribute value is %s", unify_value.dump().c_str());
             UN::OffWaitTime::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::OffWaitTime::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::OffWaitTime::Id);
         }
         break;
     }
@@ -723,8 +708,7 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "StartUpOnOff attribute value is %s", unify_value.dump().c_str());
             UN::StartUpOnOff::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::StartUpOnOff::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::StartUpOnOff::Id);
         }
         break;
     }
@@ -737,8 +721,7 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -751,8 +734,7 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -884,8 +866,8 @@ void OnOffSwitchConfigurationAttributeAccess::reported_updated(const bridged_end
         {
             sl_log_debug(LOG_TAG, "SwitchType attribute value is %s", unify_value.dump().c_str());
             UN::SwitchType::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOffSwitchConfiguration::Id, MN::SwitchType::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOffSwitchConfiguration::Id,
+                                                   MN::SwitchType::Id);
         }
         break;
     }
@@ -899,8 +881,7 @@ void OnOffSwitchConfigurationAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "SwitchActions attribute value is %s", unify_value.dump().c_str());
             UN::SwitchActions::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOffSwitchConfiguration::Id,
-                                                   MN::SwitchActions::Id, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::SwitchActions::Id);
         }
         break;
     }
@@ -913,8 +894,8 @@ void OnOffSwitchConfigurationAttributeAccess::reported_updated(const bridged_end
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOffSwitchConfiguration::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOffSwitchConfiguration::Id,
+                                                   MN::FeatureMap::Id);
         }
         break;
     }
@@ -928,8 +909,7 @@ void OnOffSwitchConfigurationAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOffSwitchConfiguration::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -1168,8 +1148,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "CurrentLevel attribute value is %s", unify_value.dump().c_str());
             UN::CurrentLevel::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::CurrentLevel::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::CurrentLevel::Id);
         }
         break;
     }
@@ -1182,8 +1161,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "RemainingTime attribute value is %s", unify_value.dump().c_str());
             UN::RemainingTime::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::RemainingTime::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::RemainingTime::Id);
         }
         break;
     }
@@ -1196,8 +1174,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "MinLevel attribute value is %s", unify_value.dump().c_str());
             UN::MinLevel::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::MinLevel::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::MinLevel::Id);
         }
         break;
     }
@@ -1210,8 +1187,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "MaxLevel attribute value is %s", unify_value.dump().c_str());
             UN::MaxLevel::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::MaxLevel::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::MaxLevel::Id);
         }
         break;
     }
@@ -1224,8 +1200,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "CurrentFrequency attribute value is %s", unify_value.dump().c_str());
             UN::CurrentFrequency::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::CurrentFrequency::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::CurrentFrequency::Id);
         }
         break;
     }
@@ -1238,8 +1213,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "MinFrequency attribute value is %s", unify_value.dump().c_str());
             UN::MinFrequency::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::MinFrequency::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::MinFrequency::Id);
         }
         break;
     }
@@ -1252,8 +1226,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "MaxFrequency attribute value is %s", unify_value.dump().c_str());
             UN::MaxFrequency::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::MaxFrequency::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::MaxFrequency::Id);
         }
         break;
     }
@@ -1266,8 +1239,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Options attribute value is %s", unify_value.dump().c_str());
             UN::Options::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::Options::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::Options::Id);
         }
         break;
     }
@@ -1280,8 +1252,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "OnOffTransitionTime attribute value is %s", unify_value.dump().c_str());
             UN::OnOffTransitionTime::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::OnOffTransitionTime::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::OnOffTransitionTime::Id);
         }
         break;
     }
@@ -1294,8 +1265,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "OnLevel attribute value is %s", unify_value.dump().c_str());
             UN::OnLevel::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::OnLevel::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::OnLevel::Id);
         }
         break;
     }
@@ -1308,8 +1278,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "OnTransitionTime attribute value is %s", unify_value.dump().c_str());
             UN::OnTransitionTime::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::OnTransitionTime::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::OnTransitionTime::Id);
         }
         break;
     }
@@ -1322,8 +1291,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "OffTransitionTime attribute value is %s", unify_value.dump().c_str());
             UN::OffTransitionTime::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::OffTransitionTime::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::OffTransitionTime::Id);
         }
         break;
     }
@@ -1336,8 +1304,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "DefaultMoveRate attribute value is %s", unify_value.dump().c_str());
             UN::DefaultMoveRate::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::DefaultMoveRate::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::DefaultMoveRate::Id);
         }
         break;
     }
@@ -1350,8 +1317,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "StartUpCurrentLevel attribute value is %s", unify_value.dump().c_str());
             UN::StartUpCurrentLevel::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::StartUpCurrentLevel::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::StartUpCurrentLevel::Id);
         }
         break;
     }
@@ -1364,8 +1330,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -1378,8 +1343,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -1586,8 +1550,7 @@ void BinaryInputBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "ActiveText attribute value is %s", unify_value.dump().c_str());
             UN::ActiveText::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::ActiveText::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::ActiveText::Id);
         }
         break;
     }
@@ -1600,8 +1563,7 @@ void BinaryInputBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "Description attribute value is %s", unify_value.dump().c_str());
             UN::Description::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::Description::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::Description::Id);
         }
         break;
     }
@@ -1614,8 +1576,7 @@ void BinaryInputBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "InactiveText attribute value is %s", unify_value.dump().c_str());
             UN::InactiveText::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::InactiveText::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::InactiveText::Id);
         }
         break;
     }
@@ -1628,8 +1589,7 @@ void BinaryInputBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "OutOfService attribute value is %s", unify_value.dump().c_str());
             UN::OutOfService::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::OutOfService::Id,
-                                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::OutOfService::Id);
         }
         break;
     }
@@ -1642,8 +1602,7 @@ void BinaryInputBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "Polarity attribute value is %s", unify_value.dump().c_str());
             UN::Polarity::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::Polarity::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::Polarity::Id);
         }
         break;
     }
@@ -1656,8 +1615,7 @@ void BinaryInputBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "PresentValue attribute value is %s", unify_value.dump().c_str());
             UN::PresentValue::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::PresentValue::Id,
-                                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::PresentValue::Id);
         }
         break;
     }
@@ -1670,8 +1628,7 @@ void BinaryInputBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "Reliability attribute value is %s", unify_value.dump().c_str());
             UN::Reliability::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::Reliability::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::Reliability::Id);
         }
         break;
     }
@@ -1684,8 +1641,7 @@ void BinaryInputBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "StatusFlags attribute value is %s", unify_value.dump().c_str());
             UN::StatusFlags::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::StatusFlags::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::StatusFlags::Id);
         }
         break;
     }
@@ -1698,8 +1654,7 @@ void BinaryInputBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "ApplicationType attribute value is %s", unify_value.dump().c_str());
             UN::ApplicationType::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::ApplicationType::Id,
-                                                   ZCL_INT32U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::ApplicationType::Id);
         }
         break;
     }
@@ -1712,8 +1667,7 @@ void BinaryInputBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -1726,8 +1680,7 @@ void BinaryInputBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BinaryInputBasic::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -1841,8 +1794,7 @@ void PulseWidthModulationAttributeAccess::reported_updated(const bridged_endpoin
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PulseWidthModulation::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PulseWidthModulation::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -1856,8 +1808,7 @@ void PulseWidthModulationAttributeAccess::reported_updated(const bridged_endpoin
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PulseWidthModulation::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -2089,8 +2040,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "DataModelRevision attribute value is %s", unify_value.dump().c_str());
             UN::DataModelRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::DataModelRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::DataModelRevision::Id);
         }
         break;
     }
@@ -2103,8 +2053,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "VendorName attribute value is %s", unify_value.dump().c_str());
             UN::VendorName::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::VendorName::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::VendorName::Id);
         }
         break;
     }
@@ -2117,8 +2066,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "VendorID attribute value is %s", unify_value.dump().c_str());
             UN::VendorID::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::VendorID::Id,
-                                                   ZCL_VENDOR_ID_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::VendorID::Id);
         }
         break;
     }
@@ -2131,8 +2079,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "ProductName attribute value is %s", unify_value.dump().c_str());
             UN::ProductName::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::ProductName::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::ProductName::Id);
         }
         break;
     }
@@ -2145,8 +2092,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "ProductID attribute value is %s", unify_value.dump().c_str());
             UN::ProductID::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::ProductID::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::ProductID::Id);
         }
         break;
     }
@@ -2159,8 +2105,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "NodeLabel attribute value is %s", unify_value.dump().c_str());
             UN::NodeLabel::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::NodeLabel::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::NodeLabel::Id);
         }
         break;
     }
@@ -2173,8 +2118,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "Location attribute value is %s", unify_value.dump().c_str());
             UN::Location::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::Location::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::Location::Id);
         }
         break;
     }
@@ -2187,8 +2131,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "HardwareVersion attribute value is %s", unify_value.dump().c_str());
             UN::HardwareVersion::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::HardwareVersion::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::HardwareVersion::Id);
         }
         break;
     }
@@ -2201,8 +2144,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "HardwareVersionString attribute value is %s", unify_value.dump().c_str());
             UN::HardwareVersionString::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::HardwareVersionString::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::HardwareVersionString::Id);
         }
         break;
     }
@@ -2215,8 +2157,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "SoftwareVersion attribute value is %s", unify_value.dump().c_str());
             UN::SoftwareVersion::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::SoftwareVersion::Id,
-                                                   ZCL_INT32U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::SoftwareVersion::Id);
         }
         break;
     }
@@ -2229,8 +2170,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "SoftwareVersionString attribute value is %s", unify_value.dump().c_str());
             UN::SoftwareVersionString::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::SoftwareVersionString::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::SoftwareVersionString::Id);
         }
         break;
     }
@@ -2243,8 +2183,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "ManufacturingDate attribute value is %s", unify_value.dump().c_str());
             UN::ManufacturingDate::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::ManufacturingDate::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::ManufacturingDate::Id);
         }
         break;
     }
@@ -2257,8 +2196,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "PartNumber attribute value is %s", unify_value.dump().c_str());
             UN::PartNumber::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::PartNumber::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::PartNumber::Id);
         }
         break;
     }
@@ -2271,9 +2209,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "ProductURL attribute value is %s", unify_value.dump().c_str());
             UN::ProductURL::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::ProductURL::Id,
-                                                   ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::ProductURL::Id);
         }
         break;
     }
@@ -2286,8 +2222,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "ProductLabel attribute value is %s", unify_value.dump().c_str());
             UN::ProductLabel::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::ProductLabel::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::ProductLabel::Id);
         }
         break;
     }
@@ -2300,8 +2235,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "SerialNumber attribute value is %s", unify_value.dump().c_str());
             UN::SerialNumber::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::SerialNumber::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::SerialNumber::Id);
         }
         break;
     }
@@ -2314,8 +2248,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "LocalConfigDisabled attribute value is %s", unify_value.dump().c_str());
             UN::LocalConfigDisabled::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::LocalConfigDisabled::Id,
-                                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::LocalConfigDisabled::Id);
         }
         break;
     }
@@ -2328,8 +2261,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "Reachable attribute value is %s", unify_value.dump().c_str());
             UN::Reachable::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::Reachable::Id,
-                                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::Reachable::Id);
         }
         break;
     }
@@ -2342,8 +2274,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "UniqueID attribute value is %s", unify_value.dump().c_str());
             UN::UniqueID::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::UniqueID::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::UniqueID::Id);
         }
         break;
     }
@@ -2356,8 +2287,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -2370,8 +2300,7 @@ void BasicAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Basic::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -2487,8 +2416,7 @@ void OtaSoftwareUpdateProviderAttributeAccess::reported_updated(const bridged_en
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OtaSoftwareUpdateProvider::Id,
-                                                   MN::FeatureMap::Id, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::FeatureMap::Id);
         }
         break;
     }
@@ -2502,8 +2430,7 @@ void OtaSoftwareUpdateProviderAttributeAccess::reported_updated(const bridged_en
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OtaSoftwareUpdateProvider::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -2642,8 +2569,7 @@ void OtaSoftwareUpdateRequestorAttributeAccess::reported_updated(const bridged_e
             sl_log_debug(LOG_TAG, "UpdatePossible attribute value is %s", unify_value.dump().c_str());
             UN::UpdatePossible::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OtaSoftwareUpdateRequestor::Id,
-                                                   MN::UpdatePossible::Id, ZCL_BOOLEAN_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::UpdatePossible::Id);
         }
         break;
     }
@@ -2657,8 +2583,7 @@ void OtaSoftwareUpdateRequestorAttributeAccess::reported_updated(const bridged_e
             sl_log_debug(LOG_TAG, "UpdateState attribute value is %s", unify_value.dump().c_str());
             UN::UpdateState::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OtaSoftwareUpdateRequestor::Id,
-                                                   MN::UpdateState::Id, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::UpdateState::Id);
         }
         break;
     }
@@ -2672,8 +2597,7 @@ void OtaSoftwareUpdateRequestorAttributeAccess::reported_updated(const bridged_e
             sl_log_debug(LOG_TAG, "UpdateStateProgress attribute value is %s", unify_value.dump().c_str());
             UN::UpdateStateProgress::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OtaSoftwareUpdateRequestor::Id,
-                                                   MN::UpdateStateProgress::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::UpdateStateProgress::Id);
         }
         break;
     }
@@ -2687,8 +2611,7 @@ void OtaSoftwareUpdateRequestorAttributeAccess::reported_updated(const bridged_e
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OtaSoftwareUpdateRequestor::Id,
-                                                   MN::FeatureMap::Id, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::FeatureMap::Id);
         }
         break;
     }
@@ -2702,8 +2625,7 @@ void OtaSoftwareUpdateRequestorAttributeAccess::reported_updated(const bridged_e
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OtaSoftwareUpdateRequestor::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -2832,8 +2754,7 @@ void LocalizationConfigurationAttributeAccess::reported_updated(const bridged_en
             sl_log_debug(LOG_TAG, "ActiveLocale attribute value is %s", unify_value.dump().c_str());
             UN::ActiveLocale::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LocalizationConfiguration::Id,
-                                                   MN::ActiveLocale::Id, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ActiveLocale::Id);
         }
         break;
     }
@@ -2847,8 +2768,7 @@ void LocalizationConfigurationAttributeAccess::reported_updated(const bridged_en
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LocalizationConfiguration::Id,
-                                                   MN::FeatureMap::Id, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::FeatureMap::Id);
         }
         break;
     }
@@ -2862,8 +2782,7 @@ void LocalizationConfigurationAttributeAccess::reported_updated(const bridged_en
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LocalizationConfiguration::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -3003,8 +2922,7 @@ void TimeFormatLocalizationAttributeAccess::reported_updated(const bridged_endpo
         {
             sl_log_debug(LOG_TAG, "HourFormat attribute value is %s", unify_value.dump().c_str());
             UN::HourFormat::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeFormatLocalization::Id, MN::HourFormat::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeFormatLocalization::Id, MN::HourFormat::Id);
         }
         break;
     }
@@ -3018,8 +2936,7 @@ void TimeFormatLocalizationAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "ActiveCalendarType attribute value is %s", unify_value.dump().c_str());
             UN::ActiveCalendarType::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeFormatLocalization::Id,
-                                                   MN::ActiveCalendarType::Id, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ActiveCalendarType::Id);
         }
         break;
     }
@@ -3032,8 +2949,7 @@ void TimeFormatLocalizationAttributeAccess::reported_updated(const bridged_endpo
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeFormatLocalization::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeFormatLocalization::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -3047,8 +2963,7 @@ void TimeFormatLocalizationAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeFormatLocalization::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -3175,8 +3090,7 @@ void UnitLocalizationAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "TemperatureUnit attribute value is %s", unify_value.dump().c_str());
             UN::TemperatureUnit::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitLocalization::Id, MN::TemperatureUnit::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitLocalization::Id, MN::TemperatureUnit::Id);
         }
         break;
     }
@@ -3189,8 +3103,7 @@ void UnitLocalizationAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitLocalization::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitLocalization::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -3203,8 +3116,7 @@ void UnitLocalizationAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitLocalization::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitLocalization::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -3318,8 +3230,8 @@ void PowerSourceConfigurationAttributeAccess::reported_updated(const bridged_end
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSourceConfiguration::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSourceConfiguration::Id,
+                                                   MN::FeatureMap::Id);
         }
         break;
     }
@@ -3333,8 +3245,7 @@ void PowerSourceConfigurationAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSourceConfiguration::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -3587,8 +3498,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "Status attribute value is %s", unify_value.dump().c_str());
             UN::Status::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::Status::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::Status::Id);
         }
         break;
     }
@@ -3601,8 +3511,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "Order attribute value is %s", unify_value.dump().c_str());
             UN::Order::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::Order::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::Order::Id);
         }
         break;
     }
@@ -3615,8 +3524,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "Description attribute value is %s", unify_value.dump().c_str());
             UN::Description::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::Description::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::Description::Id);
         }
         break;
     }
@@ -3630,8 +3538,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
             sl_log_debug(LOG_TAG, "WiredAssessedInputVoltage attribute value is %s", unify_value.dump().c_str());
             UN::WiredAssessedInputVoltage::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id,
-                                                   MN::WiredAssessedInputVoltage::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::WiredAssessedInputVoltage::Id);
         }
         break;
     }
@@ -3645,8 +3552,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
             sl_log_debug(LOG_TAG, "WiredAssessedInputFrequency attribute value is %s", unify_value.dump().c_str());
             UN::WiredAssessedInputFrequency::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id,
-                                                   MN::WiredAssessedInputFrequency::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::WiredAssessedInputFrequency::Id);
         }
         break;
     }
@@ -3659,8 +3565,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "WiredCurrentType attribute value is %s", unify_value.dump().c_str());
             UN::WiredCurrentType::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::WiredCurrentType::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::WiredCurrentType::Id);
         }
         break;
     }
@@ -3673,8 +3578,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "WiredAssessedCurrent attribute value is %s", unify_value.dump().c_str());
             UN::WiredAssessedCurrent::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::WiredAssessedCurrent::Id,
-                                                   ZCL_INT32U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::WiredAssessedCurrent::Id);
         }
         break;
     }
@@ -3687,8 +3591,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "WiredNominalVoltage attribute value is %s", unify_value.dump().c_str());
             UN::WiredNominalVoltage::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::WiredNominalVoltage::Id,
-                                                   ZCL_INT32U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::WiredNominalVoltage::Id);
         }
         break;
     }
@@ -3701,8 +3604,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "WiredMaximumCurrent attribute value is %s", unify_value.dump().c_str());
             UN::WiredMaximumCurrent::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::WiredMaximumCurrent::Id,
-                                                   ZCL_INT32U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::WiredMaximumCurrent::Id);
         }
         break;
     }
@@ -3715,8 +3617,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "WiredPresent attribute value is %s", unify_value.dump().c_str());
             UN::WiredPresent::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::WiredPresent::Id,
-                                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::WiredPresent::Id);
         }
         break;
     }
@@ -3729,8 +3630,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "BatVoltage attribute value is %s", unify_value.dump().c_str());
             UN::BatVoltage::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatVoltage::Id,
-                                                   ZCL_INT32U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatVoltage::Id);
         }
         break;
     }
@@ -3743,8 +3643,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "BatPercentRemaining attribute value is %s", unify_value.dump().c_str());
             UN::BatPercentRemaining::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatPercentRemaining::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatPercentRemaining::Id);
         }
         break;
     }
@@ -3757,8 +3656,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "BatTimeRemaining attribute value is %s", unify_value.dump().c_str());
             UN::BatTimeRemaining::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatTimeRemaining::Id,
-                                                   ZCL_INT32U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatTimeRemaining::Id);
         }
         break;
     }
@@ -3771,8 +3669,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "BatChargeLevel attribute value is %s", unify_value.dump().c_str());
             UN::BatChargeLevel::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatChargeLevel::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatChargeLevel::Id);
         }
         break;
     }
@@ -3785,8 +3682,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "BatReplacementNeeded attribute value is %s", unify_value.dump().c_str());
             UN::BatReplacementNeeded::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatReplacementNeeded::Id,
-                                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatReplacementNeeded::Id);
         }
         break;
     }
@@ -3799,8 +3695,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "BatReplaceability attribute value is %s", unify_value.dump().c_str());
             UN::BatReplaceability::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatReplaceability::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatReplaceability::Id);
         }
         break;
     }
@@ -3813,8 +3708,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "BatPresent attribute value is %s", unify_value.dump().c_str());
             UN::BatPresent::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatPresent::Id,
-                                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatPresent::Id);
         }
         break;
     }
@@ -3828,8 +3722,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
             sl_log_debug(LOG_TAG, "BatReplacementDescription attribute value is %s", unify_value.dump().c_str());
             UN::BatReplacementDescription::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id,
-                                                   MN::BatReplacementDescription::Id, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::BatReplacementDescription::Id);
         }
         break;
     }
@@ -3842,8 +3735,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "BatCommonDesignation attribute value is %s", unify_value.dump().c_str());
             UN::BatCommonDesignation::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatCommonDesignation::Id,
-                                                   ZCL_INT32U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatCommonDesignation::Id);
         }
         break;
     }
@@ -3856,8 +3748,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "BatANSIDesignation attribute value is %s", unify_value.dump().c_str());
             UN::BatANSIDesignation::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatANSIDesignation::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatANSIDesignation::Id);
         }
         break;
     }
@@ -3870,8 +3761,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "BatIECDesignation attribute value is %s", unify_value.dump().c_str());
             UN::BatIECDesignation::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatIECDesignation::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatIECDesignation::Id);
         }
         break;
     }
@@ -3884,8 +3774,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "BatApprovedChemistry attribute value is %s", unify_value.dump().c_str());
             UN::BatApprovedChemistry::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatApprovedChemistry::Id,
-                                                   ZCL_INT32U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatApprovedChemistry::Id);
         }
         break;
     }
@@ -3898,8 +3787,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "BatCapacity attribute value is %s", unify_value.dump().c_str());
             UN::BatCapacity::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatCapacity::Id,
-                                                   ZCL_INT32U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatCapacity::Id);
         }
         break;
     }
@@ -3912,8 +3800,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "BatQuantity attribute value is %s", unify_value.dump().c_str());
             UN::BatQuantity::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatQuantity::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatQuantity::Id);
         }
         break;
     }
@@ -3926,8 +3813,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "BatChargeState attribute value is %s", unify_value.dump().c_str());
             UN::BatChargeState::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatChargeState::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatChargeState::Id);
         }
         break;
     }
@@ -3940,8 +3826,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "BatTimeToFullCharge attribute value is %s", unify_value.dump().c_str());
             UN::BatTimeToFullCharge::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatTimeToFullCharge::Id,
-                                                   ZCL_INT32U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatTimeToFullCharge::Id);
         }
         break;
     }
@@ -3955,8 +3840,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
             sl_log_debug(LOG_TAG, "BatFunctionalWhileCharging attribute value is %s", unify_value.dump().c_str());
             UN::BatFunctionalWhileCharging::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id,
-                                                   MN::BatFunctionalWhileCharging::Id, ZCL_BOOLEAN_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::BatFunctionalWhileCharging::Id);
         }
         break;
     }
@@ -3969,8 +3853,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "BatChargingCurrent attribute value is %s", unify_value.dump().c_str());
             UN::BatChargingCurrent::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatChargingCurrent::Id,
-                                                   ZCL_INT32U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::BatChargingCurrent::Id);
         }
         break;
     }
@@ -3983,8 +3866,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -3997,8 +3879,7 @@ void PowerSourceAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PowerSource::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -4140,8 +4021,7 @@ void GeneralCommissioningAttributeAccess::reported_updated(const bridged_endpoin
         {
             sl_log_debug(LOG_TAG, "Breadcrumb attribute value is %s", unify_value.dump().c_str());
             UN::Breadcrumb::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralCommissioning::Id, MN::Breadcrumb::Id,
-                                                   ZCL_INT64U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralCommissioning::Id, MN::Breadcrumb::Id);
         }
         break;
     }
@@ -4155,8 +4035,7 @@ void GeneralCommissioningAttributeAccess::reported_updated(const bridged_endpoin
             sl_log_debug(LOG_TAG, "RegulatoryConfig attribute value is %s", unify_value.dump().c_str());
             UN::RegulatoryConfig::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralCommissioning::Id,
-                                                   MN::RegulatoryConfig::Id, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RegulatoryConfig::Id);
         }
         break;
     }
@@ -4170,8 +4049,7 @@ void GeneralCommissioningAttributeAccess::reported_updated(const bridged_endpoin
             sl_log_debug(LOG_TAG, "LocationCapability attribute value is %s", unify_value.dump().c_str());
             UN::LocationCapability::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralCommissioning::Id,
-                                                   MN::LocationCapability::Id, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::LocationCapability::Id);
         }
         break;
     }
@@ -4185,8 +4063,7 @@ void GeneralCommissioningAttributeAccess::reported_updated(const bridged_endpoin
             sl_log_debug(LOG_TAG, "SupportsConcurrentConnection attribute value is %s", unify_value.dump().c_str());
             UN::SupportsConcurrentConnection::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralCommissioning::Id,
-                                                   MN::SupportsConcurrentConnection::Id, ZCL_BOOLEAN_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::SupportsConcurrentConnection::Id);
         }
         break;
     }
@@ -4199,8 +4076,7 @@ void GeneralCommissioningAttributeAccess::reported_updated(const bridged_endpoin
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralCommissioning::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralCommissioning::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -4214,8 +4090,7 @@ void GeneralCommissioningAttributeAccess::reported_updated(const bridged_endpoin
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralCommissioning::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -4329,8 +4204,7 @@ void DiagnosticLogsAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DiagnosticLogs::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DiagnosticLogs::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -4343,8 +4217,7 @@ void DiagnosticLogsAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DiagnosticLogs::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DiagnosticLogs::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -4483,8 +4356,7 @@ void GeneralDiagnosticsAttributeAccess::reported_updated(const bridged_endpoint 
         {
             sl_log_debug(LOG_TAG, "RebootCount attribute value is %s", unify_value.dump().c_str());
             UN::RebootCount::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralDiagnostics::Id, MN::RebootCount::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralDiagnostics::Id, MN::RebootCount::Id);
         }
         break;
     }
@@ -4497,8 +4369,7 @@ void GeneralDiagnosticsAttributeAccess::reported_updated(const bridged_endpoint 
         {
             sl_log_debug(LOG_TAG, "UpTime attribute value is %s", unify_value.dump().c_str());
             UN::UpTime::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralDiagnostics::Id, MN::UpTime::Id,
-                                                   ZCL_INT64U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralDiagnostics::Id, MN::UpTime::Id);
         }
         break;
     }
@@ -4512,8 +4383,7 @@ void GeneralDiagnosticsAttributeAccess::reported_updated(const bridged_endpoint 
             sl_log_debug(LOG_TAG, "TotalOperationalHours attribute value is %s", unify_value.dump().c_str());
             UN::TotalOperationalHours::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralDiagnostics::Id,
-                                                   MN::TotalOperationalHours::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TotalOperationalHours::Id);
         }
         break;
     }
@@ -4526,8 +4396,7 @@ void GeneralDiagnosticsAttributeAccess::reported_updated(const bridged_endpoint 
         {
             sl_log_debug(LOG_TAG, "BootReasons attribute value is %s", unify_value.dump().c_str());
             UN::BootReasons::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralDiagnostics::Id, MN::BootReasons::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralDiagnostics::Id, MN::BootReasons::Id);
         }
         break;
     }
@@ -4541,8 +4410,7 @@ void GeneralDiagnosticsAttributeAccess::reported_updated(const bridged_endpoint 
             sl_log_debug(LOG_TAG, "TestEventTriggersEnabled attribute value is %s", unify_value.dump().c_str());
             UN::TestEventTriggersEnabled::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralDiagnostics::Id,
-                                                   MN::TestEventTriggersEnabled::Id, ZCL_BOOLEAN_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TestEventTriggersEnabled::Id);
         }
         break;
     }
@@ -4555,8 +4423,7 @@ void GeneralDiagnosticsAttributeAccess::reported_updated(const bridged_endpoint 
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralDiagnostics::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralDiagnostics::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -4569,8 +4436,7 @@ void GeneralDiagnosticsAttributeAccess::reported_updated(const bridged_endpoint 
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralDiagnostics::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GeneralDiagnostics::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -4699,8 +4565,8 @@ void SoftwareDiagnosticsAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "CurrentHeapFree attribute value is %s", unify_value.dump().c_str());
             UN::CurrentHeapFree::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::SoftwareDiagnostics::Id, MN::CurrentHeapFree::Id,
-                                                   ZCL_INT64U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::SoftwareDiagnostics::Id,
+                                                   MN::CurrentHeapFree::Id);
         }
         break;
     }
@@ -4713,8 +4579,8 @@ void SoftwareDiagnosticsAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "CurrentHeapUsed attribute value is %s", unify_value.dump().c_str());
             UN::CurrentHeapUsed::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::SoftwareDiagnostics::Id, MN::CurrentHeapUsed::Id,
-                                                   ZCL_INT64U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::SoftwareDiagnostics::Id,
+                                                   MN::CurrentHeapUsed::Id);
         }
         break;
     }
@@ -4728,8 +4594,7 @@ void SoftwareDiagnosticsAttributeAccess::reported_updated(const bridged_endpoint
             sl_log_debug(LOG_TAG, "CurrentHeapHighWatermark attribute value is %s", unify_value.dump().c_str());
             UN::CurrentHeapHighWatermark::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::SoftwareDiagnostics::Id,
-                                                   MN::CurrentHeapHighWatermark::Id, ZCL_INT64U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::CurrentHeapHighWatermark::Id);
         }
         break;
     }
@@ -4742,8 +4607,7 @@ void SoftwareDiagnosticsAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::SoftwareDiagnostics::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::SoftwareDiagnostics::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -4756,8 +4620,8 @@ void SoftwareDiagnosticsAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::SoftwareDiagnostics::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::SoftwareDiagnostics::Id,
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -5161,8 +5025,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
         {
             sl_log_debug(LOG_TAG, "Channel attribute value is %s", unify_value.dump().c_str());
             UN::Channel::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id, MN::Channel::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id, MN::Channel::Id);
         }
         break;
     }
@@ -5176,8 +5039,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RoutingRole attribute value is %s", unify_value.dump().c_str());
             UN::RoutingRole::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RoutingRole::Id, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RoutingRole::Id);
         }
         break;
     }
@@ -5191,8 +5053,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "NetworkName attribute value is %s", unify_value.dump().c_str());
             UN::NetworkName::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::NetworkName::Id, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::NetworkName::Id);
         }
         break;
     }
@@ -5205,8 +5066,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
         {
             sl_log_debug(LOG_TAG, "PanId attribute value is %s", unify_value.dump().c_str());
             UN::PanId::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id, MN::PanId::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id, MN::PanId::Id);
         }
         break;
     }
@@ -5220,8 +5080,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "ExtendedPanId attribute value is %s", unify_value.dump().c_str());
             UN::ExtendedPanId::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::ExtendedPanId::Id, ZCL_INT64U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ExtendedPanId::Id);
         }
         break;
     }
@@ -5235,8 +5094,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "MeshLocalPrefix attribute value is %s", unify_value.dump().c_str());
             UN::MeshLocalPrefix::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::MeshLocalPrefix::Id, ZCL_OCTET_STRING_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MeshLocalPrefix::Id);
         }
         break;
     }
@@ -5250,8 +5108,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "OverrunCount attribute value is %s", unify_value.dump().c_str());
             UN::OverrunCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::OverrunCount::Id, ZCL_INT64U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::OverrunCount::Id);
         }
         break;
     }
@@ -5265,8 +5122,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "PartitionId attribute value is %s", unify_value.dump().c_str());
             UN::PartitionId::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::PartitionId::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PartitionId::Id);
         }
         break;
     }
@@ -5279,8 +5135,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
         {
             sl_log_debug(LOG_TAG, "Weighting attribute value is %s", unify_value.dump().c_str());
             UN::Weighting::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id, MN::Weighting::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id, MN::Weighting::Id);
         }
         break;
     }
@@ -5294,8 +5149,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "DataVersion attribute value is %s", unify_value.dump().c_str());
             UN::DataVersion::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::DataVersion::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::DataVersion::Id);
         }
         break;
     }
@@ -5309,8 +5163,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "StableDataVersion attribute value is %s", unify_value.dump().c_str());
             UN::StableDataVersion::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::StableDataVersion::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::StableDataVersion::Id);
         }
         break;
     }
@@ -5324,8 +5177,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "LeaderRouterId attribute value is %s", unify_value.dump().c_str());
             UN::LeaderRouterId::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::LeaderRouterId::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::LeaderRouterId::Id);
         }
         break;
     }
@@ -5339,8 +5191,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "DetachedRoleCount attribute value is %s", unify_value.dump().c_str());
             UN::DetachedRoleCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::DetachedRoleCount::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::DetachedRoleCount::Id);
         }
         break;
     }
@@ -5354,8 +5205,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "ChildRoleCount attribute value is %s", unify_value.dump().c_str());
             UN::ChildRoleCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::ChildRoleCount::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ChildRoleCount::Id);
         }
         break;
     }
@@ -5369,8 +5219,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RouterRoleCount attribute value is %s", unify_value.dump().c_str());
             UN::RouterRoleCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RouterRoleCount::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RouterRoleCount::Id);
         }
         break;
     }
@@ -5384,8 +5233,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "LeaderRoleCount attribute value is %s", unify_value.dump().c_str());
             UN::LeaderRoleCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::LeaderRoleCount::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::LeaderRoleCount::Id);
         }
         break;
     }
@@ -5399,8 +5247,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "AttachAttemptCount attribute value is %s", unify_value.dump().c_str());
             UN::AttachAttemptCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::AttachAttemptCount::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AttachAttemptCount::Id);
         }
         break;
     }
@@ -5414,8 +5261,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "PartitionIdChangeCount attribute value is %s", unify_value.dump().c_str());
             UN::PartitionIdChangeCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::PartitionIdChangeCount::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PartitionIdChangeCount::Id);
         }
         break;
     }
@@ -5429,8 +5275,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "BetterPartitionAttachAttemptCount attribute value is %s", unify_value.dump().c_str());
             UN::BetterPartitionAttachAttemptCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::BetterPartitionAttachAttemptCount::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::BetterPartitionAttachAttemptCount::Id);
         }
         break;
     }
@@ -5444,8 +5289,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "ParentChangeCount attribute value is %s", unify_value.dump().c_str());
             UN::ParentChangeCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::ParentChangeCount::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ParentChangeCount::Id);
         }
         break;
     }
@@ -5459,8 +5303,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "TxTotalCount attribute value is %s", unify_value.dump().c_str());
             UN::TxTotalCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::TxTotalCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TxTotalCount::Id);
         }
         break;
     }
@@ -5474,8 +5317,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "TxUnicastCount attribute value is %s", unify_value.dump().c_str());
             UN::TxUnicastCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::TxUnicastCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TxUnicastCount::Id);
         }
         break;
     }
@@ -5489,8 +5331,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "TxBroadcastCount attribute value is %s", unify_value.dump().c_str());
             UN::TxBroadcastCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::TxBroadcastCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TxBroadcastCount::Id);
         }
         break;
     }
@@ -5504,8 +5345,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "TxAckRequestedCount attribute value is %s", unify_value.dump().c_str());
             UN::TxAckRequestedCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::TxAckRequestedCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TxAckRequestedCount::Id);
         }
         break;
     }
@@ -5519,8 +5359,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "TxAckedCount attribute value is %s", unify_value.dump().c_str());
             UN::TxAckedCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::TxAckedCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TxAckedCount::Id);
         }
         break;
     }
@@ -5534,8 +5373,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "TxNoAckRequestedCount attribute value is %s", unify_value.dump().c_str());
             UN::TxNoAckRequestedCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::TxNoAckRequestedCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TxNoAckRequestedCount::Id);
         }
         break;
     }
@@ -5549,8 +5387,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "TxDataCount attribute value is %s", unify_value.dump().c_str());
             UN::TxDataCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::TxDataCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TxDataCount::Id);
         }
         break;
     }
@@ -5564,8 +5401,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "TxDataPollCount attribute value is %s", unify_value.dump().c_str());
             UN::TxDataPollCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::TxDataPollCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TxDataPollCount::Id);
         }
         break;
     }
@@ -5579,8 +5415,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "TxBeaconCount attribute value is %s", unify_value.dump().c_str());
             UN::TxBeaconCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::TxBeaconCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TxBeaconCount::Id);
         }
         break;
     }
@@ -5594,8 +5429,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "TxBeaconRequestCount attribute value is %s", unify_value.dump().c_str());
             UN::TxBeaconRequestCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::TxBeaconRequestCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TxBeaconRequestCount::Id);
         }
         break;
     }
@@ -5609,8 +5443,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "TxOtherCount attribute value is %s", unify_value.dump().c_str());
             UN::TxOtherCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::TxOtherCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TxOtherCount::Id);
         }
         break;
     }
@@ -5624,8 +5457,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "TxRetryCount attribute value is %s", unify_value.dump().c_str());
             UN::TxRetryCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::TxRetryCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TxRetryCount::Id);
         }
         break;
     }
@@ -5639,8 +5471,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "TxDirectMaxRetryExpiryCount attribute value is %s", unify_value.dump().c_str());
             UN::TxDirectMaxRetryExpiryCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::TxDirectMaxRetryExpiryCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TxDirectMaxRetryExpiryCount::Id);
         }
         break;
     }
@@ -5654,8 +5485,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "TxIndirectMaxRetryExpiryCount attribute value is %s", unify_value.dump().c_str());
             UN::TxIndirectMaxRetryExpiryCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::TxIndirectMaxRetryExpiryCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TxIndirectMaxRetryExpiryCount::Id);
         }
         break;
     }
@@ -5669,8 +5499,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "TxErrCcaCount attribute value is %s", unify_value.dump().c_str());
             UN::TxErrCcaCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::TxErrCcaCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TxErrCcaCount::Id);
         }
         break;
     }
@@ -5684,8 +5513,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "TxErrAbortCount attribute value is %s", unify_value.dump().c_str());
             UN::TxErrAbortCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::TxErrAbortCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TxErrAbortCount::Id);
         }
         break;
     }
@@ -5699,8 +5527,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "TxErrBusyChannelCount attribute value is %s", unify_value.dump().c_str());
             UN::TxErrBusyChannelCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::TxErrBusyChannelCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TxErrBusyChannelCount::Id);
         }
         break;
     }
@@ -5714,8 +5541,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RxTotalCount attribute value is %s", unify_value.dump().c_str());
             UN::RxTotalCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RxTotalCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RxTotalCount::Id);
         }
         break;
     }
@@ -5729,8 +5555,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RxUnicastCount attribute value is %s", unify_value.dump().c_str());
             UN::RxUnicastCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RxUnicastCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RxUnicastCount::Id);
         }
         break;
     }
@@ -5744,8 +5569,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RxBroadcastCount attribute value is %s", unify_value.dump().c_str());
             UN::RxBroadcastCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RxBroadcastCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RxBroadcastCount::Id);
         }
         break;
     }
@@ -5759,8 +5583,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RxDataCount attribute value is %s", unify_value.dump().c_str());
             UN::RxDataCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RxDataCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RxDataCount::Id);
         }
         break;
     }
@@ -5774,8 +5597,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RxDataPollCount attribute value is %s", unify_value.dump().c_str());
             UN::RxDataPollCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RxDataPollCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RxDataPollCount::Id);
         }
         break;
     }
@@ -5789,8 +5611,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RxBeaconCount attribute value is %s", unify_value.dump().c_str());
             UN::RxBeaconCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RxBeaconCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RxBeaconCount::Id);
         }
         break;
     }
@@ -5804,8 +5625,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RxBeaconRequestCount attribute value is %s", unify_value.dump().c_str());
             UN::RxBeaconRequestCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RxBeaconRequestCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RxBeaconRequestCount::Id);
         }
         break;
     }
@@ -5819,8 +5639,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RxOtherCount attribute value is %s", unify_value.dump().c_str());
             UN::RxOtherCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RxOtherCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RxOtherCount::Id);
         }
         break;
     }
@@ -5834,8 +5653,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RxAddressFilteredCount attribute value is %s", unify_value.dump().c_str());
             UN::RxAddressFilteredCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RxAddressFilteredCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RxAddressFilteredCount::Id);
         }
         break;
     }
@@ -5849,8 +5667,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RxDestAddrFilteredCount attribute value is %s", unify_value.dump().c_str());
             UN::RxDestAddrFilteredCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RxDestAddrFilteredCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RxDestAddrFilteredCount::Id);
         }
         break;
     }
@@ -5864,8 +5681,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RxDuplicatedCount attribute value is %s", unify_value.dump().c_str());
             UN::RxDuplicatedCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RxDuplicatedCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RxDuplicatedCount::Id);
         }
         break;
     }
@@ -5879,8 +5695,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RxErrNoFrameCount attribute value is %s", unify_value.dump().c_str());
             UN::RxErrNoFrameCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RxErrNoFrameCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RxErrNoFrameCount::Id);
         }
         break;
     }
@@ -5894,8 +5709,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RxErrUnknownNeighborCount attribute value is %s", unify_value.dump().c_str());
             UN::RxErrUnknownNeighborCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RxErrUnknownNeighborCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RxErrUnknownNeighborCount::Id);
         }
         break;
     }
@@ -5909,8 +5723,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RxErrInvalidSrcAddrCount attribute value is %s", unify_value.dump().c_str());
             UN::RxErrInvalidSrcAddrCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RxErrInvalidSrcAddrCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RxErrInvalidSrcAddrCount::Id);
         }
         break;
     }
@@ -5924,8 +5737,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RxErrSecCount attribute value is %s", unify_value.dump().c_str());
             UN::RxErrSecCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RxErrSecCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RxErrSecCount::Id);
         }
         break;
     }
@@ -5939,8 +5751,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RxErrFcsCount attribute value is %s", unify_value.dump().c_str());
             UN::RxErrFcsCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RxErrFcsCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RxErrFcsCount::Id);
         }
         break;
     }
@@ -5954,8 +5765,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "RxErrOtherCount attribute value is %s", unify_value.dump().c_str());
             UN::RxErrOtherCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::RxErrOtherCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RxErrOtherCount::Id);
         }
         break;
     }
@@ -5969,8 +5779,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "ActiveTimestamp attribute value is %s", unify_value.dump().c_str());
             UN::ActiveTimestamp::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::ActiveTimestamp::Id, ZCL_INT64U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ActiveTimestamp::Id);
         }
         break;
     }
@@ -5984,8 +5793,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "PendingTimestamp attribute value is %s", unify_value.dump().c_str());
             UN::PendingTimestamp::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::PendingTimestamp::Id, ZCL_INT64U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PendingTimestamp::Id);
         }
         break;
     }
@@ -5998,8 +5806,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
         {
             sl_log_debug(LOG_TAG, "Delay attribute value is %s", unify_value.dump().c_str());
             UN::Delay::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id, MN::Delay::Id,
-                                                   ZCL_INT32U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id, MN::Delay::Id);
         }
         break;
     }
@@ -6013,8 +5820,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "ChannelPage0Mask attribute value is %s", unify_value.dump().c_str());
             UN::ChannelPage0Mask::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::ChannelPage0Mask::Id, ZCL_OCTET_STRING_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ChannelPage0Mask::Id);
         }
         break;
     }
@@ -6027,8 +5833,8 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
+                                                   MN::FeatureMap::Id);
         }
         break;
     }
@@ -6042,8 +5848,7 @@ void ThreadNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_end
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThreadNetworkDiagnostics::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -6222,8 +6027,7 @@ void WiFiNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_endpo
         {
             sl_log_debug(LOG_TAG, "Bssid attribute value is %s", unify_value.dump().c_str());
             UN::Bssid::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id, MN::Bssid::Id,
-                                                   ZCL_OCTET_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id, MN::Bssid::Id);
         }
         break;
     }
@@ -6236,8 +6040,8 @@ void WiFiNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_endpo
         {
             sl_log_debug(LOG_TAG, "SecurityType attribute value is %s", unify_value.dump().c_str());
             UN::SecurityType::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id, MN::SecurityType::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id,
+                                                   MN::SecurityType::Id);
         }
         break;
     }
@@ -6250,8 +6054,7 @@ void WiFiNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_endpo
         {
             sl_log_debug(LOG_TAG, "WiFiVersion attribute value is %s", unify_value.dump().c_str());
             UN::WiFiVersion::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id, MN::WiFiVersion::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id, MN::WiFiVersion::Id);
         }
         break;
     }
@@ -6265,8 +6068,7 @@ void WiFiNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "ChannelNumber attribute value is %s", unify_value.dump().c_str());
             UN::ChannelNumber::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id,
-                                                   MN::ChannelNumber::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ChannelNumber::Id);
         }
         break;
     }
@@ -6279,8 +6081,7 @@ void WiFiNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_endpo
         {
             sl_log_debug(LOG_TAG, "Rssi attribute value is %s", unify_value.dump().c_str());
             UN::Rssi::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id, MN::Rssi::Id,
-                                                   ZCL_INT8S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id, MN::Rssi::Id);
         }
         break;
     }
@@ -6294,8 +6095,7 @@ void WiFiNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "BeaconLostCount attribute value is %s", unify_value.dump().c_str());
             UN::BeaconLostCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id,
-                                                   MN::BeaconLostCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::BeaconLostCount::Id);
         }
         break;
     }
@@ -6309,8 +6109,7 @@ void WiFiNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "BeaconRxCount attribute value is %s", unify_value.dump().c_str());
             UN::BeaconRxCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id,
-                                                   MN::BeaconRxCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::BeaconRxCount::Id);
         }
         break;
     }
@@ -6324,8 +6123,7 @@ void WiFiNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "PacketMulticastRxCount attribute value is %s", unify_value.dump().c_str());
             UN::PacketMulticastRxCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id,
-                                                   MN::PacketMulticastRxCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PacketMulticastRxCount::Id);
         }
         break;
     }
@@ -6339,8 +6137,7 @@ void WiFiNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "PacketMulticastTxCount attribute value is %s", unify_value.dump().c_str());
             UN::PacketMulticastTxCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id,
-                                                   MN::PacketMulticastTxCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PacketMulticastTxCount::Id);
         }
         break;
     }
@@ -6354,8 +6151,7 @@ void WiFiNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "PacketUnicastRxCount attribute value is %s", unify_value.dump().c_str());
             UN::PacketUnicastRxCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id,
-                                                   MN::PacketUnicastRxCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PacketUnicastRxCount::Id);
         }
         break;
     }
@@ -6369,8 +6165,7 @@ void WiFiNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "PacketUnicastTxCount attribute value is %s", unify_value.dump().c_str());
             UN::PacketUnicastTxCount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id,
-                                                   MN::PacketUnicastTxCount::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PacketUnicastTxCount::Id);
         }
         break;
     }
@@ -6384,8 +6179,7 @@ void WiFiNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "CurrentMaxRate attribute value is %s", unify_value.dump().c_str());
             UN::CurrentMaxRate::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id,
-                                                   MN::CurrentMaxRate::Id, ZCL_INT64U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::CurrentMaxRate::Id);
         }
         break;
     }
@@ -6398,8 +6192,8 @@ void WiFiNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_endpo
         {
             sl_log_debug(LOG_TAG, "OverrunCount attribute value is %s", unify_value.dump().c_str());
             UN::OverrunCount::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id, MN::OverrunCount::Id,
-                                                   ZCL_INT64U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id,
+                                                   MN::OverrunCount::Id);
         }
         break;
     }
@@ -6412,8 +6206,7 @@ void WiFiNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_endpo
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -6427,8 +6220,7 @@ void WiFiNetworkDiagnosticsAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WiFiNetworkDiagnostics::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -6614,8 +6406,7 @@ void TimeSynchronizationAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "UTCTime attribute value is %s", unify_value.dump().c_str());
             UN::UTCTime::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeSynchronization::Id, MN::UTCTime::Id,
-                                                   ZCL_EPOCH_US_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeSynchronization::Id, MN::UTCTime::Id);
         }
         break;
     }
@@ -6628,8 +6419,7 @@ void TimeSynchronizationAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "Granularity attribute value is %s", unify_value.dump().c_str());
             UN::Granularity::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeSynchronization::Id, MN::Granularity::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeSynchronization::Id, MN::Granularity::Id);
         }
         break;
     }
@@ -6642,8 +6432,7 @@ void TimeSynchronizationAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "TimeSource attribute value is %s", unify_value.dump().c_str());
             UN::TimeSource::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeSynchronization::Id, MN::TimeSource::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeSynchronization::Id, MN::TimeSource::Id);
         }
         break;
     }
@@ -6657,8 +6446,7 @@ void TimeSynchronizationAttributeAccess::reported_updated(const bridged_endpoint
             sl_log_debug(LOG_TAG, "TrustedTimeNodeId attribute value is %s", unify_value.dump().c_str());
             UN::TrustedTimeNodeId::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeSynchronization::Id,
-                                                   MN::TrustedTimeNodeId::Id, ZCL_NODE_ID_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TrustedTimeNodeId::Id);
         }
         break;
     }
@@ -6671,8 +6459,7 @@ void TimeSynchronizationAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "DefaultNtp attribute value is %s", unify_value.dump().c_str());
             UN::DefaultNtp::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeSynchronization::Id, MN::DefaultNtp::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeSynchronization::Id, MN::DefaultNtp::Id);
         }
         break;
     }
@@ -6685,8 +6472,7 @@ void TimeSynchronizationAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "LocalTime attribute value is %s", unify_value.dump().c_str());
             UN::LocalTime::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeSynchronization::Id, MN::LocalTime::Id,
-                                                   ZCL_EPOCH_US_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeSynchronization::Id, MN::LocalTime::Id);
         }
         break;
     }
@@ -6700,8 +6486,7 @@ void TimeSynchronizationAttributeAccess::reported_updated(const bridged_endpoint
             sl_log_debug(LOG_TAG, "TimeZoneDatabase attribute value is %s", unify_value.dump().c_str());
             UN::TimeZoneDatabase::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeSynchronization::Id,
-                                                   MN::TimeZoneDatabase::Id, ZCL_BOOLEAN_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TimeZoneDatabase::Id);
         }
         break;
     }
@@ -6714,8 +6499,7 @@ void TimeSynchronizationAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "NtpServerPort attribute value is %s", unify_value.dump().c_str());
             UN::NtpServerPort::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeSynchronization::Id, MN::NtpServerPort::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeSynchronization::Id, MN::NtpServerPort::Id);
         }
         break;
     }
@@ -6728,8 +6512,7 @@ void TimeSynchronizationAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeSynchronization::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeSynchronization::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -6742,8 +6525,8 @@ void TimeSynchronizationAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeSynchronization::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TimeSynchronization::Id,
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -6871,8 +6654,7 @@ void SwitchAttributeAccess::reported_updated(const bridged_endpoint * ep, const 
         {
             sl_log_debug(LOG_TAG, "NumberOfPositions attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfPositions::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Switch::Id, MN::NumberOfPositions::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Switch::Id, MN::NumberOfPositions::Id);
         }
         break;
     }
@@ -6885,8 +6667,7 @@ void SwitchAttributeAccess::reported_updated(const bridged_endpoint * ep, const 
         {
             sl_log_debug(LOG_TAG, "CurrentPosition attribute value is %s", unify_value.dump().c_str());
             UN::CurrentPosition::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Switch::Id, MN::CurrentPosition::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Switch::Id, MN::CurrentPosition::Id);
         }
         break;
     }
@@ -6899,8 +6680,7 @@ void SwitchAttributeAccess::reported_updated(const bridged_endpoint * ep, const 
         {
             sl_log_debug(LOG_TAG, "MultiPressMax attribute value is %s", unify_value.dump().c_str());
             UN::MultiPressMax::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Switch::Id, MN::MultiPressMax::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Switch::Id, MN::MultiPressMax::Id);
         }
         break;
     }
@@ -6913,8 +6693,7 @@ void SwitchAttributeAccess::reported_updated(const bridged_endpoint * ep, const 
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Switch::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Switch::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -6927,8 +6706,7 @@ void SwitchAttributeAccess::reported_updated(const bridged_endpoint * ep, const 
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Switch::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Switch::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -7058,8 +6836,7 @@ void OperationalCredentialsAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "SupportedFabrics attribute value is %s", unify_value.dump().c_str());
             UN::SupportedFabrics::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OperationalCredentials::Id,
-                                                   MN::SupportedFabrics::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::SupportedFabrics::Id);
         }
         break;
     }
@@ -7073,8 +6850,7 @@ void OperationalCredentialsAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "CommissionedFabrics attribute value is %s", unify_value.dump().c_str());
             UN::CommissionedFabrics::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OperationalCredentials::Id,
-                                                   MN::CommissionedFabrics::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::CommissionedFabrics::Id);
         }
         break;
     }
@@ -7088,8 +6864,7 @@ void OperationalCredentialsAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "CurrentFabricIndex attribute value is %s", unify_value.dump().c_str());
             UN::CurrentFabricIndex::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OperationalCredentials::Id,
-                                                   MN::CurrentFabricIndex::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::CurrentFabricIndex::Id);
         }
         break;
     }
@@ -7102,8 +6877,7 @@ void OperationalCredentialsAttributeAccess::reported_updated(const bridged_endpo
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OperationalCredentials::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OperationalCredentials::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -7117,8 +6891,7 @@ void OperationalCredentialsAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OperationalCredentials::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -7251,8 +7024,7 @@ void GroupKeyManagementAttributeAccess::reported_updated(const bridged_endpoint 
             sl_log_debug(LOG_TAG, "MaxGroupsPerFabric attribute value is %s", unify_value.dump().c_str());
             UN::MaxGroupsPerFabric::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GroupKeyManagement::Id,
-                                                   MN::MaxGroupsPerFabric::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MaxGroupsPerFabric::Id);
         }
         break;
     }
@@ -7266,8 +7038,7 @@ void GroupKeyManagementAttributeAccess::reported_updated(const bridged_endpoint 
             sl_log_debug(LOG_TAG, "MaxGroupKeysPerFabric attribute value is %s", unify_value.dump().c_str());
             UN::MaxGroupKeysPerFabric::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GroupKeyManagement::Id,
-                                                   MN::MaxGroupKeysPerFabric::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MaxGroupKeysPerFabric::Id);
         }
         break;
     }
@@ -7280,8 +7051,7 @@ void GroupKeyManagementAttributeAccess::reported_updated(const bridged_endpoint 
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GroupKeyManagement::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GroupKeyManagement::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -7294,8 +7064,7 @@ void GroupKeyManagementAttributeAccess::reported_updated(const bridged_endpoint 
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GroupKeyManagement::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::GroupKeyManagement::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -7408,8 +7177,7 @@ void FixedLabelAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FixedLabel::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FixedLabel::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -7422,8 +7190,7 @@ void FixedLabelAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FixedLabel::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FixedLabel::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -7544,8 +7311,7 @@ void UserLabelAttributeAccess::reported_updated(const bridged_endpoint * ep, con
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UserLabel::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UserLabel::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -7558,8 +7324,7 @@ void UserLabelAttributeAccess::reported_updated(const bridged_endpoint * ep, con
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UserLabel::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UserLabel::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -7673,8 +7438,7 @@ void ProxyConfigurationAttributeAccess::reported_updated(const bridged_endpoint 
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ProxyConfiguration::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ProxyConfiguration::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -7687,8 +7451,7 @@ void ProxyConfigurationAttributeAccess::reported_updated(const bridged_endpoint 
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ProxyConfiguration::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ProxyConfiguration::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -7802,8 +7565,7 @@ void ProxyDiscoveryAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ProxyDiscovery::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ProxyDiscovery::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -7816,8 +7578,7 @@ void ProxyDiscoveryAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ProxyDiscovery::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ProxyDiscovery::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -7930,8 +7691,7 @@ void ProxyValidAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ProxyValid::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ProxyValid::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -7944,8 +7704,7 @@ void ProxyValidAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ProxyValid::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ProxyValid::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -8063,8 +7822,7 @@ void BooleanStateAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "StateValue attribute value is %s", unify_value.dump().c_str());
             UN::StateValue::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BooleanState::Id, MN::StateValue::Id,
-                                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BooleanState::Id, MN::StateValue::Id);
         }
         break;
     }
@@ -8077,8 +7835,7 @@ void BooleanStateAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BooleanState::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BooleanState::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -8091,8 +7848,7 @@ void BooleanStateAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BooleanState::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BooleanState::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -8246,8 +8002,7 @@ void ModeSelectAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "Description attribute value is %s", unify_value.dump().c_str());
             UN::Description::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ModeSelect::Id, MN::Description::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ModeSelect::Id, MN::Description::Id);
         }
         break;
     }
@@ -8260,8 +8015,7 @@ void ModeSelectAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "StandardNamespace attribute value is %s", unify_value.dump().c_str());
             UN::StandardNamespace::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ModeSelect::Id, MN::StandardNamespace::Id,
-                                                   ZCL_ENUM16_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ModeSelect::Id, MN::StandardNamespace::Id);
         }
         break;
     }
@@ -8274,8 +8028,7 @@ void ModeSelectAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "CurrentMode attribute value is %s", unify_value.dump().c_str());
             UN::CurrentMode::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ModeSelect::Id, MN::CurrentMode::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ModeSelect::Id, MN::CurrentMode::Id);
         }
         break;
     }
@@ -8288,8 +8041,7 @@ void ModeSelectAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "StartUpMode attribute value is %s", unify_value.dump().c_str());
             UN::StartUpMode::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ModeSelect::Id, MN::StartUpMode::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ModeSelect::Id, MN::StartUpMode::Id);
         }
         break;
     }
@@ -8302,8 +8054,7 @@ void ModeSelectAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "OnMode attribute value is %s", unify_value.dump().c_str());
             UN::OnMode::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ModeSelect::Id, MN::OnMode::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ModeSelect::Id, MN::OnMode::Id);
         }
         break;
     }
@@ -8316,8 +8067,7 @@ void ModeSelectAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ModeSelect::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ModeSelect::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -8330,8 +8080,7 @@ void ModeSelectAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ModeSelect::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ModeSelect::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -8768,8 +8517,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "LockState attribute value is %s", unify_value.dump().c_str());
             UN::LockState::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::LockState::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::LockState::Id);
         }
         break;
     }
@@ -8782,8 +8530,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "LockType attribute value is %s", unify_value.dump().c_str());
             UN::LockType::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::LockType::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::LockType::Id);
         }
         break;
     }
@@ -8796,8 +8543,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "ActuatorEnabled attribute value is %s", unify_value.dump().c_str());
             UN::ActuatorEnabled::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::ActuatorEnabled::Id,
-                                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::ActuatorEnabled::Id);
         }
         break;
     }
@@ -8810,8 +8556,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "DoorState attribute value is %s", unify_value.dump().c_str());
             UN::DoorState::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::DoorState::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::DoorState::Id);
         }
         break;
     }
@@ -8824,8 +8569,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "DoorOpenEvents attribute value is %s", unify_value.dump().c_str());
             UN::DoorOpenEvents::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::DoorOpenEvents::Id,
-                                                   ZCL_INT32U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::DoorOpenEvents::Id);
         }
         break;
     }
@@ -8838,8 +8582,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "DoorClosedEvents attribute value is %s", unify_value.dump().c_str());
             UN::DoorClosedEvents::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::DoorClosedEvents::Id,
-                                                   ZCL_INT32U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::DoorClosedEvents::Id);
         }
         break;
     }
@@ -8852,8 +8595,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "OpenPeriod attribute value is %s", unify_value.dump().c_str());
             UN::OpenPeriod::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::OpenPeriod::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::OpenPeriod::Id);
         }
         break;
     }
@@ -8867,8 +8609,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
             sl_log_debug(LOG_TAG, "NumberOfTotalUsersSupported attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfTotalUsersSupported::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
-                                                   MN::NumberOfTotalUsersSupported::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::NumberOfTotalUsersSupported::Id);
         }
         break;
     }
@@ -8881,8 +8622,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "NumberOfPINUsersSupported attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfPINUsersSupported::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::NumberOfPINUsersSupported::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::NumberOfPINUsersSupported::Id);
         }
         break;
     }
@@ -8895,8 +8635,8 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "NumberOfRFIDUsersSupported attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfRFIDUsersSupported::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::NumberOfRFIDUsersSupported::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
+                                                   MN::NumberOfRFIDUsersSupported::Id);
         }
         break;
     }
@@ -8910,8 +8650,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
             sl_log_debug(LOG_TAG, "NumberOfWeekDaySchedulesSupportedPerUser attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfWeekDaySchedulesSupportedPerUser::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
-                                                   MN::NumberOfWeekDaySchedulesSupportedPerUser::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::NumberOfWeekDaySchedulesSupportedPerUser::Id);
         }
         break;
     }
@@ -8925,8 +8664,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
             sl_log_debug(LOG_TAG, "NumberOfYearDaySchedulesSupportedPerUser attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfYearDaySchedulesSupportedPerUser::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
-                                                   MN::NumberOfYearDaySchedulesSupportedPerUser::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::NumberOfYearDaySchedulesSupportedPerUser::Id);
         }
         break;
     }
@@ -8940,8 +8678,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
             sl_log_debug(LOG_TAG, "NumberOfHolidaySchedulesSupported attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfHolidaySchedulesSupported::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
-                                                   MN::NumberOfHolidaySchedulesSupported::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::NumberOfHolidaySchedulesSupported::Id);
         }
         break;
     }
@@ -8954,8 +8691,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "MaxPINCodeLength attribute value is %s", unify_value.dump().c_str());
             UN::MaxPINCodeLength::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::MaxPINCodeLength::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::MaxPINCodeLength::Id);
         }
         break;
     }
@@ -8968,8 +8704,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "MinPINCodeLength attribute value is %s", unify_value.dump().c_str());
             UN::MinPINCodeLength::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::MinPINCodeLength::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::MinPINCodeLength::Id);
         }
         break;
     }
@@ -8982,8 +8717,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "MaxRFIDCodeLength attribute value is %s", unify_value.dump().c_str());
             UN::MaxRFIDCodeLength::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::MaxRFIDCodeLength::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::MaxRFIDCodeLength::Id);
         }
         break;
     }
@@ -8996,8 +8730,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "MinRFIDCodeLength attribute value is %s", unify_value.dump().c_str());
             UN::MinRFIDCodeLength::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::MinRFIDCodeLength::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::MinRFIDCodeLength::Id);
         }
         break;
     }
@@ -9010,8 +8743,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "CredentialRulesSupport attribute value is %s", unify_value.dump().c_str());
             UN::CredentialRulesSupport::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::CredentialRulesSupport::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::CredentialRulesSupport::Id);
         }
         break;
     }
@@ -9025,8 +8757,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
             sl_log_debug(LOG_TAG, "NumberOfCredentialsSupportedPerUser attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfCredentialsSupportedPerUser::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
-                                                   MN::NumberOfCredentialsSupportedPerUser::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::NumberOfCredentialsSupportedPerUser::Id);
         }
         break;
     }
@@ -9039,8 +8770,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "Language attribute value is %s", unify_value.dump().c_str());
             UN::Language::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::Language::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::Language::Id);
         }
         break;
     }
@@ -9053,8 +8783,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "LEDSettings attribute value is %s", unify_value.dump().c_str());
             UN::LEDSettings::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::LEDSettings::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::LEDSettings::Id);
         }
         break;
     }
@@ -9067,8 +8796,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "AutoRelockTime attribute value is %s", unify_value.dump().c_str());
             UN::AutoRelockTime::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::AutoRelockTime::Id,
-                                                   ZCL_INT32U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::AutoRelockTime::Id);
         }
         break;
     }
@@ -9081,8 +8809,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "SoundVolume attribute value is %s", unify_value.dump().c_str());
             UN::SoundVolume::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::SoundVolume::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::SoundVolume::Id);
         }
         break;
     }
@@ -9095,8 +8822,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "OperatingMode attribute value is %s", unify_value.dump().c_str());
             UN::OperatingMode::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::OperatingMode::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::OperatingMode::Id);
         }
         break;
     }
@@ -9109,8 +8835,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "SupportedOperatingModes attribute value is %s", unify_value.dump().c_str());
             UN::SupportedOperatingModes::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::SupportedOperatingModes::Id,
-                                                   ZCL_BITMAP16_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::SupportedOperatingModes::Id);
         }
         break;
     }
@@ -9124,8 +8849,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
             sl_log_debug(LOG_TAG, "DefaultConfigurationRegister attribute value is %s", unify_value.dump().c_str());
             UN::DefaultConfigurationRegister::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
-                                                   MN::DefaultConfigurationRegister::Id, ZCL_BITMAP16_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::DefaultConfigurationRegister::Id);
         }
         break;
     }
@@ -9138,8 +8862,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "EnableLocalProgramming attribute value is %s", unify_value.dump().c_str());
             UN::EnableLocalProgramming::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::EnableLocalProgramming::Id,
-                                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::EnableLocalProgramming::Id);
         }
         break;
     }
@@ -9152,8 +8875,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "EnableOneTouchLocking attribute value is %s", unify_value.dump().c_str());
             UN::EnableOneTouchLocking::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::EnableOneTouchLocking::Id,
-                                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::EnableOneTouchLocking::Id);
         }
         break;
     }
@@ -9166,8 +8888,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "EnableInsideStatusLED attribute value is %s", unify_value.dump().c_str());
             UN::EnableInsideStatusLED::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::EnableInsideStatusLED::Id,
-                                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::EnableInsideStatusLED::Id);
         }
         break;
     }
@@ -9180,8 +8901,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "EnablePrivacyModeButton attribute value is %s", unify_value.dump().c_str());
             UN::EnablePrivacyModeButton::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::EnablePrivacyModeButton::Id,
-                                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::EnablePrivacyModeButton::Id);
         }
         break;
     }
@@ -9194,8 +8914,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "LocalProgrammingFeatures attribute value is %s", unify_value.dump().c_str());
             UN::LocalProgrammingFeatures::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::LocalProgrammingFeatures::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::LocalProgrammingFeatures::Id);
         }
         break;
     }
@@ -9208,8 +8927,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "WrongCodeEntryLimit attribute value is %s", unify_value.dump().c_str());
             UN::WrongCodeEntryLimit::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::WrongCodeEntryLimit::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::WrongCodeEntryLimit::Id);
         }
         break;
     }
@@ -9223,8 +8941,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
             sl_log_debug(LOG_TAG, "UserCodeTemporaryDisableTime attribute value is %s", unify_value.dump().c_str());
             UN::UserCodeTemporaryDisableTime::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
-                                                   MN::UserCodeTemporaryDisableTime::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::UserCodeTemporaryDisableTime::Id);
         }
         break;
     }
@@ -9237,8 +8954,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "SendPINOverTheAir attribute value is %s", unify_value.dump().c_str());
             UN::SendPINOverTheAir::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::SendPINOverTheAir::Id,
-                                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::SendPINOverTheAir::Id);
         }
         break;
     }
@@ -9252,8 +8968,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
             sl_log_debug(LOG_TAG, "RequirePINforRemoteOperation attribute value is %s", unify_value.dump().c_str());
             UN::RequirePINforRemoteOperation::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
-                                                   MN::RequirePINforRemoteOperation::Id, ZCL_BOOLEAN_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RequirePINforRemoteOperation::Id);
         }
         break;
     }
@@ -9266,8 +8981,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "ExpiringUserTimeout attribute value is %s", unify_value.dump().c_str());
             UN::ExpiringUserTimeout::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::ExpiringUserTimeout::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::ExpiringUserTimeout::Id);
         }
         break;
     }
@@ -9280,8 +8994,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -9294,8 +9007,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -9527,8 +9239,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "Type attribute value is %s", unify_value.dump().c_str());
             UN::Type::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::Type::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::Type::Id);
         }
         break;
     }
@@ -9542,8 +9253,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
             sl_log_debug(LOG_TAG, "PhysicalClosedLimitLift attribute value is %s", unify_value.dump().c_str());
             UN::PhysicalClosedLimitLift::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id,
-                                                   MN::PhysicalClosedLimitLift::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PhysicalClosedLimitLift::Id);
         }
         break;
     }
@@ -9557,8 +9267,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
             sl_log_debug(LOG_TAG, "PhysicalClosedLimitTilt attribute value is %s", unify_value.dump().c_str());
             UN::PhysicalClosedLimitTilt::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id,
-                                                   MN::PhysicalClosedLimitTilt::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PhysicalClosedLimitTilt::Id);
         }
         break;
     }
@@ -9571,8 +9280,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "CurrentPositionLift attribute value is %s", unify_value.dump().c_str());
             UN::CurrentPositionLift::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::CurrentPositionLift::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::CurrentPositionLift::Id);
         }
         break;
     }
@@ -9585,8 +9293,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "CurrentPositionTilt attribute value is %s", unify_value.dump().c_str());
             UN::CurrentPositionTilt::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::CurrentPositionTilt::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::CurrentPositionTilt::Id);
         }
         break;
     }
@@ -9600,8 +9307,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
             sl_log_debug(LOG_TAG, "NumberOfActuationsLift attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfActuationsLift::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id,
-                                                   MN::NumberOfActuationsLift::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::NumberOfActuationsLift::Id);
         }
         break;
     }
@@ -9615,8 +9321,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
             sl_log_debug(LOG_TAG, "NumberOfActuationsTilt attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfActuationsTilt::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id,
-                                                   MN::NumberOfActuationsTilt::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::NumberOfActuationsTilt::Id);
         }
         break;
     }
@@ -9628,8 +9333,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "ConfigStatus attribute value is %s", unify_value.dump().c_str());
             UN::ConfigStatus::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::ConfigStatus::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::ConfigStatus::Id);
         }
         break;
     }
@@ -9643,8 +9347,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
             sl_log_debug(LOG_TAG, "CurrentPositionLiftPercentage attribute value is %s", unify_value.dump().c_str());
             UN::CurrentPositionLiftPercentage::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id,
-                                                   MN::CurrentPositionLiftPercentage::Id, ZCL_PERCENT_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::CurrentPositionLiftPercentage::Id);
         }
         break;
     }
@@ -9658,8 +9361,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
             sl_log_debug(LOG_TAG, "CurrentPositionTiltPercentage attribute value is %s", unify_value.dump().c_str());
             UN::CurrentPositionTiltPercentage::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id,
-                                                   MN::CurrentPositionTiltPercentage::Id, ZCL_PERCENT_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::CurrentPositionTiltPercentage::Id);
         }
         break;
     }
@@ -9671,8 +9373,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "OperationalStatus attribute value is %s", unify_value.dump().c_str());
             UN::OperationalStatus::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::OperationalStatus::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::OperationalStatus::Id);
         }
         break;
     }
@@ -9686,8 +9387,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
             sl_log_debug(LOG_TAG, "TargetPositionLiftPercent100ths attribute value is %s", unify_value.dump().c_str());
             UN::TargetPositionLiftPercent100ths::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id,
-                                                   MN::TargetPositionLiftPercent100ths::Id, ZCL_PERCENT100THS_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TargetPositionLiftPercent100ths::Id);
         }
         break;
     }
@@ -9701,8 +9401,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
             sl_log_debug(LOG_TAG, "TargetPositionTiltPercent100ths attribute value is %s", unify_value.dump().c_str());
             UN::TargetPositionTiltPercent100ths::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id,
-                                                   MN::TargetPositionTiltPercent100ths::Id, ZCL_PERCENT100THS_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TargetPositionTiltPercent100ths::Id);
         }
         break;
     }
@@ -9715,8 +9414,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "EndProductType attribute value is %s", unify_value.dump().c_str());
             UN::EndProductType::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::EndProductType::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::EndProductType::Id);
         }
         break;
     }
@@ -9730,8 +9428,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
             sl_log_debug(LOG_TAG, "CurrentPositionLiftPercent100ths attribute value is %s", unify_value.dump().c_str());
             UN::CurrentPositionLiftPercent100ths::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id,
-                                                   MN::CurrentPositionLiftPercent100ths::Id, ZCL_PERCENT100THS_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::CurrentPositionLiftPercent100ths::Id);
         }
         break;
     }
@@ -9745,8 +9442,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
             sl_log_debug(LOG_TAG, "CurrentPositionTiltPercent100ths attribute value is %s", unify_value.dump().c_str());
             UN::CurrentPositionTiltPercent100ths::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id,
-                                                   MN::CurrentPositionTiltPercent100ths::Id, ZCL_PERCENT100THS_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::CurrentPositionTiltPercent100ths::Id);
         }
         break;
     }
@@ -9760,8 +9456,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
             sl_log_debug(LOG_TAG, "InstalledOpenLimitLift attribute value is %s", unify_value.dump().c_str());
             UN::InstalledOpenLimitLift::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id,
-                                                   MN::InstalledOpenLimitLift::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::InstalledOpenLimitLift::Id);
         }
         break;
     }
@@ -9775,8 +9470,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
             sl_log_debug(LOG_TAG, "InstalledClosedLimitLift attribute value is %s", unify_value.dump().c_str());
             UN::InstalledClosedLimitLift::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id,
-                                                   MN::InstalledClosedLimitLift::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::InstalledClosedLimitLift::Id);
         }
         break;
     }
@@ -9790,8 +9484,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
             sl_log_debug(LOG_TAG, "InstalledOpenLimitTilt attribute value is %s", unify_value.dump().c_str());
             UN::InstalledOpenLimitTilt::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id,
-                                                   MN::InstalledOpenLimitTilt::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::InstalledOpenLimitTilt::Id);
         }
         break;
     }
@@ -9805,8 +9498,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
             sl_log_debug(LOG_TAG, "InstalledClosedLimitTilt attribute value is %s", unify_value.dump().c_str());
             UN::InstalledClosedLimitTilt::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id,
-                                                   MN::InstalledClosedLimitTilt::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::InstalledClosedLimitTilt::Id);
         }
         break;
     }
@@ -9818,8 +9510,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "Mode attribute value is %s", unify_value.dump().c_str());
             UN::Mode::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::Mode::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::Mode::Id);
         }
         break;
     }
@@ -9831,8 +9522,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "SafetyStatus attribute value is %s", unify_value.dump().c_str());
             UN::SafetyStatus::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::SafetyStatus::Id,
-                                                   ZCL_BITMAP16_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::SafetyStatus::Id);
         }
         break;
     }
@@ -9845,8 +9535,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -9859,8 +9548,7 @@ void WindowCoveringAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WindowCovering::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -10072,8 +9760,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "BarrierMovingState attribute value is %s", unify_value.dump().c_str());
             UN::BarrierMovingState::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierMovingState::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierMovingState::Id);
         }
         break;
     }
@@ -10086,8 +9773,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "BarrierSafetyStatus attribute value is %s", unify_value.dump().c_str());
             UN::BarrierSafetyStatus::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierSafetyStatus::Id,
-                                                   ZCL_BITMAP16_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierSafetyStatus::Id);
         }
         break;
     }
@@ -10100,8 +9786,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "BarrierCapabilities attribute value is %s", unify_value.dump().c_str());
             UN::BarrierCapabilities::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierCapabilities::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierCapabilities::Id);
         }
         break;
     }
@@ -10114,8 +9799,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "BarrierOpenEvents attribute value is %s", unify_value.dump().c_str());
             UN::BarrierOpenEvents::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierOpenEvents::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierOpenEvents::Id);
         }
         break;
     }
@@ -10128,8 +9812,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "BarrierCloseEvents attribute value is %s", unify_value.dump().c_str());
             UN::BarrierCloseEvents::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierCloseEvents::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierCloseEvents::Id);
         }
         break;
     }
@@ -10143,8 +9826,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
             sl_log_debug(LOG_TAG, "BarrierCommandOpenEvents attribute value is %s", unify_value.dump().c_str());
             UN::BarrierCommandOpenEvents::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id,
-                                                   MN::BarrierCommandOpenEvents::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::BarrierCommandOpenEvents::Id);
         }
         break;
     }
@@ -10158,8 +9840,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
             sl_log_debug(LOG_TAG, "BarrierCommandCloseEvents attribute value is %s", unify_value.dump().c_str());
             UN::BarrierCommandCloseEvents::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id,
-                                                   MN::BarrierCommandCloseEvents::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::BarrierCommandCloseEvents::Id);
         }
         break;
     }
@@ -10172,8 +9853,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "BarrierOpenPeriod attribute value is %s", unify_value.dump().c_str());
             UN::BarrierOpenPeriod::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierOpenPeriod::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierOpenPeriod::Id);
         }
         break;
     }
@@ -10186,8 +9866,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "BarrierClosePeriod attribute value is %s", unify_value.dump().c_str());
             UN::BarrierClosePeriod::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierClosePeriod::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierClosePeriod::Id);
         }
         break;
     }
@@ -10200,8 +9879,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "BarrierPosition attribute value is %s", unify_value.dump().c_str());
             UN::BarrierPosition::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierPosition::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierPosition::Id);
         }
         break;
     }
@@ -10214,8 +9892,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -10228,8 +9905,7 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -10803,8 +10479,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "LocalTemperature attribute value is %s", unify_value.dump().c_str());
             UN::LocalTemperature::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::LocalTemperature::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::LocalTemperature::Id);
         }
         break;
     }
@@ -10817,8 +10492,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "OutdoorTemperature attribute value is %s", unify_value.dump().c_str());
             UN::OutdoorTemperature::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OutdoorTemperature::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OutdoorTemperature::Id);
         }
         break;
     }
@@ -10830,8 +10504,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "Occupancy attribute value is %s", unify_value.dump().c_str());
             UN::Occupancy::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::Occupancy::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::Occupancy::Id);
         }
         break;
     }
@@ -10844,8 +10517,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "AbsMinHeatSetpointLimit attribute value is %s", unify_value.dump().c_str());
             UN::AbsMinHeatSetpointLimit::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::AbsMinHeatSetpointLimit::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::AbsMinHeatSetpointLimit::Id);
         }
         break;
     }
@@ -10858,8 +10530,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "AbsMaxHeatSetpointLimit attribute value is %s", unify_value.dump().c_str());
             UN::AbsMaxHeatSetpointLimit::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::AbsMaxHeatSetpointLimit::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::AbsMaxHeatSetpointLimit::Id);
         }
         break;
     }
@@ -10872,8 +10543,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "AbsMinCoolSetpointLimit attribute value is %s", unify_value.dump().c_str());
             UN::AbsMinCoolSetpointLimit::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::AbsMinCoolSetpointLimit::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::AbsMinCoolSetpointLimit::Id);
         }
         break;
     }
@@ -10886,8 +10556,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "AbsMaxCoolSetpointLimit attribute value is %s", unify_value.dump().c_str());
             UN::AbsMaxCoolSetpointLimit::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::AbsMaxCoolSetpointLimit::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::AbsMaxCoolSetpointLimit::Id);
         }
         break;
     }
@@ -10900,8 +10569,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "PICoolingDemand attribute value is %s", unify_value.dump().c_str());
             UN::PICoolingDemand::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::PICoolingDemand::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::PICoolingDemand::Id);
         }
         break;
     }
@@ -10914,8 +10582,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "PIHeatingDemand attribute value is %s", unify_value.dump().c_str());
             UN::PIHeatingDemand::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::PIHeatingDemand::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::PIHeatingDemand::Id);
         }
         break;
     }
@@ -10929,8 +10596,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
             sl_log_debug(LOG_TAG, "HVACSystemTypeConfiguration attribute value is %s", unify_value.dump().c_str());
             UN::HVACSystemTypeConfiguration::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::HVACSystemTypeConfiguration::Id, ZCL_BITMAP8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::HVACSystemTypeConfiguration::Id);
         }
         break;
     }
@@ -10944,8 +10610,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
             sl_log_debug(LOG_TAG, "LocalTemperatureCalibration attribute value is %s", unify_value.dump().c_str());
             UN::LocalTemperatureCalibration::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::LocalTemperatureCalibration::Id, ZCL_INT8S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::LocalTemperatureCalibration::Id);
         }
         break;
     }
@@ -10958,8 +10623,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "OccupiedCoolingSetpoint attribute value is %s", unify_value.dump().c_str());
             UN::OccupiedCoolingSetpoint::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedCoolingSetpoint::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedCoolingSetpoint::Id);
         }
         break;
     }
@@ -10972,8 +10636,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "OccupiedHeatingSetpoint attribute value is %s", unify_value.dump().c_str());
             UN::OccupiedHeatingSetpoint::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedHeatingSetpoint::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedHeatingSetpoint::Id);
         }
         break;
     }
@@ -10987,8 +10650,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
             sl_log_debug(LOG_TAG, "UnoccupiedCoolingSetpoint attribute value is %s", unify_value.dump().c_str());
             UN::UnoccupiedCoolingSetpoint::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::UnoccupiedCoolingSetpoint::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::UnoccupiedCoolingSetpoint::Id);
         }
         break;
     }
@@ -11002,8 +10664,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
             sl_log_debug(LOG_TAG, "UnoccupiedHeatingSetpoint attribute value is %s", unify_value.dump().c_str());
             UN::UnoccupiedHeatingSetpoint::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::UnoccupiedHeatingSetpoint::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::UnoccupiedHeatingSetpoint::Id);
         }
         break;
     }
@@ -11016,8 +10677,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "MinHeatSetpointLimit attribute value is %s", unify_value.dump().c_str());
             UN::MinHeatSetpointLimit::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MinHeatSetpointLimit::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MinHeatSetpointLimit::Id);
         }
         break;
     }
@@ -11030,8 +10690,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "MaxHeatSetpointLimit attribute value is %s", unify_value.dump().c_str());
             UN::MaxHeatSetpointLimit::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MaxHeatSetpointLimit::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MaxHeatSetpointLimit::Id);
         }
         break;
     }
@@ -11044,8 +10703,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "MinCoolSetpointLimit attribute value is %s", unify_value.dump().c_str());
             UN::MinCoolSetpointLimit::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MinCoolSetpointLimit::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MinCoolSetpointLimit::Id);
         }
         break;
     }
@@ -11058,8 +10716,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "MaxCoolSetpointLimit attribute value is %s", unify_value.dump().c_str());
             UN::MaxCoolSetpointLimit::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MaxCoolSetpointLimit::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MaxCoolSetpointLimit::Id);
         }
         break;
     }
@@ -11072,8 +10729,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "MinSetpointDeadBand attribute value is %s", unify_value.dump().c_str());
             UN::MinSetpointDeadBand::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MinSetpointDeadBand::Id,
-                                                   ZCL_INT8S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MinSetpointDeadBand::Id);
         }
         break;
     }
@@ -11086,8 +10742,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "RemoteSensing attribute value is %s", unify_value.dump().c_str());
             UN::RemoteSensing::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::RemoteSensing::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::RemoteSensing::Id);
         }
         break;
     }
@@ -11101,8 +10756,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
             sl_log_debug(LOG_TAG, "ControlSequenceOfOperation attribute value is %s", unify_value.dump().c_str());
             UN::ControlSequenceOfOperation::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::ControlSequenceOfOperation::Id, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ControlSequenceOfOperation::Id);
         }
         break;
     }
@@ -11115,8 +10769,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "SystemMode attribute value is %s", unify_value.dump().c_str());
             UN::SystemMode::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::SystemMode::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::SystemMode::Id);
         }
         break;
     }
@@ -11129,8 +10782,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "ThermostatRunningMode attribute value is %s", unify_value.dump().c_str());
             UN::ThermostatRunningMode::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ThermostatRunningMode::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ThermostatRunningMode::Id);
         }
         break;
     }
@@ -11143,8 +10795,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "StartOfWeek attribute value is %s", unify_value.dump().c_str());
             UN::StartOfWeek::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::StartOfWeek::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::StartOfWeek::Id);
         }
         break;
     }
@@ -11158,8 +10809,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
             sl_log_debug(LOG_TAG, "NumberOfWeeklyTransitions attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfWeeklyTransitions::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::NumberOfWeeklyTransitions::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::NumberOfWeeklyTransitions::Id);
         }
         break;
     }
@@ -11172,8 +10822,8 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "NumberOfDailyTransitions attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfDailyTransitions::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::NumberOfDailyTransitions::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
+                                                   MN::NumberOfDailyTransitions::Id);
         }
         break;
     }
@@ -11186,8 +10836,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "TemperatureSetpointHold attribute value is %s", unify_value.dump().c_str());
             UN::TemperatureSetpointHold::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::TemperatureSetpointHold::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::TemperatureSetpointHold::Id);
         }
         break;
     }
@@ -11201,8 +10850,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
             sl_log_debug(LOG_TAG, "TemperatureSetpointHoldDuration attribute value is %s", unify_value.dump().c_str());
             UN::TemperatureSetpointHoldDuration::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::TemperatureSetpointHoldDuration::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TemperatureSetpointHoldDuration::Id);
         }
         break;
     }
@@ -11216,8 +10864,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
             sl_log_debug(LOG_TAG, "ThermostatProgrammingOperationMode attribute value is %s", unify_value.dump().c_str());
             UN::ThermostatProgrammingOperationMode::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::ThermostatProgrammingOperationMode::Id, ZCL_BITMAP8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ThermostatProgrammingOperationMode::Id);
         }
         break;
     }
@@ -11229,8 +10876,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "ThermostatRunningState attribute value is %s", unify_value.dump().c_str());
             UN::ThermostatRunningState::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ThermostatRunningState::Id,
-                                                   ZCL_BITMAP16_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ThermostatRunningState::Id);
         }
         break;
     }
@@ -11243,8 +10889,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "SetpointChangeSource attribute value is %s", unify_value.dump().c_str());
             UN::SetpointChangeSource::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::SetpointChangeSource::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::SetpointChangeSource::Id);
         }
         break;
     }
@@ -11257,8 +10902,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "SetpointChangeAmount attribute value is %s", unify_value.dump().c_str());
             UN::SetpointChangeAmount::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::SetpointChangeAmount::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::SetpointChangeAmount::Id);
         }
         break;
     }
@@ -11272,8 +10916,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
             sl_log_debug(LOG_TAG, "SetpointChangeSourceTimestamp attribute value is %s", unify_value.dump().c_str());
             UN::SetpointChangeSourceTimestamp::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::SetpointChangeSourceTimestamp::Id, ZCL_UTC_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::SetpointChangeSourceTimestamp::Id);
         }
         break;
     }
@@ -11286,8 +10929,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "OccupiedSetback attribute value is %s", unify_value.dump().c_str());
             UN::OccupiedSetback::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedSetback::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedSetback::Id);
         }
         break;
     }
@@ -11300,8 +10942,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "OccupiedSetbackMin attribute value is %s", unify_value.dump().c_str());
             UN::OccupiedSetbackMin::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedSetbackMin::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedSetbackMin::Id);
         }
         break;
     }
@@ -11314,8 +10955,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "OccupiedSetbackMax attribute value is %s", unify_value.dump().c_str());
             UN::OccupiedSetbackMax::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedSetbackMax::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedSetbackMax::Id);
         }
         break;
     }
@@ -11328,8 +10968,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "UnoccupiedSetback attribute value is %s", unify_value.dump().c_str());
             UN::UnoccupiedSetback::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::UnoccupiedSetback::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::UnoccupiedSetback::Id);
         }
         break;
     }
@@ -11342,8 +10981,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "UnoccupiedSetbackMin attribute value is %s", unify_value.dump().c_str());
             UN::UnoccupiedSetbackMin::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::UnoccupiedSetbackMin::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::UnoccupiedSetbackMin::Id);
         }
         break;
     }
@@ -11356,8 +10994,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "UnoccupiedSetbackMax attribute value is %s", unify_value.dump().c_str());
             UN::UnoccupiedSetbackMax::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::UnoccupiedSetbackMax::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::UnoccupiedSetbackMax::Id);
         }
         break;
     }
@@ -11370,8 +11007,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "EmergencyHeatDelta attribute value is %s", unify_value.dump().c_str());
             UN::EmergencyHeatDelta::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::EmergencyHeatDelta::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::EmergencyHeatDelta::Id);
         }
         break;
     }
@@ -11384,8 +11020,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "ACType attribute value is %s", unify_value.dump().c_str());
             UN::ACType::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACType::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACType::Id);
         }
         break;
     }
@@ -11398,8 +11033,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "ACCapacity attribute value is %s", unify_value.dump().c_str());
             UN::ACCapacity::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACCapacity::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACCapacity::Id);
         }
         break;
     }
@@ -11412,8 +11046,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "ACRefrigerantType attribute value is %s", unify_value.dump().c_str());
             UN::ACRefrigerantType::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACRefrigerantType::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACRefrigerantType::Id);
         }
         break;
     }
@@ -11426,8 +11059,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "ACCompressorType attribute value is %s", unify_value.dump().c_str());
             UN::ACCompressorType::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACCompressorType::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACCompressorType::Id);
         }
         break;
     }
@@ -11440,8 +11072,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "ACErrorCode attribute value is %s", unify_value.dump().c_str());
             UN::ACErrorCode::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACErrorCode::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACErrorCode::Id);
         }
         break;
     }
@@ -11454,8 +11085,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "ACLouverPosition attribute value is %s", unify_value.dump().c_str());
             UN::ACLouverPosition::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACLouverPosition::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACLouverPosition::Id);
         }
         break;
     }
@@ -11468,8 +11098,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "ACCoilTemperature attribute value is %s", unify_value.dump().c_str());
             UN::ACCoilTemperature::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACCoilTemperature::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACCoilTemperature::Id);
         }
         break;
     }
@@ -11482,8 +11111,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "ACCapacityformat attribute value is %s", unify_value.dump().c_str());
             UN::ACCapacityformat::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACCapacityformat::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACCapacityformat::Id);
         }
         break;
     }
@@ -11496,8 +11124,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -11510,8 +11137,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -11727,8 +11353,7 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "FanMode attribute value is %s", unify_value.dump().c_str());
             UN::FanMode::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::FanMode::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::FanMode::Id);
         }
         break;
     }
@@ -11741,8 +11366,7 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "FanModeSequence attribute value is %s", unify_value.dump().c_str());
             UN::FanModeSequence::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::FanModeSequence::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::FanModeSequence::Id);
         }
         break;
     }
@@ -11755,8 +11379,7 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "PercentSetting attribute value is %s", unify_value.dump().c_str());
             UN::PercentSetting::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::PercentSetting::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::PercentSetting::Id);
         }
         break;
     }
@@ -11769,8 +11392,7 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "PercentCurrent attribute value is %s", unify_value.dump().c_str());
             UN::PercentCurrent::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::PercentCurrent::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::PercentCurrent::Id);
         }
         break;
     }
@@ -11783,8 +11405,7 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "SpeedMax attribute value is %s", unify_value.dump().c_str());
             UN::SpeedMax::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::SpeedMax::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::SpeedMax::Id);
         }
         break;
     }
@@ -11797,8 +11418,7 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "SpeedSetting attribute value is %s", unify_value.dump().c_str());
             UN::SpeedSetting::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::SpeedSetting::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::SpeedSetting::Id);
         }
         break;
     }
@@ -11811,8 +11431,7 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "SpeedCurrent attribute value is %s", unify_value.dump().c_str());
             UN::SpeedCurrent::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::SpeedCurrent::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::SpeedCurrent::Id);
         }
         break;
     }
@@ -11825,8 +11444,7 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "RockSupport attribute value is %s", unify_value.dump().c_str());
             UN::RockSupport::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::RockSupport::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::RockSupport::Id);
         }
         break;
     }
@@ -11839,8 +11457,7 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "RockSetting attribute value is %s", unify_value.dump().c_str());
             UN::RockSetting::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::RockSetting::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::RockSetting::Id);
         }
         break;
     }
@@ -11853,8 +11470,7 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "WindSupport attribute value is %s", unify_value.dump().c_str());
             UN::WindSupport::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::WindSupport::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::WindSupport::Id);
         }
         break;
     }
@@ -11867,8 +11483,7 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "WindSetting attribute value is %s", unify_value.dump().c_str());
             UN::WindSetting::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::WindSetting::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::WindSetting::Id);
         }
         break;
     }
@@ -11881,8 +11496,7 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -11895,8 +11509,7 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -12052,8 +11665,7 @@ void ThermostatUserInterfaceConfigurationAttributeAccess::reported_updated(const
             sl_log_debug(LOG_TAG, "TemperatureDisplayMode attribute value is %s", unify_value.dump().c_str());
             UN::TemperatureDisplayMode::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id,
-                                                   MN::TemperatureDisplayMode::Id, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TemperatureDisplayMode::Id);
         }
         break;
     }
@@ -12067,8 +11679,7 @@ void ThermostatUserInterfaceConfigurationAttributeAccess::reported_updated(const
             sl_log_debug(LOG_TAG, "KeypadLockout attribute value is %s", unify_value.dump().c_str());
             UN::KeypadLockout::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id,
-                                                   MN::KeypadLockout::Id, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::KeypadLockout::Id);
         }
         break;
     }
@@ -12082,8 +11693,7 @@ void ThermostatUserInterfaceConfigurationAttributeAccess::reported_updated(const
             sl_log_debug(LOG_TAG, "ScheduleProgrammingVisibility attribute value is %s", unify_value.dump().c_str());
             UN::ScheduleProgrammingVisibility::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id,
-                                                   MN::ScheduleProgrammingVisibility::Id, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ScheduleProgrammingVisibility::Id);
         }
         break;
     }
@@ -12097,8 +11707,7 @@ void ThermostatUserInterfaceConfigurationAttributeAccess::reported_updated(const
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id,
-                                                   MN::FeatureMap::Id, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::FeatureMap::Id);
         }
         break;
     }
@@ -12112,8 +11721,7 @@ void ThermostatUserInterfaceConfigurationAttributeAccess::reported_updated(const
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -12590,8 +12198,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "CurrentHue attribute value is %s", unify_value.dump().c_str());
             UN::CurrentHue::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CurrentHue::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CurrentHue::Id);
         }
         break;
     }
@@ -12604,8 +12211,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "CurrentSaturation attribute value is %s", unify_value.dump().c_str());
             UN::CurrentSaturation::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CurrentSaturation::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CurrentSaturation::Id);
         }
         break;
     }
@@ -12618,8 +12224,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "RemainingTime attribute value is %s", unify_value.dump().c_str());
             UN::RemainingTime::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::RemainingTime::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::RemainingTime::Id);
         }
         break;
     }
@@ -12632,8 +12237,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "CurrentX attribute value is %s", unify_value.dump().c_str());
             UN::CurrentX::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CurrentX::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CurrentX::Id);
         }
         break;
     }
@@ -12646,8 +12250,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "CurrentY attribute value is %s", unify_value.dump().c_str());
             UN::CurrentY::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CurrentY::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CurrentY::Id);
         }
         break;
     }
@@ -12660,8 +12263,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "DriftCompensation attribute value is %s", unify_value.dump().c_str());
             UN::DriftCompensation::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::DriftCompensation::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::DriftCompensation::Id);
         }
         break;
     }
@@ -12674,8 +12276,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "CompensationText attribute value is %s", unify_value.dump().c_str());
             UN::CompensationText::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CompensationText::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CompensationText::Id);
         }
         break;
     }
@@ -12688,8 +12289,8 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ColorTemperatureMireds attribute value is %s", unify_value.dump().c_str());
             UN::ColorTemperatureMireds::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorTemperatureMireds::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
+                                                   MN::ColorTemperatureMireds::Id);
         }
         break;
     }
@@ -12702,8 +12303,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ColorMode attribute value is %s", unify_value.dump().c_str());
             UN::ColorMode::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorMode::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorMode::Id);
         }
         break;
     }
@@ -12716,8 +12316,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Options attribute value is %s", unify_value.dump().c_str());
             UN::Options::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Options::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Options::Id);
         }
         break;
     }
@@ -12730,8 +12329,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "NumberOfPrimaries attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfPrimaries::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::NumberOfPrimaries::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::NumberOfPrimaries::Id);
         }
         break;
     }
@@ -12744,8 +12342,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Primary1X attribute value is %s", unify_value.dump().c_str());
             UN::Primary1X::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary1X::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary1X::Id);
         }
         break;
     }
@@ -12758,8 +12355,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Primary1Y attribute value is %s", unify_value.dump().c_str());
             UN::Primary1Y::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary1Y::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary1Y::Id);
         }
         break;
     }
@@ -12772,8 +12368,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Primary1Intensity attribute value is %s", unify_value.dump().c_str());
             UN::Primary1Intensity::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary1Intensity::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary1Intensity::Id);
         }
         break;
     }
@@ -12786,8 +12381,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Primary2X attribute value is %s", unify_value.dump().c_str());
             UN::Primary2X::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary2X::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary2X::Id);
         }
         break;
     }
@@ -12800,8 +12394,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Primary2Y attribute value is %s", unify_value.dump().c_str());
             UN::Primary2Y::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary2Y::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary2Y::Id);
         }
         break;
     }
@@ -12814,8 +12407,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Primary2Intensity attribute value is %s", unify_value.dump().c_str());
             UN::Primary2Intensity::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary2Intensity::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary2Intensity::Id);
         }
         break;
     }
@@ -12828,8 +12420,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Primary3X attribute value is %s", unify_value.dump().c_str());
             UN::Primary3X::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary3X::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary3X::Id);
         }
         break;
     }
@@ -12842,8 +12433,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Primary3Y attribute value is %s", unify_value.dump().c_str());
             UN::Primary3Y::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary3Y::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary3Y::Id);
         }
         break;
     }
@@ -12856,8 +12446,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Primary3Intensity attribute value is %s", unify_value.dump().c_str());
             UN::Primary3Intensity::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary3Intensity::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary3Intensity::Id);
         }
         break;
     }
@@ -12870,8 +12459,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Primary4X attribute value is %s", unify_value.dump().c_str());
             UN::Primary4X::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary4X::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary4X::Id);
         }
         break;
     }
@@ -12884,8 +12472,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Primary4Y attribute value is %s", unify_value.dump().c_str());
             UN::Primary4Y::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary4Y::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary4Y::Id);
         }
         break;
     }
@@ -12898,8 +12485,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Primary4Intensity attribute value is %s", unify_value.dump().c_str());
             UN::Primary4Intensity::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary4Intensity::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary4Intensity::Id);
         }
         break;
     }
@@ -12912,8 +12498,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Primary5X attribute value is %s", unify_value.dump().c_str());
             UN::Primary5X::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary5X::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary5X::Id);
         }
         break;
     }
@@ -12926,8 +12511,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Primary5Y attribute value is %s", unify_value.dump().c_str());
             UN::Primary5Y::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary5Y::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary5Y::Id);
         }
         break;
     }
@@ -12940,8 +12524,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Primary5Intensity attribute value is %s", unify_value.dump().c_str());
             UN::Primary5Intensity::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary5Intensity::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary5Intensity::Id);
         }
         break;
     }
@@ -12954,8 +12537,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Primary6X attribute value is %s", unify_value.dump().c_str());
             UN::Primary6X::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary6X::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary6X::Id);
         }
         break;
     }
@@ -12968,8 +12550,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Primary6Y attribute value is %s", unify_value.dump().c_str());
             UN::Primary6Y::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary6Y::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary6Y::Id);
         }
         break;
     }
@@ -12982,8 +12563,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "Primary6Intensity attribute value is %s", unify_value.dump().c_str());
             UN::Primary6Intensity::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary6Intensity::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary6Intensity::Id);
         }
         break;
     }
@@ -12996,8 +12576,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "WhitePointX attribute value is %s", unify_value.dump().c_str());
             UN::WhitePointX::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::WhitePointX::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::WhitePointX::Id);
         }
         break;
     }
@@ -13010,8 +12589,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "WhitePointY attribute value is %s", unify_value.dump().c_str());
             UN::WhitePointY::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::WhitePointY::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::WhitePointY::Id);
         }
         break;
     }
@@ -13024,8 +12602,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ColorPointRX attribute value is %s", unify_value.dump().c_str());
             UN::ColorPointRX::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointRX::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointRX::Id);
         }
         break;
     }
@@ -13038,8 +12615,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ColorPointRY attribute value is %s", unify_value.dump().c_str());
             UN::ColorPointRY::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointRY::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointRY::Id);
         }
         break;
     }
@@ -13052,8 +12628,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ColorPointRIntensity attribute value is %s", unify_value.dump().c_str());
             UN::ColorPointRIntensity::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointRIntensity::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointRIntensity::Id);
         }
         break;
     }
@@ -13066,8 +12641,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ColorPointGX attribute value is %s", unify_value.dump().c_str());
             UN::ColorPointGX::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointGX::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointGX::Id);
         }
         break;
     }
@@ -13080,8 +12654,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ColorPointGY attribute value is %s", unify_value.dump().c_str());
             UN::ColorPointGY::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointGY::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointGY::Id);
         }
         break;
     }
@@ -13094,8 +12667,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ColorPointGIntensity attribute value is %s", unify_value.dump().c_str());
             UN::ColorPointGIntensity::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointGIntensity::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointGIntensity::Id);
         }
         break;
     }
@@ -13108,8 +12680,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ColorPointBX attribute value is %s", unify_value.dump().c_str());
             UN::ColorPointBX::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointBX::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointBX::Id);
         }
         break;
     }
@@ -13122,8 +12693,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ColorPointBY attribute value is %s", unify_value.dump().c_str());
             UN::ColorPointBY::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointBY::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointBY::Id);
         }
         break;
     }
@@ -13136,8 +12706,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ColorPointBIntensity attribute value is %s", unify_value.dump().c_str());
             UN::ColorPointBIntensity::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointBIntensity::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointBIntensity::Id);
         }
         break;
     }
@@ -13150,8 +12719,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "EnhancedCurrentHue attribute value is %s", unify_value.dump().c_str());
             UN::EnhancedCurrentHue::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::EnhancedCurrentHue::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::EnhancedCurrentHue::Id);
         }
         break;
     }
@@ -13164,8 +12732,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "EnhancedColorMode attribute value is %s", unify_value.dump().c_str());
             UN::EnhancedColorMode::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::EnhancedColorMode::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::EnhancedColorMode::Id);
         }
         break;
     }
@@ -13178,8 +12745,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ColorLoopActive attribute value is %s", unify_value.dump().c_str());
             UN::ColorLoopActive::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorLoopActive::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorLoopActive::Id);
         }
         break;
     }
@@ -13192,8 +12758,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ColorLoopDirection attribute value is %s", unify_value.dump().c_str());
             UN::ColorLoopDirection::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorLoopDirection::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorLoopDirection::Id);
         }
         break;
     }
@@ -13206,8 +12771,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ColorLoopTime attribute value is %s", unify_value.dump().c_str());
             UN::ColorLoopTime::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorLoopTime::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorLoopTime::Id);
         }
         break;
     }
@@ -13221,8 +12785,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
             sl_log_debug(LOG_TAG, "ColorLoopStartEnhancedHue attribute value is %s", unify_value.dump().c_str());
             UN::ColorLoopStartEnhancedHue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
-                                                   MN::ColorLoopStartEnhancedHue::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ColorLoopStartEnhancedHue::Id);
         }
         break;
     }
@@ -13236,8 +12799,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
             sl_log_debug(LOG_TAG, "ColorLoopStoredEnhancedHue attribute value is %s", unify_value.dump().c_str());
             UN::ColorLoopStoredEnhancedHue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
-                                                   MN::ColorLoopStoredEnhancedHue::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ColorLoopStoredEnhancedHue::Id);
         }
         break;
     }
@@ -13249,8 +12811,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ColorCapabilities attribute value is %s", unify_value.dump().c_str());
             UN::ColorCapabilities::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorCapabilities::Id,
-                                                   ZCL_BITMAP16_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorCapabilities::Id);
         }
         break;
     }
@@ -13264,8 +12825,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
             sl_log_debug(LOG_TAG, "ColorTempPhysicalMinMireds attribute value is %s", unify_value.dump().c_str());
             UN::ColorTempPhysicalMinMireds::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
-                                                   MN::ColorTempPhysicalMinMireds::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ColorTempPhysicalMinMireds::Id);
         }
         break;
     }
@@ -13279,8 +12839,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
             sl_log_debug(LOG_TAG, "ColorTempPhysicalMaxMireds attribute value is %s", unify_value.dump().c_str());
             UN::ColorTempPhysicalMaxMireds::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
-                                                   MN::ColorTempPhysicalMaxMireds::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ColorTempPhysicalMaxMireds::Id);
         }
         break;
     }
@@ -13294,8 +12853,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
             sl_log_debug(LOG_TAG, "CoupleColorTempToLevelMinMireds attribute value is %s", unify_value.dump().c_str());
             UN::CoupleColorTempToLevelMinMireds::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
-                                                   MN::CoupleColorTempToLevelMinMireds::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::CoupleColorTempToLevelMinMireds::Id);
         }
         break;
     }
@@ -13309,8 +12867,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
             sl_log_debug(LOG_TAG, "StartUpColorTemperatureMireds attribute value is %s", unify_value.dump().c_str());
             UN::StartUpColorTemperatureMireds::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
-                                                   MN::StartUpColorTemperatureMireds::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::StartUpColorTemperatureMireds::Id);
         }
         break;
     }
@@ -13323,8 +12880,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -13337,8 +12893,7 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -13478,8 +13033,7 @@ void IlluminanceMeasurementAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "MeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id,
-                                                   MN::MeasuredValue::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MeasuredValue::Id);
         }
         break;
     }
@@ -13493,8 +13047,7 @@ void IlluminanceMeasurementAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "MinMeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MinMeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id,
-                                                   MN::MinMeasuredValue::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MinMeasuredValue::Id);
         }
         break;
     }
@@ -13508,8 +13061,7 @@ void IlluminanceMeasurementAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "MaxMeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MaxMeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id,
-                                                   MN::MaxMeasuredValue::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MaxMeasuredValue::Id);
         }
         break;
     }
@@ -13522,8 +13074,7 @@ void IlluminanceMeasurementAttributeAccess::reported_updated(const bridged_endpo
         {
             sl_log_debug(LOG_TAG, "Tolerance attribute value is %s", unify_value.dump().c_str());
             UN::Tolerance::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id, MN::Tolerance::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id, MN::Tolerance::Id);
         }
         break;
     }
@@ -13537,8 +13088,7 @@ void IlluminanceMeasurementAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "LightSensorType attribute value is %s", unify_value.dump().c_str());
             UN::LightSensorType::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id,
-                                                   MN::LightSensorType::Id, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::LightSensorType::Id);
         }
         break;
     }
@@ -13551,8 +13101,7 @@ void IlluminanceMeasurementAttributeAccess::reported_updated(const bridged_endpo
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -13566,8 +13115,7 @@ void IlluminanceMeasurementAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -13702,8 +13250,7 @@ void TemperatureMeasurementAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "MeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TemperatureMeasurement::Id,
-                                                   MN::MeasuredValue::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MeasuredValue::Id);
         }
         break;
     }
@@ -13717,8 +13264,7 @@ void TemperatureMeasurementAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "MinMeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MinMeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TemperatureMeasurement::Id,
-                                                   MN::MinMeasuredValue::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MinMeasuredValue::Id);
         }
         break;
     }
@@ -13732,8 +13278,7 @@ void TemperatureMeasurementAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "MaxMeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MaxMeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TemperatureMeasurement::Id,
-                                                   MN::MaxMeasuredValue::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MaxMeasuredValue::Id);
         }
         break;
     }
@@ -13746,8 +13291,7 @@ void TemperatureMeasurementAttributeAccess::reported_updated(const bridged_endpo
         {
             sl_log_debug(LOG_TAG, "Tolerance attribute value is %s", unify_value.dump().c_str());
             UN::Tolerance::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TemperatureMeasurement::Id, MN::Tolerance::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TemperatureMeasurement::Id, MN::Tolerance::Id);
         }
         break;
     }
@@ -13760,8 +13304,7 @@ void TemperatureMeasurementAttributeAccess::reported_updated(const bridged_endpo
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TemperatureMeasurement::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TemperatureMeasurement::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -13775,8 +13318,7 @@ void TemperatureMeasurementAttributeAccess::reported_updated(const bridged_endpo
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TemperatureMeasurement::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -13935,8 +13477,7 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "MeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredValue::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::MeasuredValue::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::MeasuredValue::Id);
         }
         break;
     }
@@ -13950,8 +13491,7 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
             sl_log_debug(LOG_TAG, "MinMeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MinMeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id,
-                                                   MN::MinMeasuredValue::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MinMeasuredValue::Id);
         }
         break;
     }
@@ -13965,8 +13505,7 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
             sl_log_debug(LOG_TAG, "MaxMeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MaxMeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id,
-                                                   MN::MaxMeasuredValue::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MaxMeasuredValue::Id);
         }
         break;
     }
@@ -13979,8 +13518,7 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "Tolerance attribute value is %s", unify_value.dump().c_str());
             UN::Tolerance::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::Tolerance::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::Tolerance::Id);
         }
         break;
     }
@@ -13993,8 +13531,7 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "ScaledValue attribute value is %s", unify_value.dump().c_str());
             UN::ScaledValue::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::ScaledValue::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::ScaledValue::Id);
         }
         break;
     }
@@ -14007,8 +13544,7 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "MinScaledValue attribute value is %s", unify_value.dump().c_str());
             UN::MinScaledValue::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::MinScaledValue::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::MinScaledValue::Id);
         }
         break;
     }
@@ -14021,8 +13557,7 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "MaxScaledValue attribute value is %s", unify_value.dump().c_str());
             UN::MaxScaledValue::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::MaxScaledValue::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::MaxScaledValue::Id);
         }
         break;
     }
@@ -14035,8 +13570,8 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "ScaledTolerance attribute value is %s", unify_value.dump().c_str());
             UN::ScaledTolerance::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::ScaledTolerance::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id,
+                                                   MN::ScaledTolerance::Id);
         }
         break;
     }
@@ -14049,8 +13584,7 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "Scale attribute value is %s", unify_value.dump().c_str());
             UN::Scale::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::Scale::Id,
-                                                   ZCL_INT8S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::Scale::Id);
         }
         break;
     }
@@ -14063,8 +13597,7 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -14077,8 +13610,8 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id,
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -14212,8 +13745,7 @@ void FlowMeasurementAttributeAccess::reported_updated(const bridged_endpoint * e
         {
             sl_log_debug(LOG_TAG, "MeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredValue::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FlowMeasurement::Id, MN::MeasuredValue::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FlowMeasurement::Id, MN::MeasuredValue::Id);
         }
         break;
     }
@@ -14226,8 +13758,7 @@ void FlowMeasurementAttributeAccess::reported_updated(const bridged_endpoint * e
         {
             sl_log_debug(LOG_TAG, "MinMeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MinMeasuredValue::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FlowMeasurement::Id, MN::MinMeasuredValue::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FlowMeasurement::Id, MN::MinMeasuredValue::Id);
         }
         break;
     }
@@ -14240,8 +13771,7 @@ void FlowMeasurementAttributeAccess::reported_updated(const bridged_endpoint * e
         {
             sl_log_debug(LOG_TAG, "MaxMeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MaxMeasuredValue::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FlowMeasurement::Id, MN::MaxMeasuredValue::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FlowMeasurement::Id, MN::MaxMeasuredValue::Id);
         }
         break;
     }
@@ -14254,8 +13784,7 @@ void FlowMeasurementAttributeAccess::reported_updated(const bridged_endpoint * e
         {
             sl_log_debug(LOG_TAG, "Tolerance attribute value is %s", unify_value.dump().c_str());
             UN::Tolerance::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FlowMeasurement::Id, MN::Tolerance::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FlowMeasurement::Id, MN::Tolerance::Id);
         }
         break;
     }
@@ -14268,8 +13797,7 @@ void FlowMeasurementAttributeAccess::reported_updated(const bridged_endpoint * e
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FlowMeasurement::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FlowMeasurement::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -14282,8 +13810,7 @@ void FlowMeasurementAttributeAccess::reported_updated(const bridged_endpoint * e
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FlowMeasurement::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FlowMeasurement::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -14419,8 +13946,7 @@ void RelativeHumidityMeasurementAttributeAccess::reported_updated(const bridged_
             sl_log_debug(LOG_TAG, "MeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::RelativeHumidityMeasurement::Id,
-                                                   MN::MeasuredValue::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MeasuredValue::Id);
         }
         break;
     }
@@ -14434,8 +13960,7 @@ void RelativeHumidityMeasurementAttributeAccess::reported_updated(const bridged_
             sl_log_debug(LOG_TAG, "MinMeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MinMeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::RelativeHumidityMeasurement::Id,
-                                                   MN::MinMeasuredValue::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MinMeasuredValue::Id);
         }
         break;
     }
@@ -14449,8 +13974,7 @@ void RelativeHumidityMeasurementAttributeAccess::reported_updated(const bridged_
             sl_log_debug(LOG_TAG, "MaxMeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MaxMeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::RelativeHumidityMeasurement::Id,
-                                                   MN::MaxMeasuredValue::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MaxMeasuredValue::Id);
         }
         break;
     }
@@ -14464,8 +13988,7 @@ void RelativeHumidityMeasurementAttributeAccess::reported_updated(const bridged_
             sl_log_debug(LOG_TAG, "Tolerance attribute value is %s", unify_value.dump().c_str());
             UN::Tolerance::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::RelativeHumidityMeasurement::Id,
-                                                   MN::Tolerance::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::Tolerance::Id);
         }
         break;
     }
@@ -14479,8 +14002,7 @@ void RelativeHumidityMeasurementAttributeAccess::reported_updated(const bridged_
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::RelativeHumidityMeasurement::Id,
-                                                   MN::FeatureMap::Id, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::FeatureMap::Id);
         }
         break;
     }
@@ -14494,8 +14016,7 @@ void RelativeHumidityMeasurementAttributeAccess::reported_updated(const bridged_
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::RelativeHumidityMeasurement::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -14740,8 +14261,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "Occupancy attribute value is %s", unify_value.dump().c_str());
             UN::Occupancy::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id, MN::Occupancy::Id,
-                                                   ZCL_BITMAP8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id, MN::Occupancy::Id);
         }
         break;
     }
@@ -14755,8 +14275,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
             sl_log_debug(LOG_TAG, "OccupancySensorType attribute value is %s", unify_value.dump().c_str());
             UN::OccupancySensorType::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::OccupancySensorType::Id, ZCL_ENUM8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::OccupancySensorType::Id);
         }
         break;
     }
@@ -14769,8 +14288,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
             sl_log_debug(LOG_TAG, "OccupancySensorTypeBitmap attribute value is %s", unify_value.dump().c_str());
             UN::OccupancySensorTypeBitmap::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::OccupancySensorTypeBitmap::Id, ZCL_BITMAP8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::OccupancySensorTypeBitmap::Id);
         }
         break;
     }
@@ -14784,8 +14302,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
             sl_log_debug(LOG_TAG, "PirOccupiedToUnoccupiedDelay attribute value is %s", unify_value.dump().c_str());
             UN::PirOccupiedToUnoccupiedDelay::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::PirOccupiedToUnoccupiedDelay::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PirOccupiedToUnoccupiedDelay::Id);
         }
         break;
     }
@@ -14799,8 +14316,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
             sl_log_debug(LOG_TAG, "PirUnoccupiedToOccupiedDelay attribute value is %s", unify_value.dump().c_str());
             UN::PirUnoccupiedToOccupiedDelay::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::PirUnoccupiedToOccupiedDelay::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PirUnoccupiedToOccupiedDelay::Id);
         }
         break;
     }
@@ -14814,8 +14330,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
             sl_log_debug(LOG_TAG, "PirUnoccupiedToOccupiedThreshold attribute value is %s", unify_value.dump().c_str());
             UN::PirUnoccupiedToOccupiedThreshold::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::PirUnoccupiedToOccupiedThreshold::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PirUnoccupiedToOccupiedThreshold::Id);
         }
         break;
     }
@@ -14829,8 +14344,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
             sl_log_debug(LOG_TAG, "UltrasonicOccupiedToUnoccupiedDelay attribute value is %s", unify_value.dump().c_str());
             UN::UltrasonicOccupiedToUnoccupiedDelay::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::UltrasonicOccupiedToUnoccupiedDelay::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::UltrasonicOccupiedToUnoccupiedDelay::Id);
         }
         break;
     }
@@ -14844,8 +14358,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
             sl_log_debug(LOG_TAG, "UltrasonicUnoccupiedToOccupiedDelay attribute value is %s", unify_value.dump().c_str());
             UN::UltrasonicUnoccupiedToOccupiedDelay::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::UltrasonicUnoccupiedToOccupiedDelay::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::UltrasonicUnoccupiedToOccupiedDelay::Id);
         }
         break;
     }
@@ -14859,8 +14372,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
             sl_log_debug(LOG_TAG, "UltrasonicUnoccupiedToOccupiedThreshold attribute value is %s", unify_value.dump().c_str());
             UN::UltrasonicUnoccupiedToOccupiedThreshold::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::UltrasonicUnoccupiedToOccupiedThreshold::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::UltrasonicUnoccupiedToOccupiedThreshold::Id);
         }
         break;
     }
@@ -14874,8 +14386,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
             sl_log_debug(LOG_TAG, "PhysicalContactOccupiedToUnoccupiedDelay attribute value is %s", unify_value.dump().c_str());
             UN::PhysicalContactOccupiedToUnoccupiedDelay::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::PhysicalContactOccupiedToUnoccupiedDelay::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PhysicalContactOccupiedToUnoccupiedDelay::Id);
         }
         break;
     }
@@ -14889,8 +14400,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
             sl_log_debug(LOG_TAG, "PhysicalContactUnoccupiedToOccupiedDelay attribute value is %s", unify_value.dump().c_str());
             UN::PhysicalContactUnoccupiedToOccupiedDelay::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::PhysicalContactUnoccupiedToOccupiedDelay::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PhysicalContactUnoccupiedToOccupiedDelay::Id);
         }
         break;
     }
@@ -14904,8 +14414,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
             sl_log_debug(LOG_TAG, "PhysicalContactUnoccupiedToOccupiedThreshold attribute value is %s", unify_value.dump().c_str());
             UN::PhysicalContactUnoccupiedToOccupiedThreshold::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::PhysicalContactUnoccupiedToOccupiedThreshold::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PhysicalContactUnoccupiedToOccupiedThreshold::Id);
         }
         break;
     }
@@ -14918,8 +14427,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -14932,8 +14440,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -15051,8 +14558,7 @@ void WakeOnLanAttributeAccess::reported_updated(const bridged_endpoint * ep, con
         {
             sl_log_debug(LOG_TAG, "MACAddress attribute value is %s", unify_value.dump().c_str());
             UN::MACAddress::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WakeOnLan::Id, MN::MACAddress::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WakeOnLan::Id, MN::MACAddress::Id);
         }
         break;
     }
@@ -15065,8 +14571,7 @@ void WakeOnLanAttributeAccess::reported_updated(const bridged_endpoint * ep, con
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WakeOnLan::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WakeOnLan::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -15079,8 +14584,7 @@ void WakeOnLanAttributeAccess::reported_updated(const bridged_endpoint * ep, con
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WakeOnLan::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::WakeOnLan::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -15193,8 +14697,7 @@ void ChannelAttributeAccess::reported_updated(const bridged_endpoint * ep, const
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Channel::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Channel::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -15207,8 +14710,7 @@ void ChannelAttributeAccess::reported_updated(const bridged_endpoint * ep, const
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Channel::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Channel::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -15327,8 +14829,7 @@ void TargetNavigatorAttributeAccess::reported_updated(const bridged_endpoint * e
         {
             sl_log_debug(LOG_TAG, "CurrentTarget attribute value is %s", unify_value.dump().c_str());
             UN::CurrentTarget::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TargetNavigator::Id, MN::CurrentTarget::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TargetNavigator::Id, MN::CurrentTarget::Id);
         }
         break;
     }
@@ -15341,8 +14842,7 @@ void TargetNavigatorAttributeAccess::reported_updated(const bridged_endpoint * e
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TargetNavigator::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TargetNavigator::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -15355,8 +14855,7 @@ void TargetNavigatorAttributeAccess::reported_updated(const bridged_endpoint * e
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TargetNavigator::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TargetNavigator::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -15499,8 +14998,7 @@ void MediaPlaybackAttributeAccess::reported_updated(const bridged_endpoint * ep,
         {
             sl_log_debug(LOG_TAG, "CurrentState attribute value is %s", unify_value.dump().c_str());
             UN::CurrentState::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaPlayback::Id, MN::CurrentState::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaPlayback::Id, MN::CurrentState::Id);
         }
         break;
     }
@@ -15513,8 +15011,7 @@ void MediaPlaybackAttributeAccess::reported_updated(const bridged_endpoint * ep,
         {
             sl_log_debug(LOG_TAG, "StartTime attribute value is %s", unify_value.dump().c_str());
             UN::StartTime::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaPlayback::Id, MN::StartTime::Id,
-                                                   ZCL_EPOCH_US_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaPlayback::Id, MN::StartTime::Id);
         }
         break;
     }
@@ -15527,8 +15024,7 @@ void MediaPlaybackAttributeAccess::reported_updated(const bridged_endpoint * ep,
         {
             sl_log_debug(LOG_TAG, "Duration attribute value is %s", unify_value.dump().c_str());
             UN::Duration::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaPlayback::Id, MN::Duration::Id,
-                                                   ZCL_INT64U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaPlayback::Id, MN::Duration::Id);
         }
         break;
     }
@@ -15541,8 +15037,7 @@ void MediaPlaybackAttributeAccess::reported_updated(const bridged_endpoint * ep,
         {
             sl_log_debug(LOG_TAG, "PlaybackSpeed attribute value is %s", unify_value.dump().c_str());
             UN::PlaybackSpeed::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaPlayback::Id, MN::PlaybackSpeed::Id,
-                                                   ZCL_SINGLE_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaPlayback::Id, MN::PlaybackSpeed::Id);
         }
         break;
     }
@@ -15555,8 +15050,7 @@ void MediaPlaybackAttributeAccess::reported_updated(const bridged_endpoint * ep,
         {
             sl_log_debug(LOG_TAG, "SeekRangeEnd attribute value is %s", unify_value.dump().c_str());
             UN::SeekRangeEnd::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaPlayback::Id, MN::SeekRangeEnd::Id,
-                                                   ZCL_INT64U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaPlayback::Id, MN::SeekRangeEnd::Id);
         }
         break;
     }
@@ -15569,8 +15063,7 @@ void MediaPlaybackAttributeAccess::reported_updated(const bridged_endpoint * ep,
         {
             sl_log_debug(LOG_TAG, "SeekRangeStart attribute value is %s", unify_value.dump().c_str());
             UN::SeekRangeStart::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaPlayback::Id, MN::SeekRangeStart::Id,
-                                                   ZCL_INT64U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaPlayback::Id, MN::SeekRangeStart::Id);
         }
         break;
     }
@@ -15583,8 +15076,7 @@ void MediaPlaybackAttributeAccess::reported_updated(const bridged_endpoint * ep,
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaPlayback::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaPlayback::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -15597,8 +15089,7 @@ void MediaPlaybackAttributeAccess::reported_updated(const bridged_endpoint * ep,
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaPlayback::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaPlayback::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -15716,8 +15207,7 @@ void MediaInputAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "CurrentInput attribute value is %s", unify_value.dump().c_str());
             UN::CurrentInput::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaInput::Id, MN::CurrentInput::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaInput::Id, MN::CurrentInput::Id);
         }
         break;
     }
@@ -15730,8 +15220,7 @@ void MediaInputAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaInput::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaInput::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -15744,8 +15233,7 @@ void MediaInputAttributeAccess::reported_updated(const bridged_endpoint * ep, co
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaInput::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::MediaInput::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -15858,8 +15346,7 @@ void LowPowerAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LowPower::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LowPower::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -15872,8 +15359,7 @@ void LowPowerAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LowPower::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LowPower::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -15986,8 +15472,7 @@ void KeypadInputAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::KeypadInput::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::KeypadInput::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -16000,8 +15485,7 @@ void KeypadInputAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::KeypadInput::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::KeypadInput::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -16129,8 +15613,7 @@ void ContentLauncherAttributeAccess::reported_updated(const bridged_endpoint * e
             sl_log_debug(LOG_TAG, "SupportedStreamingProtocols attribute value is %s", unify_value.dump().c_str());
             UN::SupportedStreamingProtocols::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ContentLauncher::Id,
-                                                   MN::SupportedStreamingProtocols::Id, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::SupportedStreamingProtocols::Id);
         }
         break;
     }
@@ -16143,8 +15626,7 @@ void ContentLauncherAttributeAccess::reported_updated(const bridged_endpoint * e
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ContentLauncher::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ContentLauncher::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -16157,8 +15639,7 @@ void ContentLauncherAttributeAccess::reported_updated(const bridged_endpoint * e
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ContentLauncher::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ContentLauncher::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -16276,8 +15757,7 @@ void AudioOutputAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "CurrentOutput attribute value is %s", unify_value.dump().c_str());
             UN::CurrentOutput::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::AudioOutput::Id, MN::CurrentOutput::Id,
-                                                   ZCL_INT8U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::AudioOutput::Id, MN::CurrentOutput::Id);
         }
         break;
     }
@@ -16290,8 +15770,7 @@ void AudioOutputAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::AudioOutput::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::AudioOutput::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -16304,8 +15783,7 @@ void AudioOutputAttributeAccess::reported_updated(const bridged_endpoint * ep, c
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::AudioOutput::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::AudioOutput::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -16427,8 +15905,7 @@ void ApplicationLauncherAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationLauncher::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationLauncher::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -16441,8 +15918,8 @@ void ApplicationLauncherAttributeAccess::reported_updated(const bridged_endpoint
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationLauncher::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationLauncher::Id,
+                                                   MN::ClusterRevision::Id);
         }
         break;
     }
@@ -16586,8 +16063,7 @@ void ApplicationBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "VendorName attribute value is %s", unify_value.dump().c_str());
             UN::VendorName::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationBasic::Id, MN::VendorName::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationBasic::Id, MN::VendorName::Id);
         }
         break;
     }
@@ -16600,8 +16076,7 @@ void ApplicationBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "VendorID attribute value is %s", unify_value.dump().c_str());
             UN::VendorID::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationBasic::Id, MN::VendorID::Id,
-                                                   ZCL_VENDOR_ID_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationBasic::Id, MN::VendorID::Id);
         }
         break;
     }
@@ -16614,8 +16089,7 @@ void ApplicationBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "ApplicationName attribute value is %s", unify_value.dump().c_str());
             UN::ApplicationName::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationBasic::Id, MN::ApplicationName::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationBasic::Id, MN::ApplicationName::Id);
         }
         break;
     }
@@ -16628,8 +16102,7 @@ void ApplicationBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "ProductID attribute value is %s", unify_value.dump().c_str());
             UN::ProductID::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationBasic::Id, MN::ProductID::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationBasic::Id, MN::ProductID::Id);
         }
         break;
     }
@@ -16642,8 +16115,7 @@ void ApplicationBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "Status attribute value is %s", unify_value.dump().c_str());
             UN::Status::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationBasic::Id, MN::Status::Id,
-                                                   ZCL_ENUM8_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationBasic::Id, MN::Status::Id);
         }
         break;
     }
@@ -16656,8 +16128,8 @@ void ApplicationBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "ApplicationVersion attribute value is %s", unify_value.dump().c_str());
             UN::ApplicationVersion::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationBasic::Id, MN::ApplicationVersion::Id,
-                                                   ZCL_CHAR_STRING_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationBasic::Id,
+                                                   MN::ApplicationVersion::Id);
         }
         break;
     }
@@ -16670,8 +16142,7 @@ void ApplicationBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationBasic::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationBasic::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -16684,8 +16155,7 @@ void ApplicationBasicAttributeAccess::reported_updated(const bridged_endpoint * 
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationBasic::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ApplicationBasic::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -16798,8 +16268,7 @@ void AccountLoginAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::AccountLogin::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::AccountLogin::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -16812,8 +16281,7 @@ void AccountLoginAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         {
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::AccountLogin::Id, MN::ClusterRevision::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::AccountLogin::Id, MN::ClusterRevision::Id);
         }
         break;
     }
@@ -17632,8 +17100,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "MeasurementType attribute value is %s", unify_value.dump().c_str());
             UN::MeasurementType::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::MeasurementType::Id, ZCL_BITMAP32_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MeasurementType::Id);
         }
         break;
     }
@@ -17646,8 +17113,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "DcVoltage attribute value is %s", unify_value.dump().c_str());
             UN::DcVoltage::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcVoltage::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcVoltage::Id);
         }
         break;
     }
@@ -17660,8 +17126,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "DcVoltageMin attribute value is %s", unify_value.dump().c_str());
             UN::DcVoltageMin::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcVoltageMin::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcVoltageMin::Id);
         }
         break;
     }
@@ -17674,8 +17139,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "DcVoltageMax attribute value is %s", unify_value.dump().c_str());
             UN::DcVoltageMax::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcVoltageMax::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcVoltageMax::Id);
         }
         break;
     }
@@ -17688,8 +17152,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "DcCurrent attribute value is %s", unify_value.dump().c_str());
             UN::DcCurrent::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcCurrent::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcCurrent::Id);
         }
         break;
     }
@@ -17702,8 +17165,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "DcCurrentMin attribute value is %s", unify_value.dump().c_str());
             UN::DcCurrentMin::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcCurrentMin::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcCurrentMin::Id);
         }
         break;
     }
@@ -17716,8 +17178,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "DcCurrentMax attribute value is %s", unify_value.dump().c_str());
             UN::DcCurrentMax::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcCurrentMax::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcCurrentMax::Id);
         }
         break;
     }
@@ -17730,8 +17191,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "DcPower attribute value is %s", unify_value.dump().c_str());
             UN::DcPower::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcPower::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcPower::Id);
         }
         break;
     }
@@ -17744,8 +17204,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "DcPowerMin attribute value is %s", unify_value.dump().c_str());
             UN::DcPowerMin::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcPowerMin::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcPowerMin::Id);
         }
         break;
     }
@@ -17758,8 +17217,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "DcPowerMax attribute value is %s", unify_value.dump().c_str());
             UN::DcPowerMax::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcPowerMax::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcPowerMax::Id);
         }
         break;
     }
@@ -17773,8 +17231,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "DcVoltageMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::DcVoltageMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::DcVoltageMultiplier::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::DcVoltageMultiplier::Id);
         }
         break;
     }
@@ -17788,8 +17245,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "DcVoltageDivisor attribute value is %s", unify_value.dump().c_str());
             UN::DcVoltageDivisor::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::DcVoltageDivisor::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::DcVoltageDivisor::Id);
         }
         break;
     }
@@ -17803,8 +17259,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "DcCurrentMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::DcCurrentMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::DcCurrentMultiplier::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::DcCurrentMultiplier::Id);
         }
         break;
     }
@@ -17818,8 +17273,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "DcCurrentDivisor attribute value is %s", unify_value.dump().c_str());
             UN::DcCurrentDivisor::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::DcCurrentDivisor::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::DcCurrentDivisor::Id);
         }
         break;
     }
@@ -17833,8 +17287,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "DcPowerMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::DcPowerMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::DcPowerMultiplier::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::DcPowerMultiplier::Id);
         }
         break;
     }
@@ -17848,8 +17301,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "DcPowerDivisor attribute value is %s", unify_value.dump().c_str());
             UN::DcPowerDivisor::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::DcPowerDivisor::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::DcPowerDivisor::Id);
         }
         break;
     }
@@ -17862,8 +17314,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "AcFrequency attribute value is %s", unify_value.dump().c_str());
             UN::AcFrequency::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::AcFrequency::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::AcFrequency::Id);
         }
         break;
     }
@@ -17877,8 +17328,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AcFrequencyMin attribute value is %s", unify_value.dump().c_str());
             UN::AcFrequencyMin::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcFrequencyMin::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AcFrequencyMin::Id);
         }
         break;
     }
@@ -17892,8 +17342,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AcFrequencyMax attribute value is %s", unify_value.dump().c_str());
             UN::AcFrequencyMax::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcFrequencyMax::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AcFrequencyMax::Id);
         }
         break;
     }
@@ -17907,8 +17356,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "NeutralCurrent attribute value is %s", unify_value.dump().c_str());
             UN::NeutralCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::NeutralCurrent::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::NeutralCurrent::Id);
         }
         break;
     }
@@ -17922,8 +17370,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "TotalActivePower attribute value is %s", unify_value.dump().c_str());
             UN::TotalActivePower::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::TotalActivePower::Id, ZCL_INT32S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TotalActivePower::Id);
         }
         break;
     }
@@ -17937,8 +17384,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "TotalReactivePower attribute value is %s", unify_value.dump().c_str());
             UN::TotalReactivePower::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::TotalReactivePower::Id, ZCL_INT32S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TotalReactivePower::Id);
         }
         break;
     }
@@ -17952,8 +17398,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "TotalApparentPower attribute value is %s", unify_value.dump().c_str());
             UN::TotalApparentPower::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::TotalApparentPower::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::TotalApparentPower::Id);
         }
         break;
     }
@@ -17967,8 +17412,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "Measured1stHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::Measured1stHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::Measured1stHarmonicCurrent::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::Measured1stHarmonicCurrent::Id);
         }
         break;
     }
@@ -17982,8 +17426,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "Measured3rdHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::Measured3rdHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::Measured3rdHarmonicCurrent::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::Measured3rdHarmonicCurrent::Id);
         }
         break;
     }
@@ -17997,8 +17440,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "Measured5thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::Measured5thHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::Measured5thHarmonicCurrent::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::Measured5thHarmonicCurrent::Id);
         }
         break;
     }
@@ -18012,8 +17454,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "Measured7thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::Measured7thHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::Measured7thHarmonicCurrent::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::Measured7thHarmonicCurrent::Id);
         }
         break;
     }
@@ -18027,8 +17468,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "Measured9thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::Measured9thHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::Measured9thHarmonicCurrent::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::Measured9thHarmonicCurrent::Id);
         }
         break;
     }
@@ -18042,8 +17482,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "Measured11thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::Measured11thHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::Measured11thHarmonicCurrent::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::Measured11thHarmonicCurrent::Id);
         }
         break;
     }
@@ -18057,8 +17496,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "MeasuredPhase1stHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredPhase1stHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::MeasuredPhase1stHarmonicCurrent::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MeasuredPhase1stHarmonicCurrent::Id);
         }
         break;
     }
@@ -18072,8 +17510,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "MeasuredPhase3rdHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredPhase3rdHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::MeasuredPhase3rdHarmonicCurrent::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MeasuredPhase3rdHarmonicCurrent::Id);
         }
         break;
     }
@@ -18087,8 +17524,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "MeasuredPhase5thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredPhase5thHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::MeasuredPhase5thHarmonicCurrent::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MeasuredPhase5thHarmonicCurrent::Id);
         }
         break;
     }
@@ -18102,8 +17538,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "MeasuredPhase7thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredPhase7thHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::MeasuredPhase7thHarmonicCurrent::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MeasuredPhase7thHarmonicCurrent::Id);
         }
         break;
     }
@@ -18117,8 +17552,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "MeasuredPhase9thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredPhase9thHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::MeasuredPhase9thHarmonicCurrent::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MeasuredPhase9thHarmonicCurrent::Id);
         }
         break;
     }
@@ -18132,8 +17566,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "MeasuredPhase11thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredPhase11thHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::MeasuredPhase11thHarmonicCurrent::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::MeasuredPhase11thHarmonicCurrent::Id);
         }
         break;
     }
@@ -18147,8 +17580,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AcFrequencyMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::AcFrequencyMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcFrequencyMultiplier::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AcFrequencyMultiplier::Id);
         }
         break;
     }
@@ -18162,8 +17594,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AcFrequencyDivisor attribute value is %s", unify_value.dump().c_str());
             UN::AcFrequencyDivisor::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcFrequencyDivisor::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AcFrequencyDivisor::Id);
         }
         break;
     }
@@ -18177,8 +17608,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "PowerMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::PowerMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::PowerMultiplier::Id, ZCL_INT32U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PowerMultiplier::Id);
         }
         break;
     }
@@ -18191,8 +17621,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "PowerDivisor attribute value is %s", unify_value.dump().c_str());
             UN::PowerDivisor::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::PowerDivisor::Id,
-                                                   ZCL_INT32U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::PowerDivisor::Id);
         }
         break;
     }
@@ -18206,8 +17635,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "HarmonicCurrentMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::HarmonicCurrentMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::HarmonicCurrentMultiplier::Id, ZCL_INT8S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::HarmonicCurrentMultiplier::Id);
         }
         break;
     }
@@ -18221,8 +17649,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "PhaseHarmonicCurrentMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::PhaseHarmonicCurrentMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::PhaseHarmonicCurrentMultiplier::Id, ZCL_INT8S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PhaseHarmonicCurrentMultiplier::Id);
         }
         break;
     }
@@ -18236,8 +17663,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "InstantaneousVoltage attribute value is %s", unify_value.dump().c_str());
             UN::InstantaneousVoltage::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::InstantaneousVoltage::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::InstantaneousVoltage::Id);
         }
         break;
     }
@@ -18251,8 +17677,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "InstantaneousLineCurrent attribute value is %s", unify_value.dump().c_str());
             UN::InstantaneousLineCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::InstantaneousLineCurrent::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::InstantaneousLineCurrent::Id);
         }
         break;
     }
@@ -18266,8 +17691,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "InstantaneousActiveCurrent attribute value is %s", unify_value.dump().c_str());
             UN::InstantaneousActiveCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::InstantaneousActiveCurrent::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::InstantaneousActiveCurrent::Id);
         }
         break;
     }
@@ -18281,8 +17705,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "InstantaneousReactiveCurrent attribute value is %s", unify_value.dump().c_str());
             UN::InstantaneousReactiveCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::InstantaneousReactiveCurrent::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::InstantaneousReactiveCurrent::Id);
         }
         break;
     }
@@ -18296,8 +17719,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "InstantaneousPower attribute value is %s", unify_value.dump().c_str());
             UN::InstantaneousPower::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::InstantaneousPower::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::InstantaneousPower::Id);
         }
         break;
     }
@@ -18310,8 +17732,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "RmsVoltage attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltage::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::RmsVoltage::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::RmsVoltage::Id);
         }
         break;
     }
@@ -18324,8 +17745,8 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "RmsVoltageMin attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageMin::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::RmsVoltageMin::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
+                                                   MN::RmsVoltageMin::Id);
         }
         break;
     }
@@ -18338,8 +17759,8 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "RmsVoltageMax attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageMax::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::RmsVoltageMax::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
+                                                   MN::RmsVoltageMax::Id);
         }
         break;
     }
@@ -18352,8 +17773,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "RmsCurrent attribute value is %s", unify_value.dump().c_str());
             UN::RmsCurrent::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::RmsCurrent::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::RmsCurrent::Id);
         }
         break;
     }
@@ -18366,8 +17786,8 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "RmsCurrentMin attribute value is %s", unify_value.dump().c_str());
             UN::RmsCurrentMin::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::RmsCurrentMin::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
+                                                   MN::RmsCurrentMin::Id);
         }
         break;
     }
@@ -18380,8 +17800,8 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "RmsCurrentMax attribute value is %s", unify_value.dump().c_str());
             UN::RmsCurrentMax::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::RmsCurrentMax::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
+                                                   MN::RmsCurrentMax::Id);
         }
         break;
     }
@@ -18394,8 +17814,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "ActivePower attribute value is %s", unify_value.dump().c_str());
             UN::ActivePower::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::ActivePower::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::ActivePower::Id);
         }
         break;
     }
@@ -18409,8 +17828,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "ActivePowerMin attribute value is %s", unify_value.dump().c_str());
             UN::ActivePowerMin::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActivePowerMin::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ActivePowerMin::Id);
         }
         break;
     }
@@ -18424,8 +17842,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "ActivePowerMax attribute value is %s", unify_value.dump().c_str());
             UN::ActivePowerMax::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActivePowerMax::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ActivePowerMax::Id);
         }
         break;
     }
@@ -18438,8 +17855,8 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "ReactivePower attribute value is %s", unify_value.dump().c_str());
             UN::ReactivePower::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::ReactivePower::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
+                                                   MN::ReactivePower::Id);
         }
         break;
     }
@@ -18452,8 +17869,8 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "ApparentPower attribute value is %s", unify_value.dump().c_str());
             UN::ApparentPower::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::ApparentPower::Id,
-                                                   ZCL_INT16U_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
+                                                   MN::ApparentPower::Id);
         }
         break;
     }
@@ -18466,8 +17883,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "PowerFactor attribute value is %s", unify_value.dump().c_str());
             UN::PowerFactor::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::PowerFactor::Id,
-                                                   ZCL_INT8S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::PowerFactor::Id);
         }
         break;
     }
@@ -18481,8 +17897,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AverageRmsVoltageMeasurementPeriod attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsVoltageMeasurementPeriod::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsVoltageMeasurementPeriod::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AverageRmsVoltageMeasurementPeriod::Id);
         }
         break;
     }
@@ -18496,8 +17911,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AverageRmsUnderVoltageCounter attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsUnderVoltageCounter::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsUnderVoltageCounter::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AverageRmsUnderVoltageCounter::Id);
         }
         break;
     }
@@ -18511,8 +17925,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsExtremeOverVoltagePeriod attribute value is %s", unify_value.dump().c_str());
             UN::RmsExtremeOverVoltagePeriod::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsExtremeOverVoltagePeriod::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsExtremeOverVoltagePeriod::Id);
         }
         break;
     }
@@ -18526,8 +17939,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsExtremeUnderVoltagePeriod attribute value is %s", unify_value.dump().c_str());
             UN::RmsExtremeUnderVoltagePeriod::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsExtremeUnderVoltagePeriod::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsExtremeUnderVoltagePeriod::Id);
         }
         break;
     }
@@ -18541,8 +17953,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsVoltageSagPeriod attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageSagPeriod::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageSagPeriod::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsVoltageSagPeriod::Id);
         }
         break;
     }
@@ -18556,8 +17967,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsVoltageSwellPeriod attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageSwellPeriod::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageSwellPeriod::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsVoltageSwellPeriod::Id);
         }
         break;
     }
@@ -18571,8 +17981,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AcVoltageMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::AcVoltageMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcVoltageMultiplier::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AcVoltageMultiplier::Id);
         }
         break;
     }
@@ -18586,8 +17995,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AcVoltageDivisor attribute value is %s", unify_value.dump().c_str());
             UN::AcVoltageDivisor::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcVoltageDivisor::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AcVoltageDivisor::Id);
         }
         break;
     }
@@ -18601,8 +18009,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AcCurrentMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::AcCurrentMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcCurrentMultiplier::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AcCurrentMultiplier::Id);
         }
         break;
     }
@@ -18616,8 +18023,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AcCurrentDivisor attribute value is %s", unify_value.dump().c_str());
             UN::AcCurrentDivisor::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcCurrentDivisor::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AcCurrentDivisor::Id);
         }
         break;
     }
@@ -18631,8 +18037,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AcPowerMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::AcPowerMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcPowerMultiplier::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AcPowerMultiplier::Id);
         }
         break;
     }
@@ -18646,8 +18051,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AcPowerDivisor attribute value is %s", unify_value.dump().c_str());
             UN::AcPowerDivisor::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcPowerDivisor::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AcPowerDivisor::Id);
         }
         break;
     }
@@ -18661,8 +18065,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "OverloadAlarmsMask attribute value is %s", unify_value.dump().c_str());
             UN::OverloadAlarmsMask::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::OverloadAlarmsMask::Id, ZCL_BITMAP8_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::OverloadAlarmsMask::Id);
         }
         break;
     }
@@ -18676,8 +18079,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "VoltageOverload attribute value is %s", unify_value.dump().c_str());
             UN::VoltageOverload::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::VoltageOverload::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::VoltageOverload::Id);
         }
         break;
     }
@@ -18691,8 +18093,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "CurrentOverload attribute value is %s", unify_value.dump().c_str());
             UN::CurrentOverload::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::CurrentOverload::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::CurrentOverload::Id);
         }
         break;
     }
@@ -18706,8 +18107,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AcOverloadAlarmsMask attribute value is %s", unify_value.dump().c_str());
             UN::AcOverloadAlarmsMask::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcOverloadAlarmsMask::Id, ZCL_BITMAP16_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AcOverloadAlarmsMask::Id);
         }
         break;
     }
@@ -18721,8 +18121,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AcVoltageOverload attribute value is %s", unify_value.dump().c_str());
             UN::AcVoltageOverload::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcVoltageOverload::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AcVoltageOverload::Id);
         }
         break;
     }
@@ -18736,8 +18135,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AcCurrentOverload attribute value is %s", unify_value.dump().c_str());
             UN::AcCurrentOverload::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcCurrentOverload::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AcCurrentOverload::Id);
         }
         break;
     }
@@ -18751,8 +18149,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AcActivePowerOverload attribute value is %s", unify_value.dump().c_str());
             UN::AcActivePowerOverload::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcActivePowerOverload::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AcActivePowerOverload::Id);
         }
         break;
     }
@@ -18766,8 +18163,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AcReactivePowerOverload attribute value is %s", unify_value.dump().c_str());
             UN::AcReactivePowerOverload::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcReactivePowerOverload::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AcReactivePowerOverload::Id);
         }
         break;
     }
@@ -18781,8 +18177,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AverageRmsOverVoltage attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsOverVoltage::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsOverVoltage::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AverageRmsOverVoltage::Id);
         }
         break;
     }
@@ -18796,8 +18191,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AverageRmsUnderVoltage attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsUnderVoltage::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsUnderVoltage::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AverageRmsUnderVoltage::Id);
         }
         break;
     }
@@ -18811,8 +18205,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsExtremeOverVoltage attribute value is %s", unify_value.dump().c_str());
             UN::RmsExtremeOverVoltage::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsExtremeOverVoltage::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsExtremeOverVoltage::Id);
         }
         break;
     }
@@ -18826,8 +18219,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsExtremeUnderVoltage attribute value is %s", unify_value.dump().c_str());
             UN::RmsExtremeUnderVoltage::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsExtremeUnderVoltage::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsExtremeUnderVoltage::Id);
         }
         break;
     }
@@ -18840,8 +18232,8 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "RmsVoltageSag attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageSag::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::RmsVoltageSag::Id,
-                                                   ZCL_INT16S_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
+                                                   MN::RmsVoltageSag::Id);
         }
         break;
     }
@@ -18855,8 +18247,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsVoltageSwell attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageSwell::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageSwell::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsVoltageSwell::Id);
         }
         break;
     }
@@ -18870,8 +18261,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "LineCurrentPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::LineCurrentPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::LineCurrentPhaseB::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::LineCurrentPhaseB::Id);
         }
         break;
     }
@@ -18885,8 +18275,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "ActiveCurrentPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::ActiveCurrentPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActiveCurrentPhaseB::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ActiveCurrentPhaseB::Id);
         }
         break;
     }
@@ -18900,8 +18289,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "ReactiveCurrentPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::ReactiveCurrentPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ReactiveCurrentPhaseB::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ReactiveCurrentPhaseB::Id);
         }
         break;
     }
@@ -18915,8 +18303,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsVoltagePhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltagePhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltagePhaseB::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsVoltagePhaseB::Id);
         }
         break;
     }
@@ -18930,8 +18317,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsVoltageMinPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageMinPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageMinPhaseB::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsVoltageMinPhaseB::Id);
         }
         break;
     }
@@ -18945,8 +18331,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsVoltageMaxPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageMaxPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageMaxPhaseB::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsVoltageMaxPhaseB::Id);
         }
         break;
     }
@@ -18960,8 +18345,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsCurrentPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsCurrentPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsCurrentPhaseB::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsCurrentPhaseB::Id);
         }
         break;
     }
@@ -18975,8 +18359,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsCurrentMinPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsCurrentMinPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsCurrentMinPhaseB::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsCurrentMinPhaseB::Id);
         }
         break;
     }
@@ -18990,8 +18373,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsCurrentMaxPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsCurrentMaxPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsCurrentMaxPhaseB::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsCurrentMaxPhaseB::Id);
         }
         break;
     }
@@ -19005,8 +18387,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "ActivePowerPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::ActivePowerPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActivePowerPhaseB::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ActivePowerPhaseB::Id);
         }
         break;
     }
@@ -19020,8 +18401,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "ActivePowerMinPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::ActivePowerMinPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActivePowerMinPhaseB::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ActivePowerMinPhaseB::Id);
         }
         break;
     }
@@ -19035,8 +18415,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "ActivePowerMaxPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::ActivePowerMaxPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActivePowerMaxPhaseB::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ActivePowerMaxPhaseB::Id);
         }
         break;
     }
@@ -19050,8 +18429,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "ReactivePowerPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::ReactivePowerPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ReactivePowerPhaseB::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ReactivePowerPhaseB::Id);
         }
         break;
     }
@@ -19065,8 +18443,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "ApparentPowerPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::ApparentPowerPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ApparentPowerPhaseB::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ApparentPowerPhaseB::Id);
         }
         break;
     }
@@ -19080,8 +18457,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "PowerFactorPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::PowerFactorPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::PowerFactorPhaseB::Id, ZCL_INT8S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PowerFactorPhaseB::Id);
         }
         break;
     }
@@ -19095,8 +18471,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AverageRmsVoltageMeasurementPeriodPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsVoltageMeasurementPeriodPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsVoltageMeasurementPeriodPhaseB::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AverageRmsVoltageMeasurementPeriodPhaseB::Id);
         }
         break;
     }
@@ -19110,8 +18485,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AverageRmsOverVoltageCounterPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsOverVoltageCounterPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsOverVoltageCounterPhaseB::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AverageRmsOverVoltageCounterPhaseB::Id);
         }
         break;
     }
@@ -19125,8 +18499,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AverageRmsUnderVoltageCounterPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsUnderVoltageCounterPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsUnderVoltageCounterPhaseB::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AverageRmsUnderVoltageCounterPhaseB::Id);
         }
         break;
     }
@@ -19140,8 +18513,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsExtremeOverVoltagePeriodPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsExtremeOverVoltagePeriodPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsExtremeOverVoltagePeriodPhaseB::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsExtremeOverVoltagePeriodPhaseB::Id);
         }
         break;
     }
@@ -19155,8 +18527,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsExtremeUnderVoltagePeriodPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsExtremeUnderVoltagePeriodPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsExtremeUnderVoltagePeriodPhaseB::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsExtremeUnderVoltagePeriodPhaseB::Id);
         }
         break;
     }
@@ -19170,8 +18541,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsVoltageSagPeriodPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageSagPeriodPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageSagPeriodPhaseB::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsVoltageSagPeriodPhaseB::Id);
         }
         break;
     }
@@ -19185,8 +18555,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsVoltageSwellPeriodPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageSwellPeriodPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageSwellPeriodPhaseB::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsVoltageSwellPeriodPhaseB::Id);
         }
         break;
     }
@@ -19200,8 +18569,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "LineCurrentPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::LineCurrentPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::LineCurrentPhaseC::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::LineCurrentPhaseC::Id);
         }
         break;
     }
@@ -19215,8 +18583,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "ActiveCurrentPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::ActiveCurrentPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActiveCurrentPhaseC::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ActiveCurrentPhaseC::Id);
         }
         break;
     }
@@ -19230,8 +18597,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "ReactiveCurrentPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::ReactiveCurrentPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ReactiveCurrentPhaseC::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ReactiveCurrentPhaseC::Id);
         }
         break;
     }
@@ -19245,8 +18611,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsVoltagePhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltagePhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltagePhaseC::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsVoltagePhaseC::Id);
         }
         break;
     }
@@ -19260,8 +18625,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsVoltageMinPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageMinPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageMinPhaseC::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsVoltageMinPhaseC::Id);
         }
         break;
     }
@@ -19275,8 +18639,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsVoltageMaxPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageMaxPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageMaxPhaseC::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsVoltageMaxPhaseC::Id);
         }
         break;
     }
@@ -19290,8 +18653,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsCurrentPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsCurrentPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsCurrentPhaseC::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsCurrentPhaseC::Id);
         }
         break;
     }
@@ -19305,8 +18667,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsCurrentMinPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsCurrentMinPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsCurrentMinPhaseC::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsCurrentMinPhaseC::Id);
         }
         break;
     }
@@ -19320,8 +18681,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsCurrentMaxPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsCurrentMaxPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsCurrentMaxPhaseC::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsCurrentMaxPhaseC::Id);
         }
         break;
     }
@@ -19335,8 +18695,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "ActivePowerPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::ActivePowerPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActivePowerPhaseC::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ActivePowerPhaseC::Id);
         }
         break;
     }
@@ -19350,8 +18709,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "ActivePowerMinPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::ActivePowerMinPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActivePowerMinPhaseC::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ActivePowerMinPhaseC::Id);
         }
         break;
     }
@@ -19365,8 +18723,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "ActivePowerMaxPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::ActivePowerMaxPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActivePowerMaxPhaseC::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ActivePowerMaxPhaseC::Id);
         }
         break;
     }
@@ -19380,8 +18737,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "ReactivePowerPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::ReactivePowerPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ReactivePowerPhaseC::Id, ZCL_INT16S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ReactivePowerPhaseC::Id);
         }
         break;
     }
@@ -19395,8 +18751,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "ApparentPowerPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::ApparentPowerPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ApparentPowerPhaseC::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ApparentPowerPhaseC::Id);
         }
         break;
     }
@@ -19410,8 +18765,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "PowerFactorPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::PowerFactorPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::PowerFactorPhaseC::Id, ZCL_INT8S_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::PowerFactorPhaseC::Id);
         }
         break;
     }
@@ -19425,8 +18779,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AverageRmsVoltageMeasurementPeriodPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsVoltageMeasurementPeriodPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsVoltageMeasurementPeriodPhaseC::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AverageRmsVoltageMeasurementPeriodPhaseC::Id);
         }
         break;
     }
@@ -19440,8 +18793,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AverageRmsOverVoltageCounterPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsOverVoltageCounterPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsOverVoltageCounterPhaseC::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AverageRmsOverVoltageCounterPhaseC::Id);
         }
         break;
     }
@@ -19455,8 +18807,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "AverageRmsUnderVoltageCounterPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsUnderVoltageCounterPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsUnderVoltageCounterPhaseC::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::AverageRmsUnderVoltageCounterPhaseC::Id);
         }
         break;
     }
@@ -19470,8 +18821,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsExtremeOverVoltagePeriodPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsExtremeOverVoltagePeriodPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsExtremeOverVoltagePeriodPhaseC::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsExtremeOverVoltagePeriodPhaseC::Id);
         }
         break;
     }
@@ -19485,8 +18835,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsExtremeUnderVoltagePeriodPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsExtremeUnderVoltagePeriodPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsExtremeUnderVoltagePeriodPhaseC::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsExtremeUnderVoltagePeriodPhaseC::Id);
         }
         break;
     }
@@ -19500,8 +18849,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsVoltageSagPeriodPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageSagPeriodPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageSagPeriodPhaseC::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsVoltageSagPeriodPhaseC::Id);
         }
         break;
     }
@@ -19515,8 +18863,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "RmsVoltageSwellPeriodPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageSwellPeriodPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageSwellPeriodPhaseC::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::RmsVoltageSwellPeriodPhaseC::Id);
         }
         break;
     }
@@ -19529,8 +18876,7 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
         {
             sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
             UN::FeatureMap::Set(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::FeatureMap::Id,
-                                                   ZCL_BITMAP32_ATTRIBUTE_TYPE, reinterpret_cast<uint8_t *>(&value.value()));
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::FeatureMap::Id);
         }
         break;
     }
@@ -19544,8 +18890,2121 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
             sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
             UN::ClusterRevision::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ClusterRevision::Id, ZCL_INT16U_ATTRIBUTE_TYPE,
-                                                   reinterpret_cast<uint8_t *>(&value.value()));
+                                                   MN::ClusterRevision::Id);
+        }
+        break;
+    }
+    }
+}
+
+CHIP_ERROR
+UnitTestingAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    namespace MN = chip::app::Clusters::UnitTesting::Attributes;
+    namespace UN = unify::matter_bridge::UnitTesting::Attributes;
+    if (aPath.mClusterId != Clusters::UnitTesting::Id)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+    try
+    {
+        switch (aPath.mAttributeId)
+        {
+        case MN::Boolean::Id: { // type is boolean
+            MN::Boolean::TypeInfo::Type value;
+            UN::Boolean::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Bitmap8::Id: { // type is Bitmap8MaskMap
+            MN::Bitmap8::TypeInfo::Type value;
+            UN::Bitmap8::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Bitmap16::Id: { // type is Bitmap16MaskMap
+            MN::Bitmap16::TypeInfo::Type value;
+            UN::Bitmap16::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Bitmap32::Id: { // type is Bitmap32MaskMap
+            MN::Bitmap32::TypeInfo::Type value;
+            UN::Bitmap32::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Bitmap64::Id: { // type is Bitmap64MaskMap
+            MN::Bitmap64::TypeInfo::Type value;
+            UN::Bitmap64::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Int8u::Id: { // type is int8u
+            MN::Int8u::TypeInfo::Type value;
+            UN::Int8u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Int16u::Id: { // type is int16u
+            MN::Int16u::TypeInfo::Type value;
+            UN::Int16u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Int24u::Id: { // type is int24u
+            MN::Int24u::TypeInfo::Type value;
+            UN::Int24u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Int32u::Id: { // type is int32u
+            MN::Int32u::TypeInfo::Type value;
+            UN::Int32u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Int40u::Id: { // type is int40u
+            MN::Int40u::TypeInfo::Type value;
+            UN::Int40u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Int48u::Id: { // type is int48u
+            MN::Int48u::TypeInfo::Type value;
+            UN::Int48u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Int56u::Id: { // type is int56u
+            MN::Int56u::TypeInfo::Type value;
+            UN::Int56u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Int64u::Id: { // type is int64u
+            MN::Int64u::TypeInfo::Type value;
+            UN::Int64u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Int8s::Id: { // type is int8s
+            MN::Int8s::TypeInfo::Type value;
+            UN::Int8s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Int16s::Id: { // type is int16s
+            MN::Int16s::TypeInfo::Type value;
+            UN::Int16s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Int24s::Id: { // type is int24s
+            MN::Int24s::TypeInfo::Type value;
+            UN::Int24s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Int32s::Id: { // type is int32s
+            MN::Int32s::TypeInfo::Type value;
+            UN::Int32s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Int40s::Id: { // type is int40s
+            MN::Int40s::TypeInfo::Type value;
+            UN::Int40s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Int48s::Id: { // type is int48s
+            MN::Int48s::TypeInfo::Type value;
+            UN::Int48s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Int56s::Id: { // type is int56s
+            MN::Int56s::TypeInfo::Type value;
+            UN::Int56s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Int64s::Id: { // type is int64s
+            MN::Int64s::TypeInfo::Type value;
+            UN::Int64s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Enum8::Id: { // type is enum8
+            MN::Enum8::TypeInfo::Type value;
+            UN::Enum8::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Enum16::Id: { // type is enum16
+            MN::Enum16::TypeInfo::Type value;
+            UN::Enum16::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::FloatSingle::Id: { // type is single
+            MN::FloatSingle::TypeInfo::Type value;
+            UN::FloatSingle::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::FloatDouble::Id: { // type is double
+            MN::FloatDouble::TypeInfo::Type value;
+            UN::FloatDouble::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::OctetString::Id: { // type is octet_string
+            MN::OctetString::TypeInfo::Type value;
+            UN::OctetString::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::LongOctetString::Id: { // type is long_octet_string
+            MN::LongOctetString::TypeInfo::Type value;
+            UN::LongOctetString::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::CharString::Id: { // type is char_string
+            MN::CharString::TypeInfo::Type value;
+            UN::CharString::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::LongCharString::Id: { // type is long_char_string
+            MN::LongCharString::TypeInfo::Type value;
+            UN::LongCharString::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::EpochUs::Id: { // type is epoch_us
+            MN::EpochUs::TypeInfo::Type value;
+            UN::EpochUs::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::EpochS::Id: { // type is epoch_s
+            MN::EpochS::TypeInfo::Type value;
+            UN::EpochS::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::VendorId::Id: { // type is vendor_id
+            MN::VendorId::TypeInfo::Type value;
+            UN::VendorId::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::EnumAttr::Id: { // type is SimpleEnum
+            MN::EnumAttr::TypeInfo::Type value;
+            UN::EnumAttr::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::RangeRestrictedInt8u::Id: { // type is int8u
+            MN::RangeRestrictedInt8u::TypeInfo::Type value;
+            UN::RangeRestrictedInt8u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::RangeRestrictedInt8s::Id: { // type is int8s
+            MN::RangeRestrictedInt8s::TypeInfo::Type value;
+            UN::RangeRestrictedInt8s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::RangeRestrictedInt16u::Id: { // type is int16u
+            MN::RangeRestrictedInt16u::TypeInfo::Type value;
+            UN::RangeRestrictedInt16u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::RangeRestrictedInt16s::Id: { // type is int16s
+            MN::RangeRestrictedInt16s::TypeInfo::Type value;
+            UN::RangeRestrictedInt16s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::TimedWriteBoolean::Id: { // type is boolean
+            MN::TimedWriteBoolean::TypeInfo::Type value;
+            UN::TimedWriteBoolean::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::GeneralErrorBoolean::Id: { // type is boolean
+            MN::GeneralErrorBoolean::TypeInfo::Type value;
+            UN::GeneralErrorBoolean::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::ClusterErrorBoolean::Id: { // type is boolean
+            MN::ClusterErrorBoolean::TypeInfo::Type value;
+            UN::ClusterErrorBoolean::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::Unsupported::Id: { // type is boolean
+            MN::Unsupported::TypeInfo::Type value;
+            UN::Unsupported::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableBoolean::Id: { // type is boolean
+            MN::NullableBoolean::TypeInfo::Type value;
+            UN::NullableBoolean::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableBitmap8::Id: { // type is Bitmap8MaskMap
+            MN::NullableBitmap8::TypeInfo::Type value;
+            UN::NullableBitmap8::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableBitmap16::Id: { // type is Bitmap16MaskMap
+            MN::NullableBitmap16::TypeInfo::Type value;
+            UN::NullableBitmap16::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableBitmap32::Id: { // type is Bitmap32MaskMap
+            MN::NullableBitmap32::TypeInfo::Type value;
+            UN::NullableBitmap32::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableBitmap64::Id: { // type is Bitmap64MaskMap
+            MN::NullableBitmap64::TypeInfo::Type value;
+            UN::NullableBitmap64::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableInt8u::Id: { // type is int8u
+            MN::NullableInt8u::TypeInfo::Type value;
+            UN::NullableInt8u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableInt16u::Id: { // type is int16u
+            MN::NullableInt16u::TypeInfo::Type value;
+            UN::NullableInt16u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableInt24u::Id: { // type is int24u
+            MN::NullableInt24u::TypeInfo::Type value;
+            UN::NullableInt24u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableInt32u::Id: { // type is int32u
+            MN::NullableInt32u::TypeInfo::Type value;
+            UN::NullableInt32u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableInt40u::Id: { // type is int40u
+            MN::NullableInt40u::TypeInfo::Type value;
+            UN::NullableInt40u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableInt48u::Id: { // type is int48u
+            MN::NullableInt48u::TypeInfo::Type value;
+            UN::NullableInt48u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableInt56u::Id: { // type is int56u
+            MN::NullableInt56u::TypeInfo::Type value;
+            UN::NullableInt56u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableInt64u::Id: { // type is int64u
+            MN::NullableInt64u::TypeInfo::Type value;
+            UN::NullableInt64u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableInt8s::Id: { // type is int8s
+            MN::NullableInt8s::TypeInfo::Type value;
+            UN::NullableInt8s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableInt16s::Id: { // type is int16s
+            MN::NullableInt16s::TypeInfo::Type value;
+            UN::NullableInt16s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableInt24s::Id: { // type is int24s
+            MN::NullableInt24s::TypeInfo::Type value;
+            UN::NullableInt24s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableInt32s::Id: { // type is int32s
+            MN::NullableInt32s::TypeInfo::Type value;
+            UN::NullableInt32s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableInt40s::Id: { // type is int40s
+            MN::NullableInt40s::TypeInfo::Type value;
+            UN::NullableInt40s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableInt48s::Id: { // type is int48s
+            MN::NullableInt48s::TypeInfo::Type value;
+            UN::NullableInt48s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableInt56s::Id: { // type is int56s
+            MN::NullableInt56s::TypeInfo::Type value;
+            UN::NullableInt56s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableInt64s::Id: { // type is int64s
+            MN::NullableInt64s::TypeInfo::Type value;
+            UN::NullableInt64s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableEnum8::Id: { // type is enum8
+            MN::NullableEnum8::TypeInfo::Type value;
+            UN::NullableEnum8::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableEnum16::Id: { // type is enum16
+            MN::NullableEnum16::TypeInfo::Type value;
+            UN::NullableEnum16::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableFloatSingle::Id: { // type is single
+            MN::NullableFloatSingle::TypeInfo::Type value;
+            UN::NullableFloatSingle::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableFloatDouble::Id: { // type is double
+            MN::NullableFloatDouble::TypeInfo::Type value;
+            UN::NullableFloatDouble::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableOctetString::Id: { // type is octet_string
+            MN::NullableOctetString::TypeInfo::Type value;
+            UN::NullableOctetString::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableCharString::Id: { // type is char_string
+            MN::NullableCharString::TypeInfo::Type value;
+            UN::NullableCharString::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableEnumAttr::Id: { // type is SimpleEnum
+            MN::NullableEnumAttr::TypeInfo::Type value;
+            UN::NullableEnumAttr::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableRangeRestrictedInt8u::Id: { // type is int8u
+            MN::NullableRangeRestrictedInt8u::TypeInfo::Type value;
+            UN::NullableRangeRestrictedInt8u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableRangeRestrictedInt8s::Id: { // type is int8s
+            MN::NullableRangeRestrictedInt8s::TypeInfo::Type value;
+            UN::NullableRangeRestrictedInt8s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableRangeRestrictedInt16u::Id: { // type is int16u
+            MN::NullableRangeRestrictedInt16u::TypeInfo::Type value;
+            UN::NullableRangeRestrictedInt16u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NullableRangeRestrictedInt16s::Id: { // type is int16s
+            MN::NullableRangeRestrictedInt16s::TypeInfo::Type value;
+            UN::NullableRangeRestrictedInt16s::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::WriteOnlyInt8u::Id: { // type is int8u
+            MN::WriteOnlyInt8u::TypeInfo::Type value;
+            UN::WriteOnlyInt8u::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::FeatureMap::Id: { // type is bitmap32
+            MN::FeatureMap::TypeInfo::Type value;
+            value = get_feature_map_settings(aPath);
+            return aEncoder.Encode(value);
+        }
+        case MN::ClusterRevision::Id: { // type is int16u
+            MN::ClusterRevision::TypeInfo::Type value;
+            value = ZCL_UNIT_TESTING_REVISION;
+            return aEncoder.Encode(value);
+        }
+        }
+    } catch (const std::out_of_range & e)
+    {
+        sl_log_info(LOG_TAG,
+                    "The request attribute Path for endpoint [%i] is not found in the attribute state "
+                    "container: %s\n",
+                    atr_path.mEndpointId, e.what());
+        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR UnitTestingAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    using namespace chip::app::Clusters::UnitTesting;
+
+    if (aPath.mClusterId != Clusters::UnitTesting::Id)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
+
+    if (!unify_node)
+    {
+        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+    }
+
+    std::string attribute_name;
+    nlohmann::json jsn;
+
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::Boolean::Id: {
+
+        Attributes::Boolean::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Boolean");
+        break;
+    }
+    case Attributes::Bitmap8::Id: {
+
+        Attributes::Bitmap8::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Bitmap8");
+        break;
+    }
+    case Attributes::Bitmap16::Id: {
+
+        Attributes::Bitmap16::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Bitmap16");
+        break;
+    }
+    case Attributes::Bitmap32::Id: {
+
+        Attributes::Bitmap32::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Bitmap32");
+        break;
+    }
+    case Attributes::Bitmap64::Id: {
+
+        Attributes::Bitmap64::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Bitmap64");
+        break;
+    }
+    case Attributes::Int8u::Id: {
+
+        Attributes::Int8u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Int8u");
+        break;
+    }
+    case Attributes::Int16u::Id: {
+
+        Attributes::Int16u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Int16u");
+        break;
+    }
+    case Attributes::Int24u::Id: {
+
+        Attributes::Int24u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Int24u");
+        break;
+    }
+    case Attributes::Int32u::Id: {
+
+        Attributes::Int32u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Int32u");
+        break;
+    }
+    case Attributes::Int40u::Id: {
+
+        Attributes::Int40u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Int40u");
+        break;
+    }
+    case Attributes::Int48u::Id: {
+
+        Attributes::Int48u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Int48u");
+        break;
+    }
+    case Attributes::Int56u::Id: {
+
+        Attributes::Int56u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Int56u");
+        break;
+    }
+    case Attributes::Int64u::Id: {
+
+        Attributes::Int64u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Int64u");
+        break;
+    }
+    case Attributes::Int8s::Id: {
+
+        Attributes::Int8s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Int8s");
+        break;
+    }
+    case Attributes::Int16s::Id: {
+
+        Attributes::Int16s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Int16s");
+        break;
+    }
+    case Attributes::Int24s::Id: {
+
+        Attributes::Int24s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Int24s");
+        break;
+    }
+    case Attributes::Int32s::Id: {
+
+        Attributes::Int32s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Int32s");
+        break;
+    }
+    case Attributes::Int40s::Id: {
+
+        Attributes::Int40s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Int40s");
+        break;
+    }
+    case Attributes::Int48s::Id: {
+
+        Attributes::Int48s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Int48s");
+        break;
+    }
+    case Attributes::Int56s::Id: {
+
+        Attributes::Int56s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Int56s");
+        break;
+    }
+    case Attributes::Int64s::Id: {
+
+        Attributes::Int64s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Int64s");
+        break;
+    }
+    case Attributes::Enum8::Id: {
+
+        Attributes::Enum8::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Enum8");
+        break;
+    }
+    case Attributes::Enum16::Id: {
+
+        Attributes::Enum16::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Enum16");
+        break;
+    }
+    case Attributes::FloatSingle::Id: {
+
+        Attributes::FloatSingle::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("FloatSingle");
+        break;
+    }
+    case Attributes::FloatDouble::Id: {
+
+        Attributes::FloatDouble::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("FloatDouble");
+        break;
+    }
+    case Attributes::OctetString::Id: {
+
+        Attributes::OctetString::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("OctetString");
+        break;
+    }
+    case Attributes::ListInt8u::Id: {
+
+        Attributes::ListInt8u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("ListInt8u");
+        break;
+    }
+    case Attributes::ListOctetString::Id: {
+
+        Attributes::ListOctetString::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("ListOctetString");
+        break;
+    }
+    case Attributes::ListStructOctetString::Id: {
+
+        Attributes::ListStructOctetString::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("ListStructOctetString");
+        break;
+    }
+    case Attributes::LongOctetString::Id: {
+
+        Attributes::LongOctetString::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("LongOctetString");
+        break;
+    }
+    case Attributes::CharString::Id: {
+
+        Attributes::CharString::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("CharString");
+        break;
+    }
+    case Attributes::LongCharString::Id: {
+
+        Attributes::LongCharString::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("LongCharString");
+        break;
+    }
+    case Attributes::EpochUs::Id: {
+
+        Attributes::EpochUs::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("EpochUs");
+        break;
+    }
+    case Attributes::EpochS::Id: {
+
+        Attributes::EpochS::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("EpochS");
+        break;
+    }
+    case Attributes::VendorId::Id: {
+
+        Attributes::VendorId::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("VendorId");
+        break;
+    }
+    case Attributes::ListNullablesAndOptionalsStruct::Id: {
+
+        Attributes::ListNullablesAndOptionalsStruct::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("ListNullablesAndOptionalsStruct");
+        break;
+    }
+    case Attributes::EnumAttr::Id: {
+
+        Attributes::EnumAttr::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("EnumAttr");
+        break;
+    }
+    case Attributes::StructAttr::Id: {
+
+        Attributes::StructAttr::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("StructAttr");
+        break;
+    }
+    case Attributes::RangeRestrictedInt8u::Id: {
+
+        Attributes::RangeRestrictedInt8u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("RangeRestrictedInt8u");
+        break;
+    }
+    case Attributes::RangeRestrictedInt8s::Id: {
+
+        Attributes::RangeRestrictedInt8s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("RangeRestrictedInt8s");
+        break;
+    }
+    case Attributes::RangeRestrictedInt16u::Id: {
+
+        Attributes::RangeRestrictedInt16u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("RangeRestrictedInt16u");
+        break;
+    }
+    case Attributes::RangeRestrictedInt16s::Id: {
+
+        Attributes::RangeRestrictedInt16s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("RangeRestrictedInt16s");
+        break;
+    }
+    case Attributes::ListLongOctetString::Id: {
+
+        Attributes::ListLongOctetString::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("ListLongOctetString");
+        break;
+    }
+    case Attributes::ListFabricScoped::Id: {
+
+        Attributes::ListFabricScoped::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("ListFabricScoped");
+        break;
+    }
+    case Attributes::TimedWriteBoolean::Id: {
+
+        Attributes::TimedWriteBoolean::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("TimedWriteBoolean");
+        break;
+    }
+    case Attributes::GeneralErrorBoolean::Id: {
+
+        Attributes::GeneralErrorBoolean::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("GeneralErrorBoolean");
+        break;
+    }
+    case Attributes::ClusterErrorBoolean::Id: {
+
+        Attributes::ClusterErrorBoolean::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("ClusterErrorBoolean");
+        break;
+    }
+    case Attributes::Unsupported::Id: {
+
+        Attributes::Unsupported::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("Unsupported");
+        break;
+    }
+    case Attributes::NullableBoolean::Id: {
+
+        Attributes::NullableBoolean::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableBoolean");
+        break;
+    }
+    case Attributes::NullableBitmap8::Id: {
+
+        Attributes::NullableBitmap8::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableBitmap8");
+        break;
+    }
+    case Attributes::NullableBitmap16::Id: {
+
+        Attributes::NullableBitmap16::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableBitmap16");
+        break;
+    }
+    case Attributes::NullableBitmap32::Id: {
+
+        Attributes::NullableBitmap32::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableBitmap32");
+        break;
+    }
+    case Attributes::NullableBitmap64::Id: {
+
+        Attributes::NullableBitmap64::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableBitmap64");
+        break;
+    }
+    case Attributes::NullableInt8u::Id: {
+
+        Attributes::NullableInt8u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableInt8u");
+        break;
+    }
+    case Attributes::NullableInt16u::Id: {
+
+        Attributes::NullableInt16u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableInt16u");
+        break;
+    }
+    case Attributes::NullableInt24u::Id: {
+
+        Attributes::NullableInt24u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableInt24u");
+        break;
+    }
+    case Attributes::NullableInt32u::Id: {
+
+        Attributes::NullableInt32u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableInt32u");
+        break;
+    }
+    case Attributes::NullableInt40u::Id: {
+
+        Attributes::NullableInt40u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableInt40u");
+        break;
+    }
+    case Attributes::NullableInt48u::Id: {
+
+        Attributes::NullableInt48u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableInt48u");
+        break;
+    }
+    case Attributes::NullableInt56u::Id: {
+
+        Attributes::NullableInt56u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableInt56u");
+        break;
+    }
+    case Attributes::NullableInt64u::Id: {
+
+        Attributes::NullableInt64u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableInt64u");
+        break;
+    }
+    case Attributes::NullableInt8s::Id: {
+
+        Attributes::NullableInt8s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableInt8s");
+        break;
+    }
+    case Attributes::NullableInt16s::Id: {
+
+        Attributes::NullableInt16s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableInt16s");
+        break;
+    }
+    case Attributes::NullableInt24s::Id: {
+
+        Attributes::NullableInt24s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableInt24s");
+        break;
+    }
+    case Attributes::NullableInt32s::Id: {
+
+        Attributes::NullableInt32s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableInt32s");
+        break;
+    }
+    case Attributes::NullableInt40s::Id: {
+
+        Attributes::NullableInt40s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableInt40s");
+        break;
+    }
+    case Attributes::NullableInt48s::Id: {
+
+        Attributes::NullableInt48s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableInt48s");
+        break;
+    }
+    case Attributes::NullableInt56s::Id: {
+
+        Attributes::NullableInt56s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableInt56s");
+        break;
+    }
+    case Attributes::NullableInt64s::Id: {
+
+        Attributes::NullableInt64s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableInt64s");
+        break;
+    }
+    case Attributes::NullableEnum8::Id: {
+
+        Attributes::NullableEnum8::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableEnum8");
+        break;
+    }
+    case Attributes::NullableEnum16::Id: {
+
+        Attributes::NullableEnum16::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableEnum16");
+        break;
+    }
+    case Attributes::NullableFloatSingle::Id: {
+
+        Attributes::NullableFloatSingle::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableFloatSingle");
+        break;
+    }
+    case Attributes::NullableFloatDouble::Id: {
+
+        Attributes::NullableFloatDouble::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableFloatDouble");
+        break;
+    }
+    case Attributes::NullableOctetString::Id: {
+
+        Attributes::NullableOctetString::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableOctetString");
+        break;
+    }
+    case Attributes::NullableCharString::Id: {
+
+        Attributes::NullableCharString::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableCharString");
+        break;
+    }
+    case Attributes::NullableEnumAttr::Id: {
+
+        Attributes::NullableEnumAttr::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableEnumAttr");
+        break;
+    }
+    case Attributes::NullableStruct::Id: {
+
+        Attributes::NullableStruct::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableStruct");
+        break;
+    }
+    case Attributes::NullableRangeRestrictedInt8u::Id: {
+
+        Attributes::NullableRangeRestrictedInt8u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableRangeRestrictedInt8u");
+        break;
+    }
+    case Attributes::NullableRangeRestrictedInt8s::Id: {
+
+        Attributes::NullableRangeRestrictedInt8s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableRangeRestrictedInt8s");
+        break;
+    }
+    case Attributes::NullableRangeRestrictedInt16u::Id: {
+
+        Attributes::NullableRangeRestrictedInt16u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableRangeRestrictedInt16u");
+        break;
+    }
+    case Attributes::NullableRangeRestrictedInt16s::Id: {
+
+        Attributes::NullableRangeRestrictedInt16s::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("NullableRangeRestrictedInt16s");
+        break;
+    }
+    case Attributes::WriteOnlyInt8u::Id: {
+
+        Attributes::WriteOnlyInt8u::TypeInfo::DecodableType value;
+        aDecoder.Decode(value);
+        jsn["value"]   = to_json(value);
+        attribute_name = std::string("WriteOnlyInt8u");
+        break;
+    }
+    }
+
+    if (!attribute_name.empty())
+    {
+        std::string payload_str;
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
+            "/UnitTesting/Attributes/" + attribute_name + "/Desired";
+        payload_str = jsn.dump();
+        m_unify_mqtt.Publish(topic, payload_str, true);
+        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void UnitTestingAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
+                                                  const std::string & attribute, const nlohmann::json & unify_value)
+{
+    namespace MN = chip::app::Clusters::UnitTesting::Attributes;
+    namespace UN = unify::matter_bridge::UnitTesting::Attributes;
+
+    auto cluster_id = device_translator::instance().get_cluster_id(cluster);
+
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::UnitTesting::Id))
+    {
+        return;
+    }
+
+    // get attribute id
+    auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
+
+    if (!attribute_id.has_value())
+    {
+        return;
+    }
+
+    chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
+    ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::UnitTesting::Id, attribute_id.value());
+    switch (attribute_id.value())
+    {
+    // type is boolean
+    case MN::Boolean::Id: {
+        using T                = MN::Boolean::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Boolean attribute value is %s", unify_value.dump().c_str());
+            UN::Boolean::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Boolean::Id);
+        }
+        break;
+    }
+        // type is Bitmap8MaskMap
+    case MN::Bitmap8::Id: {
+        std::optional<uint8_t> value = from_json_Bitmap8(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Bitmap8 attribute value is %s", unify_value.dump().c_str());
+            UN::Bitmap8::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Bitmap8::Id);
+        }
+        break;
+    }
+        // type is Bitmap16MaskMap
+    case MN::Bitmap16::Id: {
+        std::optional<uint16_t> value = from_json_Bitmap16(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Bitmap16 attribute value is %s", unify_value.dump().c_str());
+            UN::Bitmap16::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Bitmap16::Id);
+        }
+        break;
+    }
+        // type is Bitmap32MaskMap
+    case MN::Bitmap32::Id: {
+        std::optional<uint32_t> value = from_json_Bitmap32(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Bitmap32 attribute value is %s", unify_value.dump().c_str());
+            UN::Bitmap32::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Bitmap32::Id);
+        }
+        break;
+    }
+        // type is Bitmap64MaskMap
+    case MN::Bitmap64::Id: {
+        std::optional<uint64_t> value = from_json_Bitmap64(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Bitmap64 attribute value is %s", unify_value.dump().c_str());
+            UN::Bitmap64::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Bitmap64::Id);
+        }
+        break;
+    }
+        // type is int8u
+    case MN::Int8u::Id: {
+        using T                = MN::Int8u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Int8u attribute value is %s", unify_value.dump().c_str());
+            UN::Int8u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Int8u::Id);
+        }
+        break;
+    }
+        // type is int16u
+    case MN::Int16u::Id: {
+        using T                = MN::Int16u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Int16u attribute value is %s", unify_value.dump().c_str());
+            UN::Int16u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Int16u::Id);
+        }
+        break;
+    }
+        // type is int24u
+    case MN::Int24u::Id: {
+        using T                = MN::Int24u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Int24u attribute value is %s", unify_value.dump().c_str());
+            UN::Int24u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Int24u::Id);
+        }
+        break;
+    }
+        // type is int32u
+    case MN::Int32u::Id: {
+        using T                = MN::Int32u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Int32u attribute value is %s", unify_value.dump().c_str());
+            UN::Int32u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Int32u::Id);
+        }
+        break;
+    }
+        // type is int40u
+    case MN::Int40u::Id: {
+        using T                = MN::Int40u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Int40u attribute value is %s", unify_value.dump().c_str());
+            UN::Int40u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Int40u::Id);
+        }
+        break;
+    }
+        // type is int48u
+    case MN::Int48u::Id: {
+        using T                = MN::Int48u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Int48u attribute value is %s", unify_value.dump().c_str());
+            UN::Int48u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Int48u::Id);
+        }
+        break;
+    }
+        // type is int56u
+    case MN::Int56u::Id: {
+        using T                = MN::Int56u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Int56u attribute value is %s", unify_value.dump().c_str());
+            UN::Int56u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Int56u::Id);
+        }
+        break;
+    }
+        // type is int64u
+    case MN::Int64u::Id: {
+        using T                = MN::Int64u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Int64u attribute value is %s", unify_value.dump().c_str());
+            UN::Int64u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Int64u::Id);
+        }
+        break;
+    }
+        // type is int8s
+    case MN::Int8s::Id: {
+        using T                = MN::Int8s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Int8s attribute value is %s", unify_value.dump().c_str());
+            UN::Int8s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Int8s::Id);
+        }
+        break;
+    }
+        // type is int16s
+    case MN::Int16s::Id: {
+        using T                = MN::Int16s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Int16s attribute value is %s", unify_value.dump().c_str());
+            UN::Int16s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Int16s::Id);
+        }
+        break;
+    }
+        // type is int24s
+    case MN::Int24s::Id: {
+        using T                = MN::Int24s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Int24s attribute value is %s", unify_value.dump().c_str());
+            UN::Int24s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Int24s::Id);
+        }
+        break;
+    }
+        // type is int32s
+    case MN::Int32s::Id: {
+        using T                = MN::Int32s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Int32s attribute value is %s", unify_value.dump().c_str());
+            UN::Int32s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Int32s::Id);
+        }
+        break;
+    }
+        // type is int40s
+    case MN::Int40s::Id: {
+        using T                = MN::Int40s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Int40s attribute value is %s", unify_value.dump().c_str());
+            UN::Int40s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Int40s::Id);
+        }
+        break;
+    }
+        // type is int48s
+    case MN::Int48s::Id: {
+        using T                = MN::Int48s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Int48s attribute value is %s", unify_value.dump().c_str());
+            UN::Int48s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Int48s::Id);
+        }
+        break;
+    }
+        // type is int56s
+    case MN::Int56s::Id: {
+        using T                = MN::Int56s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Int56s attribute value is %s", unify_value.dump().c_str());
+            UN::Int56s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Int56s::Id);
+        }
+        break;
+    }
+        // type is int64s
+    case MN::Int64s::Id: {
+        using T                = MN::Int64s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Int64s attribute value is %s", unify_value.dump().c_str());
+            UN::Int64s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Int64s::Id);
+        }
+        break;
+    }
+        // type is enum8
+    case MN::Enum8::Id: {
+        using T                = MN::Enum8::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Enum8 attribute value is %s", unify_value.dump().c_str());
+            UN::Enum8::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Enum8::Id);
+        }
+        break;
+    }
+        // type is enum16
+    case MN::Enum16::Id: {
+        using T                = MN::Enum16::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Enum16 attribute value is %s", unify_value.dump().c_str());
+            UN::Enum16::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Enum16::Id);
+        }
+        break;
+    }
+        // type is single
+    case MN::FloatSingle::Id: {
+        using T                = MN::FloatSingle::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "FloatSingle attribute value is %s", unify_value.dump().c_str());
+            UN::FloatSingle::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::FloatSingle::Id);
+        }
+        break;
+    }
+        // type is double
+    case MN::FloatDouble::Id: {
+        using T                = MN::FloatDouble::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "FloatDouble attribute value is %s", unify_value.dump().c_str());
+            UN::FloatDouble::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::FloatDouble::Id);
+        }
+        break;
+    }
+        // type is octet_string
+    case MN::OctetString::Id: {
+        using T                = MN::OctetString::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "OctetString attribute value is %s", unify_value.dump().c_str());
+            UN::OctetString::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::OctetString::Id);
+        }
+        break;
+    }
+        // type is long_octet_string
+    case MN::LongOctetString::Id: {
+        using T                = MN::LongOctetString::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "LongOctetString attribute value is %s", unify_value.dump().c_str());
+            UN::LongOctetString::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::LongOctetString::Id);
+        }
+        break;
+    }
+        // type is char_string
+    case MN::CharString::Id: {
+        using T                = MN::CharString::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "CharString attribute value is %s", unify_value.dump().c_str());
+            UN::CharString::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::CharString::Id);
+        }
+        break;
+    }
+        // type is long_char_string
+    case MN::LongCharString::Id: {
+        using T                = MN::LongCharString::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "LongCharString attribute value is %s", unify_value.dump().c_str());
+            UN::LongCharString::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::LongCharString::Id);
+        }
+        break;
+    }
+        // type is epoch_us
+    case MN::EpochUs::Id: {
+        using T                = MN::EpochUs::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "EpochUs attribute value is %s", unify_value.dump().c_str());
+            UN::EpochUs::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::EpochUs::Id);
+        }
+        break;
+    }
+        // type is epoch_s
+    case MN::EpochS::Id: {
+        using T                = MN::EpochS::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "EpochS attribute value is %s", unify_value.dump().c_str());
+            UN::EpochS::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::EpochS::Id);
+        }
+        break;
+    }
+        // type is vendor_id
+    case MN::VendorId::Id: {
+        using T                = MN::VendorId::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "VendorId attribute value is %s", unify_value.dump().c_str());
+            UN::VendorId::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::VendorId::Id);
+        }
+        break;
+    }
+        // type is SimpleEnum
+    case MN::EnumAttr::Id: {
+        using T                = MN::EnumAttr::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "EnumAttr attribute value is %s", unify_value.dump().c_str());
+            UN::EnumAttr::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::EnumAttr::Id);
+        }
+        break;
+    }
+        // type is int8u
+    case MN::RangeRestrictedInt8u::Id: {
+        using T                = MN::RangeRestrictedInt8u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "RangeRestrictedInt8u attribute value is %s", unify_value.dump().c_str());
+            UN::RangeRestrictedInt8u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::RangeRestrictedInt8u::Id);
+        }
+        break;
+    }
+        // type is int8s
+    case MN::RangeRestrictedInt8s::Id: {
+        using T                = MN::RangeRestrictedInt8s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "RangeRestrictedInt8s attribute value is %s", unify_value.dump().c_str());
+            UN::RangeRestrictedInt8s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::RangeRestrictedInt8s::Id);
+        }
+        break;
+    }
+        // type is int16u
+    case MN::RangeRestrictedInt16u::Id: {
+        using T                = MN::RangeRestrictedInt16u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "RangeRestrictedInt16u attribute value is %s", unify_value.dump().c_str());
+            UN::RangeRestrictedInt16u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::RangeRestrictedInt16u::Id);
+        }
+        break;
+    }
+        // type is int16s
+    case MN::RangeRestrictedInt16s::Id: {
+        using T                = MN::RangeRestrictedInt16s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "RangeRestrictedInt16s attribute value is %s", unify_value.dump().c_str());
+            UN::RangeRestrictedInt16s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::RangeRestrictedInt16s::Id);
+        }
+        break;
+    }
+        // type is boolean
+    case MN::TimedWriteBoolean::Id: {
+        using T                = MN::TimedWriteBoolean::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "TimedWriteBoolean attribute value is %s", unify_value.dump().c_str());
+            UN::TimedWriteBoolean::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::TimedWriteBoolean::Id);
+        }
+        break;
+    }
+        // type is boolean
+    case MN::GeneralErrorBoolean::Id: {
+        using T                = MN::GeneralErrorBoolean::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "GeneralErrorBoolean attribute value is %s", unify_value.dump().c_str());
+            UN::GeneralErrorBoolean::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::GeneralErrorBoolean::Id);
+        }
+        break;
+    }
+        // type is boolean
+    case MN::ClusterErrorBoolean::Id: {
+        using T                = MN::ClusterErrorBoolean::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "ClusterErrorBoolean attribute value is %s", unify_value.dump().c_str());
+            UN::ClusterErrorBoolean::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::ClusterErrorBoolean::Id);
+        }
+        break;
+    }
+        // type is boolean
+    case MN::Unsupported::Id: {
+        using T                = MN::Unsupported::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "Unsupported attribute value is %s", unify_value.dump().c_str());
+            UN::Unsupported::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::Unsupported::Id);
+        }
+        break;
+    }
+        // type is boolean
+    case MN::NullableBoolean::Id: {
+        using T                = MN::NullableBoolean::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableBoolean attribute value is %s", unify_value.dump().c_str());
+            UN::NullableBoolean::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableBoolean::Id);
+        }
+        break;
+    }
+        // type is Bitmap8MaskMap
+    case MN::NullableBitmap8::Id: {
+        using T                = MN::NullableBitmap8::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableBitmap8 attribute value is %s", unify_value.dump().c_str());
+            UN::NullableBitmap8::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableBitmap8::Id);
+        }
+        break;
+    }
+        // type is Bitmap16MaskMap
+    case MN::NullableBitmap16::Id: {
+        using T                = MN::NullableBitmap16::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableBitmap16 attribute value is %s", unify_value.dump().c_str());
+            UN::NullableBitmap16::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableBitmap16::Id);
+        }
+        break;
+    }
+        // type is Bitmap32MaskMap
+    case MN::NullableBitmap32::Id: {
+        using T                = MN::NullableBitmap32::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableBitmap32 attribute value is %s", unify_value.dump().c_str());
+            UN::NullableBitmap32::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableBitmap32::Id);
+        }
+        break;
+    }
+        // type is Bitmap64MaskMap
+    case MN::NullableBitmap64::Id: {
+        using T                = MN::NullableBitmap64::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableBitmap64 attribute value is %s", unify_value.dump().c_str());
+            UN::NullableBitmap64::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableBitmap64::Id);
+        }
+        break;
+    }
+        // type is int8u
+    case MN::NullableInt8u::Id: {
+        using T                = MN::NullableInt8u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableInt8u attribute value is %s", unify_value.dump().c_str());
+            UN::NullableInt8u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableInt8u::Id);
+        }
+        break;
+    }
+        // type is int16u
+    case MN::NullableInt16u::Id: {
+        using T                = MN::NullableInt16u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableInt16u attribute value is %s", unify_value.dump().c_str());
+            UN::NullableInt16u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableInt16u::Id);
+        }
+        break;
+    }
+        // type is int24u
+    case MN::NullableInt24u::Id: {
+        using T                = MN::NullableInt24u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableInt24u attribute value is %s", unify_value.dump().c_str());
+            UN::NullableInt24u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableInt24u::Id);
+        }
+        break;
+    }
+        // type is int32u
+    case MN::NullableInt32u::Id: {
+        using T                = MN::NullableInt32u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableInt32u attribute value is %s", unify_value.dump().c_str());
+            UN::NullableInt32u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableInt32u::Id);
+        }
+        break;
+    }
+        // type is int40u
+    case MN::NullableInt40u::Id: {
+        using T                = MN::NullableInt40u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableInt40u attribute value is %s", unify_value.dump().c_str());
+            UN::NullableInt40u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableInt40u::Id);
+        }
+        break;
+    }
+        // type is int48u
+    case MN::NullableInt48u::Id: {
+        using T                = MN::NullableInt48u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableInt48u attribute value is %s", unify_value.dump().c_str());
+            UN::NullableInt48u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableInt48u::Id);
+        }
+        break;
+    }
+        // type is int56u
+    case MN::NullableInt56u::Id: {
+        using T                = MN::NullableInt56u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableInt56u attribute value is %s", unify_value.dump().c_str());
+            UN::NullableInt56u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableInt56u::Id);
+        }
+        break;
+    }
+        // type is int64u
+    case MN::NullableInt64u::Id: {
+        using T                = MN::NullableInt64u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableInt64u attribute value is %s", unify_value.dump().c_str());
+            UN::NullableInt64u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableInt64u::Id);
+        }
+        break;
+    }
+        // type is int8s
+    case MN::NullableInt8s::Id: {
+        using T                = MN::NullableInt8s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableInt8s attribute value is %s", unify_value.dump().c_str());
+            UN::NullableInt8s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableInt8s::Id);
+        }
+        break;
+    }
+        // type is int16s
+    case MN::NullableInt16s::Id: {
+        using T                = MN::NullableInt16s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableInt16s attribute value is %s", unify_value.dump().c_str());
+            UN::NullableInt16s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableInt16s::Id);
+        }
+        break;
+    }
+        // type is int24s
+    case MN::NullableInt24s::Id: {
+        using T                = MN::NullableInt24s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableInt24s attribute value is %s", unify_value.dump().c_str());
+            UN::NullableInt24s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableInt24s::Id);
+        }
+        break;
+    }
+        // type is int32s
+    case MN::NullableInt32s::Id: {
+        using T                = MN::NullableInt32s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableInt32s attribute value is %s", unify_value.dump().c_str());
+            UN::NullableInt32s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableInt32s::Id);
+        }
+        break;
+    }
+        // type is int40s
+    case MN::NullableInt40s::Id: {
+        using T                = MN::NullableInt40s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableInt40s attribute value is %s", unify_value.dump().c_str());
+            UN::NullableInt40s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableInt40s::Id);
+        }
+        break;
+    }
+        // type is int48s
+    case MN::NullableInt48s::Id: {
+        using T                = MN::NullableInt48s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableInt48s attribute value is %s", unify_value.dump().c_str());
+            UN::NullableInt48s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableInt48s::Id);
+        }
+        break;
+    }
+        // type is int56s
+    case MN::NullableInt56s::Id: {
+        using T                = MN::NullableInt56s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableInt56s attribute value is %s", unify_value.dump().c_str());
+            UN::NullableInt56s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableInt56s::Id);
+        }
+        break;
+    }
+        // type is int64s
+    case MN::NullableInt64s::Id: {
+        using T                = MN::NullableInt64s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableInt64s attribute value is %s", unify_value.dump().c_str());
+            UN::NullableInt64s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableInt64s::Id);
+        }
+        break;
+    }
+        // type is enum8
+    case MN::NullableEnum8::Id: {
+        using T                = MN::NullableEnum8::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableEnum8 attribute value is %s", unify_value.dump().c_str());
+            UN::NullableEnum8::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableEnum8::Id);
+        }
+        break;
+    }
+        // type is enum16
+    case MN::NullableEnum16::Id: {
+        using T                = MN::NullableEnum16::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableEnum16 attribute value is %s", unify_value.dump().c_str());
+            UN::NullableEnum16::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableEnum16::Id);
+        }
+        break;
+    }
+        // type is single
+    case MN::NullableFloatSingle::Id: {
+        using T                = MN::NullableFloatSingle::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableFloatSingle attribute value is %s", unify_value.dump().c_str());
+            UN::NullableFloatSingle::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableFloatSingle::Id);
+        }
+        break;
+    }
+        // type is double
+    case MN::NullableFloatDouble::Id: {
+        using T                = MN::NullableFloatDouble::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableFloatDouble attribute value is %s", unify_value.dump().c_str());
+            UN::NullableFloatDouble::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableFloatDouble::Id);
+        }
+        break;
+    }
+        // type is octet_string
+    case MN::NullableOctetString::Id: {
+        using T                = MN::NullableOctetString::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableOctetString attribute value is %s", unify_value.dump().c_str());
+            UN::NullableOctetString::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableOctetString::Id);
+        }
+        break;
+    }
+        // type is char_string
+    case MN::NullableCharString::Id: {
+        using T                = MN::NullableCharString::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableCharString attribute value is %s", unify_value.dump().c_str());
+            UN::NullableCharString::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableCharString::Id);
+        }
+        break;
+    }
+        // type is SimpleEnum
+    case MN::NullableEnumAttr::Id: {
+        using T                = MN::NullableEnumAttr::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableEnumAttr attribute value is %s", unify_value.dump().c_str());
+            UN::NullableEnumAttr::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::NullableEnumAttr::Id);
+        }
+        break;
+    }
+        // type is int8u
+    case MN::NullableRangeRestrictedInt8u::Id: {
+        using T                = MN::NullableRangeRestrictedInt8u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableRangeRestrictedInt8u attribute value is %s", unify_value.dump().c_str());
+            UN::NullableRangeRestrictedInt8u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id,
+                                                   MN::NullableRangeRestrictedInt8u::Id);
+        }
+        break;
+    }
+        // type is int8s
+    case MN::NullableRangeRestrictedInt8s::Id: {
+        using T                = MN::NullableRangeRestrictedInt8s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableRangeRestrictedInt8s attribute value is %s", unify_value.dump().c_str());
+            UN::NullableRangeRestrictedInt8s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id,
+                                                   MN::NullableRangeRestrictedInt8s::Id);
+        }
+        break;
+    }
+        // type is int16u
+    case MN::NullableRangeRestrictedInt16u::Id: {
+        using T                = MN::NullableRangeRestrictedInt16u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableRangeRestrictedInt16u attribute value is %s", unify_value.dump().c_str());
+            UN::NullableRangeRestrictedInt16u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id,
+                                                   MN::NullableRangeRestrictedInt16u::Id);
+        }
+        break;
+    }
+        // type is int16s
+    case MN::NullableRangeRestrictedInt16s::Id: {
+        using T                = MN::NullableRangeRestrictedInt16s::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "NullableRangeRestrictedInt16s attribute value is %s", unify_value.dump().c_str());
+            UN::NullableRangeRestrictedInt16s::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id,
+                                                   MN::NullableRangeRestrictedInt16s::Id);
+        }
+        break;
+    }
+        // type is int8u
+    case MN::WriteOnlyInt8u::Id: {
+        using T                = MN::WriteOnlyInt8u::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "WriteOnlyInt8u attribute value is %s", unify_value.dump().c_str());
+            UN::WriteOnlyInt8u::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::WriteOnlyInt8u::Id);
+        }
+        break;
+    }
+        // type is bitmap32
+    case MN::FeatureMap::Id: {
+        using T                = MN::FeatureMap::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "FeatureMap attribute value is %s", unify_value.dump().c_str());
+            UN::FeatureMap::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::FeatureMap::Id);
+        }
+        break;
+    }
+        // type is int16u
+    case MN::ClusterRevision::Id: {
+        using T                = MN::ClusterRevision::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value())
+        {
+            sl_log_debug(LOG_TAG, "ClusterRevision attribute value is %s", unify_value.dump().c_str());
+            UN::ClusterRevision::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::UnitTesting::Id, MN::ClusterRevision::Id);
         }
         break;
     }

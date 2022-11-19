@@ -5060,3 +5060,499 @@ void ElectricalMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInt
     }
     ctxt.SetCommandHandled();
 }
+
+void UnitTestingClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext & ctxt)
+{
+    using namespace chip::app::Clusters::UnitTesting;
+
+    auto unify_node = m_node_state_monitor.bridged_endpoint(ctxt.mRequestPath.mEndpointId);
+    if (!unify_node)
+    {
+        sl_log_info(LOG_TAG, "The endpoint [%i] is not a part of unify matter bridge node", ctxt.mRequestPath.mEndpointId);
+        return;
+    }
+
+    std::string cmd;
+    nlohmann::json payload = {};
+
+    switch (ctxt.mRequestPath.mCommandId)
+    {
+    case Commands::Test::Id: {
+        cmd = "Test";
+        Commands::Test::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+        }
+    }
+    break;
+    case Commands::TestNotHandled::Id: {
+        cmd = "TestNotHandled";
+        Commands::TestNotHandled::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+        }
+    }
+    break;
+    case Commands::TestSpecific::Id: {
+        cmd = "TestSpecific";
+        Commands::TestSpecific::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+        }
+    }
+    break;
+    case Commands::TestUnknownCommand::Id: {
+        cmd = "TestUnknownCommand";
+        Commands::TestUnknownCommand::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+        }
+    }
+    break;
+    case Commands::TestAddArguments::Id: {
+        cmd = "TestAddArguments";
+        Commands::TestAddArguments::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+            try
+            {
+                payload["Arg1"] = to_json(data.arg1);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try
+            {
+                payload["Arg2"] = to_json(data.arg2);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+        }
+    }
+    break;
+    case Commands::TestSimpleArgumentRequest::Id: {
+        cmd = "TestSimpleArgumentRequest";
+        Commands::TestSimpleArgumentRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+            try
+            {
+                payload["Arg1"] = to_json(data.arg1);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+        }
+    }
+    break;
+    case Commands::TestStructArrayArgumentRequest::Id: {
+        cmd = "TestStructArrayArgumentRequest";
+        Commands::TestStructArrayArgumentRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+            try
+            {
+                payload["Arg1"] = to_json(data.arg1);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try
+            {
+                payload["Arg2"] = to_json(data.arg2);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try
+            {
+                payload["Arg3"] = to_json(data.arg3);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try
+            {
+                payload["Arg4"] = to_json(data.arg4);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try
+            {
+                payload["Arg5"] = to_json(data.arg5);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try
+            {
+                payload["Arg6"] = to_json(data.arg6);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+        }
+    }
+    break;
+    case Commands::TestStructArgumentRequest::Id: {
+        cmd = "TestStructArgumentRequest";
+        Commands::TestStructArgumentRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+            try
+            {
+                payload["Arg1"] = to_json(data.arg1);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+        }
+    }
+    break;
+    case Commands::TestNestedStructArgumentRequest::Id: {
+        cmd = "TestNestedStructArgumentRequest";
+        Commands::TestNestedStructArgumentRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+            try
+            {
+                payload["Arg1"] = to_json(data.arg1);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+        }
+    }
+    break;
+    case Commands::TestListStructArgumentRequest::Id: {
+        cmd = "TestListStructArgumentRequest";
+        Commands::TestListStructArgumentRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+            try
+            {
+                payload["Arg1"] = to_json(data.arg1);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+        }
+    }
+    break;
+    case Commands::TestListInt8UArgumentRequest::Id: {
+        cmd = "TestListInt8UArgumentRequest";
+        Commands::TestListInt8UArgumentRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+            try
+            {
+                payload["Arg1"] = to_json(data.arg1);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+        }
+    }
+    break;
+    case Commands::TestNestedStructListArgumentRequest::Id: {
+        cmd = "TestNestedStructListArgumentRequest";
+        Commands::TestNestedStructListArgumentRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+            try
+            {
+                payload["Arg1"] = to_json(data.arg1);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+        }
+    }
+    break;
+    case Commands::TestListNestedStructListArgumentRequest::Id: {
+        cmd = "TestListNestedStructListArgumentRequest";
+        Commands::TestListNestedStructListArgumentRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+            try
+            {
+                payload["Arg1"] = to_json(data.arg1);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+        }
+    }
+    break;
+    case Commands::TestListInt8UReverseRequest::Id: {
+        cmd = "TestListInt8UReverseRequest";
+        Commands::TestListInt8UReverseRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+            try
+            {
+                payload["Arg1"] = to_json(data.arg1);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+        }
+    }
+    break;
+    case Commands::TestEnumsRequest::Id: {
+        cmd = "TestEnumsRequest";
+        Commands::TestEnumsRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+            try
+            {
+                payload["Arg1"] = to_json(data.arg1);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try
+            {
+                payload["Arg2"] = to_json(data.arg2);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+        }
+    }
+    break;
+    case Commands::TestNullableOptionalRequest::Id: {
+        cmd = "TestNullableOptionalRequest";
+        Commands::TestNullableOptionalRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+            if (data.arg1.HasValue())
+            {
+                try
+                {
+                    payload["Arg1"] = to_json(data.arg1.Value());
+                } catch (std::exception & ex)
+                {
+                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
+                }
+            }
+        }
+    }
+    break;
+    case Commands::TestComplexNullableOptionalRequest::Id: {
+        cmd = "TestComplexNullableOptionalRequest";
+        Commands::TestComplexNullableOptionalRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+            try
+            {
+                payload["NullableInt"] = to_json(data.nullableInt);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            if (data.optionalInt.HasValue())
+            {
+                try
+                {
+                    payload["OptionalInt"] = to_json(data.optionalInt.Value());
+                } catch (std::exception & ex)
+                {
+                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
+                }
+            }
+            if (data.nullableOptionalInt.HasValue())
+            {
+                try
+                {
+                    payload["NullableOptionalInt"] = to_json(data.nullableOptionalInt.Value());
+                } catch (std::exception & ex)
+                {
+                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
+                }
+            }
+            try
+            {
+                payload["NullableString"] = to_json(data.nullableString);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            if (data.optionalString.HasValue())
+            {
+                try
+                {
+                    payload["OptionalString"] = to_json(data.optionalString.Value());
+                } catch (std::exception & ex)
+                {
+                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
+                }
+            }
+            if (data.nullableOptionalString.HasValue())
+            {
+                try
+                {
+                    payload["NullableOptionalString"] = to_json(data.nullableOptionalString.Value());
+                } catch (std::exception & ex)
+                {
+                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
+                }
+            }
+            try
+            {
+                payload["NullableStruct"] = to_json(data.nullableStruct);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            if (data.optionalStruct.HasValue())
+            {
+                try
+                {
+                    payload["OptionalStruct"] = to_json(data.optionalStruct.Value());
+                } catch (std::exception & ex)
+                {
+                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
+                }
+            }
+            if (data.nullableOptionalStruct.HasValue())
+            {
+                try
+                {
+                    payload["NullableOptionalStruct"] = to_json(data.nullableOptionalStruct.Value());
+                } catch (std::exception & ex)
+                {
+                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
+                }
+            }
+            try
+            {
+                payload["NullableList"] = to_json(data.nullableList);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            if (data.optionalList.HasValue())
+            {
+                try
+                {
+                    payload["OptionalList"] = to_json(data.optionalList.Value());
+                } catch (std::exception & ex)
+                {
+                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
+                }
+            }
+            if (data.nullableOptionalList.HasValue())
+            {
+                try
+                {
+                    payload["NullableOptionalList"] = to_json(data.nullableOptionalList.Value());
+                } catch (std::exception & ex)
+                {
+                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
+                }
+            }
+        }
+    }
+    break;
+    case Commands::SimpleStructEchoRequest::Id: {
+        cmd = "SimpleStructEchoRequest";
+        Commands::SimpleStructEchoRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+            try
+            {
+                payload["Arg1"] = to_json(data.arg1);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+        }
+    }
+    break;
+    case Commands::TimedInvokeRequest::Id: {
+        cmd = "TimedInvokeRequest";
+        Commands::TimedInvokeRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+        }
+    }
+    break;
+    case Commands::TestSimpleOptionalArgumentRequest::Id: {
+        cmd = "TestSimpleOptionalArgumentRequest";
+        Commands::TestSimpleOptionalArgumentRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+            if (data.arg1.HasValue())
+            {
+                try
+                {
+                    payload["Arg1"] = to_json(data.arg1.Value());
+                } catch (std::exception & ex)
+                {
+                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
+                }
+            }
+        }
+    }
+    break;
+    case Commands::TestEmitTestEventRequest::Id: {
+        cmd = "TestEmitTestEventRequest";
+        Commands::TestEmitTestEventRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+            try
+            {
+                payload["Arg1"] = to_json(data.arg1);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try
+            {
+                payload["Arg2"] = to_json(data.arg2);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+            try
+            {
+                payload["Arg3"] = to_json(data.arg3);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+        }
+    }
+    break;
+    case Commands::TestEmitTestFabricScopedEventRequest::Id: {
+        cmd = "TestEmitTestFabricScopedEventRequest";
+        Commands::TestEmitTestFabricScopedEventRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR)
+        {
+            try
+            {
+                payload["Arg1"] = to_json(data.arg1);
+            } catch (std::exception & ex)
+            {
+                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
+            }
+        }
+    }
+    break;
+    }
+
+    if (!cmd.empty())
+    {
+        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::Success);
+        send_unify_mqtt_cmd(ctxt, cmd, payload);
+        sl_log_debug(LOG_TAG, "Mapped [%] command to unify dotdot data model", cmd.c_str());
+    }
+    else
+    {
+        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::UnsupportedCommand);
+    }
+    ctxt.SetCommandHandled();
+}

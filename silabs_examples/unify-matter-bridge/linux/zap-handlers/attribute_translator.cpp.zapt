@@ -194,9 +194,7 @@ void {{asUpperCamelCase label}}AttributeAccess::reported_updated(const bridged_e
         MatterReportingAttributeChangeCallback(
           node_matter_endpoint,
           Clusters::{{asUpperCamelCase parent.label}}::Id,
-          MN::{{asUpperCamelCase label}}::Id,
-          ZCL_{{typeAsDelimitedMacro type}}_ATTRIBUTE_TYPE,
-          reinterpret_cast<uint8_t *>(&value.value()));
+          MN::{{asUpperCamelCase label}}::Id);
       }
       break;
     }

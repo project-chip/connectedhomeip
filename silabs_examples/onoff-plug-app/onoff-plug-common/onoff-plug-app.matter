@@ -1,11 +1,6 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-struct LabelStruct {
-    char_string<16> label = 0;
-    char_string<16> value = 1;
-}
-
 server cluster Identify = 3 {
   enum IdentifyEffectIdentifier : ENUM8 {
     kBlink = 0;
@@ -1418,13 +1413,12 @@ server cluster GroupKeyManagement = 63 {
 }
 
 server cluster FixedLabel = 64 {
-  readonly attribute LabelStruct labelList[] = 0;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
+  struct LabelStruct {
+    char_string<16> label = 0;
+    char_string<16> value = 1;
+  }
 
-server cluster UserLabel = 65 {
-  attribute access(write: manage) LabelStruct labelList[] = 0;
+  readonly attribute LabelStruct labelList[] = 0;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -1693,12 +1687,6 @@ endpoint 0 {
   }
 
   server cluster FixedLabel {
-    callback attribute labelList;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster UserLabel {
     callback attribute labelList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;

@@ -234,9 +234,7 @@ void BridgedDeviceBasicInfoAttributeAccess::reported_updated(
         attribute_state_cache::get_instance().set<std::string>(attrpath, value);
         MatterReportingAttributeChangeCallback(matter_endpoint,
                                                BridgedDeviceBasic::Id,
-                                               VendorName::Id,
-                                               ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                               &value_vec[0]);
+                                               VendorName::Id);
         break;
       }
       case VendorID::Id: {
@@ -248,9 +246,7 @@ void BridgedDeviceBasicInfoAttributeAccess::reported_updated(
         MatterReportingAttributeChangeCallback(
           matter_endpoint,
           BridgedDeviceBasic::Id,
-          VendorID::Id,
-          ZCL_INT16U_ATTRIBUTE_TYPE,
-          reinterpret_cast<uint8_t *>(unspecified_vendor));
+          VendorID::Id);
         break;
       }
       case ProductName::Id: {
@@ -259,9 +255,7 @@ void BridgedDeviceBasicInfoAttributeAccess::reported_updated(
         attribute_state_cache::get_instance().set<std::string>(attrpath, value);
         MatterReportingAttributeChangeCallback(matter_endpoint,
                                                BridgedDeviceBasic::Id,
-                                               ProductName::Id,
-                                               ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                               &value_vec[0]);
+                                               ProductName::Id);
         break;
       }
       case HardwareVersion::Id: {
@@ -270,10 +264,7 @@ void BridgedDeviceBasicInfoAttributeAccess::reported_updated(
         MatterReportingAttributeChangeCallback(
           matter_endpoint,
           BridgedDeviceBasic::Id,
-          HardwareVersion::Id,
-          
-          ZCL_INT16U_ATTRIBUTE_TYPE,
-          reinterpret_cast<uint8_t *>(value));
+          HardwareVersion::Id);
         break;
       }
       case HardwareVersionString::Id: {
@@ -282,10 +273,7 @@ void BridgedDeviceBasicInfoAttributeAccess::reported_updated(
         attribute_state_cache::get_instance().set<std::string>(attrpath, value);
         MatterReportingAttributeChangeCallback(matter_endpoint,
                                                BridgedDeviceBasic::Id,
-                                               HardwareVersionString::Id,
-                                               
-                                               ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                               &value_vec[0]);
+                                               HardwareVersionString::Id);
         break;
       }
       case SoftwareVersion::Id: {
@@ -294,10 +282,7 @@ void BridgedDeviceBasicInfoAttributeAccess::reported_updated(
         MatterReportingAttributeChangeCallback(
           matter_endpoint,
           BridgedDeviceBasic::Id,
-          SoftwareVersion::Id,
-          
-          ZCL_INT32U_ATTRIBUTE_TYPE,
-          reinterpret_cast<uint8_t *>(value));
+          SoftwareVersion::Id);
         break;
       }
       case SoftwareVersionString::Id: {
@@ -306,10 +291,7 @@ void BridgedDeviceBasicInfoAttributeAccess::reported_updated(
         attribute_state_cache::get_instance().set<std::string>(attrpath, value);
         MatterReportingAttributeChangeCallback(matter_endpoint,
                                                BridgedDeviceBasic::Id,
-                                               SoftwareVersionString::Id,
-                                               
-                                               ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                               &value_vec[0]);
+                                               SoftwareVersionString::Id);
         break;
       }
       case ManufacturingDate::Id: {
@@ -318,10 +300,7 @@ void BridgedDeviceBasicInfoAttributeAccess::reported_updated(
         attribute_state_cache::get_instance().set<std::string>(attrpath, value);
         MatterReportingAttributeChangeCallback(matter_endpoint,
                                                BridgedDeviceBasic::Id,
-                                               ManufacturingDate::Id,
-                                               
-                                               ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                               &value_vec[0]);
+                                               ManufacturingDate::Id);
         break;
       }
       case ProductURL::Id: {
@@ -330,10 +309,7 @@ void BridgedDeviceBasicInfoAttributeAccess::reported_updated(
         attribute_state_cache::get_instance().set<std::string>(attrpath, value);
         MatterReportingAttributeChangeCallback(matter_endpoint,
                                                BridgedDeviceBasic::Id,
-                                               ProductURL::Id,
-                                               
-                                               ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                               &value_vec[0]);
+                                               ProductURL::Id);
         break;
       }
       case ProductLabel::Id: {
@@ -342,10 +318,7 @@ void BridgedDeviceBasicInfoAttributeAccess::reported_updated(
         attribute_state_cache::get_instance().set<std::string>(attrpath, value);
         MatterReportingAttributeChangeCallback(matter_endpoint,
                                                BridgedDeviceBasic::Id,
-                                               ProductLabel::Id,
-                                               
-                                               ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                               &value_vec[0]);
+                                               ProductLabel::Id);
         break;
       }
       case SerialNumber::Id: {
@@ -354,10 +327,7 @@ void BridgedDeviceBasicInfoAttributeAccess::reported_updated(
         attribute_state_cache::get_instance().set<std::string>(attrpath, value);
         MatterReportingAttributeChangeCallback(matter_endpoint,
                                                BridgedDeviceBasic::Id,
-                                               SerialNumber::Id,
-                                               
-                                               ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                               &value_vec[0]);
+                                               SerialNumber::Id);
       }
     }
   }
@@ -375,10 +345,7 @@ void BridgedDeviceBasicInfoAttributeAccess::reported_updated(
       attribute_state_cache::get_instance().set<std::string>(attrpath, name);
       MatterReportingAttributeChangeCallback(matter_endpoint,
                                              BridgedDeviceBasic::Id,
-                                             NodeLabel::Id,
-                                             
-                                             ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                             &name_vec[0]);
+                                             NodeLabel::Id);
     }
   }
 }
@@ -402,9 +369,7 @@ void BridgedDeviceBasicInfoAttributeAccess::unify_node_reachable_state_update(
     MatterReportingAttributeChangeCallback(
       ep.matter_endpoint,
       BridgedDeviceBasic::Id,
-      Reachable::Id,
-      ZCL_BOOLEAN_ATTRIBUTE_TYPE,
-      reinterpret_cast<uint8_t *>(&node_reachable_state));
+      Reachable::Id);
 
     // update the ReachableChanged Event
     Events::ReachableChanged::Type event {node_reachable_state};

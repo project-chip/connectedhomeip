@@ -20074,5 +20074,2349 @@ EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint1
 } // namespace Attributes
 } // namespace ElectricalMeasurement
 
+namespace UnitTesting {
+namespace Attributes {
+
+namespace Boolean {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, bool & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<bool>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const bool & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<bool>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Boolean
+
+namespace Bitmap8 {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
+                  chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
+                  const chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Bitmap8
+
+namespace Bitmap16 {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
+                  chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
+                  const chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Bitmap16
+
+namespace Bitmap32 {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
+                  chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
+                  const chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Bitmap32
+
+namespace Bitmap64 {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
+                  chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
+                  const chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Bitmap64
+
+namespace Int8u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint8_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint8_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Int8u
+
+namespace Int16u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint16_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint16_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Int16u
+
+namespace Int24u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint32_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint32_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Int24u
+
+namespace Int32u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint32_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint32_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Int32u
+
+namespace Int40u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint64_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<OddSizedInteger<5, false>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint64_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<OddSizedInteger<5, false>>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Int40u
+
+namespace Int48u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint64_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<OddSizedInteger<6, false>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint64_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<OddSizedInteger<6, false>>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Int48u
+
+namespace Int56u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint64_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<OddSizedInteger<7, false>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint64_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<OddSizedInteger<7, false>>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Int56u
+
+namespace Int64u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint64_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint64_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint64_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint64_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Int64u
+
+namespace Int8s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, int8_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<int8_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const int8_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<int8_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Int8s
+
+namespace Int16s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, int16_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const int16_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<int16_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Int16s
+
+namespace Int24s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, int32_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, true>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const int32_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<OddSizedInteger<3, true>>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Int24s
+
+namespace Int32s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, int32_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<int32_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const int32_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<int32_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Int32s
+
+namespace Int40s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, int64_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<OddSizedInteger<5, true>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const int64_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<OddSizedInteger<5, true>>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Int40s
+
+namespace Int48s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, int64_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<OddSizedInteger<6, true>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const int64_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<OddSizedInteger<6, true>>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Int48s
+
+namespace Int56s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, int64_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<OddSizedInteger<7, true>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const int64_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<OddSizedInteger<7, true>>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Int56s
+
+namespace Int64s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, int64_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<int64_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const int64_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<int64_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Int64s
+
+namespace Enum8 {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint8_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint8_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Enum8
+
+namespace Enum16 {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint16_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint16_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Enum16
+
+namespace FloatSingle {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, float & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<float>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const float & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<float>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace FloatSingle
+
+namespace FloatDouble {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, double & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<double>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const double & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<double>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace FloatDouble
+
+namespace OctetString {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::ByteSpan & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<chip::ByteSpan>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::ByteSpan & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    cache.set<chip::ByteSpan>(endpoint, value);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace OctetString
+
+namespace LongOctetString {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::ByteSpan & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<chip::ByteSpan>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::ByteSpan & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    cache.set<chip::ByteSpan>(endpoint, value);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace LongOctetString
+
+namespace CharString {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::CharSpan & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<chip::CharSpan>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::CharSpan & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    cache.set<chip::CharSpan>(endpoint, value);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace CharString
+
+namespace LongCharString {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::CharSpan & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<chip::CharSpan>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::CharSpan & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    cache.set<chip::CharSpan>(endpoint, value);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace LongCharString
+
+namespace EpochUs {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint64_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint64_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint64_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint64_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace EpochUs
+
+namespace EpochS {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint32_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint32_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace EpochS
+
+namespace VendorId {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::VendorId & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<chip::VendorId>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::VendorId & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<chip::VendorId>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace VendorId
+
+namespace EnumAttr {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::Clusters::UnitTesting::SimpleEnum & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<chip::app::Clusters::UnitTesting::SimpleEnum>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::Clusters::UnitTesting::SimpleEnum & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<chip::app::Clusters::UnitTesting::SimpleEnum>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace EnumAttr
+
+namespace RangeRestrictedInt8u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint8_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint8_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace RangeRestrictedInt8u
+
+namespace RangeRestrictedInt8s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, int8_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<int8_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const int8_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<int8_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace RangeRestrictedInt8s
+
+namespace RangeRestrictedInt16u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint16_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint16_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace RangeRestrictedInt16u
+
+namespace RangeRestrictedInt16s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, int16_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const int16_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<int16_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace RangeRestrictedInt16s
+
+namespace TimedWriteBoolean {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, bool & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<bool>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const bool & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<bool>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace TimedWriteBoolean
+
+namespace GeneralErrorBoolean {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, bool & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<bool>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const bool & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<bool>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace GeneralErrorBoolean
+
+namespace ClusterErrorBoolean {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, bool & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<bool>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const bool & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<bool>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace ClusterErrorBoolean
+
+namespace Unsupported {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, bool & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<bool>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const bool & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<bool>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace Unsupported
+
+namespace NullableBoolean {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<bool> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<bool>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<bool> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<bool>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableBoolean
+
+namespace NullableBitmap8 {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
+                  chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
+                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableBitmap8
+
+namespace NullableBitmap16 {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
+                  chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
+                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableBitmap16
+
+namespace NullableBitmap32 {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
+                  chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
+                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableBitmap32
+
+namespace NullableBitmap64 {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
+                  chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
+                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableBitmap64
+
+namespace NullableInt8u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableInt8u
+
+namespace NullableInt16u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<uint16_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableInt16u
+
+namespace NullableInt24u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<uint32_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<OddSizedInteger<3, false>>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableInt24u
+
+namespace NullableInt32u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<uint32_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableInt32u
+
+namespace NullableInt40u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<uint64_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<OddSizedInteger<5, false>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<OddSizedInteger<5, false>>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableInt40u
+
+namespace NullableInt48u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<uint64_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<OddSizedInteger<6, false>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<OddSizedInteger<6, false>>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableInt48u
+
+namespace NullableInt56u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<uint64_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<OddSizedInteger<7, false>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<OddSizedInteger<7, false>>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableInt56u
+
+namespace NullableInt64u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<uint64_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint64_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint64_t>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableInt64u
+
+namespace NullableInt8s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<int8_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<int8_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<int8_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<int8_t>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableInt8s
+
+namespace NullableInt16s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<int16_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<int16_t>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableInt16s
+
+namespace NullableInt24s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<int32_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<OddSizedInteger<3, true>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<int32_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<OddSizedInteger<3, true>>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableInt24s
+
+namespace NullableInt32s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<int32_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<int32_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<int32_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<int32_t>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableInt32s
+
+namespace NullableInt40s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<int64_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<OddSizedInteger<5, true>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<int64_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<OddSizedInteger<5, true>>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableInt40s
+
+namespace NullableInt48s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<int64_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<OddSizedInteger<6, true>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<int64_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<OddSizedInteger<6, true>>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableInt48s
+
+namespace NullableInt56s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<int64_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<OddSizedInteger<7, true>>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<int64_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<OddSizedInteger<7, true>>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableInt56s
+
+namespace NullableInt64s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<int64_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<int64_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<int64_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<int64_t>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableInt64s
+
+namespace NullableEnum8 {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableEnum8
+
+namespace NullableEnum16 {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<uint16_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableEnum16
+
+namespace NullableFloatSingle {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<float> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<float>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<float> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<float>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableFloatSingle
+
+namespace NullableFloatDouble {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<double> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<double>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<double> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<double>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableFloatDouble
+
+namespace NullableOctetString {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<chip::ByteSpan> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<chip::ByteSpan>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    cache.set<chip::ByteSpan>(endpoint, value);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableOctetString
+
+namespace NullableCharString {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<chip::CharSpan> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<chip::CharSpan>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<chip::CharSpan> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    cache.set<chip::CharSpan>(endpoint, value);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableCharString
+
+namespace NullableEnumAttr {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
+                  chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<chip::app::Clusters::UnitTesting::SimpleEnum>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
+                  const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<chip::app::Clusters::UnitTesting::SimpleEnum>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableEnumAttr
+
+namespace NullableRangeRestrictedInt8u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableRangeRestrictedInt8u
+
+namespace NullableRangeRestrictedInt8s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<int8_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<int8_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<int8_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<int8_t>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableRangeRestrictedInt8s
+
+namespace NullableRangeRestrictedInt16u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<uint16_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableRangeRestrictedInt16u
+
+namespace NullableRangeRestrictedInt16s {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, chip::app::DataModel::Nullable<int16_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value.SetNonNull(tmp);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<int16_t>;
+    Traits::StorageType storageValue;
+    if (value.HasValidValue())
+    {
+        Traits::WorkingToStorage(value.Value(), storageValue);
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace NullableRangeRestrictedInt16s
+
+namespace WriteOnlyInt8u {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint8_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint8_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace WriteOnlyInt8u
+
+namespace FeatureMap {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint32_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint32_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint16_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp_storage;
+
+    cache.get<Traits::StorageType>(endpoint, temp_storage);
+    auto tmp = Traits::StorageToWorking(temp_storage);
+
+    value = tmp;
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint16_t & value)
+{
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+    using Traits                  = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    cache.set(endpoint, storageValue);
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace UnitTesting
+
 } // namespace matter_bridge
 } // namespace unify
