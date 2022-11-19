@@ -14,7 +14,7 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/pigweed.gni")
-
+import("${build_root}/chip/java/config.gni")
 import("${build_root}/config/compiler/compiler.gni")
 import("${build_root}/config/sysroot.gni")
 import("${build_root}/config/target.gni")
@@ -248,7 +248,7 @@ config("strict_warnings") {
     ]
   }
 
-  if (getenv("JAVA_PATH") != "") {
+  if (build_java_matter_controller) {
     cflags -= [ "-Wshadow" ]
   }
 

@@ -222,6 +222,13 @@ enum class LevelControlFeature : uint32_t
     kLighting  = 0x2,
     kFrequency = 0x4,
 };
+
+// Bitmap for LevelControlOptions
+enum class LevelControlOptions : uint8_t
+{
+    kExecuteIfOff           = 0x1,
+    kCoupleColorTempToLevel = 0x2,
+};
 } // namespace LevelControl
 
 namespace BinaryInputBasic {

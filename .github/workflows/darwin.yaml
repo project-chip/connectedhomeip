@@ -107,11 +107,11 @@ jobs:
               run: |
                   scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
             - name: Build example OTA Provider
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: |
                   scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
             - name: Build example OTA Requestor
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: |
                   scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false
             - name: Delete Defaults
