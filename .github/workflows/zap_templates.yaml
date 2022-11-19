@@ -29,7 +29,7 @@ jobs:
 
         runs-on: ubuntu-20.04
         container:
-            image: connectedhomeip/chip-build-zap:0.6.06
+            image: connectedhomeip/chip-build:0.6.11
         defaults:
             run:
                 shell: sh
@@ -44,18 +44,10 @@ jobs:
                       token: ${{ github.token }}
                   attempt_limit: 3
                   attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform linux
-            - name: Setup ZAP
-              timeout-minutes: 10
-              run: |
-                  cd third_party/zap/repo/
-                  npm ci
-                  npm run version-stamp
-                  npm rebuild canvas --update-binary
-                  npm run build-spa
             - name: Generate all
               run: scripts/tools/zap_regen_all.py
+            - name: Ensure git works in current working directory
+              run: git config --global --add safe.directory `pwd`
             - name: Check for uncommited changes
               run: |
                   git add .
