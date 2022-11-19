@@ -15982,6 +15982,11 @@ typedef NS_OPTIONS(uint32_t, MTRLevelControlFeature) {
     MTRLevelControlFeatureFrequency = 0x4,
 };
 
+typedef NS_OPTIONS(uint8_t, MTRLevelControlOptions) {
+    MTRLevelControlOptionsExecuteIfOff = 0x1,
+    MTRLevelControlOptionsCoupleColorTempToLevel = 0x2,
+};
+
 typedef NS_ENUM(uint8_t, MTRAccessControlAuthMode) {
     MTRAccessControlAuthModePASE = 0x01,
     MTRAccessControlAuthModeCASE = 0x02,

@@ -227,7 +227,10 @@
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": ["Test_TC_DGSW_1_1"],
-    "Subscriptions": ["TestSubscribe_OnOff"],
+    "Subscriptions": [
+        "TestSubscribe_OnOff",
+        "TestSubscribe_AdministratorCommissioning"
+    ],
     "DoorLock": [
         "DL_UsersAndCredentials",
         "DL_LockUnlock",
