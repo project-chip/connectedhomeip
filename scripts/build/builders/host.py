@@ -432,7 +432,7 @@ class HostBuilder(GnBuilder):
             self._Execute(['genhtml', os.path.join(self.coverage_dir, 'lcov_final.info'), '--output-directory',
                            os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
 
-        if self.app.ExamplePath() == "java-matter-controller" and 'JAVA_PATH' in os.environ:
+        if self.app == HostApp.JAVA_MATTER_CONTROLLER:
             self.createJavaExecutable("java-matter-controller")
 
     def build_outputs(self):

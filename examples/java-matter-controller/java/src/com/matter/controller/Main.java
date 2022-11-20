@@ -23,7 +23,6 @@ import chip.devicecontroller.ControllerParams;
 import com.matter.controller.commands.common.*;
 import com.matter.controller.commands.discover.*;
 import com.matter.controller.commands.pairing.*;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 public class Main {
@@ -85,21 +84,6 @@ public class Main {
   }
 
   public static void main(String[] args) {
-    System.setProperty("java.library.path", "../lib/jni");
-
-    Field fieldSysPath = null;
-    try {
-      fieldSysPath = ClassLoader.class.getDeclaredField("sys_paths");
-    } catch (NoSuchFieldException e) {
-      throw new RuntimeException(e);
-    }
-    fieldSysPath.setAccessible(true);
-    try {
-      fieldSysPath.set(null, null);
-    } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
-    }
-
     ChipDeviceController controller =
         new ChipDeviceController(
             ControllerParams.newBuilder()
