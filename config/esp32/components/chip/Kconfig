@@ -227,7 +227,7 @@ menu "CHIP Device Layer"
             default 25
             help
                 The maximum number of events that can be held in the CHIP Platform event queue.
-        
+
         config ENABLE_EXTENDED_DISCOVERY
             bool "Enable Extended discovery Support"
             default n
@@ -474,7 +474,7 @@ menu "CHIP Device Layer"
         config USE_BLE_ONLY_FOR_COMMISSIONING
 	    bool "Use BLE only for commissioning"
 	    default y
-	    help 
+	    help
             Disable this flag if BLE is used for any other purpose than commissioning.
             When enabled, it deinitialized the BLE on successful commissioning, and on
             bootup do not initialize the BLE if device is already provisioned with Wi-Fi/Thread credentials.
@@ -656,6 +656,13 @@ menu "CHIP Device Layer"
                 Use ESP32 Device Info Provider to get device instance info from factory partition.
                 Details like Supported calendar types, supported locales, and fixed labels will be read from factory
                 partition.
+
+        config ENABLE_ESP32_LOCATIONCAPABILITY
+            depends on ENABLE_ESP32_FACTORY_DATA_PROVIDER
+            bool "Enable ESP32 Device LocationCapability "
+            default n
+            help
+                Enable ESP32 Device LocationCapability
 
     endmenu
 
@@ -849,7 +856,7 @@ menu "CHIP Device Layer"
             default "nvs"
             help
                 Label of the partition to store key-values in the "chip-counters" namespace.
-        
+
         config CHIP_KVS_NAMESPACE_PARTITION_LABEL
             string "chip-kvs namespace partition label"
             default "nvs"
