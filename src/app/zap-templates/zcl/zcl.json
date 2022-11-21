@@ -77,7 +77,7 @@
         "zll-devices.xml",
         "zll.xml"
     ],
-    "manufacturersXml": "../../../../third_party/zap/repo/zcl-builtin/shared/manufacturers.xml",
+    "manufacturersXml": "../../../../src/app/zap-templates/zcl/data-model/manufacturers.xml",
     "options": {
         "text": {
             "defaultResponsePolicy": ["Always", "Conditional", "Never"]

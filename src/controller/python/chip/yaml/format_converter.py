@@ -20,9 +20,26 @@ from chip.clusters.Types import Nullable, NullValue
 from chip.tlv import uint, float32
 import enum
 from chip.yaml.errors import ValidationError
+import binascii
 
 
-_HEX_PREFIX = 'hex:'
+def convert_yaml_octet_string_to_bytes(s: str) -> bytes:
+    """Convert YAML octet string body to bytes, handling any c-style hex escapes (e.g. \x5a) and hex: prefix"""
+    # Step 1: handle explicit "hex:" prefix
+    if s.startswith('hex:'):
+        return binascii.unhexlify(s[4:])
+
+    # Step 2: convert non-hex-prefixed to bytes
+    # TODO(#23669): This does not properly support utf8 octet strings. We mimic
+    # javascript codegen behavior. Behavior of javascript is:
+    #   * Octet string character >= u+0200 errors out.
+    #   * Any character greater than 0xFF has the upper bytes chopped off.
+    as_bytes = [ord(c) for c in s]
+
+    if any([value > 0x200 for value in as_bytes]):
+        raise ValueError('Unsupported char in octet string %r' % as_bytes)
+    accumulated_hex = ''.join([f"{(v & 0xFF):02x}" for v in as_bytes])
+    return binascii.unhexlify(accumulated_hex)
 
 
 def convert_name_value_pair_to_dict(arg_values):
@@ -118,9 +135,7 @@ def convert_yaml_type(field_value, field_type, use_from_dict=False):
         return field_type(field_value)
     # YAML treats bytes as strings. Convert to a byte string.
     elif (field_type == bytes and type(field_value) != bytes):
-        if isinstance(field_value, str) and field_value.startswith(_HEX_PREFIX):
-            return bytes.fromhex(field_value[len(_HEX_PREFIX):])
-        return str.encode(field_value)
+        return convert_yaml_octet_string_to_bytes(field_value)
     # By default, just return the field_value casted to field_type.
     else:
         return field_type(field_value)

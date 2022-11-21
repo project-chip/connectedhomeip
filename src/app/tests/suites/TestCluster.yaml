@@ -749,7 +749,8 @@ tests:
       command: "readAttribute"
       attribute: "octet_string"
       response:
-          value: "\r\n\xff\"\xa0"
+          # This is the properly 'hex:...' version of "\r\n\xff\"\xa0"
+          value: "hex:0d0aff22a0"
 
     - label: "Write attribute OCTET_STRING"
       command: "writeAttribute"
