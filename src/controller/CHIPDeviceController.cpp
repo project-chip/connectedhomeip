@@ -703,9 +703,15 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         }
         else if (params.HasDiscriminator())
         {
+            // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
+            // for later.
+            mRendezvousParametersForDeviceDiscoveredOverBle = params;
+
             SetupDiscriminator discriminator;
             discriminator.SetLongValue(params.GetDiscriminator());
-            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(discriminator));
+            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(
+                              discriminator, this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError));
+            ExitNow(CHIP_NO_ERROR);
         }
         else
         {
@@ -739,6 +745,38 @@ exit:
 
     return err;
 }
+
+#if CONFIG_NETWORK_LAYER_BLE
+void DeviceCommissioner::OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_CONNECTION_OBJECT connObj)
+{
+    auto self   = static_cast<DeviceCommissioner *>(appState);
+    auto device = self->mDeviceInPASEEstablishment;
+
+    if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kBle)
+    {
+        auto remoteId = device->GetDeviceId();
+
+        auto params = self->mRendezvousParametersForDeviceDiscoveredOverBle;
+        params.SetConnectionObject(connObj);
+        self->mRendezvousParametersForDeviceDiscoveredOverBle = RendezvousParameters();
+
+        self->ReleaseCommissioneeDevice(device);
+        LogErrorOnFailure(self->EstablishPASEConnection(remoteId, params));
+    }
+}
+
+void DeviceCommissioner::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err)
+{
+    auto self   = static_cast<DeviceCommissioner *>(appState);
+    auto device = self->mDeviceInPASEEstablishment;
+
+    if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kBle)
+    {
+        self->ReleaseCommissioneeDevice(device);
+        self->mRendezvousParametersForDeviceDiscoveredOverBle = RendezvousParameters();
+    }
+}
+#endif // CONFIG_NETWORK_LAYER_BLE
 
 CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningParameters & params)
 {
