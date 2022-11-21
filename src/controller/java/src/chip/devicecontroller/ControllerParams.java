@@ -304,7 +304,7 @@ public final class ControllerParams {
     /**
      * The Product Attestation Authority certificates that are trusted to sign
      * device attestation information.
-     * 
+     *
      * @param paaCerts The Product Attestation Authority certificates
      *                 containing the X.509 DER certificate.
      */
@@ -316,7 +316,7 @@ public final class ControllerParams {
     /**
      * The Certificate Declaration certificates that are trusted to sign
      * device attestation information.
-     * 
+     *
      * @param cdCerts The Certificate Declaration certificates
      *                containing the X.509 DER certificate.
      */

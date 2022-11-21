@@ -98,13 +98,13 @@ public class ChipDeviceController {
   /**
    * If DeviceAttestationCompletionCallback is setted, then it will always be
    * called when device attestation completes.
-   * 
+   *
    * When {@link
    * DeviceAttestationDelegate.DeviceAttestationCompletionCallback#onDeviceAttestationCompleted(long,
    * long, AttestationInfo, int)} is received,
    * {@link #continueCommissioning(long, boolean)}
    * must be called.
-   * 
+   *
    * @param failSafeExpiryTimeout the value to set for the fail-safe timer before
    *                              onDeviceAttestationCompleted is invoked.
    * @param completionCallback    the callback will be invoked when
@@ -121,12 +121,12 @@ public class ChipDeviceController {
    * If DeviceAttestationFailureCallback is setted, then it will be called
    * when device attestation fails, and the client can decide to continue or stop
    * the commissioning.
-   * 
+   *
    * When {@link
    * DeviceAttestationDelegate.DeviceAttestationFailureCallback#onDeviceAttestationFailed(long,
    * long, int)} is received,
    * {@link #continueCommissioning(long, boolean)} must be called.
-   * 
+   *
    * @param failSafeExpiryTimeout the value to set for the fail-safe timer before
    *                              onDeviceAttestationFailed is invoked.
    * @param failureCallback       the callback will be invoked when device

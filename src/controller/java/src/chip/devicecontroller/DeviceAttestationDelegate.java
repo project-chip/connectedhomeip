@@ -35,7 +35,7 @@ public interface DeviceAttestationDelegate {
   public interface DeviceAttestationFailureCallback extends DeviceAttestationDelegate {
     /**
      * The callback will be invoked when device attestation failed
-     * 
+     *
      * @param devicePtr Handle of device being commissioned
      * @param errorCode Error code for the failure.
      */
