@@ -1,7 +1,9 @@
 # Use Arm Virtual Hardware to commission a Matter device over Bluetooth and control over Wi-Fi
 
-To learn about Arm Virtual Hardware(AVH) and using it to start development with the Matter stack, refer to the blog published [here](https://community.arm.com/arm-community-blogs/b/internet-of-things-blog/posts/getting-started-with-matter-using-arm-virtual-hardware)
-In this guide, we will demonstrate how to commission a Matter device over Bluetooth and control it over Wi-Fi, all using Arm Virtual Hardware.
+In this guide, we will demonstrate how to commission a Matter device over Bluetooth and control it over Wi-Fi, all using [Arm Virtual Hardware](https://www.arm.com/products/development-tools/simulation/virtual-hardware).
+
+To learn about Arm Virtual Hardware(AVH) and start using it for development with the Matter stack, refer to the blog published [here](https://community.arm.com/arm-community-blogs/b/internet-of-things-blog/posts/getting-started-with-matter-using-arm-virtual-hardware).
+
 
 ## Pre-requisites
 
@@ -17,35 +19,35 @@ In this guide, we will demonstrate how to commission a Matter device over Blueto
 
 2. In the Device tab, click the Create Device button.
 
-![AVH_create_device](AVH_create_device.png)
+![AVH_create_device](images/AVH_create_device.png)
 
 3. Then click on the Raspberry Pi 4 board to select it.
 
-![AVH_select1](AVH_select1.png)
+![AVH_select1](images/AVH_select1.png)
 
 4. Click the Next button to continue
 
-![AVH_select2](AVH_select2.png)
+![AVH_select2](images/AVH_select2.png)
 
 5. Click the “browse” link on right-hand side and select the Ubuntu Server 22.04 image from the pre-requisites. 
 
-![AVH_configure1](AVH_configure1.png)
+![AVH_configure1](images/AVH_configure1.png)
 
 6. Once uploaded click Next
 
-![AVH_configure2](AVH_configure2.png)
+![AVH_configure2](images/AVH_configure2.png)
 
 7. Enter a device name and click the Create Device button. Any name is fine. We used ubuntu-lighting
 
-![AVH_launch_device](AVH_launch_device.png)
+![AVH_launch_device](images/AVH_launch_device.png)
 
 8. Wait for the virtual device to be created and start up. Click the Console tab to interact with the virtual board.
 
-![AVH_console1](AVH_console1.png)
+![AVH_console1](images/AVH_console1.png)
 
 9. Use username: ubuntu and password: ubuntu to log into the console and change your password.
 
-![AVH_console2](AVH_console2.png)
+![AVH_console2](images/AVH_console2.png)
 
 10. As per the [Building Matter - Installing prerequisites on Raspberry Pi 4 section](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md#installing-prerequisites-on-raspberry-pi-4), edit /etc/systemd/system/dbus-fi.w1.wpa_supplicant1.service with sudo and a text editor of your choice. Change the ExecStart line to  
 
@@ -77,7 +79,7 @@ sudo apt-get -y install git gcc g++ python3 pkg-config libssl-dev libdbus-1-dev 
 
 14. Press tab to select “Ok” when presented with the following prompt, then press enter.
 
-![AVH_console3](AVH_console3.png)
+![AVH_console3](images/AVH_console3.png)
 
 15. Clone the Matter repo and setup sub modules
 
