@@ -17,6 +17,15 @@ import os
 import shutil
 import tarfile
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
+
+@dataclass
+class BuilderOptions:
+    # Enable flashbundle generation stage
+    enable_flashbundle: bool = False
+    # Allow to wrap default build command
+    pw_command_launcher: str = None
 
 
 class Builder(ABC):
@@ -34,11 +43,7 @@ class Builder(ABC):
         # Set post-init once actual build target is known
         self.identifier = None
         self.output_dir = None
-
-        # Enable flashbundle generation stage
-        self.enable_flashbundle = False
-        # Allow to override the default build command
-        self.pw_command_launcher = None
+        self.options = BuilderOptions()
 
     @abstractmethod
     def generate(self):
@@ -82,13 +87,13 @@ class Builder(ABC):
 
     def outputs(self):
         artifacts = self.build_outputs()
-        if self.enable_flashbundle:
+        if self.options.enable_flashbundle:
             artifacts.update(self.flashbundle())
         return artifacts
 
     def build(self):
         self._build()
-        if self.enable_flashbundle:
+        if self.options.enable_flashbundle:
             self._generate_flashbundle()
 
     def _Execute(self, cmdarray, title=None):
