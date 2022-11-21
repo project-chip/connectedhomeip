@@ -564,6 +564,7 @@ typedef void (*OnOffSwitchConfigurationAcceptedCommandListListAttributeCallback)
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OnOffSwitchConfigurationAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*LevelControlOptionsAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions>);
 typedef void (*LevelControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*LevelControlAcceptedCommandListListAttributeCallback)(
@@ -2425,6 +2426,36 @@ public:
     void OnSubscriptionEstablished();
     using MTROnOffSwitchConfigurationAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTROnOffSwitchConfigurationAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRLevelControlOptionsAttributeCallbackBridge : public MTRCallbackBridge<LevelControlOptionsAttributeCallback>
+{
+public:
+    MTRLevelControlOptionsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<LevelControlOptionsAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRLevelControlOptionsAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<LevelControlOptionsAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions> value);
+};
+
+class MTRLevelControlOptionsAttributeCallbackSubscriptionBridge : public MTRLevelControlOptionsAttributeCallbackBridge
+{
+public:
+    MTRLevelControlOptionsAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              MTRActionBlock action,
+                                                              MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRLevelControlOptionsAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRLevelControlOptionsAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRLevelControlOptionsAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

@@ -177,7 +177,7 @@ public:
             ChipLogError(Discovery, "Failed to set up commissioner responder: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
-    ~AdvertiserMinMdns() override { RemoveServices(); }
+    ~AdvertiserMinMdns() override { ClearServices(); }
 
     // Service advertiser
     CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override;
@@ -281,6 +281,8 @@ private:
     OperationalQueryAllocator::Allocator * FindOperationalAllocator(const FullQName & qname);
     OperationalQueryAllocator::Allocator * FindEmptyOperationalAllocator();
 
+    void ClearServices();
+
     ResponseSender mResponseSender;
     uint8_t mCommissionableInstanceName[sizeof(uint64_t)];
 
@@ -367,6 +369,18 @@ void AdvertiserMinMdns::Shutdown()
 
 CHIP_ERROR AdvertiserMinMdns::RemoveServices()
 {
+    // Send a "goodbye" packet for each RR being removed, as defined in RFC 6762.
+    // This allows mDNS clients to remove stale cached records which may not be re-added with
+    // subsequent Advertise() calls. In the case the same records are re-added, this extra
+    // is not harmful though suboptimal, so this is a subject to improvement in the future.
+    AdvertiseRecords(BroadcastAdvertiseType::kRemovingAll);
+    ClearServices();
+
+    return CHIP_NO_ERROR;
+}
+
+void AdvertiserMinMdns::ClearServices()
+{
     while (mOperationalResponders.begin() != mOperationalResponders.end())
     {
         auto it = mOperationalResponders.begin();
@@ -391,7 +405,6 @@ CHIP_ERROR AdvertiserMinMdns::RemoveServices()
 
     mQueryResponderAllocatorCommissionable.Clear();
     mQueryResponderAllocatorCommissioner.Clear();
-    return CHIP_NO_ERROR;
 }
 
 OperationalQueryAllocator::Allocator * AdvertiserMinMdns::FindOperationalAllocator(const FullQName & qname)
@@ -431,16 +444,10 @@ OperationalQueryAllocator::Allocator * AdvertiserMinMdns::FindEmptyOperationalAl
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters & params)
 {
-
     char nameBuffer[Operational::kInstanceNameMaxLength + 1] = "";
 
     // need to set server name
     ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), params.GetPeerId()));
-
-    // Advertising data changed. Send a TTL=0 for everything as a refresh,
-    // which will clear caches (including things we are about to remove). Once this is done
-    // we will re-advertise available records with a longer TTL again.
-    AdvertiseRecords(BroadcastAdvertiseType::kRemovingAll);
 
     QNamePart nameCheckParts[]  = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
     FullQName nameCheck         = FullQName(nameCheckParts);
@@ -558,11 +565,6 @@ CHIP_ERROR AdvertiserMinMdns::UpdateCommissionableInstanceName()
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & params)
 {
-    // Advertising data changed. Send a TTL=0 for everything as a refresh,
-    // which will clear caches (including things we are about to remove). Once this is done
-    // we will re-advertise available records with a longer TTL again.
-    AdvertiseRecords(BroadcastAdvertiseType::kRemovingAll);
-
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
         mQueryResponderAllocatorCommissionable.Clear();

@@ -182,4 +182,29 @@ void PairingSession::NotifySessionEstablishmentError(CHIP_ERROR error)
     delegate->OnSessionEstablishmentError(error);
 }
 
+void PairingSession::OnSessionReleased()
+{
+    if (mRole == CryptoContext::SessionRole::kInitiator)
+    {
+        NotifySessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
+        return;
+    }
+
+    // Send the error notification async, because our delegate is likely to want
+    // to create a new session to listen for new connection attempts, and doing
+    // that under an OnSessionReleased notification is not safe.
+    if (!mSessionManager)
+    {
+        return;
+    }
+
+    mSessionManager->SystemLayer()->ScheduleWork(
+        [](auto * systemLayer, auto * appState) -> void {
+            ChipLogError(Inet, "ASYNC CASE Session establishment failed");
+            auto * _this = static_cast<PairingSession *>(appState);
+            _this->NotifySessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
+        },
+        this);
+}
+
 } // namespace chip

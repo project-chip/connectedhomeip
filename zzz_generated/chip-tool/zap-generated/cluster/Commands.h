@@ -8521,7 +8521,8 @@ void registerClusterLevelControl(Commands & commands, CredentialIssuerCommands *
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<uint8_t>>(Id, "options", 0, UINT8_MAX, Attributes::Options::Id, credsIssuerConfig),     //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions>>>(
+            Id, "options", 0, UINT8_MAX, Attributes::Options::Id, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "on-off-transition-time", 0, UINT16_MAX, Attributes::OnOffTransitionTime::Id,
                                               credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(Id, "on-level", 0, UINT8_MAX, Attributes::OnLevel::Id,

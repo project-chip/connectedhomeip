@@ -28,7 +28,8 @@ typedef struct
     (rsi_pin_t) { .port = gpioPort##port_id, .pin = pin_id }
 
 #if defined(EFR32MG12_BRD4161A) || defined(BRD4161A) || defined(EFR32MG12_BRD4162A) || defined(BRD4162A) ||                        \
-    defined(EFR32MG12_BRD4163A) || defined(BRD4163A) || defined(EFR32MG12_BRD4164A) || defined(BRD4164A)
+    defined(EFR32MG12_BRD4163A) || defined(BRD4163A) || defined(EFR32MG12_BRD4164A) || defined(BRD4164A) ||                        \
+    defined(EFR32MG12_BRD4170A) || defined(BRD4170A)
 // BRD4161-63-64 are pin to pin compatible for SPI
 #include "brd4161a.h"
 #elif defined(EFR32MG24_BRD4186C) || defined(BRD4186C)

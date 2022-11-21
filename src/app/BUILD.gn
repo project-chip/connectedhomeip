@@ -183,6 +183,7 @@ static_library("app") {
     "WriteHandler.cpp",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
+    "reporting/reporting.h",
   ]
 
   public_deps = [
