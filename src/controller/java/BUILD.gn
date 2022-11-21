@@ -49,7 +49,12 @@ shared_library("jni") {
     "zap-generated/CHIPReadCallbacks.cpp",
     "zap-generated/CHIPReadCallbacks.h",
   ]
-
+  if (build_java_matter_controller) {
+    sources += [
+      "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
+      "${chip_root}/src/controller/ExamplePersistentStorage.h",
+    ]
+  }
   deps = [
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/controller/data_model:java-jni-sources",

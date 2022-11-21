@@ -19,7 +19,7 @@
 #pragma once
 
 #ifdef CONFIG_USE_LOCAL_STORAGE
-#include "../../config/PersistentStorage.h"
+#include <controller/ExamplePersistentStorage.h>
 #endif // CONFIG_USE_LOCAL_STORAGE
 
 #include "../common/CHIPCommand.h"

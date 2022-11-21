@@ -66,6 +66,8 @@ static_library("chip-tool-utils") {
     # TODO - enable CommissionedListCommand once DNS Cache is implemented
     #    "commands/pairing/CommissionedListCommand.cpp",
     #    "commands/pairing/CommissionedListCommand.h",
+    "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
+    "${chip_root}/src/controller/ExamplePersistentStorage.h",
     "commands/pairing/CloseSessionCommand.cpp",
     "commands/pairing/CloseSessionCommand.h",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
@@ -75,7 +77,6 @@ static_library("chip-tool-utils") {
     "commands/payload/SetupPayloadParseCommand.cpp",
     "commands/payload/SetupPayloadVerhoeff.cpp",
     "commands/storage/StorageManagementCommand.cpp",
-    "config/PersistentStorage.cpp",
   ]
 
   deps = []
