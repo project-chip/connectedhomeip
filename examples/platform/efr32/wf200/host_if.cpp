@@ -307,7 +307,7 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
         if (strcmp(scan_ssid, (char *)&scan_result->ssid_def.ssid[0]) != CMP_SUCCESS)
             return;
     }
-    if ((ap = (struct scan_result_holder *)pvPortMalloc(sizeof(*ap))) == (struct scan_result_holder *)0) 
+    if ((ap = (struct scan_result_holder *)pvPortMalloc(sizeof(*ap))) == (struct scan_result_holder *)0)
     {
         EFR32_LOG("*ERR*Scan: No Mem");
     }
@@ -375,7 +375,7 @@ static void sl_wfx_connect_callback(sl_wfx_connect_ind_body_t connect_indication
 {
     uint8_t *mac    = connect_indication_body.mac;
     uint32_t status = connect_indication_body.status;
-    switch (status) 
+    switch (status)
     {
         case WFM_STATUS_SUCCESS: {
             EFR32_LOG("STA-Connected\r\n");
@@ -826,11 +826,11 @@ static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac)
 
         sl_status_t status = sl_wfx_get_signal_strength((uint32_t*)&signal_strength);
 
-        if (status == SL_STATUS_OK) 
+        if (status == SL_STATUS_OK)
         {
             EFR32_LOG("status SL_STATUS_OK & signal_strength:: %d", signal_strength);
             ap->rssi = (signal_strength - 220)/2;
-            
+
         }
         return status;
     }
@@ -846,10 +846,10 @@ static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac)
     {
         int32_t status;
         status = get_all_counters();
-        if (status != SL_STATUS_OK) 
+        if (status != SL_STATUS_OK)
         {
             EFR32_LOG("Failed to get the couters");
-        } 
+        }
         else
         {
             extra_info->beacon_lost_count = counters->body.count_miss_beacon;
@@ -929,7 +929,7 @@ static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac)
         if (request != NULL) {
             sl_wfx_free_command_buffer((sl_wfx_generic_message_t *)request, command_id, SL_WFX_CONTROL_BUFFER);
         }
-        
+
         return result;
     }
 
