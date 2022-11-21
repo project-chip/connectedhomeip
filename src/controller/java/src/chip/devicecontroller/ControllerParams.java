@@ -1,13 +1,9 @@
 package chip.devicecontroller;
 
 import java.util.ArrayList;
-
 import javax.annotation.Nullable;
 
-/**
- * Parameters representing initialization arguments for
- * {@link ChipDeviceController}.
- */
+/** Parameters representing initialization arguments for {@link ChipDeviceController}. */
 public final class ControllerParams {
 
   private final long fabricId;
@@ -17,27 +13,18 @@ public final class ControllerParams {
   private final boolean attemptNetworkScanWiFi;
   private final boolean attemptNetworkScanThread;
   private final boolean skipCommissioningComplete;
-  @Nullable
-  private final KeypairDelegate keypairDelegate;
-  @Nullable
-  private final byte[] rootCertificate;
-  @Nullable
-  private final byte[] intermediateCertificate;
-  @Nullable
-  private final byte[] operationalCertificate;
-  @Nullable
-  private final byte[] ipk;
-  @Nullable
-  private final ArrayList<byte[]> paaCerts;
-  @Nullable
-  private final ArrayList<byte[]> cdCerts;
+  @Nullable private final KeypairDelegate keypairDelegate;
+  @Nullable private final byte[] rootCertificate;
+  @Nullable private final byte[] intermediateCertificate;
+  @Nullable private final byte[] operationalCertificate;
+  @Nullable private final byte[] ipk;
+  @Nullable private final ArrayList<byte[]> paaCerts;
+  @Nullable private final ArrayList<byte[]> cdCerts;
   private final long adminSubject;
 
   private static final int LEGACY_GLOBAL_CHIP_PORT = 5540;
 
-  /**
-   * @param udpListenPort the UDP listening port, or 0 to pick any available port.
-   */
+  /** @param udpListenPort the UDP listening port, or 0 to pick any available port. */
   private ControllerParams(Builder builder) {
     this.fabricId = builder.fabricId;
     this.udpListenPort = builder.udpListenPort;
@@ -123,8 +110,7 @@ public final class ControllerParams {
   }
 
   /**
-   * Returns parameters which uses the provided {@code operationalKeyConfig} as
-   * its operating
+   * Returns parameters which uses the provided {@code operationalKeyConfig} as its operating
    * credentials. You must set a vendor ID, 0xFFF4 is a test vendor ID
    * ControllerParams.newBuilder().setControllerVendorId(0xFFF4).build()
    */
@@ -146,24 +132,16 @@ public final class ControllerParams {
     private boolean attemptNetworkScanWiFi = false;
     private boolean attemptNetworkScanThread = false;
     private boolean skipCommissioningComplete = false;
-    @Nullable
-    private KeypairDelegate keypairDelegate = null;
-    @Nullable
-    private byte[] rootCertificate = null;
-    @Nullable
-    private byte[] intermediateCertificate = null;
-    @Nullable
-    private byte[] operationalCertificate = null;
-    @Nullable
-    private byte[] ipk = null;
-    @Nullable
-    private ArrayList<byte[]> paaCerts;
-    @Nullable
-    private ArrayList<byte[]> cdCerts;
+    @Nullable private KeypairDelegate keypairDelegate = null;
+    @Nullable private byte[] rootCertificate = null;
+    @Nullable private byte[] intermediateCertificate = null;
+    @Nullable private byte[] operationalCertificate = null;
+    @Nullable private byte[] ipk = null;
+    @Nullable private ArrayList<byte[]> paaCerts;
+    @Nullable private ArrayList<byte[]> cdCerts;
     private long adminSubject = 0;
 
-    private Builder() {
-    }
+    private Builder() {}
 
     public Builder setFabricId(long fabricId) {
       if (fabricId < 1) {
@@ -187,15 +165,11 @@ public final class ControllerParams {
     }
 
     /**
-     * Sets the FailsafeTimer duration passed to ChipDeviceCommissioner's
-     * CommissioningParameters.
-     * Increasing this value from its default will allow more time for network
-     * scans, cloud op cert
+     * Sets the FailsafeTimer duration passed to ChipDeviceCommissioner's CommissioningParameters.
+     * Increasing this value from its default will allow more time for network scans, cloud op cert
      * signing calls, and user interaction.
      *
-     * <p>
-     * Note: It is also possible for internal logic (within Autocommissioner, etc)
-     * to re-call
+     * <p>Note: It is also possible for internal logic (within Autocommissioner, etc) to re-call
      * ArmFailSafe to account for network config delays.
      *
      * @param failsafeTimerSeconds
@@ -213,14 +187,10 @@ public final class ControllerParams {
      * Enable/disable wifi network scan during commissioning in the the default
      * CommissioningDelegate used by the ChipDeviceCommissioner.
      *
-     * <p>
-     * Specifically, this sets AttemptWiFiNetworkScan in the CommissioningParameters
-     * passed to
+     * <p>Specifically, this sets AttemptWiFiNetworkScan in the CommissioningParameters passed to
      * the CommissioningDelegate.
      *
-     * <p>
-     * When a WiFi scan is attempted, the result will be propagated to the
-     * ScanNetworksListener
+     * <p>When a WiFi scan is attempted, the result will be propagated to the ScanNetworksListener
      * assigned to the ChipDeviceController.
      *
      * @param attemptNetworkScanWiFi
@@ -235,14 +205,10 @@ public final class ControllerParams {
      * Enable/disable Thread network scan during commissioning in the the default
      * CommissioningDelegate used by the ChipDeviceCommissioner.
      *
-     * <p>
-     * Specifically, this sets AttemptThreadNetworkScan in the
-     * CommissioningParameters passed to
+     * <p>Specifically, this sets AttemptThreadNetworkScan in the CommissioningParameters passed to
      * the CommissioningDelegate.
      *
-     * <p>
-     * When a Thread scan is attempted, the result will be propagated to the
-     * ScanNetworksListener
+     * <p>When a Thread scan is attempted, the result will be propagated to the ScanNetworksListener
      * assigned to the ChipDeviceController.
      *
      * @param attemptNetworkScanWiFi
@@ -254,18 +220,13 @@ public final class ControllerParams {
     }
 
     /**
-     * Disable the CASE phase of commissioning when the CommissioningComplete
-     * command is sent by
+     * Disable the CASE phase of commissioning when the CommissioningComplete command is sent by
      * this ChipDeviceCommissioner.
      *
-     * <p>
-     * Specifically, this sets SkipCommissioningComplete in the
-     * CommissioningParameters passed to
+     * <p>Specifically, this sets SkipCommissioningComplete in the CommissioningParameters passed to
      * the CommissioningDelegate.
      *
-     * <p>
-     * A controller will set this to true when the CASE phase of commissioning is
-     * done by a
+     * <p>A controller will set this to true when the CASE phase of commissioning is done by a
      * separate process, for example, by a Hub on the network.
      *
      * @param skipCommissioningComplete
@@ -302,11 +263,11 @@ public final class ControllerParams {
     }
 
     /**
-     * The Product Attestation Authority certificates that are trusted to sign
-     * device attestation information.
+     * The Product Attestation Authority certificates that are trusted to sign device attestation
+     * information.
      *
-     * @param paaCerts The Product Attestation Authority certificates
-     *                 containing the X.509 DER certificate.
+     * @param paaCerts The Product Attestation Authority certificates containing the X.509 DER
+     *     certificate.
      */
     public Builder setPaaCerts(ArrayList<byte[]> paaCerts) {
       this.paaCerts = paaCerts;
@@ -314,11 +275,10 @@ public final class ControllerParams {
     }
 
     /**
-     * The Certificate Declaration certificates that are trusted to sign
-     * device attestation information.
+     * The Certificate Declaration certificates that are trusted to sign device attestation
+     * information.
      *
-     * @param cdCerts The Certificate Declaration certificates
-     *                containing the X.509 DER certificate.
+     * @param cdCerts The Certificate Declaration certificates containing the X.509 DER certificate.
      */
     public Builder setCdCerts(ArrayList<byte[]> cdCerts) {
       this.cdCerts = cdCerts;
@@ -326,10 +286,8 @@ public final class ControllerParams {
     }
 
     /**
-     * Sets the AdminSubject value passed to ChipDeviceCommissioner's
-     * CommissioningParameters. This
-     * value is passed in the AddNoc command sent to the commissionee and represents
-     * the subject of
+     * Sets the AdminSubject value passed to ChipDeviceCommissioner's CommissioningParameters. This
+     * value is passed in the AddNoc command sent to the commissionee and represents the subject of
      * the default ACL created by that call.
      *
      * @param adminSubject
