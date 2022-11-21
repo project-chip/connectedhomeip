@@ -81,7 +81,7 @@ void InitializeOTARequestor(void)
 
 void TriggerOTAQuery(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
     OTARequestorInterface * requestor = GetRequestorInstance();
 
     if (requestor != nullptr)
