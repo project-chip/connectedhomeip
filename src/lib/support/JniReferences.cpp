@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -145,7 +145,7 @@ void JniReferences::ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * fun
 {
     if (cbErr == CHIP_JNI_ERROR_EXCEPTION_THROWN)
     {
-        ChipLogError(Support, "Java exception thrown in %s", functName);
+        ChipLogError(Support, "Java exception thrown in %s", StringOrNullMarker(functName));
         env->ExceptionDescribe();
     }
     else
@@ -166,7 +166,7 @@ void JniReferences::ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * fun
             errStr = ErrorStr(cbErr);
             break;
         }
-        ChipLogError(Support, "Error in %s : %s", functName, errStr);
+        ChipLogError(Support, "Error in %s : %s", StringOrNullMarker(functName), errStr);
     }
 }
 

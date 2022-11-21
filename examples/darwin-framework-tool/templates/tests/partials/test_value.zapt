@@ -35,9 +35,9 @@
     {{else if (chip_tests_config_has definedValue)}}
       m{{asUpperCamelCase definedValue}}.HasValue() ?
       {{#if (isCharString type)}}
-        m{{asUpperCamelCase definedValue}}.Value() : @"{{chip_tests_config_get_default_value definedValue}}";
+        [[NSString alloc] initWithBytes:m{{asUpperCamelCase definedValue}}.Value().data() length:m{{asUpperCamelCase definedValue}}.Value().size() encoding:NSUTF8StringEncoding] : @"{{chip_tests_config_get_default_value definedValue}}";
       {{else if (isOctetString type)}}
-        {{> octetStringValue value=(chip_tests_config_get_default_value definedValue)}};
+        [NSData dataWithBytes:m{{asUpperCamelCase definedValue}}.Value().data() length:m{{asUpperCamelCase definedValue}}.Value().size()] : {{> octetStringValue value=(chip_tests_config_get_default_value definedValue)}};
       {{else}}
         [NSNumber numberWith{{asObjectiveCNumberType definedValue type false}}:m{{asUpperCamelCase definedValue}}.Value()] :
         [NSNumber numberWith{{asObjectiveCNumberType definedValue type false}}:{{asTypedExpressionFromObjectiveC (chip_tests_config_get_default_value definedValue) type}}];

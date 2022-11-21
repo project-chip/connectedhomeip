@@ -18,6 +18,7 @@
 #import "CastingServerBridge.h"
 #import "CastingServer.h"
 
+#import "CommissionableDataProviderImpl.hpp"
 #import "ConversionUtils.hpp"
 #import "MatterCallbacks.h"
 #import "OnboardingPayload.h"
@@ -29,14 +30,17 @@
 #include <lib/support/CHIPListUtils.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
-#include <platform/TestOnlyCommissionableDataProvider.h>
 
 @interface CastingServerBridge ()
 
-// queue used to serialize all work performed by the CastingServerBridge
-@property (atomic, readonly) dispatch_queue_t chipWorkQueue;
+@property AppParameters * appParameters;
 
 @property OnboardingPayload * _Nonnull onboardingPayload;
+
+@property chip::DeviceLayer::CommissionableDataProviderImpl * commissionableDataProvider;
+
+// queue used to serialize all work performed by the CastingServerBridge
+@property (atomic) dispatch_queue_t chipWorkQueue;
 
 @property void (^_Nonnull commissioningCompleteCallback)(bool);
 
@@ -87,45 +91,12 @@
             return nil;
         }
 
-        chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
-        uint32_t defaultTestPasscode = 0;
-        VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupPasscode(defaultTestPasscode) == CHIP_NO_ERROR);
-        uint16_t defaultTestSetupDiscriminator = 0;
-        VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupDiscriminator(defaultTestSetupDiscriminator) == CHIP_NO_ERROR);
-        _onboardingPayload = [[OnboardingPayload alloc] initWithSetupPasscode:defaultTestPasscode
-                                                           setupDiscriminator:defaultTestSetupDiscriminator];
-
-        // Initialize device attestation config
-        SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
-
-        // Initialize device attestation verifier from a constant version
-        {
-            // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
-            const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-            SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
-        }
-
-        // init app Server
-        static chip::CommonCaseDeviceServerInitParams initParams;
-        err = initParams.InitializeStaticResourcesBeforeServerInit();
-        if (err != CHIP_NO_ERROR) {
-            ChipLogError(AppServer, "InitializeStaticResourcesBeforeServerInit failed: %s", ErrorStr(err));
-            return nil;
-        }
-        err = chip::Server::GetInstance().Init(initParams);
-        if (err != CHIP_NO_ERROR) {
-            ChipLogError(AppServer, "chip::Server init failed: %s", ErrorStr(err));
-            return nil;
-        }
-
-        _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
-
         _commandResponseCallbacks = [NSMutableDictionary dictionary];
         _subscriptionEstablishedCallbacks = [NSMutableDictionary dictionary];
         _subscriptionReadSuccessCallbacks = [NSMutableDictionary dictionary];
         _subscriptionReadFailureCallbacks = [NSMutableDictionary dictionary];
-
-        chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
+        _readSuccessCallbacks = [NSMutableDictionary dictionary];
+        _readFailureCallbacks = [NSMutableDictionary dictionary];
     }
     return self;
 }
@@ -136,12 +107,82 @@
 {
     ChipLogProgress(AppServer, "CastingServerBridge().initApp() called");
 
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    _commissionableDataProvider = new chip::DeviceLayer::CommissionableDataProviderImpl();
+    _appParameters = appParameters;
+    AppParams cppAppParams;
+    if (_appParameters != nil) {
+        err = [ConversionUtils convertToCppAppParamsInfoFrom:_appParameters outAppParams:cppAppParams];
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(AppServer, "AppParameters conversion failed: %s", ErrorStr(err));
+            return;
+        }
+
+        // set fields in commissionableDataProvider
+        _commissionableDataProvider->SetSpake2pIterationCount(_appParameters.spake2pIterationCount);
+        if (_appParameters.spake2pSalt != nil) {
+            chip::ByteSpan spake2pSaltSpan
+                = chip::ByteSpan(static_cast<const uint8_t *>(_appParameters.spake2pSalt.bytes), _appParameters.spake2pSalt.length);
+            _commissionableDataProvider->SetSpake2pSalt(spake2pSaltSpan);
+        }
+
+        if (_appParameters.spake2pVerifier != nil) {
+            chip::ByteSpan spake2pVerifierSpan = chip::ByteSpan(
+                static_cast<const uint8_t *>(_appParameters.spake2pVerifier.bytes), _appParameters.spake2pVerifier.length);
+            _commissionableDataProvider->SetSpake2pSalt(spake2pVerifierSpan);
+        }
+
+        if (_appParameters.onboardingPayload != nil) {
+            _commissionableDataProvider->SetSetupPasscode(_appParameters.onboardingPayload.setupPasscode);
+            _commissionableDataProvider->SetSetupDiscriminator(_appParameters.onboardingPayload.setupDiscriminator);
+        }
+
+        uint32_t setupPasscode = 0;
+        uint16_t setupDiscriminator = 0;
+        _commissionableDataProvider->GetSetupPasscode(setupPasscode);
+        _commissionableDataProvider->GetSetupDiscriminator(setupDiscriminator);
+        _onboardingPayload = [[OnboardingPayload alloc] initWithSetupPasscode:setupPasscode setupDiscriminator:setupDiscriminator];
+    }
+    chip::DeviceLayer::SetCommissionableDataProvider(_commissionableDataProvider);
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+
+    // Initialize device attestation verifier from a constant version
+    {
+        // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+        const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+        SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+    }
+
+    // init app Server
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    err = initParams.InitializeStaticResourcesBeforeServerInit();
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(AppServer, "InitializeStaticResourcesBeforeServerInit failed: %s", ErrorStr(err));
+        return;
+    }
+
+    err = chip::Server::GetInstance().Init(initParams);
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(AppServer, "chip::Server init failed: %s", ErrorStr(err));
+        return;
+    }
+
+    _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
+
+    chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
+
     dispatch_async(_chipWorkQueue, ^{
-        bool initAppStatus = true;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        AppParams appParam;
+        if (appParameters != nil) {
+            err = CastingServer::GetInstance()->Init();
+        } else if ((err = [ConversionUtils convertToCppAppParamsInfoFrom:appParameters outAppParams:appParam]) == CHIP_NO_ERROR) {
+            err = CastingServer::GetInstance()->Init(&appParam);
+        }
 
-        AppParams appParams;
-
-        CHIP_ERROR err = CastingServer::GetInstance()->Init();
+        Boolean initAppStatus = true;
         if (err != CHIP_NO_ERROR) {
             ChipLogError(AppServer, "CastingServerBridge().initApp() failed: %" CHIP_ERROR_FORMAT, err.Format());
             initAppStatus = false;
@@ -151,8 +192,6 @@
             initAppStatusHandler(initAppStatus);
         });
     });
-
-    CastingServer::GetInstance()->Init();
 }
 
 - (void)discoverCommissioners:(dispatch_queue_t _Nonnull)clientQueue
@@ -870,7 +909,7 @@
 }
 
 - (void)mediaPlayback_seek:(ContentApp * _Nonnull)contentApp
-                  position:(uint8_t)position
+                  position:(uint64_t)position
           responseCallback:(void (^_Nonnull)(bool))responseCallback
                clientQueue:(dispatch_queue_t _Nonnull)clientQueue
         requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
@@ -1571,7 +1610,7 @@
                 chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType vendorName) {
                 void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
                     objectForKey:@"applicationBasic_subscribeVendorName"];
-                callback([NSString stringWithUTF8String:vendorName.data()]);
+                callback(vendorName.data() != nil ? [NSString stringWithUTF8String:vendorName.data()] : nil);
             },
             [](void * context, CHIP_ERROR err) {
                 void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
@@ -1800,13 +1839,13 @@
             &endpoint, nullptr,
             [](void * context,
                 chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo::DecodableArgType vendorName) {
-                void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"applicationBasic_readVendorName"];
+                void (^callback)(NSString * _Nonnull) =
+                    [[CastingServerBridge getSharedInstance].readSuccessCallbacks objectForKey:@"applicationBasic_readVendorName"];
                 callback([NSString stringWithUTF8String:vendorName.data()]);
             },
             [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"applicationBasic_readVendorName"];
+                void (^callback)(MatterError *) =
+                    [[CastingServerBridge getSharedInstance].readFailureCallbacks objectForKey:@"applicationBasic_readVendorName"];
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             });
         dispatch_async(clientQueue, ^{
@@ -1835,13 +1874,13 @@
         CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadVendorID(
             &endpoint, nullptr,
             [](void * context, chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType vendorID) {
-                void (^callback)(NSNumber * _Nonnull) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"applicationBasic_readVendorID"];
+                void (^callback)(NSNumber * _Nonnull) =
+                    [[CastingServerBridge getSharedInstance].readSuccessCallbacks objectForKey:@"applicationBasic_readVendorID"];
                 callback(@(vendorID));
             },
             [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"applicationBasic_readVendorID"];
+                void (^callback)(MatterError *) =
+                    [[CastingServerBridge getSharedInstance].readFailureCallbacks objectForKey:@"applicationBasic_readVendorID"];
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             });
         dispatch_async(clientQueue, ^{
@@ -1872,12 +1911,12 @@
             &endpoint, nullptr,
             [](void * context,
                 chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableArgType applicationName) {
-                void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].readSuccessCallbacks
                     objectForKey:@"applicationBasic_readApplicationName"];
                 callback([NSString stringWithUTF8String:applicationName.data()]);
             },
             [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].readFailureCallbacks
                     objectForKey:@"applicationBasic_readApplicationName"];
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             });
@@ -1907,13 +1946,13 @@
         CHIP_ERROR err = CastingServer::GetInstance()->ApplicationBasic_ReadProductID(
             &endpoint, nullptr,
             [](void * context, chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType productID) {
-                void (^callback)(uint16_t) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
-                    objectForKey:@"applicationBasic_readProductID"];
+                void (^callback)(uint16_t) =
+                    [[CastingServerBridge getSharedInstance].readSuccessCallbacks objectForKey:@"applicationBasic_readProductID"];
                 callback(productID);
             },
             [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
-                    objectForKey:@"applicationBasic_readProductID"];
+                void (^callback)(MatterError *) =
+                    [[CastingServerBridge getSharedInstance].readFailureCallbacks objectForKey:@"applicationBasic_readProductID"];
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             });
         dispatch_async(clientQueue, ^{
@@ -1945,12 +1984,12 @@
             [](void * context,
                 chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType
                     applicationVersion) {
-                void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].subscriptionReadSuccessCallbacks
+                void (^callback)(NSString * _Nonnull) = [[CastingServerBridge getSharedInstance].readSuccessCallbacks
                     objectForKey:@"applicationBasic_readApplicationVersion"];
                 callback([NSString stringWithUTF8String:applicationVersion.data()]);
             },
             [](void * context, CHIP_ERROR err) {
-                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].subscriptionReadFailureCallbacks
+                void (^callback)(MatterError *) = [[CastingServerBridge getSharedInstance].readFailureCallbacks
                     objectForKey:@"applicationBasic_readApplicationVersion"];
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             });

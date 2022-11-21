@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorde
                 const gchar * value_str = g_variant_get_string(value, nullptr);
                 if (value_str == nullptr)
                     continue;
-                ChipLogProgress(DeviceLayer, "Thread role changed to: %s", value_str);
+                ChipLogProgress(DeviceLayer, "Thread role changed to: %s", StringOrNullMarker(value_str));
                 me->ThreadDevcieRoleChangedHandler(value_str);
             }
         }

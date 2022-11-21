@@ -3569,7 +3569,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRTestClusterClusterSimpleStruct
+@implementation MTRUnitTestingClusterSimpleStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3595,7 +3595,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRTestClusterClusterSimpleStruct alloc] init];
+    auto other = [[MTRUnitTestingClusterSimpleStruct alloc] init];
 
     other.a = self.a;
     other.b = self.b;
@@ -3619,7 +3619,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRTestClusterClusterTestFabricScoped
+@implementation MTRTestClusterClusterSimpleStruct : MTRUnitTestingClusterSimpleStruct
+@end
+
+@implementation MTRUnitTestingClusterTestFabricScoped
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3634,7 +3637,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _fabricSensitiveCharString = @"";
 
-        _fabricSensitiveStruct = [MTRTestClusterClusterSimpleStruct new];
+        _fabricSensitiveStruct = [MTRUnitTestingClusterSimpleStruct new];
 
         _fabricSensitiveInt8uList = [NSArray array];
 
@@ -3645,7 +3648,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRTestClusterClusterTestFabricScoped alloc] init];
+    auto other = [[MTRUnitTestingClusterTestFabricScoped alloc] init];
 
     other.fabricSensitiveInt8u = self.fabricSensitiveInt8u;
     other.optionalFabricSensitiveInt8u = self.optionalFabricSensitiveInt8u;
@@ -3673,7 +3676,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRTestClusterClusterNullablesAndOptionalsStruct
+@implementation MTRTestClusterClusterTestFabricScoped : MTRUnitTestingClusterTestFabricScoped
+@end
+
+@implementation MTRUnitTestingClusterNullablesAndOptionalsStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3707,7 +3713,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRTestClusterClusterNullablesAndOptionalsStruct alloc] init];
+    auto other = [[MTRUnitTestingClusterNullablesAndOptionalsStruct alloc] init];
 
     other.nullableInt = self.nullableInt;
     other.optionalInt = self.optionalInt;
@@ -3739,7 +3745,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRTestClusterClusterNestedStruct
+@implementation MTRTestClusterClusterNullablesAndOptionalsStruct : MTRUnitTestingClusterNullablesAndOptionalsStruct
+@end
+
+@implementation MTRUnitTestingClusterNestedStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3748,14 +3757,14 @@ NS_ASSUME_NONNULL_BEGIN
 
         _b = @(0);
 
-        _c = [MTRTestClusterClusterSimpleStruct new];
+        _c = [MTRUnitTestingClusterSimpleStruct new];
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRTestClusterClusterNestedStruct alloc] init];
+    auto other = [[MTRUnitTestingClusterNestedStruct alloc] init];
 
     other.a = self.a;
     other.b = self.b;
@@ -3773,7 +3782,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRTestClusterClusterNestedStructList
+@implementation MTRTestClusterClusterNestedStruct : MTRUnitTestingClusterNestedStruct
+@end
+
+@implementation MTRUnitTestingClusterNestedStructList
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3782,7 +3794,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _b = @(0);
 
-        _c = [MTRTestClusterClusterSimpleStruct new];
+        _c = [MTRUnitTestingClusterSimpleStruct new];
 
         _d = [NSArray array];
 
@@ -3797,7 +3809,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRTestClusterClusterNestedStructList alloc] init];
+    auto other = [[MTRUnitTestingClusterNestedStructList alloc] init];
 
     other.a = self.a;
     other.b = self.b;
@@ -3819,7 +3831,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRTestClusterClusterDoubleNestedStructList
+@implementation MTRTestClusterClusterNestedStructList : MTRUnitTestingClusterNestedStructList
+@end
+
+@implementation MTRUnitTestingClusterDoubleNestedStructList
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3831,7 +3846,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRTestClusterClusterDoubleNestedStructList alloc] init];
+    auto other = [[MTRUnitTestingClusterDoubleNestedStructList alloc] init];
 
     other.a = self.a;
 
@@ -3846,7 +3861,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRTestClusterClusterTestListStructOctet
+@implementation MTRTestClusterClusterDoubleNestedStructList : MTRUnitTestingClusterDoubleNestedStructList
+@end
+
+@implementation MTRUnitTestingClusterTestListStructOctet
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3860,7 +3878,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRTestClusterClusterTestListStructOctet alloc] init];
+    auto other = [[MTRUnitTestingClusterTestListStructOctet alloc] init];
 
     other.member1 = self.member1;
     other.member2 = self.member2;
@@ -3877,7 +3895,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRTestClusterClusterTestEventEvent
+@implementation MTRTestClusterClusterTestListStructOctet : MTRUnitTestingClusterTestListStructOctet
+@end
+
+@implementation MTRUnitTestingClusterTestEventEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3888,7 +3909,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _arg3 = @(0);
 
-        _arg4 = [MTRTestClusterClusterSimpleStruct new];
+        _arg4 = [MTRUnitTestingClusterSimpleStruct new];
 
         _arg5 = [NSArray array];
 
@@ -3899,7 +3920,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRTestClusterClusterTestEventEvent alloc] init];
+    auto other = [[MTRUnitTestingClusterTestEventEvent alloc] init];
 
     other.arg1 = self.arg1;
     other.arg2 = self.arg2;
@@ -3920,7 +3941,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRTestClusterClusterTestFabricScopedEventEvent
+@implementation MTRTestClusterClusterTestEventEvent : MTRUnitTestingClusterTestEventEvent
+@end
+
+@implementation MTRUnitTestingClusterTestFabricScopedEventEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3932,7 +3956,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRTestClusterClusterTestFabricScopedEventEvent alloc] init];
+    auto other = [[MTRUnitTestingClusterTestFabricScopedEventEvent alloc] init];
 
     other.fabricIndex = self.fabricIndex;
 
@@ -3946,6 +3970,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRTestClusterClusterTestFabricScopedEventEvent : MTRUnitTestingClusterTestFabricScopedEventEvent
 @end
 
 NS_ASSUME_NONNULL_END

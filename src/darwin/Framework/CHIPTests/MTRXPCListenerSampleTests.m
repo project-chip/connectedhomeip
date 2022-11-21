@@ -41,9 +41,6 @@ static uint16_t kTestVendorId = 0xFFF1u;
 // Singleton controller we use.
 static MTRDeviceController * sController = nil;
 
-// Device we use to send speak CASE to the server.
-static MTRBaseDevice * sDevice = nil;
-
 //
 // Sample XPC Listener implementation that directly communicates with local CHIPDevice instance
 //
@@ -65,7 +62,7 @@ static MTRBaseDevice * sDevice = nil;
 @interface MTRDeviceControllerServerSample<MatterDeviceControllerServerProtocol> : NSObject
 @property (nonatomic, readonly, strong) NSString * identifier;
 - (instancetype)initWithClientProxy:(id<MTRDeviceControllerClientProtocol>)proxy
-           attributeCacheDictionary:(NSMutableDictionary<NSNumber *, MTRAttributeCacheContainer *> *)cacheDictionary;
+        clusterStateCacheDictionary:(NSMutableDictionary<NSNumber *, MTRClusterStateCacheContainer *> *)cacheDictionary;
 @end
 
 @interface MTRXPCListenerSample ()
@@ -75,7 +72,8 @@ static MTRBaseDevice * sDevice = nil;
 @property (nonatomic, readonly, strong) NSXPCInterface * clientInterface;
 @property (nonatomic, readonly, strong) NSXPCListener * xpcListener;
 @property (nonatomic, readonly, strong) NSMutableDictionary<NSString *, MTRDeviceControllerServerSample *> * servers;
-@property (nonatomic, readonly, strong) NSMutableDictionary<NSNumber *, MTRAttributeCacheContainer *> * attributeCacheDictionary;
+@property (nonatomic, readonly, strong)
+    NSMutableDictionary<NSNumber *, MTRClusterStateCacheContainer *> * clusterStateCacheDictionary;
 
 @end
 
@@ -87,7 +85,7 @@ static MTRBaseDevice * sDevice = nil;
         _serviceInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRDeviceControllerServerProtocol)];
         _clientInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRDeviceControllerClientProtocol)];
         _servers = [NSMutableDictionary dictionary];
-        _attributeCacheDictionary = [NSMutableDictionary dictionary];
+        _clusterStateCacheDictionary = [NSMutableDictionary dictionary];
         _xpcListener = [NSXPCListener anonymousListener];
         [_xpcListener setDelegate:(id<NSXPCListenerDelegate>) self];
     }
@@ -115,7 +113,7 @@ static MTRBaseDevice * sDevice = nil;
     newConnection.exportedInterface = _serviceInterface;
     newConnection.remoteObjectInterface = _clientInterface;
     __auto_type newServer = [[MTRDeviceControllerServerSample alloc] initWithClientProxy:[newConnection remoteObjectProxy]
-                                                                attributeCacheDictionary:_attributeCacheDictionary];
+                                                             clusterStateCacheDictionary:_clusterStateCacheDictionary];
     newConnection.exportedObject = newServer;
     [_servers setObject:newServer forKey:newServer.identifier];
     newConnection.invalidationHandler = ^{
@@ -130,7 +128,8 @@ static MTRBaseDevice * sDevice = nil;
 
 @interface MTRDeviceControllerServerSample ()
 @property (nonatomic, readwrite, strong) id<MTRDeviceControllerClientProtocol> clientProxy;
-@property (nonatomic, readonly, strong) NSMutableDictionary<NSNumber *, MTRAttributeCacheContainer *> * attributeCacheDictionary;
+@property (nonatomic, readonly, strong)
+    NSMutableDictionary<NSNumber *, MTRClusterStateCacheContainer *> * clusterStateCacheDictionary;
 @end
 
 // This sample does not have multiple controllers and hence controller Id shall be the same.
@@ -139,12 +138,12 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
 @implementation MTRDeviceControllerServerSample
 
 - (instancetype)initWithClientProxy:(id<MTRDeviceControllerClientProtocol>)proxy
-           attributeCacheDictionary:(NSMutableDictionary<NSNumber *, MTRAttributeCacheContainer *> *)cacheDictionary
+        clusterStateCacheDictionary:(NSMutableDictionary<NSNumber *, MTRClusterStateCacheContainer *> *)cacheDictionary
 {
     if ([super init]) {
         _clientProxy = proxy;
         _identifier = [[NSUUID UUID] UUIDString];
-        _attributeCacheDictionary = cacheDictionary;
+        _clusterStateCacheDictionary = cacheDictionary;
     }
     return self;
 }
@@ -173,25 +172,16 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
     (void) controller;
     __auto_type sharedController = sController;
     if (sharedController) {
-        [sharedController
-            getBaseDevice:nodeId
-                    queue:dispatch_get_main_queue()
-               completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                   if (error) {
-                       NSLog(@"Failed to get connected device");
-                       completion(nil, error);
-                   } else {
-                       [device readAttributeWithEndpointId:endpointId
-                                                 clusterId:clusterId
-                                               attributeId:attributeId
-                                                    params:[MTRDeviceController decodeXPCReadParams:params]
-                                               clientQueue:dispatch_get_main_queue()
-                                                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
-                                                    NSError * _Nullable error) {
-                                                    completion([MTRDeviceController encodeXPCResponseValues:values], error);
-                                                }];
-                   }
-               }];
+        __auto_type device = [MTRBaseDevice deviceWithNodeID:@(nodeId) controller:sharedController];
+        [device
+            readAttributesWithEndpointID:endpointId
+                               clusterID:clusterId
+                             attributeID:attributeId
+                                  params:[MTRDeviceController decodeXPCReadParams:params]
+                                   queue:dispatch_get_main_queue()
+                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                  completion([MTRDeviceController encodeXPCResponseValues:values], error);
+                              }];
     } else {
         NSLog(@"Failed to get shared controller");
         completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
@@ -210,27 +200,17 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
     (void) controller;
     __auto_type sharedController = sController;
     if (sharedController) {
-        [sharedController
-            getBaseDevice:nodeId
-                    queue:dispatch_get_main_queue()
-               completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                   if (error) {
-                       NSLog(@"Failed to get connected device");
-                       completion(nil, error);
-                   } else {
-
-                       [device writeAttributeWithEndpointId:endpointId
-                                                  clusterId:clusterId
-                                                attributeId:attributeId
-                                                      value:value
-                                          timedWriteTimeout:timeoutMs
-                                                clientQueue:dispatch_get_main_queue()
-                                                 completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
-                                                     NSError * _Nullable error) {
-                                                     completion([MTRDeviceController encodeXPCResponseValues:values], error);
-                                                 }];
-                   }
-               }];
+        __auto_type device = [MTRBaseDevice deviceWithNodeID:@(nodeId) controller:sharedController];
+        [device
+            writeAttributeWithEndpointID:endpointId
+                               clusterID:clusterId
+                             attributeID:attributeId
+                                   value:value
+                       timedWriteTimeout:timeoutMs
+                                   queue:dispatch_get_main_queue()
+                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                  completion([MTRDeviceController encodeXPCResponseValues:values], error);
+                              }];
     } else {
         NSLog(@"Failed to get shared controller");
         completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
@@ -249,26 +229,17 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
     (void) controller;
     __auto_type sharedController = sController;
     if (sharedController) {
-        [sharedController
-            getBaseDevice:nodeId
-                    queue:dispatch_get_main_queue()
-               completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                   if (error) {
-                       NSLog(@"Failed to get connected device");
-                       completion(nil, error);
-                   } else {
-                       [device invokeCommandWithEndpointId:endpointId
-                                                 clusterId:clusterId
-                                                 commandId:commandId
-                                             commandFields:fields
-                                        timedInvokeTimeout:nil
-                                               clientQueue:dispatch_get_main_queue()
-                                                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
-                                                    NSError * _Nullable error) {
-                                                    completion([MTRDeviceController encodeXPCResponseValues:values], error);
-                                                }];
-                   }
-               }];
+        __auto_type device = [MTRBaseDevice deviceWithNodeID:@(nodeId) controller:sharedController];
+        [device
+            invokeCommandWithEndpointID:endpointId
+                              clusterID:clusterId
+                              commandID:commandId
+                          commandFields:fields
+                     timedInvokeTimeout:nil
+                                  queue:dispatch_get_main_queue()
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 completion([MTRDeviceController encodeXPCResponseValues:values], error);
+                             }];
     } else {
         NSLog(@"Failed to get shared controller");
         completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
@@ -287,48 +258,28 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
 {
     __auto_type sharedController = sController;
     if (sharedController) {
-        [sharedController
-            getBaseDevice:nodeId
-                    queue:dispatch_get_main_queue()
-               completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                   if (error) {
-                       NSLog(@"Failed to get connected device");
-                       establishedHandler();
-                       // Send an error report so that the client knows of the failure
-                       [self.clientProxy handleReportWithController:controller
-                                                             nodeId:nodeId
-                                                             values:nil
-                                                              error:[NSError errorWithDomain:MTRErrorDomain
-                                                                                        code:MTRErrorCodeGeneralError
-                                                                                    userInfo:nil]];
-                   } else {
-                       __auto_type * subscriptionParams = [MTRDeviceController decodeXPCSubscribeParams:params];
-                       if (subscriptionParams == nil) {
-                           subscriptionParams = [[MTRSubscribeParams alloc] initWithMinInterval:minInterval
-                                                                                    maxInterval:maxInterval];
-                       } else {
-                           subscriptionParams.minInterval = minInterval;
-                           subscriptionParams.maxInterval = maxInterval;
-                       }
-                       [device subscribeAttributeWithEndpointId:endpointId
-                                                      clusterId:clusterId
-                                                    attributeId:attributeId
-                                                    minInterval:minInterval
-                                                    maxInterval:maxInterval
-                                                         params:subscriptionParams
-                                                    clientQueue:dispatch_get_main_queue()
-                                                  reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
-                                                      NSError * _Nullable error) {
-                                                      [self.clientProxy
-                                                          handleReportWithController:controller
-                                                                              nodeId:nodeId
-                                                                              values:[MTRDeviceController
-                                                                                         encodeXPCResponseValues:values]
-                                                                               error:error];
-                                                  }
-                                        subscriptionEstablished:establishedHandler];
-                   }
-               }];
+        __auto_type * subscriptionParams = [MTRDeviceController decodeXPCSubscribeParams:params];
+        if (subscriptionParams == nil) {
+            subscriptionParams = [[MTRSubscribeParams alloc] initWithMinInterval:minInterval maxInterval:maxInterval];
+        } else {
+            subscriptionParams.minInterval = minInterval;
+            subscriptionParams.maxInterval = maxInterval;
+        }
+        __auto_type device = [MTRBaseDevice deviceWithNodeID:@(nodeId) controller:sharedController];
+        [device subscribeToAttributesWithEndpointID:endpointId
+                                          clusterID:clusterId
+                                        attributeID:attributeId
+                                             params:subscriptionParams
+                                              queue:dispatch_get_main_queue()
+                                      reportHandler:^(
+                                          NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                          [self.clientProxy
+                                              handleReportWithController:controller
+                                                                  nodeId:nodeId
+                                                                  values:[MTRDeviceController encodeXPCResponseValues:values]
+                                                                   error:error];
+                                      }
+                            subscriptionEstablished:establishedHandler];
     } else {
         NSLog(@"Failed to get shared controller");
         establishedHandler();
@@ -346,16 +297,8 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
 {
     __auto_type sharedController = sController;
     if (sharedController) {
-        [sharedController getBaseDevice:nodeId
-                                  queue:dispatch_get_main_queue()
-                             completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                                 if (error) {
-                                     NSLog(@"Failed to get connected device");
-                                 } else {
-                                     [device deregisterReportHandlersWithClientQueue:dispatch_get_main_queue()
-                                                                          completion:completion];
-                                 }
-                             }];
+        __auto_type device = [MTRBaseDevice deviceWithNodeID:@(nodeId) controller:sharedController];
+        [device deregisterReportHandlersWithQueue:dispatch_get_main_queue() completion:completion];
     } else {
         NSLog(@"Failed to get shared controller");
         completion();
@@ -372,55 +315,46 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
 {
     __auto_type sharedController = sController;
     if (sharedController) {
-        MTRAttributeCacheContainer * attributeCacheContainer;
+        MTRClusterStateCacheContainer * clusterStateCacheContainer;
         if (shouldCache) {
-            attributeCacheContainer = [[MTRAttributeCacheContainer alloc] init];
+            clusterStateCacheContainer = [[MTRClusterStateCacheContainer alloc] init];
         }
 
-        [sharedController getBaseDevice:nodeId
-                                  queue:dispatch_get_main_queue()
-                      completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                          if (error) {
-                              NSLog(@"Error: Failed to get connected device (%llu) for attribute cache: %@", nodeId, error);
-                              completion(error);
-                              return;
-                          }
-                          NSMutableArray * established = [NSMutableArray arrayWithCapacity:1];
-                          [established addObject:@NO];
-                          __auto_type * subscriptionParams = [MTRDeviceController decodeXPCSubscribeParams:params];
-                          if (subscriptionParams == nil) {
-                              subscriptionParams = [[MTRSubscribeParams alloc] initWithMinInterval:minInterval
-                                                                                       maxInterval:maxInterval];
-                          } else {
-                              subscriptionParams.minInterval = minInterval;
-                              subscriptionParams.maxInterval = maxInterval;
-                          }
-                          [device subscribeWithQueue:dispatch_get_main_queue()
-                              params:subscriptionParams
-                              attributeCacheContainer:attributeCacheContainer
-                              attributeReportHandler:^(NSArray * value) {
-                                  NSLog(@"Received report: %@", value);
-                              }
-                              eventReportHandler:nil
-                              errorHandler:^(NSError * error) {
-                                  NSLog(@"Received report error: %@", error);
-                                  if (![established[0] boolValue]) {
-                                      established[0] = @YES;
-                                      completion(error);
-                                  }
-                              }
-                              subscriptionEstablished:^() {
-                                  NSLog(@"Attribute cache subscription succeeded for device %llu", nodeId);
-                                  if (attributeCacheContainer) {
-                                      [self.attributeCacheDictionary setObject:attributeCacheContainer forKey:@(nodeId)];
-                                  }
-                                  if (![established[0] boolValue]) {
-                                      established[0] = @YES;
-                                      completion(nil);
-                                  }
-                              }
-                              resubscriptionScheduled:nil];
-                      }];
+        __auto_type device = [MTRBaseDevice deviceWithNodeID:@(nodeId) controller:sharedController];
+        NSMutableArray * established = [NSMutableArray arrayWithCapacity:1];
+        [established addObject:@NO];
+        __auto_type * subscriptionParams = [MTRDeviceController decodeXPCSubscribeParams:params];
+        if (subscriptionParams == nil) {
+            subscriptionParams = [[MTRSubscribeParams alloc] initWithMinInterval:minInterval maxInterval:maxInterval];
+        } else {
+            subscriptionParams.minInterval = minInterval;
+            subscriptionParams.maxInterval = maxInterval;
+        }
+        [device subscribeWithQueue:dispatch_get_main_queue()
+            params:subscriptionParams
+            clusterStateCacheContainer:clusterStateCacheContainer
+            attributeReportHandler:^(NSArray * value) {
+                NSLog(@"Received report: %@", value);
+            }
+            eventReportHandler:nil
+            errorHandler:^(NSError * error) {
+                NSLog(@"Received report error: %@", error);
+                if (![established[0] boolValue]) {
+                    established[0] = @YES;
+                    completion(error);
+                }
+            }
+            subscriptionEstablished:^() {
+                NSLog(@"Attribute cache subscription succeeded for device %llu", nodeId);
+                if (clusterStateCacheContainer) {
+                    [self.clusterStateCacheDictionary setObject:clusterStateCacheContainer forKey:@(nodeId)];
+                }
+                if (![established[0] boolValue]) {
+                    established[0] = @YES;
+                    completion(nil);
+                }
+            }
+            resubscriptionScheduled:nil];
     } else {
         NSLog(@"Failed to get shared controller");
         completion([NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
@@ -434,16 +368,17 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
                              attributeId:(NSNumber * _Nullable)attributeId
                               completion:(MTRValuesHandler)completion
 {
-    MTRAttributeCacheContainer * attributeCacheContainer = _attributeCacheDictionary[[NSNumber numberWithUnsignedLongLong:nodeId]];
-    if (attributeCacheContainer) {
-        [attributeCacheContainer
-            readAttributeWithEndpointID:endpointId
-                              clusterID:clusterId
-                            attributeID:attributeId
-                                  queue:dispatch_get_main_queue()
-                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                 completion([MTRDeviceController encodeXPCResponseValues:values], error);
-                             }];
+    MTRClusterStateCacheContainer * clusterStateCacheContainer
+        = _clusterStateCacheDictionary[[NSNumber numberWithUnsignedLongLong:nodeId]];
+    if (clusterStateCacheContainer) {
+        [clusterStateCacheContainer
+            readAttributesWithEndpointID:endpointId
+                               clusterID:clusterId
+                             attributeID:attributeId
+                                   queue:dispatch_get_main_queue()
+                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                  completion([MTRDeviceController encodeXPCResponseValues:values], error);
+                              }];
     } else {
         NSLog(@"Attribute cache for node ID %llu was not setup", nodeId);
         completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
@@ -453,7 +388,6 @@ static NSString * const MTRDeviceControllerId = @"MTRController";
 @end
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
-static const uint16_t kCASESetupTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId = 0x12344321;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
@@ -471,11 +405,11 @@ static MTRBaseDevice * GetConnectedDevice(void)
     return mConnectedDevice;
 }
 
-@interface MTRRemoteDeviceSampleTestPairingDelegate : NSObject <MTRDevicePairingDelegate>
+@interface MTRRemoteDeviceSampleTestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
 @end
 
-@implementation MTRRemoteDeviceSampleTestPairingDelegate
+@implementation MTRRemoteDeviceSampleTestDeviceControllerDelegate
 - (id)initWithExpectation:(XCTestExpectation *)expectation
 {
     self = [super init];
@@ -485,17 +419,19 @@ static MTRBaseDevice * GetConnectedDevice(void)
     return self;
 }
 
-- (void)onPairingComplete:(NSError *)error
+- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError *)error
 {
     XCTAssertEqual(error.code, 0);
     NSError * commissionError = nil;
-    [sController commissionDevice:kDeviceId commissioningParams:[[MTRCommissioningParameters alloc] init] error:&commissionError];
+    [sController commissionNodeWithID:@(kDeviceId)
+                  commissioningParams:[[MTRCommissioningParameters alloc] init]
+                                error:&commissionError];
     XCTAssertNil(commissionError);
 
-    // Keep waiting for onCommissioningComplete
+    // Keep waiting for controller:commissioningComplete
 }
 
-- (void)onCommissioningComplete:(NSError *)error
+- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error
 {
     XCTAssertEqual(error.code, 0);
     [_expectation fulfill];
@@ -528,36 +464,36 @@ static MTRBaseDevice * GetConnectedDevice(void)
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
 
-    __auto_type * factory = [MTRControllerFactory sharedInstance];
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
     __auto_type * storage = [[MTRTestStorage alloc] init];
-    __auto_type * factoryParams = [[MTRControllerFactoryParams alloc] initWithStorage:storage];
+    __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
     factoryParams.port = @(kLocalPort);
 
-    BOOL ok = [factory startup:factoryParams];
+    NSError * error;
+    BOOL ok = [factory startControllerFactory:factoryParams error:&error];
     XCTAssertTrue(ok);
+    XCTAssertNil(error);
 
     __auto_type * testKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(testKeys);
 
-    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys
-                                                                                   fabricID:@(1)
-                                                                                        ipk:testKeys.ipk];
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:testKeys.ipk fabricID:@(1) nocSigner:testKeys];
     params.vendorID = @(kTestVendorId);
 
-    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory createControllerOnNewFabric:params error:&error];
     XCTAssertNotNil(controller);
+    XCTAssertNil(error);
 
     sController = controller;
 
-    MTRRemoteDeviceSampleTestPairingDelegate * pairing =
-        [[MTRRemoteDeviceSampleTestPairingDelegate alloc] initWithExpectation:expectation];
-    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
+    MTRRemoteDeviceSampleTestDeviceControllerDelegate * deviceControllerDelegate =
+        [[MTRRemoteDeviceSampleTestDeviceControllerDelegate alloc] initWithExpectation:expectation];
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.device_controller_delegate", DISPATCH_QUEUE_SERIAL);
 
-    [controller setPairingDelegate:pairing queue:callbackQueue];
+    [controller setDeviceControllerDelegate:deviceControllerDelegate queue:callbackQueue];
 
-    NSError * error;
     __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload error:&error];
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
@@ -566,17 +502,6 @@ static MTRBaseDevice * GetConnectedDevice(void)
     XCTAssertNil(error);
 
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
-
-    __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
-    [controller getBaseDevice:kDeviceId
-                        queue:dispatch_get_main_queue()
-                   completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                       XCTAssertEqual(error.code, 0);
-                       sDevice = device;
-                       [connectionExpectation fulfill];
-                       connectionExpectation = nil;
-                   }];
-    [self waitForExpectationsWithTimeout:kCASESetupTimeoutInSeconds handler:nil];
 
     mSampleListener = [[MTRXPCListenerSample alloc] init];
     [mSampleListener start];
@@ -593,16 +518,13 @@ static MTRBaseDevice * GetConnectedDevice(void)
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 
-    [[MTRControllerFactory sharedInstance] shutdown];
+    [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
 
     mDeviceController = nil;
 }
 
 - (void)waitForCommissionee
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
-
-    dispatch_queue_t queue = dispatch_get_main_queue();
     __auto_type remoteController = [MTRDeviceController
         sharedControllerWithID:MTRDeviceControllerId
                xpcConnectBlock:^NSXPCConnection * _Nonnull {
@@ -612,13 +534,7 @@ static MTRBaseDevice * GetConnectedDevice(void)
                    NSLog(@"Listener is not active");
                    return nil;
                }];
-    [remoteController getBaseDevice:kDeviceId
-                              queue:queue
-                         completion:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                             mConnectedDevice = device;
-                             [expectation fulfill];
-                         }];
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+    mConnectedDevice = [MTRBaseDevice deviceWithNodeID:@(kDeviceId) controller:remoteController];
     mDeviceController = remoteController;
 }
 
@@ -1781,7 +1697,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     sleep(1);
 }
 
-- (void)test900_SubscribeAttributeCache
+- (void)test900_SubscribeClusterStateCache
 {
 #if MANUAL_INDIVIDUAL_TEST
     [self initStack];
@@ -1792,12 +1708,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    MTRAttributeCacheContainer * attributeCacheContainer = [[MTRAttributeCacheContainer alloc] init];
+    MTRClusterStateCacheContainer * clusterStateCacheContainer = [[MTRClusterStateCacheContainer alloc] init];
     NSLog(@"Setting up attribute cache subscription...");
     __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(60)];
     [device subscribeWithQueue:queue
         params:params
-        attributeCacheContainer:attributeCacheContainer
+        clusterStateCacheContainer:clusterStateCacheContainer
         attributeReportHandler:^(NSArray * value) {
             NSLog(@"Report for attribute cache: %@", value);
         }
@@ -1880,28 +1796,28 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     sleep(1);
     NSLog(@"Reading from attribute cache...");
     expectation = [self expectationWithDescription:@"Cache read"];
-    [attributeCacheContainer
-        readAttributeWithEndpointID:@1
-                          clusterID:@6
-                        attributeID:@0
-                              queue:queue
-                         completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                             NSLog(@"Cached attribute read: %@, error: %@", values, error);
-                             XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
-                             XCTAssertEqual([values count], 1);
-                             for (NSDictionary<NSString *, id> * value in values) {
-                                 XCTAssertTrue([value isKindOfClass:[NSDictionary class]]);
-                                 NSDictionary * result = value;
-                                 MTRAttributePath * path = result[@"attributePath"];
-                                 XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
-                                 XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
-                                 XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
-                                 XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
-                                 XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
-                                 XCTAssertEqual([result[@"data"][@"value"] boolValue], YES);
-                             }
-                             [expectation fulfill];
-                         }];
+    [clusterStateCacheContainer
+        readAttributesWithEndpointID:@1
+                           clusterID:@6
+                         attributeID:@0
+                               queue:queue
+                          completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                              NSLog(@"Cached attribute read: %@, error: %@", values, error);
+                              XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+                              XCTAssertEqual([values count], 1);
+                              for (NSDictionary<NSString *, id> * value in values) {
+                                  XCTAssertTrue([value isKindOfClass:[NSDictionary class]]);
+                                  NSDictionary * result = value;
+                                  MTRAttributePath * path = result[@"attributePath"];
+                                  XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                                  XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
+                                  XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
+                                  XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+                                  XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
+                                  XCTAssertEqual([result[@"data"][@"value"] boolValue], YES);
+                              }
+                              [expectation fulfill];
+                          }];
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
 }
 
@@ -1910,7 +1826,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 {
     // Put the device back in the state we found it: open commissioning window, no fabrics commissioned.
     dispatch_queue_t queue = dispatch_get_main_queue();
-    MTRBaseDevice * device = sDevice;
+    __auto_type device = [MTRBaseDevice deviceWithNodeID:@(kDeviceId) controller:sController];
 
     // Get our current fabric index, for later deletion.
     XCTestExpectation * readFabricIndexExpectation = [self expectationWithDescription:@"Fabric index read"];

@@ -1133,7 +1133,7 @@
 #define ZCL_RMS_VOLTAGE_SAG_PERIOD_PHASE_C_ATTRIBUTE_ID (0x0A16)
 #define ZCL_RMS_VOLTAGE_SWELL_PERIOD_PHASE_C_ATTRIBUTE_ID (0x0A17)
 
-// Attribute ids for cluster: Test Cluster
+// Attribute ids for cluster: Unit Testing
 
 // Client attributes
 

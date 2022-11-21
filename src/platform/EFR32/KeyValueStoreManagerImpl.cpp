@@ -144,6 +144,11 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         *read_bytes_size = outLen;
     }
 
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    }
+
     return err;
 }
 

@@ -867,7 +867,7 @@ class ChipDeviceController():
                               timeout value based on transport characteristics as well as the responsiveness of the target.
 
         E.g
-            (1, Clusters.TestCluster.Attributes.XYZAttribute('hello')) -- Write 'hello' to the XYZ attribute on the test cluster to endpoint 1
+            (1, Clusters.UnitTesting.Attributes.XYZAttribute('hello')) -- Write 'hello' to the XYZ attribute on the test cluster to endpoint 1
         '''
         self.CheckIsActive()
 

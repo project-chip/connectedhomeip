@@ -13,20 +13,23 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
+import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/config/android/config.gni")
 
 javac_runner = "${chip_root}/build/chip/java/javac_runner.py"
 jar_runner = "${chip_root}/build/chip/java/jar_runner.py"
 write_build_config = "${chip_root}/build/chip/java/write_build_config.py"
 
-assert(android_sdk_root != "", "android_sdk_root must be specified")
+assert(android_sdk_root != "" || build_java_matter_controller,
+       "android_sdk_root or java_path must be specified")
 
 # Declare a java library target
 #
 #   sources: List of .java files included in this library. Mutually exclusive with jar_path.
 #
 #   jar_path: A path to an existing JAR. Mutually exclusive with sources.
+#
+#   deps: List of dependent .jar files needed by this library.
 #
 #   output_name: File name for the output .jar (not including extension).
 #     Defaults to the input .jar file name.
@@ -183,6 +186,8 @@ template("java_library") {
 #   sources: List of .java files included in this binary. Mutually exclusive with jar_path.
 #
 #   jar_path: A path to an existing JAR. Mutually exclusive with sources.
+#
+#   deps: List of dependent .jar files needed by this binary.
 #
 #   output_name: File name for the output binary under root_build_dir/bin.
 #

@@ -1091,7 +1091,7 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace ElectricalMeasurement
 
-namespace TestCluster {
+namespace UnitTesting {
 namespace Commands {
 
 namespace Test {
@@ -1231,7 +1231,7 @@ static constexpr CommandId Id = 0x00000015;
 } // namespace TestEmitTestFabricScopedEventRequest
 
 } // namespace Commands
-} // namespace TestCluster
+} // namespace UnitTesting
 
 namespace FaultInjection {
 namespace Commands {

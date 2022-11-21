@@ -22,6 +22,9 @@
 #include "FreeRTOS.h"
 #include <platform/CHIPDeviceLayer.h>
 
+#define BLE_STACK_TASK_NAME "Bluetooth stack"
+#define BLE_LINK_TASK_NAME "Bluetooth linklayer"
+
 static StackType_t monitoringStack[MONITORING_STACK_SIZE_byte / sizeof(StackType_t)];
 static StaticTask_t monitoringTaskStruct;
 

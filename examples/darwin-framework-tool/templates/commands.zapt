@@ -225,6 +225,9 @@ public:
         if (mFabricFiltered.HasValue()) {
           params.filterByFabric = mFabricFiltered.Value();
         }
+        if (mAutoResubscribe.HasValue()) {
+          params.resubscribeIfLost = mAutoResubscribe.Value();
+        }
         [cluster subscribe{{>attribute}}WithParams:params
                                 subscriptionEstablished:^(){ mSubscriptionEstablished=YES; }
                                 reportHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {

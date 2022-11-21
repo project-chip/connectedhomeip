@@ -147,7 +147,7 @@ Status BekenWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Mutabl
 
 CHIP_ERROR BekenWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
-    ChipLogProgress(NetworkProvisioning, "BekenWiFiDriver::ConnectWiFiNetwork....ssid:%s", ssid);
+    ChipLogProgress(NetworkProvisioning, "BekenWiFiDriver::ConnectWiFiNetwork....ssid:%s", StringOrNullMarker(ssid));
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
 
     wifi_sta_config_t sta_config;

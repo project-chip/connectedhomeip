@@ -28,10 +28,10 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.05
+            image: connectedhomeip/chip-build:0.6.06
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.15
+            - uses: Wandalen/wretry.action@v1.0.36
               if: ${{ !env.ACT }}
               name: Checkout
               with:
@@ -103,6 +103,8 @@ jobs:
                      if [ "$idl_file" = "./scripts/idl/tests/inputs/optional_argument.matter" ]; then continue; fi
                      if [ "$idl_file" = "./scripts/idl/tests/inputs/several_clusters.matter" ]; then continue; fi
                      if [ "$idl_file" = "./scripts/idl/tests/inputs/simple_attribute.matter" ]; then continue; fi
+                     if [ "$idl_file" = "./scripts/idl/tests/inputs/large_lighting_app.matter" ]; then continue; fi
+                     if [ "$idl_file" = "./scripts/idl/tests/inputs/large_all_clusters_app.matter" ]; then continue; fi
 
                      ./scripts/run_in_build_env.sh "./scripts/idl_lint.py --log-level warn $idl_file" >/dev/null || exit 1
                  done

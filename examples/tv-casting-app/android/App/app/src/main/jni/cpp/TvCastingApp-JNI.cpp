@@ -52,10 +52,10 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     return AndroidAppServerJNI_OnUnload(jvm, reserved);
 }
 
-JNI_METHOD(jboolean, init)(JNIEnv *, jobject, jobject jAppParameters)
+JNI_METHOD(jboolean, initJni)(JNIEnv *, jobject, jobject jAppParameters)
 {
     chip::DeviceLayer::StackLock lock;
-    ChipLogProgress(AppServer, "JNI_METHOD init called");
+    ChipLogProgress(AppServer, "JNI_METHOD initJni called");
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (jAppParameters == nullptr)
@@ -1358,7 +1358,7 @@ JNI_METHOD(jboolean, targetNavigator_1navigateTarget)
 
     ChipLogProgress(AppServer, "JNI_METHOD targetNavigator_navigateTarget called");
 
-    const char * nativeData = env->GetStringUTFChars(data, 0);
+    const char * nativeData = (data != nullptr ? env->GetStringUTFChars(data, 0) : nullptr);
 
     TargetEndpointInfo endpoint;
     CHIP_ERROR err = convertJContentAppToTargetEndpointInfo(contentApp, endpoint);
@@ -1371,12 +1371,16 @@ JNI_METHOD(jboolean, targetNavigator_1navigateTarget)
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->TargetNavigator_NavigateTarget(
-        &endpoint, static_cast<uint8_t>(target), chip::MakeOptional(CharSpan::fromCharString(nativeData)),
+        &endpoint, static_cast<uint8_t>(target),
+        (nativeData != nullptr ? chip::MakeOptional(CharSpan::fromCharString(nativeData)) : chip::NullOptional),
         [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(TargetNavigator_NavigateTarget).Handle(err); });
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "CastingServer.TargetNavigator_NavigateTarget failed %" CHIP_ERROR_FORMAT, err.Format()));
 
-    env->ReleaseStringUTFChars(data, nativeData);
+    if (nativeData != nullptr)
+    {
+        env->ReleaseStringUTFChars(data, nativeData);
+    }
 exit:
     if (err != CHIP_NO_ERROR)
     {

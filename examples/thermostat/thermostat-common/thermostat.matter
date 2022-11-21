@@ -1436,6 +1436,16 @@ server cluster Thermostat = 513 {
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
 }
 
+server cluster ThermostatUserInterfaceConfiguration = 516 {
+  attribute enum8 temperatureDisplayMode = 0;
+  attribute access(write: manage) enum8 keypadLockout = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 endpoint 0 {
   device type rootdevice = 22;
   binding cluster OtaSoftwareUpdateProvider;
@@ -1743,29 +1753,13 @@ endpoint 1 {
     ram      attribute clusterRevision default = 4;
   }
 
-  server cluster Basic {
-    callback attribute dataModelRevision default = 10;
-    callback attribute vendorName;
-    callback attribute vendorID;
-    callback attribute productName;
-    callback attribute productID;
-    persist  attribute nodeLabel;
-    callback attribute location default = "XX";
-    callback attribute hardwareVersion;
-    callback attribute hardwareVersionString;
-    callback attribute softwareVersion;
-    callback attribute softwareVersionString;
-    callback attribute manufacturingDate default = "20210614123456ZZ";
-    callback attribute partNumber;
-    callback attribute productURL;
-    callback attribute productLabel;
-    callback attribute serialNumber;
-    persist  attribute localConfigDisabled;
-    ram      attribute reachable default = 1;
-    callback attribute uniqueID;
-    callback attribute capabilityMinima;
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
     ram      attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster Thermostat {
@@ -1774,20 +1768,30 @@ endpoint 1 {
     ram      attribute absMaxHeatSetpointLimit default = 3000;
     ram      attribute absMinCoolSetpointLimit default = 1600;
     ram      attribute absMaxCoolSetpointLimit default = 3200;
-    ram      attribute occupiedCoolingSetpoint default = 0x0A28;
-    ram      attribute occupiedHeatingSetpoint default = 0x07D0;
+    persist  attribute occupiedCoolingSetpoint default = 0x0A28;
+    persist  attribute occupiedHeatingSetpoint default = 0x07D0;
     ram      attribute minHeatSetpointLimit default = 700;
     ram      attribute maxHeatSetpointLimit default = 3000;
     ram      attribute minCoolSetpointLimit default = 1600;
     ram      attribute maxCoolSetpointLimit default = 3200;
     ram      attribute minSetpointDeadBand default = 0x19;
     ram      attribute controlSequenceOfOperation default = 0x04;
-    ram      attribute systemMode default = 0x01;
+    persist  attribute systemMode default = 0x01;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x23;
     ram      attribute clusterRevision default = 5;
+  }
+
+  server cluster ThermostatUserInterfaceConfiguration {
+    ram      attribute temperatureDisplayMode;
+    ram      attribute keypadLockout;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 1;
   }
 }
 
