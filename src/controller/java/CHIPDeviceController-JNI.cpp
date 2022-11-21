@@ -611,7 +611,7 @@ JNI_METHOD(void, continueCommissioning)
                                                                  : chip::Credentials::AttestationVerificationResult::kSuccess;
     chip::DeviceProxy * deviceProxy = reinterpret_cast<chip::DeviceProxy *>(devicePtr);
     err                             = wrapper->Controller()->ContinueCommissioningAfterDeviceAttestation(
-                                    deviceProxy, ignoreAttestationFailure ? chip::Credentials::AttestationVerificationResult::kSuccess : lastAttestationResult);
+        deviceProxy, ignoreAttestationFailure ? chip::Credentials::AttestationVerificationResult::kSuccess : lastAttestationResult);
 
     if (err != CHIP_NO_ERROR)
     {
