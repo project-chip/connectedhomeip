@@ -117,6 +117,10 @@ extern "C" {
 #include "sl_component_catalog.h"
 #endif
 
+#if SL_SYSTEM_VIEW
+#include "SEGGER_SYSVIEW_FreeRTOS.h"
+#endif
+
 /*-----------------------------------------------------------
  * Application specific definitions.
  *
