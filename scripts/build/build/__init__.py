@@ -25,7 +25,8 @@ class Context:
         self.completed_steps = set()
 
     def SetupBuilders(self, targets: Sequence[str],
-                      enable_flashbundle: bool):
+                      enable_flashbundle: bool,
+                      pw_command_launcher: str):
         """
         Configures internal builders for the given platform/board/app
         combination.
@@ -35,7 +36,9 @@ class Context:
         for target in targets:
             found = False
             for choice in BUILD_TARGETS:
-                builder = choice.Create(target, self.runner, self.repository_path, self.output_prefix, enable_flashbundle)
+                builder = choice.Create(
+                    target, self.runner, self.repository_path, self.output_prefix,
+                    enable_flashbundle, pw_command_launcher)
                 if builder:
                     self.builders.append(builder)
                     found = True

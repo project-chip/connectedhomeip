@@ -60,7 +60,10 @@ class GnBuilder(Builder):
             '--root=%s' % self.root
         ]
 
-        extra_args = self.GnBuildArgs()
+        extra_args = []
+        if self.pw_command_launcher:
+            extra_args.append('pw_command_launcher="%s"' % self.pw_command_launcher)
+        extra_args.extend(self.GnBuildArgs() or [])
         if extra_args:
             cmd += ['--args=%s' % ' '.join(extra_args)]
 

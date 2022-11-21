@@ -22,8 +22,8 @@ from abc import ABC, abstractmethod
 class Builder(ABC):
     """Generic builder base class for CHIP.
 
-    Provides ability to boostrap and copy output artifacts and subclasses can use
-    a generic shell runner.
+    Provides ability to bootstrap and copy output artifacts and subclasses can
+    use a generic shell runner.
 
     """
 
@@ -35,6 +35,9 @@ class Builder(ABC):
         # Set post-init once actual build target is known
         self.identifier = None
         self.output_dir = None
+
+        # Allow to override the default build command
+        self.pw_command_launcher = None
 
     def enable_flashbundle(self, enable_flashbundle: bool):
         self._enable_flashbundle = enable_flashbundle

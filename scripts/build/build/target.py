@@ -330,7 +330,7 @@ class BuildTarget:
         return _StringIntoParts(value, suffix, self.fixed_targets, self.modifiers)
 
     def Create(self, name: str, runner, repository_path: str, output_prefix: str,
-               enable_flashbundle: bool):
+               enable_flashbundle: bool, pw_command_launcher: str):
 
         parts = self.StringIntoTargetParts(name)
 
@@ -349,5 +349,6 @@ class BuildTarget:
         builder.output_dir = os.path.join(output_prefix, name)
         builder.chip_dir = repository_path
         builder.enable_flashbundle(enable_flashbundle)
+        builder.pw_command_launcher = pw_command_launcher
 
         return builder
