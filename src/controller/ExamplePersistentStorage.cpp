@@ -15,7 +15,7 @@
  *   limitations under the License.
  *
  */
-#include "PersistentStorage.h"
+#include "ExamplePersistentStorage.h"
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/IniEscaping.h>

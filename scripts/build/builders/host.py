@@ -363,31 +363,6 @@ class HostBuilder(GnBuilder):
         else:
             raise Exception('Unknown host board type: %r' % self)
 
-    def copyToExampleApp(self, jnilibs_dir, libs_dir, libs, jars):
-        self._Execute(
-            ["mkdir", "-p", jnilibs_dir], title="Prepare Native libs " + self.identifier
-        )
-
-        for libName in libs:
-            self._Execute(
-                [
-                    "cp",
-                    os.path.join(
-                        self.output_dir, "lib", "jni", self.board.AbiName(), libName
-                    ),
-                    os.path.join(jnilibs_dir, libName),
-                ]
-            )
-
-        for jarName in jars.keys():
-            self._Execute(
-                [
-                    "cp",
-                    os.path.join(self.output_dir, "lib", jars[jarName]),
-                    os.path.join(libs_dir, jarName),
-                ]
-            )
-
     def createJavaExecutable(self, java_program):
         self._Execute(
             [
@@ -442,32 +417,6 @@ class HostBuilder(GnBuilder):
                            '--exclude', os.path.join(self.chip_dir, 'third_party/*'),
                            '--exclude', '/usr/include/*',
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
-            if self.app.exampleName == "java-matter-controller" and 'JAVA_PATH' in os.environ:
-                jnilibs_dir = os.path.join(
-                    self.root,
-                    "examples/",
-                    self.app.ExampleName(),
-                    "app/libs/jniLibs",
-                    self.board.AbiName(),
-                )
-
-                libs_dir = os.path.join(
-                    self.root, "examples/", self.app.ExampleName(), "app/libs"
-                )
-
-                libs = [
-                    "libSetupPayloadParser.so",
-                    "libCHIPController.so",
-                    "libc++_shared.so",
-                ]
-
-                jars = {
-                    "CHIPController.jar": "third_party/connectedhomeip/src/controller/java/CHIPController.jar",
-                    "SetupPayloadParser.jar": "third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar",
-                }
-
-                self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
-                self.createJavaExecutable("java-matter-controller")
 
     def PostBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
@@ -482,6 +431,9 @@ class HostBuilder(GnBuilder):
                            ], title="Final coverage info")
             self._Execute(['genhtml', os.path.join(self.coverage_dir, 'lcov_final.info'), '--output-directory',
                            os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
+
+        if self.app == HostApp.JAVA_MATTER_CONTROLLER:
+            self.createJavaExecutable("java-matter-controller")
 
     def build_outputs(self):
         outputs = {}
