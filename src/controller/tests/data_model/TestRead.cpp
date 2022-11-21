@@ -50,14 +50,14 @@ bool expectedAttribute1                     = true;
 int16_t expectedAttribute2                  = 42;
 uint64_t expectedAttribute3                 = 0xdeadbeef0000cafe;
 uint8_t expectedAttribute4[256]             = {
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
 };
 
 enum ResponseDirective
@@ -2699,10 +2699,31 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
     chip::Optional<chip::DataVersion> dataVersion(1);
     for (size_t i = 0; i < (app::InteractionModelEngine::kReadHandlerPoolSize + 1); i++)
     {
-        NL_TEST_ASSERT(apSuite,
-                       Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-                           &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
-                           onSubscriptionEstablishedCb, nullptr, false, true, dataVersion) == CHIP_NO_ERROR);
+        Controller::detail::ReportAttributeParams<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::DecodableType>
+            params(sessionHandle);
+
+        params.mOnReportCb                  = onSuccessCb;
+        params.mOnErrorCb                   = onFailureCb;
+        params.mOnSubscriptionEstablishedCb = onSubscriptionEstablishedCb;
+        params.mOnResubscriptionAttemptCb   = nullptr;
+        params.mOnDoneCb                    = nullptr;
+        params.mMinIntervalFloorSeconds     = 0;
+        params.mMaxIntervalCeilingSeconds   = 10;
+        params.mReportType                  = app::ReadClient::InteractionType::Subscribe;
+        params.mKeepSubscriptions           = true;
+        params.mIsFabricFiltered            = false;
+
+        // Increase timeout, so that slow versions (specifically gcc_debug) does not time out.
+        params.mTimeout = chip::System::Clock::Seconds16(15);
+
+        CHIP_ERROR err =
+            Controller::detail::ReportAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::DecodableType>(
+                &ctx.GetExchangeManager(), kTestEndpointId,
+                Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::GetClusterId(),
+                Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::GetAttributeId(), std::move(params),
+                dataVersion);
+
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }
 
     // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
