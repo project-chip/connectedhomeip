@@ -61,7 +61,7 @@ StaticSemaphore_t xEthernetIfSemaBuffer;
 
 #define LWIP_FRAME_ALIGNMENT 60
 
-uint32_t overrun_count=0;
+uint32_t overrun_count = 0;
 
 /*****************************************************************************
  * Variables
@@ -171,14 +171,14 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
         if (netif->input(p, netif) != ERR_OK)
         {
             overrun_count++;
-            EFR32_LOG("overrun count entering when fail to alloc value %d",overrun_count);
+            EFR32_LOG("overrun count entering when fail to alloc value %d", overrun_count);
             pbuf_free(p);
         }
     }
     else
     {
-            overrun_count++;
-            EFR32_LOG("overrun count entering when fail to alloc value %d",overrun_count);
+        overrun_count++;
+        EFR32_LOG("overrun count entering when fail to alloc value %d", overrun_count);
     }
 }
 
@@ -227,7 +227,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     {
         EFR32_LOG("*ERR*EN-Out: No mem frame len=%d", framelength);
         overrun_count++;
-        EFR32_LOG ("overrun count exiting when faied to alloc value %d",overrun_count);
+        EFR32_LOG("overrun count exiting when faied to alloc value %d", overrun_count);
         return ERR_MEM;
     }
     buffer = tx_buffer->body.packet_data;
