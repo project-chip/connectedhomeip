@@ -40,7 +40,7 @@ logger = logging.getLogger('YamlParser')
 
 
 @dataclass
-class _CommonObjects:
+class _ReferenceObjects:
     # Data model lookup to get python attribute, cluster, command object.
     data_model_lookup: DataModelLookup = None
     # Where various test action response are stored and loaded from.
@@ -50,8 +50,8 @@ class _CommonObjects:
 
 
 class _ConstraintValue:
-    def __init__(self, value, field_type, common_objects: _CommonObjects):
-        self._response_storage = common_objects.response_storage
+    def __init__(self, value, field_type, reference_objects: _ReferenceObjects):
+        self._response_storage = reference_objects.response_storage
         self._load_expected_response_key = None
         self._value = None
 
@@ -63,7 +63,7 @@ class _ConstraintValue:
             self._load_expected_response_key = value
         else:
             self._value = Converter.convert_yaml_type(
-                value, field_type, common_objects.config_values)
+                value, field_type, reference_objects.config_values)
 
     def get_value(self):
         if self._load_expected_response_key:
@@ -72,21 +72,21 @@ class _ConstraintValue:
 
 
 class _Constraints:
-    def __init__(self, constraints: dict, field_type, common_objects: _CommonObjects):
-        self._response_storage = common_objects.response_storage
+    def __init__(self, constraints: dict, field_type, reference_objects: _ReferenceObjects):
+        self._response_storage = reference_objects.response_storage
         self._has_value = constraints.get('hasValue')
         self._type = constraints.get('type')
         self._starts_with = constraints.get('startsWith')
         self._ends_with = constraints.get('endsWith')
         self._is_upper_case = constraints.get('isUpperCase')
         self._is_lower_case = constraints.get('isLowerCase')
-        self._min_value = _ConstraintValue(constraints.get('minValue'), field_type, common_objects)
-        self._max_value = _ConstraintValue(constraints.get('maxValue'), field_type, common_objects)
+        self._min_value = _ConstraintValue(constraints.get('minValue'), field_type, reference_objects)
+        self._max_value = _ConstraintValue(constraints.get('maxValue'), field_type, reference_objects)
         self._contains = constraints.get('contains')
         self._excludes = constraints.get('excludes')
         self._has_masks_set = constraints.get('hasMasksSet')
         self._has_masks_clear = constraints.get('hasMasksClear')
-        self._not_value = _ConstraintValue(constraints.get('notValue'), field_type, common_objects)
+        self._not_value = _ConstraintValue(constraints.get('notValue'), field_type, reference_objects)
 
     def are_constrains_met(self, response) -> bool:
         return_value = True
@@ -160,13 +160,13 @@ class BaseAction(ABC):
 class InvokeAction(BaseAction):
     '''Single invoke action to be executed including validation of response.'''
 
-    def __init__(self, item: dict, cluster: str, common_objects: _CommonObjects):
+    def __init__(self, item: dict, cluster: str, reference_objects: _ReferenceObjects):
         '''Parse cluster invoke from yaml test configuration.
 
         Args:
           'item': Dictionary containing single invoke to be parsed.
           'cluster': Name of cluster which to invoke action is targeting.
-          'common_objects': Contains global common objects such has data model lookup, storage
+          'reference_objects': Contains global common objects such has data model lookup, storage
             for device responses and top level test configurations variable.
         Raises:
           ParsingError: Raised if there is a benign error, and there is currently no
@@ -180,7 +180,7 @@ class InvokeAction(BaseAction):
         self._expected_raw_response: dict = field(default_factory=dict)
         self._expected_response_object = None
 
-        command = common_objects.data_model_lookup.get_command(self._cluster, self._command_name)
+        command = reference_objects.data_model_lookup.get_command(self._cluster, self._command_name)
 
         if command is None:
             raise ParsingError(
@@ -194,7 +194,7 @@ class InvokeAction(BaseAction):
 
             try:
                 request_data = Converter.convert_yaml_type(
-                    request_data_as_dict, type(command_object), common_objects.config_values)
+                    request_data_as_dict, type(command_object), reference_objects.config_values)
             except ValueError:
                 raise ParsingError('Could not covert yaml type')
 
@@ -209,13 +209,13 @@ class InvokeAction(BaseAction):
                 self._expected_raw_response is not None and
                 self._expected_raw_response.get('values')):
             response_type = stringcase.pascalcase(self._request_object.response_type)
-            expected_command = common_objects.data_model_lookup.get_command(self._cluster,
-                                                                            response_type)
+            expected_command = reference_objects.data_model_lookup.get_command(self._cluster,
+                                                                               response_type)
             expected_response_args = self._expected_raw_response['values']
             expected_response_data_as_dict = Converter.convert_name_value_pair_to_dict(
                 expected_response_args)
             expected_response_data = Converter.convert_yaml_type(
-                expected_response_data_as_dict, expected_command, common_objects.config_values)
+                expected_response_data_as_dict, expected_command, reference_objects.config_values)
             self._expected_response_object = expected_command.FromDict(expected_response_data)
 
     def run_action(self, dev_ctrl: ChipDeviceCtrl, endpoint: int, node_id: int):
@@ -240,13 +240,13 @@ class InvokeAction(BaseAction):
 class ReadAttributeAction(BaseAction):
     '''Single read attribute action to be executed including validation.'''
 
-    def __init__(self, item: dict, cluster: str, common_objects: _CommonObjects):
+    def __init__(self, item: dict, cluster: str, reference_objects: _ReferenceObjects):
         '''Parse read attribute action from yaml test configuration.
 
         Args:
           'item': Dictionary contains single read attribute action to be parsed.
           'cluster': Name of cluster read attribute action is targeting.
-          'common_objects': Contains global common objects such has data model lookup, storage
+          'reference_objects': Contains global common objects such has data model lookup, storage
             for device responses and top level test configurations variable.
         Raises:
           ParsingError: Raised if there is a benign error, and there is currently no
@@ -263,16 +263,16 @@ class ReadAttributeAction(BaseAction):
         self._expected_raw_response: dict = field(default_factory=dict)
         self._expected_response_object: None = None
         self._possibly_unsupported = False
-        self._response_storage = common_objects.response_storage
+        self._response_storage = reference_objects.response_storage
         self._save_response_key = None
 
-        self._cluster_object = common_objects.data_model_lookup.get_cluster(self._cluster)
+        self._cluster_object = reference_objects.data_model_lookup.get_cluster(self._cluster)
         if self._cluster_object is None:
             raise UnexpectedParsingError(
                 f'ReadAttribute failed to find cluster object:{self._cluster}')
 
-        self._request_object = common_objects.data_model_lookup.get_attribute(self._cluster,
-                                                                              self._attribute_name)
+        self._request_object = reference_objects.data_model_lookup.get_attribute(self._cluster,
+                                                                                 self._attribute_name)
         if self._request_object is None:
             raise ParsingError(
                 f'ReadAttribute failed to find cluster:{self._cluster} '
@@ -311,13 +311,13 @@ class ReadAttributeAction(BaseAction):
             else:
                 self._expected_response_data = Converter.convert_yaml_type(
                     expected_response_value, self._expected_response_object,
-                    common_objects.config_values, use_from_dict=True)
+                    reference_objects.config_values, use_from_dict=True)
 
         constraints = self._expected_raw_response.get('constraints')
         if constraints:
             self._constraints = _Constraints(constraints,
                                              self._request_object.attribute_type.Type,
-                                             common_objects)
+                                             reference_objects)
 
     def run_action(self, dev_ctrl: ChipDeviceCtrl, endpoint: int, node_id: int):
         try:
@@ -364,13 +364,13 @@ class ReadAttributeAction(BaseAction):
 class WriteAttributeAction(BaseAction):
     '''Single write attribute action to be executed including validation.'''
 
-    def __init__(self, item: dict, cluster: str, common_objects: _CommonObjects):
+    def __init__(self, item: dict, cluster: str, reference_objects: _ReferenceObjects):
         '''Parse write attribute action from yaml test configuration.
 
         Args:
           'item': Dictionary contains single write attribute action to be parsed.
           'cluster': Name of cluster write attribute action is targeting.
-          'common_objects': Contains global common objects such has data model lookup, storage
+          'reference_objects': Contains global common objects such has data model lookup, storage
             for device responses and top level test configurations variable.
         Raises:
           ParsingError: Raised if there is a benign error, and there is currently no
@@ -382,7 +382,7 @@ class WriteAttributeAction(BaseAction):
         self._cluster = cluster
         self._request_object = None
 
-        attribute = common_objects.data_model_lookup.get_attribute(
+        attribute = reference_objects.data_model_lookup.get_attribute(
             self._cluster, self._attribute_name)
         if attribute is None:
             raise ParsingError(
@@ -393,7 +393,7 @@ class WriteAttributeAction(BaseAction):
             args = item['arguments']['value']
             try:
                 request_data = Converter.convert_yaml_type(
-                    args, attribute.attribute_type.Type, common_objects.config_values)
+                    args, attribute.attribute_type.Type, reference_objects.config_values)
             except ValueError:
                 raise ParsingError('Could not covert yaml type')
 
@@ -438,14 +438,14 @@ class YamlTestParser:
         self._config.setdefault('nodeId', _NODE_ID_DEFAULT)
         self._config.setdefault('endpoint', _ENDPOINT_DETAULT)
         self._config.setdefault('cluster', _CLUSTER_DEFAULT)
-        # TODO timeout is still not used
+        # TODO timeout is currently not used
         self._config.setdefault('timeout', _TIMEOUT_DEFAULT)
 
         self._config['cluster'] = self._config['cluster'].replace(' ', '').replace('/', '')
         self._base_action_test_list = []
-        self._common_objects = _CommonObjects(data_model_lookup=PreDefinedDataModelLookup(),
-                                              response_storage=ResponseStorage(),
-                                              config_values=self._config)
+        self._reference_objects = _ReferenceObjects(data_model_lookup=PreDefinedDataModelLookup(),
+                                                    response_storage=ResponseStorage(),
+                                                    config_values=self._config)
 
         for item in self._raw_data['tests']:
             # This currently behaves differently than the c++ version. We are evaluating if test
@@ -483,7 +483,7 @@ class YamlTestParser:
           None if 'item' was not parsed for a known reason that is not fatal.
         '''
         try:
-            return InvokeAction(item, cluster, self._common_objects)
+            return InvokeAction(item, cluster, self._reference_objects)
         except ParsingError:
             return None
 
@@ -498,7 +498,7 @@ class YamlTestParser:
           None if 'item' was not parsed for a known reason that is not fatal.
         '''
         try:
-            return ReadAttributeAction(item, cluster, self._common_objects)
+            return ReadAttributeAction(item, cluster, self._reference_objects)
         except ParsingError:
             return None
 
@@ -513,13 +513,13 @@ class YamlTestParser:
           None if 'item' was not parsed for a known reason that is not fatal.
         '''
         try:
-            return WriteAttributeAction(item, cluster, self._common_objects)
+            return WriteAttributeAction(item, cluster, self._reference_objects)
         except ParsingError:
             return None
 
     def execute_tests(self, dev_ctrl: ChipDeviceCtrl):
         '''Executes parsed YAML tests.'''
-        self._common_objects.response_storage.clear()
+        self._reference_objects.response_storage.clear()
         for idx, action in enumerate(self._base_action_test_list):
             logger.info(f'test: {idx} -- Executing{action.label}')
 
