@@ -58,6 +58,8 @@ class InstalledScriptInfo:
 
 # Make sure wheel is not considered pure and avoid shared libraries in purelib
 # folder.
+
+
 class BinaryDistribution(Distribution):
     def has_ext_modules(foo):
         return True
