@@ -1,9 +1,11 @@
 ARG VERSION=latest
 FROM connectedhomeip/chip-build:${VERSION}
 
-RUN set -x \
-    && pip install bflb-iot-tool \
-    && apt-get update \
-    && apt-get install -fy \
-    vim \
-    && : # last line
+RUN apt update -y \
+ && apt clean \
+ && pip3 install bflb-iot-tool
+
+COPY setup.sh /tmp
+
+RUN cd /tmp \
+ && bash setup.sh
