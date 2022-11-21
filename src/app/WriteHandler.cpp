@@ -554,9 +554,8 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     err = writeRequestParser.Init(reader);
     SuccessOrExit(err);
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    err = writeRequestParser.CheckSchemaValidity();
-    SuccessOrExit(err);
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    writeRequestParser.PrettyPrint();
 #endif
     err = writeRequestParser.GetSuppressResponse(&mSuppressResponse);
     if (err == CHIP_END_OF_TLV)

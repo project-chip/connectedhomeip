@@ -369,17 +369,23 @@ CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
 
 CHIP_ERROR ConfigurationManagerImpl::GetRegulatoryLocation(uint8_t & location)
 {
-    uint32_t value = 0;
+    uint32_t value;
 
-    CHIP_ERROR err = ReadConfigValue(PosixConfig::kConfigKey_RegulatoryLocation, value);
-
-    if (err == CHIP_NO_ERROR)
+    if (CHIP_NO_ERROR != ReadConfigValue(PosixConfig::kConfigKey_RegulatoryLocation, value))
     {
-        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        ReturnErrorOnFailure(GetLocationCapability(location));
+
+        if (CHIP_NO_ERROR != StoreRegulatoryLocation(location))
+        {
+            ChipLogError(DeviceLayer, "Failed to store RegulatoryLocation");
+        }
+    }
+    else
+    {
         location = static_cast<uint8_t>(value);
     }
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)

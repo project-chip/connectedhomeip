@@ -347,8 +347,8 @@ class AttributeCache:
         cluster and attribute IDs, but instead by the cluster object descriptor types for each of those generated
         cluster objects.
 
-            E.g Clusters.TestCluster is the literal key for indexing the test cluster.
-                Clusters.TestCluster.Attributes.Int16u is the listeral key for indexing an attribute in the test cluster.
+            E.g Clusters.UnitTesting.is the literal key for indexing the test cluster.
+                Clusters.UnitTesting.Attributes.Int16u is the listeral key for indexing an attribute in the test cluster.
 
         This strongly typed keys permit a more natural and safer form of indexing.
     '''

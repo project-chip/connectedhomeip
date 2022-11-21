@@ -13,7 +13,6 @@ include(${prj_root}/GCC-RELEASE/project_hp/asdk/includepath.cmake)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/zzz_generated/ota-requestor-app/zap-generated/callback-stub.cpp
     ${chip_dir}/zzz_generated/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
 
     ${chip_dir}/examples/ota-requestor-app/ameba/main/chipinterface.cpp

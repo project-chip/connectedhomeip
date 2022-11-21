@@ -11,7 +11,7 @@
 		3C4E53B028E4F28100F293E8 /* MediaPlaybackTypes.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C4E53AF28E4F28100F293E8 /* MediaPlaybackTypes.mm */; };
 		3C4E53B228E5184C00F293E8 /* TargetNavigatorTypes.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C4E53B128E5184C00F293E8 /* TargetNavigatorTypes.mm */; };
 		3C4E53B628E5595A00F293E8 /* ContentLauncherTypes.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C4E53B528E5595A00F293E8 /* ContentLauncherTypes.mm */; };
-		3C66FBFC290327BB00B63FE7 /* AppParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C66FBFB290327BB00B63FE7 /* AppParameters.m */; };
+		3C66FBFC290327BB00B63FE7 /* AppParameters.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C66FBFB290327BB00B63FE7 /* AppParameters.mm */; };
 		3C81C74C28F7A777001CB9D1 /* ContentApp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3C81C74B28F7A777001CB9D1 /* ContentApp.mm */; };
 		3C81C75028F7A7D3001CB9D1 /* VideoPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C81C74F28F7A7D3001CB9D1 /* VideoPlayer.m */; };
 		3CCB87212869085400771BAD /* MatterTvCastingBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CCB87202869085400771BAD /* MatterTvCastingBridge.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -27,6 +27,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3C0D9CDF2920A30C00D3332B /* CommissionableDataProviderImpl.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CommissionableDataProviderImpl.hpp; sourceTree = "<group>"; };
 		3C4AE64E286A7D40005B52A4 /* OnboardingPayload.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OnboardingPayload.h; sourceTree = "<group>"; };
 		3C4AE64F286A7D4D005B52A4 /* OnboardingPayload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OnboardingPayload.m; sourceTree = "<group>"; };
 		3C4E53AF28E4F28100F293E8 /* MediaPlaybackTypes.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MediaPlaybackTypes.mm; sourceTree = "<group>"; };
@@ -35,7 +36,7 @@
 		3C4E53B428E5593700F293E8 /* ContentLauncherTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ContentLauncherTypes.h; sourceTree = "<group>"; };
 		3C4E53B528E5595A00F293E8 /* ContentLauncherTypes.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ContentLauncherTypes.mm; sourceTree = "<group>"; };
 		3C66FBFA2903279A00B63FE7 /* AppParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppParameters.h; sourceTree = "<group>"; };
-		3C66FBFB290327BB00B63FE7 /* AppParameters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppParameters.m; sourceTree = "<group>"; };
+		3C66FBFB290327BB00B63FE7 /* AppParameters.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppParameters.mm; sourceTree = "<group>"; };
 		3C81C74B28F7A777001CB9D1 /* ContentApp.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ContentApp.mm; sourceTree = "<group>"; };
 		3C81C74E28F7A7AE001CB9D1 /* ContentApp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ContentApp.h; sourceTree = "<group>"; };
 		3C81C74F28F7A7D3001CB9D1 /* VideoPlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VideoPlayer.m; sourceTree = "<group>"; };
@@ -93,7 +94,7 @@
 				3CCB873A286A593700771BAD /* CastingServerBridge.h */,
 				3CCB873D286A593700771BAD /* CastingServerBridge.mm */,
 				3C66FBFA2903279A00B63FE7 /* AppParameters.h */,
-				3C66FBFB290327BB00B63FE7 /* AppParameters.m */,
+				3C66FBFB290327BB00B63FE7 /* AppParameters.mm */,
 				3CCB873B286A593700771BAD /* DiscoveredNodeData.h */,
 				3CCB8739286A593700771BAD /* DiscoveredNodeData.mm */,
 				3CCB873C286A593700771BAD /* ConversionUtils.hpp */,
@@ -112,6 +113,7 @@
 				3C4E53AF28E4F28100F293E8 /* MediaPlaybackTypes.mm */,
 				3C4E53B328E5185F00F293E8 /* TargetNavigatorTypes.h */,
 				3C4E53B128E5184C00F293E8 /* TargetNavigatorTypes.mm */,
+				3C0D9CDF2920A30C00D3332B /* CommissionableDataProviderImpl.hpp */,
 			);
 			path = MatterTvCastingBridge;
 			sourceTree = "<group>";
@@ -226,7 +228,7 @@
 				3C81C75028F7A7D3001CB9D1 /* VideoPlayer.m in Sources */,
 				3CCB8744286A593700771BAD /* ConversionUtils.mm in Sources */,
 				3C4E53B028E4F28100F293E8 /* MediaPlaybackTypes.mm in Sources */,
-				3C66FBFC290327BB00B63FE7 /* AppParameters.m in Sources */,
+				3C66FBFC290327BB00B63FE7 /* AppParameters.mm in Sources */,
 				3CCB873F286A593700771BAD /* DiscoveredNodeData.mm in Sources */,
 				3C81C74C28F7A777001CB9D1 /* ContentApp.mm in Sources */,
 				3C4AE650286A7D4D005B52A4 /* OnboardingPayload.m in Sources */,

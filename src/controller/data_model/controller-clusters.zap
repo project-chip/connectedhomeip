@@ -17763,7 +17763,7 @@
           ]
         },
         {
-          "name": "Test Cluster",
+          "name": "Unit Testing",
           "code": 4294048773,
           "mfgCode": null,
           "define": "TEST_CLUSTER",
@@ -17951,7 +17951,7 @@
           ]
         },
         {
-          "name": "Test Cluster",
+          "name": "Unit Testing",
           "code": 4294048773,
           "mfgCode": null,
           "define": "TEST_CLUSTER",

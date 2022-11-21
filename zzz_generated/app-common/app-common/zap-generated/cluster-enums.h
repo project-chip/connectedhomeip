@@ -222,6 +222,13 @@ enum class LevelControlFeature : uint32_t
     kLighting  = 0x2,
     kFrequency = 0x4,
 };
+
+// Bitmap for LevelControlOptions
+enum class LevelControlOptions : uint8_t
+{
+    kExecuteIfOff           = 0x1,
+    kCoupleColorTempToLevel = 0x2,
+};
 } // namespace LevelControl
 
 namespace BinaryInputBasic {
@@ -2266,7 +2273,7 @@ namespace AccountLogin {
 namespace ElectricalMeasurement {
 } // namespace ElectricalMeasurement
 
-namespace TestCluster {
+namespace UnitTesting {
 
 // Enum for SimpleEnum
 enum class SimpleEnum : uint8_t
@@ -2321,7 +2328,7 @@ enum class SimpleBitmap : uint8_t
     kValueB = 0x2,
     kValueC = 0x4,
 };
-} // namespace TestCluster
+} // namespace UnitTesting
 
 namespace FaultInjection {
 

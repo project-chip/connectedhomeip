@@ -774,7 +774,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * devName)
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 
-    if (devName == NULL && devName[0] == 0)
+    if (devName == NULL || devName[0] == 0)
     {
         ChipLogError(DeviceLayer, "Invalid name");
 

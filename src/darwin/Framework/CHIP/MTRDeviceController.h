@@ -29,6 +29,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 @class MTRCommissioningParameters;
 @class MTRSetupPayload;
 @protocol MTRDevicePairingDelegate;
+@protocol MTRDeviceControllerDelegate;
 
 @interface MTRDeviceController : NSObject
 
@@ -57,9 +58,9 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * provided discriminator.
  *
  * Then a PASE session will be established with the device, unless an error
- * occurs.  MTRDevicePairingDelegate will be notified as follows:
+ * occurs.  MTRDeviceControllerDelegate will be notified as follows:
  *
- * * Discovery fails: onStatusUpdate with MTRPairingStatusFailed.
+ * * Discovery fails: onStatusUpdate with MTRCommissioningStatusFailed.
  *
  * * Discovery succeeds but commissioning session setup fails: onPairingComplete
  *   with an error.
@@ -108,13 +109,13 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
- * Set the Delegate for the Device Pairing  as well as the Queue on which the Delegate callbacks will be triggered
+ * Set the Delegate for the device controller  as well as the Queue on which the Delegate callbacks will be triggered
  *
- * @param[in] delegate The delegate the pairing process should use
+ * @param[in] delegate The delegate the commissioning process should use
  *
  * @param[in] queue The queue on which the callbacks will be delivered
  */
-- (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
+- (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue MTR_NEWLY_AVAILABLE;
 
 /**
  * Sets this MTRDeviceController to use the given issuer for issuing operational certs. By default, the MTRDeviceController uses an
@@ -216,6 +217,9 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
                               iterations:(uint32_t)iterations
                                     salt:(NSData *)salt
     MTR_NEWLY_DEPRECATED("Please use computePASEVerifierForSetupPasscode:iterations:salt:error:");
+
+- (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate
+                     queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use setDeviceControllerDelegate:");
 
 @end
 

@@ -17,6 +17,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "OnboardingPayload.h"
+
 #ifndef AppParameters_h
 #define AppParameters_h
 
@@ -24,7 +26,13 @@
 
 @property NSData * rotatingDeviceIdUniqueId;
 
-- (AppParameters *)initWithRotatingDeviceIdUniqueId:(NSData *)rotatingDeviceIdUniqueId;
+@property OnboardingPayload * onboardingPayload;
+
+@property uint32_t spake2pIterationCount;
+
+@property NSData * spake2pSalt;
+
+@property NSData * spake2pVerifier;
 
 @end
 

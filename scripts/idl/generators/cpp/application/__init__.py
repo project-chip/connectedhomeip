@@ -54,3 +54,13 @@ class CppApplicationGenerator(CodeGenerator):
                 'clusters': self.idl.clusters,
             }
         )
+
+        # Source for __attribute__(weak) implementations of all cluster
+        # initialization methods
+        self.internal_render_one_output(
+            template_path="cpp/application/CallbackStubSource.jinja",
+            output_file_name="app/callback-stub.cpp",
+            vars={
+                'clusters': self.idl.clusters,
+            }
+        )
