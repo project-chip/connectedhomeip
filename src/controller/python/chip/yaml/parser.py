@@ -80,13 +80,16 @@ class _Constraints:
         self._ends_with = constraints.get('endsWith')
         self._is_upper_case = constraints.get('isUpperCase')
         self._is_lower_case = constraints.get('isLowerCase')
-        self._min_value = _ConstraintValue(constraints.get('minValue'), field_type, reference_objects)
-        self._max_value = _ConstraintValue(constraints.get('maxValue'), field_type, reference_objects)
+        self._min_value = _ConstraintValue(constraints.get('minValue'), field_type,
+                                           reference_objects)
+        self._max_value = _ConstraintValue(constraints.get('maxValue'), field_type,
+                                           reference_objects)
         self._contains = constraints.get('contains')
         self._excludes = constraints.get('excludes')
         self._has_masks_set = constraints.get('hasMasksSet')
         self._has_masks_clear = constraints.get('hasMasksClear')
-        self._not_value = _ConstraintValue(constraints.get('notValue'), field_type, reference_objects)
+        self._not_value = _ConstraintValue(constraints.get('notValue'), field_type,
+                                           reference_objects)
 
     def are_constrains_met(self, response) -> bool:
         return_value = True
@@ -142,6 +145,54 @@ class _Constraints:
         return return_value
 
 
+class _SaveAs:
+    def __init__(self, save_as_key: str, response_storage: ResponseStorage):
+        self._save_as_key = save_as_key
+        self._response_storage = response_storage
+        self._response_storage.save(self._save_as_key, None)
+
+    def save_response(self, value):
+        self._response_storage.save(self._save_as_key, value)
+
+    @classmethod
+    def extract_save_as_property(cls, items: dict, response_storage: ResponseStorage):
+        save_as_key = items.get('saveAs')
+        if not save_as_key:
+            return None
+        return cls(save_as_key, response_storage)
+
+
+class _ExpectedResponse:
+    def __init__(self, value, response_object, reference_objects: _ReferenceObjects):
+        self._load_expected_response_in_verify = None
+        self._expected_response_object = response_object
+        self._expected_response = None
+        self._response_storage = reference_objects.response_storage
+        if isinstance(value, str) and self._response_storage.is_key_saved(value):
+            self._load_expected_response_in_verify = value
+        else:
+            self._expected_response = Converter.convert_yaml_type(
+                value, response_object, reference_objects.config_values, use_from_dict=True)
+
+    def verify(self, response):
+        if (self._expected_response_object is None):
+            return True
+
+        if self._load_expected_response_in_verify is not None:
+            self._expected_response = self._response_storage.load(
+                self._load_expected_response_in_verify)
+
+        if (self._expected_response != response):
+            # TODO: It is debatable if this is the right thing to be doing here. This might
+            # need a follow up cleanup.
+            if (self._expected_response_object != float32 or
+                    not math.isclose(self._expected_response, response, rel_tol=1e-6)):
+                logger.error(f'Expected response {self._expected_response} didnt match '
+                             f'actual object {response}')
+                return False
+        return True
+
+
 class BaseAction(ABC):
     '''Interface for a single yaml action that is to be executed.'''
 
@@ -180,7 +231,8 @@ class InvokeAction(BaseAction):
         self._expected_raw_response: dict = field(default_factory=dict)
         self._expected_response_object = None
 
-        command = reference_objects.data_model_lookup.get_command(self._cluster, self._command_name)
+        command = reference_objects.data_model_lookup.get_command(
+            self._cluster, self._command_name)
 
         if command is None:
             raise ParsingError(
@@ -258,21 +310,20 @@ class ReadAttributeAction(BaseAction):
         self._constraints = None
         self._cluster = cluster
         self._cluster_object = None
-        self._load_expected_response_key = None
         self._request_object = None
         self._expected_raw_response: dict = field(default_factory=dict)
-        self._expected_response_object: None = None
+        self._expected_response: _ExpectedResponse = None
         self._possibly_unsupported = False
         self._response_storage = reference_objects.response_storage
-        self._save_response_key = None
+        self._save_as = None
 
         self._cluster_object = reference_objects.data_model_lookup.get_cluster(self._cluster)
         if self._cluster_object is None:
             raise UnexpectedParsingError(
                 f'ReadAttribute failed to find cluster object:{self._cluster}')
 
-        self._request_object = reference_objects.data_model_lookup.get_attribute(self._cluster,
-                                                                                 self._attribute_name)
+        self._request_object = reference_objects.data_model_lookup.get_attribute(
+            self._cluster, self._attribute_name)
         if self._request_object is None:
             raise ParsingError(
                 f'ReadAttribute failed to find cluster:{self._cluster} '
@@ -293,25 +344,15 @@ class ReadAttributeAction(BaseAction):
         if (self._expected_raw_response is None):
             raise UnexpectedParsingError(f'ReadAttribute missing expected response. {self.label}')
 
-        self._save_response_key = self._expected_raw_response.get('saveAs')
-        if self._save_response_key:
-            self._response_storage.save(self._save_response_key, None)
+        self._save_as = _SaveAs.extract_save_as_property(
+            self._expected_raw_response, reference_objects.response_storage)
 
         if 'value' in self._expected_raw_response:
-            self._expected_response_object = self._request_object.attribute_type.Type
+            expected_response_object = self._request_object.attribute_type.Type
             expected_response_value = self._expected_raw_response['value']
-
-            if (isinstance(expected_response_value, str) and
-                    self._response_storage.is_key_saved(expected_response_value)):
-                # Value provided is actually a key to use with storage to load saved data, since
-                # this parser, parses all the action first and then runs them we will load the
-                # saved expected response during validation time as we can rely on a previous
-                # action to save a value that we are comparing against.
-                self._load_expected_response_key = expected_response_value
-            else:
-                self._expected_response_data = Converter.convert_yaml_type(
-                    expected_response_value, self._expected_response_object,
-                    reference_objects.config_values, use_from_dict=True)
+            self._expected_response = _ExpectedResponse(expected_response_value,
+                                                        expected_response_object,
+                                                        reference_objects)
 
         constraints = self._expected_raw_response.get('constraints')
         if constraints:
@@ -338,27 +379,16 @@ class ReadAttributeAction(BaseAction):
             return
 
         parsed_resp = resp[endpoint][self._cluster_object][self._request_object]
+
+        if self._save_as is not None:
+            self._save_as.save_response(parsed_resp)
+
         if self._constraints and not self._constraints.are_constrains_met(parsed_resp):
             logger.error(f'Constraints check failed')
             # TODO how should we fail the test here?
 
-        # TODO: There is likely an issue here with Optional fields since None
-        if (self._expected_response_object is not None):
-
-            if self._load_expected_response_key is not None:
-                self._expected_response_data = self._response_storage.load(
-                    self._load_expected_response_key)
-
-            if (self._expected_response_data != parsed_resp):
-                # TODO: It is debatable if this is the right thing to be doing here. This might
-                # need a follow up cleanup.
-                if (self._expected_response_object != float32 or
-                        not math.isclose(self._expected_response_data, parsed_resp, rel_tol=1e-6)):
-                    logger.error(f'Expected response {self._expected_response_data} didnt match '
-                                 f'actual object {parsed_resp}')
-
-        if self._save_response_key is not None:
-            self._response_storage.save(self._save_response_key, parsed_resp)
+        if self._expected_response is not None:
+            self._expected_response.verify(parsed_resp)
 
 
 class WriteAttributeAction(BaseAction):
