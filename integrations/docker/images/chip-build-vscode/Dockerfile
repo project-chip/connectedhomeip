@@ -106,6 +106,8 @@ ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 
 ENV TIZEN_VERSION 6.0
 ENV TIZEN_SDK_ROOT /opt/tizen-sdk
+ENV TIZEN_SDK_TOOLCHAIN $TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2
+ENV TIZEN_SDK_TOOLCHAIN_CCACHE $TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-ccache
 ENV TIZEN_SDK_SYSROOT $TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/mobile/rootstraps/mobile-$TIZEN_VERSION-device.core
 
 ENV FVP_CORSTONE_300_PATH=/opt/FVP_Corstone_SSE-300

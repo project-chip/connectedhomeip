@@ -47,6 +47,7 @@ RUN set -x \
 # ------------------------------------------------------------------------------
 # Set environment
 ENV TIZEN_SDK_TOOLCHAIN $TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2
+ENV TIZEN_SDK_TOOLCHAIN_CCACHE $TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-ccache
 ENV TIZEN_SDK_SYSROOT $TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/mobile/rootstraps/mobile-$TIZEN_VERSION-device.core
 ENV PATH="$TIZEN_SDK_TOOLCHAIN/bin:$TIZEN_SDK_ROOT/tools/ide/bin:$TIZEN_SDK_ROOT/tools:$PATH"
 
