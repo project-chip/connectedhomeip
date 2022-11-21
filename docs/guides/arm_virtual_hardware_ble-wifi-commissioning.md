@@ -37,7 +37,7 @@ To learn about Arm Virtual Hardware(AVH) and start using it for development with
 
 ![AVH_configure2](images/AVH_configure2.png)
 
-7. Enter a device name and click the Create Device button. Any name is fine. We used ubuntu-lighting
+7. Enter a device name and click the Create Device button. Any name is fine. We used `ubuntu-lighting`
 
 ![AVH_launch_device](images/AVH_launch_device.png)
 
@@ -73,7 +73,6 @@ sudo systemctl daemon-reload
 
 ```console
 sudo apt-get update
-
 sudo apt-get -y install git gcc g++ python3 pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev 
 ```
 
@@ -175,7 +174,7 @@ The selected option of “ble-wifi” specifies to the chip-tool application tha
 ./out/debug/chip-tool onoff on 42 1
 ```
 
-On the `ubuntu-lighting-app` instance you will see the log messages shown below indicating the light has been turned on
+On the `ubuntu-lighting` instance you will see the log messages shown below indicating the light has been turned on
 
 ```console
 [TIMESTAMP][INSTANCEID] CHIP:ZCL: On/Off set value: 1 1
@@ -188,7 +187,7 @@ On the `ubuntu-lighting-app` instance you will see the log messages shown below 
 ./out/debug/chip-tool onoff off 42 1
 ```
 
-On the `ubuntu-lighting-app` instance you will see the log messages shown below indicating the light has been turned off
+On the `ubuntu-lighting` instance you will see the log messages shown below indicating the light has been turned off
 
 ```console
 [TIMESTAMP][INSTANCEID] CHIP:ZCL: On/Off set value: 1 0
