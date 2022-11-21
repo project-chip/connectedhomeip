@@ -417,7 +417,7 @@ class ClusterObjectTests:
 
         logger.info("6: Reading Ex Cx Ex, with filter")
         req = [
-            (1, Clusters.TestCluster.Events.TestEvent, 0),
+            (1, Clusters.UnitTesting.Events.TestEvent, 0),
         ]
         await cls.TriggerAndWaitForEventsWithFilter(devCtrl, req)
 
