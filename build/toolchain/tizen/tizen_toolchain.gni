@@ -27,8 +27,15 @@ template("tizen_toolchain") {
     forward_variables_from(_invoker_toolchain_args, "*")
   }
 
-  _tizen_toolchain_prefix =
-      "${tizen_sdk_root}/tools/arm-linux-gnueabi-gcc-9.2/bin/arm-linux-gnueabi-"
+  # Try to get the toolchain from the environment. Otherwise, use the default
+  # toolchain path based on Tizen SDK location. Overwriting the toolchain env
+  # variable can for example allow ccache setup for Tizen builds.
+  _tizen_toolchain = getenv("TIZEN_SDK_TOOLCHAIN")
+  if (_tizen_toolchain == "") {
+    _tizen_toolchain = "${tizen_sdk_root}/tools/arm-linux-gnueabi-gcc-9.2"
+  }
+
+  _tizen_toolchain_prefix = "${_tizen_toolchain}/bin/arm-linux-gnueabi-"
 
   gcc_toolchain(target_name) {
     toolchain_args = _tizen_toolchain_args
