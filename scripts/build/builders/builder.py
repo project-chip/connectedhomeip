@@ -30,17 +30,15 @@ class Builder(ABC):
     def __init__(self, root, runner):
         self.root = os.path.abspath(root)
         self._runner = runner
-        self._enable_flashbundle = False
 
         # Set post-init once actual build target is known
         self.identifier = None
         self.output_dir = None
 
+        # Enable flashbundle generation stage
+        self.enable_flashbundle = False
         # Allow to override the default build command
         self.pw_command_launcher = None
-
-    def enable_flashbundle(self, enable_flashbundle: bool):
-        self._enable_flashbundle = enable_flashbundle
 
     @abstractmethod
     def generate(self):
@@ -84,13 +82,13 @@ class Builder(ABC):
 
     def outputs(self):
         artifacts = self.build_outputs()
-        if self._enable_flashbundle:
+        if self.enable_flashbundle:
             artifacts.update(self.flashbundle())
         return artifacts
 
     def build(self):
         self._build()
-        if self._enable_flashbundle:
+        if self.enable_flashbundle:
             self._generate_flashbundle()
 
     def _Execute(self, cmdarray, title=None):

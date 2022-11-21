@@ -348,7 +348,7 @@ class BuildTarget:
         builder.identifier = name
         builder.output_dir = os.path.join(output_prefix, name)
         builder.chip_dir = repository_path
-        builder.enable_flashbundle(enable_flashbundle)
+        builder.enable_flashbundle = enable_flashbundle
         builder.pw_command_launcher = pw_command_launcher
 
         return builder
