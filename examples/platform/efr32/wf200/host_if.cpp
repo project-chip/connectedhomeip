@@ -276,7 +276,7 @@ sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload)
 /****************************************************************************
  * @brief
  * Callback for individual scan result
- * @param[in] scan_result: Scan result of all SSID's 
+ * @param[in] scan_result: Scan result of all SSID's
  *****************************************************************************/
 static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_result)
 {
@@ -336,7 +336,7 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
 /****************************************************************************
  * @brief
  * Callback for scan complete
- * @param[in] status:Status of WLAN scan api 
+ * @param[in] status:Status of WLAN scan api
  *****************************************************************************/
 /* ARGSUSED */
 static void sl_wfx_scan_complete_callback(uint32_t status)
@@ -406,7 +406,7 @@ static void sl_wfx_connect_callback(sl_wfx_connect_ind_body_t connect_indication
 /****************************************************************************
  * @brief
  * Callback for station disconnect
- * @param[in]  mac: MAC address of device 
+ * @param[in]  mac: MAC address of device
  * @param[in]  reason: Reason code of disconnection
  *****************************************************************************/
 static void sl_wfx_disconnect_callback(uint8_t * mac, uint16_t reason)
@@ -469,7 +469,7 @@ static void sl_wfx_client_connected_callback(uint8_t * mac)
 /****************************************************************************
  * @brief
  * Callback for client rejected from AP
- * @param[in] status: Status of ap rejected 
+ * @param[in] status: Status of ap rejected
  * @param[in] mac: MAC adress of device
  *****************************************************************************/
 static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac)
@@ -1048,7 +1048,7 @@ sl_status_t wfx_connect_to_ap(void)
 /****************************************************************************
  * @brief
  * get the wifi mac addresss
- * @param[in] interface: 
+ * @param[in] interface:
  * @param[in] addr : address
  *****************************************************************************/
 void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr)
