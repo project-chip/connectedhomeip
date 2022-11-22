@@ -1107,15 +1107,6 @@ bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
 } // namespace app
 } // namespace chip
 
-void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                                            EmberAfAttributeType type, uint8_t * data)
-{
-    IgnoreUnusedVariable(type);
-    IgnoreUnusedVariable(data);
-
-    MatterReportingAttributeChangeCallback(endpoint, clusterId, attributeId);
-}
-
 void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
     // Attribute writes have asserted this already, but this assert should catch

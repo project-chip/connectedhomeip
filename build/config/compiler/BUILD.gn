@@ -14,7 +14,7 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/pigweed.gni")
-
+import("${build_root}/chip/java/config.gni")
 import("${build_root}/config/compiler/compiler.gni")
 import("${build_root}/config/sysroot.gni")
 import("${build_root}/config/target.gni")
@@ -246,6 +246,10 @@ config("strict_warnings") {
       "-Wshadow",
       "-Wvla",
     ]
+  }
+
+  if (build_java_matter_controller) {
+    cflags -= [ "-Wshadow" ]
   }
 
   cflags_cc = [ "-Wnon-virtual-dtor" ]

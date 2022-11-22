@@ -300,6 +300,11 @@ server cluster LevelControl = 8 {
     kFrequency = 0x4;
   }
 
+  bitmap LevelControlOptions : BITMAP8 {
+    kExecuteIfOff = 0x1;
+    kCoupleColorTempToLevel = 0x2;
+  }
+
   readonly attribute nullable int8u currentLevel = 0;
   readonly attribute int16u remainingTime = 1;
   readonly attribute int8u minLevel = 2;
@@ -307,7 +312,7 @@ server cluster LevelControl = 8 {
   readonly attribute int16u currentFrequency = 4;
   readonly attribute int16u minFrequency = 5;
   readonly attribute int16u maxFrequency = 6;
-  attribute bitmap8 options = 15;
+  attribute LevelControlOptions options = 15;
   attribute int16u onOffTransitionTime = 16;
   attribute nullable int8u onLevel = 17;
   attribute nullable int16u onTransitionTime = 18;
@@ -320,55 +325,55 @@ server cluster LevelControl = 8 {
   request struct MoveToLevelRequest {
     INT8U level = 0;
     nullable INT16U transitionTime = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
+    LevelControlOptions optionsMask = 2;
+    LevelControlOptions optionsOverride = 3;
   }
 
   request struct MoveRequest {
     MoveMode moveMode = 0;
     nullable INT8U rate = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
+    LevelControlOptions optionsMask = 2;
+    LevelControlOptions optionsOverride = 3;
   }
 
   request struct StepRequest {
     StepMode stepMode = 0;
     INT8U stepSize = 1;
     nullable INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
+    LevelControlOptions optionsMask = 3;
+    LevelControlOptions optionsOverride = 4;
   }
 
   request struct StopRequest {
-    BITMAP8 optionsMask = 0;
-    BITMAP8 optionsOverride = 1;
+    LevelControlOptions optionsMask = 0;
+    LevelControlOptions optionsOverride = 1;
   }
 
   request struct MoveToLevelWithOnOffRequest {
     INT8U level = 0;
     nullable INT16U transitionTime = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
+    LevelControlOptions optionsMask = 2;
+    LevelControlOptions optionsOverride = 3;
   }
 
   request struct MoveWithOnOffRequest {
     MoveMode moveMode = 0;
     nullable INT8U rate = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
+    LevelControlOptions optionsMask = 2;
+    LevelControlOptions optionsOverride = 3;
   }
 
   request struct StepWithOnOffRequest {
     StepMode stepMode = 0;
     INT8U stepSize = 1;
     nullable INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
+    LevelControlOptions optionsMask = 3;
+    LevelControlOptions optionsOverride = 4;
   }
 
   request struct StopWithOnOffRequest {
-    BITMAP8 optionsMask = 0;
-    BITMAP8 optionsOverride = 1;
+    LevelControlOptions optionsMask = 0;
+    LevelControlOptions optionsOverride = 1;
   }
 
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;

@@ -18,20 +18,13 @@
 #pragma once
 
 #include <app/ConcreteAttributePath.h>
-#include <app/util/af-types.h>
 
 /** @brief Reporting Attribute Change
  *
  * This function is called by the framework when an attribute managed by the
  * framework changes.  The application should call this function when an
- * externally-managed attribute changes.  The application should use the change
- * notification to inform its reporting decisions.
- */
-void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                            EmberAfAttributeType type, uint8_t * data);
-
-/*
- * Same but with just an attribute path and no data available.
+ * externally-managed attribute changes.  This function triggers attribute
+ * reports for subscriptions as needed.
  */
 void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 

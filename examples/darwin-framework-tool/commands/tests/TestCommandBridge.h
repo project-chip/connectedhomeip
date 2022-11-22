@@ -48,9 +48,9 @@ constexpr const char * kDefaultKey = "default";
 @property chip::NodeId deviceId;
 @property BOOL active; // Whether to pass on notifications to the commandBridge
 
-- (void)onStatusUpdate:(MTRCommissioningStatus)status;
-- (void)onCommissioningSessionEstablishmentDone:(NSError * _Nullable)error;
-- (void)onCommissioningComplete:(NSError * _Nullable)error;
+- (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status;
+- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error;
+- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithTestCommandBridge:(TestCommandBridge *)commandBridge;
@@ -529,7 +529,7 @@ private:
 NS_ASSUME_NONNULL_BEGIN
 
 @implementation TestDeviceControllerDelegate
-- (void)onStatusUpdate:(MTRCommissioningStatus)status
+- (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status
 {
     if (_active) {
         if (status == MTRCommissioningStatusSuccess) {
@@ -542,7 +542,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void)onCommissioningSessionEstablishmentDone:(NSError * _Nullable)error
+- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
 {
     if (_active) {
         if (error != nil) {
@@ -556,7 +556,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
 }
 
-- (void)onCommissioningComplete:(NSError * _Nullable)error
+- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error
 {
     if (_active) {
         _active = NO;

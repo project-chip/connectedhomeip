@@ -54,10 +54,6 @@
 	url = https://github.com/Qorvo/QMatter
 	branch  = vlatest-libs
 	platforms = qpg
-[submodule "zap"]
-	path = third_party/zap/repo
-	url = https://github.com/project-chip/zap.git
-	branch  = master
 [submodule "freertos"]
 	path = third_party/freertos/repo
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git

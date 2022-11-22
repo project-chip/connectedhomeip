@@ -6,6 +6,7 @@
 
 #include <lib/support/SafeString.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemClock.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread/platform/logging.h>
@@ -54,20 +55,22 @@
 #include "SEGGER_RTT.h"
 #include "SEGGER_RTT_Conf.h"
 
-#define LOG_ERROR "<error > "
-#define LOG_WARN "<warn  > "
-#define LOG_INFO "<info  > "
-#define LOG_DETAIL "<detail> "
+#define LOG_ERROR "[error ]"
+#define LOG_WARN "[warn  ]"
+#define LOG_INFO "[info  ]"
+#define LOG_DETAIL "[detail]"
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#define LOG_LWIP "<lwip  > "
+#define LOG_LWIP "[lwip  ]"
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-#define LOG_EFR32 "<efr32 > "
+#define LOG_EFR32 "[efr32 ]"
 // If a new category string LOG_* is created, add it in the MaxStringLength arguments below
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 static constexpr size_t kMaxCategoryStrLen = chip::MaxStringLength(LOG_ERROR, LOG_WARN, LOG_INFO, LOG_DETAIL, LOG_LWIP, LOG_EFR32);
 #else
 static constexpr size_t kMaxCategoryStrLen = chip::MaxStringLength(LOG_ERROR, LOG_WARN, LOG_INFO, LOG_DETAIL, LOG_EFR32);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+static constexpr size_t kMaxTimestampStrLen = 16; // "[" (HH)HH:MM:SS + "." + miliseconds(3digits) + "]"
 
 #if EFR32_LOG_ENABLED
 static bool sLogInitialized = false;
@@ -78,6 +81,35 @@ static uint8_t sCmdLineBuffer[LOG_RTT_BUFFER_SIZE];
 #endif
 
 #if EFR32_LOG_ENABLED
+
+using namespace chip;
+
+/**
+ * @brief Add a timestamp in hh:mm:ss.ms format and the given prefix string to the given char buffer
+ * The time stamp is derived from the boot time
+ *
+ * @param logBuffer: pointer to the buffer where to add the information
+ *        prefix: A prefix to add to the trace e.g. The category
+ *        maxSize: Space availaible in the given buffer.
+ */
+static size_t AddTimeStampAndPrefixStr(char * logBuffer, const char * prefix, size_t maxSize)
+{
+    VerifyOrDie(logBuffer != nullptr);
+    VerifyOrDie(prefix != nullptr);
+    VerifyOrDie(maxSize > kMaxTimestampStrLen + strlen(prefix)); // Greater than to at least accommodate a ending Null Character
+
+    // Derive the hours, minutes, seconds and milliseconds since boot time millisecond counter
+    uint64_t bootTime     = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
+    uint16_t milliseconds = bootTime % 1000;
+    uint32_t totalSeconds = bootTime / 1000;
+    uint8_t seconds       = totalSeconds % 60;
+    totalSeconds /= 60;
+    uint8_t minutes = totalSeconds % 60;
+    uint32_t hours  = totalSeconds / 60;
+
+    return snprintf(logBuffer, maxSize, "[%02lu:%02u:%02u.%03u]%s", hours, minutes, seconds, milliseconds, prefix);
+}
+
 /**
  * Print a log message to RTT
  */
@@ -135,10 +167,10 @@ extern "C" void efr32Log(const char * aFormat, ...)
     va_start(v, aFormat);
 #if EFR32_LOG_ENABLED
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-    static_assert(sizeof(formattedMsg) > kMaxCategoryStrLen); // Greater than to at least accommodate a ending Null Character
+    static_assert(sizeof(formattedMsg) >
+                  kMaxTimestampStrLen + kMaxCategoryStrLen); // Greater than to at least accommodate a ending Null Character
 
-    strcpy(formattedMsg, LOG_EFR32);
-    size_t prefixLen = strlen(formattedMsg);
+    size_t prefixLen = AddTimeStampAndPrefixStr(formattedMsg, LOG_EFR32, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE);
     size_t len       = vsnprintf(formattedMsg + prefixLen, sizeof formattedMsg - prefixLen, aFormat, v);
 
     if (len >= sizeof formattedMsg - prefixLen)
@@ -182,26 +214,24 @@ void LogV(const char * module, uint8_t category, const char * aFormat, va_list v
         size_t formattedMsgLen;
 
         // len for Category string + "[" + Module name + "] " (Brackets and space =3)
-        constexpr size_t maxPrefixLen = kMaxCategoryStrLen + chip::Logging::kMaxModuleNameLen + 3;
+        constexpr size_t maxPrefixLen = kMaxTimestampStrLen + kMaxCategoryStrLen + chip::Logging::kMaxModuleNameLen + 3;
         static_assert(sizeof(formattedMsg) > maxPrefixLen); // Greater than to at least accommodate a ending Null Character
 
         switch (category)
         {
         case kLogCategory_Error:
-            strcpy(formattedMsg, LOG_ERROR);
+            formattedMsgLen = AddTimeStampAndPrefixStr(formattedMsg, LOG_ERROR, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE);
             break;
         case kLogCategory_Progress:
         default:
-            strcpy(formattedMsg, LOG_INFO);
+            formattedMsgLen = AddTimeStampAndPrefixStr(formattedMsg, LOG_INFO, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE);
             break;
         case kLogCategory_Detail:
-            strcpy(formattedMsg, LOG_DETAIL);
+            formattedMsgLen = AddTimeStampAndPrefixStr(formattedMsg, LOG_DETAIL, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE);
             break;
         }
 
-        formattedMsgLen = strlen(formattedMsg);
-
-        // Form the log prefix, e.g. "[DL] "
+        // Add the module name to the log prefix , e.g. "[DL] "
         snprintf(formattedMsg + formattedMsgLen, sizeof(formattedMsg) - formattedMsgLen, "[%s] ", module);
         formattedMsg[sizeof(formattedMsg) - 1] = 0;
         formattedMsgLen                        = strlen(formattedMsg);
@@ -238,8 +268,7 @@ extern "C" void LwIPLog(const char * aFormat, ...)
 #if EFR32_LOG_ENABLED
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
-    strcpy(formattedMsg, LOG_LWIP);
-    size_t prefixLen = strlen(formattedMsg);
+    size_t prefixLen = AddTimeStampAndPrefixStr(formattedMsg, LOG_LWIP, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE);
     size_t len       = vsnprintf(formattedMsg + prefixLen, sizeof formattedMsg - prefixLen, aFormat, v);
 
     if (len >= sizeof formattedMsg - prefixLen)
@@ -272,6 +301,7 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
 
     va_start(v, aFormat);
 #if EFR32_LOG_ENABLED
+    size_t prefixLen;
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
     if (sLogInitialized)
@@ -279,27 +309,22 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
         switch (aLogLevel)
         {
         case OT_LOG_LEVEL_CRIT:
-            strcpy(formattedMsg, LOG_ERROR "[ot] ");
+            prefixLen = AddTimeStampAndPrefixStr(formattedMsg, LOG_ERROR "[ot] ", CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE);
             break;
         case OT_LOG_LEVEL_WARN:
-            strcpy(formattedMsg, LOG_WARN "[ot] ");
+            prefixLen = AddTimeStampAndPrefixStr(formattedMsg, LOG_WARN "[ot] ", CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE);
             break;
         case OT_LOG_LEVEL_NOTE:
-            strcpy(formattedMsg, LOG_INFO "[ot] ");
-            break;
         case OT_LOG_LEVEL_INFO:
-            strcpy(formattedMsg, LOG_INFO "[ot] ");
+            prefixLen = AddTimeStampAndPrefixStr(formattedMsg, LOG_INFO "[ot] ", CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE);
             break;
         case OT_LOG_LEVEL_DEBG:
-            strcpy(formattedMsg, LOG_DETAIL "[ot] ");
-            break;
         default:
-            strcpy(formattedMsg, LOG_DETAIL "[ot] ");
+            prefixLen = AddTimeStampAndPrefixStr(formattedMsg, LOG_DETAIL "[ot] ", CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE);
             break;
         }
 
-        size_t prefixLen = strlen(formattedMsg);
-        size_t len       = vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, aFormat, v);
+        size_t len = vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, aFormat, v);
 
         if (len >= sizeof formattedMsg - prefixLen)
         {

@@ -103,6 +103,8 @@ jobs:
                      if [ "$idl_file" = "./scripts/idl/tests/inputs/optional_argument.matter" ]; then continue; fi
                      if [ "$idl_file" = "./scripts/idl/tests/inputs/several_clusters.matter" ]; then continue; fi
                      if [ "$idl_file" = "./scripts/idl/tests/inputs/simple_attribute.matter" ]; then continue; fi
+                     if [ "$idl_file" = "./scripts/idl/tests/inputs/large_lighting_app.matter" ]; then continue; fi
+                     if [ "$idl_file" = "./scripts/idl/tests/inputs/large_all_clusters_app.matter" ]; then continue; fi
 
                      ./scripts/run_in_build_env.sh "./scripts/idl_lint.py --log-level warn $idl_file" >/dev/null || exit 1
                  done
