@@ -24,38 +24,51 @@
 
 class LEDWidget;
 
-enum class AppEventType : uint8_t {
-	None = 0,
-	Button,
-	ButtonPushed,
-	ButtonReleased,
-	Timer,
-	UpdateLedState,
-	IdentifyStart,
-	IdentifyStop,
-	StartSMPAdvertising
+enum class AppEventType : uint8_t
+{
+    None = 0,
+    Button,
+    ButtonPushed,
+    ButtonReleased,
+    Timer,
+    UpdateLedState,
+    IdentifyStart,
+    IdentifyStop,
+    StartSMPAdvertising
 };
 
-enum class FunctionEvent : uint8_t { NoneSelected = 0, SoftwareUpdate = 0, FactoryReset, AdvertisingStart };
+enum class FunctionEvent : uint8_t
+{
+    NoneSelected   = 0,
+    SoftwareUpdate = 0,
+    FactoryReset,
+    AdvertisingStart
+};
 
-struct AppEvent {
-	union {
-		struct {
-			uint8_t PinNo;
-			uint8_t Action;
-		} ButtonEvent;
-		struct {
-			void *Context;
-		} TimerEvent;
-		struct {
-			uint8_t Action;
-			int32_t Actor;
-		} LockEvent;
-		struct {
-			LEDWidget *LedWidget;
-		} UpdateLedStateEvent;
-	};
+struct AppEvent
+{
+    union
+    {
+        struct
+        {
+            uint8_t PinNo;
+            uint8_t Action;
+        } ButtonEvent;
+        struct
+        {
+            void * Context;
+        } TimerEvent;
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+        } LockEvent;
+        struct
+        {
+            LEDWidget * LedWidget;
+        } UpdateLedStateEvent;
+    };
 
-	AppEventType Type{ AppEventType::None };
-	EventHandler Handler;
+    AppEventType Type{ AppEventType::None };
+    EventHandler Handler;
 };

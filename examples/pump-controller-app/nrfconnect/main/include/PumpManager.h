@@ -75,7 +75,6 @@ private:
 
     static void PumpStartTimerEventHandler(const AppEvent & aEvent);
 
-
     static PumpManager sPump;
 };
 
