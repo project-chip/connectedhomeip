@@ -12,7 +12,13 @@ client cluster Third = 3 {
       kKnown = 100;
     }
 
+    bitmap LevelControlOptions : BITMAP8 {
+      kExecuteIfOff = 0x1;
+      kCoupleColorTempToLevel = 0x2;
+    }
+
     attribute MyEnum someEnum = 10;
+    attribute LevelControlOptions options = 20;
 }
 
 server cluster Third = 3 {
