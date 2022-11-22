@@ -28,7 +28,7 @@ using namespace ::chip::DeviceLayer;
 
 constexpr EndpointId kThermostatEndpoint = 1;
 constexpr uint16_t kSensorTimerPeriodMs  = 30000; // 30s timer period
-constexpr uint16_t kMinTemperatureDelta  = 50;    // 0.5 degree Celcius
+constexpr uint16_t kMinTemperatureDelta  = 50;    // 0.5 degree Celsius
 
 k_timer sSensorTimer;
 
