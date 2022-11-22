@@ -176,15 +176,15 @@ public final class ControllerParams {
     }
 
     /**
-   	 * Sets the CASEFailsafeExpirySeconds duration passed to ChipDeviceCommissioner's CommissioningParameters.
-   	 * After PASE session has finished, the failsafe is rearmed with the specified expiry before continuing
-   	 * commissioning.
-   	 *
-   	 * <p>Note: If CASEFailsafeExpirySeconds is not set (or is 0), the failsafe will not be rearmed.
-   	 *
-   	 * @param caseFailsafeExpirySeconds
-   	 * @return
-   	 */
+     * Sets the CASEFailsafeExpirySeconds duration passed to ChipDeviceCommissioner's
+     * CommissioningParameters. After PASE session has finished, the failsafe is rearmed with the
+     * specified expiry before continuing commissioning.
+     *
+     * <p>Note: If CASEFailsafeExpirySeconds is not set (or is 0), the failsafe will not be rearmed.
+     *
+     * @param caseFailsafeExpirySeconds
+     * @return
+     */
     public Builder setCASEFailsafeTimerSeconds(int failsafeTimerSeconds) {
       if (failsafeTimerSeconds < 1 || failsafeTimerSeconds > 900) {
         throw new IllegalArgumentException("failsafeTimerSeconds must be between 0 and 900");
