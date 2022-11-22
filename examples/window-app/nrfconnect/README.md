@@ -190,7 +190,7 @@ following states are possible:
 
 -   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
     provisioned, but does not yet have full connectivity for Thread or Wi-Fi
-    network, or the related services.
+    network.
 
 -   _Solid On_ &mdash; The device is fully provisioned and has full Thread
     network and service connectivity.

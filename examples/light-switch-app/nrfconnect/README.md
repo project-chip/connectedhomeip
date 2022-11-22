@@ -16,14 +16,15 @@ creating your own application.
 The example is based on
 [Matter](https://github.com/project-chip/connectedhomeip) and Nordic
 Semiconductor's nRF Connect SDK, and was created to facilitate testing and
-certification of a Matter device communicating over a low-power, 802.15.4
-network, either Thread or Wi-Fi.
+certification of a Matter device communicating over a low-power, 802.15.4 Thread
+network, or Wi-Fi network.
 
 The example behaves as a Matter accessory, that is a device that can be paired
 into an existing Matter network and can be controlled by this network. In the
 case of Thread, this device works as a Thread Sleepy End Device. Support for
 both Thread and Wi-Fi is mutually exclusive and depends on the hardware
-platform, so only one protocol can be supported for a specific lock device.
+platform, so only one protocol can be supported for a specific light switch
+device.
 
 <hr>
 
@@ -291,7 +292,7 @@ following states are possible:
 
 -   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
     provisioned, but does not yet have full connectivity for Thread or Wi-Fi
-    network, or the related services.
+    network.
 
 -   _Solid On_ &mdash; The device is fully provisioned.
 

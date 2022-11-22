@@ -11,14 +11,14 @@ a reference for creating your own application.
 The example is based on
 [Matter](https://github.com/project-chip/connectedhomeip) and Nordic
 Semiconductor's nRF Connect SDK, and was created to facilitate testing and
-certification of a Matter device communicating over a low-power, 802.15.4
-network, either Thread or Wi-Fi.
+certification of a Matter device communicating over a low-power, 802.15.4 Thread
+network, or Wi-Fi network.
 
 The example behaves as a Matter accessory, that is a device that can be paired
 into an existing Matter network and can be controlled by this network. In the
 case of Thread, this device works as a Thread Sleepy End Device. Support for
 both Thread and Wi-Fi is mutually exclusive and depends on the hardware
-platform, so only one protocol can be supported for a specific lock device.
+platform, so only one protocol can be supported for a specific light device.
 
 <hr>
 
@@ -234,7 +234,7 @@ following states are possible:
 
 -   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
     provisioned, but does not yet have full connectivity for Thread or Wi-Fi
-    network, or the related services.
+    network.
 
 -   _Solid On_ &mdash; The device is fully provisioned.
 
@@ -264,12 +264,12 @@ following states are possible:
 **Button 2** &mdash; Pressing the button once changes the lighting state to the
 opposite one.
 
--   On nRF52840 DK, nRF5340 DK, and nRF21540 DK: Changes the lock state to the
+-   On nRF52840 DK, nRF5340 DK, and nRF21540 DK: Changes the LED state to the
     opposite one.
 
 -   On nRF7002 DK:
 
-    -   If pressed for less than three seconds, it changes the lock state to the
+    -   If pressed for less than three seconds, it changes the LED state to the
         opposite one.
 
     -   If pressed for more than three seconds, it starts the NFC tag emulation,
