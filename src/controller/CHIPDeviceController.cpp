@@ -1091,15 +1091,15 @@ void DeviceCommissioner::OnFailedToExtendedArmFailSafeDeviceAttestation(void * c
 }
 
 void DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
-                                           Optional<System::Clock::Timeout> timeout, OnExtendFailsafeSuccess onSuccess,
+                                           Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
                                            OnExtendFailsafeFailure onFailure)
 {
     uint64_t breadcrumb = static_cast<uint64_t>(step);
     GeneralCommissioning::Commands::ArmFailSafe::Type request;
     request.expiryLengthSeconds = armFailSafeTimeout;
     request.breadcrumb          = breadcrumb;
-    ChipLogProgress(Controller, "Arming failsafe for CASE (%u seconds)", request.expiryLengthSeconds);
-    SendCommand<GeneralCommissioningCluster>(proxy, request, onSuccess, onFailure, kRootEndpointId, timeout);
+    ChipLogProgress(Controller, "Arming failsafe (%u seconds)", request.expiryLengthSeconds);
+    SendCommand<GeneralCommissioningCluster>(proxy, request, onSuccess, onFailure, kRootEndpointId, commandTimeout);
 }
 
 void DeviceCommissioner::ExtendArmFailSafeForDeviceAttestation(const Credentials::DeviceAttestationVerifier::AttestationInfo & info,
@@ -2072,11 +2072,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     switch (step)
     {
     case CommissioningStage::kArmFailsafe: {
-        GeneralCommissioning::Commands::ArmFailSafe::Type request;
-        request.expiryLengthSeconds = params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeTimeout);
-        request.breadcrumb          = breadcrumb;
-        ChipLogProgress(Controller, "Arming failsafe (%u seconds)", request.expiryLengthSeconds);
-        SendCommand<GeneralCommissioningCluster>(proxy, request, OnArmFailSafe, OnBasicFailure, endpoint, timeout);
+        VerifyOrDie(endpoint == kRootEndpointId);
+        ExtendArmFailSafe(proxy, step, params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeTimeout), timeout, OnArmFailSafe,
+                          OnBasicFailure);
     }
     break;
     case CommissioningStage::kReadCommissioningInfo: {

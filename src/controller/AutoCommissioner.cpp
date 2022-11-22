@@ -178,6 +178,27 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     return nextStage;
 }
 
+CommissioningStage AutoCommissioner::GetNextCommissioningStageNetworkSetup(CommissioningStage currentStage, CHIP_ERROR & lastErr)
+{
+    if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId)
+    {
+        return CommissioningStage::kWiFiNetworkSetup;
+    }
+    if (mParams.GetThreadOperationalDataset().HasValue() && mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
+    {
+        return CommissioningStage::kThreadNetworkSetup;
+    }
+
+    ChipLogError(Controller, "Required network information not provided in commissioning parameters");
+    ChipLogError(Controller, "Parameters supplied: wifi (%s) thread (%s)", mParams.GetWiFiCredentials().HasValue() ? "yes" : "no",
+                 mParams.GetThreadOperationalDataset().HasValue() ? "yes" : "no");
+    ChipLogError(Controller, "Device supports: wifi (%s) thread(%s)",
+                 mDeviceCommissioningInfo.network.wifi.endpoint == kInvalidEndpointId ? "no" : "yes",
+                 mDeviceCommissioningInfo.network.thread.endpoint == kInvalidEndpointId ? "no" : "yes");
+    lastErr = CHIP_ERROR_INVALID_ARGUMENT;
+    return CommissioningStage::kCleanup;
+}
+
 CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr)
 {
     if (mStopCommissioning)
@@ -229,10 +250,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         if (mNeedsNetworkSetup)
         {
             // if there is a WiFi or a Thread endpoint, then perform scan
-            if ((mParams.GetAttemptWiFiNetworkScan().ValueOr(false) &&
-                 mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId) ||
-                (mParams.GetAttemptThreadNetworkScan().ValueOr(false) &&
-                 mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId))
+            if (IsScanNeeded())
             {
                 // Perform Scan (kScanNetworks) and collect credentials (kNeedsNetworkCreds) right before configuring network.
                 // This order of steps allows the workflow to return to collect credentials again if network enablement fails.
@@ -240,29 +258,11 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             }
             ChipLogProgress(Controller, "No NetworkScan enabled or WiFi/Thread endpoint not specified, skipping ScanNetworks");
 
-            if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId)
-            {
-                return CommissioningStage::kWiFiNetworkSetup;
-            }
-            if (mParams.GetThreadOperationalDataset().HasValue() &&
-                mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
-            {
-                return CommissioningStage::kThreadNetworkSetup;
-            }
-
-            ChipLogError(Controller, "Required network information not provided in commissioning parameters");
-            ChipLogError(Controller, "Parameters supplied: wifi (%s) thread (%s)",
-                         mParams.GetWiFiCredentials().HasValue() ? "yes" : "no",
-                         mParams.GetThreadOperationalDataset().HasValue() ? "yes" : "no");
-            ChipLogError(Controller, "Device supports: wifi (%s) thread(%s)",
-                         mDeviceCommissioningInfo.network.wifi.endpoint == kInvalidEndpointId ? "no" : "yes",
-                         mDeviceCommissioningInfo.network.thread.endpoint == kInvalidEndpointId ? "no" : "yes");
-            lastErr = CHIP_ERROR_INVALID_ARGUMENT;
-            return CommissioningStage::kCleanup;
+            return GetNextCommissioningStageNetworkSetup(currentStage, lastErr);
         }
         else
         {
-            setCASEFailsafeTimerIfNeeded();
+            SetCASEFailsafeTimerIfNeeded();
             if (mParams.GetSkipCommissioningComplete().ValueOr(false))
             {
                 return CommissioningStage::kCleanup;
@@ -272,25 +272,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kScanNetworks:
         return CommissioningStage::kNeedsNetworkCreds;
     case CommissioningStage::kNeedsNetworkCreds:
-        if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId)
-        {
-            return CommissioningStage::kWiFiNetworkSetup;
-        }
-        if (mParams.GetThreadOperationalDataset().HasValue() &&
-            mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
-        {
-            return CommissioningStage::kThreadNetworkSetup;
-        }
-
-        ChipLogError(Controller, "Required network information not provided in commissioning parameters");
-        ChipLogError(Controller, "Parameters supplied: wifi (%s) thread (%s)",
-                     mParams.GetWiFiCredentials().HasValue() ? "yes" : "no",
-                     mParams.GetThreadOperationalDataset().HasValue() ? "yes" : "no");
-        ChipLogError(Controller, "Device supports: wifi (%s) thread(%s)",
-                     mDeviceCommissioningInfo.network.wifi.endpoint == kInvalidEndpointId ? "no" : "yes",
-                     mDeviceCommissioningInfo.network.thread.endpoint == kInvalidEndpointId ? "no" : "yes");
-        lastErr = CHIP_ERROR_INVALID_ARGUMENT;
-        return CommissioningStage::kCleanup;
+        return GetNextCommissioningStageNetworkSetup(currentStage, lastErr);
     case CommissioningStage::kWiFiNetworkSetup:
         if (mParams.GetThreadOperationalDataset().HasValue() &&
             mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
@@ -319,16 +301,16 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         else if (mParams.GetSkipCommissioningComplete().ValueOr(false))
         {
-            setCASEFailsafeTimerIfNeeded();
+            SetCASEFailsafeTimerIfNeeded();
             return CommissioningStage::kCleanup;
         }
         else
         {
-            setCASEFailsafeTimerIfNeeded();
+            SetCASEFailsafeTimerIfNeeded();
             return CommissioningStage::kFindOperational;
         }
     case CommissioningStage::kThreadNetworkEnable:
-        setCASEFailsafeTimerIfNeeded();
+        SetCASEFailsafeTimerIfNeeded();
         if (mParams.GetSkipCommissioningComplete().ValueOr(false))
         {
             return CommissioningStage::kCleanup;
@@ -361,15 +343,17 @@ OnExtendFailsafeSuccessForCASE(void * context,
     ChipLogProgress(Controller, "ExtendFailsafe received ArmFailSafe response errorCode=%u", to_underlying(data.errorCode));
 }
 
-void AutoCommissioner::setCASEFailsafeTimerIfNeeded()
+void AutoCommissioner::SetCASEFailsafeTimerIfNeeded()
 {
     // if there is a final fail-safe timer configured then, send it
-    if (mParams.GetCASEFailsafeTimerSeconds().HasValue())
+    if (mParams.GetCASEFailsafeTimerSeconds().HasValue() && mCommissioneeDeviceProxy != nullptr)
     {
         // send the command via the PASE session (mCommissioneeDeviceProxy) since the CASE portion of commissioning
         // might be done by a different service (ex. PASE is done by a phone app and CASE is done by a Hub).
         // Also, we want the CASE failsafe timer to apply for the time it takes the Hub to perform operational discovery,
         // CASE establishment, and receipt of the commissioning complete command.
+        // We know that the mCommissioneeDeviceProxy is still valid at this point since it gets cleared during cleanup
+        // and SetCASEFailsafeTimerIfNeeded is always called before that stage.
         mCommissioner->ExtendArmFailSafe(mCommissioneeDeviceProxy, CommissioningStage::kFindOperational,
                                          mParams.GetCASEFailsafeTimerSeconds().Value(),
                                          GetCommandTimeout(mCommissioneeDeviceProxy, CommissioningStage::kArmFailsafe),
@@ -541,20 +525,17 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             completionStatus.networkCommissioningStatus =
                 MakeOptional(report.Get<NetworkCommissioningStatusInfo>().networkCommissioningStatus);
 
-            // if we are configured to scan networks, then don't error out
-            // instead, allow the app to try another network
-            if ((mParams.GetAttemptWiFiNetworkScan().ValueOr(false) &&
-                 mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId) ||
-                (mParams.GetAttemptThreadNetworkScan().ValueOr(false) &&
-                 mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId))
+            // If we are configured to scan networks, then don't error out.
+            // Instead, allow the app to try another network.
+            if (IsScanNeeded())
             {
                 if (completionStatus.err == CHIP_NO_ERROR)
                 {
                     completionStatus.err = err;
                 }
                 err = CHIP_NO_ERROR;
-                // walk back the completed stage to kScanNetworks
-                // this will allow the app to try another network
+                // Walk back the completed stage to kScanNetworks.
+                // This will allow the app to try another network.
                 report.stageCompleted = CommissioningStage::kScanNetworks;
             }
         }

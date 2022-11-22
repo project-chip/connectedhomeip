@@ -567,6 +567,11 @@ public:
      * or it may call this method after obtaining network credentials using asyncronous methods (prompting user, cloud API call,
      * etc).
      *
+     * If an error happens in the subsequent network commissioning step (either NetworkConfig or ConnectNetwork commands)
+     * then the DevicePairingDelegate will receive the error in completionStatus.networkCommissioningStatus and the
+     * commissioning stage will return to kNeedsNetworkCreds so that the DevicePairingDelegate can re-attempt with new
+     * network information. The DevicePairingDelegate can exit the commissioning process by calling StopPairing.
+     *
      * @return CHIP_ERROR   The return status. Returns CHIP_ERROR_INCORRECT_STATE if not in the correct state (kNeedsNetworkCreds).
      */
     CHIP_ERROR NetworkCredentialsReady();
@@ -679,7 +684,7 @@ public:
 
     // Reset the arm failsafe timer during commissioning.
     void ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
-                           Optional<System::Clock::Timeout> timeout, OnExtendFailsafeSuccess onSuccess,
+                           Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
                            OnExtendFailsafeFailure onFailure);
 
 private:
