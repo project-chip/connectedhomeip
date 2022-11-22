@@ -320,7 +320,7 @@ class ClusterObjectTests:
         # We trigger sending an event a couple of times just to be safe.
         await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.UnitTesting.Commands.TestEmitTestEventRequest())
         await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.UnitTesting.Commands.TestEmitTestEventRequest())
-        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.UnitTesting.Commands.TestEmitTestEventRequest())
+        return await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.UnitTesting.Commands.TestEmitTestEventRequest())
 
     @ classmethod
     async def _RetryForContent(cls, request, until, retryCount=10, intervalSeconds=1):
@@ -336,6 +336,28 @@ class ClusterObjectTests:
     async def TriggerAndWaitForEvents(cls, devCtrl, req):
         await cls._TriggerEvent(devCtrl)
         await cls._RetryForContent(request=lambda: devCtrl.ReadEvent(nodeid=NODE_ID, events=req), until=lambda res: res != 0)
+
+    @ classmethod
+    async def TriggerAndWaitForEventsWithFilter(cls, devCtrl, req):
+        response = await cls._TriggerEvent(devCtrl)
+        current_event_filter = response.value
+
+        def validate_got_expected_event(events):
+            number_of_events = len(events)
+            if number_of_events != 1:
+                return False
+
+            parsed_event_number = events[0].Header.EventNumber
+            if parsed_event_number != current_event_filter:
+                return False
+            return True
+
+        await cls._RetryForContent(request=lambda: devCtrl.ReadEvent(nodeid=NODE_ID, events=req, eventNumberFilter=current_event_filter), until=validate_got_expected_event)
+
+        def validate_got_no_event(events):
+            return len(events) == 0
+
+        await cls._RetryForContent(request=lambda: devCtrl.ReadEvent(nodeid=NODE_ID, events=req, eventNumberFilter=(current_event_filter + 1)), until=validate_got_no_event)
 
     @ classmethod
     @ base.test_case
@@ -392,6 +414,12 @@ class ClusterObjectTests:
         ]
 
         await cls.TriggerAndWaitForEvents(devCtrl, req)
+
+        logger.info("6: Reading Ex Cx Ex, with filter")
+        req = [
+            (1, Clusters.UnitTesting.Events.TestEvent, 0),
+        ]
+        await cls.TriggerAndWaitForEventsWithFilter(devCtrl, req)
 
         # TODO: Add more wildcard test for IM events.
 

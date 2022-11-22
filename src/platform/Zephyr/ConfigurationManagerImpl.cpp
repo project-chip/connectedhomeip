@@ -27,7 +27,10 @@
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+
 #include <platform/Zephyr/ZephyrConfig.h>
+
+#include "InetUtils.h"
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -199,6 +202,21 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 #endif
 
     PlatformMgr().Shutdown();
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    const net_if * const iface = InetUtils::GetInterface();
+    VerifyOrReturnError(iface != nullptr && iface->if_dev != nullptr, CHIP_ERROR_INTERNAL);
+
+    const auto linkAddrStruct = iface->if_dev->link_addr;
+    memcpy(buf, linkAddrStruct.addr, linkAddrStruct.len);
+
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
 }
 
 ConfigurationManager & ConfigurationMgrImpl()

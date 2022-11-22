@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		1E5801C328941C050033A199 /* MTRTestOTAProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E748B3828941A44008A1BE8 /* MTRTestOTAProvider.m */; };
-		1E85730C265519AE0050A4D9 /* callback-stub.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E857307265519AE0050A4D9 /* callback-stub.cpp */; };
 		1EC3238D271999E2002A8BF0 /* cluster-objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EC3238C271999E2002A8BF0 /* cluster-objects.cpp */; };
 		1EC4CE5D25CC26E900D7304F /* MTRBaseClusters.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4CE5925CC26E900D7304F /* MTRBaseClusters.mm */; };
 		1EC4CE6425CC276600D7304F /* MTRBaseClusters.h in Headers */ = {isa = PBXBuildFile; fileRef = 1EC4CE6325CC276600D7304F /* MTRBaseClusters.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -150,7 +149,6 @@
 /* Begin PBXFileReference section */
 		1E748B3828941A44008A1BE8 /* MTRTestOTAProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRTestOTAProvider.m; sourceTree = "<group>"; };
 		1E748B3928941A45008A1BE8 /* MTRTestOTAProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestOTAProvider.h; sourceTree = "<group>"; };
-		1E857307265519AE0050A4D9 /* callback-stub.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "callback-stub.cpp"; path = "../../../../zzz_generated/controller-clusters/zap-generated/callback-stub.cpp"; sourceTree = "<group>"; };
 		1EC3238C271999E2002A8BF0 /* cluster-objects.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "cluster-objects.cpp"; path = "../../../../zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp"; sourceTree = "<group>"; };
 		1EC4CE5925CC26E900D7304F /* MTRBaseClusters.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MTRBaseClusters.mm; path = "zap-generated/MTRBaseClusters.mm"; sourceTree = "<group>"; };
 		1EC4CE6325CC276600D7304F /* MTRBaseClusters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MTRBaseClusters.h; path = "zap-generated/MTRBaseClusters.h"; sourceTree = "<group>"; };
@@ -328,7 +326,6 @@
 				51B22C1D2740CB0A008D5055 /* MTRStructsObjc.h */,
 				1EC3238C271999E2002A8BF0 /* cluster-objects.cpp */,
 				1ED276DF26C57CF000547A89 /* MTRCallbackBridge.mm */,
-				1E857307265519AE0050A4D9 /* callback-stub.cpp */,
 				1EC4CE6325CC276600D7304F /* MTRBaseClusters.h */,
 				1EC4CE5925CC26E900D7304F /* MTRBaseClusters.mm */,
 				7596A83D28751220004DAE0E /* MTRBaseClusters_internal.h */,
@@ -715,7 +712,6 @@
 				51E0310127EA20D20083DC9C /* MTRControllerAccessControl.mm in Sources */,
 				1ED276E226C5812A00547A89 /* MTRCluster.mm in Sources */,
 				B2E0D7B3245B0B5C003C5B48 /* MTRError.mm in Sources */,
-				1E85730C265519AE0050A4D9 /* callback-stub.cpp in Sources */,
 				51E51FC1282AD37A00FC978D /* MTRDeviceControllerStartupParams.mm in Sources */,
 				1ED276E026C57CF000547A89 /* MTRCallbackBridge.mm in Sources */,
 				517BF3F1282B62B800A8B7DB /* MTRCertificates.mm in Sources */,

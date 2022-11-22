@@ -391,7 +391,7 @@ void pychip_ReadClient_OverrideLivenessTimeout(ReadClient * pReadClient, uint32_
 
 PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient, ReadClientCallback ** pCallback,
                                    DeviceProxy * device, uint8_t * readParamsBuf, size_t numAttributePaths,
-                                   size_t numDataversionFilters, size_t numEventPaths, ...)
+                                   size_t numDataversionFilters, size_t numEventPaths, uint64_t * eventNumberFilter, ...)
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
     PyReadAttributeParams pyParams = {};
@@ -401,7 +401,7 @@ PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient,
     std::unique_ptr<ReadClientCallback> callback = std::make_unique<ReadClientCallback>(appContext);
 
     va_list args;
-    va_start(args, numEventPaths);
+    va_start(args, eventNumberFilter);
 
     std::unique_ptr<AttributePathParams[]> attributePaths(new AttributePathParams[numAttributePaths]);
     std::unique_ptr<chip::app::DataVersionFilter[]> dataVersionFilters(new chip::app::DataVersionFilter[numDataversionFilters]);
@@ -461,6 +461,14 @@ PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient,
         {
             params.mpEventPathParamsList    = eventPaths.get();
             params.mEventPathParamsListSize = numEventPaths;
+        }
+        if (eventNumberFilter != nullptr)
+        {
+            static_assert(sizeof(chip::EventNumber) == sizeof(*eventNumberFilter) &&
+                              std::is_unsigned<chip::EventNumber>::value ==
+                                  std::is_unsigned<std::remove_pointer<decltype(eventNumberFilter)>::type>::value,
+                          "EventNumber type mismatch");
+            params.mEventNumber = MakeOptional(EventNumber(*eventNumberFilter));
         }
 
         params.mIsFabricFiltered = pyParams.isFabricFiltered;

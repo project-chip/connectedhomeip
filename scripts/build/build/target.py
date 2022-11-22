@@ -46,6 +46,8 @@ import re
 from dataclasses import dataclass
 from typing import Any, Dict, List, Iterable, Optional
 
+from builders.builder import BuilderOptions
+
 
 report_rejected_parts = True
 
@@ -330,7 +332,7 @@ class BuildTarget:
         return _StringIntoParts(value, suffix, self.fixed_targets, self.modifiers)
 
     def Create(self, name: str, runner, repository_path: str, output_prefix: str,
-               enable_flashbundle: bool):
+               builder_options: BuilderOptions):
 
         parts = self.StringIntoTargetParts(name)
 
@@ -348,6 +350,6 @@ class BuildTarget:
         builder.identifier = name
         builder.output_dir = os.path.join(output_prefix, name)
         builder.chip_dir = repository_path
-        builder.enable_flashbundle(enable_flashbundle)
+        builder.options = builder_options
 
         return builder

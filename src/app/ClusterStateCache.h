@@ -483,6 +483,10 @@ public:
         mEventStatusCache.clear();
     }
 
+    /*
+     *  Get the last concrete report data path, if path is not concrete cluster path, return CHIP_ERROR_NOT_FOUND
+     *
+     */
     CHIP_ERROR GetLastReportDataPath(ConcreteClusterPath & aPath);
 
 private:

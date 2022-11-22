@@ -359,7 +359,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         // The callee will weed out attributes that do not need to be stored.
         emAfSaveAttributeToStorageIfNeeded(data, endpoint, cluster, metadata);
 
-        MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID, dataType, data);
+        MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID);
 
         // Post write attribute callback for all attributes changes, regardless
         // of cluster.

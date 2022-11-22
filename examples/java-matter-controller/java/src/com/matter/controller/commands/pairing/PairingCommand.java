@@ -18,6 +18,7 @@
 
 package com.matter.controller.commands.pairing;
 
+import chip.devicecontroller.ChipDeviceController;
 import com.matter.controller.commands.common.CredentialsIssuer;
 import com.matter.controller.commands.common.IPAddress;
 import com.matter.controller.commands.common.MatterCommand;
@@ -47,20 +48,22 @@ public abstract class PairingCommand extends MatterCommand {
   private final StringBuffer mDiscoveryFilterInstanceName = new StringBuffer();
 
   public PairingCommand(
+      ChipDeviceController controller,
       String commandName,
       PairingModeType mode,
       PairingNetworkType networkType,
       CredentialsIssuer credsIssuer) {
-    this(commandName, mode, networkType, credsIssuer, DiscoveryFilterType.NONE);
+    this(controller, commandName, mode, networkType, credsIssuer, DiscoveryFilterType.NONE);
   }
 
   public PairingCommand(
+      ChipDeviceController controller,
       String commandName,
       PairingModeType mode,
       PairingNetworkType networkType,
       CredentialsIssuer credsIssuer,
       DiscoveryFilterType filterType) {
-    super(commandName, credsIssuer);
+    super(controller, commandName, credsIssuer);
     this.mPairingMode = mode;
     this.mNetworkType = networkType;
     this.mFilterType = filterType;
