@@ -57,8 +57,8 @@
 // Macro to drive LDMA channel number
 #define RSI_LDMA_TRANSFER_CHANNEL_NUM 3
 
-// Macro to drive semaphore block minimun tick value
-#define RSI_SEM_BLOCK_MIN_TICK_VALUE 50
+// Macro to drive semaphore block minimun timer in milli seconds
+#define RSI_SEM_BLOCK_MIN_TIMER_VALUE_MS 50
 
 /******************************************************
  * *               Function Declarations

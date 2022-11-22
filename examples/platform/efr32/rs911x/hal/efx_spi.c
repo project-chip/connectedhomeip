@@ -284,13 +284,26 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
         {
             transmitDMA(rx_buf, tx_buf, xlen);
         }
+
         /*
-         * Wait for the call-back to complete
+         * receiveDMA() and transmitDMA() are asynchronous
+         * Our application design assumes that this function is synchronous
+         * To make it synchronous, we wait to re-acquire the semaphore before exiting this function
+         * rx_dma_complete() gives back the semaphore when the SPI transfer is done
          */
-        if (xSemaphoreTake(spi_sem, pdMS_TO_TICKS(RSI_SEM_BLOCK_MIN_TICK_VALUE)) == pdTRUE)
+        if (xSemaphoreTake(spi_sem, pdMS_TO_TICKS(RSI_SEM_BLOCK_MIN_TIMER_VALUE_MS)) == pdTRUE)
         {
+            // Transfer complete
+            // Give back the semaphore before exiting, so that it may be re-acquired
+            // in this function, just before the next transfer
             xSemaphoreGive(spi_sem);
         }
+        // Temporary patch
+        // Sometimes the xSemaphoreTake() above is getting stuck indefinitely
+        // As a workaround, if the transfer is not done within RSI_SEM_BLOCK_MIN_TIMER_VALUE_MS
+        // stop and start it again
+        // No need to re-acquire the semaphore since this is the function that acquired it
+        // TODO: Remove this after a permanent solution is found to the problem of the transfer getting stuck
         else
         {
             uint32_t ldma_flags = 0;
