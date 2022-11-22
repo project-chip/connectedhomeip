@@ -438,7 +438,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
                 chip::DeviceLayer::PlatformMgr().UnlockChipStack();
                 if (err != CHIP_NO_ERROR)
                 {
-                    EFR32_LOG("Failed to open the Basic Commissioning Window");
+                    SILABS_LOG("Failed to open the Basic Commissioning Window");
                 }
             }
             else { SILABS_LOG("Network is already provisioned, Ble advertissement not enabled"); }
