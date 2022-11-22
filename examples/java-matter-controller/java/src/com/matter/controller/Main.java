@@ -113,5 +113,6 @@ public class Main {
     } catch (Exception e) {
       System.out.println("Run command failed with exception: " + e.getMessage());
     }
+    controller.shutdownCommissioning();
   }
 }

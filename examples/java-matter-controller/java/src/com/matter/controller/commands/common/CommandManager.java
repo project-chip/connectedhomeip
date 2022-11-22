@@ -89,10 +89,10 @@ public final class CommandManager {
       }
     }
 
-    String[] temp = Arrays.copyOfRange(args, 1, args.length);
+    String[] temp = Arrays.copyOfRange(args, 2, args.length);
 
     try {
-      command.initArguments(args.length - 1, temp);
+      command.initArguments(args.length - 2, temp);
       command.run();
     } catch (IllegalArgumentException e) {
       System.out.println("Arguments init failed with exception: " + e.getMessage());
