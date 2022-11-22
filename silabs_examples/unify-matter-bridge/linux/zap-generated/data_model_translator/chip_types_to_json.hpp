@@ -246,6 +246,10 @@ nlohmann::json inline to_json(const chip::app::Clusters::OnOff::OnOffStartUpOnOf
 //    return "{\"no bitmap support\"}";
 //}
 //
+// template<> nlohmann::json to_json(const chip::BitFlags<LevelControl::LevelControlOptions, uint8_t>& value) {
+//    return "{\"no bitmap support\"}";
+//}
+//
 
 /***************************** Struct Converted FIXME**************/
 //

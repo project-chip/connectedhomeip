@@ -911,11 +911,12 @@ EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint1
 
 namespace Options {
 
-EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint8_t & value)
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
+                  chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions> & value)
 {
     attribute_state_cache & cache = attribute_state_cache::get_instance();
 
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions>>;
     Traits::StorageType temp_storage;
 
     cache.get<Traits::StorageType>(endpoint, temp_storage);
@@ -925,10 +926,11 @@ EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint8_t & v
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint8_t & value)
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
+                  const chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions> & value)
 {
     attribute_state_cache & cache = attribute_state_cache::get_instance();
-    using Traits                  = NumericAttributeTraits<uint8_t>;
+    using Traits                  = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions>>;
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     cache.set(endpoint, storageValue);

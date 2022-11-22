@@ -215,8 +215,10 @@ EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint1
 } // namespace MaxFrequency
 
 namespace Options {
-EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint, uint8_t & value);
-EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint, const uint8_t & value);
+EmberAfStatus Get(const chip::app::ConcreteAttributePath & endpoint,
+                  chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions> & value);
+EmberAfStatus Set(const chip::app::ConcreteAttributePath & endpoint,
+                  const chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions> & value);
 } // namespace Options
 
 namespace OnOffTransitionTime {

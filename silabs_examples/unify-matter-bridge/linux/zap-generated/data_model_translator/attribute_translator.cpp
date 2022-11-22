@@ -965,7 +965,7 @@ LevelControlAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attri
             UN::MaxFrequency::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
-        case MN::Options::Id: { // type is bitmap8
+        case MN::Options::Id: { // type is LevelControlOptions
             MN::Options::TypeInfo::Type value;
             UN::Options::Get(atr_path, value);
             return aEncoder.Encode(value);
@@ -1229,7 +1229,7 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
         }
         break;
     }
-        // type is bitmap8
+        // type is LevelControlOptions
     case MN::Options::Id: {
         using T                = MN::Options::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);

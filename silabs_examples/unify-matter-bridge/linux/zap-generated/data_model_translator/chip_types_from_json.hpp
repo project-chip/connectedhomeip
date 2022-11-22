@@ -359,6 +359,11 @@ inline std::optional<OnOff::OnOffStartUpOnOff> from_json(const nlohmann::json & 
 //}
 
 //
+// template<> inline nlohmann::json to_json(const chip::BitFlags<LevelControl::LevelControlOptions, uint8_t>& value) {
+//    return "{\"no bitmap support\"}";
+//}
+
+//
 
 /***************************** Struct Converters **************/
 //
@@ -3619,28 +3624,6 @@ inline std::optional<ZclEnumEnhancedColorMode> from_json(const nlohmann::json & 
         return std::nullopt;
     }
 }
-// Because some bitmaps are defined as <enum> in Matter xml files, this handles translating bitmaps for them.
-// TODO: Check if is enum instead of LevelControlOptions
-std::optional<uint8_t> from_json_LevelControlOptions(const nlohmann::json & value)
-{
-    uint8_t bitmap_value = 0x00;
-    try
-    {
-        if (value["ExecuteIfOff"].get<bool>())
-        {
-            bitmap_value |= ZCL_BITMAP_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF;
-        }
-        if (value["CoupleColorTempToLevel"].get<bool>())
-        {
-            bitmap_value |= ZCL_BITMAP_LEVEL_CONTROL_OPTIONS_COUPLE_COLOR_TEMP_TO_LEVEL;
-        }
-        return bitmap_value;
-    } catch (const nlohmann::json::exception & e)
-    {
-        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
-        return std::nullopt;
-    }
-}
 template <>
 inline std::optional<ZclEnumOccupancySensorType> from_json(const nlohmann::json & value)
 {
@@ -5033,6 +5016,27 @@ std::optional<uint32_t> from_json_LevelControlFeature(const nlohmann::json & val
         if (value["Frequency"].get<bool>())
         {
             bitmap_value |= ZCL_BITMAP_LEVEL_CONTROL_FEATURE_FREQUENCY;
+        }
+        return bitmap_value;
+    } catch (const nlohmann::json::exception & e)
+    {
+        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
+        return std::nullopt;
+    }
+}
+
+std::optional<uint8_t> from_json_LevelControlOptions(const nlohmann::json & value)
+{
+    uint8_t bitmap_value = 0x00;
+    try
+    {
+        if (value["ExecuteIfOff"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF;
+        }
+        if (value["CoupleColorTempToLevel"].get<bool>())
+        {
+            bitmap_value |= ZCL_BITMAP_LEVEL_CONTROL_OPTIONS_COUPLE_COLOR_TEMP_TO_LEVEL;
         }
         return bitmap_value;
     } catch (const nlohmann::json::exception & e)
