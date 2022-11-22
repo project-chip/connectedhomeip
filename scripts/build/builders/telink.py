@@ -40,7 +40,7 @@ class TelinkApp(Enum):
         elif self == TelinkApp.OTA_REQUESTOR:
             return 'ota-requestor-app'
         elif self == TelinkApp.THERMOSTAT:
-            return 'thermostat-app'
+            return 'thermostat'
         else:
             raise Exception('Unknown app type: %r' % self)
 

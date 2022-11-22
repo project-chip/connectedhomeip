@@ -104,7 +104,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-thermostat' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d thermostat-app \
+                    telink tlsr9518adk80d thermostat \
                     out/telink-tlsr9518adk80d-thermostat/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
