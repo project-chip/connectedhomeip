@@ -26,37 +26,25 @@ _CREATE_DOCKER_SCRIPT_PATH = os.path.dirname(__file__)
 _SUPPORTED_PLATFORM = 'linux_x86'
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-c', '--commit_sha', required=True,
-                    action='store',
-                    dest='commit_sha')
-parser.add_argument('-s', '--short_sha', required=True,
-                    action='store',
-                    dest='short_sha')
-parser.add_argument('-r', '--revision_id', required=True,
-                    action='store',
-                    dest='revision_id')
-parser.add_argument('-b', '--build_id', required=True,
-                    action='store',
-                    dest='build_id')
-parser.add_argument('-i', '--image_name', required=True,
-                    action='store',
-                    dest='image_name')
-parser.add_argument('-t', '--tar_path', required=True,
-                    action='store',
-                    dest='tar_path')
+parser.add_argument('-c', '--commit_sha', required=True)
+parser.add_argument('-s', '--short_sha', required=True)
+parser.add_argument('-r', '--revision_id', required=True)
+parser.add_argument('-b', '--build_id', required=True)
+parser.add_argument('-i', '--image_name', required=True)
+parser.add_argument('-t', '--tar_path', required=True)
 
 args = parser.parse_args()
 
 out_directory = f'{_CREATE_DOCKER_SCRIPT_PATH}/out'
 
 for device_file_name in os.listdir(args.tar_path):
-    # Clean up the out directory before extracting device files
-    shutil.rmtree(out_directory)
-    os.mkdir(out_directory)
-
     platform, device = device_file_name.split('-')
     if _SUPPORTED_PLATFORM not in platform:
         continue
+
+    # Clean up the out directory before extracting device files
+    shutil.rmtree(out_directory)
+    os.mkdir(out_directory)
 
     device = device.replace('.tar.gz', '')
 
