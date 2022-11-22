@@ -101,208 +101,6 @@ server cluster Groups = 4 {
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
-server cluster Scenes = 5 {
-  bitmap ScenesCopyMode : BITMAP8 {
-    kCopyAllScenes = 0x1;
-  }
-
-  struct ExtensionFieldSet {
-    cluster_id clusterId = 0;
-    AttributeValuePair attributeValueList[] = 1;
-  }
-
-  struct AttributeValuePair {
-    optional attrib_id attributeId = 0;
-    int8u attributeValue[] = 1;
-  }
-
-  readonly attribute int8u sceneCount = 0;
-  readonly attribute int8u currentScene = 1;
-  readonly attribute group_id currentGroup = 2;
-  readonly attribute boolean sceneValid = 3;
-  readonly attribute bitmap8 nameSupport = 4;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct AddSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
-    INT16U transitionTime = 2;
-    CHAR_STRING sceneName = 3;
-    ExtensionFieldSet extensionFieldSets[] = 4;
-  }
-
-  request struct ViewSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
-  }
-
-  request struct RemoveSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
-  }
-
-  request struct RemoveAllScenesRequest {
-    group_id groupId = 0;
-  }
-
-  request struct StoreSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
-  }
-
-  request struct RecallSceneRequest {
-    group_id groupId = 0;
-    INT8U sceneId = 1;
-    optional nullable INT16U transitionTime = 2;
-  }
-
-  request struct GetSceneMembershipRequest {
-    group_id groupId = 0;
-  }
-
-  response struct AddSceneResponse = 0 {
-    ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
-  }
-
-  response struct ViewSceneResponse = 1 {
-    ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
-    optional INT16U transitionTime = 3;
-    optional CHAR_STRING sceneName = 4;
-    optional ExtensionFieldSet extensionFieldSets[] = 5;
-  }
-
-  response struct RemoveSceneResponse = 2 {
-    ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
-  }
-
-  response struct RemoveAllScenesResponse = 3 {
-    ENUM8 status = 0;
-    group_id groupId = 1;
-  }
-
-  response struct StoreSceneResponse = 4 {
-    ENUM8 status = 0;
-    group_id groupId = 1;
-    INT8U sceneId = 2;
-  }
-
-  response struct GetSceneMembershipResponse = 6 {
-    ENUM8 status = 0;
-    nullable INT8U capacity = 1;
-    group_id groupId = 2;
-    optional INT8U sceneList[] = 3;
-  }
-
-  fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
-  fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
-  fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
-  fabric command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
-  fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
-  fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
-  fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
-}
-
-client cluster OnOff = 6 {
-  enum OnOffDelayedAllOffEffectVariant : ENUM8 {
-    kFadeToOffIn0p8Seconds = 0;
-    kNoFade = 1;
-    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
-  }
-
-  enum OnOffDyingLightEffectVariant : ENUM8 {
-    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
-  }
-
-  enum OnOffEffectIdentifier : ENUM8 {
-    kDelayedAllOff = 0;
-    kDyingLight = 1;
-  }
-
-  enum OnOffStartUpOnOff : ENUM8 {
-    kOff = 0;
-    kOn = 1;
-    kTogglePreviousOnOff = 2;
-  }
-
-  bitmap OnOffControl : BITMAP8 {
-    kAcceptOnlyWhenOn = 0x1;
-  }
-
-  bitmap OnOffFeature : BITMAP32 {
-    kLighting = 0x1;
-  }
-
-  bitmap SceneFeatures : BITMAP32 {
-    kSceneNames = 0x1;
-  }
-
-  readonly attribute boolean onOff = 0;
-  readonly attribute boolean globalSceneControl = 16384;
-  attribute int16u onTime = 16385;
-  attribute int16u offWaitTime = 16386;
-  attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  command Off(): DefaultSuccess = 0;
-  command On(): DefaultSuccess = 1;
-  command Toggle(): DefaultSuccess = 2;
-}
-
-server cluster OnOff = 6 {
-  enum OnOffDelayedAllOffEffectVariant : ENUM8 {
-    kFadeToOffIn0p8Seconds = 0;
-    kNoFade = 1;
-    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
-  }
-
-  enum OnOffDyingLightEffectVariant : ENUM8 {
-    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
-  }
-
-  enum OnOffEffectIdentifier : ENUM8 {
-    kDelayedAllOff = 0;
-    kDyingLight = 1;
-  }
-
-  enum OnOffStartUpOnOff : ENUM8 {
-    kOff = 0;
-    kOn = 1;
-    kTogglePreviousOnOff = 2;
-  }
-
-  bitmap OnOffControl : BITMAP8 {
-    kAcceptOnlyWhenOn = 0x1;
-  }
-
-  bitmap OnOffFeature : BITMAP32 {
-    kLighting = 0x1;
-  }
-
-  bitmap SceneFeatures : BITMAP32 {
-    kSceneNames = 0x1;
-  }
-
-  readonly attribute boolean onOff = 0;
-  readonly attribute boolean globalSceneControl = 16384;
-  attribute int16u onTime = 16385;
-  attribute int16u offWaitTime = 16386;
-  attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  command Off(): DefaultSuccess = 0;
-  command On(): DefaultSuccess = 1;
-  command Toggle(): DefaultSuccess = 2;
-}
-
 client cluster LevelControl = 8 {
   enum MoveMode : ENUM8 {
     kUp = 0;
@@ -334,104 +132,9 @@ client cluster LevelControl = 8 {
   attribute nullable int16u offTransitionTime = 19;
   attribute nullable int8u defaultMoveRate = 20;
   attribute access(write: manage) nullable int8u startUpCurrentLevel = 16384;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct MoveToLevelRequest {
-    INT8U level = 0;
-    nullable INT16U transitionTime = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
-  }
-
-  request struct MoveRequest {
-    MoveMode moveMode = 0;
-    nullable INT8U rate = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
-  }
-
-  request struct StepRequest {
-    StepMode stepMode = 0;
-    INT8U stepSize = 1;
-    nullable INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
-  }
-
-  request struct StopRequest {
-    BITMAP8 optionsMask = 0;
-    BITMAP8 optionsOverride = 1;
-  }
-
-  request struct MoveToLevelWithOnOffRequest {
-    INT8U level = 0;
-    nullable INT16U transitionTime = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
-  }
-
-  request struct MoveWithOnOffRequest {
-    MoveMode moveMode = 0;
-    nullable INT8U rate = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
-  }
-
-  request struct StepWithOnOffRequest {
-    StepMode stepMode = 0;
-    INT8U stepSize = 1;
-    nullable INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
-  }
-
-  request struct StopWithOnOffRequest {
-    BITMAP8 optionsMask = 0;
-    BITMAP8 optionsOverride = 1;
-  }
-
-  command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
-  command Move(MoveRequest): DefaultSuccess = 1;
-  command Step(StepRequest): DefaultSuccess = 2;
-  command Stop(StopRequest): DefaultSuccess = 3;
-  command MoveToLevelWithOnOff(MoveToLevelWithOnOffRequest): DefaultSuccess = 4;
-  command MoveWithOnOff(MoveWithOnOffRequest): DefaultSuccess = 5;
-  command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
-  command StopWithOnOff(StopWithOnOffRequest): DefaultSuccess = 7;
-}
-
-server cluster LevelControl = 8 {
-  enum MoveMode : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  enum StepMode : ENUM8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap LevelControlFeature : BITMAP32 {
-    kOnOff = 0x1;
-    kLighting = 0x2;
-    kFrequency = 0x4;
-  }
-
-  readonly attribute nullable int8u currentLevel = 0;
-  readonly attribute int16u remainingTime = 1;
-  readonly attribute int8u minLevel = 2;
-  readonly attribute int8u maxLevel = 3;
-  readonly attribute int16u currentFrequency = 4;
-  readonly attribute int16u minFrequency = 5;
-  readonly attribute int16u maxFrequency = 6;
-  attribute bitmap8 options = 15;
-  attribute int16u onOffTransitionTime = 16;
-  attribute nullable int8u onLevel = 17;
-  attribute nullable int16u onTransitionTime = 18;
-  attribute nullable int16u offTransitionTime = 19;
-  attribute nullable int8u defaultMoveRate = 20;
-  attribute access(write: manage) nullable int8u startUpCurrentLevel = 16384;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -517,6 +220,9 @@ client cluster Descriptor = 29 {
   readonly attribute CLUSTER_ID serverList[] = 1;
   readonly attribute CLUSTER_ID clientList[] = 2;
   readonly attribute ENDPOINT_NO partsList[] = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -531,6 +237,9 @@ server cluster Descriptor = 29 {
   readonly attribute CLUSTER_ID serverList[] = 1;
   readonly attribute CLUSTER_ID clientList[] = 2;
   readonly attribute ENDPOINT_NO partsList[] = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -545,6 +254,9 @@ server cluster Binding = 30 {
   }
 
   attribute TargetStruct binding[] = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -1375,43 +1087,6 @@ server cluster EthernetNetworkDiagnostics = 55 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
-server cluster Switch = 59 {
-  info event SwitchLatched = 0 {
-    INT8U newPosition = 0;
-  }
-
-  info event InitialPress = 1 {
-    INT8U newPosition = 0;
-  }
-
-  info event LongPress = 2 {
-    INT8U newPosition = 0;
-  }
-
-  info event ShortRelease = 3 {
-    INT8U previousPosition = 0;
-  }
-
-  info event LongRelease = 4 {
-    INT8U previousPosition = 0;
-  }
-
-  info event MultiPressOngoing = 5 {
-    INT8U newPosition = 0;
-    INT8U currentNumberOfPressesCounted = 1;
-  }
-
-  info event MultiPressComplete = 6 {
-    INT8U newPosition = 0;
-    INT8U totalNumberOfPressesCounted = 1;
-  }
-
-  readonly attribute int8u numberOfPositions = 0;
-  readonly attribute int8u currentPosition = 1;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 server cluster AdministratorCommissioning = 60 {
   enum CommissioningWindowStatus : ENUM8 {
     kWindowNotOpen = 0;
@@ -1625,24 +1300,20 @@ server cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-server cluster BarrierControl = 259 {
-  readonly attribute enum8 barrierMovingState = 1;
-  readonly attribute bitmap16 barrierSafetyStatus = 2;
-  readonly attribute bitmap8 barrierCapabilities = 3;
-  readonly attribute int8u barrierPosition = 10;
+client cluster WakeOnLan = 1283 {
+  readonly attribute char_string<32> MACAddress = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-  request struct BarrierControlGoToPercentRequest {
-    INT8U percentOpen = 0;
-  }
-
-  command BarrierControlGoToPercent(BarrierControlGoToPercentRequest): DefaultSuccess = 0;
-  command BarrierControlStop(): DefaultSuccess = 1;
 }
 
 server cluster WakeOnLan = 1283 {
   readonly attribute char_string<32> MACAddress = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -1681,6 +1352,10 @@ client cluster Channel = 1284 {
   readonly attribute ChannelInfo channelList[] = 0;
   readonly attribute nullable LineupInfo lineup = 1;
   readonly attribute nullable ChannelInfo currentChannel = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ChangeChannelRequest {
@@ -1714,10 +1389,19 @@ client cluster TargetNavigator = 1285 {
   }
 
   readonly attribute TargetInfo targetList[] = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct NavigateTargetRequest {
     INT8U target = 0;
+    optional CHAR_STRING data = 1;
+  }
+
+  response struct NavigateTargetResponse = 1 {
+    TargetNavigatorStatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
 
@@ -1741,6 +1425,11 @@ client cluster MediaPlayback = 1286 {
     kBuffering = 3;
   }
 
+  readonly attribute PlaybackStateEnum currentState = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SkipForwardRequest {
@@ -1753,6 +1442,11 @@ client cluster MediaPlayback = 1286 {
 
   request struct SeekRequest {
     INT64U position = 0;
+  }
+
+  response struct PlaybackResponse = 10 {
+    MediaPlaybackStatusEnum status = 0;
+    optional CHAR_STRING data = 1;
   }
 
   command Play(): PlaybackResponse = 0;
@@ -1796,6 +1490,10 @@ client cluster MediaInput = 1287 {
   }
 
   readonly attribute InputInfo inputList[] = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SelectInputRequest {
@@ -1811,6 +1509,16 @@ client cluster MediaInput = 1287 {
   command ShowInputStatus(): DefaultSuccess = 1;
   command HideInputStatus(): DefaultSuccess = 2;
   command RenameInput(RenameInputRequest): DefaultSuccess = 3;
+}
+
+client cluster LowPower = 1288 {
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  command Sleep(): DefaultSuccess = 0;
 }
 
 client cluster KeypadInput = 1289 {
@@ -1915,10 +1623,18 @@ client cluster KeypadInput = 1289 {
     kNumberKeys = 0x4;
   }
 
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SendKeyRequest {
     CecKeyCode keyCode = 0;
+  }
+
+  response struct SendKeyResponse = 1 {
+    KeypadInputStatusEnum status = 0;
   }
 
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
@@ -2000,6 +1716,10 @@ client cluster ContentLauncher = 1290 {
 
   readonly attribute CHAR_STRING acceptHeader[] = 0;
   attribute bitmap32 supportedStreamingProtocols = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct LaunchContentRequest {
@@ -2039,6 +1759,10 @@ client cluster AudioOutput = 1291 {
   }
 
   readonly attribute OutputInfo outputList[] = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SelectOutputRequest {
@@ -2071,6 +1795,10 @@ client cluster ApplicationLauncher = 1292 {
   }
 
   readonly attribute INT16U catalogList[] = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct LaunchAppRequest {
@@ -2086,6 +1814,11 @@ client cluster ApplicationLauncher = 1292 {
     Application application = 0;
   }
 
+  response struct LauncherResponse = 3 {
+    ApplicationLauncherStatusEnum status = 0;
+    OCTET_STRING data = 1;
+  }
+
   command LaunchApp(LaunchAppRequest): LauncherResponse = 0;
   command StopApp(StopAppRequest): LauncherResponse = 1;
   command HideApp(HideAppRequest): LauncherResponse = 2;
@@ -2099,16 +1832,31 @@ client cluster ApplicationBasic = 1293 {
     kActiveVisibleNotFocus = 3;
   }
 
+  struct ApplicationBasicApplication {
+    int16u catalogVendorId = 0;
+    char_string applicationId = 1;
+  }
+
   readonly attribute char_string<32> vendorName = 0;
   readonly attribute vendor_id vendorID = 1;
   readonly attribute char_string<32> applicationName = 2;
   readonly attribute int16u productID = 3;
+  readonly attribute ApplicationBasicApplication application = 4;
   readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;
+  readonly attribute vendor_id allowedVendorList[] = 7;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
 client cluster AccountLogin = 1294 {
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct GetSetupPINRequest {
@@ -2118,6 +1866,10 @@ client cluster AccountLogin = 1294 {
   request struct LoginRequest {
     CHAR_STRING<100> tempAccountIdentifier = 0;
     CHAR_STRING setupPIN = 1;
+  }
+
+  response struct GetSetupPINResponse = 1 {
+    CHAR_STRING setupPIN = 0;
   }
 
   timed command GetSetupPIN(GetSetupPINRequest): GetSetupPINResponse = 0;
@@ -2397,14 +2149,15 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type videoplayer = 35;
-  binding cluster OnOff;
+  device type videoplayer = 41;
   binding cluster LevelControl;
   binding cluster Descriptor;
+  binding cluster WakeOnLan;
   binding cluster Channel;
   binding cluster TargetNavigator;
   binding cluster MediaPlayback;
   binding cluster MediaInput;
+  binding cluster LowPower;
   binding cluster KeypadInput;
   binding cluster ContentLauncher;
   binding cluster AudioOutput;
@@ -2425,45 +2178,6 @@ endpoint 1 {
     ram      attribute clusterRevision default = 4;
   }
 
-  server cluster Scenes {
-    ram      attribute sceneCount;
-    ram      attribute currentScene;
-    ram      attribute currentGroup;
-    ram      attribute sceneValid;
-    ram      attribute nameSupport;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 4;
-  }
-
-  server cluster OnOff {
-    ram      attribute onOff;
-    ram      attribute globalSceneControl default = 0x01;
-    ram      attribute onTime;
-    ram      attribute offWaitTime;
-    ram      attribute startUpOnOff;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 4;
-  }
-
-  server cluster LevelControl {
-    persist  attribute currentLevel;
-    ram      attribute remainingTime;
-    ram      attribute minLevel;
-    ram      attribute maxLevel default = 0xFF;
-    ram      attribute currentFrequency;
-    ram      attribute minFrequency;
-    ram      attribute maxFrequency;
-    ram      attribute options;
-    ram      attribute onOffTransitionTime;
-    ram      attribute onLevel default = 0xFE;
-    ram      attribute onTransitionTime;
-    ram      attribute offTransitionTime;
-    ram      attribute defaultMoveRate;
-    persist  attribute startUpCurrentLevel default = 255;
-    ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 5;
-  }
-
   server cluster BinaryInputBasic {
     ram      attribute outOfService;
     ram      attribute presentValue;
@@ -2477,19 +2191,18 @@ endpoint 1 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap;
     callback attribute clusterRevision default = 1;
   }
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster Switch {
-    ram      attribute numberOfPositions default = 2;
-    ram      attribute currentPosition;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
@@ -2500,37 +2213,13 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster BarrierControl {
-    ram      attribute barrierMovingState;
-    ram      attribute barrierSafetyStatus;
-    ram      attribute barrierCapabilities;
-    ram      attribute barrierPosition;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 1;
-  }
-
   server cluster WakeOnLan {
     ram      attribute MACAddress;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
-  }
-}
-endpoint 2 {
-  device type occupancysensor = 263;
-
-  server cluster OnOff {
-    ram      attribute onOff;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 4;
-  }
-
-  server cluster Descriptor {
-    callback attribute deviceTypeList;
-    callback attribute serverList;
-    callback attribute clientList;
-    callback attribute partsList;
-    ram      attribute featureMap;
-    callback attribute clusterRevision default = 1;
   }
 }
 

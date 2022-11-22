@@ -30,15 +30,6 @@
 namespace chip {
 namespace Controller {
 
-class DLL_EXPORT OnOffCluster : public ClusterBase
-{
-public:
-    OnOffCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::OnOff::Id, endpoint)
-    {}
-    ~OnOffCluster() {}
-};
-
 class DLL_EXPORT LevelControlCluster : public ClusterBase
 {
 public:
@@ -55,6 +46,15 @@ public:
         ClusterBase(exchangeManager, session, app::Clusters::Descriptor::Id, endpoint)
     {}
     ~DescriptorCluster() {}
+};
+
+class DLL_EXPORT WakeOnLanCluster : public ClusterBase
+{
+public:
+    WakeOnLanCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::WakeOnLan::Id, endpoint)
+    {}
+    ~WakeOnLanCluster() {}
 };
 
 class DLL_EXPORT ChannelCluster : public ClusterBase
@@ -91,6 +91,15 @@ public:
         ClusterBase(exchangeManager, session, app::Clusters::MediaInput::Id, endpoint)
     {}
     ~MediaInputCluster() {}
+};
+
+class DLL_EXPORT LowPowerCluster : public ClusterBase
+{
+public:
+    LowPowerCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::LowPower::Id, endpoint)
+    {}
+    ~LowPowerCluster() {}
 };
 
 class DLL_EXPORT KeypadInputCluster : public ClusterBase
