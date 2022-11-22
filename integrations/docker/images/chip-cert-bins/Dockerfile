@@ -251,7 +251,6 @@ RUN case ${TARGETPLATFORM} in \
         *) ;; \
     esac
 
-RUN npm --prefix third_party/zap/repo/ ci
 RUN scripts/examples/gn_build_test_example.sh app1
 
 RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true -i no

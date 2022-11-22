@@ -94,8 +94,8 @@
             "description": "A randomly-generated 128-bit or longer octet string. Length has been expanded with 'hex:' prefix",
             "type": "string",
             "pattern": "^hex:([0-9A-Fa-f]{2}){16,}$",
-            "minLength": 20,
-            "minLength": 36
+            "minLength": 36,
+            "maxLength": 68
         },
         "dac_cert": {
             "description": "DAC certificate in hex-string format",

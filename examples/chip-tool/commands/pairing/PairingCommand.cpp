@@ -109,10 +109,19 @@ CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
 {
-    RendezvousParameters params =
-        RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
-    CommissioningParameters commissioningParams = GetCommissioningParameters();
-    return CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
+    auto params = RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (mPaseOnly.ValueOr(false))
+    {
+        err = CurrentCommissioner().EstablishPASEConnection(remoteId, params);
+    }
+    else
+    {
+        auto commissioningParams = GetCommissioningParameters();
+        err                      = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
+    }
+    return err;
 }
 
 CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
@@ -183,7 +192,7 @@ void PairingCommand::OnPairingComplete(CHIP_ERROR err)
     {
         ChipLogProgress(chipTool, "Pairing Success");
         ChipLogProgress(chipTool, "PASE establishment successful");
-        if (mPairingMode == PairingMode::CodePaseOnly)
+        if (mPairingMode == PairingMode::CodePaseOnly || mPaseOnly.ValueOr(false))
         {
             SetCommandExitStatus(err);
         }

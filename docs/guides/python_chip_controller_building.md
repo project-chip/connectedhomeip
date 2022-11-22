@@ -1,3 +1,9 @@
+# Deprecation notice
+
+chip-device-ctrl is no longer maintained and should not be used.
+
+Matter-repl is the current python controller implementation.
+
 # Working with Python CHIP Controller
 
 The Python CHIP Controller is a tool that allows to commission a Matter device

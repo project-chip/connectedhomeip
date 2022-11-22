@@ -51,7 +51,7 @@ function(chip_codegen TARGET_NAME)
     #
     # find_package(Python3 REQUIRED)
     add_custom_command(
-        OUTPUT "${OUT_NAMES}"
+        OUTPUT ${OUT_NAMES}
         COMMAND "${CHIP_ROOT}/scripts/codegen.py"
         ARGS "--generator" "${ARG_GENERATOR}"
              "--output-dir" "${GEN_FOLDER}"

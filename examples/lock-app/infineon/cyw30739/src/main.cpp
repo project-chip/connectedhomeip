@@ -66,7 +66,6 @@ static FactoryDataProvider sFactoryDataProvider;
 static void InitApp(intptr_t args);
 static void ActionInitiated(LockManager::Action_t aAction, int32_t aActor);
 static void ActionCompleted(LockManager::Action_t aAction);
-static void WriteClusterState(uint8_t value);
 static void UpdateClusterState(intptr_t context);
 
 #ifndef _countof

@@ -1617,7 +1617,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
                                                    uint16_t maxReadLength)
 {
     // Added for the pairing of TE9 to report the commission_info
-    // default function (in zzz_generated/all-clusters-app/zap-generated/callback-stub.cpp)
+    // default function (in callback-stub.cpp)
     //
     PRINTF("-> %s()\n\r", __FUNCTION__);
     return EMBER_ZCL_STATUS_SUCCESS;
