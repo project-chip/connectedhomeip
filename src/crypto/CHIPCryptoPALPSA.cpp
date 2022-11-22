@@ -107,112 +107,82 @@ bool isValidTag(const uint8_t * tag, size_t tag_length)
 } // namespace
 
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * key, size_t key_length, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
+                           const Aes128KeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length)
 {
-    VerifyOrReturnError(isBufferNonEmpty(key, key_length), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(isBufferNonEmpty(nonce, nonce_length), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(isValidTag(tag, tag_length), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((ciphertext != nullptr && plaintext != nullptr) || plaintext_length == 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aad != nullptr || aad_length == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     const psa_algorithm_t algorithm = PSA_ALG_AEAD_WITH_SHORTENED_TAG(PSA_ALG_CCM, tag_length);
-    CHIP_ERROR error                = CHIP_NO_ERROR;
     psa_status_t status             = PSA_SUCCESS;
-    psa_key_attributes_t attrs      = PSA_KEY_ATTRIBUTES_INIT;
-    psa_key_id_t keyId              = 0;
     psa_aead_operation_t operation  = PSA_AEAD_OPERATION_INIT;
     size_t out_length;
     size_t tag_out_length;
 
-    psa_set_key_type(&attrs, PSA_KEY_TYPE_AES);
-    psa_set_key_algorithm(&attrs, algorithm);
-    psa_set_key_usage_flags(&attrs, PSA_KEY_USAGE_ENCRYPT);
-
-    status = psa_import_key(&attrs, key, key_length, &keyId);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
-
-    status = psa_aead_encrypt_setup(&operation, keyId, algorithm);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    status = psa_aead_encrypt_setup(&operation, key.As<psa_key_id_t>(), algorithm);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_aead_set_lengths(&operation, aad_length, plaintext_length);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_aead_set_nonce(&operation, nonce, nonce_length);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_aead_update_ad(&operation, aad, aad_length);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_aead_update(&operation, plaintext, plaintext_length, ciphertext,
                              PSA_AEAD_UPDATE_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm, plaintext_length), &out_length);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     ciphertext += out_length;
 
     status = psa_aead_finish(&operation, ciphertext, PSA_AEAD_FINISH_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm), &out_length, tag,
                              tag_length, &tag_out_length);
-    VerifyOrExit(status == PSA_SUCCESS && tag_length == tag_out_length, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == PSA_SUCCESS && tag_length == tag_out_length, CHIP_ERROR_INTERNAL);
 
-exit:
-    psa_destroy_key(keyId);
-    psa_reset_key_attributes(&attrs);
-
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length, const uint8_t * nonce,
+                           const uint8_t * tag, size_t tag_length, const Aes128KeyHandle & key, const uint8_t * nonce,
                            size_t nonce_length, uint8_t * plaintext)
 {
-    VerifyOrReturnError(isBufferNonEmpty(key, key_length), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(isBufferNonEmpty(nonce, nonce_length), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(isValidTag(tag, tag_length), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((ciphertext != nullptr && plaintext != nullptr) || ciphertext_length == 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aad != nullptr || aad_length == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     const psa_algorithm_t algorithm = PSA_ALG_AEAD_WITH_SHORTENED_TAG(PSA_ALG_CCM, tag_length);
-    CHIP_ERROR error                = CHIP_NO_ERROR;
     psa_status_t status             = PSA_SUCCESS;
-    psa_key_attributes_t attrs      = PSA_KEY_ATTRIBUTES_INIT;
-    psa_key_id_t keyId              = 0;
     psa_aead_operation_t operation  = PSA_AEAD_OPERATION_INIT;
     size_t outLength;
 
-    psa_set_key_type(&attrs, PSA_KEY_TYPE_AES);
-    psa_set_key_algorithm(&attrs, algorithm);
-    psa_set_key_usage_flags(&attrs, PSA_KEY_USAGE_DECRYPT);
-
-    status = psa_import_key(&attrs, key, key_length, &keyId);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
-
-    status = psa_aead_decrypt_setup(&operation, keyId, algorithm);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    status = psa_aead_decrypt_setup(&operation, key.As<psa_key_id_t>(), algorithm);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_aead_set_lengths(&operation, aad_length, ciphertext_length);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_aead_set_nonce(&operation, nonce, nonce_length);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_aead_update_ad(&operation, aad, aad_length);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     status = psa_aead_update(&operation, ciphertext, ciphertext_length, plaintext,
                              PSA_AEAD_UPDATE_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm, ciphertext_length), &outLength);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     plaintext += outLength;
 
     status = psa_aead_verify(&operation, plaintext, PSA_AEAD_VERIFY_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm), &outLength, tag,
                              tag_length);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
-exit:
-    psa_destroy_key(keyId);
-    psa_reset_key_attributes(&attrs);
-
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Hash_SHA256(const uint8_t * data, const size_t data_length, uint8_t * out_buffer)

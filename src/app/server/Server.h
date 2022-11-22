@@ -38,6 +38,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/OperationalCertificateStore.h>
 #include <credentials/PersistentStorageOpCertStore.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <crypto/OperationalKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <inet/InetConfig.h>
@@ -85,8 +86,7 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 
 struct ServerInitParams
 {
-    ServerInitParams()          = default;
-    virtual ~ServerInitParams() = default;
+    ServerInitParams() = default;
 
     // Not copyable
     ServerInitParams(const ServerInitParams &) = delete;
@@ -116,6 +116,8 @@ struct ServerInitParams
     // Group data provider: MUST be injected. Used to maintain critical keys such as the Identity
     // Protection Key (IPK) for CASE. Must be initialized before being provided.
     Credentials::GroupDataProvider * groupDataProvider = nullptr;
+    // Session keystore: MUST be injected. Used to derive and manage lifecycle of symmetric keys.
+    Crypto::SessionKeystore * sessionKeystore = nullptr;
     // Access control delegate: MUST be injected. Used to look up access control rules. Must be
     // initialized before being provided.
     Access::AccessControl::Delegate * accessDelegate = nullptr;
@@ -215,22 +217,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
      * @return CHIP_NO_ERROR on success or a CHIP_ERROR value from APIs called to initialize
      *         resources on failure.
      */
-    virtual CHIP_ERROR InitializeStaticResourcesBeforeServerInit()
+    CHIP_ERROR InitializeStaticResourcesBeforeServerInit()
     {
-        static chip::KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
-        static chip::PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
-        static chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
-        static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
-        static IgnoreCertificateValidityPolicy sDefaultCertValidityPolicy;
-
-#if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
-        static chip::SimpleSessionResumptionStorage sSessionResumptionStorage;
-#endif
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-        static chip::app::SimpleSubscriptionResumptionStorage sSubscriptionResumptionStorage;
-#endif
-        static chip::app::DefaultAclStorage sAclStorage;
-
         // KVS-based persistent storage delegate injection
         if (persistentStorageDelegate == nullptr)
         {
@@ -259,8 +247,12 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
             this->opCertStore = &sPersistentStorageOpCertStore;
         }
 
+        // Session Keystore injection
+        this->sessionKeystore = &sSessionKeystore;
+
         // Group Data provider injection
         sGroupDataProvider.SetStorageDelegate(this->persistentStorageDelegate);
+        sGroupDataProvider.SetSessionKeystore(this->sessionKeystore);
         ReturnErrorOnFailure(sGroupDataProvider.Init());
         this->groupDataProvider = &sGroupDataProvider;
 
@@ -291,6 +283,21 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    static KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
+    static PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
+    static Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
+    static Credentials::GroupDataProviderImpl sGroupDataProvider;
+    static IgnoreCertificateValidityPolicy sDefaultCertValidityPolicy;
+#if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
+    static SimpleSessionResumptionStorage sSessionResumptionStorage;
+#endif
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    static app::SimpleSubscriptionResumptionStorage sSubscriptionResumptionStorage;
+#endif
+    static app::DefaultAclStorage sAclStorage;
+    static Crypto::DefaultSessionKeystore sSessionKeystore;
 };
 
 /**
@@ -341,6 +348,8 @@ public:
     TransportMgrBase & GetTransportManager() { return mTransports; }
 
     Credentials::GroupDataProvider * GetGroupDataProvider() { return mGroupsProvider; }
+
+    Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * GetBleLayerObject() { return mBleLayer; }
@@ -556,6 +565,7 @@ private:
     app::SubscriptionResumptionStorage * mSubscriptionResumptionStorage;
     Credentials::CertificateValidityPolicy * mCertificateValidityPolicy;
     Credentials::GroupDataProvider * mGroupsProvider;
+    Crypto::SessionKeystore * mSessionKeystore;
     app::DefaultAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;
     ServerFabricDelegate mFabricDelegate;

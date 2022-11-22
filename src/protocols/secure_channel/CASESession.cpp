@@ -119,12 +119,6 @@ constexpr uint8_t kTBEData3_Nonce[] =
 constexpr size_t kTBEDataNonceLength = sizeof(kTBEData2_Nonce);
 static_assert(sizeof(kTBEData2_Nonce) == sizeof(kTBEData3_Nonce), "TBEData2_Nonce and TBEData3_Nonce must be same size");
 
-#ifdef ENABLE_HSM_HKDF
-using HKDF_sha_crypto = HKDF_shaHSM;
-#else
-using HKDF_sha_crypto = HKDF_sha;
-#endif
-
 // Amounts of time to allow for server-side processing of messages.
 //
 // These timeout values only allow for the server-side processing and assume that any transport-specific
@@ -190,6 +184,7 @@ CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::Certi
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(sessionManager.GetSessionKeystore() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     Clear();
 
@@ -331,8 +326,9 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session) const
             VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
         }
 
-        ReturnErrorOnFailure(session.InitFromSecret(mSharedSecret.Span(), ByteSpan(msg_salt),
-                                                    CryptoContext::SessionInfoType::kSessionEstablishment, mRole));
+        ReturnErrorOnFailure(session.InitFromSecret(*mSessionManager->GetSessionKeystore(), mSharedSecret.Span(),
+                                                    ByteSpan(msg_salt), CryptoContext::SessionInfoType::kSessionEstablishment,
+                                                    mRole));
 
         return CHIP_NO_ERROR;
     }
@@ -347,8 +343,8 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session) const
             VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
         }
 
-        ReturnErrorOnFailure(session.InitFromSecret(mSharedSecret.Span(), ByteSpan(msg_salt),
-                                                    CryptoContext::SessionInfoType::kSessionResumption, mRole));
+        ReturnErrorOnFailure(session.InitFromSecret(*mSessionManager->GetSessionKeystore(), mSharedSecret.Span(),
+                                                    ByteSpan(msg_salt), CryptoContext::SessionInfoType::kSessionResumption, mRole));
 
         return CHIP_NO_ERROR;
     }
@@ -757,10 +753,8 @@ CHIP_ERROR CASESession::SendSigma2()
     MutableByteSpan saltSpan(msg_salt);
     ReturnErrorOnFailure(ConstructSaltSigma2(ByteSpan(msg_rand), mEphemeralKey->Pubkey(), ByteSpan(mIPK), saltSpan));
 
-    HKDF_sha_crypto mHKDF;
-    uint8_t sr2k[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
-    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(mSharedSecret.ConstBytes(), mSharedSecret.Length(), saltSpan.data(), saltSpan.size(),
-                                           kKDFSR2Info, kKDFInfoLength, sr2k, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES));
+    AutoReleaseSessionKey sr2k(*mSessionManager->GetSessionKeystore());
+    ReturnErrorOnFailure(DeriveSigmaKey(saltSpan, ByteSpan(kKDFSR2Info), sr2k));
 
     // Construct Sigma2 TBS Data
     size_t msg_r2_signed_len =
@@ -817,10 +811,9 @@ CHIP_ERROR CASESession::SendSigma2()
     msg_r2_signed_enc_len = static_cast<size_t>(tlvWriter.GetLengthWritten());
 
     // Generate the encrypted data blob
-    ReturnErrorOnFailure(AES_CCM_encrypt(msg_R2_Encrypted.Get(), msg_r2_signed_enc_len, nullptr, 0, sr2k,
-                                         CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, kTBEData2_Nonce, kTBEDataNonceLength,
-                                         msg_R2_Encrypted.Get(), msg_R2_Encrypted.Get() + msg_r2_signed_enc_len,
-                                         CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
+    ReturnErrorOnFailure(AES_CCM_encrypt(msg_R2_Encrypted.Get(), msg_r2_signed_enc_len, nullptr, 0, sr2k.KeyHandle(),
+                                         kTBEData2_Nonce, kTBEDataNonceLength, msg_R2_Encrypted.Get(),
+                                         msg_R2_Encrypted.Get() + msg_r2_signed_enc_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
     // Construct Sigma2 Msg
     const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
@@ -959,7 +952,7 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     size_t max_msg_r2_signed_enc_len;
     constexpr size_t kCaseOverheadForFutureTbeData = 128;
 
-    uint8_t sr2k[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+    AutoReleaseSessionKey sr2k(*mSessionManager->GetSessionKeystore());
 
     P256ECDSASignature tbsData2Signature;
 
@@ -1010,13 +1003,8 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     // Generate the S2K key
     {
         MutableByteSpan saltSpan(msg_salt);
-        err = ConstructSaltSigma2(ByteSpan(responderRandom), mRemotePubKey, ByteSpan(mIPK), saltSpan);
-        SuccessOrExit(err);
-
-        HKDF_sha_crypto mHKDF;
-        err = mHKDF.HKDF_SHA256(mSharedSecret.ConstBytes(), mSharedSecret.Length(), saltSpan.data(), saltSpan.size(), kKDFSR2Info,
-                                kKDFInfoLength, sr2k, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
-        SuccessOrExit(err);
+        SuccessOrExit(err = ConstructSaltSigma2(ByteSpan(responderRandom), mRemotePubKey, ByteSpan(mIPK), saltSpan));
+        SuccessOrExit(err = DeriveSigmaKey(saltSpan, ByteSpan(kKDFSR2Info), sr2k));
     }
 
     SuccessOrExit(err = mCommissioningHash.AddData(ByteSpan{ buf, buflen }));
@@ -1038,9 +1026,8 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     msg_r2_encrypted_len = msg_r2_encrypted_len_with_tag - CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
 
     SuccessOrExit(err = AES_CCM_decrypt(msg_R2_Encrypted.Get(), msg_r2_encrypted_len, nullptr, 0,
-                                        msg_R2_Encrypted.Get() + msg_r2_encrypted_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, sr2k,
-                                        CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, kTBEData2_Nonce, kTBEDataNonceLength,
-                                        msg_R2_Encrypted.Get()));
+                                        msg_R2_Encrypted.Get() + msg_r2_encrypted_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
+                                        sr2k.KeyHandle(), kTBEData2_Nonce, kTBEDataNonceLength, msg_R2_Encrypted.Get()));
 
     decryptedDataTlvReader.Init(msg_R2_Encrypted.Get(), msg_r2_encrypted_len);
     containerType = TLV::kTLVType_Structure;
@@ -1126,7 +1113,7 @@ CHIP_ERROR CASESession::SendSigma3()
 
     uint8_t msg_salt[kIPKSize + kSHA256_Hash_Length];
 
-    uint8_t sr3k[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+    AutoReleaseSessionKey sr3k(*mSessionManager->GetSessionKeystore());
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Signed;
     size_t msg_r3_signed_len;
@@ -1201,20 +1188,14 @@ CHIP_ERROR CASESession::SendSigma3()
     // Generate S3K key
     {
         MutableByteSpan saltSpan(msg_salt);
-        err = ConstructSaltSigma3(ByteSpan(mIPK), saltSpan);
-        SuccessOrExit(err);
-
-        HKDF_sha_crypto mHKDF;
-        err = mHKDF.HKDF_SHA256(mSharedSecret.ConstBytes(), mSharedSecret.Length(), saltSpan.data(), saltSpan.size(), kKDFSR3Info,
-                                kKDFInfoLength, sr3k, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
-        SuccessOrExit(err);
+        SuccessOrExit(err = ConstructSaltSigma3(ByteSpan(mIPK), saltSpan));
+        SuccessOrExit(err = DeriveSigmaKey(saltSpan, ByteSpan(kKDFSR3Info), sr3k));
     }
 
     // Generated Encrypted data blob
-    err = AES_CCM_encrypt(msg_R3_Encrypted.Get(), msg_r3_encrypted_len, nullptr, 0, sr3k, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES,
-                          kTBEData3_Nonce, kTBEDataNonceLength, msg_R3_Encrypted.Get(),
-                          msg_R3_Encrypted.Get() + msg_r3_encrypted_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
-    SuccessOrExit(err);
+    SuccessOrExit(err = AES_CCM_encrypt(msg_R3_Encrypted.Get(), msg_r3_encrypted_len, nullptr, 0, sr3k.KeyHandle(), kTBEData3_Nonce,
+                                        kTBEDataNonceLength, msg_R3_Encrypted.Get(), msg_R3_Encrypted.Get() + msg_r3_encrypted_len,
+                                        CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
     // Generate Sigma3 Msg
     data_len = TLV::EstimateStructOverhead(CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, msg_r3_encrypted_len);
@@ -1310,7 +1291,7 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
     size_t msg_r3_encrypted_len_with_tag = 0;
     size_t max_msg_r3_signed_enc_len;
 
-    uint8_t sr3k[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+    AutoReleaseSessionKey sr3k(*mSessionManager->GetSessionKeystore());
 
     uint8_t msg_salt[kIPKSize + kSHA256_Hash_Length];
 
@@ -1360,22 +1341,16 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
         // Step 1
         {
             MutableByteSpan saltSpan(msg_salt);
-            err = ConstructSaltSigma3(ByteSpan(mIPK), saltSpan);
-            SuccessOrExit(err);
-
-            HKDF_sha_crypto mHKDF;
-            err = mHKDF.HKDF_SHA256(mSharedSecret.ConstBytes(), mSharedSecret.Length(), saltSpan.data(), saltSpan.size(),
-                                    kKDFSR3Info, kKDFInfoLength, sr3k, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
-            SuccessOrExit(err);
+            SuccessOrExit(err = ConstructSaltSigma3(ByteSpan(mIPK), saltSpan));
+            SuccessOrExit(err = DeriveSigmaKey(saltSpan, ByteSpan(kKDFSR3Info), sr3k));
         }
 
         SuccessOrExit(err = mCommissioningHash.AddData(ByteSpan{ buf, bufLen }));
 
         // Step 2 - Decrypt data blob
         SuccessOrExit(err = AES_CCM_decrypt(msg_R3_Encrypted.Get(), msg_r3_encrypted_len, nullptr, 0,
-                                            msg_R3_Encrypted.Get() + msg_r3_encrypted_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, sr3k,
-                                            CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, kTBEData3_Nonce, kTBEDataNonceLength,
-                                            msg_R3_Encrypted.Get()));
+                                            msg_R3_Encrypted.Get() + msg_r3_encrypted_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
+                                            sr3k.KeyHandle(), kTBEData3_Nonce, kTBEDataNonceLength, msg_R3_Encrypted.Get()));
 
         decryptedDataTlvReader.Init(msg_R3_Encrypted.Get(), msg_r3_encrypted_len);
         containerType = TLV::kTLVType_Structure;
@@ -1563,6 +1538,11 @@ exit:
     return err;
 }
 
+CHIP_ERROR CASESession::DeriveSigmaKey(const ByteSpan & salt, const ByteSpan & info, AutoReleaseSessionKey & key) const
+{
+    return mSessionManager->GetSessionKeystore()->DeriveKey(mSharedSecret, salt, info, key.KeyHandle());
+}
+
 CHIP_ERROR CASESession::ConstructSaltSigma2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                             MutableByteSpan & salt)
 {
@@ -1603,10 +1583,8 @@ CHIP_ERROR CASESession::ConstructSaltSigma3(const ByteSpan & ipk, MutableByteSpa
 }
 
 CHIP_ERROR CASESession::ConstructSigmaResumeKey(const ByteSpan & initiatorRandom, const ByteSpan & resumptionID,
-                                                const ByteSpan & skInfo, const ByteSpan & nonce, MutableByteSpan & resumeKey)
+                                                const ByteSpan & skInfo, const ByteSpan & nonce, AutoReleaseSessionKey & resumeKey)
 {
-    VerifyOrReturnError(resumeKey.size() >= CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, CHIP_ERROR_BUFFER_TOO_SMALL);
-
     constexpr size_t saltSize = kSigmaParamRandomNumberSize + SessionResumptionStorage::kResumptionIdSize;
     uint8_t salt[saltSize];
 
@@ -1619,11 +1597,7 @@ CHIP_ERROR CASESession::ConstructSigmaResumeKey(const ByteSpan & initiatorRandom
     size_t saltWritten = 0;
     VerifyOrReturnError(bbuf.Fit(saltWritten), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    HKDF_sha_crypto mHKDF;
-    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(mSharedSecret.ConstBytes(), mSharedSecret.Length(), salt, saltWritten, skInfo.data(),
-                                           skInfo.size(), resumeKey.data(), CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES));
-    resumeKey.reduce_size(CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
-    return CHIP_NO_ERROR;
+    return DeriveSigmaKey(ByteSpan(salt, saltWritten), skInfo, resumeKey);
 }
 
 CHIP_ERROR CASESession::GenerateSigmaResumeMIC(const ByteSpan & initiatorRandom, const ByteSpan & resumptionID,
@@ -1631,13 +1605,10 @@ CHIP_ERROR CASESession::GenerateSigmaResumeMIC(const ByteSpan & initiatorRandom,
 {
     VerifyOrReturnError(resumeMIC.size() >= CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    uint8_t srk[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
-    MutableByteSpan resumeKey(srk);
-
-    ReturnErrorOnFailure(ConstructSigmaResumeKey(initiatorRandom, resumptionID, skInfo, nonce, resumeKey));
-
-    ReturnErrorOnFailure(AES_CCM_encrypt(nullptr, 0, nullptr, 0, resumeKey.data(), resumeKey.size(), nonce.data(), nonce.size(),
-                                         nullptr, resumeMIC.data(), CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
+    AutoReleaseSessionKey srk(*mSessionManager->GetSessionKeystore());
+    ReturnErrorOnFailure(ConstructSigmaResumeKey(initiatorRandom, resumptionID, skInfo, nonce, srk));
+    ReturnErrorOnFailure(AES_CCM_encrypt(nullptr, 0, nullptr, 0, srk.KeyHandle(), nonce.data(), nonce.size(), nullptr,
+                                         resumeMIC.data(), CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
     resumeMIC.reduce_size(CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     return CHIP_NO_ERROR;
@@ -1648,13 +1619,10 @@ CHIP_ERROR CASESession::ValidateSigmaResumeMIC(const ByteSpan & resumeMIC, const
 {
     VerifyOrReturnError(resumeMIC.size() == CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    uint8_t srk[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
-    MutableByteSpan resumeKey(srk);
-
-    ReturnErrorOnFailure(ConstructSigmaResumeKey(initiatorRandom, resumptionID, skInfo, nonce, resumeKey));
-
-    ReturnErrorOnFailure(AES_CCM_decrypt(nullptr, 0, nullptr, 0, resumeMIC.data(), resumeMIC.size(), resumeKey.data(),
-                                         resumeKey.size(), nonce.data(), nonce.size(), nullptr));
+    AutoReleaseSessionKey srk(*mSessionManager->GetSessionKeystore());
+    ReturnErrorOnFailure(ConstructSigmaResumeKey(initiatorRandom, resumptionID, skInfo, nonce, srk));
+    ReturnErrorOnFailure(AES_CCM_decrypt(nullptr, 0, nullptr, 0, resumeMIC.data(), resumeMIC.size(), srk.KeyHandle(), nonce.data(),
+                                         nonce.size(), nullptr));
 
     return CHIP_NO_ERROR;
 }
