@@ -20,8 +20,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-
 #include "wfx_host_events.h"
 #include "wifi_config.h"
 
@@ -31,8 +29,8 @@
 
 #include "FreeRTOS.h"
 #include "event_groups.h"
-#include "task.h"
 #include "siwx917_utils.h"
+#include "task.h"
 
 #include <platform/CHIPDeviceLayer.h>
 using namespace ::chip;

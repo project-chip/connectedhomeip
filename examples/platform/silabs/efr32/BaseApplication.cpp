@@ -51,9 +51,9 @@
 #include <setup_payload/SetupPayload.h>
 
 #if CHIP_ENABLE_OPENTHREAD
-#include <platform/silabs/EFR32/ThreadStackManagerImpl.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
+#include <platform/silabs/EFR32/ThreadStackManagerImpl.h>
 #endif // CHIP_ENABLE_OPENTHREAD
 
 #ifdef SL_WIFI

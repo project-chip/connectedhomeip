@@ -75,11 +75,7 @@ int16_t rsi_uart_recv(uint8_t * ptrBuf, uint16_t bufLen);
 int16_t rsi_com_port_send(uint8_t * ptrBuf, uint16_t bufLen);
 int16_t rsi_com_port_receive(uint8_t * ptrBuf, uint16_t bufLen);
 uint32_t rsi_get_random_number(void);
-int32_t rsi_timer_start(uint8_t timer_node,
-                        uint8_t mode,
-                        uint8_t type,
-                        uint32_t duration,
-                        void (*rsi_timer_expiry_handler)(void));
+int32_t rsi_timer_start(uint8_t timer_node, uint8_t mode, uint8_t type, uint32_t duration, void (*rsi_timer_expiry_handler)(void));
 int32_t rsi_timer_stop(uint8_t timer_node);
 uint32_t rsi_timer_read(uint8_t timer_node);
 void rsi_delay_us(uint32_t delay_us);

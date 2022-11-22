@@ -30,13 +30,12 @@
 #include "timers.h"
 
 extern "C" {
+#include <bluetooth/rsi_ble_config.h>
 #include <rsi_ble.h>
 #include <rsi_ble_apis.h>
-#include <bluetooth/rsi_ble_config.h>
 #include <rsi_bt_common.h>
 #include <rsi_bt_common_apis.h>
 //#include "wfx_sl_ble_init.h"
-
 }
 
 namespace chip {
@@ -55,8 +54,8 @@ public:
     void HandleBootEvent(void);
     void HandleConnectEvent(void);
     void HandleConnectionCloseEvent(uint16_t reason);
-    void HandleWriteEvent(rsi_ble_event_write_t  evt);
-    void UpdateMtu(rsi_ble_event_mtu_t  evt);
+    void HandleWriteEvent(rsi_ble_event_write_t evt);
+    void UpdateMtu(rsi_ble_event_mtu_t evt);
     void HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId);
     void HandleTXCharCCCDWrite(void);
     void HandleSoftTimerEvent(void);

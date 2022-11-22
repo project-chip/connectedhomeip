@@ -69,7 +69,6 @@ public:
 
     CHIP_ERROR StartAppTask();
 
-
     /**
      * @brief Callback called by the identify-server when an identify command is received
      *

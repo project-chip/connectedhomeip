@@ -27,7 +27,6 @@
 #define SL_WFX_SCAN_COMPLETE_ID 4
 #define WFX_RSI_SSID_SIZE 64
 
-
 #ifndef RS911X_SOCKETS
 /* LwIP includes. */
 #include "lwip/apps/httpd.h"
@@ -49,12 +48,10 @@
 
 #include "sl_status.h"
 
-
 #define WLAN_TASK_STACK_SIZE 1024
 #define WLAN_TASK_PRIORITY 3
 #define WLAN_DRIVER_TASK_PRIORITY 2
 #define MAX_JOIN_RETRIES_COUNT 5
-
 
 // WLAN related Macros
 #define ETH_FRAME 0
@@ -279,7 +276,6 @@ void * wfx_rsi_alloc_pkt(void);
 void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off);
 int32_t wfx_rsi_send_data(void * p, uint16_t len);
 #endif /* RS911X_WIFI */
-
 
 #ifdef __cplusplus
 }

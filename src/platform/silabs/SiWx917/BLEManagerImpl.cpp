@@ -31,7 +31,6 @@
 
 //#include "rail.h"
 extern "C" {
-#include <stdbool.h>
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "task.h"
@@ -41,6 +40,7 @@ extern "C" {
 #include "wfx_sl_ble_init.h"
 #include <rsi_driver.h>
 #include <rsi_utils.h>
+#include <stdbool.h>
 }
 #include <ble/CHIPBleServiceData.h>
 #include <lib/support/CodeUtils.h>
@@ -58,10 +58,10 @@ extern uint16_t rsi_ble_measurement_hndl;
 extern rsi_ble_event_conn_status_t conn_event_to_app;
 extern sl_wfx_msg_t event_msg;
 
-//StaticTask_t busInitTaskStruct;
+// StaticTask_t busInitTaskStruct;
 
 /* wfxRsi Task will use as its stack */
-//StackType_t wfxRsiInitTaskStack[WFX_RSI_TASK_SZ] = { 0 };
+// StackType_t wfxRsiInitTaskStack[WFX_RSI_TASK_SZ] = { 0 };
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -72,7 +72,7 @@ void rsi_ble_event_handling_task(void)
 
     // int32_t event_id;
     WFX_RSI_LOG("StartAdvertising");
-//    chip::DeviceLayer::Internal::BLEManagerImpl().StartAdvertising(); //TODO:: Called on after init of module
+    //    chip::DeviceLayer::Internal::BLEManagerImpl().StartAdvertising(); //TODO:: Called on after init of module
 
     // Application event map
     while (1)
@@ -85,45 +85,45 @@ void rsi_ble_event_handling_task(void)
         }
         switch (event_id)
         {
-            case RSI_BLE_CONN_EVENT: {
-                rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
-                chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectEvent();
-                WFX_RSI_LOG(" RSI_BLE : Module got connected");
-            }
-            break;
-            case RSI_BLE_DISCONN_EVENT: {
-                // event invokes when disconnection was completed
-                WFX_RSI_LOG(" RSI_BLE : Module got Disconnected");
-                chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectionCloseEvent(event_msg.reason);
-                // clear the served event
-                rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
-            }
-            break;
-            case RSI_BLE_MTU_EVENT: {
-                // event invokes when write/notification events received
-                WFX_RSI_LOG("RSI_BLE:: RSI_BLE_MTU_EVENT");
-                chip::DeviceLayer::Internal::BLEMgrImpl().UpdateMtu(event_msg.rsi_ble_mtu);
-                // clear the served event
-                rsi_ble_app_clear_event(RSI_BLE_MTU_EVENT);
-            }
-            break;
-            case RSI_BLE_GATT_WRITE_EVENT: {
-                // event invokes when write/notification events received
-                WFX_RSI_LOG("RSI_BLE : RSI_BLE_GATT_WRITE_EVENT");
-                chip::DeviceLayer::Internal::BLEMgrImpl().HandleWriteEvent(event_msg.rsi_ble_write);
-                // clear the served event
-                rsi_ble_app_clear_event(RSI_BLE_GATT_WRITE_EVENT);
-            }
-            break;
-            case RSI_BLE_GATT_INDICATION_CONFIRMATION: {
-                WFX_RSI_LOG("RSI_BLE : indication confirmation");
-                chip::DeviceLayer::Internal::BLEMgrImpl().HandleTxConfirmationEvent(1);
-                rsi_ble_app_clear_event(RSI_BLE_GATT_INDICATION_CONFIRMATION);
-            }
-            break;
+        case RSI_BLE_CONN_EVENT: {
+            rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
+            chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectEvent();
+            WFX_RSI_LOG(" RSI_BLE : Module got connected");
+        }
+        break;
+        case RSI_BLE_DISCONN_EVENT: {
+            // event invokes when disconnection was completed
+            WFX_RSI_LOG(" RSI_BLE : Module got Disconnected");
+            chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectionCloseEvent(event_msg.reason);
+            // clear the served event
+            rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
+        }
+        break;
+        case RSI_BLE_MTU_EVENT: {
+            // event invokes when write/notification events received
+            WFX_RSI_LOG("RSI_BLE:: RSI_BLE_MTU_EVENT");
+            chip::DeviceLayer::Internal::BLEMgrImpl().UpdateMtu(event_msg.rsi_ble_mtu);
+            // clear the served event
+            rsi_ble_app_clear_event(RSI_BLE_MTU_EVENT);
+        }
+        break;
+        case RSI_BLE_GATT_WRITE_EVENT: {
+            // event invokes when write/notification events received
+            WFX_RSI_LOG("RSI_BLE : RSI_BLE_GATT_WRITE_EVENT");
+            chip::DeviceLayer::Internal::BLEMgrImpl().HandleWriteEvent(event_msg.rsi_ble_write);
+            // clear the served event
+            rsi_ble_app_clear_event(RSI_BLE_GATT_WRITE_EVENT);
+        }
+        break;
+        case RSI_BLE_GATT_INDICATION_CONFIRMATION: {
+            WFX_RSI_LOG("RSI_BLE : indication confirmation");
+            chip::DeviceLayer::Internal::BLEMgrImpl().HandleTxConfirmationEvent(1);
+            rsi_ble_app_clear_event(RSI_BLE_GATT_INDICATION_CONFIRMATION);
+        }
+        break;
 
-            case RSI_BLE_RESP_ATT_VALUE: {
-                WFX_RSI_LOG("RSI_BLE : RESP_ATT confirmation");
+        case RSI_BLE_RESP_ATT_VALUE: {
+            WFX_RSI_LOG("RSI_BLE : RESP_ATT confirmation");
         }
         default:
             break;
@@ -173,8 +173,8 @@ namespace {
 #define BLE_CONFIG_MIN_INTERVAL (16) // Time = Value x 1.25 ms = 30ms
 #define BLE_CONFIG_MAX_INTERVAL (80) // Time = Value x 1.25 ms = 100ms
 #define BLE_CONFIG_LATENCY (0)
-#define BLE_CONFIG_TIMEOUT (100) // Time = Value x 10 ms = 1s
-#define BLE_CONFIG_MIN_CE_LENGTH (0) // Leave to min value
+#define BLE_CONFIG_TIMEOUT (100)          // Time = Value x 10 ms = 1s
+#define BLE_CONFIG_MIN_CE_LENGTH (0)      // Leave to min value
 #define BLE_CONFIG_MAX_CE_LENGTH (0xFFFF) // Leave to max value
 
 #define BLE__DEFAULT_TIMER_PERIOD 1
@@ -198,11 +198,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
     CHIP_ERROR err;
     ChipLogProgress(DeviceLayer, "%s Start ", __func__);
 
+    //    wfx_rsi.init_task = xTaskCreateStatic((TaskFunction_t) wfx_sl_module_init, "init_task", WFX_RSI_TASK_SZ, NULL, 1,
+    //    wfxRsiInitTaskStack, &busInitTaskStruct);
 
-
-//    wfx_rsi.init_task = xTaskCreateStatic((TaskFunction_t) wfx_sl_module_init, "init_task", WFX_RSI_TASK_SZ, NULL, 1, wfxRsiInitTaskStack, &busInitTaskStruct);
-
-    if (NULL == wfx_rsi.init_task) {
+    if (NULL == wfx_rsi.init_task)
+    {
         WFX_RSI_LOG("%s: error: failed to create task.", __func__);
     }
 
@@ -295,7 +295,7 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 {
     ChipLogProgress(DeviceLayer, "_SetDeviceName Started");
-    rsi_bt_set_local_name((uint8_t *)RSI_BLE_DEV_NAME);
+    rsi_bt_set_local_name((uint8_t *) RSI_BLE_DEV_NAME);
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported)
     {
         ChipLogProgress(DeviceLayer, "_SetDeviceName CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE");
@@ -408,7 +408,8 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 {
     int32_t status = 0;
     WFX_RSI_LOG("In send indication");
-    status = rsi_ble_indicate_value(event_msg.resp_enh_conn.dev_addr, event_msg.rsi_ble_measurement_hndl, (data->DataLength()), data->Start());
+    status = rsi_ble_indicate_value(event_msg.resp_enh_conn.dev_addr, event_msg.rsi_ble_measurement_hndl, (data->DataLength()),
+                                    data->Start());
     if (status != RSI_SUCCESS)
     {
         WFX_RSI_LOG("indication %d failed with error code %lx ", status);
@@ -611,9 +612,9 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         ChipLogDetail(DeviceLayer, "Start BLE advertissement");
     }
 
-//    bd_addr unusedBdAddr; // We can ignore this field when setting random address.
+    //    bd_addr unusedBdAddr; // We can ignore this field when setting random address.
 
-//    (void) unusedBdAddr;
+    //    (void) unusedBdAddr;
 
     err = ConfigureAdvertisingData();
     SuccessOrExit(err);
@@ -669,7 +670,7 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
     return err;
 }
 
-void BLEManagerImpl::UpdateMtu(rsi_ble_event_mtu_t  evt)
+void BLEManagerImpl::UpdateMtu(rsi_ble_event_mtu_t evt)
 {
     CHIPoBLEConState * bleConnState = GetConnectionState(event_msg.connectionHandle);
     if (bleConnState != NULL)
@@ -751,7 +752,7 @@ void BLEManagerImpl::HandleWriteEvent(rsi_ble_event_write_t evt)
 
     WFX_RSI_LOG("attribute = %d,rsi_ble_measurement_hndl = %d", attribute, event_msg.rsi_ble_measurement_hndl);
 
-    if (evt.handle[0] == (uint8_t) event_msg.rsi_ble_gatt_server_client_config_hndl) //TODO:: compare the handle exactly
+    if (evt.handle[0] == (uint8_t) event_msg.rsi_ble_gatt_server_client_config_hndl) // TODO:: compare the handle exactly
     {
         WFX_RSI_LOG("Inside HandleTXCharCCCDWrite ");
         HandleTXCharCCCDWrite();
@@ -776,7 +777,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(void)
 
 void BLEManagerImpl::HandleRXCharWrite(rsi_ble_event_write_t * evt)
 {
-    uint8_t conId = 1;
+    uint8_t conId  = 1;
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle buf;
     uint16_t writeLen = evt->length;
@@ -812,16 +813,16 @@ exit:
 void BLEManagerImpl::HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId)
 {
     ChipDeviceEvent event;
-//    uint8_t timerHandle = sInstance.GetTimerHandle(conId, false);
-//
-//    ChipLogProgress(DeviceLayer, "Tx Confirmation received");
-//
-//    // stop indication confirmation timer // TODO:: Need to find the proper repleacement
-//    if (timerHandle < kMaxConnections)
-//    {
-//        ChipLogProgress(DeviceLayer, " stop soft timer");
-//        // sl_bt_system_set_lazy_soft_timer(0, 0, timerHandle, false);
-//    }
+    //    uint8_t timerHandle = sInstance.GetTimerHandle(conId, false);
+    //
+    //    ChipLogProgress(DeviceLayer, "Tx Confirmation received");
+    //
+    //    // stop indication confirmation timer // TODO:: Need to find the proper repleacement
+    //    if (timerHandle < kMaxConnections)
+    //    {
+    //        ChipLogProgress(DeviceLayer, " stop soft timer");
+    //        // sl_bt_system_set_lazy_soft_timer(0, 0, timerHandle, false);
+    //    }
 
     event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
     event.CHIPoBLEIndicateConfirm.ConId = conId;

@@ -18,7 +18,7 @@
 #include <string.h>
 #include <task.h>
 
-#ifdef BRD4325A  // For Si917 Platform only
+#ifdef BRD4325A // For Si917 Platform only
 #include "core_cm4.h"
 #endif
 
@@ -399,7 +399,7 @@ extern "C" __attribute__((naked)) void HardFault_Handler(void)
                    "debugHardfault_address: .word debugHardfault  \n");
 }
 
-#if defined (BRD4325A) // Only for CCP Platforms
+#if defined(BRD4325A) // Only for CCP Platforms
 extern "C" void vApplicationMallocFailedHook(void)
 {
     /* Called if a call to pvPortMalloc() fails because there is insufficient

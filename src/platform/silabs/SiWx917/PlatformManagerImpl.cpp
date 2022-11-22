@@ -24,12 +24,12 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/silabs/DiagnosticDataProviderImpl.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
-#include <crypto/CHIPCryptoPAL.h>
+#include <platform/silabs/DiagnosticDataProviderImpl.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
@@ -66,7 +66,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     CHIP_ERROR err;
 
     // Initialize the configuration system.
-    ChipLogProgress(DeviceLayer,"PlatformManagerImpl::_InitChipStack(void)");
+    ChipLogProgress(DeviceLayer, "PlatformManagerImpl::_InitChipStack(void)");
     err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
     SuccessOrExit(err);
 

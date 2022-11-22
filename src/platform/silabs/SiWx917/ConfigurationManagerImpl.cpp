@@ -30,7 +30,6 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/silabs/SilabsConfig.h>
 
-
 #include "core_cm4.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
@@ -61,7 +60,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     IncreaseBootCount();
     // It is possible to configure the possible reset sources with RMU_ResetControl
     // In this case, we keep Reset control at default setting
-
 
 #ifndef CCP_SI917_BRINGUP
     rebootCause = RMU_ResetCauseGet();

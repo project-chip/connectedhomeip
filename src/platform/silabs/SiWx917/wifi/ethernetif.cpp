@@ -21,7 +21,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #ifndef WF200_WIFI
 #include "FreeRTOS.h"
 #include "event_groups.h"
@@ -131,11 +130,11 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
 #ifdef WIFI_DEBUG_ENABLED
         SILABS_LOG("%s: DROP, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x", __func__,
 
-                  dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
+                   dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
 
-                  src_mac[0], src_mac[1], src_mac[2], src_mac[3], src_mac[4], src_mac[5],
+                   src_mac[0], src_mac[1], src_mac[2], src_mac[3], src_mac[4], src_mac[5],
 
-                  b[12], b[13]);
+                   b[12], b[13]);
 #endif
         return;
     }
@@ -152,15 +151,15 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
         }
 #ifdef WIFI_DEBUG_ENABLED
         SILABS_LOG("EN:IN %d,[%02x:%02x:%02x:%02x:%02x%02x][%02x:%02x:%02x:%02x:%02x:%02x]type=%02x%02x", bufferoffset, b[0], b[1],
-                  b[2], b[3], b[4], b[5], b[6], b[7], b[8], b[9], b[10], b[11], b[12], b[13]);
+                   b[2], b[3], b[4], b[5], b[6], b[7], b[8], b[9], b[10], b[11], b[12], b[13]);
         SILABS_LOG("%s: ACCEPT %d, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x", __func__,
-                  bufferoffset,
+                   bufferoffset,
 
-                  dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
+                   dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
 
-                  src_mac[0], src_mac[1], src_mac[2], src_mac[3], src_mac[4], src_mac[5],
+                   src_mac[0], src_mac[1], src_mac[2], src_mac[3], src_mac[4], src_mac[5],
 
-                  b[12], b[13]);
+                   b[12], b[13]);
 #endif
 
         if (netif->input(p, netif) != ERR_OK)
@@ -169,7 +168,6 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
         }
     }
 }
-
 
 static SemaphoreHandle_t ethout_sem;
 /*****************************************************************************
@@ -216,7 +214,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
 #ifdef WIFI_DEBUG_ENABLED
     uint8_t * b = (uint8_t *) p->payload;
     SILABS_LOG("EN-RSI: Out [%02x:%02x:%02x:%02x:%02x:%02x][%02x:%02x:%02x:%02x:%02x:%02x]type=%02x%02x", b[0], b[1], b[2], b[3],
-              b[4], b[5], b[6], b[7], b[8], b[9], b[10], b[11], b[12], b[13]);
+               b[4], b[5], b[6], b[7], b[8], b[9], b[10], b[11], b[12], b[13]);
 #endif
     /* Generate the packet */
     for (q = p, framelength = 0; q != NULL; q = q->next)
@@ -275,7 +273,6 @@ void wfx_host_received_sta_frame_cb(uint8_t * buf, int len)
         low_level_input(ifp, buf, len);
     }
 }
-
 
 /*****************************************************************************
  *  @fn  err_t sta_ethernetif_init(struct netif *netif)

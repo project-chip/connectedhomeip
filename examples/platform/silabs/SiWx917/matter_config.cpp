@@ -25,7 +25,6 @@
 
 #include <mbedtls/platform.h>
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -119,8 +118,7 @@ void SI917MatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, voi
 #endif
 }
 
-void SI917MatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg)
-{
+void SI917MatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg){
     // Initialize OTA only when Thread or WiFi connectivity is established
     /*if (((event->Type == DeviceEventType::kThreadConnectivityChange) &&
          (event->ThreadConnectivityChange.Result == kConnectivity_Established)) ||
@@ -166,20 +164,14 @@ CHIP_ERROR SI917MatterConfig::InitMatter(const char * appName)
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
 
-
-
     // Stop Matter event handling while setting up resources
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
     // Create initParams with SDK example defaults here
     static chip::CommonCaseDeviceServerInitParams initParams;
 
-
-
     // Initialize the remaining (not overridden) providers to the SDK example defaults
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-
-
 
     // Init Matter Server and Start Event Loop
     chip::Server::GetInstance().Init(initParams);

@@ -26,7 +26,6 @@ mbedtls_target = "${efr32_sdk_build_root}:efr32_sdk"
 
 openthread_external_mbedtls = mbedtls_target
 
-
 chip_device_platform = "SiWx917"
 
 #Net work configuration OpenThread
@@ -56,4 +55,4 @@ pw_build_LINK_DEPS = [
   "$dir_pw_log:impl",
 ]
 
-defines = ["MBEDTLS_CONFIG_FILE=\"efr32-chip-mbedtls-config.h\"",]
+defines = [ "MBEDTLS_CONFIG_FILE=\"efr32-chip-mbedtls-config.h\"" ]

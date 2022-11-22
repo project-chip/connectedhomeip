@@ -21,13 +21,13 @@
  *          Platform-specific key value storage implementation for SI917
  */
 
+#include "siwx917_utils.h"
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/silabs/SilabsConfig.h>
 #include <platform/KeyValueStoreManager.h>
+#include <platform/silabs/SilabsConfig.h>
 #include <stdio.h>
 #include <string.h>
-#include "siwx917_utils.h"
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer::Internal;
@@ -51,8 +51,8 @@ CHIP_ERROR KeyValueStoreManagerImpl::Init(void)
 
     memset(mKvsStoredKeyString, 0, sizeof(mKvsStoredKeyString));
     size_t outLen;
-    err = SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_KvsStringKeyMap, reinterpret_cast<uint8_t *>(mKvsStoredKeyString),
-                                          sizeof(mKvsStoredKeyString), outLen);
+    err = SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_KvsStringKeyMap,
+                                           reinterpret_cast<uint8_t *>(mKvsStoredKeyString), sizeof(mKvsStoredKeyString), outLen);
 
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND) // Initial boot
     {
@@ -116,7 +116,7 @@ void KeyValueStoreManagerImpl::ForceKeyMapSave()
 void KeyValueStoreManagerImpl::OnScheduledKeyMapSave(System::Layer * systemLayer, void * appState)
 {
     SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_KvsStringKeyMap,
-                                     reinterpret_cast<const uint8_t *>(mKvsStoredKeyString), sizeof(mKvsStoredKeyString));
+                                      reinterpret_cast<const uint8_t *>(mKvsStoredKeyString), sizeof(mKvsStoredKeyString));
 }
 
 void KeyValueStoreManagerImpl::ScheduleKeyMapSave(void)

@@ -25,7 +25,6 @@
 
 #pragma once
 
-
 // ==================== Platform Adaptations ====================
 
 #define BLE_CONNECTION_OBJECT uint8_t

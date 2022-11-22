@@ -107,7 +107,6 @@ extern "C" {
 
 #include <stdint.h>
 
-
 /*-----------------------------------------------------------
  * Application specific definitions.
  *

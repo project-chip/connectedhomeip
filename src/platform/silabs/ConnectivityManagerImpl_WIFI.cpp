@@ -21,14 +21,14 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
-#include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #include <platform/internal/BLEManager.h>
+#include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 
+#include "sl_status.h"
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
 #include <lwip/nd6.h>
 #include <lwip/netif.h>
-#include "sl_status.h"
 
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
 
@@ -264,7 +264,7 @@ void ConnectivityManagerImpl::DriveStationState()
         // disconnect the station from the AP, unless the WiFi station mode is currently
         // under application control.
 #ifndef CHIP_ONNETWORK_PAIRING
-	if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled &&
+        if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled &&
             (mWiFiStationMode != kWiFiStationMode_Enabled || !IsWiFiStationProvisioned()))
         {
             ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");

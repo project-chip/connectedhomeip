@@ -14,6 +14,7 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
+
 #import("//build_overrides/mbedtls.gni")
 
 import("${chip_root}/src/platform/device.gni")
@@ -27,35 +28,34 @@ if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
 }
 
-
 static_library("SiWx917") {
   sources = [
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    "BLEManagerImpl.cpp",
-    "BLEManagerImpl.h",
-    "bluetooth/rsi_ble_config.h",
-    "bluetooth/wfx_sl_ble_init.h",
-    "bluetooth/wfx_sl_ble_init.c",
-    "BlePlatformConfig.h",
     "../CHIPDevicePlatformConfig.h",
     "../CHIPDevicePlatformEvent.h",
     "../CHIPMem-Platform.cpp",
     "../CHIPPlatformConfig.h",
-    "ConfigurationManagerImpl.cpp",
-    "ConfigurationManagerImpl.h",
     "../ConnectivityManagerImpl.h",
     "../DiagnosticDataProviderImpl.cpp",
     "../DiagnosticDataProviderImpl.h",
+    "../InetPlatformConfig.h",
+    "../Logging.cpp",
+    "../PlatformManagerImpl.h",
     "../SilabsConfig.cpp",
     "../SilabsConfig.h",
-    "../InetPlatformConfig.h",
+    "../SystemPlatformConfig.h",
+    "BLEManagerImpl.cpp",
+    "BLEManagerImpl.h",
+    "BlePlatformConfig.h",
+    "ConfigurationManagerImpl.cpp",
+    "ConfigurationManagerImpl.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "../Logging.cpp",
     "PlatformManagerImpl.cpp",
-    "../PlatformManagerImpl.h",
-    "../SystemPlatformConfig.h",
+    "bluetooth/rsi_ble_config.h",
+    "bluetooth/wfx_sl_ble_init.c",
+    "bluetooth/wfx_sl_ble_init.h",
   ]
 
   if (chip_enable_ota_requestor) {
@@ -67,8 +67,6 @@ static_library("SiWx917") {
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
-
-
   # Add pigweed KVS
   deps = [
     "$dir_pw_kvs:crc16",
@@ -78,7 +76,6 @@ static_library("SiWx917") {
     "$dir_pw_checksum",
     "$dir_pw_kvs",
   ]
-
 
   if (chip_enable_wifi) {
     sources += [

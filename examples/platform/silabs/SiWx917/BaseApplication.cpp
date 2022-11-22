@@ -45,7 +45,6 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
-
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -79,7 +78,6 @@ TimerHandle_t sLightTimer;
 
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
-
 
 #ifdef SL_WIFI
 app::Clusters::NetworkCommissioning::Instance
@@ -250,7 +248,6 @@ void BaseApplication::FunctionEventHandler(AppEvent * aEvent)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 
         mFunction = kFunction_FactoryReset;
-
     }
     else if (mFunctionTimerActive && mFunction == kFunction_FactoryReset)
     {

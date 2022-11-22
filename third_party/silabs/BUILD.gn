@@ -20,7 +20,6 @@ import("${efr32_sdk_build_root}/silabs_board.gni")
 
 if (silabs_board == "BRD4325A") {  # CCP board
   import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
-
 } else {
   import("${efr32_sdk_build_root}/efr32_sdk.gni")
 }
@@ -37,7 +36,7 @@ assert(efr32_sdk_target != "", "efr32_sdk_target must be specified")
 
 if (silabs_board == "BRD4325A") {  # CCP board
   group("efr32_sdk") {
-    public_deps = [ efr32_sdk_target ] # TODO for Si917
+    public_deps = [ efr32_sdk_target ]  # TODO for Si917
   }
 } else {
   group("efr32_sdk") {

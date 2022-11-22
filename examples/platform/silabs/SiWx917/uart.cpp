@@ -22,12 +22,11 @@
 extern "C" {
 #endif
 #include "assert.h"
+#include "rsi_board.h"
 #include "uart.h"
 #include "uartdrv.h"
 #include <stddef.h>
 #include <string.h>
-#include "rsi_board.h"
-
 
 #if !defined(MIN)
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
@@ -97,7 +96,7 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
     // Add Terminating char at the end of buffer
     Buf[BufLength] = '\0';
 
-    Board_UARTPutSTR((uint8_t *)Buf);
+    Board_UARTPutSTR((uint8_t *) Buf);
 
     return BufLength;
 }
@@ -116,10 +115,10 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
         return UART_CONSOLE_ERR;
     }
 
-    while(--NbBytesToRead >= 0)
+    while (--NbBytesToRead >= 0)
     {
-        data = Board_UARTGetChar();
-	*Buf++ = (char)data;
+        data   = Board_UARTGetChar();
+        *Buf++ = (char) data;
     }
 
     return NbBytesToRead;

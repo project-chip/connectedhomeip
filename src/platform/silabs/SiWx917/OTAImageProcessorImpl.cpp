@@ -133,7 +133,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
 #ifndef CCP_SI917_BRINGUP
     CORE_CRITICAL_SECTION(bootloader_init();)
-#endif    
+#endif
     mSlotId                                 = 0; // Single slot until we support multiple images
     writeBufOffset                          = 0;
     mWriteOffset                            = 0;
@@ -169,7 +169,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 
 #ifndef CCP_SI917_BRINGUP
         CORE_CRITICAL_SECTION(err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, writeBuffer, kAlignmentBytes);)
-#endif        
+#endif
         if (err)
         {
             ChipLogError(SoftwareUpdate, "ERROR: In HandleFinalize bootloader_eraseWriteStorage() error %ld", err);
@@ -194,7 +194,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
 #ifndef CCP_SI917_BRINGUP
     CORE_CRITICAL_SECTION(err = bootloader_verifyImage(mSlotId, NULL);)
-#endif    
+#endif
     if (err != SL_BOOTLOADER_OK)
     {
         ChipLogError(SoftwareUpdate, "ERROR: bootloader_verifyImage() error %ld", err);
@@ -204,7 +204,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
 #ifndef CCP_SI917_BRINGUP
     CORE_CRITICAL_SECTION(err = bootloader_setImageToBootload(mSlotId);)
-#endif    
+#endif
     if (err != SL_BOOTLOADER_OK)
     {
         ChipLogError(SoftwareUpdate, "ERROR: bootloader_setImageToBootload() error %ld", err);
@@ -215,7 +215,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 #ifndef CCP_SI917_BRINGUP
     // This reboots the device
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
-#endif    
+#endif
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)

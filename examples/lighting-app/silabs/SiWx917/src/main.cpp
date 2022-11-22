@@ -49,7 +49,8 @@ static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 int main(void)
 {
     init_ccpPlatform();
-    if (SI917MatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR) {
+    if (SI917MatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
+    {
         appError(CHIP_ERROR_INTERNAL);
     }
 
@@ -66,7 +67,8 @@ int main(void)
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     SILABS_LOG("Starting App Task");
-    if (AppTask::GetAppTask().StartAppTask() != CHIP_NO_ERROR) {
+    if (AppTask::GetAppTask().StartAppTask() != CHIP_NO_ERROR)
+    {
         appError(CHIP_ERROR_INTERNAL);
     }
 
