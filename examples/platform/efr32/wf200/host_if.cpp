@@ -127,7 +127,7 @@ static void sl_wfx_ap_client_disconnected_callback(uint32_t status, uint8_t * ma
 static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac);
 #endif
 
-extern uint32_t overrun_count;
+extern uint32_t gOverrunCount;
 
 /***************************************************************************
  * @brief
@@ -795,7 +795,7 @@ int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
         extra_info->mcast_tx_count    = counters->body.count_tx_multicast_frames;
         extra_info->ucast_rx_count    = counters->body.count_rx_packets;
         extra_info->ucast_tx_count    = counters->body.count_tx_packets;
-        extra_info->overrun_count     = overrun_count;
+        extra_info->overrun_count     = gOverrunCount;
     }
     return status;
 }
