@@ -56,12 +56,20 @@ extern "C" {
 #include "sl_mbedtls.h"
 #include "sl_system_init.h"
 
+#if SL_SYSTEM_VIEW
+#include "SEGGER_SYSVIEW.h"
+#endif
+
 void initAntenna(void);
 
 void init_efrPlatform(void)
 {
     sl_system_init();
     sl_mbedtls_init();
+#if SL_SYSTEM_VIEW
+    SEGGER_SYSVIEW_Conf();
+    SEGGER_SYSVIEW_Start();
+#endif
 
 #if EFR32_LOG_ENABLED
     efr32InitLog();

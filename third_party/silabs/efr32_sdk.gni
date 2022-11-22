@@ -35,6 +35,9 @@ declare_args() {
   # Use Silabs factory data provider example.
   # Users can implement their own.
   use_efr32_factory_data_provider = true
+
+  # Enable Segger System View
+  use_system_view = false
 }
 
 # Explorer Kit and MGM240L do not have external flash
@@ -194,6 +197,17 @@ template("efr32_sdk") {
 
       #"__STACK_SIZE=0",
     ]
+
+    if (use_system_view) {
+      _include_dirs += [
+        "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10/Config/Cortex-M",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Config/",
+      ]
+
+      defines += [ "SL_SYSTEM_VIEW=1" ]
+    }
 
     defines += board_defines
 
@@ -570,6 +584,14 @@ template("efr32_sdk") {
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_event_handler.c",
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_simple_button_instances.c",
     ]
+
+    if (use_system_view) {
+      sources += [
+        "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER/SEGGER_SYSVIEW.c",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10/Config/Cortex-M/SEGGER_SYSVIEW_Config_FreeRTOS.c",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10/SEGGER_SYSVIEW_FreeRTOS.c",
+      ]
+    }
 
     if (use_wstk_leds) {
       sources += [
