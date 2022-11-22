@@ -150,7 +150,7 @@ bool MemoryInternalCheckPointer(const void * p, size_t min_size)
 } // namespace Platform
 } // namespace chip
 
-extern "C" void memMonitoringTrackAlloc(void * ptr, size_t size) {}
-extern "C" void memMonitoringTrackFree(void * ptr, size_t size) {}
+extern "C" __WEAK void memMonitoringTrackAlloc(void * ptr, size_t size) {}
+extern "C" __WEAK void memMonitoringTrackFree(void * ptr, size_t size) {}
 
 #endif // CHIP_CONFIG_MEMORY_MGMT_PLATFORM

@@ -34,7 +34,7 @@
 #define CHIP_CONFIG_PERSISTED_STORAGE_ENC_MSG_CNTR_ID 1
 #define CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH 2
 
-#define CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY SilabsConfig::kConfigKey_LifeTimeCounter
+#define CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY SILABSConfig::kConfigKey_LifeTimeCounter
 
 // ==================== Security Adaptations ====================
 

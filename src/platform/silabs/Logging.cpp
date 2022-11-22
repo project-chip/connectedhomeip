@@ -483,5 +483,5 @@ extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBu
     configMINIMAL_STACK_SIZE is specified in words, not bytes. */
     *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
 }
-#endif
+#endif // BRD4325A
 #endif // HARD_FAULT_LOG_ENABLE && SILABS_LOG_ENABLED

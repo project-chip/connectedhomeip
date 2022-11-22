@@ -135,8 +135,20 @@ void SilabsLCD::WriteDemoUI(bool state)
 void SilabsLCD::WriteDemoUI()
 {
     Clear();
-    demoUIClearMainScreen(mName);
-    demoUIDisplayApp(dState.mainState);
+    if (customUI != nullptr)
+    {
+        customUI(&glibContext);
+    }
+    else
+    {
+        demoUIClearMainScreen(mName);
+        demoUIDisplayApp(dState.mainState);
+    }
+}
+
+void SilabsLCD::SetCustomUI(customUICB cb)
+{
+    customUI = cb;
 }
 
 #ifdef QR_CODE_ENABLED

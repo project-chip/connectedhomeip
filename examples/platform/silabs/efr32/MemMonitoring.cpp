@@ -21,7 +21,9 @@
 #include "AppConfig.h"
 #include "FreeRTOS.h"
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/silabs/EFR32/freertos_bluetooth.h>
+
+#define BLE_STACK_TASK_NAME "Bluetooth stack"
+#define BLE_LINK_TASK_NAME "Bluetooth linklayer"
 
 static StackType_t monitoringStack[MONITORING_STACK_SIZE_byte / sizeof(StackType_t)];
 static StaticTask_t monitoringTaskStruct;
