@@ -1221,24 +1221,4 @@ private:
 
     UnifyMqtt & m_unify_mqtt;
 };
-class UnitTestingAttributeAccess : public attribute_translator_interface
-{
-public:
-    UnitTestingAttributeAccess(matter_node_state_monitor & node_state_monitor, UnifyMqtt & unify_mqtt) :
-        attribute_translator_interface(node_state_monitor, unify_mqtt, chip::app::Clusters::UnitTesting::Id,
-                                       "attr_translator_UnitTesting"),
-        m_unify_mqtt(unify_mqtt)
-    {}
-
-    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
-
-private:
-    void reported_updated(const bridged_endpoint * ep, const std::string & cluster, const std::string & attribute,
-                          const nlohmann::json & unify_value) override;
-
-    std::vector<const char *> unify_cluster_names() const override { return std::vector<const char *>({ "UnitTesting" }); }
-
-    UnifyMqtt & m_unify_mqtt;
-};
 } // namespace unify::matter_bridge

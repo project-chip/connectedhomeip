@@ -517,14 +517,6 @@ public:
     {}
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & HandlerContext) override;
 };
-class UnitTestingClusterCommandHandler : public command_translator_interface
-{
-public:
-    UnitTestingClusterCommandHandler(const matter_node_state_monitor & node_state_monitor, UnifyMqtt & unify_mqtt) :
-        command_translator_interface(node_state_monitor, chip::app::Clusters::UnitTesting::Id, "UnitTesting", unify_mqtt)
-    {}
-    void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & HandlerContext) override;
-};
 
 } // namespace unify::matter_bridge
 

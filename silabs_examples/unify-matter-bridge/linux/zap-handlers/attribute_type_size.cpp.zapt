@@ -62,7 +62,7 @@ constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES_SIZE = ZCL_STRUC
 {{/if}}
 {{/zcl_clusters}}
 
-attr_type_size get_attribute_type_size(ClusterId cluster_id, AttributeId attribute_id)
+attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_id)
 {
   switch(cluster_id) 
   {

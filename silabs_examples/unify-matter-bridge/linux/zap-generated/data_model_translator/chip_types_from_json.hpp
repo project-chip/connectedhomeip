@@ -6029,7 +6029,7 @@ std::optional<uint8_t> from_json_WindSupportMask(const nlohmann::json & value)
     }
 }
 
-std::optional<uint16_t> from_json_bitmap16(const nlohmann::json & value)
+std::optional<uint16_t> from_json_Bitmap16(const nlohmann::json & value)
 {
     uint16_t bitmap_value = 0x00;
     try
@@ -6042,7 +6042,7 @@ std::optional<uint16_t> from_json_bitmap16(const nlohmann::json & value)
     }
 }
 
-std::optional<uint32_t> from_json_bitmap24(const nlohmann::json & value)
+std::optional<uint32_t> from_json_Bitmap24(const nlohmann::json & value)
 {
     uint32_t bitmap_value = 0x00;
     try
@@ -6055,7 +6055,7 @@ std::optional<uint32_t> from_json_bitmap24(const nlohmann::json & value)
     }
 }
 
-std::optional<uint32_t> from_json_bitmap32(const nlohmann::json & value)
+std::optional<uint32_t> from_json_Bitmap32(const nlohmann::json & value)
 {
     uint32_t bitmap_value = 0x00;
     try
@@ -6068,7 +6068,7 @@ std::optional<uint32_t> from_json_bitmap32(const nlohmann::json & value)
     }
 }
 
-std::optional<uint64_t> from_json_bitmap64(const nlohmann::json & value)
+std::optional<uint64_t> from_json_Bitmap64(const nlohmann::json & value)
 {
     uint64_t bitmap_value = 0x00;
     try
@@ -6081,7 +6081,7 @@ std::optional<uint64_t> from_json_bitmap64(const nlohmann::json & value)
     }
 }
 
-std::optional<uint8_t> from_json_bitmap8(const nlohmann::json & value)
+std::optional<uint8_t> from_json_Bitmap8(const nlohmann::json & value)
 {
     uint8_t bitmap_value = 0x00;
     try

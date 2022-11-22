@@ -48,6 +48,7 @@ function supportedCluster(clusterName) {
     case "DeviceTemperatureConfiguration": return false
     case "PumpConfigurationAndControl": return false
     case "FaultInjection": return false
+    case "UnitTesting": return false
     default: return true
   }
 }

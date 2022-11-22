@@ -237,7 +237,7 @@ template<> inline std::optional<ZclEnum{{as_type label}}> from_json(const nlohma
 {{/zcl_enums}}
 
 {{#zcl_bitmaps}}
-std::optional<{{asUnderlyingType name}}> from_json_{{label}}(const nlohmann::json & value)
+std::optional<{{asUnderlyingType name}}> from_json_{{asUpperCamelCase label}}(const nlohmann::json & value)
 {
     {{asUnderlyingType name}} bitmap_value = 0x00;
     try {
