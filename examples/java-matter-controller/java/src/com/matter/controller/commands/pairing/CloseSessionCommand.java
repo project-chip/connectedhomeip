@@ -18,6 +18,7 @@
 
 package com.matter.controller.commands.pairing;
 
+import chip.devicecontroller.ChipDeviceController;
 import com.matter.controller.commands.common.CredentialsIssuer;
 import com.matter.controller.commands.common.MatterCommand;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,8 +28,8 @@ public final class CloseSessionCommand extends MatterCommand {
   private final AtomicLong mDestinationId = new AtomicLong();
   private final AtomicInteger mTimeoutSecs = new AtomicInteger();
 
-  public CloseSessionCommand(CredentialsIssuer credsIssuer) {
-    super("close-session", credsIssuer);
+  public CloseSessionCommand(ChipDeviceController controller, CredentialsIssuer credsIssuer) {
+    super(controller, "close-session", credsIssuer);
     addArgument("destination-id", 0, Long.MAX_VALUE, mDestinationId, null);
     addArgument(
         "timeout",

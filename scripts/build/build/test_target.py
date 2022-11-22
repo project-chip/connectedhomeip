@@ -14,15 +14,11 @@
 # limitations under the License.
 
 import unittest
+import sys
+import os
 
-try:
-    from build.target import *
-except:
-    import sys
-    import os
-
-    sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-    from target import *
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from build.target import BuildTarget, TargetPart  # noqa: E402
 
 
 class FakeBuilder:
