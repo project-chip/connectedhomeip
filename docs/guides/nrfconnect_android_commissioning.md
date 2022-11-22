@@ -7,7 +7,8 @@ example for the nRF Connect platform into a Matter fabric.
 This guide references the nRF52840 DK and Matter nRF Connect Lighting Example
 Application that communicates with other nodes over a Thread network, but the
 instructions can be adapted to other platforms and applications. For instance,
-some sections of this guide include steps for testing a Wi-Fi device, which are adapted from the original Thread-based procedure.
+some sections of this guide include steps for testing a Wi-Fi device, which are
+adapted from the original Thread-based procedure.
 
 <hr>
 
