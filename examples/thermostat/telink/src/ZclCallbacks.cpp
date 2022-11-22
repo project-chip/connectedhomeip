@@ -17,6 +17,7 @@
  */
 
 #include "AppTask.h"
+#include "TemperatureManager.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -38,5 +39,9 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         // Following print is used for printing single-byte value. Change it for printing non-single-byte values.
         ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
+    }
+    else if (clusterId == Thermostat::Id)
+    {
+        TempMgr().AttributeChangeHandler(attributePath.mEndpointId, attributeId, value, size);
     }
 }
