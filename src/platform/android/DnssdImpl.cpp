@@ -316,7 +316,16 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring hostName, 
     DnssdService service = {};
     CopyString(service.mName, jniInstanceName.c_str());
     CopyString(service.mHostName, jnihostName.c_str());
-    CopyString(service.mType, jniServiceType.c_str());
+
+    std::string serviceTypeStr(jniServiceType.c_str());
+
+    size_t index = serviceTypeStr.find(".");
+    VerifyOrReturn(index != std::string::npos, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
+
+    std::string type = serviceTypeStr.substr(0, index);
+    CopyString(service.mType, type.c_str());
+    service.mProtocol = (serviceTypeStr.substr(index + 1).compare(kOperationalProtocol) == 0) ? DnssdServiceProtocol::kDnssdProtocolTcp : DnssdServiceProtocol::kDnssdProtocolUdp;
+
     service.mPort          = static_cast<uint16_t>(port);
     service.mInterface     = iface;
     service.mTextEntrySize = 0;
@@ -403,6 +412,14 @@ void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callback
 
     VerifyOrReturn(strlen(jniServiceType.c_str()) <= kDnssdTypeAndProtocolMaxSize, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
 
+    std::string serviceTypeStr(jniServiceType.c_str());
+
+    size_t index = serviceTypeStr.find(".");
+    VerifyOrReturn(index != std::string::npos, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
+
+    std::string type = serviceTypeStr.substr(0, index);
+    DnssdServiceProtocol protocol = (serviceTypeStr.substr(index + 1).compare(kOperationalProtocol) == 0) ? DnssdServiceProtocol::kDnssdProtocolTcp : DnssdServiceProtocol::kDnssdProtocolUdp;
+
     auto size              = env->GetArrayLength(instanceName);
     DnssdService * service = new DnssdService[size];
     for (decltype(size) i = 0; i < size; i++)
@@ -412,7 +429,9 @@ void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callback
                        dispatch(CHIP_ERROR_INVALID_ARGUMENT));
 
         CopyString(service[i].mName, jniInstanceName.c_str());
-        CopyString(service[i].mType, jniServiceType.c_str());
+        CopyString(service[i].mType, type.c_str());
+        service[i].mProtocol = protocol;
+        service[i].mInterface = static_cast<Inet::InterfaceId>(1);
     }
 
     dispatch(CHIP_NO_ERROR, service, size);
