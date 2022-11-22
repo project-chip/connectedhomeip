@@ -32,6 +32,8 @@ import javax.annotation.Nullable;
  *     Matter devices from the environment.
  */
 public abstract class Command {
+  private static final String OPTIONAL_ARGUMENT_PREFIX = "--";
+  private static final int OPTIONAL_ARGUMENT_PREFIX_LENGTH = 2;
   private final String mName;
   private final ArrayList<Argument> mArgs = new ArrayList<Argument>();
   private final Optional<String> mHelpText;
@@ -87,10 +89,12 @@ public abstract class Command {
    * @param name The name that will be displayed in the command help
    * @param out A pointer to a MutableInteger where the argv value will be stored
    * @param desc The description of the argument that will be displayed in the command help
+   * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
    */
-  public final int addArgument(String name, AtomicBoolean out, @Nullable String desc) {
-    Argument arg = new Argument(name, out, desc);
+  public final int addArgument(
+      String name, AtomicBoolean out, @Nullable String desc, boolean optional) {
+    Argument arg = new Argument(name, out, desc, optional);
     mArgs.add(arg);
     return mArgs.size();
   }
@@ -102,11 +106,17 @@ public abstract class Command {
    * @param max The minimum value of the argv value
    * @param out A pointer to a MutableInteger where the argv value will be stored
    * @param desc The description of the argument that will be displayed in the command help
+   * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
    */
   public final int addArgument(
-      String name, short min, short max, AtomicInteger out, @Nullable String desc) {
-    Argument arg = new Argument(name, min, max, out, desc);
+      String name,
+      short min,
+      short max,
+      AtomicInteger out,
+      @Nullable String desc,
+      boolean optional) {
+    Argument arg = new Argument(name, min, max, out, desc, optional);
     mArgs.add(arg);
     return mArgs.size();
   }
@@ -118,11 +128,12 @@ public abstract class Command {
    * @param max The minimum value of the argv value
    * @param out A pointer to a MutableInteger where the argv value will be stored
    * @param desc The description of the argument that will be displayed in the command help
+   * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
    */
   public final int addArgument(
-      String name, int min, int max, AtomicInteger out, @Nullable String desc) {
-    Argument arg = new Argument(name, min, max, out, desc);
+      String name, int min, int max, AtomicInteger out, @Nullable String desc, boolean optional) {
+    Argument arg = new Argument(name, min, max, out, desc, optional);
     mArgs.add(arg);
     return mArgs.size();
   }
@@ -134,11 +145,12 @@ public abstract class Command {
    * @param max The minimum value of the argv value
    * @param out A pointer to a MutableInteger where the argv value will be stored
    * @param desc The description of the argument that will be displayed in the command help
+   * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
    */
   public final int addArgument(
-      String name, long min, long max, AtomicLong out, @Nullable String desc) {
-    Argument arg = new Argument(name, min, max, out, desc);
+      String name, long min, long max, AtomicLong out, @Nullable String desc, boolean optional) {
+    Argument arg = new Argument(name, min, max, out, desc, optional);
     mArgs.add(arg);
     return mArgs.size();
   }
@@ -147,10 +159,11 @@ public abstract class Command {
    * @brief Add an IP address command argument
    * @param name The name that will be displayed in the command help
    * @param out A pointer to a IPAddress where the argv value will be stored
+   * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
    */
-  public final int addArgument(String name, IPAddress out) {
-    Argument arg = new Argument(name, out);
+  public final int addArgument(String name, IPAddress out, boolean optional) {
+    Argument arg = new Argument(name, out, optional);
     mArgs.add(arg);
     return mArgs.size();
   }
@@ -160,10 +173,12 @@ public abstract class Command {
    * @param name The name that will be displayed in the command help
    * @param out A pointer to a StringBuffer where the argv value will be stored
    * @param desc The description of the argument that will be displayed in the command help
+   * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
    */
-  public final int addArgument(String name, StringBuffer out, @Nullable String desc) {
-    Argument arg = new Argument(name, out, desc);
+  public final int addArgument(
+      String name, StringBuffer out, @Nullable String desc, boolean optional) {
+    Argument arg = new Argument(name, out, desc, optional);
     mArgs.add(arg);
     return mArgs.size();
   }
@@ -174,15 +189,50 @@ public abstract class Command {
    * @param args Supplied command-line arguments as an array of String objects.
    */
   public final void initArguments(int argc, String[] args) {
-    int argsCount = mArgs.size();
+    int argvExtraArgsCount = argc;
+    int mandatoryArgsCount = 0;
+    int optionalArgsCount = 0;
 
-    if (argsCount != argc) {
-      throw new IllegalArgumentException(
-          "Wrong arguments number: " + argc + " instead of " + argsCount);
+    for (Argument arg : mArgs) {
+      if (arg.isOptional()) {
+        optionalArgsCount++;
+      } else {
+        mandatoryArgsCount++;
+        argvExtraArgsCount--;
+      }
     }
 
-    for (int i = 0; i < argsCount; i++) {
+    if (argc < mandatoryArgsCount) {
+      throw new IllegalArgumentException(
+          "initArguments: Wrong arguments number: " + argc + " instead of " + mandatoryArgsCount);
+    }
+
+    // Initialize mandatory arguments
+    for (int i = 0; i < mandatoryArgsCount; i++) {
       initArgument(i, args[i]);
+    }
+
+    // Initialize optional arguments
+    // Optional arguments expect a name and a value, so i is increased by 2 on every step.
+    for (int i = mandatoryArgsCount; i < argc; i += 2) {
+      for (int j = mandatoryArgsCount; j < mandatoryArgsCount + optionalArgsCount; j++) {
+        // optional arguments starts with OPTIONAL_ARGUMENT_PREFIX
+        if (args[i].length() <= OPTIONAL_ARGUMENT_PREFIX_LENGTH
+            && !args[i]
+                .substring(0, OPTIONAL_ARGUMENT_PREFIX_LENGTH - 1)
+                .equals(OPTIONAL_ARGUMENT_PREFIX)) {
+          continue;
+        }
+
+        if (args[i].substring(OPTIONAL_ARGUMENT_PREFIX_LENGTH).equals(mArgs.get(j).getName())) {
+          if (i + 1 >= argc) {
+            throw new IllegalArgumentException(
+                "initArguments: Optional argument " + args[i] + " missing value");
+          }
+
+          initArgument(j, args[i + 1]);
+        }
+      }
     }
   }
 
