@@ -17,10 +17,11 @@
  *    limitations under the License.
  */
 
-// Note: Due to circular dependency include platform/ConnectivityManager.h before
-//       platform/Tizen/ConnectivityManagerImpl.h (the former includes the latter).
+/**
+ * Note: Use public include for ConnectivityManager which includes our local
+ *       platform/<PLATFORM>/ConnectivityManagerImpl.h after defining interface
+ *       class. */
 #include <platform/ConnectivityManager.h>
-#include <platform/Tizen/ConnectivityManagerImpl.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <wifi-manager.h>
@@ -31,7 +32,10 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceEvent.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <system/SystemClock.h>
+#include <system/SystemLayer.h>
 
 #include "platform/internal/GenericConnectivityManagerImpl_UDP.ipp"
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT

@@ -23,10 +23,6 @@
 
 #pragma once
 
-#include <platform/CHIPDeviceBuildConfig.h>
-
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
 #include <memory>
 
 #include <bluetooth.h>
@@ -114,5 +110,3 @@ private:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

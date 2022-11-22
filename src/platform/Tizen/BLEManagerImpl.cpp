@@ -23,7 +23,8 @@
  */
 
 /**
- * Note: Fix circular dependency between ThreadStackManager and ConnectivityManager */
+ * Note: BLEManager requires ConnectivityManager to be defined beforehand,
+ *       otherwise we will face circular dependency between them. */
 #include <platform/ConnectivityManager.h>
 
 /**
@@ -31,7 +32,6 @@
  *       platform/<PLATFORM>/BLEManagerImpl.h after defining interface class. */
 #include "platform/internal/BLEManager.h"
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <strings.h>
 
 #include <cstdint>
@@ -51,7 +51,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/SetupDiscriminator.h>
-#include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
@@ -1416,5 +1415,3 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

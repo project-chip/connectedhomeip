@@ -22,7 +22,8 @@
  */
 
 /**
- * Note: Fix circular dependency between ThreadStackManager and ConnectivityManager */
+ * Note: ThreadStackManager requires ConnectivityManager to be defined
+ *       beforehand, otherwise we will face circular dependency between them. */
 #include <platform/ConnectivityManager.h>
 
 /**

@@ -23,8 +23,6 @@
 
 #include "ChipDeviceScanner.h"
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
 #include <cstdint>
 #include <cstring>
 #include <utility>
@@ -314,5 +312,3 @@ exit:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

@@ -37,8 +37,6 @@ static_library("Tizen") {
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "CHIPPlatformConfig.h",
-    "ChipDeviceScanner.cpp",
-    "ChipDeviceScanner.h",
     "ConfigurationManagerImpl.cpp",
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
@@ -88,6 +86,8 @@ static_library("Tizen") {
       "BLEManagerImpl.cpp",
       "BLEManagerImpl.h",
       "BlePlatformConfig.h",
+      "ChipDeviceScanner.cpp",
+      "ChipDeviceScanner.h",
     ]
   }
 

@@ -23,8 +23,6 @@
 
 #pragma once
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -39,7 +37,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/SetupDiscriminator.h>
-#include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
@@ -278,5 +275,3 @@ inline bool BLEManagerImpl::_IsAdvertising()
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
