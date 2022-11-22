@@ -46,7 +46,8 @@ protected:
 
     bool CheckConstraintFormat(const char * itemName, const char * current, const char * expected)
     {
-        ChipLogError(chipTool, "Warning: %s format checking is not implemented yet. Expected format: '%s'", itemName, expected);
+        ChipLogError(chipTool, "Warning: %s format checking is not implemented yet. Expected format: '%s'",
+                     StringOrNullMarker(itemName), StringOrNullMarker(expected));
         return true;
     }
 

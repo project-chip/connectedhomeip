@@ -213,20 +213,72 @@ config NVS_LOOKUP_CACHE_SIZE
     int
     default 512
 
+# Enable OpenThread
+
+config NET_L2_OPENTHREAD
+    bool
+    default y if !WIFI_NRF700X
+
+if NET_L2_OPENTHREAD
+
 # Increase the default RX stack size
 config IEEE802154_NRF5_RX_STACK_SIZE
     int
     default 1024
 
-# Enable OpenThread
+endif
 
-config NET_L2_OPENTHREAD
+if CHIP_WIFI
+
+config NRF_WIFI_LOW_POWER
     bool
-    default y
+    default n
 
-choice OPENTHREAD_STACK_VERSION
-	default OPENTHREAD_THREAD_VERSION_1_3
-endchoice
+config MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG
+    bool
+    default n
+
+config SYSTEM_WORKQUEUE_STACK_SIZE
+    int
+    default 1120
+
+# align these numbers to match the OpenThread config
+config NET_IF_UNICAST_IPV6_ADDR_COUNT
+    int
+    default 6
+
+config NET_IF_MCAST_IPV6_ADDR_COUNT
+    int
+    default 8
+
+config NET_SOCKETS_POSIX_NAMES
+    bool
+    default n
+
+config MBEDTLS_SSL_OUT_CONTENT_LEN
+    int
+    default 900
+
+# options managed by IP4/IP6 simultaneous support
+# aligned here to match OpenThread config
+config NET_MAX_ROUTERS
+    int
+    default 1
+
+config NET_MAX_CONN
+    int
+    default 4
+
+config SHELL_STACK_SIZE
+    int
+    default 2616
+
+config HEAP_MEM_POOL_SIZE
+    int
+    default 200000
+
+endif
+
 
 # Enable mbedTLS from nrf_security library
 

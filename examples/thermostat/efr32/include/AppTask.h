@@ -26,9 +26,15 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef DISPLAY_ENABLED
+#include "ThermostatUI.h"
+#endif
+
 #include "AppEvent.h"
 #include "BaseApplication.h"
 #include "FreeRTOS.h"
+#include "SensorManager.h"
+#include "TemperatureManager.h"
 #include "sl_simple_button_instances.h"
 #include "timers.h" // provides FreeRTOS timer support
 #include <app/clusters/identify-server/identify-server.h>
@@ -68,6 +74,11 @@ public:
     static void AppTaskMain(void * pvParameter);
 
     CHIP_ERROR StartAppTask();
+
+    /**
+     * @brief Request an update of the Thermostat LCD UI
+     */
+    void UpdateThermoStatUI();
 
     /**
      * @brief Event handler when a button is pressed
@@ -112,11 +123,5 @@ private:
      */
     static void ButtonHandler(AppEvent * aEvent);
 
-    /**
-     * @brief PB1 Button event processing function
-     *        Function triggers a thermostat action sent to the CHIP task
-     *
-     * @param aEvent button event being processed
-     */
     static void ThermostatActionEventHandler(AppEvent * aEvent);
 };

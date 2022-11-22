@@ -22,7 +22,7 @@ import click
 import coloredlogs
 
 import build
-from glob_matcher import GlobMatcher
+from builders.builder import BuilderOptions
 from runner import PrintOnlyRunner, ShellRunner
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
@@ -107,10 +107,15 @@ def ValidateRepoPath(context, parameter, value):
     default=False,
     is_flag=True,
     help='Skip timestaps in log output')
+@click.option(
+    '--pw-command-launcher',
+    help=(
+        'Set pigweed command launcher. E.g.: "--pw-command-launcher=ccache" '
+        'for using ccache when building examples.'))
 @click.pass_context
 def main(context, log_level, target, repo,
          out_prefix, clean, dry_run, dry_run_output, enable_flashbundle,
-         no_log_timestamps):
+         no_log_timestamps, pw_command_launcher):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -135,8 +140,10 @@ before running this script.
 
     context.obj = build.Context(
         repository_path=repo, output_prefix=out_prefix, runner=runner)
-    context.obj.SetupBuilders(
-        targets=requested_targets, enable_flashbundle=enable_flashbundle)
+    context.obj.SetupBuilders(targets=requested_targets, options=BuilderOptions(
+        enable_flashbundle=enable_flashbundle,
+        pw_command_launcher=pw_command_launcher,
+    ))
 
     if clean:
         context.obj.CleanOutputDirectories()

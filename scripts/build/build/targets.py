@@ -100,6 +100,7 @@ def BuildHostTarget():
         TargetPart('all-clusters-minimal', app=HostApp.ALL_CLUSTERS),
         TargetPart('chip-tool', app=HostApp.CHIP_TOOL),
         TargetPart('thermostat', app=HostApp.THERMOSTAT),
+        TargetPart('java-matter-controller', app=HostApp.JAVA_MATTER_CONTROLLER),
         TargetPart('minmdns', app=HostApp.MIN_MDNS),
         TargetPart('light', app=HostApp.LIGHT),
         TargetPart('lock', app=HostApp.LOCK),

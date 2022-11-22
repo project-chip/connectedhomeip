@@ -214,6 +214,23 @@ using namespace chip::Credentials;
     return AsData(chipCertBytes);
 }
 
++ (MTRCertificateDERBytes _Nullable)convertMatterCertificate:(MTRCertificateTLVBytes)matterCertificate
+{
+    chip::ByteSpan tlvCertBytes = AsByteSpan(matterCertificate);
+
+    uint8_t derCertBuffer[chip::Controller::kMaxCHIPDERCertLength];
+    chip::MutableByteSpan derCertBytes(derCertBuffer);
+
+    CHIP_ERROR errorCode = chip::Credentials::ConvertChipCertToX509Cert(tlvCertBytes, derCertBytes);
+
+    if (errorCode != CHIP_NO_ERROR) {
+        MTR_LOG_ERROR("ConvertChipCertToX509Cert: %{public}s", chip::ErrorStr(errorCode));
+        return nil;
+    }
+
+    return AsData(derCertBytes);
+}
+
 @end
 
 @implementation MTRCertificates (Deprecated)

@@ -128,6 +128,35 @@ update_config=1
 
 Finally, reboot your RPi.
 
+## Installing ZAP
+
+`zap-cli` is already installed in pre-built docker images for chip-build, such
+as
+[chip-build-vscode](https://hub.docker.com/r/connectedhomeip/chip-build-vscode).
+
+Zap generation and tooling relies on `zap-cli` being available on the current
+system. You can install it from the zap project
+[Releases](https://github.com/project-chip/zap/releases).
+
+You should install a compatible release version, generally checking against the
+release set in
+[integrations/docker/images/chip-build/Dockerfile](../../../integrations/docker/images/chip-build/Dockerfile).
+
+On linux, installation from `zap-linux.zip` is recommended as it pulls fewer
+dependencies than the `.deb` package.
+
+### Which ZAP to use
+
+ZAP scripting uses the following detection, in order:
+
+-   `$ZAP_DEVELOPMENT_PATH` to point to a zap checkout. Use this if you are
+    developing zap locally and would like to run zap with your changes
+
+-   `$ZAP_INSTALL_PATH` to point to where `zap-linux.zip`/`zap-mac.zip` was
+    unpacked. This allows you to not need to place zap/zap-cli in `$PATH`
+
+-   Otherwise scripts assume `zap-cli` or `zap` is available in `$PATH`
+
 ## Prepare for building
 
 Before running any other build command, the `scripts/activate.sh` environment

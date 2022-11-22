@@ -89,18 +89,21 @@ public:
             break;
         case PairingMode::OnNetwork:
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
+            AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         case PairingMode::SoftAP:
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
             AddArgument("discriminator", 0, 4096, &mDiscriminator);
             AddArgument("device-remote-ip", &mRemoteAddr);
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
+            AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         case PairingMode::Ethernet:
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
             AddArgument("discriminator", 0, 4096, &mDiscriminator);
             AddArgument("device-remote-ip", &mRemoteAddr);
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
+            AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         }
 
@@ -165,6 +168,7 @@ private:
     chip::Optional<uint16_t> mTimeout;
     chip::Optional<bool> mDiscoverOnce;
     chip::Optional<bool> mUseOnlyOnNetworkDiscovery;
+    chip::Optional<bool> mPaseOnly;
     uint16_t mRemotePort;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
