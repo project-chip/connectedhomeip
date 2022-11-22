@@ -14,7 +14,7 @@ TOOLCHAIN_SYMBOLIC_LINK_PATH=""
 git -C . rev-parse 2>/dev/null
 if [[ "$?" == "0" ]]; then
     # Examples in Bouffalo Lab IOT SDK repo expect toolchain under repo,
-    # let's create a symbolic link to Bouffalo Lab toolchain, 
+    # let's create a symbolic link to Bouffalo Lab toolchain,
     # if this script runs under repo
     TOOLCHAIN_SYMBOLIC_LINK_PATH=$CURRENT_DIR/../toolchain
 fi
@@ -56,11 +56,11 @@ for ((i = 0; i < ${#toolchains_url[@]}; i += 3)); do
     if [ -f "$TOOLCHAIN_SETUP_ROOT/$path"/chmod755.sh ]; then
         cd "$TOOLCHAIN_SETUP_ROOT/$path"/
         bash chmod755.sh
-        cd $CURRENT_DIR
+        cd "$CURRENT_DIR"
     fi
 done
 
 if [[ "$TOOLCHAIN_SYMBOLIC_LINK_PATH" != "" ]]; then
-    rm -rf $TOOLCHAIN_SYMBOLIC_LINK_PATH
-    ln -s $TOOLCHAIN_SETUP_ROOT $TOOLCHAIN_SYMBOLIC_LINK_PATH  
+    rm -rf "$TOOLCHAIN_SYMBOLIC_LINK_PATH"
+    ln -s "$TOOLCHAIN_SETUP_ROOT" "$TOOLCHAIN_SYMBOLIC_LINK_PATH"
 fi
