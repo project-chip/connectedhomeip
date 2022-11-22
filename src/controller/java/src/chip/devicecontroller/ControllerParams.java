@@ -177,8 +177,8 @@ public final class ControllerParams {
 
     /**
    	 * Sets the CASEFailsafeExpirySeconds duration passed to ChipDeviceCommissioner's CommissioningParameters.
-   	 * After PASE session has finished, the failsafe is rearmed with the specified expiry before continuing 
-   	 * commissioning. 
+   	 * After PASE session has finished, the failsafe is rearmed with the specified expiry before continuing
+   	 * commissioning.
    	 *
    	 * <p>Note: If CASEFailsafeExpirySeconds is not set (or is 0), the failsafe will not be rearmed.
    	 *
