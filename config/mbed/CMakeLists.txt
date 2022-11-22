@@ -489,18 +489,11 @@ if (NOT ${APP_TARGET} MATCHES "shell")
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
     )
 else()
-    include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
-    chip_configure_data_model(${APP_TARGET}
-        ZAP_FILE ${CHIP_ROOT}/examples/ota-requestor-app/ota-requestor-common/ota-requestor-app.zap
-        GEN_DIR ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated
-    )
-    target_include_directories(${APP_TARGET} PRIVATE
-                           ${GEN_DIR}/ota-requestor-app
-    )
-    target_sources(${APP_TARGET} PRIVATE
-               ${GEN_DIR}//ota-requestor-app/zap-generated/callback-stub.cpp
-               ${GEN_DIR}/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
-    )
+    target_include_directories(${APP_TARGET} 
+        PRIVATE ${GEN_DIR}/ota-requestor-app)
+    
+    target_sources(${APP_TARGET} 
+        PRIVATE ${GEN_DIR}/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp)
 endif()
 
     list(APPEND CHIP_DEFINES

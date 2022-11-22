@@ -324,6 +324,12 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
     NL_TEST_ASSERT(inSuite, session.HasValue());
     session.Value()->AsSecureSession()->MarkForEviction();
 
+    // Evicting a session async notifies the PASESession's delegate.  Normally
+    // that notification is what would delete the PASESession, but in our case
+    // that will happen as soon as things come off the stack.  So make sure to
+    // process the async bits before that happens.
+    ctx.DrainAndServiceIO();
+
     // And check that this did not result in any new notifications.
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingErrors == 0);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);

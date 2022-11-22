@@ -25,7 +25,7 @@
 #include <app-common/zap-generated/command-id.h>
 
 using namespace chip;
-
+using namespace chip::app::Clusters;
 #define MAX_LEVEL 99
 #define MIN_LEVEL 1
 
@@ -45,7 +45,8 @@ static EmberAfLevelControlState * getState(EndpointId endpoint)
 }
 
 static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize, pp::DataModel::Nullable<uint16_t> transitionTimeDs,
-                        uint8_t optionMask, uint8_t optionOverride)
+                        BitMask<LevelControl::LevelControlOptions> optionMask,
+                        BitMask<LevelControl::LevelControlOptions> optionOverride)
 {
 
     EndpointId endpoint              = emberAfCurrentEndpoint();
@@ -124,7 +125,8 @@ send_default_response:
 }
 
 bool emberAfLevelControlClusterStepCallback(uint8_t stepMode, uint8_t stepSize, pp::DataModel::Nullable<uint8_t> transitionTime,
-                                            uint8_t optionMask, uint8_t optionOverride)
+                                            BitMask<LevelControl::LevelControlOptions> optionMask,
+                                            BitMask<LevelControl::LevelControlOptions> optionOverride)
 {
     stepHandler(ZCL_STEP_COMMAND_ID, stepMode, stepSize, transitionTime, optionMask, optionOverride);
     return true;

@@ -93,12 +93,15 @@ function(chip_configure_data_model APP_TARGET)
           GENERATOR "cpp-app"
           OUTPUTS
                 "app/PluginApplicationCallbacks.h"
+                "app/callback-stub.cpp"
           OUTPUT_PATH   APP_GEN_DIR
           OUTPUT_FILES  APP_GEN_FILES
         )
 
         target_include_directories(${APP_TARGET} PRIVATE "${APP_GEN_DIR}")
         add_dependencies(${APP_TARGET} ${APP_TARGET}-codegen)
+    else()
+        set(APP_GEN_FILES)
     endif()
 
     target_sources(${APP_TARGET} PRIVATE
@@ -117,5 +120,6 @@ function(chip_configure_data_model APP_TARGET)
         ${CHIP_APP_BASE_DIR}/util/message.cpp
         ${CHIP_APP_BASE_DIR}/util/privilege-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/util.cpp
+        ${APP_GEN_FILES}
     )
 endfunction()

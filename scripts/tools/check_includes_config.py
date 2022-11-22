@@ -152,4 +152,6 @@ ALLOW: Dict[str, Set[str]] = {
     # Not really for embedded consumers; uses std::queue to keep track
     # of a list of discovered things.
     'src/controller/SetUpCodePairer.h': {'queue'},
+
+    'src/controller/ExamplePersistentStorage.cpp': {'fstream'}
 }

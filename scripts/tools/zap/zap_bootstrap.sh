@@ -32,14 +32,13 @@ EOF
 
 set -e
 
-SCRIPT_PATH="$(_get_fullpath "$0")"
-CHIP_ROOT="${SCRIPT_PATH%/scripts/tools/zap/zap_bootstrap.sh}"
+if [ -z "$ZAP_DEVELOPMENT_PATH" ]; then
+    echo 'Please set $ZAP_DEVELOPMENT_PATH to your zap checkout'
+    exit 1
+fi
 
 (
-    cd "$CHIP_ROOT" &&
-        git submodule update --init third_party/zap/repo
-
-    cd "third_party/zap/repo"
+    cd "$ZAP_DEVELOPMENT_PATH"
 
     if [ $# -eq 0 ]; then
         echo "Running ZAP bootstrap"
