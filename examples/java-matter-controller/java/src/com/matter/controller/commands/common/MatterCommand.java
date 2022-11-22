@@ -18,6 +18,7 @@
 
 package com.matter.controller.commands.common;
 
+import chip.devicecontroller.ChipDeviceController;
 import com.matter.controller.config.PersistentStorage;
 import com.matter.controller.config.PersistentStorageOpCertStore;
 import com.matter.controller.config.PersistentStorageOperationalKeystore;
@@ -26,6 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class MatterCommand extends Command {
+  private final ChipDeviceController mChipDeviceController;
   private final PersistentStorage mDefaultStorage = new PersistentStorage();
   private final PersistentStorage mCommissionerStorage = new PersistentStorage();
   private final PersistentStorageOperationalKeystore mOperationalKeystore =
@@ -40,13 +42,19 @@ public abstract class MatterCommand extends Command {
   private final AtomicBoolean mUseMaxSizedCerts = new AtomicBoolean();;
   private final AtomicBoolean mOnlyAllowTrustedCdKeys = new AtomicBoolean();;
 
-  public MatterCommand(String commandName, CredentialsIssuer credIssuerCmds) {
-    this(commandName, credIssuerCmds, null);
+  public MatterCommand(
+      ChipDeviceController controller, String commandName, CredentialsIssuer credIssuerCmds) {
+    this(controller, commandName, credIssuerCmds, null);
   }
 
-  public MatterCommand(String commandName, CredentialsIssuer credIssuerCmds, String helpText) {
+  public MatterCommand(
+      ChipDeviceController controller,
+      String commandName,
+      CredentialsIssuer credIssuerCmds,
+      String helpText) {
     super(commandName, helpText);
     this.mCredIssuerCmds = Optional.ofNullable(credIssuerCmds);
+    this.mChipDeviceController = controller;
 
     addArgument(
         "paa-trust-store-path",
@@ -79,6 +87,11 @@ public abstract class MatterCommand extends Command {
         mOnlyAllowTrustedCdKeys,
         "Only allow trusted CD verifying keys (disallow test keys). If not provided or 0 (\"false\"), untrusted CD "
             + "verifying keys are allowed. If 1 (\"true\"), test keys are disallowed.");
+  }
+
+  // This method returns the commissioner instance to be used for running the command.
+  public ChipDeviceController currentCommissioner() {
+    return mChipDeviceController;
   }
 
   /////////// Command Interface /////////

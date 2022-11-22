@@ -27,13 +27,15 @@ import java.util.ArrayList;
 
 public class Main {
   private static void registerCommandsDiscover(
-      CommandManager commandManager, CredentialsIssuer credentialsIssuer) {
+      ChipDeviceController controller,
+      CommandManager commandManager,
+      CredentialsIssuer credentialsIssuer) {
     ArrayList<Command> clusterCommands = new ArrayList<Command>();
-    DiscoverCommand discoverCommand = new DiscoverCommand(credentialsIssuer);
+    DiscoverCommand discoverCommand = new DiscoverCommand(controller, credentialsIssuer);
     DiscoverCommissionablesCommand discoverCommissionablesCommand =
-        new DiscoverCommissionablesCommand(credentialsIssuer);
+        new DiscoverCommissionablesCommand(controller, credentialsIssuer);
     DiscoverCommissionersCommand discoverCommissionersCommand =
-        new DiscoverCommissionersCommand(credentialsIssuer);
+        new DiscoverCommissionersCommand(controller, credentialsIssuer);
     clusterCommands.add(discoverCommand);
     clusterCommands.add(discoverCommissionablesCommand);
     clusterCommands.add(discoverCommissionersCommand);
@@ -42,29 +44,36 @@ public class Main {
   }
 
   private static void registerCommandsPairing(
-      CommandManager commandManager, CredentialsIssuer credentialsIssuer) {
+      ChipDeviceController controller,
+      CommandManager commandManager,
+      CredentialsIssuer credentialsIssuer) {
     ArrayList<Command> clusterCommands = new ArrayList<Command>();
-    UnpairCommand unpairCommand = new UnpairCommand(credentialsIssuer);
-    PairCodeCommand pairCodeCommand = new PairCodeCommand(credentialsIssuer);
-    PairCodePaseCommand pairCodePaseCommand = new PairCodePaseCommand(credentialsIssuer);
-    PairCodeWifiCommand pairCodeWifiCommand = new PairCodeWifiCommand(credentialsIssuer);
-    PairCodeThreadCommand pairCodeThreadCommand = new PairCodeThreadCommand(credentialsIssuer);
-    PairEthernetCommand pairEthernetCommand = new PairEthernetCommand(credentialsIssuer);
-    PairOnNetworkCommand pairOnNetworkCommand = new PairOnNetworkCommand(credentialsIssuer);
+    UnpairCommand unpairCommand = new UnpairCommand(controller, credentialsIssuer);
+    PairCodeCommand pairCodeCommand = new PairCodeCommand(controller, credentialsIssuer);
+    PairCodePaseCommand pairCodePaseCommand =
+        new PairCodePaseCommand(controller, credentialsIssuer);
+    PairCodeWifiCommand pairCodeWifiCommand =
+        new PairCodeWifiCommand(controller, credentialsIssuer);
+    PairCodeThreadCommand pairCodeThreadCommand =
+        new PairCodeThreadCommand(controller, credentialsIssuer);
+    PairEthernetCommand pairEthernetCommand =
+        new PairEthernetCommand(controller, credentialsIssuer);
+    PairOnNetworkCommand pairOnNetworkCommand =
+        new PairOnNetworkCommand(controller, credentialsIssuer);
     PairOnNetworkShortCommand pairOnNetworkShortCommand =
-        new PairOnNetworkShortCommand(credentialsIssuer);
+        new PairOnNetworkShortCommand(controller, credentialsIssuer);
     PairOnNetworkLongCommand pairOnNetworkLongCommand =
-        new PairOnNetworkLongCommand(credentialsIssuer);
+        new PairOnNetworkLongCommand(controller, credentialsIssuer);
     PairOnNetworkVendorCommand pairOnNetworkVendorCommand =
-        new PairOnNetworkVendorCommand(credentialsIssuer);
+        new PairOnNetworkVendorCommand(controller, credentialsIssuer);
     PairOnNetworkCommissioningModeCommand pairOnNetworkCommissioningModeCommand =
-        new PairOnNetworkCommissioningModeCommand(credentialsIssuer);
+        new PairOnNetworkCommissioningModeCommand(controller, credentialsIssuer);
     PairOnNetworkCommissionerCommand pairOnNetworkCommissionerCommand =
-        new PairOnNetworkCommissionerCommand(credentialsIssuer);
+        new PairOnNetworkCommissionerCommand(controller, credentialsIssuer);
     PairOnNetworkDeviceTypeCommand pairOnNetworkDeviceTypeCommand =
-        new PairOnNetworkDeviceTypeCommand(credentialsIssuer);
+        new PairOnNetworkDeviceTypeCommand(controller, credentialsIssuer);
     PairOnNetworkInstanceNameCommand pairOnNetworkInstanceNameCommand =
-        new PairOnNetworkInstanceNameCommand(credentialsIssuer);
+        new PairOnNetworkInstanceNameCommand(controller, credentialsIssuer);
     clusterCommands.add(unpairCommand);
     clusterCommands.add(pairCodeCommand);
     clusterCommands.add(pairCodePaseCommand);
@@ -94,8 +103,8 @@ public class Main {
     CredentialsIssuer credentialsIssuer = new CredentialsIssuer();
     CommandManager commandManager = new CommandManager();
 
-    registerCommandsDiscover(commandManager, credentialsIssuer);
-    registerCommandsPairing(commandManager, credentialsIssuer);
+    registerCommandsDiscover(controller, commandManager, credentialsIssuer);
+    registerCommandsPairing(controller, commandManager, credentialsIssuer);
 
     try {
       commandManager.run(args);
