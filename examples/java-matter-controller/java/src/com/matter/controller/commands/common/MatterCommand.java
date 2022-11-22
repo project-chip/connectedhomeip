@@ -129,13 +129,13 @@ public abstract class MatterCommand extends Command {
 
   private void expectResult(String expectedResult, long timeout) {
     long start = System.currentTimeMillis();
-    while (mTestResult.isPresent())
+    while (!mTestResult.isPresent())
       try {
         if (System.currentTimeMillis() > (start + timeout)) {
           throw new RuntimeException("timeout!");
         }
         Thread.sleep(100);
-      } catch (Exception ex) {
+      } catch (InterruptedException ex) {
       }
 
     if (!mTestResult.isPresent()) {

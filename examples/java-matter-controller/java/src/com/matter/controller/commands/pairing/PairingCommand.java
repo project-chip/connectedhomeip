@@ -79,7 +79,6 @@ public abstract class PairingCommand extends MatterCommand
     System.out.println("onPairingComplete with error code: " + errorCode);
     if (errorCode != 0) {
       setTestResult("Failure");
-      throw new RuntimeException("onPairingComplete");
     }
   }
 
@@ -95,7 +94,6 @@ public abstract class PairingCommand extends MatterCommand
       setTestResult("Success");
     } else {
       setTestResult("Failure");
-      throw new RuntimeException("onCommissioningComplete");
     }
   }
 
@@ -124,7 +122,6 @@ public abstract class PairingCommand extends MatterCommand
   public void onError(Throwable error) {
     setTestResult(error.toString());
     System.out.println("onError with error: " + error.toString());
-    throw new RuntimeException(error.toString());
   }
 
   @Override
@@ -161,7 +158,7 @@ public abstract class PairingCommand extends MatterCommand
     this.mFilterType = filterType;
 
     try {
-      this.mRemoteAddr = new IPAddress(InetAddress.getByName("127.0.0.1"));
+      this.mRemoteAddr = new IPAddress(InetAddress.getByName("::1"));
     } catch (UnknownHostException e) {
       throw new RuntimeException(e);
     }
