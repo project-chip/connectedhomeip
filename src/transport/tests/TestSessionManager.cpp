@@ -765,10 +765,19 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
         handle.Value()->AsSecureSession()->MarkForEviction();
     }
 
+#if CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
+    // DMalloc can be very slow to allocate/free crypto keys. Lower the amount
+    // of iterations.
+    constexpr uint32_t kAllocateTestLowerBound = UINT16_MAX - 100;
+#else
+    constexpr uint32_t kAllocateTestLowerBound = 0;
+#endif
+    constexpr uint32_t kAllocateTestHighBound = UINT16_MAX + 10;
+
     // Verify that we increment session ID by 1 for each allocation (except for
     // the wraparound case where we skip session ID 0), even when allocated
     // sessions are immediately freed.
-    for (uint32_t i = 0; i < UINT16_MAX + 10; ++i)
+    for (uint32_t i = kAllocateTestLowerBound; i < kAllocateTestHighBound; ++i)
     {
         auto handle = sessionManager.AllocateSession(
             Transport::SecureSession::Type::kPASE,
@@ -807,9 +816,18 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, sessionIds[h] != sessionIds[(h + 1) % numHandles]);
         }
 
+#if CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
+        // DMalloc can be very slow to allocate/free crypto keys. Lower the amount
+        // of iterations.
+        constexpr uint32_t kCollisionTestLowerBound = UINT16_MAX - 100;
+#else
+        constexpr uint32_t kCollisionTestLowerBound = 0;
+#endif
+        constexpr uint32_t kCollisionTestUpperBound = UINT16_MAX;
+
         // Allocate through the entire session ID space and verify that none of
         // these collide either.
-        for (int j = 0; j < UINT16_MAX; ++j)
+        for (uint32_t j = kCollisionTestLowerBound; j < kCollisionTestUpperBound; ++j)
         {
             auto handle = sessionManager.AllocateSession(
                 Transport::SecureSession::Type::kPASE,
