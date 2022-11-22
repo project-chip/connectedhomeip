@@ -12,8 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import stringcase
+
+
+def normalize_acronyms(s: str) -> str:
+    """Replaces variations of acronyms when converting various words.
+
+       Specifically when considering how to generate a CONST_CASE constant,
+       strings such as WiFi should not be WI_FI but rather WIFI
+    """
+    return s.replace('WiFi', 'Wifi').replace('WI_FI', 'WIFI')
 
 
 def RegisterCommonFilters(filtermap):
@@ -32,3 +40,5 @@ def RegisterCommonFilters(filtermap):
     filtermap['pascalcase'] = stringcase.pascalcase
     filtermap['snakecase'] = stringcase.snakecase
     filtermap['spinalcase'] = stringcase.spinalcase
+
+    filtermap['normalize_acronyms'] = normalize_acronyms

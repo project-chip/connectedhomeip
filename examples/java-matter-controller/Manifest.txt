@@ -1,2 +1,3 @@
 Main-Class: com.matter.controller.Main
+Class-Path: ../lib/third_party/connectedhomeip/src/controller/java/CHIPController.jar ../lib/third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar
 

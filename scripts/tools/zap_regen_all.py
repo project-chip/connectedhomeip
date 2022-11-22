@@ -253,10 +253,6 @@ def getTargets(type, test_target):
     return targets
 
 
-def runBootstrap():
-    subprocess.check_call(os.path.join(CHIP_ROOT_DIR, "scripts/tools/zap/zap_bootstrap.sh"), shell=True)
-
-
 def main():
     logging.basicConfig(
         level=logging.INFO,
@@ -268,9 +264,11 @@ def main():
 
     targets = getTargets(args.type, args.tests)
 
-    if (not args.dry_run):
-        if (args.run_bootstrap):
-            runBootstrap()
+    if not args.dry_run:
+
+        if args.run_bootstrap:
+            subprocess.check_call(os.path.join(CHIP_ROOT_DIR, "scripts/tools/zap/zap_bootstrap.sh"), shell=True)
+
         for target in targets:
             target.generate()
 

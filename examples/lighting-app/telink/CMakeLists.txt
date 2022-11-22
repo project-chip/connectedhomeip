@@ -52,7 +52,6 @@ target_sources(app PRIVATE
                src/LightingManager.cpp
                src/main.cpp
                src/ZclCallbacks.cpp
-               ${GEN_DIR}/lighting-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp

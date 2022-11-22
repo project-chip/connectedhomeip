@@ -54,7 +54,10 @@ template("chip_data_model") {
   chip_codegen("${_data_model_name}_codegen") {
     input = _idl
     generator = "cpp-app"
-    outputs = [ "app/PluginApplicationCallbacks.h" ]
+    outputs = [
+      "app/PluginApplicationCallbacks.h",
+      "app/callback-stub.cpp",
+    ]
   }
 
   config("${_data_model_name}_config") {
@@ -169,8 +172,6 @@ template("chip_data_model") {
     }
 
     if (defined(invoker.zap_pregenerated_dir)) {
-      sources += [ "${invoker.zap_pregenerated_dir}/callback-stub.cpp" ]
-
       if (chip_controller) {
         sources += [ "${invoker.zap_pregenerated_dir}/CHIPClusters.h" ]
       }

@@ -134,9 +134,9 @@ CASESession::~CASESession()
 
 void CASESession::OnSessionReleased()
 {
+    // Call into our super-class before we clear our state.
+    PairingSession::OnSessionReleased();
     Clear();
-    // Do this last in case the delegate frees us.
-    NotifySessionEstablishmentError(CHIP_ERROR_CONNECTION_ABORTED);
 }
 
 void CASESession::Clear()

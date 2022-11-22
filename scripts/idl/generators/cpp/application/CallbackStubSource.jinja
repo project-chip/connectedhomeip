@@ -1,5 +1,3 @@
-{{> header}}
-
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <lib/support/Span.h>
@@ -12,21 +10,21 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
-    {{#all_user_clusters_names}}
-     case ZCL_{{asDelimitedMacro define}}_ID :
-        emberAf{{asUpperCamelCase name}}ClusterInitCallback(endpoint);
+  {%- for name in clusters | sort(attribute='name') | map(attribute='name') | unique %}
+    case ZCL_{{name | normalize_acronyms | constcase}}_CLUSTER_ID:
+        emberAf{{name}}ClusterInitCallback(endpoint);
         break;
-    {{/all_user_clusters_names}}
+  {%- endfor %}
     default:
         // Unrecognized cluster ID
         break;
     }
 }
 
-{{#all_user_clusters_names}}
-void __attribute__((weak)) emberAf{{asUpperCamelCase name}}ClusterInitCallback(EndpointId endpoint)
+{%- for name in clusters | sort(attribute='name') | map(attribute='name') | unique %}
+void __attribute__((weak)) emberAf{{name}}ClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
 }
-{{/all_user_clusters_names}}
+{%- endfor %}

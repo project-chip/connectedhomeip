@@ -2414,8 +2414,10 @@ using chip::SessionHandle;
                     auto & nonNullValue_0 = request.transitionTime.SetNonNull();
                     nonNullValue_0 = params.transitionTime.unsignedShortValue;
                 }
-                request.optionsMask = params.optionsMask.unsignedCharValue;
-                request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.optionsMask
+                    = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(params.optionsMask.unsignedCharValue);
+                request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+                    params.optionsOverride.unsignedCharValue);
 
                 chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
@@ -2472,8 +2474,10 @@ using chip::SessionHandle;
                     auto & nonNullValue_0 = request.rate.SetNonNull();
                     nonNullValue_0 = params.rate.unsignedCharValue;
                 }
-                request.optionsMask = params.optionsMask.unsignedCharValue;
-                request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.optionsMask
+                    = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(params.optionsMask.unsignedCharValue);
+                request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+                    params.optionsOverride.unsignedCharValue);
 
                 chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
@@ -2531,8 +2535,10 @@ using chip::SessionHandle;
                     auto & nonNullValue_0 = request.transitionTime.SetNonNull();
                     nonNullValue_0 = params.transitionTime.unsignedShortValue;
                 }
-                request.optionsMask = params.optionsMask.unsignedCharValue;
-                request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.optionsMask
+                    = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(params.optionsMask.unsignedCharValue);
+                request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+                    params.optionsOverride.unsignedCharValue);
 
                 chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
@@ -2581,8 +2587,10 @@ using chip::SessionHandle;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.optionsMask = params.optionsMask.unsignedCharValue;
-                request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.optionsMask
+                    = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(params.optionsMask.unsignedCharValue);
+                request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+                    params.optionsOverride.unsignedCharValue);
 
                 chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
@@ -2638,8 +2646,10 @@ using chip::SessionHandle;
                     auto & nonNullValue_0 = request.transitionTime.SetNonNull();
                     nonNullValue_0 = params.transitionTime.unsignedShortValue;
                 }
-                request.optionsMask = params.optionsMask.unsignedCharValue;
-                request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.optionsMask
+                    = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(params.optionsMask.unsignedCharValue);
+                request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+                    params.optionsOverride.unsignedCharValue);
 
                 chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
@@ -2696,8 +2706,10 @@ using chip::SessionHandle;
                     auto & nonNullValue_0 = request.rate.SetNonNull();
                     nonNullValue_0 = params.rate.unsignedCharValue;
                 }
-                request.optionsMask = params.optionsMask.unsignedCharValue;
-                request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.optionsMask
+                    = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(params.optionsMask.unsignedCharValue);
+                request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+                    params.optionsOverride.unsignedCharValue);
 
                 chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
@@ -2755,8 +2767,10 @@ using chip::SessionHandle;
                     auto & nonNullValue_0 = request.transitionTime.SetNonNull();
                     nonNullValue_0 = params.transitionTime.unsignedShortValue;
                 }
-                request.optionsMask = params.optionsMask.unsignedCharValue;
-                request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.optionsMask
+                    = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(params.optionsMask.unsignedCharValue);
+                request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+                    params.optionsOverride.unsignedCharValue);
 
                 chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
@@ -2805,8 +2819,10 @@ using chip::SessionHandle;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.optionsMask = params.optionsMask.unsignedCharValue;
-                request.optionsOverride = params.optionsOverride.unsignedCharValue;
+                request.optionsMask
+                    = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(params.optionsMask.unsignedCharValue);
+                request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+                    params.optionsOverride.unsignedCharValue);
 
                 chip::Controller::LevelControlCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);

@@ -688,6 +688,12 @@ private:
     uint16_t mUdcListenPort            = CHIP_UDC_PORT;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
+#if CONFIG_NETWORK_LAYER_BLE
+    static void OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_CONNECTION_OBJECT connObj);
+    static void OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err);
+    RendezvousParameters mRendezvousParametersForDeviceDiscoveredOverBle;
+#endif
+
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
 
     /* This function sends a Device Attestation Certificate chain request to the device.
