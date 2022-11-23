@@ -21,12 +21,8 @@
 #include <platform/logging/LogV.h>
 
 #include <editline.h>
-#include <iomanip>
-#include <sstream>
 
-char kInteractiveModeName[]                            = "";
 constexpr const char * kInteractiveModePrompt          = ">>> ";
-constexpr uint8_t kInteractiveModeArgumentsMaxLength   = 32;
 constexpr const char * kInteractiveModeHistoryFilePath = "/tmp/chip_tool_history";
 constexpr const char * kInteractiveModeStopCommand     = "quit()";
 
@@ -114,31 +110,7 @@ bool InteractiveCommand::ParseCommand(char * command)
         return false;
     }
 
-    char * args[kInteractiveModeArgumentsMaxLength];
-    args[0]       = kInteractiveModeName;
-    int argsCount = 1;
-    std::string arg;
-
-    std::stringstream ss(command);
-    while (ss >> std::quoted(arg, '\''))
-    {
-        if (argsCount == kInteractiveModeArgumentsMaxLength)
-        {
-            ChipLogError(chipTool, "Too many arguments. Ignoring.");
-            return true;
-        }
-
-        char * carg = new char[arg.size() + 1];
-        strcpy(carg, arg.c_str());
-        args[argsCount++] = carg;
-    }
-
     ClearLine();
-    mHandler->RunInteractive(argsCount, args);
-
-    // Do not delete arg[0]
-    while (--argsCount)
-        delete[] args[argsCount];
-
+    mHandler->RunInteractive(command);
     return true;
 }
