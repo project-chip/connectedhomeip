@@ -183,6 +183,21 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+CHIP_ERROR extractProtocol(const char *serviceType, char *outServiceName, DnssdServiceProtocol &outProtocol)
+{
+    std::string serviceTypeStr(serviceType);
+    size_t index = serviceTypeStr.find(".");
+
+    ReturnErrorCodeIf(index == std::string::npos, CHIP_ERROR_INVALID_ARGUMENT);
+
+    CopyString(outServiceName, index + 1, serviceType);
+    outProtocol = (serviceTypeStr.substr(index + 1).compare(kOperationalProtocol) == 0)
+        ? DnssdServiceProtocol::kDnssdProtocolTcp
+        : DnssdServiceProtocol::kDnssdProtocolUdp;
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ChipDnssdResolve(DnssdService * service, Inet::InterfaceId interface, DnssdResolveCallback callback, void * context)
 {
     VerifyOrReturnError(service != nullptr && callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -317,16 +332,7 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring hostName, 
     CopyString(service.mName, jniInstanceName.c_str());
     CopyString(service.mHostName, jnihostName.c_str());
 
-    std::string serviceTypeStr(jniServiceType.c_str());
-
-    size_t index = serviceTypeStr.find(".");
-    VerifyOrReturn(index != std::string::npos, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
-
-    std::string type = serviceTypeStr.substr(0, index);
-    CopyString(service.mType, type.c_str());
-    service.mProtocol = (serviceTypeStr.substr(index + 1).compare(kOperationalProtocol) == 0)
-        ? DnssdServiceProtocol::kDnssdProtocolTcp
-        : DnssdServiceProtocol::kDnssdProtocolUdp;
+    VerifyOrReturn(extractProtocol(jniServiceType.c_str(), service.mType, service.mProtocol) == CHIP_NO_ERROR, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
 
     service.mPort          = static_cast<uint16_t>(port);
     service.mInterface     = iface;
@@ -414,16 +420,6 @@ void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callback
 
     VerifyOrReturn(strlen(jniServiceType.c_str()) <= kDnssdTypeAndProtocolMaxSize, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
 
-    std::string serviceTypeStr(jniServiceType.c_str());
-
-    size_t index = serviceTypeStr.find(".");
-    VerifyOrReturn(index != std::string::npos, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
-
-    std::string type              = serviceTypeStr.substr(0, index);
-    DnssdServiceProtocol protocol = (serviceTypeStr.substr(index + 1).compare(kOperationalProtocol) == 0)
-        ? DnssdServiceProtocol::kDnssdProtocolTcp
-        : DnssdServiceProtocol::kDnssdProtocolUdp;
-
     auto size              = env->GetArrayLength(instanceName);
     DnssdService * service = new DnssdService[size];
     for (decltype(size) i = 0; i < size; i++)
@@ -433,9 +429,7 @@ void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callback
                        dispatch(CHIP_ERROR_INVALID_ARGUMENT));
 
         CopyString(service[i].mName, jniInstanceName.c_str());
-        CopyString(service[i].mType, type.c_str());
-        service[i].mProtocol  = protocol;
-        service[i].mInterface = static_cast<Inet::InterfaceId>(1);
+        VerifyOrReturn(extractProtocol(jniServiceType.c_str(), service[i].mType, service[i].mProtocol) == CHIP_NO_ERROR, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
     }
 
     dispatch(CHIP_NO_ERROR, service, size);
