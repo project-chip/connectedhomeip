@@ -202,7 +202,7 @@ prettytable==2.5.0
     #   mbed-os-tools
 prompt-toolkit==3.0.26
     # via ipython
-protobuf==3.20.1
+protobuf==3.20.2
     # via
     #   -r requirements.txt
     #   mypy-protobuf
