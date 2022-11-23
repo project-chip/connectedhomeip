@@ -17,6 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import "DeviceAttestationCredentialsHolder.h"
 #import "OnboardingPayload.h"
 
 #ifndef AppParameters_h
@@ -33,6 +34,8 @@
 @property NSData * spake2pSalt;
 
 @property NSData * spake2pVerifier;
+
+@property DeviceAttestationCredentialsHolder * deviceAttestationCredentials;
 
 @end
 
