@@ -119,7 +119,7 @@ value/label pair `"room"`/`[light name]`.
 -   Build the example application:
 
           ```
-          $ cd ~/connectedhomeip/examples/bridge-app/linux
+          $ cd ~/connectedhomeip/examples/dynamic-bridge-app/linux
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ gn gen out/debug
@@ -129,7 +129,7 @@ value/label pair `"room"`/`[light name]`.
 -   To delete generated executable, libraries and object files use:
 
           ```
-          $ cd ~/connectedhomeip/examples/bridge-app/linux
+          $ cd ~/connectedhomeip/examples/dynamic-bridge-app/linux
           $ rm -rf out/
           ```
 
@@ -175,8 +175,8 @@ value/label pair `"room"`/`[light name]`.
         -   Run Linux Bridge Example App
 
                   ```
-                  $ cd ~/connectedhomeip/examples/bridge-app/linux
-                  $ sudo out/debug/chip-bridge-app --ble-device [bluetooth device number]
+                  $ cd ~/connectedhomeip/examples/dynamic-bridge-app/linux
+                  $ sudo out/debug/dynamic-chip-bridge-app --ble-device [bluetooth device number]
                   # In this example, the device we want to use is hci1
                   $ sudo out/debug/chip-bridge-app --ble-device 1
                   ```
