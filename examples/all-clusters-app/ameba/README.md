@@ -137,27 +137,8 @@ to be On or Off.
 
 -   Open the USB-TTL serial port and type `help` to view the available commands
 
--   To know what are the available subcommands and what it does, simply enter
-    the command that you are interested in
+-   To know what are the available subcommands are there, enter `switch` command in the shell
 
-              > switch
-                help             Usage: switch <subcommand>
-                onoff            Usage: switch onoff <subcommand>
-                levelcontrol     Usage: switch levlecontrol <subcommand>
-                colorcontrol     Usage: switch colorcontrol <subcommand>
-                thermostat       Usage: switch thermostat <subcommand>
-                groups           Usage: switch groups <subcommand>
-                binding          Usage: switch binding <subcommand>
-
-              > switch onoff
-                help            Usage: switch ononff <subcommand>
-                on              on Usage: switch onoff on
-                off             off Usage: switch onoff off
-                toggle          toggle Usage: switch onoff toggle
-                offWE           off-with-effect Usage: switch onoff offWE <EffectId> <EffectVariant>
-                onWRGS          on-with-recall-global-scene Usage: switch onoff onWRGS
-                onWTO           on-with-timed-off Usage: switch onoff onWTO <OnOffControl> <OnTime> <OffWaitTime>
-                read            Usage : switch levelcontrol read <attribute>
 
 ## Binding and Controlling a Device
 
@@ -183,8 +164,9 @@ to be On or Off.
 
 -   Send OnOff command to the device through the switch device's Matter Shell
 
-              > switch onoff on
-              > switch onoff off
+    `switch onoff on`
+    
+    `switch onoff off`
 
 *   You may also bind more than one cluster to the switch device. Below command
     binds the Identify, OnOff, LevelControl, ColorControl and Thermostat
@@ -196,11 +178,14 @@ to be On or Off.
     controllee device through the switch device's Matter Shell. Follow the
     format shown in the description of the commands.
 
-              > switch onoff on
-              > switch levelcontrol movetolevel 100 0 0 0
-              > switch colorcontrol movetohue 100 0 0 0 0
-              > switch thermostat SPRL 0 0
+    `switch onoff on`
+    
+    `switch levelcontrol movetolevel 100 0 0 0`
+    
+    `switch colorcontrol movetohue 100 0 0 0 0`
+    
+    `switch thermostat SPRL 0 0`
 
 *   You may also request to read cluster attributes from Matter Shell
 
-              > switch <cluster> read <attribute>
+    `switch <cluster> read <attribute>`
