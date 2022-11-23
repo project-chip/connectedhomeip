@@ -112,7 +112,7 @@ however we likely want:
 -   flexible codegen (we will need to split output by clusters or other rules)
 -   Human reviewable inputs
 -   Machine-validatable rules based on CSA settings (ensure mandatory attribute
-    settings are followed, ensure propper device type adherence, ensure correct
+    settings are followed, ensure proer device type adherence, ensure correct
     cluster and data type definitions)
 -   Easy to maintain and develop for chosen languages/templates/codegen in
     general
