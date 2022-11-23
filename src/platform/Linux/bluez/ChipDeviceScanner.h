@@ -44,6 +44,9 @@ public:
 
     // Called when a scan was completed (stopped or timed out)
     virtual void OnScanComplete() = 0;
+
+    // Call on scan error
+    virtual void OnScanError(CHIP_ERROR) = 0;
 };
 
 /// Allows scanning for CHIP devices

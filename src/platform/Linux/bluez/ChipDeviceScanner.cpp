@@ -150,7 +150,9 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
 
 void ChipDeviceScanner::TimerExpiredCallback(chip::System::Layer * layer, void * appState)
 {
-    static_cast<ChipDeviceScanner *>(appState)->StopScan();
+    ChipDeviceScanner * chipDeviceScanner = static_cast<ChipDeviceScanner *>(appState);
+    chipDeviceScanner->mDelegate->OnScanError(CHIP_ERROR_TIMEOUT);
+    chipDeviceScanner->StopScan();
 }
 
 CHIP_ERROR ChipDeviceScanner::StopScan()
