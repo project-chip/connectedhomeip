@@ -122,8 +122,7 @@ def convert_yaml_type(field_value, field_type, use_from_dict=False):
 
         # The field type passed in is the type of the list element and not list[T].
         for idx, item in enumerate(field_value):
-            field_value[idx] = convert_yaml_type(
-                item, list_element_type, use_from_dict)
+            field_value[idx] = convert_yaml_type(item, list_element_type, use_from_dict)
         return field_value
     # YAML conversion treats all numbers as ints. Convert to a uint type if the schema
     # type indicates so.
