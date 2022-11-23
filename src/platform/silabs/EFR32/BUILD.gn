@@ -34,8 +34,6 @@ if (chip_crypto == "platform") {
 
 static_library("EFR32") {
   sources = [
-    "../../FreeRTOS/SystemTimeSupport.cpp",
-    "../../SingletonConfigurationManager.cpp",
     "${silabs_platform_dir}/BLEManagerImpl.h",
     "${silabs_platform_dir}/BlePlatformConfig.h",
     "${silabs_platform_dir}/CHIPDevicePlatformConfig.h",
@@ -53,6 +51,8 @@ static_library("EFR32") {
     "${silabs_platform_dir}/Logging.cpp",
     "${silabs_platform_dir}/PlatformManagerImpl.h",
     "${silabs_platform_dir}/SystemPlatformConfig.h",
+    "../../FreeRTOS/SystemTimeSupport.cpp",
+    "../../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "ConfigurationManagerImpl.cpp",
     "KeyValueStoreManagerImpl.cpp",
@@ -99,8 +99,8 @@ static_library("EFR32") {
     deps += [ "${chip_root}/third_party/openthread:openthread_cli" ]
 
     sources += [
-      "../../OpenThread/OpenThreadUtils.cpp",
       "${silabs_platform_dir}/ThreadStackManagerImpl.h",
+      "../../OpenThread/OpenThreadUtils.cpp",
       "ConnectivityManagerImpl.cpp",
       "ThreadStackManagerImpl.cpp",
     ]
