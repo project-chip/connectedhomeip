@@ -137,8 +137,8 @@ to be On or Off.
 
 -   Open the USB-TTL serial port and type `help` to view the available commands
 
--   To know what are the available subcommands are there, enter `switch` command in the shell
-
+-   To know what are the available subcommands are there, enter `switch` command
+    in the shell
 
 ## Binding and Controlling a Device
 
@@ -165,7 +165,7 @@ to be On or Off.
 -   Send OnOff command to the device through the switch device's Matter Shell
 
     `switch onoff on`
-    
+
     `switch onoff off`
 
 *   You may also bind more than one cluster to the switch device. Below command
@@ -179,11 +179,11 @@ to be On or Off.
     format shown in the description of the commands.
 
     `switch onoff on`
-    
+
     `switch levelcontrol movetolevel 100 0 0 0`
-    
+
     `switch colorcontrol movetohue 100 0 0 0 0`
-    
+
     `switch thermostat SPRL 0 0`
 
 *   You may also request to read cluster attributes from Matter Shell
