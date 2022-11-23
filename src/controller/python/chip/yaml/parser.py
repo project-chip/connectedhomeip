@@ -186,13 +186,13 @@ class _ExpectedResponse:
 
         if isinstance(self._expected_response_type, float32):
             if not math.isclose(self._expected_response, response, rel_tol=1e-6):
-                logger.error(f'Expected response {self._expected_response} didnt match '
-                             f'actual object {response}')
+                logger.error(f"Expected response {self._expected_response} didn't match "
+                             f"actual object {response}")
                 return False
 
         if (self._expected_response != response):
-            logger.error(f'Expected response {self._expected_response} didnt match '
-                         f'actual object {response}')
+            logger.error(f"Expected response {self._expected_response} didn't match "
+                         f"actual object {response}")
             return False
         return True
 
@@ -345,9 +345,9 @@ class ReadAttributeAction(BaseAction):
 
         self._expected_raw_response = item.get('response')
         if (self._expected_raw_response is None):
-            # TODO actually if response is missing is typically just means that we need to confirm
+            # TODO actually if response is missing it typically means that we need to confirm
             # that we got a successful response. This will be implemented later to consider all
-            # poossibly corner cases (if there are corner cases) around that.
+            # possible corner cases around that (if there are corner cases).
             raise UnexpectedParsingError(f'ReadAttribute missing expected response. {self.label}')
 
         variable_name = self._expected_raw_response.get('saveAs')
