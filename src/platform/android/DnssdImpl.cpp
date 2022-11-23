@@ -183,7 +183,7 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR extractProtocol(const char *serviceType, char *outServiceName, DnssdServiceProtocol &outProtocol)
+CHIP_ERROR extractProtocol(const char * serviceType, char * outServiceName, DnssdServiceProtocol & outProtocol)
 {
     std::string serviceTypeStr(serviceType);
     size_t index = serviceTypeStr.find(".");
@@ -191,9 +191,8 @@ CHIP_ERROR extractProtocol(const char *serviceType, char *outServiceName, DnssdS
     ReturnErrorCodeIf(index == std::string::npos, CHIP_ERROR_INVALID_ARGUMENT);
 
     CopyString(outServiceName, index + 1, serviceType);
-    outProtocol = (serviceTypeStr.substr(index + 1).compare(kOperationalProtocol) == 0)
-        ? DnssdServiceProtocol::kDnssdProtocolTcp
-        : DnssdServiceProtocol::kDnssdProtocolUdp;
+    outProtocol = (serviceTypeStr.substr(index + 1).compare(kOperationalProtocol) == 0) ? DnssdServiceProtocol::kDnssdProtocolTcp
+                                                                                        : DnssdServiceProtocol::kDnssdProtocolUdp;
 
     return CHIP_NO_ERROR;
 }
@@ -332,7 +331,8 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring hostName, 
     CopyString(service.mName, jniInstanceName.c_str());
     CopyString(service.mHostName, jnihostName.c_str());
 
-    VerifyOrReturn(extractProtocol(jniServiceType.c_str(), service.mType, service.mProtocol) == CHIP_NO_ERROR, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturn(extractProtocol(jniServiceType.c_str(), service.mType, service.mProtocol) == CHIP_NO_ERROR,
+                   dispatch(CHIP_ERROR_INVALID_ARGUMENT));
 
     service.mPort          = static_cast<uint16_t>(port);
     service.mInterface     = iface;
@@ -429,7 +429,8 @@ void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callback
                        dispatch(CHIP_ERROR_INVALID_ARGUMENT));
 
         CopyString(service[i].mName, jniInstanceName.c_str());
-        VerifyOrReturn(extractProtocol(jniServiceType.c_str(), service[i].mType, service[i].mProtocol) == CHIP_NO_ERROR, dispatch(CHIP_ERROR_INVALID_ARGUMENT));
+        VerifyOrReturn(extractProtocol(jniServiceType.c_str(), service[i].mType, service[i].mProtocol) == CHIP_NO_ERROR,
+                       dispatch(CHIP_ERROR_INVALID_ARGUMENT));
     }
 
     dispatch(CHIP_NO_ERROR, service, size);
