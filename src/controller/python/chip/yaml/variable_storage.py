@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-class ResponseStorage:
+class VariableStorage:
     '''Stores key value pairs.
 
     This is a code readability convience object for saving/loading values.
@@ -28,9 +28,7 @@ class ResponseStorage:
         self._saved_list[key] = value
 
     def load(self, key):
-        if key in self._saved_list:
-            return self._saved_list[key]
-        return None
+        return self._saved_list.get(key)
 
     def is_key_saved(self, key) -> bool:
         return key in self._saved_list
