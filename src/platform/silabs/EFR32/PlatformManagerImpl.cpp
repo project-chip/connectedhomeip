@@ -24,11 +24,11 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/silabs/DiagnosticDataProviderImpl.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
+#include <platform/silabs/DiagnosticDataProviderImpl.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>

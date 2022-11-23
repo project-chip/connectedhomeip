@@ -21,8 +21,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
-#include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #include <platform/internal/BLEManager.h>
+#include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
