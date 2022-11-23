@@ -20,6 +20,8 @@ import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 
+silabs_platform_dir = "${chip_root}/src/platform/silabs"
+
 assert(chip_device_platform == "efr32")
 
 if (chip_enable_openthread) {
@@ -34,23 +36,23 @@ static_library("EFR32") {
   sources = [
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    "../BLEManagerImpl.h",
-    "../BlePlatformConfig.h",
-    "../CHIPDevicePlatformConfig.h",
-    "../CHIPDevicePlatformEvent.h",
-    "../CHIPMem-Platform.cpp",
-    "../CHIPPlatformConfig.h",
-    "../ConfigurationManagerImpl.h",
-    "../ConnectivityManagerImpl.h",
-    "../DiagnosticDataProviderImpl.cpp",
-    "../DiagnosticDataProviderImpl.h",
-    "../EFR32Config.cpp",
-    "../EFR32Config.h",
-    "../InetPlatformConfig.h",
-    "../KeyValueStoreManagerImpl.h",
-    "../Logging.cpp",
-    "../PlatformManagerImpl.h",
-    "../SystemPlatformConfig.h",
+    "${silabs_platform_dir}/BLEManagerImpl.h",
+    "${silabs_platform_dir}/BlePlatformConfig.h",
+    "${silabs_platform_dir}/CHIPDevicePlatformConfig.h",
+    "${silabs_platform_dir}/CHIPDevicePlatformEvent.h",
+    "${silabs_platform_dir}/CHIPMem-Platform.cpp",
+    "${silabs_platform_dir}/CHIPPlatformConfig.h",
+    "${silabs_platform_dir}/ConfigurationManagerImpl.h",
+    "${silabs_platform_dir}/ConnectivityManagerImpl.h",
+    "${silabs_platform_dir}/DiagnosticDataProviderImpl.cpp",
+    "${silabs_platform_dir}/DiagnosticDataProviderImpl.h",
+    "${silabs_platform_dir}/EFR32Config.cpp",
+    "${silabs_platform_dir}/EFR32Config.h",
+    "${silabs_platform_dir}/InetPlatformConfig.h",
+    "${silabs_platform_dir}/KeyValueStoreManagerImpl.h",
+    "${silabs_platform_dir}/Logging.cpp",
+    "${silabs_platform_dir}/PlatformManagerImpl.h",
+    "${silabs_platform_dir}/SystemPlatformConfig.h",
     "BLEManagerImpl.cpp",
     "ConfigurationManagerImpl.cpp",
     "KeyValueStoreManagerImpl.cpp",
@@ -98,7 +100,7 @@ static_library("EFR32") {
 
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
-      "../ThreadStackManagerImpl.h",
+      "${silabs_platform_dir}/ThreadStackManagerImpl.h",
       "ConnectivityManagerImpl.cpp",
       "ThreadStackManagerImpl.cpp",
     ]
@@ -115,9 +117,9 @@ static_library("EFR32") {
 
   if (chip_enable_wifi) {
     sources += [
-      "../ConnectivityManagerImpl_WIFI.cpp",
-      "../NetworkCommissioningWiFiDriver.cpp",
-      "../NetworkCommissioningWiFiDriver.h",
+      "${silabs_platform_dir}/ConnectivityManagerImpl_WIFI.cpp",
+      "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.cpp",
+      "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.h",
     ]
   }
 }
