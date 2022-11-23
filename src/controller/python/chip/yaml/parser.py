@@ -67,8 +67,8 @@ class _ConstraintValue:
         if isinstance(value, str) and self._variable_storage.is_key_saved(value):
             self._indirect_value_key = value
         else:
-            self._value = Converter.convert_yaml_type(
-                value, field_type)
+            self._value = Converter.parse_and_convert_yaml_value(
+                value, field_type, context.config_values)
 
     def get_value(self):
         '''Gets the current value of the constraint.
@@ -173,8 +173,8 @@ class _ExpectedResponse:
         if isinstance(value, str) and self._variable_storage.is_key_saved(value):
             self._load_expected_response_in_verify = value
         else:
-            self._expected_response = Converter.convert_yaml_type(
-                value, response_type, use_from_dict=True)
+            self._expected_response = Converter.parse_and_convert_yaml_value(
+                value, response_type, context.config_values, inline_cast_dict_to_struct=True)
 
     def verify(self, response):
         if (self._expected_response_type is None):
@@ -249,8 +249,8 @@ class InvokeAction(BaseAction):
             request_data_as_dict = Converter.convert_name_value_pair_to_dict(args)
 
             try:
-                request_data = Converter.convert_yaml_type(
-                    request_data_as_dict, type(command_object))
+                request_data = Converter.parse_and_convert_yaml_value(
+                    request_data_as_dict, type(command_object), context.config_values)
             except ValueError:
                 raise ParsingError('Could not covert yaml type')
 
@@ -270,8 +270,8 @@ class InvokeAction(BaseAction):
             expected_response_args = self._expected_raw_response['values']
             expected_response_data_as_dict = Converter.convert_name_value_pair_to_dict(
                 expected_response_args)
-            expected_response_data = Converter.convert_yaml_type(
-                expected_response_data_as_dict, expected_command)
+            expected_response_data = Converter.parse_and_convert_yaml_value(
+                expected_response_data_as_dict, expected_command, context.config_values)
             self._expected_response_object = expected_command.FromDict(expected_response_data)
 
     def run_action(self, dev_ctrl: ChipDeviceCtrl, endpoint: int, node_id: int):
@@ -430,8 +430,8 @@ class WriteAttributeAction(BaseAction):
         if (item.get('arguments')):
             args = item['arguments']['value']
             try:
-                request_data = Converter.convert_yaml_type(
-                    args, attribute.attribute_type.Type)
+                request_data = Converter.parse_and_convert_yaml_value(
+                    args, attribute.attribute_type.Type, context.config_values)
             except ValueError:
                 raise ParsingError('Could not covert yaml type')
 
