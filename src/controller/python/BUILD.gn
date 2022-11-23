@@ -234,6 +234,7 @@ chip_python_wheel_action("chip-core") {
         "chip/yaml/errors.py",
         "chip/yaml/format_converter.py",
         "chip/yaml/parser.py",
+        "chip/yaml/variable_storage.py",
       ]
 
       if (chip_controller) {
