@@ -112,7 +112,7 @@ if (chip_device_platform == "cc13x2_26x2") {
 } else if (chip_device_platform == "darwin") {
   _chip_device_layer = "Darwin"
 } else if (chip_device_platform == "efr32") {
-  _chip_device_layer = "EFR32"
+  _chip_device_layer = "silabs"
 } else if (chip_device_platform == "esp32") {
   _chip_device_layer = "ESP32"
 } else if (chip_device_platform == "linux") {

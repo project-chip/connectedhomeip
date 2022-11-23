@@ -24,7 +24,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/EFR32/EFR32Config.h>
+#include <platform/silabs/EFR32Config.h>
 #include <platform/KeyValueStoreManager.h>
 #include <stdio.h>
 #include <string.h>

@@ -32,29 +32,29 @@ if (chip_crypto == "platform") {
 
 static_library("EFR32") {
   sources = [
-    "../FreeRTOS/SystemTimeSupport.cpp",
-    "../SingletonConfigurationManager.cpp",
+    "../../FreeRTOS/SystemTimeSupport.cpp",
+    "../../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
-    "BLEManagerImpl.h",
-    "BlePlatformConfig.h",
-    "CHIPDevicePlatformConfig.h",
-    "CHIPDevicePlatformEvent.h",
-    "CHIPMem-Platform.cpp",
-    "CHIPPlatformConfig.h",
+    "../BLEManagerImpl.h",
+    "../BlePlatformConfig.h",
+    "../CHIPDevicePlatformConfig.h",
+    "../CHIPDevicePlatformEvent.h",
+    "../CHIPMem-Platform.cpp",
+    "../CHIPPlatformConfig.h",
     "ConfigurationManagerImpl.cpp",
-    "ConfigurationManagerImpl.h",
-    "ConnectivityManagerImpl.h",
-    "DiagnosticDataProviderImpl.cpp",
-    "DiagnosticDataProviderImpl.h",
-    "EFR32Config.cpp",
-    "EFR32Config.h",
-    "InetPlatformConfig.h",
+    "../ConfigurationManagerImpl.h",
+    "../ConnectivityManagerImpl.h",
+    "../DiagnosticDataProviderImpl.cpp",
+    "../DiagnosticDataProviderImpl.h",
+    "../EFR32Config.cpp",
+    "../EFR32Config.h",
+    "../InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
-    "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
+    "../KeyValueStoreManagerImpl.h",
+    "../Logging.cpp",
     "PlatformManagerImpl.cpp",
-    "PlatformManagerImpl.h",
-    "SystemPlatformConfig.h",
+    "../PlatformManagerImpl.h",
+    "../SystemPlatformConfig.h",
   ]
 
   if (chip_enable_ota_requestor) {
@@ -115,9 +115,9 @@ static_library("EFR32") {
 
   if (chip_enable_wifi) {
     sources += [
-      "ConnectivityManagerImpl_WIFI.cpp",
-      "NetworkCommissioningWiFiDriver.cpp",
-      "NetworkCommissioningWiFiDriver.h",
+      "../ConnectivityManagerImpl_WIFI.cpp",
+      "../NetworkCommissioningWiFiDriver.cpp",
+      "../NetworkCommissioningWiFiDriver.h",
     ]
   }
 }

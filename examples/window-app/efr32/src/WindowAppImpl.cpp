@@ -42,7 +42,7 @@
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <platform/EFR32/NetworkCommissioningWiFiDriver.h>
+#include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #endif
 
 #ifdef DISPLAY_ENABLED

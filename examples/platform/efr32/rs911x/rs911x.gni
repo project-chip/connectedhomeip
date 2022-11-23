@@ -3,7 +3,7 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 examples_plat_dir = "${chip_root}/examples/platform/efr32"
-wifi_sdk_dir = "${chip_root}/src/platform/EFR32/wifi"
+wifi_sdk_dir = "${chip_root}/src/platform/silabs/EFR32/wifi"
 wiseconnect_sdk_root = "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
 rs911x_cflags = []
 
@@ -19,7 +19,7 @@ rs911x_src_plat = [
 rs911x_plat_incs = [
   "${wifi_sdk_dir}",
   "${wifi_sdk_dir}/hal",
-  "${chip_root}/src/platform/EFR32",
+  "${chip_root}/src/platform/silabs/EFR32",
 ]
 
 #

@@ -51,7 +51,7 @@
 #include <setup_payload/SetupPayload.h>
 
 #if CHIP_ENABLE_OPENTHREAD
-#include <platform/EFR32/ThreadStackManagerImpl.h>
+#include <platform/silabs/ThreadStackManagerImpl.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #endif // CHIP_ENABLE_OPENTHREAD
@@ -59,7 +59,7 @@
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <platform/EFR32/NetworkCommissioningWiFiDriver.h>
+#include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #endif // SL_WIFI
 
 /**********************************************************
