@@ -112,7 +112,7 @@ however we likely want:
 -   flexible codegen (we will need to split output by clusters or other rules)
 -   Human readable inputs
 -   Rules that a script can validate based on CSA settings (ensure mandatory
-    attribute settings are followed, ensure proer device type adherence, ensure 
+    attribute settings are followed, ensure proer device type adherence, ensure
     correct cluster and data type definitions)
 -   Easy to maintain and develop for chosen languages/templates/codegen in
     general
