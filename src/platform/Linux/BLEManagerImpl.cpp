@@ -814,7 +814,6 @@ void BLEManagerImpl::OnScanComplete()
         ChipLogProgress(Ble, "Scan complete. No matching device found.");
         break;
     case BleScanState::kConnecting:
-        mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
         break;
     }
 
