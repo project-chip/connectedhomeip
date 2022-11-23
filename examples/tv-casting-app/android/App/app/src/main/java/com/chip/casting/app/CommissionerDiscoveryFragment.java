@@ -107,6 +107,18 @@ public class CommissionerDiscoveryFragment extends Fragment {
           }
         };
 
+    Button discoverButton = getView().findViewById(R.id.discoverButton);
+    discoverButton.setOnClickListener(
+        new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            Log.d(TAG, "Discovering on button click");
+            tvCastingApp.discoverVideoPlayerCommissioners(
+                DISCOVERY_DURATION_SECS, successCallback, failureCallback);
+          }
+        });
+
+    Log.d(TAG, "Auto discovering");
     tvCastingApp.discoverVideoPlayerCommissioners(
         DISCOVERY_DURATION_SECS, successCallback, failureCallback);
   }

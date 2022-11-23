@@ -18,12 +18,14 @@
 
 package com.matter.controller.commands.discover;
 
+import chip.devicecontroller.ChipDeviceController;
 import com.matter.controller.commands.common.CredentialsIssuer;
 import com.matter.controller.commands.common.MatterCommand;
 
 public final class DiscoverCommissionersCommand extends MatterCommand {
-  public DiscoverCommissionersCommand(CredentialsIssuer credsIssuer) {
-    super("commissioners", credsIssuer);
+  public DiscoverCommissionersCommand(
+      ChipDeviceController controller, CredentialsIssuer credsIssuer) {
+    super(controller, "commissioners", credsIssuer);
   }
 
   @Override

@@ -317,7 +317,7 @@ class FactoryDataGenerator:
             if self._args.enable_key:
                 self._add_entry("enable_key", HEX_PREFIX + self._args.enable_key)
             if self._args.user:
-                self._add_entry("user", self._args.user)
+                self._add_entry("user", self._user_data)
 
             factory_data_dict = dict(self._factory_data)
 

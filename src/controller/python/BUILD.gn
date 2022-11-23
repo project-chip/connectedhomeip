@@ -30,7 +30,10 @@ config("controller_wno_deprecate") {
   cflags = [ "-Wno-deprecated-declarations" ]
 }
 
-chip_python_version = "0.0"
+declare_args() {
+  chip_python_version = "0.0"
+  chip_python_package_prefix = "chip"
+}
 
 shared_library("ChipDeviceCtrl") {
   if (chip_controller) {
@@ -336,11 +339,12 @@ chip_python_wheel_action("chip-core") {
     lib_name = "_ChipServer.so"
   }
 
-  py_package_name = "chip-core"
+  py_package_name = "${chip_python_package_prefix}-core"
+  py_package_output = string_replace(py_package_name, "-", "_")
 
   public_deps = [ ":ChipDeviceCtrl" ]
 
-  output_name = "chip_core-${chip_python_version}-${tags}.whl"
+  output_name = "${py_package_output}-${chip_python_version}-${tags}.whl"
 }
 
 chip_python_wheel_action("chip-clusters") {
@@ -373,10 +377,11 @@ chip_python_wheel_action("chip-clusters") {
 
   py_package_reqs = [ "dacite" ]
 
-  py_package_name = "chip-clusters"
+  py_package_name = "${chip_python_package_prefix}-clusters"
+  py_package_output = string_replace(py_package_name, "-", "_")
   py_platform_tag = "any"
 
-  output_name = "chip_clusters-${chip_python_version}-py3-none-any.whl"
+  output_name = "${py_package_output}-${chip_python_version}-py3-none-any.whl"
 }
 
 chip_python_wheel_action("chip-repl") {
@@ -417,7 +422,8 @@ chip_python_wheel_action("chip-repl") {
     "mobly",
   ]
 
-  py_package_name = "chip-repl"
+  py_package_name = "${chip_python_package_prefix}-repl"
+  py_package_output = string_replace(py_package_name, "-", "_")
   py_platform_tag = "any"
 
   data_deps = [
@@ -425,5 +431,5 @@ chip_python_wheel_action("chip-repl") {
     ":chip-core",
   ]
 
-  output_name = "chip_repl-${chip_python_version}-py3-none-any.whl"
+  output_name = "${py_package_output}-${chip_python_version}-py3-none-any.whl"
 }

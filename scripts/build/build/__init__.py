@@ -5,6 +5,7 @@ from enum import Enum, auto
 from typing import Sequence
 
 from .targets import BUILD_TARGETS
+from builders.builder import BuilderOptions
 
 
 class BuildSteps(Enum):
@@ -24,8 +25,7 @@ class Context:
         self.output_prefix = output_prefix
         self.completed_steps = set()
 
-    def SetupBuilders(self, targets: Sequence[str],
-                      enable_flashbundle: bool):
+    def SetupBuilders(self, targets: Sequence[str], options: BuilderOptions):
         """
         Configures internal builders for the given platform/board/app
         combination.
@@ -35,7 +35,8 @@ class Context:
         for target in targets:
             found = False
             for choice in BUILD_TARGETS:
-                builder = choice.Create(target, self.runner, self.repository_path, self.output_prefix, enable_flashbundle)
+                builder = choice.Create(target, self.runner, self.repository_path,
+                                        self.output_prefix, options)
                 if builder:
                     self.builders.append(builder)
                     found = True

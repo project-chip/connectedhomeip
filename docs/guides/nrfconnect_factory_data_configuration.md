@@ -225,11 +225,8 @@ $ python scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py -h
     - Automatic:
 
         ```
-        --passcode <pass_code> --spake2p_path <path to spake2p executable>
+        --passcode <pass_code>
         ```
-
-    > Note: To generate new SPAKE2+ verifier you need `spake2p` executable. See
-    > the note at the end of this section to learn how to get it.
 
     - Manual:
 
@@ -320,7 +317,6 @@ $ python scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py \
 --discriminator 0xF00 \
 --generate_rd_uid \
 --passcode 20202021 \
---spake2p_path "src/tools/spake2p/out/spake2p" \
 --out "build.json" \
 --schema "scripts/tools/nrfconnect/nrfconnect_factory_data.schema"
 ```
@@ -332,16 +328,6 @@ JSON file is verified using the prepared JSON Schema.
 If the script finishes successfully, go to the location you provided with the
 `-o` argument. Use the JSON file you find there when
 [generating the factory data partition](#generating_factory_data_partition).
-
-> Note: Generating the SPAKE2+ verifier is optional and requires providing a
-> path to the `spake2p` executable. To get it, complete the following steps:
->
-> 1.  Navigate to the `connectedhomeip` root directory.
-> 2.  In a terminal, run the command:
->     `cd src/tools/spake2p && gn gen out && ninja -C out spake2p` to build the
->     executable.
-> 3.  Add the `connectedhomeip/src/tools/spake2p/out/spake2p` path as an
->     argument of `--spake2p_path` for the Python script.
 
 > Note: Generating new certificates is optional if default vendor and product
 > IDs are used and requires providing a path to the `chip-cert` executable. To
