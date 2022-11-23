@@ -221,7 +221,7 @@ class InvokeAction(BaseAction):
         Args:
           'item': Dictionary containing single invoke to be parsed.
           'cluster': Name of cluster which to invoke action is targeting.
-          'context': Contains global common objects such has data model lookup, storage
+          'context': Contains test-wide common objects such as DataModelLookup instance, storage
             for device responses and top level test configurations variable.
         Raises:
           ParsingError: Raised if there is a benign error, and there is currently no
@@ -302,7 +302,7 @@ class ReadAttributeAction(BaseAction):
         Args:
           'item': Dictionary contains single read attribute action to be parsed.
           'cluster': Name of cluster read attribute action is targeting.
-          'context': Contains global common objects such has data model lookup, storage
+          'context': Contains test-wide common objects such as DataModelLookup instance, storage
             for device responses and top level test configurations variable.
         Raises:
           ParsingError: Raised if there is a benign error, and there is currently no
@@ -408,7 +408,7 @@ class WriteAttributeAction(BaseAction):
         Args:
           'item': Dictionary contains single write attribute action to be parsed.
           'cluster': Name of cluster write attribute action is targeting.
-          'context': Contains global common objects such has data model lookup, storage
+          'context': Contains test-wide common objects such as DataModelLookup instance, storage
             for device responses and top level test configurations variable.
         Raises:
           ParsingError: Raised if there is a benign error, and there is currently no
