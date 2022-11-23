@@ -408,6 +408,70 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+    java_tests_linux:
+        name: Java Tests - Linux
+        timeout-minutes: 130
+
+        env:
+            TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
+            JAVA_PATH: /usr/lib/jvm/java-8-openjdk-amd64
+
+        if: github.actor != 'restyled-io[bot]'
+        runs-on: ubuntu-latest
+
+        container:
+            image: connectedhomeip/chip-build:0.6.06
+            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
+                net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform linux
+            - name: Try to ensure the directories for core dumping exist and we
+                  can write them.
+              run: |
+                  mkdir /tmp/cores || true
+                  sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
+                  mkdir objdir-clone || true
+            - name: Bootstrap
+              timeout-minutes: 10
+              run: scripts/build/gn_bootstrap.sh
+            - name: Uploading bootstrap logs
+              uses: actions/upload-artifact@v3
+              if: ${{ always() && !env.ACT }}
+              with:
+                  name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  path: |
+                      .environment/gn_out/.ninja_log
+                      .environment/pigweed-venv/*.log
+            - name: Build Java Mattter Controller and all clusters app
+              timeout-minutes: 50
+              run: |
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
+                  ./scripts/run_in_build_env.sh \
+                   "./scripts/build/build_examples.py \
+                      --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test \
+                      --target linux-x64-java-matter-controller \
+                      build \
+                   "
+            - name: Uploading core files
+              uses: actions/upload-artifact@v3
+              if: ${{ failure() && !env.ACT }}
+              with:
+                  name: crash-core-linux-python-repl
+                  path: /tmp/cores/
+                  # Cores are big; don't hold on to them too long.
+                  retention-days: 5
+            - name: Uploading objdir for debugging
+              uses: actions/upload-artifact@v3
+              if: ${{ failure() && !env.ACT }}
+              with:
+                  name: crash-objdir-linux-python-repl
+                  path: objdir-clone/
+                  # objdirs are big; don't hold on to them too long.
+                  retention-days: 5
 
     repl_tests_darwin:
         name: REPL Tests - Darwin
