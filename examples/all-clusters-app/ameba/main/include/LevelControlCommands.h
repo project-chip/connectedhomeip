@@ -33,6 +33,7 @@ using Shell::Engine;
 using Shell::shell_command_t;
 using Shell::streamer_get;
 using Shell::streamer_printf;
+using chip::app::Clusters::LevelControl::LevelControlOptions;
 
 Engine sShellSwitchLevelControlSubCommands;
 Engine sShellSwitchLevelControlReadSubCommands;
@@ -158,8 +159,8 @@ void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data, const E
     case Clusters::LevelControl::Commands::MoveToLevel::Id:
         moveToLevelCommand.level           = static_cast<uint8_t>(data->args[0]);
         moveToLevelCommand.transitionTime  = static_cast<DataModel::Nullable<uint16_t>>(data->args[1]);
-        moveToLevelCommand.optionsMask     = static_cast<uint8_t>(data->args[2]);
-        moveToLevelCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        moveToLevelCommand.optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(data->args[2]);
+        moveToLevelCommand.optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(data->args[3]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          moveToLevelCommand, onSuccess, onFailure);
         break;
@@ -167,8 +168,8 @@ void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data, const E
     case Clusters::LevelControl::Commands::Move::Id:
         moveCommand.moveMode        = static_cast<EmberAfMoveMode>(data->args[0]);
         moveCommand.rate            = static_cast<DataModel::Nullable<uint8_t>>(data->args[1]);
-        moveCommand.optionsMask     = static_cast<uint8_t>(data->args[2]);
-        moveCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        moveCommand.optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(data->args[2]);
+        moveCommand.optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(data->args[3]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          moveCommand, onSuccess, onFailure);
         break;
@@ -177,15 +178,15 @@ void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data, const E
         stepCommand.stepMode        = static_cast<EmberAfStepMode>(data->args[0]);
         stepCommand.stepSize        = static_cast<uint8_t>(data->args[1]);
         stepCommand.transitionTime  = static_cast<DataModel::Nullable<uint16_t>>(data->args[2]);
-        stepCommand.optionsMask     = static_cast<uint8_t>(data->args[3]);
-        stepCommand.optionsOverride = static_cast<uint8_t>(data->args[4]);
+        stepCommand.optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(data->args[3]);
+        stepCommand.optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(data->args[4]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          stepCommand, onSuccess, onFailure);
         break;
 
     case Clusters::LevelControl::Commands::Stop::Id:
-        stopCommand.optionsMask     = static_cast<uint8_t>(data->args[0]);
-        stopCommand.optionsOverride = static_cast<uint8_t>(data->args[1]);
+        stopCommand.optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(data->args[0]);
+        stopCommand.optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(data->args[1]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          stopCommand, onSuccess, onFailure);
         break;
@@ -193,8 +194,8 @@ void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data, const E
     case Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id:
         moveToLevelWithOnOffCommand.level           = static_cast<uint8_t>(data->args[0]);
         moveToLevelWithOnOffCommand.transitionTime  = static_cast<DataModel::Nullable<uint16_t>>(data->args[1]);
-        moveToLevelWithOnOffCommand.optionsMask     = static_cast<uint8_t>(data->args[2]);
-        moveToLevelWithOnOffCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        moveToLevelWithOnOffCommand.optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(data->args[2]);
+        moveToLevelWithOnOffCommand.optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(data->args[3]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          moveToLevelWithOnOffCommand, onSuccess, onFailure);
         break;
@@ -202,8 +203,8 @@ void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data, const E
     case Clusters::LevelControl::Commands::MoveWithOnOff::Id:
         moveWithOnOffCommand.moveMode        = static_cast<EmberAfMoveMode>(data->args[0]);
         moveWithOnOffCommand.rate            = static_cast<DataModel::Nullable<uint8_t>>(data->args[1]);
-        moveWithOnOffCommand.optionsMask     = static_cast<uint8_t>(data->args[2]);
-        moveWithOnOffCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        moveWithOnOffCommand.optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(data->args[2]);
+        moveWithOnOffCommand.optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(data->args[3]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          moveWithOnOffCommand, onSuccess, onFailure);
         break;
@@ -212,15 +213,15 @@ void ProcessLevelControlUnicastBindingCommand(BindingCommandData * data, const E
         stepWithOnOffCommand.stepMode        = static_cast<EmberAfStepMode>(data->args[0]);
         stepWithOnOffCommand.stepSize        = static_cast<uint8_t>(data->args[1]);
         stepWithOnOffCommand.transitionTime  = static_cast<DataModel::Nullable<uint16_t>>(data->args[2]);
-        stepWithOnOffCommand.optionsMask     = static_cast<uint8_t>(data->args[3]);
-        stepWithOnOffCommand.optionsOverride = static_cast<uint8_t>(data->args[4]);
+        stepWithOnOffCommand.optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(data->args[3]);
+        stepWithOnOffCommand.optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(data->args[4]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          stepWithOnOffCommand, onSuccess, onFailure);
         break;
 
     case Clusters::LevelControl::Commands::StopWithOnOff::Id:
-        stopWithOnOffCommand.optionsMask     = static_cast<uint8_t>(data->args[0]);
-        stopWithOnOffCommand.optionsOverride = static_cast<uint8_t>(data->args[1]);
+        stopWithOnOffCommand.optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(data->args[0]);
+        stopWithOnOffCommand.optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(data->args[1]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          stopWithOnOffCommand, onSuccess, onFailure);
         break;
@@ -245,16 +246,16 @@ void ProcessLevelControlGroupBindingCommand(BindingCommandData * data, const Emb
     case Clusters::LevelControl::Commands::MoveToLevel::Id:
         moveToLevelCommand.level           = static_cast<uint8_t>(data->args[0]);
         moveToLevelCommand.transitionTime  = static_cast<DataModel::Nullable<uint16_t>>(data->args[1]);
-        moveToLevelCommand.optionsMask     = static_cast<uint8_t>(data->args[2]);
-        moveToLevelCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        moveToLevelCommand.optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(data->args[2]);
+        moveToLevelCommand.optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(data->args[3]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToLevelCommand);
         break;
 
     case Clusters::LevelControl::Commands::Move::Id:
         moveCommand.moveMode        = static_cast<EmberAfMoveMode>(data->args[0]);
         moveCommand.rate            = static_cast<DataModel::Nullable<uint8_t>>(data->args[1]);
-        moveCommand.optionsMask     = static_cast<uint8_t>(data->args[2]);
-        moveCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        moveCommand.optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(data->args[2]);
+        moveCommand.optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(data->args[3]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveCommand);
         break;
 
@@ -262,30 +263,30 @@ void ProcessLevelControlGroupBindingCommand(BindingCommandData * data, const Emb
         stepCommand.stepMode        = static_cast<EmberAfStepMode>(data->args[0]);
         stepCommand.stepSize        = static_cast<uint8_t>(data->args[1]);
         stepCommand.transitionTime  = static_cast<DataModel::Nullable<uint16_t>>(data->args[2]);
-        stepCommand.optionsMask     = static_cast<uint8_t>(data->args[3]);
-        stepCommand.optionsOverride = static_cast<uint8_t>(data->args[4]);
+        stepCommand.optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(data->args[3]);
+        stepCommand.optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(data->args[4]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepCommand);
         break;
 
     case Clusters::LevelControl::Commands::Stop::Id:
-        stopCommand.optionsMask     = static_cast<uint8_t>(data->args[0]);
-        stopCommand.optionsOverride = static_cast<uint8_t>(data->args[1]);
+        stopCommand.optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(data->args[0]);
+        stopCommand.optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(data->args[1]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stopCommand);
         break;
 
     case Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Id:
         moveToLevelWithOnOffCommand.level           = static_cast<uint8_t>(data->args[0]);
         moveToLevelWithOnOffCommand.transitionTime  = static_cast<DataModel::Nullable<uint16_t>>(data->args[1]);
-        moveToLevelWithOnOffCommand.optionsMask     = static_cast<uint8_t>(data->args[2]);
-        moveToLevelWithOnOffCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        moveToLevelWithOnOffCommand.optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(data->args[2]);
+        moveToLevelWithOnOffCommand.optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(data->args[3]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveToLevelWithOnOffCommand);
         break;
 
     case Clusters::LevelControl::Commands::MoveWithOnOff::Id:
         moveWithOnOffCommand.moveMode        = static_cast<EmberAfMoveMode>(data->args[0]);
         moveWithOnOffCommand.rate            = static_cast<DataModel::Nullable<uint8_t>>(data->args[1]);
-        moveWithOnOffCommand.optionsMask     = static_cast<uint8_t>(data->args[2]);
-        moveWithOnOffCommand.optionsOverride = static_cast<uint8_t>(data->args[3]);
+        moveWithOnOffCommand.optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(data->args[2]);
+        moveWithOnOffCommand.optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(data->args[3]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, moveWithOnOffCommand);
         break;
 
@@ -293,14 +294,14 @@ void ProcessLevelControlGroupBindingCommand(BindingCommandData * data, const Emb
         stepWithOnOffCommand.stepMode        = static_cast<EmberAfStepMode>(data->args[0]);
         stepWithOnOffCommand.stepSize        = static_cast<uint8_t>(data->args[1]);
         stepWithOnOffCommand.transitionTime  = static_cast<DataModel::Nullable<uint16_t>>(data->args[2]);
-        stepWithOnOffCommand.optionsMask     = static_cast<uint8_t>(data->args[3]);
-        stepWithOnOffCommand.optionsOverride = static_cast<uint8_t>(data->args[4]);
+        stepWithOnOffCommand.optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(data->args[3]);
+        stepWithOnOffCommand.optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(data->args[4]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stepWithOnOffCommand);
         break;
 
     case Clusters::LevelControl::Commands::StopWithOnOff::Id:
-        stopWithOnOffCommand.optionsMask     = static_cast<uint8_t>(data->args[0]);
-        stopWithOnOffCommand.optionsOverride = static_cast<uint8_t>(data->args[1]);
+        stopWithOnOffCommand.optionsMask     = static_cast<chip::BitMask<LevelControlOptions>>(data->args[0]);
+        stopWithOnOffCommand.optionsOverride = static_cast<chip::BitMask<LevelControlOptions>>(data->args[1]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, stopWithOnOffCommand);
         break;
     }
