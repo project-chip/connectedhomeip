@@ -162,7 +162,7 @@ tests so that yaml test development goes faster.
 ./scripts/tools/zap_regen_all.py --type tests --tests chip-tool
 ```
 
-Additonally, individual code regeneration can be done using
+Additionally, individual code regeneration can be done using
 `./scripts/tools/zap/generate.py`:
 
 ```bash
