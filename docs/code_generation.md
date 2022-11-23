@@ -92,9 +92,9 @@ the [Readme.md](../scripts/idl/README.md) for details of how things work.
 file.
 
 The split between `.zap` and `.matter` currently exists as an experiment of code
-generation technologies. Currently python codegen has:
+generation technologies. Currently python codegen:
 
--   less dependencies than the nodejs dependencies of `zap`
+-   has less dependencies than the nodejs dependencies of `zap`
 -   runs significantly faster than zap
 -   more flexible codegen (can generate multiple files per cluster for example,
 -   without which some compiles would run out of RAM on large compilations)
@@ -115,7 +115,7 @@ however we likely want:
     settings are followed, ensure propper device type adherence, ensure correct
     cluster and data type definitions)
 -   Easy to maintain and develop for chosen languages/templates/codegen in
--   general
+    general
 
 ## Code generation outputs and templates
 
