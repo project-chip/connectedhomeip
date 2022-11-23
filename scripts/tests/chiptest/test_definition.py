@@ -165,6 +165,7 @@ class ApplicationPaths:
     ota_requestor_app: typing.List[str]
     tv_app: typing.List[str]
     bridge_app: typing.List[str]
+    python_yaml_tester_cmd: typing.List[str]
 
     def items(self):
         return [self.chip_tool, self.all_clusters_app, self.lock_app, self.ota_provider_app, self.ota_requestor_app, self.tv_app, self.bridge_app]
@@ -215,6 +216,7 @@ class TestDefinition:
     run_name: str
     target: TestTarget
     is_manual: bool
+    use_python_parser: bool = False
 
     def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str, timeout_seconds: typing.Optional[int], dry_run=False):
         """
@@ -278,7 +280,11 @@ class TestDefinition:
             if dry_run:
                 logging.info(" ".join(pairing_cmd))
                 logging.info(" ".join(test_cmd))
-
+            elif self.use_python_parser:
+                python_yaml_tester_cmd = paths.python_yaml_tester_cmd
+                python_cmd = python_yaml_tester_cmd + \
+                    ['--setup-code', app.setupCode] + ['--yaml-path', self.run_name]
+                runner.RunSubprocess(python_cmd, name='PYTHON_YAML', dependencies=[apps_register], timeout_seconds=timeout_seconds)
             else:
                 runner.RunSubprocess(pairing_cmd,
                                      name='PAIR', dependencies=[apps_register])

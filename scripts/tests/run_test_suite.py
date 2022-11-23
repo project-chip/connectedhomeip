@@ -193,6 +193,9 @@ def cmd_list(context):
     '--bridge-app',
     help='what bridge app to use')
 @click.option(
+    '--python-yaml-tester',
+    help='what python script to use to run yaml tests')
+@click.option(
     '--pics-file',
     type=click.Path(exists=True),
     default="src/app/tests/suites/certification/ci-pics-values",
@@ -203,7 +206,7 @@ def cmd_list(context):
     type=int,
     help='If provided, fail if a test runs for longer than this time')
 @click.pass_context
-def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, bridge_app, pics_file, test_timeout_seconds):
+def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, bridge_app, python_yaml_tester, pics_file, test_timeout_seconds):
     runner = chiptest.runner.Runner()
 
     if all_clusters_app is None:
@@ -224,6 +227,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     if bridge_app is None:
         bridge_app = FindBinaryPath('chip-bridge-app')
 
+    if python_yaml_tester is None:
+        python_yaml_tester = FindBinaryPath('python_yaml_tester.py')
+
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(
         chip_tool=[context.obj.chip_tool],
@@ -232,7 +238,8 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         ota_provider_app=[ota_provider_app],
         ota_requestor_app=[ota_requestor_app],
         tv_app=[tv_app],
-        bridge_app=[bridge_app]
+        bridge_app=[bridge_app],
+        python_yaml_tester_cmd=['python3'] + [python_yaml_tester]
     )
 
     if sys.platform == 'linux':
