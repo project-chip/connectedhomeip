@@ -34,14 +34,12 @@ static_library("EFR32") {
   sources = [
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    "BLEManagerImpl.cpp",
     "../BLEManagerImpl.h",
     "../BlePlatformConfig.h",
     "../CHIPDevicePlatformConfig.h",
     "../CHIPDevicePlatformEvent.h",
     "../CHIPMem-Platform.cpp",
     "../CHIPPlatformConfig.h",
-    "ConfigurationManagerImpl.cpp",
     "../ConfigurationManagerImpl.h",
     "../ConnectivityManagerImpl.h",
     "../DiagnosticDataProviderImpl.cpp",
@@ -49,12 +47,14 @@ static_library("EFR32") {
     "../EFR32Config.cpp",
     "../EFR32Config.h",
     "../InetPlatformConfig.h",
-    "KeyValueStoreManagerImpl.cpp",
     "../KeyValueStoreManagerImpl.h",
     "../Logging.cpp",
-    "PlatformManagerImpl.cpp",
     "../PlatformManagerImpl.h",
     "../SystemPlatformConfig.h",
+    "BLEManagerImpl.cpp",
+    "ConfigurationManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.cpp",
+    "PlatformManagerImpl.cpp",
   ]
 
   if (chip_enable_ota_requestor) {
@@ -98,9 +98,9 @@ static_library("EFR32") {
 
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
+      "../ThreadStackManagerImpl.h",
       "ConnectivityManagerImpl.cpp",
       "ThreadStackManagerImpl.cpp",
-      "../ThreadStackManagerImpl.h",
     ]
 
     if (chip_mdns == "platform") {

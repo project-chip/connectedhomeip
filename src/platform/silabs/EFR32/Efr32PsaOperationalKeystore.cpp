@@ -24,8 +24,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
-#include <platform/silabs/EFR32Config.h>
 #include "Efr32OpaqueKeypair.h"
+#include <platform/silabs/EFR32Config.h>
 
 namespace chip {
 namespace DeviceLayer {

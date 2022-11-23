@@ -16,9 +16,9 @@
  */
 
 #include "EFR32DeviceDataProvider.h"
-#include <platform/silabs/EFR32Config.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Base64.h>
+#include <platform/silabs/EFR32Config.h>
 #include <setup_payload/Base38Encode.h>
 #include <setup_payload/SetupPayload.h>
 
