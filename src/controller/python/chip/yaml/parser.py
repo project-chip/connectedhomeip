@@ -345,6 +345,9 @@ class ReadAttributeAction(BaseAction):
 
         self._expected_raw_response = item.get('response')
         if (self._expected_raw_response is None):
+            # TODO actually if response is missing is typically just means that we need to confirm
+            # that we got a successful response. This will be implemented later to consider all
+            # poossibly corner cases (if there are corner cases) around that.
             raise UnexpectedParsingError(f'ReadAttribute missing expected response. {self.label}')
 
         variable_name = self._expected_raw_response.get('saveAs')
