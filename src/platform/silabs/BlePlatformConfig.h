@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include "sl_bt_api.h"
-
 // ==================== Platform Adaptations ====================
 
 #define BLE_CONNECTION_OBJECT uint8_t
