@@ -71,7 +71,8 @@ public class NsdDiscoveryListener implements NsdManager.DiscoveryListener {
               preCommissionedVideoPlayers,
               successCallback,
               failureCallback,
-              nsdManagerResolverAvailState));
+              nsdManagerResolverAvailState,
+              1));
     } else {
       Log.d(TAG, "Ignoring discovered service: " + service.toString());
     }

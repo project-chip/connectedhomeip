@@ -20,6 +20,7 @@
 
 #import "CommissionableDataProviderImpl.hpp"
 #import "ConversionUtils.hpp"
+#import "DeviceAttestationCredentialsProviderImpl.hpp"
 #import "MatterCallbacks.h"
 #import "OnboardingPayload.h"
 
@@ -38,6 +39,8 @@
 @property OnboardingPayload * _Nonnull onboardingPayload;
 
 @property chip::DeviceLayer::CommissionableDataProviderImpl * commissionableDataProvider;
+
+@property chip::Credentials::DeviceAttestationCredentialsProvider * deviceAttestationCredentialsProvider;
 
 // queue used to serialize all work performed by the CastingServerBridge
 @property (atomic) dispatch_queue_t chipWorkQueue;
@@ -109,6 +112,7 @@
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     _commissionableDataProvider = new chip::DeviceLayer::CommissionableDataProviderImpl();
+    _deviceAttestationCredentialsProvider = chip::Credentials::Examples::GetExampleDACProvider();
     _appParameters = appParameters;
     AppParams cppAppParams;
     if (_appParameters != nil) {
@@ -137,16 +141,55 @@
             _commissionableDataProvider->SetSetupDiscriminator(_appParameters.onboardingPayload.setupDiscriminator);
         }
 
-        uint32_t setupPasscode = 0;
-        uint16_t setupDiscriminator = 0;
-        _commissionableDataProvider->GetSetupPasscode(setupPasscode);
-        _commissionableDataProvider->GetSetupDiscriminator(setupDiscriminator);
-        _onboardingPayload = [[OnboardingPayload alloc] initWithSetupPasscode:setupPasscode setupDiscriminator:setupDiscriminator];
+        if (_appParameters.deviceAttestationCredentials != nil) {
+            NSData * certificationDeclarationNsData = _appParameters.deviceAttestationCredentials.getCertificationDeclaration;
+            chip::MutableByteSpan certificationDeclaration
+                = chip::MutableByteSpan(const_cast<uint8_t *>(static_cast<const uint8_t *>(certificationDeclarationNsData.bytes)),
+                    certificationDeclarationNsData.length);
+
+            NSData * firmwareInformationNsData = _appParameters.deviceAttestationCredentials.getFirmwareInformation;
+            chip::MutableByteSpan firmwareInformation
+                = chip::MutableByteSpan(const_cast<uint8_t *>(static_cast<const uint8_t *>(firmwareInformationNsData.bytes)),
+                    firmwareInformationNsData.length);
+
+            NSData * deviceAttestationCertNsData = _appParameters.deviceAttestationCredentials.getDeviceAttestationCert;
+            chip::MutableByteSpan deviceAttestationCert
+                = chip::MutableByteSpan(const_cast<uint8_t *>(static_cast<const uint8_t *>(deviceAttestationCertNsData.bytes)),
+                    deviceAttestationCertNsData.length);
+
+            NSData * productAttestationIntermediateCertNsData
+                = _appParameters.deviceAttestationCredentials.getProductAttestationIntermediateCert;
+            chip::MutableByteSpan productAttestationIntermediateCert = chip::MutableByteSpan(
+                const_cast<uint8_t *>(static_cast<const uint8_t *>(productAttestationIntermediateCertNsData.bytes)),
+                productAttestationIntermediateCertNsData.length);
+
+            NSData * deviceAttestationCertPrivateKeyNsData
+                = _appParameters.deviceAttestationCredentials.getDeviceAttestationCertPrivateKey;
+            chip::MutableByteSpan deviceAttestationCertPrivateKey = chip::MutableByteSpan(
+                const_cast<uint8_t *>(static_cast<const uint8_t *>(deviceAttestationCertPrivateKeyNsData.bytes)),
+                deviceAttestationCertPrivateKeyNsData.length);
+
+            NSData * deviceAttestationCertPublicKeyKeyNsData
+                = _appParameters.deviceAttestationCredentials.getDeviceAttestationCertPublicKeyKey;
+            chip::MutableByteSpan deviceAttestationCertPublicKeyKey = chip::MutableByteSpan(
+                const_cast<uint8_t *>(static_cast<const uint8_t *>(deviceAttestationCertPublicKeyKeyNsData.bytes)),
+                deviceAttestationCertPublicKeyKeyNsData.length);
+
+            _deviceAttestationCredentialsProvider = new DeviceAttestationCredentialsProviderImpl(&certificationDeclaration,
+                &firmwareInformation, &deviceAttestationCert, &productAttestationIntermediateCert, &deviceAttestationCertPrivateKey,
+                &deviceAttestationCertPublicKeyKey);
+        }
     }
     chip::DeviceLayer::SetCommissionableDataProvider(_commissionableDataProvider);
 
+    uint32_t setupPasscode = 0;
+    uint16_t setupDiscriminator = 0;
+    _commissionableDataProvider->GetSetupPasscode(setupPasscode);
+    _commissionableDataProvider->GetSetupDiscriminator(setupDiscriminator);
+    _onboardingPayload = [[OnboardingPayload alloc] initWithSetupPasscode:setupPasscode setupDiscriminator:setupDiscriminator];
+
     // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+    SetDeviceAttestationCredentialsProvider(_deviceAttestationCredentialsProvider);
 
     // Initialize device attestation verifier from a constant version
     {
@@ -176,7 +219,7 @@
     dispatch_async(_chipWorkQueue, ^{
         CHIP_ERROR err = CHIP_NO_ERROR;
         AppParams appParam;
-        if (appParameters != nil) {
+        if (appParameters == nil) {
             err = CastingServer::GetInstance()->Init();
         } else if ((err = [ConversionUtils convertToCppAppParamsInfoFrom:appParameters outAppParams:appParam]) == CHIP_NO_ERROR) {
             err = CastingServer::GetInstance()->Init(&appParam);
