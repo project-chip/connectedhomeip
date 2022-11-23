@@ -790,7 +790,7 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 * device, const chip::Ble::Chi
     }
     else
     {
-        // Internal consistency eerror
+        // Internal consistency error
         ChipLogError(Ble, "Unknown discovery type. Ignoring scanned device.");
         return;
     }
