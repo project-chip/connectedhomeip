@@ -149,4 +149,5 @@ def PathsWithNetworkNamespaces(paths: ApplicationPaths) -> ApplicationPaths:
         ota_requestor_app='ip netns exec app'.split() + paths.ota_requestor_app,
         tv_app='ip netns exec app'.split() + paths.tv_app,
         bridge_app='ip netns exec app'.split() + paths.bridge_app,
+        chip_repl_yaml_tester_cmd='ip netns exec tool'.split() + paths.chip_repl_yaml_tester_cmd,
     )
