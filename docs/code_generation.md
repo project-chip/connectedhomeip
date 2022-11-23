@@ -42,7 +42,7 @@ order, the scripts will check for the following environment variables:
 
 -   if `$ZAP_DEVELOPMENT_PATH` is set, code assumes you are running zap from
     source. Use this if you develop zap. Zap has to be bootstrapped (generally
-    `npm ci` but check zap documetation for this. Some scripts have a
+    `npm ci` but check zap documentation for this. Some scripts have a
     `--run-bootstrap` command line argument to do this for you)
 
 -   if `$ZAP_INSTALL_PATH` is set, code assumes that `zap` or `zap-cli` is
@@ -73,7 +73,7 @@ result, the Matter SDK also keeps an equivalent `*.matter` file along side
 for matter:
 
 -   They are designed to be human readable, looking like a IDL (think protobuf
-    or android aidl, thrift idl etc.)
+    or android `aidl`, thrift idl etc.)
 
 -   We strive to make them contain only Matter-specific data (`.zap` files
     contain
@@ -94,7 +94,7 @@ file.
 The split between `.zap` and `.matter` currently exists as an experiment of code
 generation technologies. Currently python codegen:
 
--   has less dependencies than the nodejs dependencies of `zap`
+-   has less dependencies than the `nodejs` dependencies of `zap`
 -   runs significantly faster than zap
 -   more flexible codegen (can generate multiple files per cluster for example,
 -   without which some compiles would run out of RAM on large compilations)
@@ -110,10 +110,10 @@ logic that has all the benefits and none of the drawbacks. We are not there yet,
 however we likely want:
 
 -   flexible codegen (we will need to split output by clusters or other rules)
--   Human reviewable inputs
--   Machine-validatable rules based on CSA settings (ensure mandatory attribute
-    settings are followed, ensure proer device type adherence, ensure correct
-    cluster and data type definitions)
+-   Human readable inputs
+-   Rules that a script can validate based on CSA settings (ensure mandatory
+    attribute settings are followed, ensure proer device type adherence, ensure 
+    correct cluster and data type definitions)
 -   Easy to maintain and develop for chosen languages/templates/codegen in
     general
 
@@ -130,7 +130,7 @@ Code that is generated:
     -   `Codegen.py` will also generate a subset of application-specific files
 
 -   **Automated tests**: embedded client-side tools (`chip-tool` and
-    `darwin-framework-tool`) generate test-definition data. Eache use their own
+    `darwin-framework-tool`) generate test-definition data. Each use their own
     `examples/${TOOL}/templates/tests/templates.json` to drive what gets
     generated. Further more, test
 
