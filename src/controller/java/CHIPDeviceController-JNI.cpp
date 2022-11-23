@@ -52,7 +52,11 @@
 #include <system/SystemClock.h>
 #include <vector>
 
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+#include <controller/ExampleOperationalCredentialsIssuer.h>
+#else
 #include <platform/android/AndroidChipPlatform-JNI.h>
+#endif
 
 // Choose an approximation of PTHREAD_NULL if pthread.h doesn't define one.
 #ifndef PTHREAD_NULL
@@ -122,8 +126,10 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     SuccessOrExit(err);
     ChipLogProgress(Controller, "Java class references loaded.");
 
+#ifndef JAVA_MATTER_CONTROLLER_TEST
     err = AndroidChipPlatformJNI_OnLoad(jvm, reserved);
     SuccessOrExit(err);
+#endif // JAVA_MATTER_CONTROLLER_TEST
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -237,6 +243,7 @@ JNI_METHOD(jint, onNOCChainGeneration)
     JniByteArray jByteArrayIcac(env, intermediateCertificate);
     JniByteArray jByteArrayNoc(env, operationalCertificate);
 
+#ifndef JAVA_MATTER_CONTROLLER_TEST
     err = wrapper->GetAndroidOperationalCredentialsIssuer()->NOCChainGenerated(CHIP_NO_ERROR, jByteArrayNoc.byteSpan(),
                                                                                jByteArrayIcac.byteSpan(), jByteArrayRcac.byteSpan(),
                                                                                ipkOptional, adminSubjectOptional);
@@ -245,6 +252,7 @@ JNI_METHOD(jint, onNOCChainGeneration)
     {
         ChipLogError(Controller, "Failed to SetNocChain for the device: %" CHIP_ERROR_FORMAT, err.Format());
     }
+#endif // JAVA_MATTER_CONTROLLER_TEST
     return err.AsInteger();
 }
 
@@ -338,8 +346,13 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         bool skipCommissioningComplete     = env->CallBooleanMethod(controllerParams, getSkipCommissioningComplete);
         uint64_t adminSubject              = env->CallLongMethod(controllerParams, getAdminSubject);
 
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+        std::unique_ptr<chip::Controller::ExampleOperationalCredentialsIssuer> opCredsIssuer(
+            new chip::Controller::ExampleOperationalCredentialsIssuer());
+#else
         std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer> opCredsIssuer(
             new chip::Controller::AndroidOperationalCredentialsIssuer());
+#endif
         wrapper = AndroidDeviceControllerWrapper::AllocateNew(
             sJVM, self, kLocalDeviceId, fabricId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(),
             DeviceLayer::TCPEndPointManager(), DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate,
@@ -572,7 +585,9 @@ JNI_METHOD(void, setUseJavaCallbackForNOCRequest)
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
+#ifndef JAVA_MATTER_CONTROLLER_TEST
     wrapper->GetAndroidOperationalCredentialsIssuer()->SetUseJavaCallbackForNOCRequest(useCallback);
+#endif
 
     if (useCallback)
     {
