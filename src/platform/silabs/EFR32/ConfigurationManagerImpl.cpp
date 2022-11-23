@@ -28,7 +28,7 @@
 
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/EFR32/EFR32Config.h>
+#include <platform/silabs/EFR32Config.h>
 
 #include "em_rmu.h"
 

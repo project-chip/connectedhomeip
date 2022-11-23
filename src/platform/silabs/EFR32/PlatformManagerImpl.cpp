@@ -24,7 +24,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/EFR32/DiagnosticDataProviderImpl.h>
+#include <platform/silabs/DiagnosticDataProviderImpl.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/PlatformManager.h>

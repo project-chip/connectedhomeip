@@ -18,8 +18,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/EFR32/EFR32Config.h>
-#include <platform/EFR32/NetworkCommissioningWiFiDriver.h>
+#include <platform/silabs/EFR32Config.h>
+#include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 
 #include <limits>
 

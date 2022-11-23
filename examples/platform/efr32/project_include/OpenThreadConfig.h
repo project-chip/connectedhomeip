@@ -29,7 +29,7 @@
 
 // Disable the SiLabs-supplied OpenThread logging facilities and use
 // the facilities provided by the Device Layer (see
-// src/platform/EFR32/Logging.cpp).
+// src/platform/silabs/Logging.cpp).
 #define OPENTHREAD_CONFIG_LOG_OUTPUT OPENTHREAD_CONFIG_LOG_OUTPUT_APP
 
 // Turn on a moderate level of logging in OpenThread
