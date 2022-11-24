@@ -283,8 +283,8 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
     struct scan_result_holder * ap;
 
     SILABS_LOG("# %2d %2d  %03d %02X:%02X:%02X:%02X:%02X:%02X  %s", scan_count, scan_result->channel,
-              ((int16_t)(scan_result->rcpi - 220) / 2), scan_result->mac[0], scan_result->mac[1], scan_result->mac[2],
-              scan_result->mac[3], scan_result->mac[4], scan_result->mac[5], scan_result->ssid_def.ssid);
+               ((int16_t)(scan_result->rcpi - 220) / 2), scan_result->mac[0], scan_result->mac[1], scan_result->mac[2],
+               scan_result->mac[3], scan_result->mac[4], scan_result->mac[5], scan_result->ssid_def.ssid);
     /*Report one AP information*/
     SILABS_LOG("\r\n");
     /* don't save if filter only wants specific ssid */
@@ -475,7 +475,7 @@ static void sl_wfx_client_connected_callback(uint8_t * mac)
 static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac)
 {
     SILABS_LOG("Client rejected, reason: %d, MAC: %02X:%02X:%02X:%02X:%02X:%02X\r\n", (int) status, mac[0], mac[1], mac[2], mac[3],
-              mac[4], mac[5]);
+               mac[4], mac[5]);
 }
 
 /****************************************************************************
@@ -488,7 +488,7 @@ static void sl_wfx_ap_client_disconnected_callback(uint32_t status, uint8_t * ma
 {
     // TODO
     SILABS_LOG("Client disconnected, reason: %d, MAC: %02X:%02X:%02X:%02X:%02X:%02X\r\n", (int) status, mac[0], mac[1], mac[2],
-              mac[3], mac[4], mac[5]);
+               mac[3], mac[4], mac[5]);
 }
 #endif /* SL_WFX_CONFIG_SOFTAP */
 
@@ -636,8 +636,8 @@ static void wfx_events_task(void * p_arg)
             }
 
             SILABS_LOG("WIFI Scan Paramter set to Active channel time %d, Passive "
-                      "Channel Time: %d, Number of prob: %d",
-                      ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
+                       "Channel Time: %d, Number of prob: %d",
+                       ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
             (void) sl_wfx_set_scan_parameters(ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
             (void) sl_wfx_send_scan_command(WFM_SCAN_MODE_ACTIVE, CHANNEL_LIST, /* Channel list */
                                             CHANNEL_COUNT,                      /* Scan all chans */
@@ -684,9 +684,9 @@ static sl_status_t wfx_init(void)
     {
     case SL_STATUS_OK:
         SILABS_LOG("WF200 FW ver:%d.%d.%d [MAC %02x:%02x:%02x-%02x:%02x:%02x]", wifiContext.firmware_major,
-                  wifiContext.firmware_minor, wifiContext.firmware_build, wifiContext.mac_addr_0.octet[0],
-                  wifiContext.mac_addr_0.octet[1], wifiContext.mac_addr_0.octet[2], wifiContext.mac_addr_0.octet[3],
-                  wifiContext.mac_addr_0.octet[4], wifiContext.mac_addr_0.octet[5]);
+                   wifiContext.firmware_minor, wifiContext.firmware_build, wifiContext.mac_addr_0.octet[0],
+                   wifiContext.mac_addr_0.octet[1], wifiContext.mac_addr_0.octet[2], wifiContext.mac_addr_0.octet[3],
+                   wifiContext.mac_addr_0.octet[4], wifiContext.mac_addr_0.octet[5]);
         SILABS_LOG("WF200 Init OK");
 
         if (wifiContext.state == SL_WFX_STA_INTERFACE_CONNECTED)
@@ -756,7 +756,7 @@ int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap)
     SILABS_LOG("WIFI:SSID:: %s", &ap_info.ssid[0]);
     memcpy(ap->ssid, ap_info.ssid, sizeof(ap_info.ssid));
     SILABS_LOG("WIFI:Mac addr:: %02x:%02x:%02x:%02x:%02x:%02x", ap_info.bssid[0], ap_info.bssid[1], ap_info.bssid[2],
-              ap_info.bssid[3], ap_info.bssid[4], ap_info.bssid[5]);
+               ap_info.bssid[3], ap_info.bssid[4], ap_info.bssid[5]);
     memcpy(ap->bssid, ap_info.bssid, sizeof(ap_info.bssid));
     ap->security = ap_info.security;
     SILABS_LOG("WIFI:security:: %d", ap->security);
@@ -1034,8 +1034,8 @@ sl_status_t wfx_connect_to_ap(void)
     SILABS_LOG("WIFI:JOIN to %s", &wifi_provision.ssid[0]);
 
     SILABS_LOG("WIFI Scan Paramter set to Active channel time %d, Passive Channel "
-              "Time: %d, Number of prob: %d",
-              ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
+               "Time: %d, Number of prob: %d",
+               ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
     (void) sl_wfx_set_scan_parameters(ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
     result =
         sl_wfx_send_join_command((uint8_t *) wifi_provision.ssid, strlen(wifi_provision.ssid), NULL, CHANNEL_0,
@@ -1062,7 +1062,7 @@ void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * 
 #endif
     *addr = *mac;
     SILABS_LOG("WLAN:Get WiFi Mac addr %02x:%02x:%02x:%02x:%02x:%02x", mac->octet[0], mac->octet[1], mac->octet[2], mac->octet[3],
-              mac->octet[4], mac->octet[5]);
+               mac->octet[4], mac->octet[5]);
     memcpy(&ap_info.bssid[0], &mac->octet[0], 6);
 }
 

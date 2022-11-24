@@ -245,7 +245,7 @@ void AppTask::UpdateThermoStatUI()
     }
 #else
     SILABS_LOG("Thermostat Status - M:%d T:%d'C H:%d'C C:%d'C", TempMgr().GetMode(), TempMgr().GetCurrentTemp(),
-              TempMgr().GetHeatingSetPoint(), TempMgr().GetCoolingSetPoint());
+               TempMgr().GetHeatingSetPoint(), TempMgr().GetCoolingSetPoint());
 #endif // DISPLAY_ENABLED
 }
 

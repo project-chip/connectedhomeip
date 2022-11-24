@@ -68,7 +68,7 @@ void dhcpclient_set_link_state(int link_up)
     if (link_up)
     {
         dhcp_state = DHCP_START;
-        EFR32_LOG("DHCP: Starting");
+        SILABS_LOG("DHCP: Starting");
     }
     else
     {
@@ -94,7 +94,7 @@ uint8_t dhcpclient_poll(void * arg)
     switch (dhcp_state)
     {
     case DHCP_START:
-        EFR32_LOG("DHCP: Wait addr");
+        SILABS_LOG("DHCP: Wait addr");
         ip_addr_set_zero_ip4(&netif->ip_addr);
         ip_addr_set_zero_ip4(&netif->netmask);
         ip_addr_set_zero_ip4(&netif->gw);
@@ -108,8 +108,8 @@ uint8_t dhcpclient_poll(void * arg)
             dhcp_state = DHCP_ADDRESS_ASSIGNED;
 
             uint64_t addr = netif->ip_addr.u_addr.ip4.addr;
-            EFR32_LOG("DHCP IP: %d.%d.%d.%d", NETIF_IPV4_ADDRESS(addr, 0), NETIF_IPV4_ADDRESS(addr, 1), NETIF_IPV4_ADDRESS(addr, 2),
-                      NETIF_IPV4_ADDRESS(addr, 3));
+            SILABS_LOG("DHCP IP: %d.%d.%d.%d", NETIF_IPV4_ADDRESS(addr, 0), NETIF_IPV4_ADDRESS(addr, 1),
+                       NETIF_IPV4_ADDRESS(addr, 2), NETIF_IPV4_ADDRESS(addr, 3));
         }
         else
         {
@@ -120,7 +120,7 @@ uint8_t dhcpclient_poll(void * arg)
             {
                 dhcp_state = DHCP_TIMEOUT;
 
-                EFR32_LOG("*ERR*DHCP: Failed");
+                SILABS_LOG("*ERR*DHCP: Failed");
                 /* Stop DHCP */
                 dhcp_stop(netif);
 
@@ -136,7 +136,7 @@ uint8_t dhcpclient_poll(void * arg)
 
     case DHCP_LINK_DOWN:
         /* Stop DHCP */
-        EFR32_LOG("*ERR*DHCP Link down");
+        SILABS_LOG("*ERR*DHCP Link down");
         dhcp_stop(netif);
         dhcp_state = DHCP_OFF;
         break;

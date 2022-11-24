@@ -103,8 +103,8 @@ CHIP_ERROR EFR32DeviceDataProvider::GetSpake2pVerifier(MutableByteSpan & verifie
     char verifierB64[kSpake2pSerializedVerifier_MaxBase64Len] = { 0 };
     size_t verifierB64Len                                     = 0;
 
-    err =
-        SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_Spake2pVerifier, verifierB64, sizeof(verifierB64), verifierB64Len);
+    err = SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_Spake2pVerifier, verifierB64, sizeof(verifierB64),
+                                           verifierB64Len);
 
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -134,7 +134,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetSetupPayload(MutableCharSpan & payloadBuf
     size_t bitSetLen                                    = 0;
 
     err = SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_SetupPayloadBitSet, payloadBitSet, kTotalPayloadDataSizeInBytes,
-                                          bitSetLen);
+                                           bitSetLen);
 
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -260,7 +260,8 @@ CHIP_ERROR EFR32DeviceDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan 
                   "Length of unique ID for rotating device ID is smaller than minimum.");
 
     size_t uniqueIdLen = 0;
-    err = SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_UniqueId, uniqueIdSpan.data(), uniqueIdSpan.size(), uniqueIdLen);
+    err =
+        SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_UniqueId, uniqueIdSpan.data(), uniqueIdSpan.size(), uniqueIdLen);
 #ifdef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -294,7 +295,7 @@ CHIP_ERROR EFR32DeviceDataProvider::GetManufacturingDate(uint16_t & year, uint8_
     char * parseEnd;
 
     err = SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_ManufacturingDate, reinterpret_cast<uint8_t *>(dateStr),
-                                          sizeof(dateStr), dateLen);
+                                           sizeof(dateStr), dateLen);
     SuccessOrExit(err);
 
     VerifyOrExit(dateLen == kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);

@@ -19,7 +19,7 @@
 #include <string.h>
 #include <task.h>
 
-#ifdef BRD4325A  // For SiWx917 Platform only
+#ifdef BRD4325A // For SiWx917 Platform only
 #include "core_cm4.h"
 #endif
 

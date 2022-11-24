@@ -104,7 +104,7 @@ void TemperatureManager::AttributeChangeHandler(EndpointId endpointId, Attribute
 
     case ThermAttr::OccupiedHeatingSetpoint::Id: {
         int8_t heatingTemp = ConvertToPrintableTemp(*((int16_t *) value));
-    	SILABS_LOG("HeatingSetpoint %d", heatingTemp);
+        SILABS_LOG("HeatingSetpoint %d", heatingTemp);
         mHeatingCelsiusSetPoint = heatingTemp;
     }
     break;

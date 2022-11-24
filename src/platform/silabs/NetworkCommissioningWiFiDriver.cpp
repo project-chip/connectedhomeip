@@ -18,8 +18,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/silabs/SilabsConfig.h>
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
+#include <platform/silabs/SilabsConfig.h>
 
 #include <limits>
 
@@ -44,12 +44,12 @@ CHIP_ERROR SlWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     mpConnectCallback     = nullptr;
 
     // If reading fails, wifi is not provisioned, no need to go further.
-    err =
-        SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_WiFiSSID, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid), ssidLen);
+    err = SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_WiFiSSID, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid),
+                                           ssidLen);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
     err = SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_WiFiPSK, mSavedNetwork.credentials,
-                                          sizeof(mSavedNetwork.credentials), credentialsLen);
+                                           sizeof(mSavedNetwork.credentials), credentialsLen);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
     mSavedNetwork.credentialsLen = credentialsLen;

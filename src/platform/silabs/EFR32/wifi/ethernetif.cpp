@@ -44,10 +44,10 @@
 #include "lwip/timeouts.h"
 #include "netif/etharp.h"
 
-#ifndef EFR32_LOG
+#ifndef SILABS_LOG
 extern "C" {
 void efr32Log(const char * aFormat, ...);
-#define EFR32_LOG(...) efr32Log(__VA_ARGS__);
+#define SILABS_LOG(...) efr32Log(__VA_ARGS__);
 }
 #endif
 
@@ -136,13 +136,13 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
         (memcmp(netif->hwaddr, dst_mac, netif->hwaddr_len) != 0))
     {
 #ifdef WIFI_DEBUG_ENABLED
-        EFR32_LOG("%s: DROP, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x", __func__,
+        SILABS_LOG("%s: DROP, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x", __func__,
 
-                  dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
+                   dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
 
-                  src_mac[0], src_mac[1], src_mac[2], src_mac[3], src_mac[4], src_mac[5],
+                   src_mac[0], src_mac[1], src_mac[2], src_mac[3], src_mac[4], src_mac[5],
 
-                  b[12], b[13]);
+                   b[12], b[13]);
 #endif
         return;
     }
@@ -158,27 +158,27 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
             bufferoffset += q->len;
         }
 #ifdef WIFI_DEBUG_ENABLED
-        EFR32_LOG("%s: ACCEPT %d, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x", __func__,
-                  bufferoffset,
+        SILABS_LOG("%s: ACCEPT %d, [%02x:%02x:%02x:%02x:%02x:%02x]<-[%02x:%02x:%02x:%02x:%02x:%02x] type=%02x%02x", __func__,
+                   bufferoffset,
 
-                  dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
+                   dst_mac[0], dst_mac[1], dst_mac[2], dst_mac[3], dst_mac[4], dst_mac[5],
 
-                  src_mac[0], src_mac[1], src_mac[2], src_mac[3], src_mac[4], src_mac[5],
+                   src_mac[0], src_mac[1], src_mac[2], src_mac[3], src_mac[4], src_mac[5],
 
-                  b[12], b[13]);
+                   b[12], b[13]);
 #endif
 
         if (netif->input(p, netif) != ERR_OK)
         {
             gOverrunCount++;
-            EFR32_LOG("overrun count entering when fail to alloc value %d", gOverrunCount);
+            SILABS_LOG("overrun count entering when fail to alloc value %d", gOverrunCount);
             pbuf_free(p);
         }
     }
     else
     {
         gOverrunCount++;
-        EFR32_LOG("overrun count entering when fail to alloc value %d", gOverrunCount);
+        SILABS_LOG("overrun count entering when fail to alloc value %d", gOverrunCount);
     }
 }
 
@@ -225,9 +225,9 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     // 12 is size of other data in buffer struct, user shouldn't have to care about this?
     if (sl_wfx_host_allocate_buffer((void **) &tx_buffer, SL_WFX_TX_FRAME_BUFFER, asize) != SL_STATUS_OK)
     {
-        EFR32_LOG("*ERR*EN-Out: No mem frame len=%d", framelength);
+        SILABS_LOG("*ERR*EN-Out: No mem frame len=%d", framelength);
         gOverrunCount++;
-        EFR32_LOG("overrun count exiting when faied to alloc value %d", gOverrunCount);
+        SILABS_LOG("overrun count exiting when faied to alloc value %d", gOverrunCount);
         return ERR_MEM;
     }
     buffer = tx_buffer->body.packet_data;
@@ -249,7 +249,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     result = SL_STATUS_FAIL;
 
 #ifdef WIFI_DEBUG_ENABLED
-    EFR32_LOG("WF200: Out %d", (int) framelength);
+    SILABS_LOG("WF200: Out %d", (int) framelength);
 #endif
 
     /* send the generated frame over Wifi network */
@@ -261,7 +261,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
 
     if (result != SL_STATUS_OK)
     {
-        EFR32_LOG("*ERR*Send enet %d", (int) framelength);
+        SILABS_LOG("*ERR*Send enet %d", (int) framelength);
         return ERR_IF;
     }
     return ERR_OK;
@@ -296,7 +296,7 @@ void sl_wfx_host_received_frame_callback(sl_wfx_received_ind_t * rx_buffer)
             buffer = (uint8_t *) &(rx_buffer->body.frame[rx_buffer->body.frame_padding]);
 
 #ifdef WIFI_DEBUG_ENABLED
-            EFR32_LOG("WF200: In %d", (int) len);
+            SILABS_LOG("WF200: In %d", (int) len);
 #endif
 
             low_level_input(netif, buffer, len);
@@ -304,14 +304,14 @@ void sl_wfx_host_received_frame_callback(sl_wfx_received_ind_t * rx_buffer)
         else
         {
 #ifdef WIFI_DEBUG_ENABLED
-            EFR32_LOG("WF200: NO-INTF");
+            SILABS_LOG("WF200: NO-INTF");
 #endif
         }
     }
     else
     {
 #ifdef WIFI_DEBUG_ENABLED
-        EFR32_LOG("WF200: Invalid frame IN");
+        SILABS_LOG("WF200: Invalid frame IN");
 #endif
     }
 }
@@ -342,11 +342,11 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
         return ERR_IF;
     }
 #ifdef WIFI_DEBUG_ENABLED
-    EFR32_LOG("EN-RSI: Output");
+    SILABS_LOG("EN-RSI: Output");
 #endif
     if ((netif->flags & (NETIF_FLAG_LINK_UP | NETIF_FLAG_UP)) != (NETIF_FLAG_LINK_UP | NETIF_FLAG_UP))
     {
-        EFR32_LOG("EN-RSI:NOT UP");
+        SILABS_LOG("EN-RSI:NOT UP");
         xSemaphoreGive(ethout_sem);
         return ERR_IF;
     }
@@ -354,15 +354,15 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     rsipkt = wfx_rsi_alloc_pkt();
     if (!rsipkt)
     {
-        EFR32_LOG("EN-RSI:No buf");
+        SILABS_LOG("EN-RSI:No buf");
         xSemaphoreGive(ethout_sem);
         return ERR_IF;
     }
 
 #ifdef WIFI_DEBUG_ENABLED
     uint8_t * b = (uint8_t *) p->payload;
-    EFR32_LOG("EN-RSI: Out [%02x:%02x:%02x:%02x:%02x:%02x][%02x:%02x:%02x:%02x:%02x:%02x]type=%02x%02x", b[0], b[1], b[2], b[3],
-              b[4], b[5], b[6], b[7], b[8], b[9], b[10], b[11], b[12], b[13]);
+    SILABS_LOG("EN-RSI: Out [%02x:%02x:%02x:%02x:%02x:%02x][%02x:%02x:%02x:%02x:%02x:%02x]type=%02x%02x", b[0], b[1], b[2], b[3],
+               b[4], b[5], b[6], b[7], b[8], b[9], b[10], b[11], b[12], b[13]);
 #endif
     /* Generate the packet */
     for (q = p, framelength = 0; q != NULL; q = q->next)
@@ -376,7 +376,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
         wfx_rsi_pkt_add_data(rsipkt, (uint8_t *) (p->payload), LWIP_FRAME_ALIGNMENT - framelength, framelength);
     }
 #ifdef WIFI_DEBUG_ENABLED
-    EFR32_LOG("EN-RSI: Sending %d", framelength);
+    SILABS_LOG("EN-RSI: Sending %d", framelength);
 #endif
 
     /* forward the generated packet to RSI to
@@ -384,13 +384,13 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
      */
     if (wfx_rsi_send_data(rsipkt, framelength))
     {
-        EFR32_LOG("*ERR*EN-RSI:Send fail");
+        SILABS_LOG("*ERR*EN-RSI:Send fail");
         xSemaphoreGive(ethout_sem);
         return ERR_IF;
     }
 
 #ifdef WIFI_DEBUG_ENABLED
-    EFR32_LOG("EN-RSI:Xmit %d", framelength);
+    SILABS_LOG("EN-RSI:Xmit %d", framelength);
 #endif
     xSemaphoreGive(ethout_sem);
 

@@ -218,7 +218,7 @@ void LightingManager::AutoTurnOffTimerEventHandler(AppEvent * aEvent)
 
     light->mAutoTurnOffTimerArmed = false;
 
-	SILABS_LOG("Auto Turn Off has been triggered!");
+    SILABS_LOG("Auto Turn Off has been triggered!");
 
     light->InitiateAction(actor, OFF_ACTION);
 }
