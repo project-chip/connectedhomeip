@@ -53,6 +53,15 @@ Mac OS.
     > under this environment. If not, please try `scripts/bootstrap.sh` for
     > matter environment update.
 
+-   Setup build environment for `Bouffalo Lab` SoC
+
+    ```
+    cd third_party/bouffalolab/repo
+    sudo bash script/setup.sh
+    ```
+    > Toolchain will be downloaded and installed under /opt/bouffalolab_sdk. 
+
+
 ## Build CHIP Lighting App example
 
 The following steps take examples for BL602 develop board `BL602-IoT-Matter-V1`

@@ -38,17 +38,16 @@ declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = true
 
-  # PIN code for PASE session establishment.
-  setupPinCode = 20202021
-
-  # Monitor & log memory usage at runtime.
-  enable_heap_monitoring = false
-
   # OTA periodic query timeout in seconds
   ota_periodic_query_timeout = 86400
 
-  board = "BL602-IoT-Matter-V1"
+  enable_heap_monitoring = false
 
+  setupPinCode = 20202021
+  setupDiscriminator = 3840
+
+  board = "BL602-IoT-Matter-V1"
+  module_type = "BL602"
   baudrate = 2000000
 }
 
@@ -80,6 +79,7 @@ bl602_sdk("sdk") {
 
 bl602_executable("lighting_app") {
   output_name = "chip-bl602-lighting-example.out"
+
 
   defines = [
     "APP_TASK_STACK_SIZE=2044",
