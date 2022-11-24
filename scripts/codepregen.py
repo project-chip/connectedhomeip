@@ -1,10 +1,31 @@
 #!/usr/bin/env python
 
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import click
 import logging
 import enum
 import os
 import sys
+
+try:
+    from pregenerate import FindPregenerationTargets
+except:
+    import os
+    sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+    from pregenerate import FindPregenerationTargets
 
 try:
     import coloredlogs
@@ -57,7 +78,8 @@ def main(log_level, sdk_root, output_dir):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    # FIXME: implement
+    for target in FindPregenerationTargets(sdk_root):
+        target.Generate()
 
     logging.info("Done")
 
