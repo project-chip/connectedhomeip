@@ -42,4 +42,3 @@ class InputIdlFile:
             return os.path.join(top_dir, "zap")
         else:
             raise Exception("Unknown file type for self")
-
