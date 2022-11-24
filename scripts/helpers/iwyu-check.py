@@ -58,7 +58,7 @@ def find_program(names):
     '--no-log-timestamps',
     default=False,
     is_flag=True,
-    help='Skip timestaps in log output')
+    help='Skip timestamps in log output')
 @click.option(
     '--compile-commands-glob',
     show_default=True,
@@ -86,7 +86,8 @@ def find_program(names):
     default="",
     help='Set custom arg(s) for clang'
 )
-def main(compile_commands_glob, scanning_destination, mapping_file_dir, iwyu_args, clang_args, log_level, no_log_timestamps):
+def main(compile_commands_glob, scanning_destination, mapping_file_dir,
+         iwyu_args, clang_args, log_level, no_log_timestamps):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -114,7 +115,7 @@ def main(compile_commands_glob, scanning_destination, mapping_file_dir, iwyu_arg
 
         compile_commands_path = os.path.dirname(compile_commands)
         compile_commands_file = os.path.join(compile_commands_path, "compile_commands.json")
-        logging.info("Copy compile command file %s to %s", compile_commands, compile_commands_file)
+        logging.debug("Copy compile command file %s to %s", compile_commands, compile_commands_file)
 
         with contextlib.suppress(shutil.SameFileError):
             shutil.copyfile(compile_commands, compile_commands_file)
@@ -135,15 +136,17 @@ def main(compile_commands_glob, scanning_destination, mapping_file_dir, iwyu_arg
         if not mapping_file_dir:
             mapping_file_dir = os.path.join(root_dir, "platforms", platform)
 
-        # Specify config for platforms. Description: Some platform may needed hack clang compiler
+        # Platform specific clang arguments, as some platform
+        # may needed some hacks for clang compiler for work properly.
+        platform_clang_args = []
+
         if platform == "Tizen":
-            clang_args = [
+            platform_clang_args = [
                 "--target=arm-linux-gnueabi",
                 "-I$TIZEN_SDK_TOOLCHAIN/arm-tizen-linux-gnueabi/include/c++/9.2.0",
                 "-I$TIZEN_SDK_TOOLCHAIN/arm-tizen-linux-gnueabi/include/c++/9.2.0/arm-tizen-linux-gnueabi",
-                clang_args
+                "-I$TIZEN_SDK_TOOLCHAIN/lib/gcc/arm-tizen-linux-gnueabi/9.2.0/include",
             ]
-            clang_args = " ".join(clang_args)
 
         # TODO: Add another platform for easy scanning
         # Actually works scanning for platform: tizen, darwin, linux other not tested yet.
@@ -153,42 +156,42 @@ def main(compile_commands_glob, scanning_destination, mapping_file_dir, iwyu_arg
             "-p", compile_commands_path, scanning_destination,
             "--", iwyu_args,
             "-Xiwyu", "--mapping_file=" + mapping_file_dir + "/iwyu.imp",
-            clang_args
-        ]
+        ] + platform_clang_args + [clang_args]
 
-        logging.info("Start scanning include using IWYU for %s platform", platform)
+        logging.info("Used compile commands: %s", compile_commands)
+        logging.info("Scanning includes for platform: %s", platform)
+        logging.info("Scanning destination: %s", scanning_destination)
+
+        logging.debug("Command: %s", " ".join(command_arr))
         status = subprocess.Popen(" ".join(command_arr),
                                   shell=True,
                                   text=True,
                                   stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE,)
+                                  stderr=subprocess.PIPE)
 
-        logging.info("Scanning for %s using %s in directory %s", platform, compile_commands, scanning_destination)
-        print("============== IWYU output start  ================")
+        logging.info("============== IWYU output start  ================")
 
+        logger = logging.info
         while status.poll() is None:
             line = status.stdout.readline().rstrip()
 
             if re.match(r"^.*([A-Za-z0-9]+(/[A-Za-z0-9]+)+)\.cpp should [a-zA-Z]+ these lines:$", line):
-                logging.warning("\n%s", line)
-
+                logger = logging.warning
             elif re.match(r"^.*([A-Za-z0-9]+(/[A-Za-z0-9]+)+)\.[a-zA-Z]+ has correct #includes/fwd-decls\)$", line):
-                logging.info("\n%s", line)
-
+                logger = logging.info
             elif re.match(r"^The full include-list for .*$", line):
-                logging.warning("\n%s", line)
+                logger = logging.warning
                 warning_in_files += 1
 
-            else:
-                print(line)
+            logger("%s", line)
 
-        print("============== IWYU output end  ================")
+        logging.info("============== IWYU output end  ================")
 
     if warning_in_files:
-        logging.error("%d files has problem with includes", warning_in_files)
+        logging.error("Number of files with include issues: %d", warning_in_files)
         sys.exit(2)
     else:
-        logging.info("Every includes looks good!")
+        logging.info("Every include looks good!")
 
 
 if __name__ == '__main__':

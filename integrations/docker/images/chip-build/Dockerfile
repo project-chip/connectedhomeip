@@ -15,7 +15,6 @@ RUN set -x \
     clang \
     clang-format \
     clang-tidy \
-    clang-12 \
     curl \
     flex \
     g++ \
@@ -23,14 +22,12 @@ RUN set -x \
     git-lfs \
     gperf \
     iproute2 \
-    iwyu \
     jq \
     lcov \
     libavahi-client-dev \
     libavahi-common-dev \
     libcairo-dev \
     libcairo2-dev \
-    libclang-12-dev \
     libdbus-1-dev \
     libdbus-glib-1-dev \
     libdmalloc-dev \
@@ -60,6 +57,7 @@ RUN set -x \
     ninja-build \
     openjdk-8-jdk \
     pkg-config \
+    python-is-python3 \
     python3.9 \
     python3.9-dev \
     python3.9-venv \
@@ -124,21 +122,27 @@ RUN set -x \
     && : # last line
 
 # Need newer version of include-what-you-use
-# iwyu_tool default use python from env must be linked
 RUN set -x \
-    && ln -s /usr/bin/python3 /usr/bin/python \
-    && cd /tmp \
-    && git clone https://github.com/include-what-you-use/include-what-you-use.git \
-    && cd include-what-you-use \
-    && git checkout clang_12 \
-    && cp -Rf iwyu_tool.py /bin/iwyu_tool \
-    && mkdir build \
-    && cd build \
-    && cmake -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=/usr/lib/llvm-12 .. \
-    && make \
-    && cp -Rf bin /usr \
-    && cd ../../ \
-    && rm -rf include-what-you-use* \
+    && apt-get update \
+    # Install build and runtime requirements for IWYU
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing clang-12 libclang-12-dev \
+    # Build and install IWYU
+    && git clone --depth=1 --branch=clang_12 https://github.com/include-what-you-use/include-what-you-use.git \
+    && mkdir -p include-what-you-use/build \
+    && cd include-what-you-use/build \
+    && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_PREFIX_PATH=/usr/lib/llvm-12 -DIWYU_LINK_CLANG_DYLIB=OFF .. \
+    && make -j8 \
+    && make install \
+    # Save clang-12 files, so we can restore them after build dependencies cleanup
+    && tar -cf clang-12-files.tar $(dpkg -L libclang-common-12-dev |grep /include) /usr/lib/llvm-12/lib/libLLVM-12.so.1 \
+    # Cleanup build dependencies
+    && apt autoremove -fy clang-12 libclang-12-dev \
+    && rm -rf /var/lib/apt/lists/ \
+    # Restore clang-12 files
+    && tar -xf clang-12-files.tar -C / \
+    # Cleanup
+    && cd ../.. \
+    && rm -rf include-what-you-use \
     && : # last line
 
 # Build glib-2.0 from source with enabled thread sanitizer. This is needed for
