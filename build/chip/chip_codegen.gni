@@ -102,6 +102,9 @@ template("_chip_build_time_codegen") {
 #     Explicit names of the expected outputs. Enforced to validate that
 #     expected outputs are generated when processing input files.
 #
+#   deps, public_configs
+#     Forwarded to the resulting source set
+#
 # Command line parameters:
 #
 #  chip_code_pre_gegenerated_directory:
@@ -118,6 +121,9 @@ template("_chip_build_time_codegen") {
 #
 #       To find the list of generated files, you can run codegen.py with the
 #       "--name-only" argument
+#
+# NOTE:
+#   the result of the target_name WILL BE a `source_set`. Treat it as such.
 #
 # Example usage:
 #
@@ -157,7 +163,7 @@ template("chip_codegen") {
         "/codegen/" + invoker.generator
 
     config("${_name}_config") {
-      include_dirs = [ target_gen_dir ]
+      include_dirs = [ "${_generation_dir}" ]
     }
 
     source_set(_name) {
