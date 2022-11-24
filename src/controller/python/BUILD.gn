@@ -230,6 +230,7 @@ chip_python_wheel_action("chip-core") {
         "chip/utils/CommissioningBuildingBlocks.py",
         "chip/utils/__init__.py",
         "chip/yaml/__init__.py",
+        "chip/yaml/constraints.py",
         "chip/yaml/data_model_lookup.py",
         "chip/yaml/errors.py",
         "chip/yaml/format_converter.py",
