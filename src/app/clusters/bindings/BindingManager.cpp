@@ -204,7 +204,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR BindingManager::NotifyBoundClusterAtIndexChanged(EndpointId endpoint, ClusterId cluster, uint8_t bindingIndex, 
+CHIP_ERROR BindingManager::NotifyBoundClusterAtIndexChanged(EndpointId endpoint, ClusterId cluster, uint8_t bindingIndex,
                                                             void * context)
 {
     VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
