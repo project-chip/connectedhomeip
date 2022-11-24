@@ -36,7 +36,7 @@ class CodegenTarget:
     def Generate(self, output_root: str):
         '''Runs codegen.py to generate in the specified directory'''
 
-        output_dir = os.path.join(output_root, self.idl.pregen_subdir)
+        output_dir = os.path.join(output_root, self.idl.pregen_subdir, self.generator)
 
         logging.info(f"Generating: {self.generator}:{self.idl.relative_path} into {output_dir}")
 
