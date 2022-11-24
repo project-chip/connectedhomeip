@@ -78,8 +78,12 @@ template("_chip_build_time_codegen") {
       public_configs += invoker.public_configs
     }
 
-    if (defined(invoker.deps)) {
-      deps = invoker.deps
+    forward_variables_from(invoker, ["deps"])
+
+    if (defined(deps)) {
+      deps += [ ":${_name}_codegen" ]
+    } else {
+      deps = [ ":${_name}_codegen" ]
     }
   }
 }
@@ -136,7 +140,7 @@ template("chip_codegen") {
                                "deps",
                                "generator",
                                "input",
-                               "output",
+                               "outputs",
                                "public_configs",
                              ])
     }
@@ -163,9 +167,7 @@ template("chip_codegen") {
         public_configs += invoker.public_configs
       }
 
-      if (defined(invoker.deps)) {
-        deps = invoker.deps
-      }
+      forward_variables_from(invoker, ["deps"])
 
       sources = []
       foreach(name, invoker.outputs) {
