@@ -1,0 +1,110 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
+
+config("chip_examples_project_config") {
+  include_dirs = [ "project_include" ]
+
+  # Link options that provide a replacement for dynamic memory operations in standard
+  # library with the FreeRTOS malloc in platform code.
+  ldflags = [
+    # memory allocation -- these must be re-entrant and do locking
+    "-Wl,--wrap=malloc",
+    "-Wl,--wrap=free",
+    "-Wl,--wrap=realloc",
+    "-Wl,--wrap=calloc",
+    "-Wl,--wrap=MemoryAlloc",
+
+    # Wrap these in case internal newlib call them (e.g. strdup will)
+    # directly call _malloc_r)
+    "-Wl,--wrap=_malloc_r",
+    "-Wl,--wrap=_realloc_r",
+    "-Wl,--wrap=_free_r",
+    "-Wl,--wrap=_calloc_r",
+  ]
+}
+
+source_set("openthread_core_config_efr32_chip_examples") {
+  if (chip_enable_openthread) {
+    sources = [ "project_include/OpenThreadConfig.h" ]
+
+    public_deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
+
+    if (use_silabs_thread_lib) {
+      public_deps += [ "${efr32_sdk_build_root}:openthread_core_config_efr32" ]
+    } else {
+      public_deps += [ "${chip_root}/third_party/openthread/platforms/efr32:openthread_core_config_efr32" ]
+    }
+
+    public_configs = [ ":chip_examples_project_config" ]
+  }
+}
+
+source_set("efr-matter-shell") {
+  if (chip_build_libshell) {
+    defines = [ "ENABLE_CHIP_SHELL" ]
+
+    sources = [ "matter_shell.cpp" ]
+    include_dirs = [ "." ]
+
+    public_deps = [
+      "${chip_root}/examples/shell/shell_common:shell_common",
+      "${chip_root}/src/lib/shell:shell",
+      "${chip_root}/src/lib/shell:shell_core",
+    ]
+  }
+}
+
+config("attestation-credentials-config") {
+  include_dirs = [ "${chip_root}" ]
+
+  defines = [
+    # Set to 1 to enable EFR32 attestation credentials
+    "EFR32_ATTESTATION_CREDENTIALS",
+  ]
+}
+
+source_set("efr32-attestation-credentials") {
+  sources = [
+    "../EFR32DeviceAttestationCreds.cpp",
+    "../EFR32DeviceAttestationCreds.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/platform:platform_base",
+  ]
+
+  public_configs = [ ":attestation-credentials-config" ]
+}
+
+source_set("efr32-factory-data-provider") {
+  sources = [
+    "EFR32DeviceDataProvider.cpp",
+    "EFR32DeviceDataProvider.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  #public_configs = [ "" ]
+}
