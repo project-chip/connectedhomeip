@@ -168,7 +168,7 @@ CHIP_ERROR AppTask::Init()
     err = RegisterLockEvents();
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("RegisterLockEvents() failed");
+        SILABS_LOG("RegisterLockEvents() failed");
         appError(err);
     }
 #endif // ENABLE_CHIP_SHELL

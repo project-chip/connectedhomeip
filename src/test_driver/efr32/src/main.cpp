@@ -189,15 +189,15 @@ int main(void)
 
     chip::DeviceLayer::PlatformMgr().InitChipStack();
 
-    EFR32_LOG("***** CHIP EFR32 device tests *****\r\n");
+    SILABS_LOG("***** CHIP EFR32 device tests *****\r\n");
 
     // Start RPC service which runs the tests.
     sTestTaskHandle = xTaskCreateStatic(RunRpcService, "RPC_TEST_TASK", ArraySize(sTestTaskStack), nullptr, TEST_TASK_PRIORITY,
                                         sTestTaskStack, &sTestTaskBuffer);
-    EFR32_LOG("Starting FreeRTOS scheduler");
+    SILABS_LOG("Starting FreeRTOS scheduler");
     sl_system_kernel_start();
 
     // Should never get here.
-    EFR32_LOG("vTaskStartScheduler() failed");
+    SILABS_LOG("vTaskStartScheduler() failed");
     return -1;
 }
