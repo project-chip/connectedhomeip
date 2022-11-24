@@ -59,8 +59,8 @@ Mac OS.
     cd third_party/bouffalolab/repo
     sudo bash script/setup.sh
     ```
-    > Toolchain will be downloaded and installed under /opt/bouffalolab_sdk. 
 
+    > Toolchain will be downloaded and installed under /opt/bouffalolab_sdk.
 
 ## Build CHIP Lighting App example
 
