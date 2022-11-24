@@ -45,6 +45,7 @@ __LOG_LEVELS__ = {
     'fatal': logging.FATAL,
 }
 
+
 def _ParallelGenerateOne(arg):
     """
     Helper method to be passed to multiprocessing parallel generation of
