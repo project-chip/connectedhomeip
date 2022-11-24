@@ -9,8 +9,8 @@ callbacks. Generally this is split into:
     client-side and server-side structures and objects
 -   Callback setup using the Ember-based framework. This generally applies to
     server-side processing and the code generation defines what processing needs
-    to be done when a specific command is received or an attribute is read and what memory
-    should be allocated for storing cluster attributes
+    to be done when a specific command is received or an attribute is read and
+    what memory should be allocated for storing cluster attributes
 
 Code generation depends on the clusters that are needed by an application. Every
 application can have a different cluster and endpoint configuration. The
@@ -85,7 +85,8 @@ specific codegen.
 
 `*.matter` files are both human and machine readable. Code that can process
 these files is available at `scripts/idl` and `scripts/codegen.py`. You can read
-the [scripts/idl/README.md](../scripts/idl/README.md) for details of how things work.
+the [scripts/idl/README.md](../scripts/idl/README.md) for details of how things
+work.
 
 `scripts/codegen.py` can generate various outputs based on an input `*.matter`
 file.
@@ -95,18 +96,20 @@ generation technologies. Currently `.matter`-based Python code generation:
 
 -   has less dependencies than the `nodejs` dependencies of `zap`
 -   runs significantly faster than zap
--   offers more flexible code generation (can generate multiple files per cluster for example,
-    without which some compiles would run out of RAM on large compilations)
+-   offers more flexible code generation (can generate multiple files per
+    cluster for example, without which some compiles would run out of RAM on
+    large compilations)
 -   has a more flexible templating language
 -   has human readable (and potentially editable) input
 -   is more easily provable deterministic (`zap` uses an underlying sqlite
     database and some legacy assumptions from zigbee have historically caused
     non-determinism)
--   uses a synchronous processing model which is potentially easier to develop for
+-   uses a synchronous processing model which is potentially easier to develop
+    for
 
-Ideally, the project would be to have a single code generation method in the long
-term that has all the benefits and none of the drawbacks. We are not there yet,
-however we likely want:
+Ideally, the project would be to have a single code generation method in the
+long term that has all the benefits and none of the drawbacks. We are not there
+yet, however we likely want:
 
 -   Flexible codegen (we will need to split output by clusters or other rules)
 -   Human-readable inputs that enable code reviews and audits
