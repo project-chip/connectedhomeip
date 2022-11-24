@@ -133,11 +133,11 @@ template("chip_codegen") {
     _chip_build_time_codegen(target_name) {
       forward_variables_from(invoker,
                              [
-                               "input",
+                               "deps",
                                "generator",
+                               "input",
                                "output",
                                "public_configs",
-                               "deps",
                              ])
     }
   } else {
