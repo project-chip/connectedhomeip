@@ -141,6 +141,13 @@ else
         exit 1
     fi
 
+    if [[ "$BOUFFALOLAB_SDK_ROOT" != "" ]]; then
+        optArgs="bouffalolab_sdk_root=$BOUFFALOLAB_SDK_ROOT "$optArgs
+    else
+        # try default install path if environment BOUFFALOLAB_SDK_ROOT is not existed
+        optArgs="bouffalolab_sdk_root=/opt/bouffalolab_sdk "$optArgs
+    fi
+
     example_dir=$MATTER_ROOT/examples/$example_name/bouffalolab/$bouffalo_chip
     output_dir=$MATTER_ROOT/$output_folder
 
