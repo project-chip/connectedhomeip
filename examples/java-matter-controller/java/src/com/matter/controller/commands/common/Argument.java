@@ -112,10 +112,20 @@ public final class Argument {
         String str = (String) mValue;
         isValidArgument = value.equals(str);
         break;
+      case NUMBER_INT16:
+        AtomicInteger numShort = (AtomicInteger) mValue;
+        numShort.set(Integer.parseInt(value));
+        isValidArgument = (numShort.intValue() >= mMin && numShort.intValue() <= mMax);
+        break;
       case NUMBER_INT32:
         AtomicInteger num = (AtomicInteger) mValue;
         num.set(Integer.parseInt(value));
         isValidArgument = (num.intValue() >= mMin && num.intValue() <= mMax);
+        break;
+      case NUMBER_INT64:
+        AtomicLong numLong = (AtomicLong) mValue;
+        numLong.set(Long.parseLong(value));
+        isValidArgument = (numLong.intValue() >= mMin && numLong.intValue() <= mMax);
         break;
       case ADDRESS:
         try {

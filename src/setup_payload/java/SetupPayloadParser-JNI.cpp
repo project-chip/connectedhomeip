@@ -113,6 +113,7 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
     jfieldID productId             = env->GetFieldID(setupPayloadClass, "productId", "I");
     jfieldID commissioningFlow     = env->GetFieldID(setupPayloadClass, "commissioningFlow", "I");
     jfieldID discriminator         = env->GetFieldID(setupPayloadClass, "discriminator", "I");
+    jfieldID hasShortDiscriminator = env->GetFieldID(setupPayloadClass, "hasShortDiscriminator", "Z");
     jfieldID setUpPinCode          = env->GetFieldID(setupPayloadClass, "setupPinCode", "J");
     jfieldID discoveryCapabilities = env->GetFieldID(setupPayloadClass, "discoveryCapabilities", "Ljava/util/Set;");
 
@@ -120,11 +121,9 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
     env->SetIntField(setupPayload, vendorId, payload.vendorID);
     env->SetIntField(setupPayload, productId, payload.productID);
     env->SetIntField(setupPayload, commissioningFlow, static_cast<int>(payload.commissioningFlow));
-    // TODO: The API we have here does not handle short discriminators in any
-    // sane way.  Just do what we used to do, which is pretend that a short
-    // discriminator is actually a long discriminator with the low bits all 0.
     uint16_t discriminatorValue;
-    if (payload.discriminator.IsShortDiscriminator())
+    bool isShortDiscriminator = payload.discriminator.IsShortDiscriminator();
+    if (isShortDiscriminator)
     {
         discriminatorValue = static_cast<uint16_t>(payload.discriminator.GetShortValue())
             << (SetupDiscriminator::kLongBits - SetupDiscriminator::kShortBits);
@@ -134,6 +133,7 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
         discriminatorValue = payload.discriminator.GetLongValue();
     }
     env->SetIntField(setupPayload, discriminator, discriminatorValue);
+    env->SetBooleanField(setupPayload, hasShortDiscriminator, isShortDiscriminator);
     env->SetLongField(setupPayload, setUpPinCode, payload.setUpPINCode);
 
     env->SetObjectField(setupPayload, discoveryCapabilities,
@@ -275,19 +275,28 @@ void TransformSetupPayloadFromJobject(JNIEnv * env, jobject jPayload, SetupPaylo
 {
     jclass setupPayloadClass = env->FindClass("chip/setuppayload/SetupPayload");
 
-    jfieldID version               = env->GetFieldID(setupPayloadClass, "version", "I");
-    jfieldID vendorId              = env->GetFieldID(setupPayloadClass, "vendorId", "I");
-    jfieldID productId             = env->GetFieldID(setupPayloadClass, "productId", "I");
-    jfieldID commissioningFlow     = env->GetFieldID(setupPayloadClass, "commissioningFlow", "I");
-    jfieldID discriminator         = env->GetFieldID(setupPayloadClass, "discriminator", "I");
-    jfieldID setUpPinCode          = env->GetFieldID(setupPayloadClass, "setupPinCode", "J");
-    jfieldID discoveryCapabilities = env->GetFieldID(setupPayloadClass, "discoveryCapabilities", "Ljava/util/Set;");
+    jfieldID version                      = env->GetFieldID(setupPayloadClass, "version", "I");
+    jfieldID vendorId                     = env->GetFieldID(setupPayloadClass, "vendorId", "I");
+    jfieldID productId                    = env->GetFieldID(setupPayloadClass, "productId", "I");
+    jfieldID commissioningFlow            = env->GetFieldID(setupPayloadClass, "commissioningFlow", "I");
+    jfieldID discriminator                = env->GetFieldID(setupPayloadClass, "discriminator", "I");
+    jfieldID hasShortDiscriminatorFieldId = env->GetFieldID(setupPayloadClass, "hasShortDiscriminator", "Z");
+    jfieldID setUpPinCode                 = env->GetFieldID(setupPayloadClass, "setupPinCode", "J");
+    jfieldID discoveryCapabilities        = env->GetFieldID(setupPayloadClass, "discoveryCapabilities", "Ljava/util/Set;");
 
-    payload.version           = env->GetIntField(jPayload, version);
-    payload.vendorID          = env->GetIntField(jPayload, vendorId);
-    payload.productID         = env->GetIntField(jPayload, productId);
-    payload.commissioningFlow = static_cast<CommissioningFlow>(env->GetIntField(jPayload, commissioningFlow));
-    payload.discriminator.SetLongValue(env->GetIntField(jPayload, discriminator));
+    payload.version                = env->GetIntField(jPayload, version);
+    payload.vendorID               = env->GetIntField(jPayload, vendorId);
+    payload.productID              = env->GetIntField(jPayload, productId);
+    payload.commissioningFlow      = static_cast<CommissioningFlow>(env->GetIntField(jPayload, commissioningFlow));
+    jboolean hasShortDiscriminator = env->GetBooleanField(jPayload, hasShortDiscriminatorFieldId);
+    if (hasShortDiscriminator)
+    {
+        payload.discriminator.SetShortValue(env->GetShortField(jPayload, discriminator));
+    }
+    else
+    {
+        payload.discriminator.SetLongValue(env->GetIntField(jPayload, discriminator));
+    }
     payload.setUpPINCode = static_cast<uint32_t>(env->GetLongField(jPayload, setUpPinCode));
 
     jobject discoveryCapabilitiesObj = env->GetObjectField(jPayload, discoveryCapabilities);

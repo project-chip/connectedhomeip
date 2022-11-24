@@ -160,6 +160,12 @@ mbed-tools==7.55.1.dev1 ; platform_machine != "aarch64" and sys_platform == "lin
     # via -r requirements.mbed.txt
 mobly==1.11.1
     # via -r requirements.txt
+mypy==0.971
+    # via -r requirements.txt
+mypy-extensions==0.4.3
+    # via mypy
+mypy-protobuf==3.2.0
+    # via -r requirements.txt
 numpy==1.23.0
     # via pandas
 packaging==20.9
@@ -196,13 +202,12 @@ prettytable==2.5.0
     #   mbed-os-tools
 prompt-toolkit==3.0.26
     # via ipython
-protobuf==3.17.3
-    # via -r requirements.txt
-psutil==5.9.1
+protobuf==3.20.1
     # via
     #   -r requirements.txt
-    #   mobly
-    #   mbed-tools
+    #   mypy-protobuf
+psutil==5.9.1
+    # via -r requirements.txt
 ptyprocess==0.7.0
     # via pexpect
 py==1.11.0
@@ -287,7 +292,6 @@ six==1.16.0
     #   idf-component-manager
     #   junit-xml
     #   mbed-os-tools
-    #   protobuf
     #   python-dateutil
     #   python-engineio
     #   python-socketio
@@ -309,6 +313,8 @@ toml==0.10.2
     # via
     #   pep517
     #   pytest
+tomli==2.0.1
+    # via mypy
 tornado==6.1
     # via -r requirements.txt
 tqdm==4.61.1
@@ -319,10 +325,15 @@ traitlets==5.0.5
     # via
     #   ipython
     #   matplotlib-inline
+types-protobuf==3.19.22
+    # via
+    #   -r requirements.txt
+    #   mypy-protobuf
 typing-extensions==4.3.0 ; platform_machine != "aarch64" and sys_platform == "linux"
     # via
     #   -r requirements.mbed.txt
-    #   mbed-tools
+    #   mobly
+    #   mypy
 urllib3==1.26.5
     # via requests
 virtualenv==20.4.7

@@ -4,6 +4,8 @@ import chip.devicecontroller.ChipDeviceController;
 import com.matter.controller.commands.common.CredentialsIssuer;
 
 public final class PairOnNetworkLongCommand extends PairingCommand {
+  private static final int MATTER_PORT = 5540;
+
   public PairOnNetworkLongCommand(ChipDeviceController controller, CredentialsIssuer credsIssue) {
     super(
         controller,
@@ -15,5 +17,16 @@ public final class PairOnNetworkLongCommand extends PairingCommand {
   }
 
   @Override
-  protected void runCommand() {}
+  protected void runCommand() {
+    currentCommissioner()
+        .pairDeviceWithAddress(
+            getNodeId(),
+            getRemoteAddr().getHostAddress(),
+            MATTER_PORT,
+            getDiscriminator(),
+            getSetupPINCode(),
+            null);
+    currentCommissioner().setCompletionListener(this);
+    expectSuccess(getTimeoutMillis());
+  }
 }

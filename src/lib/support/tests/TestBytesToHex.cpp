@@ -338,6 +338,8 @@ void TestHexToBytesAndUint(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, test16Out == test16OutExpected);
 }
 
+#if CHIP_PROGRESS_LOGGING
+
 ENFORCE_FORMAT(3, 0) void AccumulateLogLineCallback(const char * module, uint8_t category, const char * msg, va_list args)
 {
     (void) module;
@@ -427,13 +429,15 @@ void TestLogBufferAsHex(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+#endif
+
 const nlTest sTests[] = {
     NL_TEST_DEF("TestBytesToHexNotNullTerminated", TestBytesToHexNotNullTerminated), //
     NL_TEST_DEF("TestBytesToHexNullTerminated", TestBytesToHexNullTerminated),       //
     NL_TEST_DEF("TestBytesToHexErrors", TestBytesToHexErrors),                       //
     NL_TEST_DEF("TestBytesToHexUint64", TestBytesToHexUint64),                       //
     NL_TEST_DEF("TestHexToBytesAndUint", TestHexToBytesAndUint),                     //
-#ifdef CHIP_PROGRESS_LOGGING
+#if CHIP_PROGRESS_LOGGING
     NL_TEST_DEF("TestLogBufferAsHex", TestLogBufferAsHex), //
 #endif
     NL_TEST_SENTINEL() //

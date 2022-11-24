@@ -103,7 +103,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     "$dir_pw_watch/py",
   ]
 
-  # Matter's in-tree pw_python_package or pw_create_python_source_tree targets.
+  # Matter's in-tree pw_python_package or pw_python_distribution targets.
   _matter_python_packages = [
     "//integrations/mobly:chip_mobly",
     "//examples/chef",
@@ -119,7 +119,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     source_packages = _matter_python_packages + _pigweed_python_packages
   }
 
-  pw_internal_pip_install("pip_install_matter_packages") {
+  pw_python_pip_install("pip_install_matter_packages") {
     packages = [ "//examples/common/pigweed/rpc_console:chip_rpc_distribution" ]
   }
 
@@ -133,7 +133,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   }
 
   # These pw_python_package targets will be installed using 'pip install --editable'
-  pw_internal_pip_install("pip_install_editable_matter_packages") {
+  pw_python_pip_install("pip_install_editable_matter_packages") {
     packages = [
       "//integrations/mobly:chip_mobly",
       "//examples/chef",

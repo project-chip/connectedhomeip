@@ -434,6 +434,7 @@
                 "telink-tlsr9518adk80d-light",
                 "telink-tlsr9518adk80d-light-switch",
                 "telink-tlsr9518adk80d-ota-requestor",
+                "telink-tlsr9518adk80d-thermostat",
                 "tizen-arm-light"
             ]
         },
