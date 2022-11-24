@@ -16,36 +16,14 @@
 import logging
 import os
 
-from dataclasses import dataclass
-from enum import Enum, auto
 from typing import Iterator
 
-
-class IdlFileType(Enum):
-    ZAP = auto()
-    MATTER = auto()
+from .types import InputIdlFile, IdlFileType
 
 
-@dataclass
-class InputIdlFile:
-    file_type: IdlFileType
-    relative_path: str
-
-
-    @property
-    def pregen_subdir(self):
-        '''
-        Returns the relative path inside the pregenerate directory where
-        data for this IDL file should be pregenerated.
-        '''
-        top_dir = os.path.splitext(self.relative_path)[0]
-
-        if self.file_type == IdlFileType.MATTER:
-            return os.path.join(top_dir, "codegen")
-        elif self.file_type == IdlFileType.ZAP:
-            return os.path.join(top_dir, "zap")
-        else:
-            raise Exception("Unknown file type for self")
+from .pregenerators import CodegenJavaPregenerator
+from .pregenerators import CodegenBridgePregenerator
+from .pregenerators import CodegenCppAppPregenerator
 
 
 def FindAllIdls(sdk_root: str) -> Iterator[InputIdlFile]:
@@ -75,11 +53,17 @@ def FindPregenerationTargets(sdk_root: str):
     """Finds all relevand pre-generation targets in the given
        SDK root.
 
-       Pre-generation targets are generally zap and matter files.
+       Pre-generation targets are based on zap and matter files with options
+       on what rules to pregenerate and how.
     """
 
-    for idl in FindAllIdls(sdk_root):
-        logging.debug(f"{idl.relative_path} => {idl.pregen_subdir}")
+    generators = [
+        CodegenBridgePregenerator,
+        CodegenJavaPregenerator,
+        CodegenCppAppPregenerator,
+    ]
 
-    # TODO: implement
-    return []
+    for idl in FindAllIdls(sdk_root):
+        for generator in generators:
+            if generator.Accept(idl):
+                yield generator.CreateTarget(sdk_root, idl)

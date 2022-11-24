@@ -81,7 +81,7 @@ def main(log_level, sdk_root, output_dir):
         os.makedirs(output_dir)
 
     for target in FindPregenerationTargets(sdk_root):
-        target.Generate()
+        target.Generate(output_dir)
 
     logging.info("Done")
 
