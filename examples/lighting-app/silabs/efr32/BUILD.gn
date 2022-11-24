@@ -18,14 +18,20 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
-import("${chip_root}/src/platform/device.gni")
 import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/platform/device.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+}
+
 assert(current_os == "freertos")
 
-project_dir = "${chip_root}/examples/window-app"
-efr32_project_dir = "${project_dir}/efr32"
+efr32_project_dir = "${chip_root}/examples/lighting-app/silabs/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
@@ -55,7 +61,7 @@ declare_args() {
   # Argument to Disable IPv4 for wifi(rs911)
   chip_enable_wifi_ipv4 = false
 
-  # Argument to force enable WPA3 security
+  # Argument to force enable WPA3 security on rs91x
   rs91x_wpa3_only = false
 }
 
@@ -87,7 +93,7 @@ if (silabs_board == "BRD4166A" || silabs_board == "BRD2601B" ||
 # WiFi settings
 if (chip_enable_wifi) {
   # disabling LCD for MG24 for wifi
-  if (silabs_board == "BRD4186C" || silabs_board == "BRD4187C") {
+  if (silabs_board == "BRD4186A" || silabs_board == "BRD4187A") {
     show_qr_code = false
     disable_lcd = true
   }
@@ -144,6 +150,17 @@ efr32_sdk("sdk") {
     "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
   ]
 
+  if (enable_heap_monitoring) {
+    defines += [ "HEAP_MONITORING" ]
+  }
+
+  if (chip_enable_pw_rpc) {
+    defines += [
+      "HAL_VCOM_ENABLE=1",
+      "PW_RPC_ENABLED",
+    ]
+  }
+
   # WiFi Settings
   if (chip_enable_wifi) {
     if (use_rs911x) {
@@ -171,23 +188,20 @@ efr32_sdk("sdk") {
   }
 }
 
-efr32_executable("window_app") {
-  output_name = "chip-efr32-window-example.out"
-  output_dir = root_out_dir
-  include_dirs = [
-    "include",
-    "${project_dir}/common/include",
-  ]
+efr32_executable("lighting_app") {
+  output_name = "chip-efr32-lighting-example.out"
+  include_dirs = [ "include" ]
   defines = []
 
   sources = [
     "${examples_common_plat_dir}/heap_4_silabs.c",
+    "${examples_plat_dir}/BaseApplication.cpp",
     "${examples_plat_dir}/efr32_utils.cpp",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/matter_config.cpp",
-    "${project_dir}/common/src/WindowApp.cpp",
-    "${project_dir}/common/src/ZclCallbacks.cpp",
-    "src/WindowAppImpl.cpp",
+    "src/AppTask.cpp",
+    "src/LightingManager.cpp",
+    "src/ZclCallbacks.cpp",
     "src/main.cpp",
   ]
 
@@ -195,14 +209,15 @@ efr32_executable("window_app") {
     sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
   }
 
-  if (chip_build_libshell || enable_openthread_cli || use_wf200 || use_rs911x) {
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
+      use_wf200 || use_rs911x) {
     sources += [ "${examples_plat_dir}/uart.cpp" ]
   }
 
   deps = [
     ":sdk",
+    "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/examples/providers:device_info_provider",
-    "${chip_root}/examples/window-app/common:window-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]
@@ -263,21 +278,68 @@ efr32_executable("window_app") {
     sources += [
       "${examples_plat_dir}/display/demo-ui.c",
       "${examples_plat_dir}/display/lcd.cpp",
-      "src/LcdPainter.cpp",
     ]
-    include_dirs += [ "${examples_plat_dir}/display" ]
-    defines += [ "DISPLAY_ENABLED" ]
 
+    include_dirs += [ "${examples_plat_dir}/display" ]
+    defines += [
+      "DISPLAY_ENABLED",
+      "IS_DEMO_LIGHT=1",
+    ]
     if (show_qr_code) {
-      deps += [ "${chip_root}/examples/common/QRCode" ]
       defines += [ "QR_CODE_ENABLED" ]
+
+      deps += [ "${chip_root}/examples/common/QRCode" ]
     }
   }
 
-  if (enable_heap_monitoring) {
-    defines += [ "HEAP_MONITORING" ]
+  if (chip_enable_pw_rpc) {
+    defines += [
+      "PW_RPC_ENABLED",
+      "PW_RPC_ATTRIBUTE_SERVICE=1",
+      "PW_RPC_BUTTON_SERVICE=1",
+      "PW_RPC_DESCRIPTOR_SERVICE=1",
+      "PW_RPC_DEVICE_SERVICE=1",
+      "PW_RPC_LIGHTING_SERVICE=1",
+      "PW_RPC_OTCLI_SERVICE=1",
+      "PW_RPC_THREAD_SERVICE=1",
+      "PW_RPC_TRACING_SERVICE=1",
+    ]
 
+    sources += [
+      "${chip_root}/examples/common/pigweed/RpcService.cpp",
+      "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
+      "${examples_common_plat_dir}/PigweedLogger.cpp",
+      "${examples_common_plat_dir}/Rpc.cpp",
+    ]
+
+    deps += [
+      "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_stream:sys_io_stream",
+      "$dir_pw_trace",
+      "$dir_pw_trace_tokenized",
+      "$dir_pw_trace_tokenized:trace_rpc_service",
+      "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
+      "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
+    ]
+
+    deps += pw_build_LINK_DEPS
+
+    include_dirs += [
+      "${chip_root}/examples/common",
+      "${chip_root}/examples/common/pigweed/efr32",
+    ]
+  }
+
+  if (enable_heap_monitoring) {
     sources += [ "${examples_common_plat_dir}/MemMonitoring.cpp" ]
+    defines += [ "HEAP_MONITORING" ]
   }
 
   ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
@@ -310,10 +372,12 @@ efr32_executable("window_app") {
   if (use_efr32_factory_data_provider) {
     deps += [ "${examples_plat_dir}:efr32-factory-data-provider" ]
   }
+
+  output_dir = root_out_dir
 }
 
 group("efr32") {
-  deps = [ ":window_app" ]
+  deps = [ ":lighting_app" ]
 }
 
 group("default") {
