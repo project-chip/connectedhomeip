@@ -24,6 +24,7 @@ CODEGEN_PY_PATH = os.path.join(os.path.dirname(__file__), '..', 'codegen.py')
 
 class CodegenTarget:
     """A target that uses `scripts/codegen.py` to generate files."""
+
     def __init__(self, idl: InputIdlFile, generator: str, sdk_root: str):
         self.idl = idl
         self.generator = generator
