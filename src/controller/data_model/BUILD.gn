@@ -170,8 +170,6 @@ if (current_os == "android" || build_java_matter_controller) {
   }
 
   source_set("java-jni-sources") {
-    sources = get_target_outputs(":java-jni-generate")
-
     public_configs = [ "${chip_root}/src:includes" ]
     deps = [
       ":data_model",
