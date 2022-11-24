@@ -131,9 +131,14 @@ template("_chip_build_time_codegen") {
 template("chip_codegen") {
   if (chip_code_pre_gegenerated_directory == "") {
     _chip_build_time_codegen(target_name) {
-      forward_variables_from(invoker, [
-        "input", "generator", "output", "public_configs", "deps"
-      ])
+      forward_variables_from(invoker,
+                             [
+                               "input",
+                               "generator",
+                               "output",
+                               "public_configs",
+                               "deps",
+                             ])
     }
   } else {
     _name = target_name

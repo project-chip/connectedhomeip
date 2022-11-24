@@ -68,13 +68,9 @@ template("chip_data_model") {
       "app/callback-stub.cpp",
     ]
 
-    public_configs = [
-      ":${_data_model_name}_config",
-    ]
+    public_configs = [ ":${_data_model_name}_config" ]
 
-    deps = [
-      "${chip_root}/src/app/common:cluster-objects",
-    ]
+    deps = [ "${chip_root}/src/app/common:cluster-objects" ]
   }
 
   _use_default_im_dispatch = !defined(invoker.use_default_im_dispatch) ||
