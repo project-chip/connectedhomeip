@@ -25,7 +25,7 @@
 #include <lib/support/SafeInt.h>
 
 #include "Efr32OpaqueKeypair.h"
-#include <platform/silabs/EFR32Config.h>
+#include <platform/silabs/SilabsConfig.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -56,7 +56,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::Init()
     size_t existingLen = 0;
     bool update_cache  = false;
 
-    if (EFR32Config::ConfigValueExists(EFR32Config::kConfigKey_OpKeyMap, existingLen))
+    if (SILABSConfig::ConfigValueExists(SILABSConfig::kConfigKey_OpKeyMap, existingLen))
     {
         // There's a pre-existing key map on disk. Size the map to read it fully.
         size_t outLen = 0;
@@ -76,7 +76,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::Init()
         VerifyOrExit(mKeyMap, error = CHIP_ERROR_NO_MEMORY);
 
         // Read the existing key map
-        error = EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, (uint8_t *) mKeyMap, existingLen, outLen);
+        error = SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_OpKeyMap, (uint8_t *) mKeyMap, existingLen, outLen);
         SuccessOrExit(error);
 
         // If upsizing, extend the map with undefined indices
@@ -127,7 +127,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::Init()
     // Write-out keymap if needed
     if (update_cache)
     {
-        error = EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, mKeyMap, mKeyMapSize);
+        error = SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_OpKeyMap, mKeyMap, mKeyMapSize);
         SuccessOrExit(error);
     }
 
@@ -304,7 +304,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::CommitOpKeypairForFabric(FabricIndex fab
     mKeyMap[keymap_index] = fabricIndex;
 
     // Persist key map
-    CHIP_ERROR error = EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, mKeyMap, mKeyMapSize);
+    CHIP_ERROR error = SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_OpKeyMap, mKeyMap, mKeyMapSize);
     if (error != CHIP_NO_ERROR)
     {
         return error;
@@ -349,7 +349,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fab
     mKeyMap[keymap_index] = kUndefinedFabricIndex;
 
     // Persist key map
-    CHIP_ERROR error = EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, mKeyMap, mKeyMapSize);
+    CHIP_ERROR error = SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_OpKeyMap, mKeyMap, mKeyMapSize);
     if (error != CHIP_NO_ERROR)
     {
         return error;
