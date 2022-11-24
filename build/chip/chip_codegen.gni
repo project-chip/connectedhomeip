@@ -18,41 +18,15 @@ import("//build_overrides/pigweed.gni")
 
 import("$dir_pw_build/python.gni")
 
-# Defines a target that runs code generation based on
-# scripts/codegen.py
+declare_args() {
+  # Location where code has been pre-generated
+  chip_code_pre_gegenerated_directory = ""
+}
+
+# Code generation that will happen at build time.
 #
-# Arguments:
-#   input
-#     The ".matter" file to use to start the code generation
 #
-#   generator
-#     Name of the generator to use (e.g. java, cpp-app)
-#
-#   outputs
-#     Explicit names of the expected outputs. Enforced to validate that
-#     expected outputs are generated when processing input files.
-#
-# NOTE: content of "outputs" is verified to match the output of codegen.py
-#       exactly. It is not inferred on purpose, to make build-rules explicit
-#       and verifiable (even though codege.py can at runtime report its outputs)
-#
-#       To find the list of generated files, you can run codegen.py with the
-#       "--name-only" argument
-#
-# Example usage:
-#
-#  chip_codegen("java-jni-generate") {
-#    input = "controller-clusters.matter"
-#    generator = "java"
-#
-#    outputs = [
-#       "jni/IdentifyClient-ReadImpl.cpp",
-#       "jni/IdentifyClient-InvokeSubscribeImpl.cpp",
-#       # ... more to follow
-#    ]
-#  }
-#
-template("chip_codegen") {
+template("_chip_build_time_codegen") {
   _name = target_name
   _generator = invoker.generator
 
@@ -90,6 +64,96 @@ template("chip_codegen") {
     outputs = []
     foreach(name, invoker.outputs) {
       outputs += [ "${target_gen_dir}/${name}" ]
+    }
+  }
+}
+
+# Defines a target that runs code generation based on
+# scripts/codegen.py
+#
+# Arguments:
+#   input
+#     The ".matter" file to use to start the code generation
+#
+#   generator
+#     Name of the generator to use (e.g. java, cpp-app)
+#
+#   outputs
+#     Explicit names of the expected outputs. Enforced to validate that
+#     expected outputs are generated when processing input files.
+#
+# Command line parameters:
+#
+#  chip_code_pre_gegenerated_directory:
+#     - If this is set, generation will NOT happen at compile time but rather
+#       the code generation is assumed to have already happened and reside in
+#       the given location.
+#     - The TOP LEVEL directory is assumed to be given. Actual location for
+#       individual generators is expected to be of the form
+#       <top_dir>/<matter_path>/<generator>
+#
+# NOTE: content of "outputs" is verified to match the output of codegen.py
+#       exactly. It is not inferred on purpose, to make build-rules explicit
+#       and verifiable (even though codege.py can at runtime report its outputs)
+#
+#       To find the list of generated files, you can run codegen.py with the
+#       "--name-only" argument
+#
+# Example usage:
+#
+#  chip_codegen("java-jni-generate") {
+#    input = "controller-clusters.matter"
+#    generator = "java"
+#
+#    outputs = [
+#       "jni/IdentifyClient-ReadImpl.cpp",
+#       "jni/IdentifyClient-InvokeSubscribeImpl.cpp",
+#       # ... more to follow
+#    ]
+#  }
+#
+template("chip_codegen") {
+  if (chip_code_pre_gegenerated_directory == "") {
+    _chip_build_time_codegen(target_name) {
+      input = invoker.input
+      generator = invoker.generator
+      outputs = invoker.outputs
+    }
+  } else {
+    _name = target_name
+
+    # This contstructs a path like:
+    #  FROM all-clusters-app.matter (inside examples/all-clusters-app/all-clusters-common/)
+    #  USING "cpp-app" for generator:
+    #    => ${pregen_dir}/examples/all-clusters-app/all-clusters-common/all-clusters-app/codegen/cpp-app
+    _generation_dir =
+        chip_code_pre_gegenerated_directory + "/" +
+        string_replace(rebase_path(invoker.input, chip_root), ".matter", "") +
+        "/codegen/" + invoker.generator
+
+
+    config("${_name}_config") {
+      include_dirs = [ target_gen_dir]
+    }
+
+    action("${_name}") {
+      script = "${chip_root}/build/chip/copy_tree.py"
+
+      args = [
+        "--src-dir",
+        rebase_path(_generation_dir),
+        "--dest-dir",
+        rebase_path(target_gen_dir),
+      ]
+
+      public_configs = [ ":${_name}_config" ]
+
+      inputs = []
+      outputs = []
+      foreach(name, invoker.outputs) {
+        inputs += [ "${_generation_dir}/${name}" ]
+        outputs += [ "${target_gen_dir}/${name}" ]
+      }
     }
   }
 }
