@@ -82,8 +82,8 @@ config("attestation-credentials-config") {
 
 source_set("efr32-attestation-credentials") {
   sources = [
-    "../EFR32DeviceAttestationCreds.cpp",
-    "../EFR32DeviceAttestationCreds.h",
+    "../SilabsDeviceAttestationCreds.cpp",
+    "../SilabsDeviceAttestationCreds.h",
   ]
 
   public_deps = [

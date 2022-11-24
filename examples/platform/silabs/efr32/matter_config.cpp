@@ -87,7 +87,7 @@ void UnlockOpenThreadTask(void)
 
 CHIP_ERROR EFR32MatterConfig::InitOpenThread(void)
 {
-    EFR32_LOG("Initializing OpenThread stack");
+    SILABS_LOG("Initializing OpenThread stack");
     ReturnErrorOnFailure(ThreadStackMgr().InitThreadStack());
 
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
@@ -100,7 +100,7 @@ CHIP_ERROR EFR32MatterConfig::InitOpenThread(void)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 #endif // CHIP_DEVICE_CONFIG_THREAD_FTD
 
-    EFR32_LOG("Starting OpenThread task");
+    SILABS_LOG("Starting OpenThread task");
     return ThreadStackMgrImpl().StartThreadTask();
 }
 #endif // CHIP_ENABLE_OPENTHREAD
@@ -121,7 +121,7 @@ void EFR32MatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event,
          (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)))
     {
 #if EFR32_OTA_ENABLED
-        EFR32_LOG("Scheduling OTA Requestor initialization")
+        SILABS_LOG("Scheduling OTA Requestor initialization")
         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
                                                     InitOTARequestorHandler, nullptr);
 #endif
@@ -134,9 +134,9 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
 
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
-    EFR32_LOG("==================================================");
-    EFR32_LOG("%s starting", appName);
-    EFR32_LOG("==================================================");
+    SILABS_LOG("==================================================");
+    SILABS_LOG("%s starting", appName);
+    SILABS_LOG("==================================================");
 
 #if PW_RPC_ENABLED
     chip::rpc::Init();
@@ -151,7 +151,7 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
     //==============================================
     // Init Matter Stack
     //==============================================
-    EFR32_LOG("Init CHIP Stack");
+    SILABS_LOG("Init CHIP Stack");
     // Init Chip memory management before the stack
     ReturnErrorOnFailure(chip::Platform::MemoryInit());
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
@@ -196,7 +196,7 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
     // OTA Requestor initialization will be triggered by the connectivity events
     PlatformMgr().AddEventHandler(ConnectivityEventCallback, reinterpret_cast<intptr_t>(nullptr));
 
-    EFR32_LOG("Starting Platform Manager Event Loop");
+    SILABS_LOG("Starting Platform Manager Event Loop");
     ReturnErrorOnFailure(PlatformMgr().StartEventLoopTask());
 
 #ifdef SL_WIFI
@@ -239,5 +239,5 @@ extern "C" void vApplicationIdleHook(void)
     // FreeRTOS Idle callback
 
     // Check CHIP Config nvm3 and repack flash if necessary.
-    Internal::EFR32Config::RepackNvm3Flash();
+    Internal::SILABSConfig::RepackNvm3Flash();
 }

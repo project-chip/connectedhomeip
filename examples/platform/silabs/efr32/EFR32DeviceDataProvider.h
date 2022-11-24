@@ -29,11 +29,11 @@ namespace EFR32 {
  */
 
 class EFR32DeviceDataProvider : public CommissionableDataProvider,
-                                public Internal::GenericDeviceInstanceInfoProvider<Internal::EFR32Config>
+                                public Internal::GenericDeviceInstanceInfoProvider<Internal::SILABSConfig>
 {
 public:
     EFR32DeviceDataProvider() :
-        CommissionableDataProvider(), Internal::GenericDeviceInstanceInfoProvider<Internal::EFR32Config>(
+        CommissionableDataProvider(), Internal::GenericDeviceInstanceInfoProvider<Internal::SILABSConfig>(
                                           ConfigurationManagerImpl::GetDefaultInstance())
     {}
 
