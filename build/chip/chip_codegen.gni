@@ -78,7 +78,7 @@ template("_chip_build_time_codegen") {
       public_configs += invoker.public_configs
     }
 
-    forward_variables_from(invoker, ["deps"])
+    forward_variables_from(invoker, [ "deps" ])
 
     if (defined(deps)) {
       deps += [ ":${_name}_codegen" ]
@@ -167,7 +167,7 @@ template("chip_codegen") {
         public_configs += invoker.public_configs
       }
 
-      forward_variables_from(invoker, ["deps"])
+      forward_variables_from(invoker, [ "deps" ])
 
       sources = []
       foreach(name, invoker.outputs) {
