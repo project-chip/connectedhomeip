@@ -100,7 +100,8 @@ def main(log_level, parallel, sdk_root, output_dir):
     if parallel:
         target_and_dir = zip(targets, itertools.repeat(output_dir))
         with multiprocessing.Pool() as pool:
-            pool.map(_ParallelGenerateOne, target_and_dir)
+            for _ in pool.imap_unordered(_ParallelGenerateOne, target_and_dir):
+                pass
     else:
         for target in targets:
             target.Generate(output_dir)
