@@ -101,7 +101,7 @@ jobs:
       - name: Build example EFR32 Lighting App for BRD4161A with RPCs
         timeout-minutes: 15
         run: |
-          scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/lighting_app_debug_rpc BRD4161A "is_debug=false" \
+          scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32/ out/lighting_app_debug_rpc BRD4161A "is_debug=false" \
             disable_lcd=true 'import("//with_pw_rpc.gni")'
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+rpc lighting-app \
             out/lighting_app_debug_rpc/BRD4161A/chip-efr32-lighting-example.out /tmp/bloat_reports/
@@ -118,7 +118,7 @@ jobs:
       - name: Build example EFR32+RS911x WiFi Lighting app for BRD4161A
         timeout-minutes: 15
         run: |
-          scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/lighting_app_wifi_rs911x BRD4161A --wifi rs911x
+          scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32/ out/lighting_app_wifi_rs911x BRD4161A --wifi rs911x
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+rs911x lighting-app \
             out/lighting_app_wifi_rs911x/BRD4161A/chip-efr32-lighting-example.out /tmp/bloat_reports/
       - name: Clean out build output
