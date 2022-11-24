@@ -29,6 +29,10 @@ import enum
 from bitarray import bitarray
 from bitarray.util import ba2int
 
+CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('scripts', 'tools'))]
+sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'scripts', 'tools', 'spake2p'))
+from spake2p import generate_verifier  # noqa: E402
+
 if os.getenv('IDF_PATH'):
     sys.path.insert(0, os.path.join(os.getenv('IDF_PATH'),
                                     'components',
@@ -48,9 +52,6 @@ TOOLS = {}
 FACTORY_PARTITION_CSV = 'nvs_partition.csv'
 FACTORY_PARTITION_BIN = 'factory_partition.bin'
 NVS_KEY_PARTITION_BIN = 'nvs_key_partition.bin'
-
-CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len("/scripts/tools")]
-
 
 FACTORY_DATA = {
     # CommissionableDataProvider
@@ -264,24 +265,14 @@ def validate_args(args):
 def gen_spake2p_params(passcode):
     iter_count_max = 10000
     salt_len_max = 32
-    salt = base64.b64encode(os.urandom(salt_len_max)).decode('utf-8')
+    salt = os.urandom(salt_len_max)
+    verifier = generate_verifier(passcode, salt, iter_count_max)
 
-    spake2p_py = '{}/{}'.format(CHIP_TOPDIR, 'scripts/tools/spake2p/spake2p.py')
-
-    cmd = [
-        spake2p_py, 'gen-verifier',
-        '--iteration-count', str(iter_count_max),
-        '--salt', salt,
-        '--passcode', str(passcode),
-    ]
-
-    out_dict = {
+    return {
         'Iteration Count': iter_count_max,
-        'Salt': salt,
+        'Salt': base64.b64encode(salt).decode('utf-8'),
+        'Verifier': base64.b64encode(verifier).decode('utf-8'),
     }
-
-    out_dict['Verifier'] = subprocess.check_output(cmd).decode('utf-8')
-    return out_dict
 
 
 def populate_factory_data(args, spake2p_params):
