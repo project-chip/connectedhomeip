@@ -88,6 +88,11 @@ def ValidateRepoPath(context, parameter, value):
     type=click.Path(file_okay=False, resolve_path=True),
     help='Prefix for the generated file output.')
 @click.option(
+    '--pregen-dir',
+    default=None,
+    type=click.Path(file_okay=False, resolve_path=True),
+    help='Directory where generated files have been pre-generated.')
+@click.option(
     '--clean',
     default=False,
     is_flag=True,
@@ -114,7 +119,7 @@ def ValidateRepoPath(context, parameter, value):
         'for using ccache when building examples.'))
 @click.pass_context
 def main(context, log_level, target, repo,
-         out_prefix, clean, dry_run, dry_run_output, enable_flashbundle,
+         out_prefix, pregen_dir, clean, dry_run, dry_run_output, enable_flashbundle,
          no_log_timestamps, pw_command_launcher):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
@@ -143,6 +148,7 @@ before running this script.
     context.obj.SetupBuilders(targets=requested_targets, options=BuilderOptions(
         enable_flashbundle=enable_flashbundle,
         pw_command_launcher=pw_command_launcher,
+        pregen_dir=pregen_dir,
     ))
 
     if clean:
