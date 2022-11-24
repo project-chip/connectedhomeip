@@ -34,7 +34,7 @@ template("_chip_build_time_codegen") {
     include_dirs = [ target_gen_dir ]
   }
 
-  pw_python_action(_name) {
+  pw_python_action("${_name}_codegen") {
     script = "${chip_root}/scripts/codegen.py"
 
     _idl_file = invoker.input
@@ -53,7 +53,6 @@ template("_chip_build_time_codegen") {
     ]
 
     deps = [ "${chip_root}/scripts/idl" ]
-    public_configs = [ ":${_name}_config" ]
 
     inputs = [
       _idl_file,
@@ -64,6 +63,23 @@ template("_chip_build_time_codegen") {
     outputs = []
     foreach(name, invoker.outputs) {
       outputs += [ "${target_gen_dir}/${name}" ]
+    }
+  }
+
+  source_set(_name) {
+    sources = []
+    foreach(name, invoker.outputs) {
+      sources += [ "${target_gen_dir}/${name}" ]
+    }
+
+    public_configs = [ ":${_name}_config" ]
+
+    if (defined(invoker.public_configs)) {
+      public_configs += invoker.public_configs
+    }
+
+    if (defined(invoker.deps)) {
+      deps = invoker.deps
     }
   }
 }
@@ -115,9 +131,9 @@ template("_chip_build_time_codegen") {
 template("chip_codegen") {
   if (chip_code_pre_gegenerated_directory == "") {
     _chip_build_time_codegen(target_name) {
-      input = invoker.input
-      generator = invoker.generator
-      outputs = invoker.outputs
+      forward_variables_from(invoker, [
+        "input", "generator", "output", "public_configs", "deps"
+      ])
     }
   } else {
     _name = target_name
@@ -135,23 +151,20 @@ template("chip_codegen") {
       include_dirs = [ target_gen_dir ]
     }
 
-    action("${_name}") {
-      script = "${chip_root}/build/chip/copy_tree.py"
-
-      args = [
-        "--src-dir",
-        rebase_path(_generation_dir),
-        "--dest-dir",
-        rebase_path(target_gen_dir),
-      ]
-
+    source_set(_name) {
       public_configs = [ ":${_name}_config" ]
 
-      inputs = []
-      outputs = []
+      if (defined(invoker.public_configs)) {
+        public_configs += invoker.public_configs
+      }
+
+      if (defined(invoker.deps)) {
+        deps = invoker.deps
+      }
+
+      sources = []
       foreach(name, invoker.outputs) {
-        inputs += [ "${_generation_dir}/${name}" ]
-        outputs += [ "${target_gen_dir}/${name}" ]
+        sources += [ "${_generation_dir}/${name}" ]
       }
     }
   }
