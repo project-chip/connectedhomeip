@@ -83,13 +83,16 @@ CHIP_ERROR BindingManager::Init(const BindingManagerInitParams & params)
     }
     else
     {
-        for (const EmberBindingTableEntry & entry : BindingTable::GetInstance())
+        if (params.establishConnectionOnInit)
         {
-            if (entry.type == EMBER_UNICAST_BINDING)
+            for (const EmberBindingTableEntry & entry : BindingTable::GetInstance())
             {
-                // The CASE connection can also fail if the unicast peer is offline.
-                // There is recovery mechanism to retry connection on-demand so ignore error.
-                (void) UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
+                if (entry.type == EMBER_UNICAST_BINDING)
+                {
+                    // The CASE connection can also fail if the unicast peer is offline.
+                    // There is recovery mechanism to retry connection on-demand so ignore error.
+                    (void) UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
+                }
             }
         }
     }
@@ -192,6 +195,40 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
             {
                 mBoundDeviceChangedHandler(*iter, nullptr, bindingContext->GetContext());
             }
+        }
+    }
+
+exit:
+    bindingContext->DecrementConsumersNumber();
+
+    return error;
+}
+
+CHIP_ERROR BindingManager::NotifyBoundClusterAtIndexChanged(EndpointId endpoint, ClusterId cluster, uint8_t bindingTableIndex, void * context)
+{
+    VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mBoundDeviceChangedHandler, CHIP_NO_ERROR);
+
+    CHIP_ERROR error      = CHIP_NO_ERROR;
+    auto * bindingContext = mPendingNotificationMap.NewPendingNotificationContext(context);
+    VerifyOrReturnError(bindingContext != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    bindingContext->IncrementConsumersNumber();
+
+    EmberBindingTableEntry entry = BindingTable::GetInstance().GetAt(bindingTableIndex);
+
+    if (entry.local == endpoint && (!entry.clusterId.HasValue() || entry.clusterId.Value() == cluster))
+    {
+        if (entry.type == EMBER_UNICAST_BINDING)
+        {
+            error = mPendingNotificationMap.AddPendingNotification(bindingTableIndex, bindingContext);
+            SuccessOrExit(error);
+            error = EstablishConnection(ScopedNodeId(entry.nodeId, entry.fabricIndex));
+            SuccessOrExit(error);
+        }
+        else if (entry.type == EMBER_MULTICAST_BINDING)
+        {
+            mBoundDeviceChangedHandler(entry, nullptr, bindingContext->GetContext());
         }
     }
 

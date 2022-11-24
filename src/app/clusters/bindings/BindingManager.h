@@ -53,6 +53,7 @@ struct BindingManagerInitParams
     FabricTable * mFabricTable               = nullptr;
     CASESessionManager * mCASESessionManager = nullptr;
     PersistentStorageDelegate * mStorage     = nullptr;
+    bool establishConnectionOnInit           = true;
 };
 
 /**
@@ -117,6 +118,18 @@ public:
      *
      */
     CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context);
+
+    /*
+     * Notify a cluster change to a specific bound device associated with the (endpoint, cluster) tuple.
+     *
+     * For a unicast bindings with an active session and multicast bindings, the BoundDeviceChangedHandler
+     * will be called before the function returns.
+     *
+     * For unicast bindings without an active session, the notification will be queued and a new session will
+     * be initiated. The BoundDeviceChangedHandler will be called once the session is established.
+     *
+     */
+    CHIP_ERROR NotifyBoundClusterAtIndexChanged(EndpointId endpoint, ClusterId cluster, uint8_t bindingIndex, void * context);
 
     static BindingManager & GetInstance() { return sBindingManager; }
 
