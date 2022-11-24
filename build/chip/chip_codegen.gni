@@ -131,9 +131,8 @@ template("chip_codegen") {
         string_replace(rebase_path(invoker.input, chip_root), ".matter", "") +
         "/codegen/" + invoker.generator
 
-
     config("${_name}_config") {
-      include_dirs = [ target_gen_dir]
+      include_dirs = [ target_gen_dir ]
     }
 
     action("${_name}") {
