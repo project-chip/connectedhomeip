@@ -204,7 +204,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR BindingManager::NotifyBoundClusterAtIndexChanged(EndpointId endpoint, ClusterId cluster, uint8_t bindingTableIndex, void * context)
+CHIP_ERROR BindingManager::NotifyBoundClusterAtIndexChanged(EndpointId endpoint, ClusterId cluster, uint8_t bindingIndex, void * context)
 {
     VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBoundDeviceChangedHandler, CHIP_NO_ERROR);
@@ -215,13 +215,13 @@ CHIP_ERROR BindingManager::NotifyBoundClusterAtIndexChanged(EndpointId endpoint,
 
     bindingContext->IncrementConsumersNumber();
 
-    EmberBindingTableEntry entry = BindingTable::GetInstance().GetAt(bindingTableIndex);
+    EmberBindingTableEntry entry = BindingTable::GetInstance().GetAt(bindingIndex);
 
     if (entry.local == endpoint && (!entry.clusterId.HasValue() || entry.clusterId.Value() == cluster))
     {
         if (entry.type == EMBER_UNICAST_BINDING)
         {
-            error = mPendingNotificationMap.AddPendingNotification(bindingTableIndex, bindingContext);
+            error = mPendingNotificationMap.AddPendingNotification(bindingIndex, bindingContext);
             SuccessOrExit(error);
             error = EstablishConnection(ScopedNodeId(entry.nodeId, entry.fabricIndex));
             SuccessOrExit(error);
