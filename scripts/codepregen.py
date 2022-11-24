@@ -95,17 +95,14 @@ def main(log_level, parallel, sdk_root, output_dir):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    if parallel:
-        target_and_dir = zip(
-            FindPregenerationTargets(sdk_root),
-            itertools.repeat(output_dir))
+    targets = FindPregenerationTargets(sdk_root)
 
-        p = multiprocessing.Pool()
-        p.map(_ParallelGenerateOne, target_and_dir)
-        p.close()
-        p.join()
+    if parallel:
+        target_and_dir = zip(targets, itertools.repeat(output_dir))
+        with multiprocessing.Pool() as pool:
+            pool.map(_ParallelGenerateOne, target_and_dir)
     else:
-        for target in FindPregenerationTargets(sdk_root):
+        for target in targets:
             target.Generate(output_dir)
 
     logging.info("Done")
