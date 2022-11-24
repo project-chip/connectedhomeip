@@ -80,7 +80,6 @@ bl602_sdk("sdk") {
 bl602_executable("lighting_app") {
   output_name = "chip-bl602-lighting-example.out"
 
-
   defines = [
     "APP_TASK_STACK_SIZE=2044",
     "CHIP_UART_BAUDRATE=${baudrate}",
@@ -196,7 +195,6 @@ bl602_executable("lighting_app") {
     sources += [ "${examples_plat_common_dir}/plat/OTAConfig.cpp" ]
   }
 
-  print(defines)
   ldscript = "${examples_plat_dir}/ldscripts/flash_rom.ld"
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]

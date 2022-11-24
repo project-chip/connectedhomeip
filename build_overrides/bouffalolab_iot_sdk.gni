@@ -19,5 +19,5 @@ declare_args() {
   # Root directory for bl702 SDK build files.
   bl702_sdk_build_root = "//third_party/bouffalolab/bl702"
 
-  bouffalolab_sdk_root=""
+  bouffalolab_sdk_root = "/opt/bouffalolab_sdk"
 }

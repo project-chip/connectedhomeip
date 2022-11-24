@@ -21,5 +21,5 @@ declare_args() {
   bl702_sdk_build_root =
       "//third_party/connectedhomeip/third_party/bouffalolab/bl702"
 
-  bouffalolab_sdk_root=""
+  bouffalolab_sdk_root = "/opt/bouffalolab_sdk"
 }
