@@ -260,7 +260,8 @@ class ReadAttributeAction(BaseAction):
         if constraints:
             self._constraints = get_constraints(constraints,
                                                 self._request_object.attribute_type.Type,
-                                                context.variable_storage)
+                                                context.variable_storage,
+                                                context.config_values)
 
     def run_action(self, dev_ctrl: ChipDeviceCtrl, endpoint: int, node_id: int):
         try:
