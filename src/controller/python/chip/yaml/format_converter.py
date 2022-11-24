@@ -23,11 +23,13 @@ from chip.yaml.errors import ValidationError
 import binascii
 
 
-def _substitute_in_config_variables(field_value, config_values: dict):
+def substitute_in_config_variables(field_value, config_values: dict):
     ''' Substitutes values that are config variables.
 
     YAML values can contain a string of a configuration variable name. In these instances we
     substitute the configuration variable name with the actual value.
+
+    For examples see unittest src/controller/python/test/unit_tests/test_yaml_format_converter.py
 
     # TODO This should also substitue any saveAs values as well as perform any required
     # evaluations.
@@ -38,25 +40,18 @@ def _substitute_in_config_variables(field_value, config_values: dict):
     Returns:
         Value with all global configuration variables substituted with the real value.
     '''
-    if (type(field_value) is dict):
-        return_values = {}
-        for key in field_value:
-            return_values[key] = _substitute_in_config_variables(field_value[key], config_values)
-
-        return return_values
-    elif(type(field_value) is list):
-        return_values = []
-        for item in field_value:
-            return_values.append(_substitute_in_config_variables(item, config_values))
-        return return_values
-    elif isinstance(field_value, str) and field_value in config_values:
+    if isinstance(field_value, dict):
+        return {key: substitute_in_config_variables(
+            field_value[key], config_values) for key in field_value}
+    if isinstance(field_value, list):
+        return [substitute_in_config_variables(item, config_values) for item in field_value]
+    if isinstance(field_value, str) and field_value in config_values:
         config_value = config_values[field_value]
         if isinstance(config_value, dict) and 'defaultValue' in config_value:
             # TODO currently we don't validate that if config_value['type'] is provided
             # that the type does in fact match our expectation.
             return config_value['defaultValue']
-        else:
-            return config_values[field_value]
+        return config_values[field_value]
 
     return field_value
 
@@ -114,8 +109,8 @@ def convert_yaml_type(field_value, field_type, inline_cast_dict_to_struct):
         'field_type': Pythonic command/attribute/event object type that we
             are converting value to.
         'inline_cast_dict_to_struct': If true, for any dictionary 'field_value'
-            types provided we will do an inline convertion to the corresponding
-            struct in `field_type` by doing field_type.FromDict(...).
+            types provided we will do a convertion to the corresponding data
+            model class in `field_type` by doing field_type.FromDict(...).
     '''
     origin = typing.get_origin(field_type)
 
@@ -195,7 +190,7 @@ def parse_and_convert_yaml_value(field_value, field_type, config_values: dict,
     ''' Parse and converts YAML type
 
     Parsing the YAML value means performing required substitutions and evaluations. Parsing is
-    than followed by converting from the YAML type done using yaml.safe_load() to the type used in
+    then followed by converting from the YAML type done using yaml.safe_load() to the type used in
     the various command/attribute/event object data model types.
 
     Args:
@@ -207,6 +202,6 @@ def parse_and_convert_yaml_value(field_value, field_type, config_values: dict,
             types provided we will do an inline convertion to the corresponding
             struct in `field_type` by doing field_type.FromDict(...).
     '''
-    field_value_with_config_variables = _substitute_in_config_variables(field_value, config_values)
+    field_value_with_config_variables = substitute_in_config_variables(field_value, config_values)
     return convert_yaml_type(field_value_with_config_variables, field_type,
                              inline_cast_dict_to_struct)
