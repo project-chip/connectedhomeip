@@ -13,10 +13,10 @@ callbacks. Generally this is split into:
     what memory should be allocated for storing cluster attributes
 
 Code generation depends on the clusters that are needed by an application. Every
-application can have a different cluster and endpoint configuration. The
-selection of the supported clusters and attributes (since attributes are
-optional, not all attributes of a cluster need to be supported and RAM allocated
-for them) is generally stored in `*.zap` files.
+application configures the specific set of endpoints and clusters it needs based
+on the device type it supports. The selection of the supported clusters and
+attributes (as optional attributes may be omitted to save memory) is generally
+stored in `*.zap` files.
 
 The selection of enabled clusters and files is done using
 [ZAP](https://github.com/project-chip/zap). You can download a recent release of
@@ -27,18 +27,18 @@ check the `ZAP_VERSION` setting).
 
 Beyond basic zap file selection, there are also `.json` zap settings that define
 additional cluster info: source XML files, sdk-access methods and data types.
-There are only 2 currently in use such files:
+There are only two such files currently in use:
 
 -   `src/app/zap-templates/zcl/zcl.json` is the **default** one
--   `src/app/zap-templates/zcl/zcl-with-test-extensions.json` is in use for
-    `all-clusters-app` to show how a cluster extension is configured and has
-    minimal diffs from `zcl.json` (but it is different)
+-   `src/app/zap-templates/zcl/zcl-with-test-extensions.json` is used by
+    `all-clusters-app` to show how a cluster extension may be configured with
+    minimal changes from `zcl.json` (but it is different)
 
 ### Installing zap and environment variables
 
 Matter scripts may need to invoke `zap-cli` (for code generation) or `zap` (to
-start the UI tool). For this, it needs to know where to find the commands. In
-order, the scripts will check for the following environment variables:
+start the UI tool). For this, scrips need to know where to find the commands. In
+the following order, the scripts process these environment variables:
 
 -   if `$ZAP_DEVELOPMENT_PATH` is set, code assumes you are running zap from
     source. Use this if you develop zap. Zap has to be bootstrapped (generally
@@ -78,7 +78,7 @@ for matter:
 -   We strive to make them contain only Matter-specific data (`.zap` files
     contain more generic data and is designed to be ZigBee backwards compatible)
 
-Currently `.matter` file are generated from `.zap` files during the application
+Currently `.matter` files are generated from `.zap` files during the application
 specific codegen.
 
 ### `*.matter` parsing and codegen
@@ -94,7 +94,8 @@ file.
 The split between `.zap` and `.matter` currently exists as an experiment of code
 generation technologies. Currently `.matter`-based Python code generation:
 
--   has less dependencies than the `nodejs` dependencies of `zap`
+-   has fewer third party dependencies than `zap`, which installs a significant
+    number of `npm` packages.
 -   runs significantly faster than zap
 -   offers more flexible code generation (can generate multiple files per
     cluster for example, without which some compiles would run out of RAM on
@@ -106,6 +107,7 @@ generation technologies. Currently `.matter`-based Python code generation:
     non-determinism)
 -   uses a synchronous processing model which is potentially easier to develop
     for
+-   has lower complexity, is unit tested and uses typing extensively
 
 Ideally, the project would be to have a single code generation method in the
 long term that has all the benefits and none of the drawbacks. We are not there
