@@ -7,9 +7,9 @@ callbacks. Generally this is split into:
 
 -   Data serialization for structures/lists/commands. This applies to both
     client-side and server-side structures and objects
--   Callback setup using the ember framework. This generally applies to
+-   Callback setup using the Ember-based framework. This generally applies to
     server-side processing and the code generation defines what processing needs
-    to be done when a specific command is sent/attribute is read and what memory
+    to be done when a specific command is received or an attribute is read and what memory
     should be allocated for storing cluster attributes
 
 Code generation depends on the clusters that are needed by an application. Every
@@ -76,8 +76,7 @@ for matter:
     or android `aidl`, thrift idl etc.)
 
 -   We strive to make them contain only Matter-specific data (`.zap` files
-    contain
--   more generic data and is designed to be ZigBee backwards compatible)
+    contain more generic data and is designed to be ZigBee backwards compatible)
 
 Currently `.matter` file are generated from `.zap` files during the application
 specific codegen.
@@ -86,32 +85,32 @@ specific codegen.
 
 `*.matter` files are both human and machine readable. Code that can process
 these files is available at `scripts/idl` and `scripts/codegen.py`. You can read
-the [Readme.md](../scripts/idl/README.md) for details of how things work.
+the [scripts/idl/README.md](../scripts/idl/README.md) for details of how things work.
 
 `scripts/codegen.py` can generate various outputs based on an input `*.matter`
 file.
 
 The split between `.zap` and `.matter` currently exists as an experiment of code
-generation technologies. Currently python codegen:
+generation technologies. Currently `.matter`-based Python code generation:
 
 -   has less dependencies than the `nodejs` dependencies of `zap`
 -   runs significantly faster than zap
--   more flexible codegen (can generate multiple files per cluster for example,
--   without which some compiles would run out of RAM on large compilations)
+-   offers more flexible code generation (can generate multiple files per cluster for example,
+    without which some compiles would run out of RAM on large compilations)
 -   has a more flexible templating language
 -   has human readable (and potentially editable) input
 -   is more easily provable deterministic (`zap` uses an underlying sqlite
     database and some legacy assumptions from zigbee have historically caused
     non-determinism)
--   synchronous processing of data is potentially easier to develop for
+-   uses a synchronous processing model which is potentially easier to develop for
 
-Ideal long term goal for the project would be to have a single code generation
-logic that has all the benefits and none of the drawbacks. We are not there yet,
+Ideally, the project would be to have a single code generation method in the long
+term that has all the benefits and none of the drawbacks. We are not there yet,
 however we likely want:
 
--   flexible codegen (we will need to split output by clusters or other rules)
--   Human readable inputs
--   Rules that a script can validate based on CSA settings (ensure mandatory
+-   Flexible codegen (we will need to split output by clusters or other rules)
+-   Human-readable inputs that enable code reviews and audits
+-   Rules that a script can validate based on CSA data model (ensure mandatory
     attribute settings are followed, ensure proer device type adherence, ensure
     correct cluster and data type definitions)
 -   Easy to maintain and develop for chosen languages/templates/codegen in
@@ -132,7 +131,7 @@ Code that is generated:
 -   **Automated tests**: embedded client-side tools (`chip-tool` and
     `darwin-framework-tool`) generate test-definition data. Each use their own
     `examples/${TOOL}/templates/tests/templates.json` to drive what gets
-    generated. Further more, test
+    generated.
 
 -   **Controller clusters** target: the file
     `src/controller/data_model/controller-clusters.zap` contains a set of
