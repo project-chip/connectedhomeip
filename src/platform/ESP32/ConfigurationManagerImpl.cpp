@@ -221,6 +221,25 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint32_t & softwareVer)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
+{
+#if CONFIG_ENABLE_ESP32_LOCATIONCAPABILITY
+    uint32_t value = 0;
+    CHIP_ERROR err = ReadConfigValue(ESP32Config::kConfigKey_LocationCapability, value);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        location = static_cast<uint8_t>(value);
+    }
+
+    return err;
+#else
+    location = static_cast<uint8_t>(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+    return CHIP_NO_ERROR;
+#endif
+}
+
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
