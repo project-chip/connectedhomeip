@@ -83,4 +83,15 @@ class CodegenCppAppPregenerator:
 
     @staticmethod
     def Accept(idl: InputIdlFile):
-        return False
+        if idl.file_type != IdlFileType.MATTER:
+            return False
+
+        # we should not be checked for these, but verify just in case
+        if '/tests/' in idl.relative_path:
+            return False
+
+        return True
+
+    @staticmethod
+    def CreateTarget(sdk_root: str, idl: InputIdlFile):
+        return CodegenTarget(sdk_root=sdk_root, idl=idl, generator="cpp-app")
