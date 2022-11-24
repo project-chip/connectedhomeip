@@ -183,14 +183,19 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR extractProtocol(const char * serviceType, char * outServiceName, DnssdServiceProtocol & outProtocol)
+template <size_t N>
+CHIP_ERROR extractProtocol(const char * serviceType, char (&outServiceName)[N], DnssdServiceProtocol & outProtocol)
 {
     std::string serviceTypeStr(serviceType);
     size_t index = serviceTypeStr.find(".");
 
     ReturnErrorCodeIf(index == std::string::npos, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(index + 1 > N, CHIP_ERROR_INVALID_ARGUMENT);
 
-    CopyString(outServiceName, index + 1, serviceType);
+    memcpy(outServiceName, serviceType, index);
+    outServiceName[index] = '\0'; // Set a null terminator
+
+    // kOperationalProtocol -> _tcp, kCommissionProtocol -> _udp
     outProtocol = (serviceTypeStr.substr(index + 1).compare(kOperationalProtocol) == 0) ? DnssdServiceProtocol::kDnssdProtocolTcp
                                                                                         : DnssdServiceProtocol::kDnssdProtocolUdp;
 
