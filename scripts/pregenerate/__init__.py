@@ -58,12 +58,12 @@ def FindPregenerationTargets(sdk_root: str):
     """
 
     generators = [
-        CodegenBridgePregenerator,
-        CodegenJavaPregenerator,
-        CodegenCppAppPregenerator,
+        CodegenBridgePregenerator(sdk_root),
+        CodegenJavaPregenerator(sdk_root),
+        CodegenCppAppPregenerator(sdk_root),
     ]
 
     for idl in FindAllIdls(sdk_root):
         for generator in generators:
             if generator.Accept(idl):
-                yield generator.CreateTarget(sdk_root, idl)
+                yield generator.CreateTarget(idl)

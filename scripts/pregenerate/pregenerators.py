@@ -23,6 +23,7 @@ CODEGEN_PY_PATH = os.path.join(os.path.dirname(__file__), '..', 'codegen.py')
 
 
 class CodegenTarget:
+    """A target that uses `scripts/codegen.py` to generate files."""
     def __init__(self, idl: InputIdlFile, generator: str, sdk_root: str):
         self.idl = idl
         self.generator = generator
@@ -53,35 +54,39 @@ class CodegenTarget:
 class CodegenBridgePregenerator:
     """Pregeneration logic for "bridge" codegen.py outputs"""
 
-    @staticmethod
+    def __init__(self, sdk_root):
+        self.sdk_root = sdk_root
+
     def Accept(idl: InputIdlFile):
         # Bridge is highly specific, a single path is acceptable for dynamic
         # bridge codegen
         return idl.relative_path == "examples/dynamic-bridge-app/bridge-common/bridge-app.matter"
 
-    @staticmethod
-    def CreateTarget(sdk_root: str, idl: InputIdlFile):
-        return CodegenTarget(sdk_root=sdk_root, idl=idl, generator="bridge")
+    def CreateTarget(idl: InputIdlFile):
+        return CodegenTarget(sdk_root=self.sdk_root, idl=idl, generator="bridge")
 
 
 class CodegenJavaPregenerator:
     """Pregeneration logic for "java" codegen.py outputs"""
 
-    @staticmethod
+    def __init__(self, sdk_root):
+        self.sdk_root = sdk_root
+
     def Accept(idl: InputIdlFile):
         # Java is highly specific, a single path is acceptable for dynamic
         # bridge codegen
         return idl.relative_path == "src/controller/data_model/controller-clusters.matter"
 
-    @staticmethod
-    def CreateTarget(sdk_root: str, idl: InputIdlFile):
-        return CodegenTarget(sdk_root=sdk_root, idl=idl, generator="java")
+    def CreateTarget(idl: InputIdlFile):
+        return CodegenTarget(sdk_root=self.sdk_root, idl=idl, generator="java")
 
 
 class CodegenCppAppPregenerator:
     """Pregeneration logic for "cpp-app" codegen.py outputs"""
 
-    @staticmethod
+    def __init__(self, sdk_root):
+        self.sdk_root = sdk_root
+
     def Accept(idl: InputIdlFile):
         if idl.file_type != IdlFileType.MATTER:
             return False
@@ -92,6 +97,5 @@ class CodegenCppAppPregenerator:
 
         return True
 
-    @staticmethod
-    def CreateTarget(sdk_root: str, idl: InputIdlFile):
-        return CodegenTarget(sdk_root=sdk_root, idl=idl, generator="cpp-app")
+    def CreateTarget(idl: InputIdlFile):
+        return CodegenTarget(sdk_root=self.sdk_root, idl=idl, generator="cpp-app")
