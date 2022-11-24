@@ -16,9 +16,12 @@
 
 import click
 import logging
+import multiprocessing
+import itertools
 import enum
 import os
 import sys
+
 
 try:
     from pregenerate import FindPregenerationTargets
@@ -42,6 +45,13 @@ __LOG_LEVELS__ = {
     'fatal': logging.FATAL,
 }
 
+def _ParallelGenerateOne(arg):
+    """
+    Helper method to be passed to multiprocessing parallel generation of
+    items.
+    """
+    arg[0].Generate(arg[1])
+
 
 @click.command()
 @click.option(
@@ -50,11 +60,15 @@ __LOG_LEVELS__ = {
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Determines the verbosity of script output')
 @click.option(
+    '--parallel/--no-parallel',
+    default=True,
+    help='Do parallel/multiprocessing codege.')
+@click.option(
     '--sdk-root',
     default=None,
-    help='Path to the SDK root (where .zap/.matter files exist)')
+    help='Path to the SDK root (where .zap/.matter files exist).')
 @click.argument('output_dir')
-def main(log_level, sdk_root, output_dir):
+def main(log_level, parallel, sdk_root, output_dir):
     if _has_coloredlogs:
         coloredlogs.install(level=__LOG_LEVELS__[
                             log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
@@ -80,8 +94,18 @@ def main(log_level, sdk_root, output_dir):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    for target in FindPregenerationTargets(sdk_root):
-        target.Generate(output_dir)
+    if parallel:
+        target_and_dir = zip(
+            FindPregenerationTargets(sdk_root),
+            itertools.repeat(output_dir))
+
+        p = multiprocessing.Pool()
+        p.map(_ParallelGenerateOne, target_and_dir)
+        p.close()
+        p.join()
+    else:
+        for target in FindPregenerationTargets(sdk_root):
+            target.Generate(output_dir)
 
     logging.info("Done")
 
