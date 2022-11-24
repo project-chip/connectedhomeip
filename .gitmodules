@@ -291,6 +291,6 @@
 	platforms = openiotsdk
 [submodule "bouffalolab_sdk"]
 	path = third_party/bouffalolab/repo
-	url = https://github.com/bouffalolab/bl_iot_sdk_tiny.git 
-	branch = main
-	platforms = bouffalolab 
+	url = https://github.com/bouffalolab/bl_iot_sdk_tiny.git
+        branch = main
+        platforms = bouffalolab
