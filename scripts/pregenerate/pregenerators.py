@@ -40,6 +40,7 @@ class CodegenTarget:
 
         cmd = [
             CODEGEN_PY_PATH,
+            '--log-level', 'fatal',
             '--generator', self.generator,
             '--output-dir', output_dir,
             os.path.join(self.sdk_root, self.idl.relative_path)
