@@ -811,13 +811,12 @@ void BLEManagerImpl::OnScanComplete()
         break;
     case BleScanState::kScanForAddress:
     case BleScanState::kScanForDiscriminator:
+        mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
         ChipLogProgress(Ble, "Scan complete. No matching device found.");
         break;
     case BleScanState::kConnecting:
         break;
     }
-
-    mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
 }
 
 void BLEManagerImpl::OnScanError(CHIP_ERROR err)
