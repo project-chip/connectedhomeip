@@ -50,11 +50,15 @@ jobs:
               run: |
                   ./scripts/examples/imxlinux_example.sh \
                   examples/lighting-app/linux/ examples/lighting-app/linux/out/aarch64
+            - name: Clean out build output
+              run: rm -rf ./out
             - name: Build chip-tool
               timeout-minutes: 30
               run: |
                   ./scripts/examples/imxlinux_example.sh \
                   examples/chip-tool examples/chip-tool/out/aarch64
+            - name: Clean out build output
+              run: rm -rf ./out
             - name: Build thermostat
               timeout-minutes: 30
               run: |
@@ -62,6 +66,8 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target imx-thermostat build \
                      "
+            - name: Clean out build output
+              run: rm -rf ./out
             - name: Build all-cluster
               timeout-minutes: 30
               run: |
@@ -69,6 +75,8 @@ jobs:
                      "./scripts/build/build_examples.py \
                          --target imx-all-clusters-app build \
                      "
+            - name: Clean out build output
+              run: rm -rf ./out
             - name: Build all-cluster-minimal
               timeout-minutes: 30
               run: |
@@ -76,6 +84,8 @@ jobs:
                      "./scripts/build/build_examples.py \
                          --target imx-all-clusters-minimal-app build \
                      "
+            - name: Clean out build output
+              run: rm -rf ./out
             - name: Build ota-provider-app
               timeout-minutes: 30
               run: |
@@ -83,3 +93,5 @@ jobs:
                      "./scripts/build/build_examples.py \
                          --target imx-ota-provider-app build
                      "
+            - name: Clean out build output
+              run: rm -rf ./out

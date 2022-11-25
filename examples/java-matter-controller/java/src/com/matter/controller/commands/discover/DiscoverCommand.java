@@ -18,6 +18,7 @@
 
 package com.matter.controller.commands.discover;
 
+import chip.devicecontroller.ChipDeviceController;
 import com.matter.controller.commands.common.CredentialsIssuer;
 import com.matter.controller.commands.common.MatterCommand;
 import java.util.concurrent.atomic.AtomicLong;
@@ -26,8 +27,8 @@ public final class DiscoverCommand extends MatterCommand {
   private final AtomicLong mNodeId = new AtomicLong();
   private final AtomicLong mFabricId = new AtomicLong();
 
-  public DiscoverCommand(CredentialsIssuer credsIssuer) {
-    super("resolve", credsIssuer);
+  public DiscoverCommand(ChipDeviceController controller, CredentialsIssuer credsIssuer) {
+    super(controller, "resolve", credsIssuer);
     addArgument("nodeid", 0, Long.MAX_VALUE, mNodeId, null);
     addArgument("fabricid", 0, Long.MAX_VALUE, mFabricId, null);
   }

@@ -42,7 +42,7 @@ IGNORE: Set[str] = {
     '/platform/Beken/',
     '/platform/Infineon/CYW30739/',
     '/platform/Darwin/',
-    '/platform/EFR32/',
+    '/platform/silabs/',
     '/platform/ESP32/',
     '/platform/fake/',
     '/platform/Linux/',

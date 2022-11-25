@@ -26,6 +26,7 @@
 
 #include <stdint.h>
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
 
 /** @brief On/off Cluster Server Post Init
@@ -36,3 +37,5 @@
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
 void emberAfPluginLevelControlClusterServerPostInitCallback(chip::EndpointId endpoint);
+
+bool HasFeature(chip::EndpointId endpoint, chip::app::Clusters::LevelControl::LevelControlFeature feature);

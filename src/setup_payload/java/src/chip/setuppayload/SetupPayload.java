@@ -21,6 +21,12 @@ public class SetupPayload {
   /** The CHIP device discriminator: */
   public int discriminator;
   /**
+   * If hasShortDiscriminator is true, the discriminator value contains just the high 4 bits of the
+   * full discriminator. For example, if hasShortDiscriminator is true and discriminator is 0xA,
+   * then the full discriminator can be anything in the range 0xA00 t0 0xAFF.
+   */
+  public boolean hasShortDiscriminator;
+  /**
    * The CHIP device setup PIN code: setupPINCode SHALL be greater than 0. Also invalid setupPINCode
    * is {000000000, 11111111, 22222222, 33333333, 44444444, 55555555, 66666666, 77777777, 88888888,
    * 99999999, 12345678, 87654321}.
@@ -41,12 +47,33 @@ public class SetupPayload {
       Set<DiscoveryCapability> discoveryCapabilities,
       int discriminator,
       long setupPinCode) {
+    this(
+        version,
+        vendorId,
+        productId,
+        commissioningFlow,
+        discoveryCapabilities,
+        discriminator,
+        false,
+        setupPinCode);
+  }
+
+  public SetupPayload(
+      int version,
+      int vendorId,
+      int productId,
+      int commissioningFlow,
+      Set<DiscoveryCapability> discoveryCapabilities,
+      int discriminator,
+      boolean hasShortDiscriminator,
+      long setupPinCode) {
     this.version = version;
     this.vendorId = vendorId;
     this.productId = productId;
     this.commissioningFlow = commissioningFlow;
     this.discoveryCapabilities = discoveryCapabilities;
     this.discriminator = discriminator;
+    this.hasShortDiscriminator = hasShortDiscriminator;
     this.setupPinCode = setupPinCode;
     this.optionalQRCodeInfo = new HashMap<Integer, OptionalQRCodeInfo>();
   }
