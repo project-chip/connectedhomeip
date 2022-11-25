@@ -86,8 +86,10 @@ struct CommonAttributeAccessInterface : public chip::app::AttributeAccessInterfa
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
 
-    void OnListWriteBegin(const chip::app::ConcreteAttributePath & aPath) override;
-    void OnListWriteEnd(const chip::app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful) override;
+    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, TLV::TLVWriter & writer);
+
+    void OnListWriteBegin(const chip::app::ConcreteAttributePath & aPath);
+    void OnListWriteEnd(const chip::app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful);
 };
 
 CommonCluster * CommonAttributeAccessInterface::FindCluster(const chip::app::ConcreteClusterPath & path)
@@ -123,6 +125,18 @@ CHIP_ERROR CommonAttributeAccessInterface::Write(const chip::app::ConcreteDataAt
     if (!c)
         return CHIP_ERROR_NOT_IMPLEMENTED;
     return c->ForwardWriteToBridge(aPath, aDecoder);
+}
+
+CHIP_ERROR CommonAttributeAccessInterface::Read(const chip::app::ConcreteReadAttributePath & aPath,
+                                                chip::TLV::TLVWriter & writer)
+{
+    CommonCluster * c = FindCluster(aPath);
+    if (!c)
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    AttributeInterface * a = c->FindAttribute(aPath.mAttributeId);
+    if (!a)
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    return a->Read(aPath, writer);
 }
 
 void CommonAttributeAccessInterface::OnListWriteBegin(const chip::app::ConcreteAttributePath & aPath)
@@ -177,6 +191,117 @@ std::unique_ptr<GeneratedCluster> CreateCluster(chip::ClusterId id)
     return nullptr;
 }
 
+void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const Span<const char> *) { wr.PutString(chip::TLV::Tag(), buffer, (uint32_t) strlen(buffer)); }
+void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const ByteSpan *) { wr.PutBytes(chip::TLV::Tag(), (const uint8_t *) buffer, (uint32_t) strlen(buffer)); }
+void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const float *) { wr.Put(chip::TLV::Tag(), (float) atof(buffer)); }
+void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const double *) { wr.Put(chip::TLV::Tag(), atof(buffer)); }
+void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const int64_t *) { wr.Put(chip::TLV::Tag(), (int64_t) strtoll(buffer, nullptr, 10)); }
+void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const uint64_t *) { wr.Put(chip::TLV::Tag(), (uint64_t) strtoll(buffer, nullptr, 10)); }
+void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const bool *) { wr.PutBoolean(chip::TLV::Tag(), (*buffer) ? true : false); }
+
+template<typename T>
+void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const T *) { wr.Put(chip::TLV::Tag(), (int64_t) strtoll(buffer, nullptr, 10)); }
+
+void WriteValueToBuffer(const bool & value, uint8_t * buffer, const uint16_t & maxReadLength)
+{
+    if (maxReadLength == 1)
+        *buffer = value ? 1 : 0;
+}
+
+template<typename T>
+void WriteValueToBuffer(const T & value, uint8_t * buffer, const uint16_t & maxReadLength)
+{
+    size_t value_size = sizeof(value);
+    if (maxReadLength >= value_size)
+    {
+        memcpy(buffer, &value, value_size);
+    }
+}
+
+template<typename T>
+void WriteValueToBuffer(chip::TLV::TLVReader & reader, uint8_t * buffer, const uint16_t & maxReadLength)
+{
+    T v;
+    chip::app::DataModel::Decode(reader, v);
+    WriteValueToBuffer(v, buffer, maxReadLength);
+}
+
+// if `read` is true, read from `buffer`, and write to `data`
+// otherwise, read from `data`, and write to `buffer`
+template<typename T>
+void ReadOrWriteBuffer(std::vector<uint8_t> * data, uint8_t * buffer, uint16_t maxReadLength, bool read)
+{
+    if (read)
+    {
+        chip::TLV::TLVWriter wr;
+        wr.Init(data->data(), data->size());
+        ReadValueFromBuffer(wr, (char *)buffer, (const T *) nullptr);
+        wr.Finalize();
+        data->resize(wr.GetLengthWritten());
+    }
+    else
+    {
+        chip::TLV::TLVReader rd;
+        rd.Init(data->data(), data->size());
+        rd.Next();
+        WriteValueToBuffer<T>(rd, buffer, maxReadLength);
+    }
+}
+
+void ReadOrWriteBufferForType(std::vector<uint8_t> * data, uint8_t * buffer, EmberAfAttributeType type, uint16_t maxReadLength, bool read)
+{
+    switch (type)
+    {
+    case ZCL_OCTET_STRING_ATTRIBUTE_TYPE:
+    case ZCL_CHAR_STRING_ATTRIBUTE_TYPE:
+        ReadOrWriteBuffer<Span<const char>>(data, buffer, maxReadLength, read);
+        break;
+    case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE:
+    case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
+        ReadOrWriteBuffer<ByteSpan>(data, buffer, maxReadLength, read);
+        break;
+    case ZCL_STRUCT_ATTRIBUTE_TYPE:
+        // structs not supported yet
+        break;
+    case ZCL_SINGLE_ATTRIBUTE_TYPE:
+        ReadOrWriteBuffer<float>(data, buffer, maxReadLength, read);
+        break;
+    case ZCL_DOUBLE_ATTRIBUTE_TYPE:
+        ReadOrWriteBuffer<double>(data, buffer, maxReadLength, read);
+        break;
+    case ZCL_INT8S_ATTRIBUTE_TYPE:
+    case ZCL_INT16S_ATTRIBUTE_TYPE:
+    case ZCL_INT24S_ATTRIBUTE_TYPE:
+    case ZCL_INT32S_ATTRIBUTE_TYPE:
+    case ZCL_INT40S_ATTRIBUTE_TYPE:
+    case ZCL_INT48S_ATTRIBUTE_TYPE:
+    case ZCL_INT56S_ATTRIBUTE_TYPE:
+    case ZCL_INT64S_ATTRIBUTE_TYPE:
+        ReadOrWriteBuffer<int64_t>(data, buffer, maxReadLength, read);
+        break;
+
+    case ZCL_INT8U_ATTRIBUTE_TYPE:
+    case ZCL_INT16U_ATTRIBUTE_TYPE:
+    case ZCL_INT24U_ATTRIBUTE_TYPE:
+    case ZCL_INT32U_ATTRIBUTE_TYPE:
+    case ZCL_INT40U_ATTRIBUTE_TYPE:
+    case ZCL_INT48U_ATTRIBUTE_TYPE:
+    case ZCL_INT56U_ATTRIBUTE_TYPE:
+    case ZCL_INT64U_ATTRIBUTE_TYPE:
+        ReadOrWriteBuffer<uint64_t>(data, buffer, maxReadLength, read);
+        break;
+
+    case ZCL_BOOLEAN_ATTRIBUTE_TYPE:
+        ReadOrWriteBuffer<bool>(data, buffer, maxReadLength, read);
+        break;
+    default:
+        // Assume integer
+        ReadOrWriteBuffer<int64_t>(data, buffer, maxReadLength, read);
+        break;
+    }
+}
+
+
 bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                 const Actions::Commands::InstantAction::DecodableType & commandData)
 {
@@ -191,34 +316,32 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
-    EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
+    if ((endpointIndex >= CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT) || (gDevices[endpointIndex] == nullptr))
+        return EMBER_ZCL_STATUS_FAILURE;
 
-    if ((endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT) && (gDevices[endpointIndex] != nullptr))
-    {
-        DynamicDevice * dev = g_device_impls[endpointIndex].get();
-        CommonCluster * cluster = nullptr;
-        const std::vector<CommonCluster *> clusters = dev->clusters();
-        int clusters_count = (int) clusters.size();
-        for (int cluster_index = 0; cluster_index < clusters_count; cluster_index++)
-        {
-            if (clusters[cluster_index]->GetClusterId() == clusterId)
-            {
-                cluster = clusters[cluster_index];
-                break;
-            }
-        }
+    chip::app::AttributeAccessInterface * accessInterface = chip::app::GetAttributeAccessOverride(endpoint, clusterId);
 
-        if (cluster == nullptr) return ret;
+    if (accessInterface == nullptr)
+        return EMBER_ZCL_STATUS_FAILURE;
 
-        AttributeInterface * attribute = cluster->FindAttribute(attributeMetadata->attributeId);
+    std::vector<uint8_t> data(attributeMetadata->size + 64);
 
-        if (clusterId == ZCL_ON_OFF_CLUSTER_ID)
-        {
-            ret = HandleReadOnOffAttribute(static_cast<Attribute<bool> *>(attribute), buffer, maxReadLength);
-        }
-    }
+    // read the attribute and write it to `data`
+    chip::TLV::TLVWriter writer;
+    writer.Init(data.data(), data.size());
+    CHIP_ERROR err = static_cast<CommonAttributeAccessInterface *>(accessInterface)->Read(
+        chip::app::ConcreteDataAttributePath(endpoint, clusterId, attributeMetadata->attributeId),
+        writer
+    );
+    if (err != CHIP_NO_ERROR)
+        return EMBER_ZCL_STATUS_FAILURE;
+    writer.Finalize();
+    data.resize(writer.GetLengthWritten());
 
-    return ret;
+    // read from `data` and write to `buffer`
+    ReadOrWriteBufferForType(&data, buffer, attributeMetadata->attributeType, maxReadLength, false);
+
+    return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
@@ -226,64 +349,28 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
-    EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
-
-    if ((endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT) && (gDevices[endpointIndex] != nullptr))
-    {
-        DynamicDevice * dev = g_device_impls[endpointIndex].get();
-        CommonCluster * cluster = nullptr;
-        const std::vector<CommonCluster *> clusters = dev->clusters();
-        int clusters_count = (int) clusters.size();
-        for (int cluster_index = 0; cluster_index < clusters_count; cluster_index++)
-        {
-            if (clusters[cluster_index]->GetClusterId() == clusterId)
-            {
-                cluster = clusters[cluster_index];
-                break;
-            }
-        }
-
-        if (cluster == nullptr) return ret;
-
-        AttributeInterface * attribute = cluster->FindAttribute(attributeMetadata->attributeId);
-
-        if (clusterId == ZCL_ON_OFF_CLUSTER_ID)
-        {
-            ret = HandleWriteOnOffAttribute(static_cast<Attribute<bool> *>(attribute), buffer);
-        }
-    }
-
-    return ret;
-}
-
-EmberAfStatus HandleReadOnOffAttribute(Attribute<bool> * attribute, uint8_t * buffer, uint16_t maxReadLength)
-{
-    if ((attribute->GetId() == ZCL_ON_OFF_ATTRIBUTE_ID) && (maxReadLength == 1))
-    {
-        *buffer = attribute->Peek() ? 1 : 0;
-    }
-    else if ((attribute->GetId() == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
-    {
-        *buffer = (uint16_t) ZCL_ON_OFF_CLUSTER_REVISION;
-    }
-    else
-    {
+    if ((endpointIndex >= CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT) || (gDevices[endpointIndex] == nullptr))
         return EMBER_ZCL_STATUS_FAILURE;
-    }
 
-    return EMBER_ZCL_STATUS_SUCCESS;
-}
+    chip::app::AttributeAccessInterface * accessInterface = chip::app::GetAttributeAccessOverride(endpoint, clusterId);
 
-EmberAfStatus HandleWriteOnOffAttribute(Attribute<bool> * attribute, uint8_t * buffer)
-{
-    if (attribute->GetId() == ZCL_ON_OFF_ATTRIBUTE_ID)
-    {
-        *attribute = (*buffer) == 1;
-    }
-    else
-    {
+    if (accessInterface == nullptr)
         return EMBER_ZCL_STATUS_FAILURE;
-    }
+
+    std::vector<uint8_t> data(attributeMetadata->size + 64);
+
+    // read from `buffer` and write to `data`
+    ReadOrWriteBufferForType(&data, buffer, attributeMetadata->attributeType, 0, true);
+
+    // read from `data` and write to attribute
+    chip::TLV::TLVReader reader;
+    reader.Init(data.data(), data.size());
+    reader.Next();
+    chip::app::AttributeValueDecoder decoder(reader, chip::Access::SubjectDescriptor());
+    CHIP_ERROR err = accessInterface->Write(chip::app::ConcreteReadAttributePath(endpoint, clusterId, attributeMetadata->attributeId), decoder);
+    if (err != CHIP_NO_ERROR)
+        return EMBER_ZCL_STATUS_FAILURE;
+
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
