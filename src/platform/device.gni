@@ -198,6 +198,15 @@ if (_chip_device_layer != "none" && chip_device_platform != "external") {
       "<platform/" + _chip_device_layer + "/SystemPlatformConfig.h>"
 }
 
+declare_args() {
+  # Enable jlink/segger_rtt support.
+  if (chip_device_platform == "qpg") {
+    chip_enable_segger_rtt = false
+  } else {
+    chip_enable_segger_rtt = true
+  }
+}
+
 assert(
     (current_os != "freertos" && chip_device_platform == "none") ||
         chip_device_platform == "fake" ||
