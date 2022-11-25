@@ -52,7 +52,7 @@ if [ ! -d "$WEBOS_SYSROOT" ]; then
     chmod 555 "$WEBOS_SDK_EXTRACT_SCRIPT_PATH"
 
     echo "##### Install webOS OSE NDK #####"
-    "$WEBOS_SDK_EXTRACT_SCRIPT_PATH" -d third_party/webos_sdk/v2.14.1 -y
+    "$WEBOS_SDK_EXTRACT_SCRIPT_PATH" -d "$WEBOS_SDK_PATH" -y
 fi
 
 # Activating webOS NDK build environment
@@ -63,7 +63,7 @@ echo ""
 # Build webos example
 echo "##### Build webos example #####"
 echo "##### Performing gn gen #####"
-gn gen out/host --args="is_debug=false target_os=\"webos\" target_cpu=\"arm\" chip_enable_python_modules=false ar_webos=\"$AR\" cc_webos=\"$CC -Wno-format-security\" cxx_webos=\"$CXX\" webos_sysroot=\"$PKG_CONFIG_SYSROOT_DIR\" chip_build_tests=false enable_syslog=true treat_warnings_as_errors=false"
+gn gen "$REPO_DIR/out/host" --args="is_debug=false target_os=\"webos\" target_cpu=\"arm\" chip_enable_python_modules=false ar_webos=\"$AR\" cc_webos=\"$CC -Wno-format-security\" cxx_webos=\"$CXX\" webos_sysroot=\"$PKG_CONFIG_SYSROOT_DIR\" chip_build_tests=false enable_syslog=true treat_warnings_as_errors=false"
 
 echo "##### Building by ninja #####"
-ninja -C out/host
+ninja -C "$REPO_DIR/out/host"
