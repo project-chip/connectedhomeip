@@ -105,7 +105,7 @@ CHIP_ERROR NrfWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     {
         WiFiManager::ConnectionHandling handling{ [] { Instance().OnNetworkStatusChanged(Status::kSuccess); },
                                                   [] { Instance().OnNetworkStatusChanged(Status::kUnknownError); },
-                                                  System::Clock::Timeout{ kWiFiConnectNetworkTimeoutSeconds * 1000 } };
+                                                  System::Clock::Seconds32{ kWiFiConnectNetworkTimeoutSeconds } };
         ReturnErrorOnFailure(
             WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling));
     }
@@ -158,7 +158,7 @@ CHIP_ERROR NrfWiFiDriver::RevertConfiguration()
     {
         WiFiManager::ConnectionHandling handling{ [] { Instance().OnNetworkStatusChanged(Status::kSuccess); },
                                                   [] { Instance().OnNetworkStatusChanged(Status::kUnknownError); },
-                                                  System::Clock::Timeout{ kWiFiConnectNetworkTimeoutSeconds * 1000 } };
+                                                  System::Clock::Seconds32{ kWiFiConnectNetworkTimeoutSeconds } };
         ReturnErrorOnFailure(
             WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling));
     }
@@ -212,7 +212,7 @@ void NrfWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
     Status status = Status::kSuccess;
     WiFiManager::ConnectionHandling handling{ [] { Instance().OnNetworkStatusChanged(Status::kSuccess); },
                                               [] { Instance().OnNetworkStatusChanged(Status::kUnknownError); },
-                                              System::Clock::Timeout{ kWiFiConnectNetworkTimeoutSeconds * 1000 } };
+                                              System::Clock::Seconds32{ kWiFiConnectNetworkTimeoutSeconds } };
 
     VerifyOrExit(WiFiManager::StationStatus::CONNECTING != WiFiManager::Instance().GetStationStatus(),
                  status = Status::kOtherConnectionFailure);

@@ -190,7 +190,7 @@ CHIP_ERROR WiFiManager::Connect(const ByteSpan & ssid, const ByteSpan & credenti
 
     mHandling.mOnConnectionSuccess = handling.mOnConnectionSuccess;
     mHandling.mOnConnectionFailed  = handling.mOnConnectionFailed;
-    mHandling.mConnectionTimeoutMs = handling.mConnectionTimeoutMs;
+    mHandling.mConnectionTimeout   = handling.mConnectionTimeout;
 
     mWiFiState = WIFI_STATE_ASSOCIATING;
 
@@ -308,7 +308,7 @@ void WiFiManager::ScanResultHandler(uint8_t * data)
                 Instance().mWiFiParams.mParams.psk = Instance().mWantedNetwork.pass;
             }
 
-            Instance().mWiFiParams.mParams.timeout = Instance().mHandling.mConnectionTimeoutMs.count();
+            Instance().mWiFiParams.mParams.timeout = Instance().mHandling.mConnectionTimeout.count();
             Instance().mWiFiParams.mParams.channel = scanResult->channel;
             Instance().mWiFiParams.mRssi           = scanResult->rssi;
         }
@@ -330,7 +330,7 @@ void WiFiManager::ScanDoneHandler(uint8_t * data)
         Instance().mScanDoneCallback(requestStatus);
     }
 
-    if (requestStatus == WiFiRequestStatus::FAIL)
+    if (requestStatus == WiFiRequestStatus::FAILURE)
     {
         ChipLogDetail(DeviceLayer, "Scan request failed (%d)", status->status);
     }
@@ -385,9 +385,9 @@ void WiFiManager::ConnectHandler(uint8_t * data)
     const wifi_status * status      = reinterpret_cast<const wifi_status *>(data);
     WiFiRequestStatus requestStatus = static_cast<WiFiRequestStatus>(status->status);
 
-    if (requestStatus == WiFiRequestStatus::FAIL)
+    if (requestStatus == WiFiRequestStatus::FAILURE || requestStatus == WiFiRequestStatus::TERMINATED)
     {
-        ChipLogDetail(DeviceLayer, "Connection to WiFi network failed");
+        ChipLogDetail(DeviceLayer, "Connection to WiFi network failed or was terminated by another request");
         Instance().mWiFiState = WIFI_STATE_DISCONNECTED;
         if (Instance().mHandling.mOnConnectionFailed)
         {

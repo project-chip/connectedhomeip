@@ -90,8 +90,9 @@ class WiFiManager
 public:
     enum WiFiRequestStatus : int
     {
-        FAIL    = -1,
-        SUCCESS = 0
+        SUCCESS    = 0,
+        FAILURE    = 1,
+        TERMINATED = 2
     };
 
     using ScanResultCallback = void (*)(const NetworkCommissioning::WiFiScanResponse &);
@@ -121,7 +122,7 @@ public:
     {
         ConnectionCallback mOnConnectionSuccess{};
         ConnectionCallback mOnConnectionFailed{};
-        System::Clock::Timeout mConnectionTimeoutMs{};
+        System::Clock::Seconds32 mConnectionTimeout{};
     };
 
     struct WiFiInfo
