@@ -176,10 +176,18 @@ class Esp32Builder(Builder):
             self._Execute(
                 ['bash', '-c', 'echo -e "\\nCONFIG_DISABLE_IPV4=y\\n" >>%s' % shlex.quote(defaults_out)])
 
-        cmd = "\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py -C {example_path} -B {out} reconfigure".format(
+        cmake_flags = []
+
+        if self.options.pregen_dir:
+            cmake_flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
+
+        cmake_args = (" " + " ".join(cmake_flags)) if len(cmake_flags) > 0 else ""
+
+        cmd = "\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py -C {example_path} -B {out}{cmake_args} reconfigure".format(
             defaults=shlex.quote(defaults_out),
             example_path=self.ExamplePath,
-            out=shlex.quote(self.output_dir)
+            out=shlex.quote(self.output_dir),
+            cmake_args=cmake_args,
         )
 
         # This will do a 'cmake reconfigure' which will create ninja files without rebuilding
