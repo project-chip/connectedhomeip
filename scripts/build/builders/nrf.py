@@ -173,7 +173,7 @@ class NrfConnectBuilder(Builder):
                 flags.append("-DCONF_FILE=prj_no_dfu.conf")
 
             if self.options.pregen_dir:
-                flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR=\"{self.options.pregen_dir}\"")
+                flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
 
             build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
