@@ -32,6 +32,7 @@ class CmdLineArgs:
     templateFile: str
     outputDir: str
     runBootstrap: bool
+    parallel: bool = True
 
 
 CHIP_ROOT_DIR = os.path.realpath(
@@ -103,6 +104,9 @@ def runArgumentsParser() -> CmdLineArgs:
                         help='Output directory for the generated files (default: automatically selected)')
     parser.add_argument('--run-bootstrap', default=None, action='store_true',
                         help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
+    parser.add_argument('--parallel', action='store_true')
+    parser.add_argument('--no-parallel', action='store_false', dest='parallel')
+    parser.set_defaults(parallel=True)
     args = parser.parse_args()
 
     # By default, this script assumes that the global CHIP template is used with
