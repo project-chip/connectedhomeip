@@ -186,18 +186,26 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 template <size_t N>
 CHIP_ERROR extractProtocol(const char * serviceType, char (&outServiceName)[N], DnssdServiceProtocol & outProtocol)
 {
-    std::string serviceTypeStr(serviceType);
-    size_t index = serviceTypeStr.find(".");
+    const char * dotPos          = strrchr(serviceType, '.');
+    ReturnErrorCodeIf(dotPos == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorCodeIf(index == std::string::npos, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorCodeIf(index + 1 > N, CHIP_ERROR_INVALID_ARGUMENT);
+    size_t lengthWithoutProtocol = static_cast<size_t>(dotPos - serviceType);
+    ReturnErrorCodeIf(lengthWithoutProtocol + 1 > N, CHIP_ERROR_INVALID_ARGUMENT);
 
-    memcpy(outServiceName, serviceType, index);
-    outServiceName[index] = '\0'; // Set a null terminator
+    memcpy(outServiceName, serviceType, lengthWithoutProtocol);
+    outServiceName[lengthWithoutProtocol] = '\0'; // Set a null terminator
 
-    // kOperationalProtocol -> _tcp, kCommissionProtocol -> _udp
-    outProtocol = (serviceTypeStr.substr(index + 1).compare(kOperationalProtocol) == 0) ? DnssdServiceProtocol::kDnssdProtocolTcp
-                                                                                        : DnssdServiceProtocol::kDnssdProtocolUdp;
+    outProtocol = DnssdServiceProtocol::kDnssdProtocolUnknown;
+    if (strcmp("._tcp", dotPos) == 0)
+    {
+        outProtocol = DnssdServiceProtocol::kDnssdProtocolTcp;
+    }
+    else if (strcmp("._udp", dotPos) == 0)
+    {
+        outProtocol = DnssdServiceProtocol::kDnssdProtocolUdp;
+    }
+
+    ReturnErrorCodeIf(outProtocol == DnssdServiceProtocol::kDnssdProtocolUnknown, CHIP_ERROR_INVALID_ARGUMENT);
 
     return CHIP_NO_ERROR;
 }
