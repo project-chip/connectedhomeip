@@ -129,7 +129,8 @@ class MbedBuilder(Builder):
             if self.options.pregen_dir:
                 flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
 
-            self._Execute(['cmake', '-S', shlex.quote(self.ExamplePath), '-B', shlex.quote(self.output_dir), '-GNinja'] + flags, title='Generating ' + self.identifier)
+            self._Execute(['cmake', '-S', shlex.quote(self.ExamplePath), '-B', shlex.quote(self.output_dir),
+                          '-GNinja'] + flags, title='Generating ' + self.identifier)
 
     def _build(self):
         # Remove old artifacts to force linking
