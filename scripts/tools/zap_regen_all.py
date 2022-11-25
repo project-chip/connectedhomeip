@@ -119,7 +119,7 @@ def setupArgumentsParser():
     parser.add_argument('--parallel', action='store_true')
     parser.add_argument('--no-parallel', action='store_false', dest='parallel')
     parser.set_defaults(parallel=True)
-                        
+
     return parser.parse_args()
 
 
@@ -259,12 +259,14 @@ def getTargets(type, test_target):
 
     return targets
 
+
 def _ParallelGenerateOne(target):
     """
     Helper method to be passed to multiprocessing parallel generation of
     items.
     """
     target.generate()
+
 
 def main():
     logging.basicConfig(
