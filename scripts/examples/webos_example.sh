@@ -15,29 +15,49 @@
 #    limitations under the License.
 #
 
+SCRIPT_DIR=$(dirname "$0")
+REPO_DIR=$(realpath "$SCRIPT_DIR/../..")
+WEBOS_REPO_DIR="$REPO_DIR/third_party/webos_sdk"
+WEBOS_SDK_VER="v2.14.1"
+
+WEBOS_SDK_PATH="$WEBOS_REPO_DIR/$WEBOS_SDK_VER"
+WEBOS_SYSROOT="$WEBOS_SDK_PATH/sysroots"
+WEBOS_SDK_EXTRACT_SCRIPT_PATH="$WEBOS_SDK_PATH/webos-sdk-x86_64-cortexa7t2hf-neon-vfpv4-toolchain-2.14.1.g.sh"
+ENVIRONMENT_SETUP_SCRIPT="$WEBOS_SDK_PATH/environment-setup-cortexa7t2hf-neon-vfpv4-webos-linux-gnueabi"
+
 # Activating connectedhomeip build environment
-source scripts/activate.sh
+source "$REPO_DIR/scripts/activate.sh"
 
-# Clone webos_sdk
+echo "Clone webos_sdk"
 echo "##### Cloning webOS OSE SDK #####"
-git clone https://github.com/cabin15/webos-ose-ndk third_party/webos_sdk
 
-# Extract webOS SDK
-cat third_party/webos_sdk/v2.14.1/webos_sdk.tar* | (
-    cd third_party/webos_sdk/v2.14.1/
-    tar xvzf -
-)
+if [ ! -d "$WEBOS_REPO_DIR" ]; then
+    git clone https://github.com/cabin15/webos-ose-ndk "$WEBOS_REPO_DIR"
+else
+    echo "webOS-ose-ndk already exists in $WEBOS_REPO_DIR"
+fi
 
-# Grant execute permission for NDK install script
-chmod 555 third_party/webos_sdk/v2.14.1/webos-sdk-x86_64-cortexa7t2hf-neon-vfpv4-toolchain-2.14.1.g.sh
+echo "Extract webOS SDK"
+if [ ! -e "$WEBOS_SDK_EXTRACT_SCRIPT_PATH" ]; then
+    cat "$WEBOS_SDK_PATH/webos_sdk.tar"* | (
+        cd "$WEBOS_SDK_PATH" || (echo "Failed to cd to $WEBOS_SDK_PATH" && exit 1)
+        tar xvzf -
+    )
+else
+    echo "webOS SDK already extracted"
+fi
 
-# Install webOS OSE NDK
-echo "##### Install webOS OSE NDK #####"
-third_party/webos_sdk/v2.14.1/webos-sdk-x86_64-cortexa7t2hf-neon-vfpv4-toolchain-2.14.1.g.sh -d third_party/webos_sdk/v2.14.1 -y
+if [ ! -d "$WEBOS_SYSROOT" ]; then
+    echo "webOS SDK not extracted"
+    chmod 555 "$WEBOS_SDK_EXTRACT_SCRIPT_PATH"
+
+    echo "##### Install webOS OSE NDK #####"
+    "$WEBOS_SDK_EXTRACT_SCRIPT_PATH" -d third_party/webos_sdk/v2.14.1 -y
+fi
 
 # Activating webOS NDK build environment
 echo "##### Activating webOS NDK build environment #####"
-source third_party/webos_sdk/v2.14.1/environment-setup-cortexa7t2hf-neon-vfpv4-webos-linux-gnueabi
+source "$ENVIRONMENT_SETUP_SCRIPT"
 echo ""
 
 # Build webos example
