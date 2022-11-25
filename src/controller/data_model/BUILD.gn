@@ -31,7 +31,6 @@ chip_data_model("data_model") {
 }
 
 if (current_os == "android" || build_java_matter_controller) {
-
   config("java-build-config") {
     if (build_java_matter_controller) {
       include_dirs = java_matter_controller_dependent_paths
@@ -176,8 +175,8 @@ if (current_os == "android" || build_java_matter_controller) {
     ]
 
     deps = [
-        ":data_model",
-        "${chip_root}/src/platform:platform_buildconfig",
+      ":data_model",
+      "${chip_root}/src/platform:platform_buildconfig",
     ]
 
     public_configs = [ ":java-build-config" ]
