@@ -200,7 +200,7 @@ Code pre-generation can be used:
     of golden image tests in `scripts/idl/tests`
 
 The script to trigger code pre-generation is `scripts/code_pregenerate.py` and
-requires the pregeneration output directory as an argument
+requires the pre-generation output directory as an argument
 
 ```bash
 scripts/code_pregenerate.py ${OUTPUT_DIRECTORY:-./zzz_pregenerated/}
