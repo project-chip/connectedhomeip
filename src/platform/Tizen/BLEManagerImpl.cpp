@@ -515,18 +515,26 @@ void BLEManagerImpl::OnChipDeviceScanned(void * device, const Ble::ChipBLEDevice
     ConnectHandler(deviceInfo->remote_address);
 }
 
-void BLEManagerImpl::OnChipScanComplete()
+void BLEManagerImpl::OnScanComplete()
 {
-    if (mBLEScanConfig.mBleScanState != BleScanState::kScanForDiscriminator &&
-        mBLEScanConfig.mBleScanState != BleScanState::kScanForAddress)
+    switch (mBLEScanConfig.mBleScanState)
     {
-        ChipLogProgress(DeviceLayer, "Scan complete notification without an active scan.");
-        return;
+    case BleScanState::kNotScanning:
+        ChipLogProgress(Ble, "Scan complete notification without an active scan.");
+        break;
+    case BleScanState::kScanForAddress:
+    case BleScanState::kScanForDiscriminator:
+        mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
+        ChipLogProgress(Ble, "Scan complete. No matching device found.");
+        break;
+    case BleScanState::kConnecting:
+        break;
     }
+}
 
-    ChipLogError(DeviceLayer, "Scan Completed with Timeout: Notify Upstream.");
-    BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_TIMEOUT);
-    mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
+void BLEManagerImpl::OnScanError(CHIP_ERROR err)
+{
+    ChipLogDetail(Ble, "BLE scan error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 int BLEManagerImpl::RegisterGATTServer()

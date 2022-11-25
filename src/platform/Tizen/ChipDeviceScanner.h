@@ -65,7 +65,10 @@ public:
     virtual void OnChipDeviceScanned(void * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
 
     // Called when a scan was completed (stopped or timed out)
-    virtual void OnChipScanComplete(void) = 0;
+    virtual void OnScanComplete(void) = 0;
+
+    // Called on scan error
+    virtual void OnScanError(CHIP_ERROR err) = 0;
 };
 
 /// Allows scanning for CHIP devices

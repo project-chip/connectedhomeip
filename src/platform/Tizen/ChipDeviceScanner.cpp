@@ -242,7 +242,7 @@ CHIP_ERROR ChipDeviceScanner::StopChipScan()
     UnRegisterScanFilter();
 
     // Report to Impl class
-    mDelegate->OnChipScanComplete();
+    mDelegate->OnScanComplete();
 
     mIsScanning = false;
 

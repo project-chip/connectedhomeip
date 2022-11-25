@@ -138,7 +138,8 @@ private:
 
     //  ===== Members that implement virtual methods on ChipDeviceScannerDelegate
     void OnChipDeviceScanned(void * device, const Ble::ChipBLEDeviceIdentificationInfo & info) override;
-    void OnChipScanComplete() override;
+    void OnScanComplete() override;
+    void OnScanError(CHIP_ERROR err) override;
 
     // ===== Members for internal use by the following friends.
 
