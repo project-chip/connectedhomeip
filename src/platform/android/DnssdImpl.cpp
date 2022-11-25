@@ -186,7 +186,7 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 template <size_t N>
 CHIP_ERROR extractProtocol(const char * serviceType, char (&outServiceName)[N], DnssdServiceProtocol & outProtocol)
 {
-    const char * dotPos          = strrchr(serviceType, '.');
+    const char * dotPos = strrchr(serviceType, '.');
     ReturnErrorCodeIf(dotPos == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     size_t lengthWithoutProtocol = static_cast<size_t>(dotPos - serviceType);
