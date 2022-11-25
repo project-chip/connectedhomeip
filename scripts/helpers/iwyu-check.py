@@ -167,7 +167,7 @@ def main(compile_commands_glob, scanning_destination, mapping_file_dir,
                                   shell=True,
                                   text=True,
                                   stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE)
+                                  stderr=subprocess.STDOUT)
 
         logging.info("============== IWYU output start  ================")
 
@@ -175,7 +175,9 @@ def main(compile_commands_glob, scanning_destination, mapping_file_dir,
         while status.poll() is None:
             line = status.stdout.readline().rstrip()
 
-            if re.match(r"^.*([A-Za-z0-9]+(/[A-Za-z0-9]+)+)\.cpp should [a-zA-Z]+ these lines:$", line):
+            if re.match(r"^warning:.*$", line):
+                logger = logging.warning
+            elif re.match(r"^.*([A-Za-z0-9]+(/[A-Za-z0-9]+)+)\.cpp should [a-zA-Z]+ these lines:$", line):
                 logger = logging.warning
             elif re.match(r"^.*([A-Za-z0-9]+(/[A-Za-z0-9]+)+)\.[a-zA-Z]+ has correct #includes/fwd-decls\)$", line):
                 logger = logging.info
