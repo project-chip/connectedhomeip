@@ -110,7 +110,7 @@ class BouffalolabBuilder(GnBuilder):
         try:
             self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])
         except KeyError:
-            # environment BOUFFALOLAB_SDK_ROOT is existed, try default setup path
+            # environment BOUFFALOLAB_SDK_ROOT is not existed, try default setup path
             self.argsOpt.append('bouffalolab_sdk_root="/opt/bouffalolab_sdk"')
 
     def GnBuildArgs(self):
