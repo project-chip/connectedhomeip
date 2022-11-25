@@ -80,11 +80,10 @@ template("_chip_build_time_codegen") {
 
     forward_variables_from(invoker, [ "deps" ])
 
-    if (defined(deps)) {
-      deps += [ ":${_name}_codegen" ]
-    } else {
-      deps = [ ":${_name}_codegen" ]
+    if (!defined(deps)) {
+      deps = []
     }
+    deps += [ ":${_name}_codegen" ]
   }
 }
 

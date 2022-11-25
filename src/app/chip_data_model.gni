@@ -70,7 +70,11 @@ template("chip_data_model") {
 
     public_configs = [ ":${_data_model_name}_config" ]
 
-    deps = [ "${chip_root}/src/app/common:cluster-objects" ]
+    if (!defined(deps)) {
+      deps = []
+    }
+
+    deps += [ "${chip_root}/src/app/common:cluster-objects" ]
   }
 
   _use_default_im_dispatch = !defined(invoker.use_default_im_dispatch) ||
@@ -89,7 +93,10 @@ template("chip_data_model") {
       sources = []
     }
 
-    deps = [ ":${_data_model_name}_codegen" ]
+    if (!defined(deps)) {
+      deps = []
+    }
+    deps += [ ":${_data_model_name}_codegen" ]
 
     sources += [
       "${_app_root}/clusters/barrier-control-server/barrier-control-server.h",
