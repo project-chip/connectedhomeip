@@ -259,6 +259,11 @@ def main():
 
     # The maximum memory usage is over 4GB (#15620)
     os.environ["NODE_OPTIONS"] = "--max-old-space-size=8192"
+
+    if cmdLineArgs.parallel:
+        # Parallel-compatible runs will need separate state
+        os.environ["ZAP_TEMPSTATE"] = "1"
+
     runGeneration(cmdLineArgs.zapFile, cmdLineArgs.zclFile, cmdLineArgs.templateFile, cmdLineArgs.outputDir)
 
     prettifiers = [
