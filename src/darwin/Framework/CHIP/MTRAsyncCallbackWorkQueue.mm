@@ -88,7 +88,7 @@
     os_unfair_lock_unlock(&_lock);
 
     MTR_LOG_INFO(
-        "MTRAsyncCallbackWorkQueue invalidate for context %@items count: %lu", _context, (unsigned long) invalidateItems.count);
+        "MTRAsyncCallbackWorkQueue invalidate for context %@ items count: %lu", _context, (unsigned long) invalidateItems.count);
     for (MTRAsyncCallbackQueueWorkItem * item in invalidateItems) {
         [item cancel];
     }
