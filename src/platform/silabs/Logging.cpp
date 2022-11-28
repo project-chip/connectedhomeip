@@ -19,6 +19,10 @@
 #include <string.h>
 #include <task.h>
 
+#ifdef BRD4325A // For SiWx917 Platform only
+#include "core_cm4.h"
+#endif
+
 #ifdef PW_RPC_ENABLED
 #include "PigweedLogger.h"
 #endif
@@ -62,17 +66,17 @@
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #define LOG_LWIP "[lwip  ]"
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-#define LOG_EFR32 "[efr32 ]"
+#define LOG_SILABS "[silabs ]"
 // If a new category string LOG_* is created, add it in the MaxStringLength arguments below
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-static constexpr size_t kMaxCategoryStrLen = chip::MaxStringLength(LOG_ERROR, LOG_WARN, LOG_INFO, LOG_DETAIL, LOG_LWIP, LOG_EFR32);
+static constexpr size_t kMaxCategoryStrLen = chip::MaxStringLength(LOG_ERROR, LOG_WARN, LOG_INFO, LOG_DETAIL, LOG_LWIP, LOG_SILABS);
 #else
-static constexpr size_t kMaxCategoryStrLen = chip::MaxStringLength(LOG_ERROR, LOG_WARN, LOG_INFO, LOG_DETAIL, LOG_EFR32);
+static constexpr size_t kMaxCategoryStrLen = chip::MaxStringLength(LOG_ERROR, LOG_WARN, LOG_INFO, LOG_DETAIL, LOG_SILABS);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 static constexpr size_t kMaxTimestampStrLen = 16; // "[" (HH)HH:MM:SS + "." + miliseconds(3digits) + "]"
 
-#if EFR32_LOG_ENABLED
+#if SILABS_LOG_ENABLED
 static bool sLogInitialized = false;
 #endif
 #if LOG_RTT_BUFFER_INDEX != 0
@@ -80,7 +84,7 @@ static uint8_t sLogBuffer[LOG_RTT_BUFFER_SIZE];
 static uint8_t sCmdLineBuffer[LOG_RTT_BUFFER_SIZE];
 #endif
 
-#if EFR32_LOG_ENABLED
+#if SILABS_LOG_ENABLED
 
 using namespace chip;
 
@@ -132,14 +136,14 @@ static void PrintLog(const char * msg)
 #endif
     }
 }
-#endif // EFR32_LOG_ENABLED
+#endif // SILABS_LOG_ENABLED
 
 /**
  * Initialize Segger RTT for logging
  */
-extern "C" void efr32InitLog(void)
+extern "C" void silabsInitLog(void)
 {
-#if EFR32_LOG_ENABLED
+#if SILABS_LOG_ENABLED
 #if LOG_RTT_BUFFER_INDEX != 0
     SEGGER_RTT_ConfigUpBuffer(LOG_RTT_BUFFER_INDEX, LOG_RTT_BUFFER_NAME, sLogBuffer, LOG_RTT_BUFFER_SIZE,
                               SEGGER_RTT_MODE_NO_BLOCK_TRIM);
@@ -154,7 +158,7 @@ extern "C" void efr32InitLog(void)
     PigweedLogger::init();
 #endif
     sLogInitialized = true;
-#endif // EFR32_LOG_ENABLED
+#endif // SILABS_LOG_ENABLED
 }
 
 /**
@@ -165,12 +169,12 @@ extern "C" void efr32Log(const char * aFormat, ...)
     va_list v;
 
     va_start(v, aFormat);
-#if EFR32_LOG_ENABLED
+#if SILABS_LOG_ENABLED
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
     static_assert(sizeof(formattedMsg) >
                   kMaxTimestampStrLen + kMaxCategoryStrLen); // Greater than to at least accommodate a ending Null Character
 
-    size_t prefixLen = AddTimeStampAndPrefixStr(formattedMsg, LOG_EFR32, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE);
+    size_t prefixLen = AddTimeStampAndPrefixStr(formattedMsg, LOG_SILABS, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE);
     size_t len       = vsnprintf(formattedMsg + prefixLen, sizeof formattedMsg - prefixLen, aFormat, v);
 
     if (len >= sizeof formattedMsg - prefixLen)
@@ -179,7 +183,7 @@ extern "C" void efr32Log(const char * aFormat, ...)
     }
 
     PrintLog(formattedMsg);
-#endif // EFR32_LOG_ENABLED
+#endif // SILABS_LOG_ENABLED
 
     va_end(v);
 }
@@ -207,7 +211,7 @@ namespace Platform {
  */
 void LogV(const char * module, uint8_t category, const char * aFormat, va_list v)
 {
-#if EFR32_LOG_ENABLED && _CHIP_USE_LOGGING
+#if SILABS_LOG_ENABLED && _CHIP_USE_LOGGING
     if (IsCategoryEnabled(category))
     {
         char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
@@ -248,7 +252,7 @@ void LogV(const char * module, uint8_t category, const char * aFormat, va_list v
 
     // Let the application know that a log message has been emitted.
     chip::DeviceLayer::OnLogOutput();
-#endif // EFR32_LOG_ENABLED && _CHIP_USE_LOGGING
+#endif // SILABS_LOG_ENABLED && _CHIP_USE_LOGGING
 }
 
 } // namespace Platform
@@ -265,7 +269,7 @@ extern "C" void LwIPLog(const char * aFormat, ...)
     va_list v;
 
     va_start(v, aFormat);
-#if EFR32_LOG_ENABLED
+#if SILABS_LOG_ENABLED
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
     size_t prefixLen = AddTimeStampAndPrefixStr(formattedMsg, LOG_LWIP, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE);
@@ -286,7 +290,7 @@ extern "C" void LwIPLog(const char * aFormat, ...)
 
     // Let the application know that a log message has been emitted.
     chip::DeviceLayer::OnLogOutput();
-#endif // EFR32_LOG_ENABLED
+#endif // SILABS_LOG_ENABLED
     va_end(v);
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -300,7 +304,7 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
     va_list v;
 
     va_start(v, aFormat);
-#if EFR32_LOG_ENABLED
+#if SILABS_LOG_ENABLED
     size_t prefixLen;
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
@@ -342,12 +346,12 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
 
     // Let the application know that a log message has been emitted.
     chip::DeviceLayer::OnLogOutput();
-#endif // EFR32_LOG_ENABLED
+#endif // SILABS_LOG_ENABLED
     va_end(v);
 }
 #endif // CHIP_ENABLE_OPENTHREAD
 
-#if HARD_FAULT_LOG_ENABLE && EFR32_LOG_ENABLED
+#if HARD_FAULT_LOG_ENABLE && SILABS_LOG_ENABLED
 
 /**
  * Log register contents to UART when a hard fault occurs.
@@ -370,7 +374,7 @@ extern "C" void debugHardfault(uint32_t * sp)
 
     if (sLogInitialized == false)
     {
-        efr32InitLog();
+        silabsInitLog();
     }
 
     snprintf(formattedMsg, sizeof formattedMsg, LOG_ERROR "HardFault:\n");
@@ -428,7 +432,7 @@ extern "C" void vApplicationMallocFailedHook(void)
     timers, and semaphores.  The size of the FreeRTOS heap is set by the
     configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h. */
 
-    EFR32_LOG("Failed do a malloc on HEAP. Is it too small ?");
+    SILABS_LOG("Failed do a malloc on HEAP. Is it too small ?");
 
     /* Force an assert. */
     configASSERT((volatile void *) NULL);
@@ -443,8 +447,8 @@ extern "C" void vApplicationStackOverflowHook(TaskHandle_t pxTask, char * pcTask
     /* Run time stack overflow checking is performed if
     configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.  This hook
     function is called if a stack overflow is detected. */
-    EFR32_LOG("TASK OVERFLOW");
-    EFR32_LOG(pcTaskName);
+    SILABS_LOG("TASK OVERFLOW");
+    SILABS_LOG(pcTaskName);
     /* Force an assert. */
     configASSERT((volatile void *) NULL);
 }
@@ -503,4 +507,4 @@ extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBu
     configMINIMAL_STACK_SIZE is specified in words, not bytes. */
     *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
 }
-#endif // HARD_FAULT_LOG_ENABLE && EFR32_LOG_ENABLED
+#endif // HARD_FAULT_LOG_ENABLE && SILABS_LOG_ENABLED

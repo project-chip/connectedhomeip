@@ -90,27 +90,27 @@ void TemperatureManager::AttributeChangeHandler(EndpointId endpointId, Attribute
     {
     case ThermAttr::LocalTemperature::Id: {
         int8_t Temp = ConvertToPrintableTemp(*((int16_t *) value));
-        EFR32_LOG("Local temp %d", Temp);
+        SILABS_LOG("Local temp %d", Temp);
         mCurrentTempCelsius = Temp;
     }
     break;
 
     case ThermAttr::OccupiedCoolingSetpoint::Id: {
         int8_t coolingTemp = ConvertToPrintableTemp(*((int16_t *) value));
-        EFR32_LOG("CoolingSetpoint %d", coolingTemp);
+        SILABS_LOG("CoolingSetpoint %d", coolingTemp);
         mCoolingCelsiusSetPoint = coolingTemp;
     }
     break;
 
     case ThermAttr::OccupiedHeatingSetpoint::Id: {
         int8_t heatingTemp = ConvertToPrintableTemp(*((int16_t *) value));
-        EFR32_LOG("HeatingSetpoint %d", heatingTemp);
+        SILABS_LOG("HeatingSetpoint %d", heatingTemp);
         mHeatingCelsiusSetPoint = heatingTemp;
     }
     break;
 
     case ThermAttr::SystemMode::Id: {
-        EFR32_LOG("SystemMode %d", static_cast<uint8_t>(*value));
+        SILABS_LOG("SystemMode %d", static_cast<uint8_t>(*value));
         uint8_t mode = static_cast<uint8_t>(*value);
         if (mThermMode != mode)
         {
@@ -120,7 +120,7 @@ void TemperatureManager::AttributeChangeHandler(EndpointId endpointId, Attribute
     break;
 
     default: {
-        EFR32_LOG("Unhandled thermostat attribute %x", attributeId);
+        SILABS_LOG("Unhandled thermostat attribute %x", attributeId);
         return;
     }
     break;

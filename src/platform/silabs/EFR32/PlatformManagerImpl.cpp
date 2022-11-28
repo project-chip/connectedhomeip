@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Provides an implementation of the PlatformManager object
- *          for EFR32 platforms using the Silicon Labs EFR32 SDK.
+ *          for Silabs platforms using the Silicon Labs SDK.
  */
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>

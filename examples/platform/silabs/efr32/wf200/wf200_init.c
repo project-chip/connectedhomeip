@@ -89,7 +89,7 @@ sl_status_t sl_wfx_host_disable_spi(void);
  *****************************************************************************/
 sl_status_t wfx_soft_init(void)
 {
-    EFR32_LOG("WF200:Soft Init");
+    SILABS_LOG("WF200:Soft Init");
     if ((wfx_event_Q = xQueueCreateStatic(SL_WFX_EVENT_LIST_SIZE, sizeof(uint8_t), sWfxEventQueueBuffer, &sWfxEventQueueStruct)) ==
         NULL)
     {
@@ -118,7 +118,7 @@ sl_status_t wfx_soft_init(void)
  *****************************************************************************/
 sl_status_t sl_wfx_host_init(void)
 {
-    EFR32_LOG("WFX: Host Init");
+    SILABS_LOG("WFX: Host Init");
     host_context.wf200_firmware_download_progress = 0;
     host_context.wf200_initialized                = 0;
     return SL_STATUS_OK;
@@ -420,7 +420,7 @@ sl_status_t sl_wfx_host_lock(void)
 
     if (xSemaphoreTake(wfx_mutex, TICKS_TO_WAIT_500) != pdTRUE)
     {
-        EFR32_LOG("*ERR*Wi-Fi driver mutex timo");
+        SILABS_LOG("*ERR*Wi-Fi driver mutex timo");
         status = SL_STATUS_TIMEOUT;
     }
 
@@ -536,7 +536,7 @@ void sl_wfx_host_log(const char * str, ...)
 void otSysEventSignalPending(void)
 {
     // BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
-    EFR32_LOG("*ERR*UART intr - NOT Handled");
+    SILABS_LOG("*ERR*UART intr - NOT Handled");
     portYIELD_FROM_ISR(pdFALSE);
 }
 #endif /* !CHIP_ENABLE_OPENTHREAD */

@@ -56,7 +56,7 @@ void ThermostatUI::DrawUI(GLIB_Context_t * glibContext)
 {
     if (glibContext == nullptr)
     {
-        EFR32_LOG("Context is null");
+        SILABS_LOG("Context is null");
         return;
     }
 

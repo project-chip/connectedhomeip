@@ -18,8 +18,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/silabs/EFR32Config.h>
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
+#include <platform/silabs/SilabsConfig.h>
 
 #include <limits>
 
@@ -44,12 +44,12 @@ CHIP_ERROR SlWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     mpConnectCallback     = nullptr;
 
     // If reading fails, wifi is not provisioned, no need to go further.
-    err =
-        EFR32Config::ReadConfigValueStr(EFR32Config::kConfigKey_WiFiSSID, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid), ssidLen);
+    err = SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_WiFiSSID, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid),
+                                           ssidLen);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
-    err = EFR32Config::ReadConfigValueStr(EFR32Config::kConfigKey_WiFiPSK, mSavedNetwork.credentials,
-                                          sizeof(mSavedNetwork.credentials), credentialsLen);
+    err = SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_WiFiPSK, mSavedNetwork.credentials,
+                                           sizeof(mSavedNetwork.credentials), credentialsLen);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
     mSavedNetwork.credentialsLen = credentialsLen;
@@ -64,9 +64,9 @@ CHIP_ERROR SlWiFiDriver::CommitConfiguration()
 {
     uint8_t securityType = WFX_SEC_WPA2;
 
-    ReturnErrorOnFailure(EFR32Config::WriteConfigValueStr(EFR32Config::kConfigKey_WiFiSSID, mStagingNetwork.ssid));
-    ReturnErrorOnFailure(EFR32Config::WriteConfigValueStr(EFR32Config::kConfigKey_WiFiPSK, mStagingNetwork.credentials));
-    ReturnErrorOnFailure(EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_WiFiSEC, &securityType, sizeof(securityType)));
+    ReturnErrorOnFailure(SILABSConfig::WriteConfigValueStr(SILABSConfig::kConfigKey_WiFiSSID, mStagingNetwork.ssid));
+    ReturnErrorOnFailure(SILABSConfig::WriteConfigValueStr(SILABSConfig::kConfigKey_WiFiPSK, mStagingNetwork.credentials));
+    ReturnErrorOnFailure(SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_WiFiSEC, &securityType, sizeof(securityType)));
 
     mSavedNetwork = mStagingNetwork;
     return CHIP_NO_ERROR;

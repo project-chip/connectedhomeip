@@ -23,7 +23,7 @@
 
 namespace chip {
 namespace Credentials {
-namespace EFR32 {
+namespace Silabs {
 
 /**
  * @brief Get implementation of a sample DAC provider to validate device
@@ -32,8 +32,8 @@ namespace EFR32 {
  * @returns a singleton DeviceAttestationCredentialsProvider that relies on no
  *          storage abstractions.
  */
-DeviceAttestationCredentialsProvider * GetEFR32DacProvider();
+DeviceAttestationCredentialsProvider * GetSilabsDacProvider();
 
-} // namespace EFR32
+} // namespace Silabs
 } // namespace Credentials
 } // namespace chip
