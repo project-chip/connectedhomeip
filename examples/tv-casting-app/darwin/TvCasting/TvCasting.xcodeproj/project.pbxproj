@@ -420,7 +420,7 @@
 					CoreData,
 					"-Wl,-unexported_symbol,\"__Z*\"",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.matter.TvCasting-sharadb";
+				PRODUCT_BUNDLE_IDENTIFIER = com.matter.TvCasting;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -467,7 +467,7 @@
 					"-Wformat-nonliteral",
 					"-Wformat-security",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.matter.TvCasting-sharadb";
+				PRODUCT_BUNDLE_IDENTIFIER = com.matter.TvCasting;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SWIFT_EMIT_LOC_STRINGS = YES;
