@@ -233,7 +233,7 @@ jobs:
                        --target linux-x64-rpc-console \
                        build \
                     "
-            - name: Prepare code pregen and ensure compile time pregen not possible
+            - name: Create a pre-generate directory and ensure compile-time codegen would fail
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/codepregen.py ./zzz_pregenerated"
                   mv scripts/codegen.py scripts/codegen.py.renamed
@@ -247,7 +247,7 @@ jobs:
                        --pregen-dir ./zzz_pregenerated \
                        build \
                     "
-            - name: Undo code pregeneration changes
+            - name: Undo code pre-generation changes (make compile time codegen work again)
               run: |
                   rm -rf ./zzz_pregenerated
                   mv scripts/codegen.py.renamed scripts/codegen.py
