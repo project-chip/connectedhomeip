@@ -84,6 +84,23 @@ public abstract class Command {
     return mArgs.get(index).getDesc();
   }
 
+  public final void addArgumentToList(Argument arg, boolean optional) {
+    if (arg.isOptional() || mArgs.isEmpty()) {
+      // Safe to just append to the end of a list.
+      mArgs.add(arg);
+      return;
+    }
+
+    // mandatory arg needs to be inserted before the optional arguments.
+    int index = 0;
+    while (index < mArgs.size() && !mArgs.get(index).isOptional()) {
+      index++;
+    }
+
+    // Insert before the first optional arg.
+    mArgs.add(index, arg);
+  }
+
   /**
    * @brief Add a bool command argument
    * @param name The name that will be displayed in the command help
@@ -92,11 +109,10 @@ public abstract class Command {
    * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
    */
-  public final int addArgument(
+  public final void addArgument(
       String name, AtomicBoolean out, @Nullable String desc, boolean optional) {
     Argument arg = new Argument(name, out, desc, optional);
-    mArgs.add(arg);
-    return mArgs.size();
+    addArgumentToList(arg, optional);
   }
 
   /**
@@ -109,7 +125,7 @@ public abstract class Command {
    * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
    */
-  public final int addArgument(
+  public final void addArgument(
       String name,
       short min,
       short max,
@@ -117,8 +133,7 @@ public abstract class Command {
       @Nullable String desc,
       boolean optional) {
     Argument arg = new Argument(name, min, max, out, desc, optional);
-    mArgs.add(arg);
-    return mArgs.size();
+    addArgumentToList(arg, optional);
   }
 
   /**
@@ -131,11 +146,10 @@ public abstract class Command {
    * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
    */
-  public final int addArgument(
+  public final void addArgument(
       String name, int min, int max, AtomicInteger out, @Nullable String desc, boolean optional) {
     Argument arg = new Argument(name, min, max, out, desc, optional);
-    mArgs.add(arg);
-    return mArgs.size();
+    addArgumentToList(arg, optional);
   }
 
   /**
@@ -148,11 +162,10 @@ public abstract class Command {
    * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
    */
-  public final int addArgument(
+  public final void addArgument(
       String name, long min, long max, AtomicLong out, @Nullable String desc, boolean optional) {
     Argument arg = new Argument(name, min, max, out, desc, optional);
-    mArgs.add(arg);
-    return mArgs.size();
+    addArgumentToList(arg, optional);
   }
 
   /**
@@ -162,10 +175,9 @@ public abstract class Command {
    * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
    */
-  public final int addArgument(String name, IPAddress out, boolean optional) {
+  public final void addArgument(String name, IPAddress out, boolean optional) {
     Argument arg = new Argument(name, out, optional);
-    mArgs.add(arg);
-    return mArgs.size();
+    addArgumentToList(arg, optional);
   }
 
   /**
@@ -176,11 +188,10 @@ public abstract class Command {
    * @param optional Indicate if an optional argument
    * @return The number of arguments currently added to the command
    */
-  public final int addArgument(
+  public final void addArgument(
       String name, StringBuffer out, @Nullable String desc, boolean optional) {
     Argument arg = new Argument(name, out, desc, optional);
-    mArgs.add(arg);
-    return mArgs.size();
+    addArgumentToList(arg, optional);
   }
 
   /**
@@ -189,16 +200,12 @@ public abstract class Command {
    * @param args Supplied command-line arguments as an array of String objects.
    */
   public final void initArguments(int argc, String[] args) {
-    int argvExtraArgsCount = argc;
     int mandatoryArgsCount = 0;
-    int optionalArgsCount = 0;
+    int currentIndex = 0;
 
     for (Argument arg : mArgs) {
-      if (arg.isOptional()) {
-        optionalArgsCount++;
-      } else {
+      if (!arg.isOptional()) {
         mandatoryArgsCount++;
-        argvExtraArgsCount--;
       }
     }
 
@@ -209,29 +216,27 @@ public abstract class Command {
 
     // Initialize mandatory arguments
     for (int i = 0; i < mandatoryArgsCount; i++) {
-      initArgument(i, args[i]);
+      initArgument(currentIndex++, args[i]);
     }
 
     // Initialize optional arguments
     // Optional arguments expect a name and a value, so i is increased by 2 on every step.
     for (int i = mandatoryArgsCount; i < argc; i += 2) {
-      for (int j = mandatoryArgsCount; j < mandatoryArgsCount + optionalArgsCount; j++) {
-        // optional arguments starts with OPTIONAL_ARGUMENT_PREFIX
-        if (args[i].length() <= OPTIONAL_ARGUMENT_PREFIX_LENGTH
-            && !args[i]
-                .substring(0, OPTIONAL_ARGUMENT_PREFIX_LENGTH - 1)
-                .equals(OPTIONAL_ARGUMENT_PREFIX)) {
-          continue;
+      // optional arguments starts with OPTIONAL_ARGUMENT_PREFIX
+      if (args[i].length() <= OPTIONAL_ARGUMENT_PREFIX_LENGTH
+          && !args[i].startsWith(OPTIONAL_ARGUMENT_PREFIX)) {
+        throw new IllegalArgumentException("initArguments: Invalid optional argument: " + args[i]);
+      }
+
+      if (args[i]
+          .substring(OPTIONAL_ARGUMENT_PREFIX_LENGTH)
+          .equals(mArgs.get(currentIndex).getName())) {
+        if (i + 1 >= argc) {
+          throw new IllegalArgumentException(
+              "initArguments: Optional argument " + args[i] + " missing value");
         }
 
-        if (args[i].substring(OPTIONAL_ARGUMENT_PREFIX_LENGTH).equals(mArgs.get(j).getName())) {
-          if (i + 1 >= argc) {
-            throw new IllegalArgumentException(
-                "initArguments: Optional argument " + args[i] + " missing value");
-          }
-
-          initArgument(j, args[i + 1]);
-        }
+        initArgument(currentIndex++, args[i + 1]);
       }
     }
   }
