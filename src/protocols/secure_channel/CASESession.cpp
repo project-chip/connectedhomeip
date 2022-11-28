@@ -404,7 +404,7 @@ CHIP_ERROR CASESession::SendSigma1()
     // Generate an ephemeral keypair
     mEphemeralKey = mFabricsTable->AllocateEphemeralKeypairForCASE();
     VerifyOrReturnError(mEphemeralKey != nullptr, CHIP_ERROR_NO_MEMORY);
-    ReturnErrorOnFailure(mEphemeralKey->Initialize());
+    ReturnErrorOnFailure(mEphemeralKey->Initialize(ECPKeyTarget::ECDH));
 
     // Fill in the random value
     ReturnErrorOnFailure(DRBG_get_bytes(mInitiatorRandom, sizeof(mInitiatorRandom)));
@@ -732,7 +732,7 @@ CHIP_ERROR CASESession::SendSigma2()
     // Generate an ephemeral keypair
     mEphemeralKey = mFabricsTable->AllocateEphemeralKeypairForCASE();
     VerifyOrReturnError(mEphemeralKey != nullptr, CHIP_ERROR_NO_MEMORY);
-    ReturnErrorOnFailure(mEphemeralKey->Initialize());
+    ReturnErrorOnFailure(mEphemeralKey->Initialize(ECPKeyTarget::ECDH));
 
     // Generate a Shared Secret
     ReturnErrorOnFailure(mEphemeralKey->ECDH_derive_secret(mRemotePubKey, mSharedSecret));

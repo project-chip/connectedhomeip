@@ -145,7 +145,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
 
         commissionerParams.pairingDelegate = &gPairingDelegate;
 
-        err = ephemeralKey.Initialize();
+        err = ephemeralKey.Initialize(chip::Crypto::ECPKeyTarget::ECDSA);
         SuccessOrExit(err);
 
         err = gOperationalCredentialsIssuer.Initialize(gServerStorage);

@@ -171,7 +171,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     MutableByteSpan rcacSpan(rcac.Get(), Controller::kMaxCHIPDERCertLength);
 
     Crypto::P256Keypair ephemeralKey;
-    ReturnErrorOnFailure(ephemeralKey.Initialize());
+    ReturnErrorOnFailure(ephemeralKey.Initialize(Crypto::ECPKeyTarget::ECDSA));
 
     ReturnErrorOnFailure(gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, /* fabricId = */ 1, chip::kUndefinedCATs,
                                                                         ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));

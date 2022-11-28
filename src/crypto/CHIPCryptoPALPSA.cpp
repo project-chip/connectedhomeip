@@ -515,30 +515,6 @@ static inline const PsaP256KeypairContext & to_const_keypair_ctx(const P256Keypa
     return *SafePointerCast<const PsaP256KeypairContext *>(&context);
 }
 
-static psa_status_t ConvertEcdsaKeyToEcdh(psa_key_id_t * destination, psa_key_id_t source)
-{
-    psa_status_t status             = PSA_SUCCESS;
-    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
-    uint8_t privateKey[kP256_PrivateKey_Length];
-    size_t privateKeyLength;
-
-    status = psa_export_key(source, privateKey, sizeof(privateKey), &privateKeyLength);
-
-    if (status == PSA_SUCCESS)
-    {
-        // Type based on ECC with the elliptic curve SECP256r1 -> PSA_ECC_FAMILY_SECP_R1
-        // Algorithm Elliptic Curve Diffie-Hellman (ECDH)
-        psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
-        psa_set_key_bits(&attributes, kP256_PrivateKey_Length * 8);
-        psa_set_key_algorithm(&attributes, PSA_ALG_ECDH);
-        psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
-        status = psa_import_key(&attributes, privateKey, privateKeyLength, destination);
-    }
-
-    psa_reset_key_attributes(&attributes);
-    return status;
-}
-
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
@@ -624,22 +600,17 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
 
     CHIP_ERROR error                      = CHIP_NO_ERROR;
     psa_status_t status                   = PSA_SUCCESS;
-    psa_key_id_t keyId                    = 0;
     const PsaP256KeypairContext & context = to_const_keypair_ctx(mKeypair);
     const size_t outputSize               = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
     size_t outputLength;
 
-    status = ConvertEcdsaKeyToEcdh(&keyId, context.key_id);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
-
-    status = psa_raw_key_agreement(PSA_ALG_ECDH, keyId, remote_public_key.ConstBytes(), remote_public_key.Length(),
+    status = psa_raw_key_agreement(PSA_ALG_ECDH, context.key_id, remote_public_key.ConstBytes(), remote_public_key.Length(),
                                    out_secret.Bytes(), outputSize, &outputLength);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
     SuccessOrExit(out_secret.SetLength(outputLength));
 
 exit:
     logPsaError(status);
-    psa_destroy_key(keyId);
 
     return error;
 }
@@ -675,7 +646,7 @@ bool IsBufferContentEqualConstantTime(const void * a, const void * b, size_t n)
     return mbedtls_ct_memcmp_copy(a, b, n) == 0;
 }
 
-CHIP_ERROR P256Keypair::Initialize()
+CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
 {
     VerifyOrReturnError(!mInitialized, CHIP_ERROR_INCORRECT_STATE);
 
@@ -686,11 +657,23 @@ CHIP_ERROR P256Keypair::Initialize()
     size_t publicKeyLength          = 0;
 
     // Type based on ECC with the elliptic curve SECP256r1 -> PSA_ECC_FAMILY_SECP_R1
-    // Algorithm Elliptic Curve Digital Signature Algorithm (ECDSA)
     psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
     psa_set_key_bits(&attributes, kP256_PrivateKey_Length * 8);
-    psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
-    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_EXPORT | PSA_KEY_USAGE_SIGN_MESSAGE);
+
+    if (key_target == ECPKeyTarget::ECDH)
+    {
+        psa_set_key_algorithm(&attributes, PSA_ALG_ECDH);
+        psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
+    }
+    else if (key_target == ECPKeyTarget::ECDSA)
+    {
+        psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
+        psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_EXPORT | PSA_KEY_USAGE_SIGN_MESSAGE);
+    }
+    else
+    {
+        ExitNow(error = CHIP_ERROR_UNKNOWN_KEY_TYPE);
+    }
 
     status = psa_generate_key(&attributes, &context.key_id);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
