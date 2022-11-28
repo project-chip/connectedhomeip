@@ -37,7 +37,7 @@
 
 #include <platform/cc32xx/CC32XXConfig.h>
 
-#include <app/server/Dnssd.h>
+//#include "../../app/server/Dnssd.h"
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
 #include <lwip/nd6.h>
@@ -170,16 +170,8 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
-        // if (event->CommissioningComplete.Status == CHIP_NO_ERROR)
-        // {
         ChipLogProgress(AppServer, "Commissioning completed successfully");
         DeviceLayer::Internal::CC32XXConfig::WriteKVSToNV();
-        // }
-        // else
-        // {
-        //     ChipLogError(AppServer, "Commissioning failed with error %" CHIP_ERROR_FORMAT,
-        //                  event->CommissioningComplete.Status.Format());
-        // }
     }
 }
 
@@ -208,7 +200,11 @@ void ConnectivityManagerImpl::_OnLwipEvent(struct netif * pNetIf, NetIfStatus_e 
 void ConnectivityManagerImpl::_OnIpAcquired(intptr_t arg)
 {
     cc32xxLog("ConnectivityManagerImpl::OnIpAcquired() : Start DNS Server");
-    chip::app::DnssdServer::Instance().StartServer();
+    ChipDeviceEvent event;
+    event.Type = DeviceEventType::kInterfaceIpAddressChanged;
+    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Assigned;
+    PlatformMgr().PostEventOrDie(&event);
+    //chip::app::DnssdServer::Instance().StartServer();
 }
 
 void ConnectivityManagerImpl::OnStationConnected()

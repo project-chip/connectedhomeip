@@ -65,6 +65,7 @@ source_set("lock_app_sdk") {
     "${project_dir}/main",
     "${project_dir}/main/ifmod/",
     "${chip_root}/src/platform/cc32xx",
+    "${chip_root}/examples/platform/cc32xx",
   ]
 
   deps = [
