@@ -109,11 +109,16 @@ class RunContext:
     help='Internal flag for running inside a unshared environment'
 )
 @click.option(
+    '--run-yaml-python-parser',
+    default=False,
+    is_flag=True,
+    help='Run YAML tests using python parser in addition to any other tests')
+@click.option(
     '--chip-tool',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
 def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
-         no_log_timestamps, root, internal_inside_unshare, chip_tool):
+         no_log_timestamps, root, internal_inside_unshare, run_yaml_python_parser, chip_tool):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -124,7 +129,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         chip_tool = FindBinaryPath('chip-tool')
 
     # Figures out selected test that match the given name(s)
-    all_tests = [test for test in chiptest.AllTests(chip_tool)]
+    all_tests = [test for test in chiptest.AllTests(chip_tool, run_yaml_python_parser)]
 
     # Default to only non-manual tests unless explicit targets are specified.
     tests = list(filter(lambda test: not test.is_manual, all_tests))

@@ -168,7 +168,7 @@ class ApplicationPaths:
     python_yaml_tester_cmd: typing.List[str]
 
     def items(self):
-        return [self.chip_tool, self.all_clusters_app, self.lock_app, self.ota_provider_app, self.ota_requestor_app, self.tv_app, self.bridge_app]
+        return [self.chip_tool, self.all_clusters_app, self.lock_app, self.ota_provider_app, self.ota_requestor_app, self.tv_app, self.bridge_app, self.python_yaml_tester_cmd]
 
 
 @dataclass
@@ -240,8 +240,8 @@ class TestDefinition:
                                 "don't know which application to run")
 
             for path in paths.items():
-                # Do not add chip-tool to the register
-                if path == paths.chip_tool:
+                # Do not add chip-tool or python-yaml-tester-cmd to the register
+                if path == paths.chip_tool or path == paths.python_yaml_tester_cmd:
                     continue
 
                 # For the app indicated by self.target, give it the 'default' key to add to the register
