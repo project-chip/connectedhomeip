@@ -136,4 +136,40 @@
     XCTAssertEqual(counter, 2);
 }
 
+- (void)testRunItemsAfterDrain
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Work item called after drain"];
+
+    MTRAsyncCallbackWorkQueue * workQueue = [[MTRAsyncCallbackWorkQueue alloc] initWithContext:nil queue:dispatch_get_main_queue()];
+
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+
+    MTRAsyncCallbackQueueWorkItem * workItem1 = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_main_queue()];
+    MTRAsyncCallbackReadyHandler readyHandler1 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
+        [workItem1 endWork];
+        // asynchronously signal semaphore to ensure the queue has finished draining
+        dispatch_async(dispatch_get_main_queue(), ^{
+            dispatch_semaphore_signal(sema);
+        });
+    };
+    workItem1.readyHandler = readyHandler1;
+    workItem1.cancelHandler = ^{
+    };
+    [workQueue enqueueWorkItem:workItem1];
+
+    XCTAssertEqual(dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC)), 0);
+
+    MTRAsyncCallbackQueueWorkItem * workItem2 = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_main_queue()];
+    MTRAsyncCallbackReadyHandler readyHandler2 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
+        [expectation fulfill];
+        [workItem2 endWork];
+    };
+    workItem2.readyHandler = readyHandler2;
+    workItem2.cancelHandler = ^{
+    };
+    [workQueue enqueueWorkItem:workItem2];
+
+    [self waitForExpectationsWithTimeout:5 handler:nil];
+}
+
 @end
