@@ -66,7 +66,7 @@ class GnBuilder(Builder):
             extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)
 
         if self.options.pregen_dir:
-            extra_args.append('chip_code_pre_gegenerated_directory="%s"' % self.options.pregen_dir)
+            extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
 
         extra_args.extend(self.GnBuildArgs() or [])
         if extra_args:

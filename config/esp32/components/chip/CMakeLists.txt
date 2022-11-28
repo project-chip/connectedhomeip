@@ -102,7 +102,7 @@ if(CONFIG_DISABLE_IPV4)
 endif()
 
 if(CHIP_CODEGEN_PREGEN_DIR)
-    chip_gn_arg_append("chip_code_pre_gegenerated_directory"  "\"${CHIP_CODEGEN_PREGEN_DIR}\"")
+    chip_gn_arg_append("chip_code_pre_generated_directory"  "\"${CHIP_CODEGEN_PREGEN_DIR}\"")
 endif()
 
 if(CONFIG_ENABLE_PW_RPC)

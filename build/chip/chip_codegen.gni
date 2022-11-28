@@ -20,7 +20,7 @@ import("$dir_pw_build/python.gni")
 
 declare_args() {
   # Location where code has been pre-generated
-  chip_code_pre_gegenerated_directory = ""
+  chip_code_pre_generated_directory = ""
 }
 
 # Code generation that will happen at build time.
@@ -106,7 +106,7 @@ template("_chip_build_time_codegen") {
 #
 # Command line parameters:
 #
-#  chip_code_pre_gegenerated_directory:
+#  chip_code_pre_generated_directory:
 #     - If this is set, generation will NOT happen at compile time but rather
 #       the code generation is assumed to have already happened and reside in
 #       the given location.
@@ -138,7 +138,7 @@ template("_chip_build_time_codegen") {
 #  }
 #
 template("chip_codegen") {
-  if (chip_code_pre_gegenerated_directory == "") {
+  if (chip_code_pre_generated_directory == "") {
     _chip_build_time_codegen(target_name) {
       forward_variables_from(invoker,
                              [
@@ -157,7 +157,7 @@ template("chip_codegen") {
     #  USING "cpp-app" for generator:
     #    => ${pregen_dir}/examples/all-clusters-app/all-clusters-common/all-clusters-app/codegen/cpp-app
     _generation_dir =
-        chip_code_pre_gegenerated_directory + "/" +
+        chip_code_pre_generated_directory + "/" +
         string_replace(rebase_path(invoker.input, chip_root), ".matter", "") +
         "/codegen/" + invoker.generator
 
