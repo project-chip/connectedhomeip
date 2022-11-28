@@ -17,7 +17,7 @@
 #import "MTRManualSetupPayloadParser.h"
 
 #import "MTRError_Internal.h"
-#import "MTRLogging.h"
+#import "MTRLogging_Internal.h"
 #import "MTRMemory.h"
 #import "MTRSetupPayload_Internal.h"
 

@@ -21,10 +21,8 @@
 
 #import <Security/Security.h>
 
-#include <Security/SecKey.h>
-
 #import "MTRCertificates.h"
-#import "MTRLogging.h"
+#import "MTRLogging_Internal.h"
 #import "NSDataSpanConversion.h"
 
 #include <controller/CommissioningDelegate.h>

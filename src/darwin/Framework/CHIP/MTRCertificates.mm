@@ -16,7 +16,7 @@
 
 #import "MTRCertificates.h"
 #import "MTRError_Internal.h"
-#import "MTRLogging.h"
+#import "MTRLogging_Internal.h"
 #import "MTRMemory.h"
 #import "MTROperationalCredentialsDelegate.h"
 #import "MTRP256KeypairBridge.h"
@@ -206,7 +206,7 @@ using namespace chip::Credentials;
     chip::MutableByteSpan chipCertBytes(chipCertBuffer);
 
     CHIP_ERROR errorCode = chip::Credentials::ConvertX509CertToChipCert(x509CertBytes, chipCertBytes);
-    MTR_LOG_ERROR("ConvertX509CertToChipCert: %{public}s", chip::ErrorStr(errorCode));
+    MTR_LOG_ERROR("ConvertX509CertToChipCert: %s", chip::ErrorStr(errorCode));
 
     if (errorCode != CHIP_NO_ERROR)
         return nil;
@@ -224,7 +224,7 @@ using namespace chip::Credentials;
     CHIP_ERROR errorCode = chip::Credentials::ConvertChipCertToX509Cert(tlvCertBytes, derCertBytes);
 
     if (errorCode != CHIP_NO_ERROR) {
-        MTR_LOG_ERROR("ConvertChipCertToX509Cert: %{public}s", chip::ErrorStr(errorCode));
+        MTR_LOG_ERROR("ConvertChipCertToX509Cert: %s", chip::ErrorStr(errorCode));
         return nil;
     }
 

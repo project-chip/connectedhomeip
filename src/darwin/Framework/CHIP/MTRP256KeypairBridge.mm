@@ -18,11 +18,11 @@
 #import "MTRP256KeypairBridge.h"
 #import "NSDataSpanConversion.h"
 
-#import <Security/SecKey.h>
+#import <Security/Security.h>
 #include <string>
 
 #import "MTRKeypair.h"
-#import "MTRLogging.h"
+#import "MTRLogging_Internal.h"
 
 using namespace chip::Crypto;
 

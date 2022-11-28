@@ -16,12 +16,9 @@
  *    limitations under the License.
  */
 
-#import <os/log.h>
+#include <lib/support/logging/CHIPLogging.h>
 
-#define MTR_LOG_FAULT(format, ...) os_log_fault(OS_LOG_DEFAULT, format, ##__VA_ARGS__)
-#define MTR_LOG_ERROR(format, ...) os_log_error(OS_LOG_DEFAULT, format, ##__VA_ARGS__)
-#define MTR_LOG_INFO(format, ...) os_log_info(OS_LOG_DEFAULT, format, ##__VA_ARGS__)
-#define MTR_LOG_DEBUG(format, ...) os_log_debug(OS_LOG_DEFAULT, format, ##__VA_ARGS__)
-
-#define MTR_LOG_METHOD_ENTRY()                                                                                                     \
-    ({ os_log_debug(OS_LOG_DEFAULT, "[<%@: %p> %@]", NSStringFromClass([self class]), self, NSStringFromSelector(_cmd)); })
+#define MTR_LOG_ERROR(msg, ...) ChipLogError(NotSpecified, msg, ##__VA_ARGS__)
+#define MTR_LOG_DEFAULT(msg, ...) ChipLogProgress(NotSpecified, msg, ##__VA_ARGS__)
+#define MTR_LOG_INFO(msg, ...) ChipLogDetail(NotSpecified, msg, ##__VA_ARGS__)
+#define MTR_LOG_DEBUG(msg, ...) ChipLogDetail(NotSpecified, msg, ##__VA_ARGS__) // same as INFO

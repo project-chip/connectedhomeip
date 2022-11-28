@@ -25,7 +25,7 @@
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
-#import "MTRLogging.h"
+#import "MTRLogging_Internal.h"
 #import "MTRMemory.h"
 #import "MTROTAProviderDelegateBridge.h"
 #import "MTRP256KeypairBridge.h"
@@ -50,7 +50,6 @@ using namespace chip::Controller;
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
 static NSString * const kErrorAttestationTrustStoreInit = @"Init failure while creating the attestation trust store";
 static NSString * const kErrorDACVerifierInit = @"Init failure while creating the device attestation verifier";
-static NSString * const kInfoFactoryShutdown = @"Shutting down the Matter controller factory";
 static NSString * const kErrorGroupProviderInit = @"Init failure while initializing group data provider";
 static NSString * const kErrorControllersInit = @"Init controllers array failure";
 static NSString * const kErrorControllerFactoryInit = @"Init failure while initializing controller factory";
@@ -414,7 +413,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         [_controllers[0] shutdown];
     }
 
-    MTR_LOG_DEBUG("%@", kInfoFactoryShutdown);
+    MTR_LOG_DEBUG("Shutting down the Matter controller factory");
     _controllerFactory->Shutdown();
 
     [self cleanupStartupObjects];

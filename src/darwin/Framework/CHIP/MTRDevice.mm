@@ -25,7 +25,7 @@
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
-#import "MTRLogging.h"
+#import "MTRLogging_Internal.h"
 
 #include "lib/core/CHIPError.h"
 #include "lib/core/DataModelTypes.h"
