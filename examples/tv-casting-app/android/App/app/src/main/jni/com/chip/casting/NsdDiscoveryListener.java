@@ -22,6 +22,7 @@ import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
 import chip.platform.NsdManagerServiceResolver;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class NsdDiscoveryListener implements NsdManager.DiscoveryListener {
@@ -34,6 +35,7 @@ public class NsdDiscoveryListener implements NsdManager.DiscoveryListener {
   private final SuccessCallback<DiscoveredNodeData> successCallback;
   private final FailureCallback failureCallback;
   private final NsdManagerServiceResolver.NsdManagerResolverAvailState nsdManagerResolverAvailState;
+  private final ExecutorService resolutionExecutor;
 
   public NsdDiscoveryListener(
       NsdManager nsdManager,
@@ -50,6 +52,7 @@ public class NsdDiscoveryListener implements NsdManager.DiscoveryListener {
     this.successCallback = successCallback;
     this.failureCallback = failureCallback;
     this.nsdManagerResolverAvailState = nsdManagerResolverAvailState;
+    this.resolutionExecutor = Executors.newSingleThreadExecutor();
   }
 
   @Override
@@ -59,33 +62,32 @@ public class NsdDiscoveryListener implements NsdManager.DiscoveryListener {
 
   @Override
   public void onServiceFound(NsdServiceInfo service) {
-    Executors.newSingleThreadExecutor()
-        .execute(
-            new Runnable() {
-              @Override
-              public void run() {
-                Log.d(TAG, "Service discovery success. " + service);
-                if (service.getServiceType().equals(targetServiceType)) {
-                  if (nsdManagerResolverAvailState != null) {
-                    nsdManagerResolverAvailState.acquireResolver();
-                  }
-
-                  Log.d(TAG, "Calling NsdManager.resolveService for " + service);
-                  nsdManager.resolveService(
-                      service,
-                      new NsdResolveListener(
-                          nsdManager,
-                          deviceTypeFilter,
-                          preCommissionedVideoPlayers,
-                          successCallback,
-                          failureCallback,
-                          nsdManagerResolverAvailState,
-                          1));
-                } else {
-                  Log.d(TAG, "Ignoring discovered service: " + service.toString());
-                }
+    this.resolutionExecutor.execute(
+        new Runnable() {
+          @Override
+          public void run() {
+            Log.d(TAG, "Service discovery success. " + service);
+            if (service.getServiceType().equals(targetServiceType)) {
+              if (nsdManagerResolverAvailState != null) {
+                nsdManagerResolverAvailState.acquireResolver();
               }
-            });
+
+              Log.d(TAG, "Calling NsdManager.resolveService for " + service);
+              nsdManager.resolveService(
+                  service,
+                  new NsdResolveListener(
+                      nsdManager,
+                      deviceTypeFilter,
+                      preCommissionedVideoPlayers,
+                      successCallback,
+                      failureCallback,
+                      nsdManagerResolverAvailState,
+                      1));
+            } else {
+              Log.d(TAG, "Ignoring discovered service: " + service.toString());
+            }
+          }
+        });
   }
 
   @Override
