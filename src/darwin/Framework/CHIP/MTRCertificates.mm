@@ -36,7 +36,7 @@ using namespace chip::Credentials;
                                                  fabricID:(NSNumber * _Nullable)fabricID
                                                     error:(NSError * __autoreleasing *)error
 {
-    NSLog(@"Generating root certificate");
+    MTR_LOG_DEFAULT("Generating root certificate");
 
     [MTRMemory ensureInit];
 
@@ -47,7 +47,7 @@ using namespace chip::Credentials;
     }
 
     if (err != CHIP_NO_ERROR) {
-        NSLog(@"Generating root certificate failed: %s", ErrorStr(err));
+        MTR_LOG_ERROR("Generating root certificate failed: %s", ErrorStr(err));
     }
 
     return rootCert;
@@ -60,7 +60,7 @@ using namespace chip::Credentials;
                                                          fabricID:(NSNumber * _Nullable)fabricID
                                                             error:(NSError * __autoreleasing *)error
 {
-    NSLog(@"Generating intermediate certificate");
+    MTR_LOG_DEFAULT("Generating intermediate certificate");
 
     [MTRMemory ensureInit];
 
@@ -72,7 +72,7 @@ using namespace chip::Credentials;
     }
 
     if (err != CHIP_NO_ERROR) {
-        NSLog(@"Generating intermediate certificate failed: %s", ErrorStr(err));
+        MTR_LOG_ERROR("Generating intermediate certificate failed: %s", ErrorStr(err));
     }
 
     return intermediate;
@@ -86,7 +86,7 @@ using namespace chip::Credentials;
                                            caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
                                                            error:(NSError * __autoreleasing _Nullable * _Nullable)error
 {
-    NSLog(@"Generating operational certificate");
+    MTR_LOG_DEFAULT("Generating operational certificate");
 
     [MTRMemory ensureInit];
 
@@ -98,7 +98,7 @@ using namespace chip::Credentials;
     }
 
     if (err != CHIP_NO_ERROR) {
-        NSLog(@"Generating operational certificate failed: %s", ErrorStr(err));
+        MTR_LOG_ERROR("Generating operational certificate failed: %s", ErrorStr(err));
     }
 
     return opcert;
@@ -111,7 +111,7 @@ using namespace chip::Credentials;
     P256PublicKey keypairPubKey;
     CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(keypair.publicKey, &keypairPubKey);
     if (err != CHIP_NO_ERROR) {
-        NSLog(@"Can't extract public key from keypair: %s", ErrorStr(err));
+        MTR_LOG_ERROR("Can't extract public key from keypair: %s", ErrorStr(err));
         return NO;
     }
     P256PublicKeySpan keypairKeySpan(keypairPubKey.ConstBytes());
@@ -119,7 +119,7 @@ using namespace chip::Credentials;
     P256PublicKey certPubKey;
     err = ExtractPubkeyFromX509Cert(AsByteSpan(certificate), certPubKey);
     if (err != CHIP_NO_ERROR) {
-        NSLog(@"Can't extract public key from certificate: %s", ErrorStr(err));
+        MTR_LOG_ERROR("Can't extract public key from certificate: %s", ErrorStr(err));
         return NO;
     }
     P256PublicKeySpan certKeySpan(certPubKey.ConstBytes());
@@ -134,7 +134,7 @@ using namespace chip::Credentials;
     P256PublicKey pubKey1;
     CHIP_ERROR err = ExtractPubkeyFromX509Cert(AsByteSpan(certificate1), pubKey1);
     if (err != CHIP_NO_ERROR) {
-        NSLog(@"Can't extract public key from first certificate: %s", ErrorStr(err));
+        MTR_LOG_ERROR("Can't extract public key from first certificate: %s", ErrorStr(err));
         return NO;
     }
     P256PublicKeySpan keySpan1(pubKey1.ConstBytes());
@@ -142,7 +142,7 @@ using namespace chip::Credentials;
     P256PublicKey pubKey2;
     err = ExtractPubkeyFromX509Cert(AsByteSpan(certificate2), pubKey2);
     if (err != CHIP_NO_ERROR) {
-        NSLog(@"Can't extract public key from second certificate: %s", ErrorStr(err));
+        MTR_LOG_ERROR("Can't extract public key from second certificate: %s", ErrorStr(err));
         return NO;
     }
     P256PublicKeySpan keySpan2(pubKey1.ConstBytes());
@@ -154,14 +154,14 @@ using namespace chip::Credentials;
     ChipDN subject1;
     err = ExtractSubjectDNFromX509Cert(AsByteSpan(certificate1), subject1);
     if (err != CHIP_NO_ERROR) {
-        NSLog(@"Can't extract subject DN from first certificate: %s", ErrorStr(err));
+        MTR_LOG_ERROR("Can't extract subject DN from first certificate: %s", ErrorStr(err));
         return NO;
     }
 
     ChipDN subject2;
     err = ExtractSubjectDNFromX509Cert(AsByteSpan(certificate2), subject2);
     if (err != CHIP_NO_ERROR) {
-        NSLog(@"Can't extract subject DN from second certificate: %s", ErrorStr(err));
+        MTR_LOG_ERROR("Can't extract subject DN from second certificate: %s", ErrorStr(err));
         return NO;
     }
 

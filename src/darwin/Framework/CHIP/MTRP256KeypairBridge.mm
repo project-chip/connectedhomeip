@@ -31,7 +31,7 @@ CHIP_ERROR MTRP256KeypairBridge::Init(id<MTRKeypair> keypair)
     if (![keypair respondsToSelector:@selector(signMessageECDSA_DER:)]
         && ![keypair respondsToSelector:@selector(signMessageECDSA_RAW:)]) {
         // Not a valid MTRKeypair implementation.
-        NSLog(@"Keypair does not support message signing");
+        MTR_LOG_ERROR("Keypair does not support message signing");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
