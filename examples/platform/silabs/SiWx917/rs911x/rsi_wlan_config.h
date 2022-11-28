@@ -45,7 +45,7 @@
      TCP_IP_FEAT_EXTENSION_VALID | /*TCP_IP_FEAT_SSL     |*/ /*TCP_IP_FEAT_DNS_CLIENT |*/                                          \
      0)
 //! To set custom feature select bit map
-#define RSI_CUSTOM_FEATURE_BIT_MAP FEAT_CUSTOM_FEAT_EXTENTION_VALID
+#define RSI_CUSTOM_FEATURE_BIT_MAP FEAT_CUSTOM_FEAT_EXTENSION_VALID
 
 #else /* Don't use RSI_SOCKETS */
 #define RSI_TCP_IP_BYPASS RSI_ENABLE

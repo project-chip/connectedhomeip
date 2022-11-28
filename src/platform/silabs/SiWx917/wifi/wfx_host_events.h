@@ -212,7 +212,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #define STATION 0
 #define BG_SCAN_RES_SIZE 500
 
-#define SPI_CONFIG_SUCESS 0
+#define SPI_CONFIG_SUCCESS 0
 #define WPA3_SECURITY 3
 
 typedef enum
@@ -333,7 +333,7 @@ bool wfx_have_ipv4_addr(sl_wfx_interface_t);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 bool wfx_have_ipv6_addr(sl_wfx_interface_t);
 wifi_mode_t wfx_get_wifi_mode(void);
-bool wfx_start_scan(char * ssid, void (*scan_cb)(wfx_wifi_scan_result_t *)); /* true returned if successfuly started */
+bool wfx_start_scan(char * ssid, void (*scan_cb)(wfx_wifi_scan_result_t *)); /* true returned if successfully started */
 void wfx_cancel_scan(void);
 
 /*

@@ -121,7 +121,7 @@ static void wfx_host_gpio_init(void)
  * @brief
  *       set the configuration of spi
  * @param[in]  usart:
- * @return  returns 0 if sucessful,
+ * @return  returns 0 if successful,
  *         -1 otherwise
  * **********************************************************************/
 static int sl_wfx_host_spi_set_config(void * usart)
@@ -223,7 +223,7 @@ sl_status_t sl_wfx_host_init_bus(void)
     USART_InitSync_TypeDef usartInit = USART_INITSYNC_DEFAULT;
 
     res = sl_wfx_host_spi_set_config(USART);
-    if (res != SPI_CONFIG_SUCESS)
+    if (res != SPI_CONFIG_SUCCESS)
     {
         return SL_STATUS_FAIL;
     }
