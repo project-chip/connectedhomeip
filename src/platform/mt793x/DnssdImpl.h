@@ -26,13 +26,13 @@
 
 namespace chip {
 namespace Dnssd {
-
 enum class ContextType
 {
     Register,
     Browse,
     Resolve,
 };
+
 
 struct GenericContext
 {
@@ -48,7 +48,9 @@ struct GenericContext
     virtual void DispatchSuccess()                        = 0;
 };
 
+
 struct RegisterContext;
+
 
 class MdnsContexts
 {
@@ -91,6 +93,25 @@ private:
     std::vector<GenericContext *> mContexts;
 };
 
+
+struct RegisterContext : public GenericContext
+{
+    DnssdPublishCallback callback;
+    std::string mType;
+    std::string mInstanceName;
+    // HostNameRegistrar mHostNameRegistrar;
+
+    RegisterContext(const char * sType, const char * instanceName, DnssdPublishCallback cb, void * cbContext);
+    // virtual ~RegisterContext() { mHostNameRegistrar.Unregister(); }
+    virtual ~RegisterContext() {}
+
+    void DispatchFailure(DNSServiceErrorType err) override;
+    void DispatchSuccess() override;
+
+    bool matches(const char * sType) { return mType.compare(sType) == 0; }
+};
+
+
 struct BrowseContext : public GenericContext
 {
     DnssdBrowseCallback callback;
@@ -103,6 +124,7 @@ struct BrowseContext : public GenericContext
     void DispatchFailure(DNSServiceErrorType err) override;
     void DispatchSuccess() override;
 };
+
 
 struct InterfaceInfo
 {
@@ -117,6 +139,7 @@ struct InterfaceInfo
     std::vector<Inet::IPAddress> addresses;
     std::string fullyQualifiedDomainName;
 };
+
 
 struct ResolveContext : public GenericContext
 {
@@ -138,6 +161,5 @@ struct ResolveContext : public GenericContext
                         const unsigned char * txtRecord);
     bool HasInterface();
 };
-
 } // namespace Dnssd
 } // namespace chip
