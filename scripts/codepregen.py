@@ -63,7 +63,7 @@ def _ParallelGenerateOne(arg):
 @click.option(
     '--parallel/--no-parallel',
     default=True,
-    help='Do parallel/multiprocessing codege.')
+    help='Do parallel/multiprocessing codegen.')
 @click.option(
     '--sdk-root',
     default=None,
@@ -81,7 +81,8 @@ def main(log_level, parallel, sdk_root, output_dir):
         )
 
     if not sdk_root:
-        sdk_root = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
+        sdk_root = os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), '..')
 
     sdk_root = os.path.abspath(sdk_root)
 

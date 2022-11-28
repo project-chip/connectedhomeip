@@ -116,7 +116,7 @@ template("_chip_build_time_codegen") {
 #
 # NOTE: content of "outputs" is verified to match the output of codegen.py
 #       exactly. It is not inferred on purpose, to make build-rules explicit
-#       and verifiable (even though codege.py can at runtime report its outputs)
+#       and verifiable (even though codegen.py can at runtime report its outputs)
 #
 #       To find the list of generated files, you can run codegen.py with the
 #       "--name-only" argument
