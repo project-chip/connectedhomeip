@@ -25,8 +25,8 @@
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
+#import "MTRFramework.h"
 #import "MTRLogging_Internal.h"
-#import "MTRMemory.h"
 #import "MTROTAProviderDelegateBridge.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
@@ -84,6 +84,11 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
 @implementation MTRDeviceControllerFactory
 
++ (void)initialize
+{
+    MTRFrameworkInit();
+}
+
 + (instancetype)sharedInstance
 {
     static MTRDeviceControllerFactory * factory = nil;
@@ -104,7 +109,6 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     _running = NO;
     _chipWorkQueue = DeviceLayer::PlatformMgrImpl().GetWorkQueue();
     _controllerFactory = &DeviceControllerFactory::GetInstance();
-    [MTRMemory ensureInit];
 
     _groupStorageDelegate = new chip::TestPersistentStorageDelegate();
     if ([self checkForInitError:(_groupStorageDelegate != nullptr) logMsg:kErrorGroupProviderInit]) {

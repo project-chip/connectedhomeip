@@ -16,8 +16,8 @@
 
 #import "MTRCertificates.h"
 #import "MTRError_Internal.h"
+#import "MTRFramework.h"
 #import "MTRLogging_Internal.h"
-#import "MTRMemory.h"
 #import "MTROperationalCredentialsDelegate.h"
 #import "MTRP256KeypairBridge.h"
 #import "NSDataSpanConversion.h"
@@ -31,15 +31,17 @@ using namespace chip::Credentials;
 
 @implementation MTRCertificates
 
++ (void)initialize
+{
+    MTRFrameworkInit();
+}
+
 + (MTRCertificateDERBytes _Nullable)createRootCertificate:(id<MTRKeypair>)keypair
                                                  issuerID:(NSNumber * _Nullable)issuerID
                                                  fabricID:(NSNumber * _Nullable)fabricID
                                                     error:(NSError * __autoreleasing *)error
 {
     MTR_LOG_DEFAULT("Generating root certificate");
-
-    [MTRMemory ensureInit];
-
     NSData * rootCert = nil;
     CHIP_ERROR err = MTROperationalCredentialsDelegate::GenerateRootCertificate(keypair, issuerID, fabricID, &rootCert);
     if (error) {
@@ -61,9 +63,6 @@ using namespace chip::Credentials;
                                                             error:(NSError * __autoreleasing *)error
 {
     MTR_LOG_DEFAULT("Generating intermediate certificate");
-
-    [MTRMemory ensureInit];
-
     NSData * intermediate = nil;
     CHIP_ERROR err = MTROperationalCredentialsDelegate::GenerateIntermediateCertificate(
         rootKeypair, rootCertificate, intermediatePublicKey, issuerID, fabricID, &intermediate);
@@ -87,9 +86,6 @@ using namespace chip::Credentials;
                                                            error:(NSError * __autoreleasing _Nullable * _Nullable)error
 {
     MTR_LOG_DEFAULT("Generating operational certificate");
-
-    [MTRMemory ensureInit];
-
     NSData * opcert = nil;
     CHIP_ERROR err = MTROperationalCredentialsDelegate::GenerateOperationalCertificate(
         signingKeypair, signingCertificate, operationalPublicKey, fabricID, nodeID, caseAuthenticatedTags, &opcert);
@@ -106,8 +102,6 @@ using namespace chip::Credentials;
 
 + (BOOL)keypair:(id<MTRKeypair>)keypair matchesCertificate:(NSData *)certificate
 {
-    [MTRMemory ensureInit];
-
     P256PublicKey keypairPubKey;
     CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(keypair.publicKey, &keypairPubKey);
     if (err != CHIP_NO_ERROR) {
@@ -129,8 +123,6 @@ using namespace chip::Credentials;
 
 + (BOOL)isCertificate:(MTRCertificateDERBytes)certificate1 equalTo:(MTRCertificateDERBytes)certificate2
 {
-    [MTRMemory ensureInit];
-
     P256PublicKey pubKey1;
     CHIP_ERROR err = ExtractPubkeyFromX509Cert(AsByteSpan(certificate1), pubKey1);
     if (err != CHIP_NO_ERROR) {
@@ -171,8 +163,6 @@ using namespace chip::Credentials;
 + (NSData * _Nullable)createCertificateSigningRequest:(id<MTRKeypair>)keypair
                                                 error:(NSError * __autoreleasing _Nullable * _Nullable)error
 {
-    [MTRMemory ensureInit];
-
     MTRP256KeypairBridge keypairBridge;
     CHIP_ERROR err = CHIP_NO_ERROR;
     do {

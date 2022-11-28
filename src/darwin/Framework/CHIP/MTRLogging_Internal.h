@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#import <Matter/MTRLogging.h>
+
 #include <lib/support/logging/CHIPLogging.h>
 
 #define MTR_LOG_ERROR(msg, ...) ChipLogError(NotSpecified, msg, ##__VA_ARGS__)
