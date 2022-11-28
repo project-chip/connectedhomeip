@@ -44,7 +44,7 @@ for name in $(ninja -C "$OUT_DIR" -t targets | grep -E '^gen_' | sed 's/: .*//')
 done
 
 # Code generation (based on zap/matter)
-for name in $(ninja -C "$OUT_DIR" -t targets | grep -E '_codegen:' | sed 's/: .*//'); do
+for name in $(ninja -C "$OUT_DIR" -t targets | grep -E -v '_no_codegen:' | grep -E '_codegen:' | sed 's/: .*//'); do
     echo "Generating $name ..."
     ninja -C "$OUT_DIR" "$name"
 done

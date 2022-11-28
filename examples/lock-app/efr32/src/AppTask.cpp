@@ -160,7 +160,7 @@ CHIP_ERROR AppTask::Init()
     err = BaseApplication::Init(&gIdentify);
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("BaseApplication::Init() failed");
+        SILABS_LOG("BaseApplication::Init() failed");
         appError(err);
     }
 
@@ -168,7 +168,7 @@ CHIP_ERROR AppTask::Init()
     err = RegisterLockEvents();
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("RegisterLockEvents() failed");
+        SILABS_LOG("RegisterLockEvents() failed");
         appError(err);
     }
 #endif // ENABLE_CHIP_SHELL
@@ -241,7 +241,7 @@ CHIP_ERROR AppTask::Init()
 
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("LockMgr().Init() failed");
+        SILABS_LOG("LockMgr().Init() failed");
         appError(err);
     }
 
@@ -273,7 +273,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("AppTask.Init() failed");
+        SILABS_LOG("AppTask.Init() failed");
         appError(err);
     }
 
@@ -281,7 +281,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     sAppTask.StartStatusLEDTimer();
 #endif
 
-    EFR32_LOG("App Task started");
+    SILABS_LOG("App Task started");
 
     // Users and credentials should be checked once from nvm flash on boot
     LockMgr().ReadConfigValues();
@@ -350,7 +350,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
 
         if (!initiated)
         {
-            EFR32_LOG("Action is already in progress or active.");
+            SILABS_LOG("Action is already in progress or active.");
         }
     }
 }
@@ -383,7 +383,7 @@ void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
     if (aAction == LockManager::UNLOCK_ACTION || aAction == LockManager::LOCK_ACTION)
     {
         bool locked = (aAction == LockManager::LOCK_ACTION);
-        EFR32_LOG("%s Action has been initiated", (locked) ? "Lock" : "Unlock");
+        SILABS_LOG("%s Action has been initiated", (locked) ? "Lock" : "Unlock");
 #ifdef ENABLE_WSTK_LEDS
         sLockLED.Set(!locked);
 #endif // ENABLE_WSTK_LEDS
@@ -406,11 +406,11 @@ void AppTask::ActionCompleted(LockManager::Action_t aAction)
     // Turn on the lock LED if in an UNLOCKED state.
     if (aAction == LockManager::LOCK_ACTION)
     {
-        EFR32_LOG("Lock Action has been completed")
+        SILABS_LOG("Lock Action has been completed")
     }
     else if (aAction == LockManager::UNLOCK_ACTION)
     {
-        EFR32_LOG("Unlock Action has been completed")
+        SILABS_LOG("Unlock Action has been completed")
     }
 
     if (sAppTask.mSyncClusterToButtonAction)
@@ -443,6 +443,6 @@ void AppTask::UpdateClusterState(intptr_t context)
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        EFR32_LOG("ERR: updating lock state %x", status);
+        SILABS_LOG("ERR: updating lock state %x", status);
     }
 }

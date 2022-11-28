@@ -36,6 +36,11 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#ifdef CONFIG_CHIP_WIFI
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/nrfconnect/wifi/NrfWiFiDriver.h>
+#endif
+
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include "OTAUtil.h"
 #endif
@@ -44,72 +49,48 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/zephyr.h>
 
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
+
 using namespace ::chip;
+using namespace ::chip::app;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
-#define FACTORY_RESET_TRIGGER_TIMEOUT 3000
-#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_EVENT_QUEUE_SIZE 10
-#define BUTTON_PUSH_EVENT 1
-#define BUTTON_RELEASE_EVENT 0
-
-LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
-K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
-
 namespace {
+constexpr uint32_t kFactoryResetTriggerTimeout              = 3000;
+constexpr uint32_t kFactoryResetCancelWindowTimeout         = 3000;
+constexpr size_t kAppEventQueueSize                         = 10;
+constexpr EndpointId kIdentifyEndpointId                    = 1;
+constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 // NOTE! This key is for test/certification only and should not be available in production devices!
 // If CONFIG_CHIP_FACTORY_DATA is enabled, this value is read from the factory data.
 uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
-LEDWidget sStatusLED;
-UnusedLedsWrapper<3> sUnusedLeds{ { DK_LED2, DK_LED3, DK_LED4 } };
+K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 k_timer sFunctionTimer;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
-constexpr EndpointId kIdentifyEndpointId = 1;
+Identify sIdentify = { kIdentifyEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
+                       EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED };
 
-void OnIdentifyTriggerEffect(Identify * identify)
-{
-    ChipLogProgress(Zcl, "OnIdentifyTriggerEffect");
-    switch (identify->mCurrentEffectIdentifier)
-    {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
-        ChipLogProgress(Zcl, "Effect: EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-        ChipLogProgress(Zcl, "Effect: EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
-        ChipLogProgress(Zcl, "Effect: EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
-        ChipLogProgress(Zcl, "Effect: EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
-        break;
-    default:
-        ChipLogProgress(Zcl, "Effect: No identifier effect");
-        break;
-    }
-    return;
-}
+LEDWidget sStatusLED;
+LEDWidget sIdentifyLED;
+#if NUMBER_OF_LEDS == 4
+FactoryResetLEDsWrapper<2> sFactoryResetLEDs{ { FACTORY_RESET_SIGNAL_LED, FACTORY_RESET_SIGNAL_LED1 } };
+#endif
 
-Identify sIdentify = {
-    chip::EndpointId{ kIdentifyEndpointId },
-    [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStop"); },
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_NONE,
-    OnIdentifyTriggerEffect,
-};
+bool sIsNetworkProvisioned = false;
+bool sIsNetworkEnabled     = false;
+bool sHaveBLEConnections   = false;
 
 } // namespace
 
-constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
-
 namespace LedConsts {
 constexpr uint32_t kBlinkRate_ms{ 500 };
+constexpr uint32_t kIdentifyBlinkRate_ms{ 500 };
 namespace StatusLed {
 namespace Unprovisioned {
 constexpr uint32_t kOn_ms{ 100 };
@@ -122,6 +103,10 @@ constexpr uint32_t kOff_ms{ 950 };
 
 } // namespace StatusLed
 } // namespace LedConsts
+
+#ifdef CONFIG_CHIP_WIFI
+app::Clusters::NetworkCommissioning::Instance sWiFiCommissioningInstance(0, &(NetworkCommissioning::NrfWiFiDriver::Instance()));
+#endif
 
 CHIP_ERROR AppTask::Init()
 {
@@ -160,13 +145,19 @@ CHIP_ERROR AppTask::Init()
         LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");
         return err;
     }
-#endif
+#elif defined(CONFIG_CHIP_WIFI)
+    sWiFiCommissioningInstance.Init();
+#else
+    return CHIP_ERROR_INTERNAL;
+#endif // CONFIG_NET_L2_OPENTHREAD
 
     // Initialize LEDs
     LEDWidget::InitGpio();
     LEDWidget::SetStateUpdateCallback(LEDStateUpdateHandler);
 
     sStatusLED.Init(SYSTEM_STATE_LED);
+    sIdentifyLED.Init(IDENTIFY_STATE_LED);
+    sIdentifyLED.Set(false);
 
     UpdateStatusLED();
 
@@ -184,7 +175,7 @@ CHIP_ERROR AppTask::Init()
     }
 
     // Initialize timer user data
-    k_timer_init(&sFunctionTimer, &AppTask::TimerEventHandler, nullptr);
+    k_timer_init(&sFunctionTimer, &AppTask::FunctionTimerTimeoutCallback, nullptr);
     k_timer_user_data_set(&sFunctionTimer, this);
 
     // Initialize CHIP server
@@ -241,120 +232,164 @@ CHIP_ERROR AppTask::StartApp()
     while (true)
     {
         k_msgq_get(&sAppEventQueue, &event, K_FOREVER);
-        DispatchEvent(&event);
+        DispatchEvent(event);
     }
 
     return CHIP_NO_ERROR;
 }
 
-void AppTask::ButtonEventHandler(uint32_t aButtonState, uint32_t aHasChanged)
+void AppTask::IdentifyStartHandler(Identify *)
 {
     AppEvent event;
-    event.Type = AppEvent::Type::Button;
+    event.Type    = AppEventType::IdentifyStart;
+    event.Handler = [](const AppEvent &) { sIdentifyLED.Blink(LedConsts::kIdentifyBlinkRate_ms); };
+    PostEvent(event);
+}
 
-    if (FUNCTION_BUTTON_MASK & aHasChanged)
+void AppTask::IdentifyStopHandler(Identify *)
+{
+    AppEvent event;
+    event.Type    = AppEventType::IdentifyStop;
+    event.Handler = [](const AppEvent &) { sIdentifyLED.Set(false); };
+    PostEvent(event);
+}
+
+void AppTask::ButtonEventHandler(uint32_t buttonState, uint32_t hasChanged)
+{
+    AppEvent button_event;
+    button_event.Type = AppEventType::Button;
+
+    if (BLE_ADVERTISEMENT_START_BUTTON_MASK & buttonState & hasChanged)
     {
-        event.ButtonEvent.PinNo  = FUNCTION_BUTTON;
-        event.ButtonEvent.Action = (FUNCTION_BUTTON_MASK & aButtonState) ? BUTTON_PUSH_EVENT : BUTTON_RELEASE_EVENT;
-        event.Handler            = FunctionHandler;
-        PostEvent(&event);
+        button_event.ButtonEvent.PinNo  = BLE_ADVERTISEMENT_START_BUTTON;
+        button_event.ButtonEvent.Action = static_cast<uint8_t>(AppEventType::ButtonPushed);
+        button_event.Handler            = StartBLEAdvertisementHandler;
+        PostEvent(button_event);
     }
 
-    if (BLE_ADVERTISEMENT_START_BUTTON_MASK & aButtonState & aHasChanged)
+    if (FUNCTION_BUTTON_MASK & hasChanged)
     {
-        event.ButtonEvent.PinNo  = BLE_ADVERTISEMENT_START_BUTTON;
-        event.ButtonEvent.Action = BUTTON_PUSH_EVENT;
-        event.Handler            = StartBLEAdvertisementHandler;
-        PostEvent(&event);
+        button_event.ButtonEvent.PinNo = FUNCTION_BUTTON;
+        button_event.ButtonEvent.Action =
+            static_cast<uint8_t>((FUNCTION_BUTTON_MASK & buttonState) ? AppEventType::ButtonPushed : AppEventType::ButtonReleased);
+        button_event.Handler = FunctionHandler;
+        PostEvent(button_event);
     }
 }
 
-void AppTask::TimerEventHandler(k_timer * aTimer)
+void AppTask::FunctionTimerTimeoutCallback(k_timer * timer)
 {
-    if (!aTimer)
+    if (!timer)
+    {
         return;
+    }
 
     AppEvent event;
-    event.Type               = AppEvent::Type::Timer;
-    event.TimerEvent.Context = k_timer_user_data_get(aTimer);
+    event.Type               = AppEventType::Timer;
+    event.TimerEvent.Context = k_timer_user_data_get(timer);
     event.Handler            = FunctionTimerEventHandler;
-    PostEvent(&event);
+    PostEvent(event);
 }
 
-void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
+void AppTask::FunctionTimerEventHandler(const AppEvent & event)
 {
-    if (!aEvent)
-        return;
-    if (aEvent->Type != AppEvent::Type::Timer)
-        return;
-
-    // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT, initiate factory reset
-    if (Instance().mFunctionTimerActive && Instance().mMode == OperatingMode::Normal)
+    if (event.Type != AppEventType::Timer || !Instance().mFunctionTimerActive)
     {
-        LOG_INF("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_TRIGGER_TIMEOUT);
+        return;
+    }
 
-        // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to cancel, if required.
-        StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
-        Instance().mMode = OperatingMode::FactoryReset;
+    // If we reached here, the button was held past kFactoryResetTriggerTimeout, initiate factory reset
+    if (Instance().mFunction == FunctionEvent::SoftwareUpdate)
+    {
+        LOG_INF("Factory Reset Triggered. Release button within %ums to cancel.", kFactoryResetTriggerTimeout);
 
-#ifdef CONFIG_STATE_LEDS
-        // Turn off all LEDs before starting blink to make sure blink is co-ordinated.
+        // Start timer for kFactoryResetCancelWindowTimeout to allow user to cancel, if required.
+        Instance().StartTimer(kFactoryResetCancelWindowTimeout);
+        Instance().mFunction = FunctionEvent::FactoryReset;
+
+        // Turn off all LEDs before starting blink to make sure blink is coordinated.
         sStatusLED.Set(false);
-        sUnusedLeds.Set(false);
+#if NUMBER_OF_LEDS == 4
+        sFactoryResetLEDs.Set(false);
+#endif
 
         sStatusLED.Blink(LedConsts::kBlinkRate_ms);
-        sUnusedLeds.Blink(LedConsts::kBlinkRate_ms);
+#if NUMBER_OF_LEDS == 4
+        sFactoryResetLEDs.Blink(LedConsts::kBlinkRate_ms);
 #endif
     }
-    else if (Instance().mFunctionTimerActive && Instance().mMode == OperatingMode::FactoryReset)
+    else if (Instance().mFunction == FunctionEvent::FactoryReset)
     {
         // Actually trigger Factory Reset
-        Instance().mMode = OperatingMode::Normal;
-        ConfigurationMgr().InitiateFactoryReset();
+        Instance().mFunction = FunctionEvent::NoneSelected;
+        chip::Server::GetInstance().ScheduleFactoryReset();
+    }
+    else if (Instance().mFunction == FunctionEvent::AdvertisingStart)
+    {
+        // The button was held past kAdvertisingTriggerTimeout, start BLE advertisement if we have 2 buttons UI
+#if NUMBER_OF_BUTTONS == 2
+        StartBLEAdvertisementHandler(event);
+#endif
     }
 }
 
-void AppTask::FunctionHandler(AppEvent * aEvent)
+#ifdef CONFIG_MCUMGR_SMP_BT
+void AppTask::RequestSMPAdvertisingStart(void)
 {
-    if (!aEvent)
-        return;
-    if (aEvent->ButtonEvent.PinNo != FUNCTION_BUTTON)
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_StartSMPAdvertising;
+    event.Handler = [](AppEvent *) { GetDFUOverSMP().StartBLEAdvertising(); };
+    sAppTask.PostEvent(&event);
+}
+#endif
+
+void AppTask::FunctionHandler(const AppEvent & event)
+{
+    if (event.ButtonEvent.PinNo != FUNCTION_BUTTON)
         return;
 
+    // To trigger software update: press the FUNCTION_BUTTON button briefly (< FACTORY_RESET_TRIGGER_TIMEOUT)
     // To initiate factory reset: press the FUNCTION_BUTTON for FACTORY_RESET_TRIGGER_TIMEOUT + FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
     // All LEDs start blinking after FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
     // To cancel factory reset: release the FUNCTION_BUTTON once all LEDs start blinking within the
     // FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    if (aEvent->ButtonEvent.Action == BUTTON_PUSH_EVENT)
+    if (event.ButtonEvent.Action == static_cast<uint8_t>(AppEventType::ButtonPushed))
     {
-        if (!Instance().mFunctionTimerActive && Instance().mMode == OperatingMode::Normal)
+        if (!Instance().mFunctionTimerActive && Instance().mFunction == FunctionEvent::NoneSelected)
         {
-            StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
+            Instance().StartTimer(kFactoryResetTriggerTimeout);
+
+            Instance().mFunction = FunctionEvent::SoftwareUpdate;
         }
     }
     else
     {
-        if (Instance().mFunctionTimerActive && Instance().mMode == OperatingMode::FactoryReset)
+        // If the button was released before factory reset got initiated, trigger a software update.
+        if (Instance().mFunctionTimerActive && Instance().mFunction == FunctionEvent::SoftwareUpdate)
         {
-            sUnusedLeds.Set(false);
+            Instance().CancelTimer();
+            Instance().mFunction = FunctionEvent::NoneSelected;
 
-            UpdateStatusLED();
-            CancelTimer();
-
-            // Change the function to none selected since factory reset has been canceled.
-            Instance().mMode = OperatingMode::Normal;
-
-            LOG_INF("Factory Reset has been Canceled");
+#ifdef CONFIG_MCUMGR_SMP_BT
+            GetDFUOverSMP().StartServer();
+#else
+            LOG_INF("Software update is disabled");
+#endif
         }
-        else if (Instance().mFunctionTimerActive)
+        else if (Instance().mFunctionTimerActive && Instance().mFunction == FunctionEvent::FactoryReset)
         {
-            CancelTimer();
-            Instance().mMode = OperatingMode::Normal;
+#if NUMBER_OF_LEDS == 4
+            sFactoryResetLEDs.Set(false);
+#endif
+            UpdateStatusLED();
+            Instance().CancelTimer();
+            Instance().mFunction = FunctionEvent::NoneSelected;
+            LOG_INF("Factory Reset has been Canceled");
         }
     }
 }
 
-void AppTask::StartBLEAdvertisementHandler(AppEvent *)
+void AppTask::StartBLEAdvertisementHandler(const AppEvent &)
 {
     if (Server::GetInstance().GetFabricTable().FabricCount() != 0)
     {
@@ -374,41 +409,39 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent *)
     }
 }
 
-void AppTask::UpdateLedStateEventHandler(AppEvent * aEvent)
+void AppTask::UpdateLedStateEventHandler(const AppEvent & event)
 {
-    if (!aEvent)
-        return;
-    if (aEvent->Type == AppEvent::Type::UpdateLedState)
+    if (event.Type == AppEventType::UpdateLedState)
     {
-        aEvent->UpdateLedStateEvent.LedWidget->UpdateState();
+        event.UpdateLedStateEvent.LedWidget->UpdateState();
     }
 }
 
-void AppTask::LEDStateUpdateHandler(LEDWidget & aLedWidget)
+void AppTask::LEDStateUpdateHandler(LEDWidget & ledWidget)
 {
     AppEvent event;
-    event.Type                          = AppEvent::Type::UpdateLedState;
+    event.Type                          = AppEventType::UpdateLedState;
     event.Handler                       = UpdateLedStateEventHandler;
-    event.UpdateLedStateEvent.LedWidget = &aLedWidget;
-    PostEvent(&event);
+    event.UpdateLedStateEvent.LedWidget = &ledWidget;
+    PostEvent(event);
 }
 
 void AppTask::UpdateStatusLED()
 {
 #ifdef CONFIG_STATE_LEDS
-    /* Update the status LED.
-     *
-     * If thread and service provisioned, keep the LED On constantly.
-     *
-     * If the system has ble connection(s) uptill the stage above, THEN blink the LED at an even
-     * rate of 100ms.
-     *
-     * Otherwise, blink the LED On for a very short time. */
-    if (Instance().mIsThreadProvisioned && Instance().mIsThreadEnabled)
+    // Update the status LED.
+    //
+    // If IPv6 network and service provisioned, keep the LED On constantly.
+    //
+    // If the system has BLE connection(s) until the stage above, THEN blink the LED at an even
+    // rate of 100ms.
+    //
+    // Otherwise, blink the LED for a very short time.
+    if (sIsNetworkProvisioned && sIsNetworkEnabled)
     {
         sStatusLED.Set(true);
     }
-    else if (Instance().mHaveBLEConnections)
+    else if (sHaveBLEConnections)
     {
         sStatusLED.Blink(LedConsts::StatusLed::Unprovisioned::kOn_ms, LedConsts::StatusLed::Unprovisioned::kOff_ms);
     }
@@ -419,25 +452,52 @@ void AppTask::UpdateStatusLED()
 #endif
 }
 
-void AppTask::ChipEventHandler(const ChipDeviceEvent * aEvent, intptr_t /* aArg */)
+void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
 {
-    if (!aEvent)
-        return;
-    switch (aEvent->Type)
+    switch (event->Type)
     {
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
-        Instance().mHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+        if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
+        {
+            if (NFCMgr().IsTagEmulationStarted())
+            {
+                LOG_INF("NFC Tag emulation is already started");
+            }
+            else
+            {
+                ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+            }
+        }
+        else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
+        {
+            NFCMgr().StopTagEmulation();
+        }
+#endif
+        sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
         UpdateStatusLED();
         break;
-    case DeviceEventType::kThreadStateChange:
-        Instance().mIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-        Instance().mIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
-        UpdateStatusLED();
-        break;
+#if defined(CONFIG_NET_L2_OPENTHREAD)
     case DeviceEventType::kDnssdPlatformInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
         InitBasicOTARequestor();
+#endif // CONFIG_CHIP_OTA_REQUESTOR
+        break;
+    case DeviceEventType::kThreadStateChange:
+        sIsNetworkProvisioned = ConnectivityMgr().IsThreadProvisioned();
+        sIsNetworkEnabled     = ConnectivityMgr().IsThreadEnabled();
+#elif defined(CONFIG_CHIP_WIFI)
+    case DeviceEventType::kWiFiConnectivityChange:
+        sIsNetworkProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+        sIsNetworkEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
+#if CONFIG_CHIP_OTA_REQUESTOR
+        if (event->WiFiConnectivityChange.Result == kConnectivity_Established)
+        {
+            InitBasicOTARequestor();
+        }
+#endif // CONFIG_CHIP_OTA_REQUESTOR
 #endif
+        UpdateStatusLED();
         break;
     default:
         break;
@@ -456,23 +516,19 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     Instance().mFunctionTimerActive = true;
 }
 
-void AppTask::PostEvent(AppEvent * aEvent)
+void AppTask::PostEvent(const AppEvent & event)
 {
-    if (!aEvent)
-        return;
-    if (k_msgq_put(&sAppEventQueue, aEvent, K_NO_WAIT))
+    if (k_msgq_put(&sAppEventQueue, &event, K_NO_WAIT) != 0)
     {
         LOG_INF("Failed to post event to app task event queue");
     }
 }
 
-void AppTask::DispatchEvent(AppEvent * aEvent)
+void AppTask::DispatchEvent(const AppEvent & event)
 {
-    if (!aEvent)
-        return;
-    if (aEvent->Handler)
+    if (event.Handler)
     {
-        aEvent->Handler(aEvent);
+        event.Handler(event);
     }
     else
     {

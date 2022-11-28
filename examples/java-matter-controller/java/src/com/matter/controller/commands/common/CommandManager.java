@@ -89,10 +89,11 @@ public final class CommandManager {
       }
     }
 
-    String[] temp = Arrays.copyOfRange(args, 1, args.length);
+    // need skip over binary and command name and only get arguments
+    String[] temp = Arrays.copyOfRange(args, 2, args.length);
 
     try {
-      command.initArguments(args.length - 1, temp);
+      command.initArguments(temp.length, temp);
       command.run();
     } catch (IllegalArgumentException e) {
       System.out.println("Arguments init failed with exception: " + e.getMessage());

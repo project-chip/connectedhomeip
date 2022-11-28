@@ -216,3 +216,7 @@ zephyr:
 telink:
     - src/platform/telink/*
     - src/platform/telink/**/*
+
+tizen:
+    - src/platform/Tizen/*
+    - src/platform/Tizen/**/*

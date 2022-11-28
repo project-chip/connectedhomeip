@@ -310,15 +310,9 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     chip::Inet::IPAddress ipAddr;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // In fact, if cancel resolve fails, we can not do anything about it
-    int ret = dnssd_cancel_resolve_service(service);
-
     rCtx->MainLoopQuit();
 
-    ret = result;
-    VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "DNSsd %s: Error: %d", __func__, ret));
-
-    ret = dnssd_service_get_name(service, &name);
+    int ret = dnssd_service_get_name(service, &name);
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_name() failed. ret: %d", ret));
 
     chip::Platform::CopyString(dnssdService.mName, name);
@@ -467,10 +461,6 @@ BrowseContext::~BrowseContext()
         g_source_destroy(mTimeoutSource);
         g_source_unref(mTimeoutSource);
     }
-    if (mIsBrowsing)
-    {
-        dnssd_cancel_browse_service(mBrowserHandle);
-    }
 }
 
 ResolveContext::ResolveContext(DnssdTizen * instance, const char * name, const char * type, uint32_t interfaceId,
@@ -485,13 +475,7 @@ ResolveContext::ResolveContext(DnssdTizen * instance, const char * name, const c
     mCbContext = context;
 }
 
-ResolveContext::~ResolveContext()
-{
-    if (mIsResolving)
-    {
-        dnssd_cancel_resolve_service(mServiceHandle);
-    }
-}
+ResolveContext::~ResolveContext() {}
 
 CHIP_ERROR DnssdTizen::Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {

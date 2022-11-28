@@ -266,3 +266,8 @@ config CHIP_CERTIFiCATION_DECLARATION_OTA_IMAGE_ID
 	  for sending it via OTA Software Update purposes.
 
 endif
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_FACTORY_RESET_ERASE_NVS
+	bool
+	default y

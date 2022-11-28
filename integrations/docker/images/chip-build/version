@@ -1,1 +1,1 @@
-0.6.11 Version bump reason: install nodejs into chip-build image, since github js actions seem to need it.
+0.6.12 Version bump reason: Update Bouffalo Lab build environment.

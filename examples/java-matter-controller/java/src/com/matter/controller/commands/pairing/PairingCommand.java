@@ -28,14 +28,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-public abstract class PairingCommand extends MatterCommand {
+public abstract class PairingCommand extends MatterCommand
+    implements ChipDeviceController.CompletionListener {
   private PairingModeType mPairingMode = PairingModeType.NONE;
   private PairingNetworkType mNetworkType = PairingNetworkType.NONE;
   private DiscoveryFilterType mFilterType = DiscoveryFilterType.NONE;
   private final IPAddress mRemoteAddr;
   private final AtomicLong mNodeId = new AtomicLong();
   private final AtomicLong mDiscoveryFilterCode = new AtomicLong();
-  private final AtomicInteger mTimeout = new AtomicInteger();
+  private final AtomicLong mTimeoutMillis = new AtomicLong();
   private final AtomicBoolean mDiscoverOnce = new AtomicBoolean();
   private final AtomicBoolean mUseOnlyOnNetworkDiscovery = new AtomicBoolean();
   private final AtomicInteger mRemotePort = new AtomicInteger();
@@ -46,6 +47,94 @@ public abstract class PairingCommand extends MatterCommand {
   private final StringBuffer mPassword = new StringBuffer();
   private final StringBuffer mOnboardingPayload = new StringBuffer();
   private final StringBuffer mDiscoveryFilterInstanceName = new StringBuffer();
+
+  public long getNodeId() {
+    return mNodeId.get();
+  }
+
+  public int getSetupPINCode() {
+    return mSetupPINCode.get();
+  }
+
+  public int getDiscriminator() {
+    return mDiscriminator.get();
+  }
+
+  public long getTimeoutMillis() {
+    return mTimeoutMillis.get();
+  }
+
+  @Override
+  public void onConnectDeviceComplete() {
+    System.out.println("onConnectDeviceComplete");
+  }
+
+  @Override
+  public void onStatusUpdate(int status) {
+    System.out.println("onStatusUpdate with status: " + status);
+  }
+
+  @Override
+  public void onPairingComplete(int errorCode) {
+    System.out.println("onPairingComplete with error code: " + errorCode);
+    if (errorCode != 0) {
+      setTestResult("Failure");
+    }
+  }
+
+  @Override
+  public void onPairingDeleted(int errorCode) {
+    System.out.println("onPairingDeleted with error code: " + errorCode);
+  }
+
+  @Override
+  public void onCommissioningComplete(long nodeId, int errorCode) {
+    System.out.println("onCommissioningComplete with error code: " + errorCode);
+    if (errorCode == 0) {
+      setTestResult("Success");
+    } else {
+      setTestResult("Failure");
+    }
+  }
+
+  @Override
+  public void onReadCommissioningInfo(
+      int vendorId, int productId, int wifiEndpointId, int threadEndpointId) {
+    System.out.println("onReadCommissioningInfo");
+  }
+
+  @Override
+  public void onCommissioningStatusUpdate(long nodeId, String stage, int errorCode) {
+    System.out.println("onCommissioningStatusUpdate");
+  }
+
+  @Override
+  public void onNotifyChipConnectionClosed() {
+    System.out.println("onNotifyChipConnectionClosed");
+  }
+
+  @Override
+  public void onCloseBleComplete() {
+    System.out.println("onCloseBleComplete");
+  }
+
+  @Override
+  public void onError(Throwable error) {
+    setTestResult(error.toString());
+    System.out.println("onError with error: " + error.toString());
+  }
+
+  @Override
+  public void onOpCSRGenerationComplete(byte[] csr) {
+    System.out.println("onOpCSRGenerationComplete");
+    for (int i = 0; i < csr.length; i++) {
+      System.out.print(csr[i] + " ");
+    }
+  }
+
+  public IPAddress getRemoteAddr() {
+    return mRemoteAddr;
+  }
 
   public PairingCommand(
       ChipDeviceController controller,
@@ -69,7 +158,7 @@ public abstract class PairingCommand extends MatterCommand {
     this.mFilterType = filterType;
 
     try {
-      this.mRemoteAddr = new IPAddress(InetAddress.getByName("0.0.0.0"));
+      this.mRemoteAddr = new IPAddress(InetAddress.getByName("::1"));
     } catch (UnknownHostException e) {
       throw new RuntimeException(e);
     }
@@ -147,6 +236,6 @@ public abstract class PairingCommand extends MatterCommand {
         break;
     }
 
-    addArgument("timeout", (short) 0, Short.MAX_VALUE, mTimeout, null);
+    addArgument("timeout", (long) 0, Long.MAX_VALUE, mTimeoutMillis, null);
   }
 }

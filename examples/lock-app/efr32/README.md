@@ -370,13 +370,13 @@ Here is some CHIPTool examples:
     Unlock door:
     ```
     ./out/chip-tool doorlock unlock-door node-id/group-id
-    ./out/chip-tool doorlock unlock-door 1 1
+    ./out/chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000
     ```
 
     Lock door:
     ```
     ./out/chip-tool doorlock lock-door node-id/group-id
-    ./out/chip-tool doorlock lock-door 1 1
+    ./out/chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000
     ```
 
 ### Notes

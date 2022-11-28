@@ -42,7 +42,7 @@ efr32_sdk("sdk") {
   defines = [
     "BOARD_ID=${silabs_board}",
     "HAL_VCOM_ENABLE=1",
-    "EFR32_LOG_ENABLED=1",
+    "SILABS_LOG_ENABLED=1",
     "PW_RPC_ENABLED",
   ]
 }

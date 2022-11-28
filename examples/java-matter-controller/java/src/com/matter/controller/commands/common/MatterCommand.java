@@ -41,6 +41,7 @@ public abstract class MatterCommand extends Command {
   private final AtomicLong mCommissionerNodeId = new AtomicLong();
   private final AtomicBoolean mUseMaxSizedCerts = new AtomicBoolean();;
   private final AtomicBoolean mOnlyAllowTrustedCdKeys = new AtomicBoolean();;
+  private Optional<String> mTestResult = Optional.empty();
 
   public MatterCommand(
       ChipDeviceController controller, String commandName, CredentialsIssuer credIssuerCmds) {
@@ -56,6 +57,8 @@ public abstract class MatterCommand extends Command {
     this.mCredIssuerCmds = Optional.ofNullable(credIssuerCmds);
     this.mChipDeviceController = controller;
 
+    // TODO: Add support to enable the below optional arguments
+    /*
     addArgument(
         "paa-trust-store-path",
         mPaaTrustStorePath,
@@ -87,6 +90,7 @@ public abstract class MatterCommand extends Command {
         mOnlyAllowTrustedCdKeys,
         "Only allow trusted CD verifying keys (disallow test keys). If not provided or 0 (\"false\"), untrusted CD "
             + "verifying keys are allowed. If 1 (\"true\"), test keys are disallowed.");
+    */
   }
 
   // This method returns the commissioner instance to be used for running the command.
@@ -97,9 +101,10 @@ public abstract class MatterCommand extends Command {
   /////////// Command Interface /////////
   @Override
   public void run() throws Exception {
-    maybeSetUpStack();
+    // TODO: setup chip storage from Java, currently it is using example one from chip-tool
+    // maybeSetUpStack();
     runCommand();
-    maybeTearDownStack();
+    // maybeTearDownStack();
   }
 
   protected abstract void runCommand();
@@ -112,5 +117,41 @@ public abstract class MatterCommand extends Command {
 
   private void maybeTearDownStack() {
     // ToDo:We need to call DeviceController::Shutdown()
+  }
+
+  public void setTestResult(String result) {
+    mTestResult = Optional.of(result);
+  }
+
+  public void expectSuccess(long timeout) {
+    expectResult("Success", timeout);
+  }
+
+  private void expectResult(String expectedResult, long timeout) {
+    long start = System.currentTimeMillis();
+    while (!mTestResult.isPresent())
+      try {
+        if (System.currentTimeMillis() > (start + timeout)) {
+          throw new RuntimeException("timeout!");
+        }
+        Thread.sleep(100);
+      } catch (InterruptedException ex) {
+      }
+
+    if (!mTestResult.isPresent()) {
+      throw new RuntimeException("received empty test result");
+    }
+
+    if (!mTestResult.get().equals(expectedResult)) {
+      if (!expectedResult.equals("Success")) {
+        System.out.format(
+            "%s command failed:%n    Expected: %s%n    Got: %s%n",
+            getName(), expectedResult, mTestResult);
+        throw new RuntimeException(getName());
+      } else {
+        System.out.format("%s command failed: %s%n", getName(), mTestResult.get());
+      }
+    }
+    mTestResult = Optional.empty();
   }
 }

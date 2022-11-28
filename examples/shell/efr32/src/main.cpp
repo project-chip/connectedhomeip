@@ -70,7 +70,7 @@ using chip::Shell::Engine;
 
 void appError(int err)
 {
-    EFR32_LOG("!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
+    SILABS_LOG("!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
     portDISABLE_INTERRUPTS();
     while (true)
         ;
@@ -102,11 +102,11 @@ int main(void)
     MemMonitoring::startHeapMonitoring();
 #endif
 
-    EFR32_LOG("==================================================");
-    EFR32_LOG("chip-efr32-shell-example starting");
-    EFR32_LOG("==================================================");
+    SILABS_LOG("==================================================");
+    SILABS_LOG("chip-efr32-shell-example starting");
+    SILABS_LOG("==================================================");
 
-    EFR32_LOG("Init CHIP Stack");
+    SILABS_LOG("Init CHIP Stack");
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
@@ -114,44 +114,44 @@ int main(void)
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
-        EFR32_LOG("PlatformMgr().InitChipStack() failed");
+        SILABS_LOG("PlatformMgr().InitChipStack() failed");
         appError(ret);
     }
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("EFR32_SHELL");
 
-    EFR32_LOG("Starting Platform Manager Event Loop");
+    SILABS_LOG("Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
     {
-        EFR32_LOG("PlatformMgr().StartEventLoopTask() failed");
+        SILABS_LOG("PlatformMgr().StartEventLoopTask() failed");
         appError(ret);
     }
 
 #if CHIP_ENABLE_OPENTHREAD
-    EFR32_LOG("Initializing OpenThread stack");
+    SILABS_LOG("Initializing OpenThread stack");
     ret = ThreadStackMgr().InitThreadStack();
     if (ret != CHIP_NO_ERROR)
     {
-        EFR32_LOG("ThreadStackMgr().InitThreadStack() failed");
+        SILABS_LOG("ThreadStackMgr().InitThreadStack() failed");
         appError(ret);
     }
 
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
     if (ret != CHIP_NO_ERROR)
     {
-        EFR32_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
+        SILABS_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
         appError(ret);
     }
 #endif // CHIP_ENABLE_OPENTHREAD
 
 #if CHIP_ENABLE_OPENTHREAD
-    EFR32_LOG("Starting OpenThread task");
+    SILABS_LOG("Starting OpenThread task");
 
     // Start OpenThread task
     ret = ThreadStackMgrImpl().StartThreadTask();
     if (ret != CHIP_NO_ERROR)
     {
-        EFR32_LOG("ThreadStackMgr().StartThreadTask() failed");
+        SILABS_LOG("ThreadStackMgr().StartThreadTask() failed");
         appError(ret);
     }
 #endif // CHIP_ENABLE_OPENTHREAD
