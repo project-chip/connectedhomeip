@@ -457,7 +457,7 @@ static void sl_wfx_stop_ap_callback(void)
 /****************************************************************************
  * @brief
  * Callback for client connect to AP
- * @param[in]  mac: MAC adress of device
+ * @param[in]  mac: MAC address of device
  *****************************************************************************/
 static void sl_wfx_client_connected_callback(uint8_t * mac)
 {
@@ -470,7 +470,7 @@ static void sl_wfx_client_connected_callback(uint8_t * mac)
  * @brief
  * Callback for client rejected from AP
  * @param[in] status: Status of ap rejected
- * @param[in] mac: MAC adress of device
+ * @param[in] mac: MAC address of device
  *****************************************************************************/
 static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac)
 {
@@ -635,7 +635,7 @@ static void wfx_events_task(void * p_arg)
                 sp       = (sl_wfx_ssid_def_t *) 0;
             }
 
-            SILABS_LOG("WIFI Scan Paramter set to Active channel time %d, Passive "
+            SILABS_LOG("WIFI Scan Parameter set to Active channel time %d, Passive "
                        "Channel Time: %d, Number of prob: %d",
                        ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
             (void) sl_wfx_set_scan_parameters(ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
@@ -1033,7 +1033,7 @@ sl_status_t wfx_connect_to_ap(void)
     }
     SILABS_LOG("WIFI:JOIN to %s", &wifi_provision.ssid[0]);
 
-    SILABS_LOG("WIFI Scan Paramter set to Active channel time %d, Passive Channel "
+    SILABS_LOG("WIFI Scan Parameter set to Active channel time %d, Passive Channel "
                "Time: %d, Number of prob: %d",
                ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
     (void) sl_wfx_set_scan_parameters(ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
@@ -1070,7 +1070,7 @@ void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * 
  * @brief
  *     function called when driver have ipv4 address
  * @param[in]  which_if:
- * @return returns false if sucessful,
+ * @return returns false if successful,
  *         true otherwise
  *****************************************************************************/
 bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
@@ -1089,7 +1089,7 @@ bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
  * @brief
  *     function called when driver have ipv6 address
  * @param[in]  which_if:
- * @return returns false if sucessful,
+ * @return returns false if successful,
  *         true otherwise
  *****************************************************************************/
 bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
@@ -1136,7 +1136,7 @@ bool wfx_is_sta_mode_enabled(void)
 /****************************************************************************
  * @brief
  *     fuction called when driver is STA connected
- * @return returns true if sucessful,
+ * @return returns true if successful,
  *         false otherwise
  *****************************************************************************/
 bool wfx_is_sta_connected(void)
@@ -1153,7 +1153,7 @@ bool wfx_is_sta_connected(void)
 /****************************************************************************
  * @brief
  *      It is automatically done when lwip link up
- * @return returns true if sucessful,
+ * @return returns true if successful,
  *         false otherwise
  *****************************************************************************/
 void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
@@ -1164,7 +1164,7 @@ void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
 /****************************************************************************
  * @brief
  *      get the wifi mode
- * @return returns WIFI_MODE_NULL if sucessful,
+ * @return returns WIFI_MODE_NULL if successful,
  *         WIFI_MODE_STA otherwise
  *****************************************************************************/
 wifi_mode_t wfx_get_wifi_mode()
@@ -1178,7 +1178,7 @@ wifi_mode_t wfx_get_wifi_mode()
  * @brief
  * This is called from the context of AppTask
  * For WF200 - Start WIFI here
- * @return returns true if sucessful,
+ * @return returns true if successful,
  *         false otherwise
  ******************************************************************************/
 bool wfx_hw_ready(void)
@@ -1215,7 +1215,7 @@ void wfx_enable_sta_mode(void)
  * @brief
  * driver scan start
  * @param[in]  callback: Callback from the wifi scan  results
- * @return returns true if sucessful,
+ * @return returns true if successful,
  *         false otherwise
  *****************************************************************************/
 #ifdef SL_WFX_CONFIG_SCAN

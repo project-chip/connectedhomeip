@@ -40,7 +40,7 @@ enum class EFR32OpaqueKeyUsages : uint8_t
  * @brief Base class for opaque keys
  *
  * Deriving from this class allows using it as a base class for operations
- * which don't expose the private key independant of key size.
+ * which don't expose the private key independent of key size.
  **/
 class EFR32OpaqueKeypair
 {

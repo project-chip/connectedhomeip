@@ -512,6 +512,7 @@ ExecStart
 executables
 ExtendedPAN
 ExtensionEntry
+EXTENTION
 extern
 extpanid
 FabricId
@@ -1259,10 +1260,12 @@ SubscribeResponse
 SubscriptionId
 substeps
 subtype
+SUCESS
 sudo
 SulfateConcentrationMeasurement
 SulfurDioxideConcentrationMeasurement
 suppressResponse
+SUPRESS
 svg
 SVR
 SWD

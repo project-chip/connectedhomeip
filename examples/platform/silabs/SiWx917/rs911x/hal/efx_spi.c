@@ -217,7 +217,7 @@ static void receiveDMA(uint8_t * rx_buf, uint16_t xlen)
  *@fn static void transmitDMA(void *rx_buf, void *tx_buf, uint8_t xlen)
  *@brief
  *    we have a tx_buf. There are some instances where
- *    a rx_buf is not specifed. If one is specified then
+ *    a rx_buf is not specified. If one is specified then
  *    the caller wants results (auto increment src)
  * @param[in] rx_buf:
  * @param[in] tx_buf:
@@ -231,7 +231,7 @@ static void transmitDMA(uint8_t * rx_buf, uint8_t * tx_buf, uint16_t xlen)
     bool srcinc;
     /*
      * we have a tx_buf. There are some instances where
-     * a rx_buf is not specifed. If one is specified then
+     * a rx_buf is not specified. If one is specified then
      * the caller wants results (auto increment src)
      * TODO - the caller specified 8/32 bit - we should use this
      * instead of dmadrvDataSize1 always
