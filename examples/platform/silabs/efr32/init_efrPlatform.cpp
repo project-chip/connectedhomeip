@@ -71,8 +71,8 @@ void init_efrPlatform(void)
     SEGGER_SYSVIEW_Start();
 #endif
 
-#if EFR32_LOG_ENABLED
-    efr32InitLog();
+#if SILABS_LOG_ENABLED
+    silabsInitLog();
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD

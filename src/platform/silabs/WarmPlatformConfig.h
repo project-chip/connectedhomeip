@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for the Chip
- *          Addressing and Routing Module (WARM) on EFR32 platforms
+ *          Addressing and Routing Module (WARM) on SILABS platforms
  *          using the Silcon Labs SDK.
  *
  */

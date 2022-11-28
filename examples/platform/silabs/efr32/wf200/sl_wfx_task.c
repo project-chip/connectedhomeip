@@ -91,7 +91,7 @@ error_handler:
  */
 static void wfx_bus_task(void * p_arg)
 {
-    EFR32_LOG("SPI: Bus Task started");
+    SILABS_LOG("SPI: Bus Task started");
     sl_wfx_host_start_platform_interrupt();
     for (;;)
     {
@@ -123,6 +123,6 @@ void wfx_bus_start()
         xTaskCreateStatic(wfx_bus_task, "wfxbus", BUS_TASK_STACK_SIZE, NULL, WFX_BUS_TASK_PRIORITY, busStack, &busTaskStruct);
     if (wfx_bus_task_handle == NULL)
     {
-        EFR32_LOG("*ERR*WFX BusTask");
+        SILABS_LOG("*ERR*WFX BusTask");
     }
 }

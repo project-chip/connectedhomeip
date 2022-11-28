@@ -25,7 +25,7 @@ extern "C" {
 #include "em_bus.h" // For CORE_CRITICAL_SECTION
 }
 
-#include <platform/silabs/EFR32Config.h>
+#include <platform/silabs/SilabsConfig.h>
 
 /// No error, operation OK
 #define SL_BOOTLOADER_OK 0L

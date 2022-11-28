@@ -142,7 +142,7 @@ CHIP_ERROR BaseApplication::StartAppTask(TaskFunction_t taskFunction)
     sAppEventQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), sAppEventQueueBuffer, &sAppEventQueueStruct);
     if (sAppEventQueue == NULL)
     {
-        EFR32_LOG("Failed to allocate app event queue");
+        SILABS_LOG("Failed to allocate app event queue");
         appError(APP_ERROR_EVENT_QUEUE_FAILED);
     }
 
@@ -151,7 +151,7 @@ CHIP_ERROR BaseApplication::StartAppTask(TaskFunction_t taskFunction)
         xTaskCreateStatic(taskFunction, APP_TASK_NAME, ArraySize(appStack), &sAppEventQueue, 1, appStack, &appTaskStruct);
     if (sAppTaskHandle == nullptr)
     {
-        EFR32_LOG("Failed to create app task");
+        SILABS_LOG("Failed to create app task");
         appError(APP_ERROR_CREATE_TASK_FAILED);
     }
     return CHIP_NO_ERROR;
@@ -163,7 +163,7 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
 
     if (identifyObj == nullptr)
     {
-        EFR32_LOG("Invalid Identify Object!");
+        SILABS_LOG("Invalid Identify Object!");
         appError(CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -173,12 +173,12 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
     /*
      * Wait for the WiFi to be initialized
      */
-    EFR32_LOG("APP: Wait WiFi Init");
+    SILABS_LOG("APP: Wait WiFi Init");
     while (!wfx_hw_ready())
     {
         vTaskDelay(10);
     }
-    EFR32_LOG("APP: Done WiFi Init");
+    SILABS_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */
 
     sWiFiNetworkCommissioningInstance.Init();
@@ -193,7 +193,7 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
     );
     if (sFunctionTimer == NULL)
     {
-        EFR32_LOG("funct timer create failed");
+        SILABS_LOG("funct timer create failed");
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
@@ -206,11 +206,11 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
     );
     if (sLightTimer == NULL)
     {
-        EFR32_LOG("Light Timer create failed");
+        SILABS_LOG("Light Timer create failed");
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
-    EFR32_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+    SILABS_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
 #ifdef ENABLE_WSTK_LEDS
     LEDWidget::InitGpio();
@@ -235,7 +235,7 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
     }
     else
     {
-        EFR32_LOG("Getting QR code failed!");
+        SILABS_LOG("Getting QR code failed!");
     }
 
     return err;
@@ -261,7 +261,7 @@ void BaseApplication::FunctionEventHandler(AppEvent * aEvent)
     // initiate factory reset
     if (mFunctionTimerActive && mFunction == kFunction_StartBleAdv)
     {
-        EFR32_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+        SILABS_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
 
         // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
         // cancel, if required.
@@ -438,10 +438,10 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
                 chip::DeviceLayer::PlatformMgr().UnlockChipStack();
                 if (err != CHIP_NO_ERROR)
                 {
-                    EFR32_LOG("Failed to open the Basic Commissioning Window");
+                    SILABS_LOG("Failed to open the Basic Commissioning Window");
                 }
             }
-            else { EFR32_LOG("Network is already provisioned, Ble advertissement not enabled"); }
+            else { SILABS_LOG("Network is already provisioned, Ble advertissement not enabled"); }
         }
         else if (mFunctionTimerActive && mFunction == kFunction_FactoryReset)
         {
@@ -454,7 +454,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             // Change the function to none selected since factory reset has been
             // canceled.
             mFunction = kFunction_NoneSelected;
-            EFR32_LOG("Factory Reset has been Canceled");
+            SILABS_LOG("Factory Reset has been Canceled");
         }
     }
 }
@@ -463,7 +463,7 @@ void BaseApplication::CancelFunctionTimer()
 {
     if (xTimerStop(sFunctionTimer, 0) == pdFAIL)
     {
-        EFR32_LOG("app timer stop() failed");
+        SILABS_LOG("app timer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 
@@ -474,7 +474,7 @@ void BaseApplication::StartFunctionTimer(uint32_t aTimeoutInMs)
 {
     if (xTimerIsTimerActive(sFunctionTimer))
     {
-        EFR32_LOG("app timer already started!");
+        SILABS_LOG("app timer already started!");
         CancelFunctionTimer();
     }
 
@@ -483,7 +483,7 @@ void BaseApplication::StartFunctionTimer(uint32_t aTimeoutInMs)
     // cannot immediately be sent to the timer command queue.
     if (xTimerChangePeriod(sFunctionTimer, aTimeoutInMs / portTICK_PERIOD_MS, 100) != pdPASS)
     {
-        EFR32_LOG("app timer start() failed");
+        SILABS_LOG("app timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 
@@ -494,7 +494,7 @@ void BaseApplication::StartStatusLEDTimer()
 {
     if (pdPASS != xTimerStart(sLightTimer, 0))
     {
-        EFR32_LOG("Light Time start failed");
+        SILABS_LOG("Light Time start failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
@@ -507,7 +507,7 @@ void BaseApplication::StopStatusLEDTimer()
 
     if (xTimerStop(sLightTimer, 100) != pdPASS)
     {
-        EFR32_LOG("Light Time start failed");
+        SILABS_LOG("Light Time start failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
@@ -549,12 +549,12 @@ void BaseApplication::PostEvent(const AppEvent * aEvent)
 
         if (!status)
         {
-            EFR32_LOG("Failed to post event to app task event queue");
+            SILABS_LOG("Failed to post event to app task event queue");
         }
     }
     else
     {
-        EFR32_LOG("Event Queue is NULL should never happen");
+        SILABS_LOG("Event Queue is NULL should never happen");
     }
 }
 
@@ -566,6 +566,6 @@ void BaseApplication::DispatchEvent(AppEvent * aEvent)
     }
     else
     {
-        EFR32_LOG("Event received with no handler. Dropping event.");
+        SILABS_LOG("Event received with no handler. Dropping event.");
     }
 }

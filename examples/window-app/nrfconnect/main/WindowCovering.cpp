@@ -27,7 +27,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/zephyr.h>
 
-LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;

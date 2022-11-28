@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Provides an implementation of the PlatformManager object
- *          for EFR32 platforms using the Silicon Labs SDK.
+ *          for SILABS platforms using the Silicon Labs SDK.
  */
 
 #pragma once
@@ -33,7 +33,7 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the PlatformManager singleton object for the EFR32 platform.
+ * Concrete implementation of the PlatformManager singleton object for the SILABS platform.
  */
 class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>
 {

@@ -51,7 +51,7 @@ namespace DeviceLayer {
 class PlatformManagerImpl;
 
 /**
- * Concrete implementation of the ConnectivityManager singleton object for Silicon Labs EFR32 platforms.
+ * Concrete implementation of the ConnectivityManager singleton object for Silicon Labs Silabs platforms.
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
@@ -193,7 +193,7 @@ inline ConnectivityManager & ConnectivityMgr(void)
  * Returns the platform-specific implementation of the ConnectivityManager singleton object.
  *
  * Chip applications can use this to gain access to features of the ConnectivityManager
- * that are specific to the ESP32 platform.
+ * that are specific to the Silabs platform.
  */
 inline ConnectivityManagerImpl & ConnectivityMgrImpl(void)
 {

@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Provides an implementation of the DiagnosticDataProvider object
- *          for EFR32 platform.
+ *          for Silabs platform.
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -47,7 +47,7 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 // Software Diagnostics Getters
 /*
  * The following Heap stats are compiled values done by the FreeRTOS Heap4 implementation.
- * See /examples/platform/efr32/heap_4_silabs.c
+ * See /examples/platform/silabs/heap_4_silabs.c
  * It keeps track of the number of calls to allocate and free memory as well as the
  * number of free bytes remaining, but says nothing about fragmentation.
  */

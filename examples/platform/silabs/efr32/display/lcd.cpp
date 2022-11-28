@@ -51,7 +51,7 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
     {
         if (APP_NAME_MAX_LENGTH < strlen((char *) name))
         {
-            EFR32_LOG("App Name too long");
+            SILABS_LOG("App Name too long");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         else
@@ -64,7 +64,7 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
     status = sl_board_enable_display();
     if (status != SL_STATUS_OK)
     {
-        EFR32_LOG("Board Display enable fail %d", status);
+        SILABS_LOG("Board Display enable fail %d", status);
         err = CHIP_ERROR_INTERNAL;
     }
 
@@ -72,7 +72,7 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
     status = DMD_init(0);
     if (DMD_OK != status)
     {
-        EFR32_LOG("DMD init failed %d", status);
+        SILABS_LOG("DMD init failed %d", status);
         err = CHIP_ERROR_INTERNAL;
     }
 
@@ -80,7 +80,7 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
     status = GLIB_contextInit(&glibContext);
     if (GLIB_OK != status)
     {
-        EFR32_LOG("Glib context init failed %d", status);
+        SILABS_LOG("Glib context init failed %d", status);
         err = CHIP_ERROR_INTERNAL;
     }
 
@@ -89,7 +89,7 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
     status                      = GLIB_clear(&glibContext);
     if (GLIB_OK != status)
     {
-        EFR32_LOG("Glib clear failed %d", status);
+        SILABS_LOG("Glib clear failed %d", status);
         err = CHIP_ERROR_INTERNAL;
     }
     demoUIInit(&glibContext);
@@ -157,7 +157,7 @@ void SilabsLCD::WriteQRCode()
     if (!qrcodegen_encodeText((const char *) mQRCodeBuffer, workBuffer, qrCode, qrcodegen_Ecc_LOW, QR_CODE_VERSION, QR_CODE_VERSION,
                               qrcodegen_Mask_AUTO, true))
     {
-        EFR32_LOG("qrcodegen_encodeText() failed");
+        SILABS_LOG("qrcodegen_encodeText() failed");
         return;
     }
 

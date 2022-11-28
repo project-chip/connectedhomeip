@@ -54,13 +54,18 @@ and [Zephyr RTOS](https://zephyrproject.org/). Visit Matter's
 to read more about the platform structure and dependencies.
 
 The Matter device that runs the pump application is controlled by the Matter
-controller device over the Thread protocol. By default, the Matter device has
-Thread disabled, and it should be paired with Matter controller and get
-configuration from it. Some actions required before establishing full
-communication are described below.
+controller device over the Thread protocol. By default, the Matter accessory
+device has IPv6 networking disabled. You must pair it with the Matter controller
+over Bluetooth® LE to get the configuration from the controller to use the
+device within a Thread or Wi-Fi network. You have to make the device
+discoverable manually (for security reasons). See
+[Bluetooth LE advertising](#bluetooth-le-advertising) to learn how to do this.
+The controller must get the commissioning information from the Matter accessory
+device and provision the device into the network.
 
-The example can be configured to use the secure bootloader and utilize it for
-performing over-the-air Device Firmware Upgrade using Bluetooth LE.
+You can test this application remotely over the Thread or the Wi-Fi protocol,
+which in either case requires more devices, including a Matter controller that
+you can configure either on a PC or a mobile device.
 
 ### Bluetooth LE advertising
 
@@ -187,8 +192,8 @@ following states are possible:
     Bluetooth LE.
 
 -   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
-    provisioned, but does not yet have full Thread network or service
-    connectivity.
+    provisioned, but does not yet have full connectivity for Thread or Wi-Fi
+    network.
 
 -   _Solid On_ &mdash; The device is fully provisioned and has full Thread
     network and service connectivity.

@@ -157,19 +157,19 @@ CHIP_ERROR AppTask::Init()
     err = BaseApplication::Init(&gIdentify);
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("BaseApplication::Init() failed");
+        SILABS_LOG("BaseApplication::Init() failed");
         appError(err);
     }
     err = SensorMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("SensorMgr::Init() failed");
+        SILABS_LOG("SensorMgr::Init() failed");
         appError(err);
     }
     err = TempMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("TempMgr::Init() failed");
+        SILABS_LOG("TempMgr::Init() failed");
         appError(err);
     }
 
@@ -189,7 +189,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("AppTask.Init() failed");
+        SILABS_LOG("AppTask.Init() failed");
         appError(err);
     }
 
@@ -197,7 +197,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     sAppTask.StartStatusLEDTimer();
 #endif
 
-    EFR32_LOG("App Task started");
+    SILABS_LOG("App Task started");
     while (true)
     {
         BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
@@ -244,8 +244,8 @@ void AppTask::UpdateThermoStatUI()
         AppTask::GetAppTask().GetLCD().WriteDemoUI(false); // State doesn't Matter
     }
 #else
-    EFR32_LOG("Thermostat Status - M:%d T:%d'C H:%d'C C:%d'C", TempMgr().GetMode(), TempMgr().GetCurrentTemp(),
-              TempMgr().GetHeatingSetPoint(), TempMgr().GetCoolingSetPoint());
+    SILABS_LOG("Thermostat Status - M:%d T:%d'C H:%d'C C:%d'C", TempMgr().GetMode(), TempMgr().GetCurrentTemp(),
+               TempMgr().GetHeatingSetPoint(), TempMgr().GetCoolingSetPoint());
 #endif // DISPLAY_ENABLED
 }
 
