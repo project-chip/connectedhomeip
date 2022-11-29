@@ -141,6 +141,11 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #define MAX_JOIN_RETRIES_COUNT 5
 #endif
 
+// WLAN retry time intervals in milli seconds
+#define WLAN_MAX_RETRY_TIMER 30000
+#define WLAN_MIN_RETRY_TIMER 1000
+#define WLAN_RETRY_TIMER 5000
+
 // WLAN related Macros
 #define ETH_FRAME 0
 #define CMP_SUCCESS 0

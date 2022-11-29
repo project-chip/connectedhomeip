@@ -66,6 +66,8 @@ bool hasNotifiedIPV6 = false;
 bool hasNotifiedIPV4 = false;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 bool hasNotifiedWifiConnectivity = false;
+bool is_commissioned             = false;
+static uint32_t retryInterval    = WLAN_MIN_RETRY_TIMER;
 
 /*
  * This file implements the interface to the RSI SAPIs
@@ -195,10 +197,32 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
          * We should enable retry.. (Need config variable for this)
          */
         WFX_RSI_LOG("%s: failed. retry: %d", __func__, wfx_rsi.join_retries);
-#if (WFX_RSI_CONFIG_MAX_JOIN != 0)
-        if (++wfx_rsi.join_retries < WFX_RSI_CONFIG_MAX_JOIN)
-#endif
+        if (!is_commissioned)
         {
+            if (wfx_rsi.join_retries < WFX_RSI_CONFIG_MAX_JOIN)
+            {
+                WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (WLAN_RETRY_TIMER / WLAN_MIN_RETRY_TIMER));
+                vTaskDelay(pdMS_TO_TICKS(WLAN_RETRY_TIMER));
+                xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
+            }
+            else
+            {
+                WFX_RSI_LOG("Connect failed after %d tries", wfx_rsi.join_retries);
+            }
+        }
+        else
+        {
+            if (retryInterval < WLAN_MAX_RETRY_TIMER)
+            {
+                WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (retryInterval / WLAN_MIN_RETRY_TIMER));
+            }
+            else
+            {
+                WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (WLAN_MAX_RETRY_TIMER / WLAN_MIN_RETRY_TIMER));
+            }
+
+            vTaskDelay(retryInterval < WLAN_MAX_RETRY_TIMER ? pdMS_TO_TICKS(retryInterval) : pdMS_TO_TICKS(retryInterval = WLAN_MAX_RETRY_TIMER));
+            retryInterval += retryInterval;
             xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
         }
     }
@@ -213,6 +237,9 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
 #else
         xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_CONN);
 #endif
+        is_commissioned      = true;
+        wfx_rsi.join_retries = 0;
+        retryInterval        = WLAN_MIN_RETRY_TIMER;
     }
 }
 
@@ -228,9 +255,9 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
  *********************************************************************/
 static void wfx_rsi_join_fail_cb(uint16_t status, uint8_t * buf, uint32_t len)
 {
-    WFX_RSI_LOG("%s: error: failed status: %02x on try %d", __func__, status, wfx_rsi.join_retries);
+    WFX_RSI_LOG("%s: error: failed status: %02x", __func__, status);
     wfx_rsi.join_retries += 1;
-    wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
+    wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
     xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
 }
 #ifdef RS911X_SOCKETS
@@ -469,12 +496,16 @@ static void wfx_rsi_do_join(void)
          */
         wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTING;
 
+        if ((status = rsi_wlan_register_callbacks(RSI_JOIN_FAIL_CB, wfx_rsi_join_fail_cb)) != RSI_SUCCESS)
+        {
+            WFX_RSI_LOG("%s: RSI callback register join failed with status: %02x", __func__, status);
+        }
+
         /* Try to connect Wifi with given Credentials
          * untill there is a success or maximum number of tries allowed
          */
-        while (++wfx_rsi.join_retries < WFX_RSI_CONFIG_MAX_JOIN)
+        while (is_commissioned || wfx_rsi.join_retries < WFX_RSI_CONFIG_MAX_JOIN)
         {
-
             /* Call rsi connect call with given ssid and password
              * And check there is a success
              */
@@ -485,15 +516,34 @@ static void wfx_rsi_do_join(void)
                 wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
                 WFX_RSI_LOG("%s: rsi_wlan_connect_async failed with status: %02x on try %d", __func__, status,
                             wfx_rsi.join_retries);
-                vTaskDelay(4000);
-                /* TODO - Start a timer.. to retry */
+                
+                if (!is_commissioned) // At comissioning time
+                {
+                    WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (WLAN_RETRY_TIMER / WLAN_MIN_RETRY_TIMER));
+                    vTaskDelay(pdMS_TO_TICKS(WLAN_RETRY_TIMER));
+                }
+                else // At reconnection time
+                {
+                    if (retryInterval < WLAN_MAX_RETRY_TIMER)
+                    {
+                        WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (retryInterval / WLAN_MIN_RETRY_TIMER));
+                    }
+                    else
+                    {
+                        WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (WLAN_MAX_RETRY_TIMER / WLAN_MIN_RETRY_TIMER));
+                    }
+
+                    vTaskDelay(retryInterval < WLAN_MAX_RETRY_TIMER ? pdMS_TO_TICKS(retryInterval) : pdMS_TO_TICKS(retryInterval = WLAN_MAX_RETRY_TIMER));
+                    retryInterval += retryInterval;
+                }
+                wfx_rsi.join_retries++;
             }
             else
             {
                 break; // exit while loop
             }
         }
-        if (wfx_rsi.join_retries == MAX_JOIN_RETRIES_COUNT)
+        if (!is_commissioned && wfx_rsi.join_retries == MAX_JOIN_RETRIES_COUNT)
         {
             WFX_RSI_LOG("Connect failed after %d tries", wfx_rsi.join_retries);
         }
