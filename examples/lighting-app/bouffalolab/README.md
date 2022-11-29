@@ -55,12 +55,19 @@ Mac OS.
 
 -   Setup build environment for `Bouffalo Lab` SoC
 
+    Run `setup.sh` to install `Bouffalo Lab` SDK to /opt/bouffalolab_sdk
+
     ```
     cd third_party/bouffalolab/repo
     sudo bash script/setup.sh
     ```
 
-    > Toolchain will be downloaded and installed under /opt/bouffalolab_sdk.
+    Please execute following command export `BOUFFALOLAB_SDK_ROOT` before
+    building.
+
+    ```
+    export BOUFFALOLAB_SDK_ROOT=/opt/bouffalolab_sdk
+    ```
 
 ## Build CHIP Lighting App example
 

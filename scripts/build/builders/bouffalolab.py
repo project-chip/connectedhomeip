@@ -107,11 +107,7 @@ class BouffalolabBuilder(GnBuilder):
         elif enable_shell:
             self.argsOpt.append('chip_build_libshell=true')
 
-        try:
-            self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])
-        except KeyError:
-            # environment BOUFFALOLAB_SDK_ROOT is not existed, try default setup path
-            self.argsOpt.append('bouffalolab_sdk_root="/opt/bouffalolab_sdk"')
+        self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])
 
     def GnBuildArgs(self):
         return self.argsOpt
