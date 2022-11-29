@@ -107,9 +107,7 @@ if (chip_crypto == "openssl") {
     sources = [ "CHIPCryptoPALmbedTLS.cpp" ]
     public_deps = [ ":public_headers" ]
 
-    external_mbedtls = current_os == "zephyr"
-
-    if (!external_mbedtls) {
+    if (!chip_external_mbedtls) {
       public_deps += [ "${mbedtls_root}:mbedtls" ]
     }
   }
