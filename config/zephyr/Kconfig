@@ -154,10 +154,10 @@ config CHIP_SED_ACTIVE_INTERVAL
 endif # CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
 
 config CHIP_THREAD_SSED
-	  bool "Enable Thread Synchronized Sleepy End Device support"
-	  depends on OPENTHREAD_CSL_RECEIVER && CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
-	  help
-		Enables Thread Synchronized Sleepy End Device support in Matter.
+	bool "Enable Thread Synchronized Sleepy End Device support"
+	depends on OPENTHREAD_CSL_RECEIVER && CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
+	help
+	Enables Thread Synchronized Sleepy End Device support in Matter.
 
 config CHIP_OTA_REQUESTOR
 	bool "Enable OTA requestor"

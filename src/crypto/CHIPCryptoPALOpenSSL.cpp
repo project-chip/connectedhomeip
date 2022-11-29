@@ -1020,7 +1020,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR P256Keypair::Initialize()
+CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
 {
     ERR_clear_error();
 

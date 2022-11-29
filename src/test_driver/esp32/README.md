@@ -1,10 +1,10 @@
-# CHIP Tests on Device
+# Matter Tests on Device
 
-An application that runs CHIP's unit tests on ESP32 device or QEMU.
+An application that runs Matter's unit tests on ESP32 device or QEMU.
 
 ---
 
--   [CHIP Tests on Device](#chip-tests-on-device)
+-   [Matter Tests on Device](#chip-tests-on-device)
     -   [Supported Devices](#supported-devices)
     -   [Building the Application](#building-the-application)
         -   [To build the application, follow these steps:](#to-build-the-application-follow-these-steps)
@@ -14,7 +14,7 @@ An application that runs CHIP's unit tests on ESP32 device or QEMU.
 
 ## Supported Devices
 
-The CHIP application is intended to work on
+The Matter application is intended to work on
 [ESP32-DevKitC](https://www.espressif.com/en/products/hardware/esp32-devkitc/overview),
 [QEMU](https://github.com/espressif/qemu), and the
 [M5Stack](http://m5stack.com). Support for the [M5Stack](http://m5stack.com) is

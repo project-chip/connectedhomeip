@@ -19,15 +19,15 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for the Chip Device Layer
- *          on EFR32 platforms using the Silicon Labs SDK.
+ *          on Silabs platforms using the Silicon Labs SDK.
  */
 
 #pragma once
 
 // ==================== Platform Adaptations ====================
 
-#define CHIP_DEVICE_CONFIG_EFR32_NVM3_ERROR_MIN 0xB00000
-#define CHIP_DEVICE_CONFIG_EFR32_BLE_ERROR_MIN 0xC00000
+#define CHIP_DEVICE_CONFIG_SILABS_NVM3_ERROR_MIN 0xB00000
+#define CHIP_DEVICE_CONFIG_SILABS_BLE_ERROR_MIN 0xC00000
 
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
 
@@ -80,6 +80,14 @@
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
 #define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE (6 * 1024)
 #endif // CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
+
+#ifndef CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL
+#define CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL chip::System::Clock::Milliseconds32(SL_SLEEP_TIME_MS)
+#endif // CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL
+
+#ifndef CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL
+#define CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL chip::System::Clock::Milliseconds32(200)
+#endif // CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL
 
 #ifndef CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE
 #if defined(EFR32MG21)

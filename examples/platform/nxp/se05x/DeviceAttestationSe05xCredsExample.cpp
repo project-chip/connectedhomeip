@@ -145,7 +145,7 @@ CHIP_ERROR ExampleSe05xDACProvider::SignWithDeviceAttestationKey(const ByteSpan 
 
     keypair.SetKeyId(DEV_ATTESTATION_KEY_SE05X_ID);
     keypair.provisioned_key = true;
-    keypair.Initialize();
+    keypair.Initialize(Crypto::ECPKeyTarget::ECDSA);
 
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(message_to_sign.data(), message_to_sign.size(), signature));
 

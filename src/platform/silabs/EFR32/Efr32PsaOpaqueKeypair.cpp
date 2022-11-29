@@ -380,7 +380,7 @@ EFR32OpaqueP256Keypair::EFR32OpaqueP256Keypair()
 
 EFR32OpaqueP256Keypair::~EFR32OpaqueP256Keypair() {}
 
-CHIP_ERROR EFR32OpaqueP256Keypair::Initialize()
+CHIP_ERROR EFR32OpaqueP256Keypair::Initialize(chip::Crypto::ECPKeyTarget key_target)
 {
     if (mPubkeyLength > 0)
     {

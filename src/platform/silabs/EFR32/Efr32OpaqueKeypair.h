@@ -161,7 +161,7 @@ public:
      * @brief Initialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Initialize() override;
+    CHIP_ERROR Initialize(chip::Crypto::ECPKeyTarget key_target) override;
 
     /**
      * @brief Serialize the keypair (unsupported on opaque keys)

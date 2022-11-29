@@ -40,9 +40,16 @@ struct Identify;
 class AppTask
 {
 public:
+    static AppTask & Instance()
+    {
+        static AppTask sAppTask;
+        return sAppTask;
+    };
+
     CHIP_ERROR StartApp();
-    void PostEvent(AppEvent *);
+
     void UpdateClusterState();
+
     static void IdentifyStartHandler(Identify *);
     static void IdentifyStopHandler(Identify *);
 
@@ -53,52 +60,38 @@ private:
         DimmerTrigger,
         Dimmer
     };
-    enum class TimerFunction : uint8_t
-    {
-        NoneSelected = 0,
-        SoftwareUpdate,
-        FactoryReset,
-    };
-    TimerFunction mFunction = TimerFunction::NoneSelected;
-
     enum class Button : uint8_t
     {
         Function,
         Dimmer,
     };
 
-    friend AppTask & GetAppTask();
-    static AppTask sAppTask;
-
     CHIP_ERROR Init();
 
-    void DispatchEvent(AppEvent *);
+    static void PostEvent(const AppEvent & event);
+    static void DispatchEvent(const AppEvent & event);
+    static void ButtonPushHandler(const AppEvent & event);
+    static void ButtonReleaseHandler(const AppEvent & event);
+    static void TimerEventHandler(const AppEvent & event);
+    static void StartBLEAdvertisementHandler(const AppEvent & event);
+    static void UpdateLedStateEventHandler(const AppEvent & event);
 
-    static void ButtonPushHandler(AppEvent *);
-    static void ButtonReleaseHandler(AppEvent *);
-    static void TimerEventHandler(AppEvent *);
-    static void StartBLEAdvertisingHandler(AppEvent *);
-    static void UpdateLedStateEventHandler(AppEvent *);
-
-    static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent *, intptr_t);
+    static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    static void ButtonEventHandler(uint32_t buttonState, uint32_t hasChanged);
+    static void LEDStateUpdateHandler(LEDWidget & ledWidget);
+    static void FunctionTimerTimeoutCallback(k_timer * timer);
     static void UpdateStatusLED();
-    static void ButtonEventHandler(uint32_t, uint32_t);
-    static void LEDStateUpdateHandler(LEDWidget &);
 
     static void StartTimer(Timer, uint32_t);
     static void CancelTimer(Timer);
-    static void TimerEventHandler(k_timer *);
 
 #ifdef CONFIG_MCUMGR_SMP_BT
     static void RequestSMPAdvertisingStart(void);
 #endif
 
+    FunctionEvent mFunction = FunctionEvent::NoneSelected;
+
 #if CONFIG_CHIP_FACTORY_DATA
     chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;
 #endif
 };
-
-inline AppTask & GetAppTask()
-{
-    return AppTask::sAppTask;
-}

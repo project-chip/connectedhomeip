@@ -40,7 +40,7 @@ void TestTask(void * pvParameter)
 {
     while (true)
     {
-        EFR32_LOG("Running Tests:");
+        SILABS_LOG("Running Tests:");
         chip::RunKvsTest();
         vTaskDelay(60000); // Run every minute
     }
@@ -51,16 +51,16 @@ int main(void)
     init_efrPlatform();
 
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
-    EFR32_LOG("==================================================");
-    EFR32_LOG("chip-efr32-persitent-storage-example starting");
-    EFR32_LOG("==================================================");
+    SILABS_LOG("==================================================");
+    SILABS_LOG("chip-efr32-persitent-storage-example starting");
+    SILABS_LOG("==================================================");
 
     // Run tests
     xTaskCreate(TestTask, "Test", 2048, NULL, 1, &sTestTaskHandle);
-    EFR32_LOG("Starting FreeRTOS scheduler");
+    SILABS_LOG("Starting FreeRTOS scheduler");
     sl_system_kernel_start();
 
     // Should never get here.
-    EFR32_LOG("vTaskStartScheduler() failed");
+    SILABS_LOG("vTaskStartScheduler() failed");
     return -1;
 }

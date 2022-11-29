@@ -40,22 +40,22 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
 
     if (LockParams.numberOfUsers > kMaxUsers)
     {
-        EFR32_LOG("Max number of users is greater than %d, the maximum amount of users currently supported on this platform",
-                  kMaxUsers);
+        SILABS_LOG("Max number of users is greater than %d, the maximum amount of users currently supported on this platform",
+                   kMaxUsers);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
     if (LockParams.numberOfCredentialsPerUser > kMaxCredentialsPerUser)
     {
-        EFR32_LOG("Max number of credentials per user is greater than %d, the maximum amount of users currently supported on this "
-                  "platform",
-                  kMaxCredentialsPerUser);
+        SILABS_LOG("Max number of credentials per user is greater than %d, the maximum amount of users currently supported on this "
+                   "platform",
+                   kMaxCredentialsPerUser);
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
     if (LockParams.numberOfWeekdaySchedulesPerUser > kMaxWeekdaySchedulesPerUser)
     {
-        EFR32_LOG(
+        SILABS_LOG(
             "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
             kMaxWeekdaySchedulesPerUser);
         return APP_ERROR_ALLOCATION_FAILED;
@@ -63,7 +63,7 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
 
     if (LockParams.numberOfYeardaySchedulesPerUser > kMaxYeardaySchedulesPerUser)
     {
-        EFR32_LOG(
+        SILABS_LOG(
             "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
             kMaxYeardaySchedulesPerUser);
         return APP_ERROR_ALLOCATION_FAILED;
@@ -71,7 +71,7 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
 
     if (LockParams.numberOfHolidaySchedules > kMaxHolidaySchedules)
     {
-        EFR32_LOG(
+        SILABS_LOG(
             "Max number of schedules is greater than %d, the maximum amount of schedules currently supported on this platform",
             kMaxHolidaySchedules);
         return APP_ERROR_ALLOCATION_FAILED;
@@ -87,7 +87,7 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
 
     if (sLockTimer == NULL)
     {
-        EFR32_LOG("sLockTimer timer create failed");
+        SILABS_LOG("sLockTimer timer create failed");
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
@@ -131,34 +131,34 @@ bool LockManager::IsValidHolidayScheduleIndex(uint8_t scheduleIndex)
 bool LockManager::ReadConfigValues()
 {
     size_t outLen;
-    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
-                                    sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
+    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
+                                     sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
 
-    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
-                                    sizeof(EmberAfPluginDoorLockCredentialInfo) * ArraySize(mLockCredentials), outLen);
+    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
+                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * ArraySize(mLockCredentials), outLen);
 
-    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames),
-                                    sizeof(mUserNames), outLen);
+    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames),
+                                     sizeof(mUserNames), outLen);
 
-    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
-                                    sizeof(mCredentialData), outLen);
+    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
+                                     sizeof(mCredentialData), outLen);
 
-    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials),
-                                    sizeof(DlCredential) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser,
-                                    outLen);
+    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials),
+                                     sizeof(DlCredential) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser,
+                                     outLen);
 
-    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *>(mWeekdaySchedule),
-                                    sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
-                                        LockParams.numberOfUsers,
-                                    outLen);
+    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *>(mWeekdaySchedule),
+                                     sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
+                                         LockParams.numberOfUsers,
+                                     outLen);
 
-    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_YearDaySchedules, reinterpret_cast<uint8_t *>(mYeardaySchedule),
-                                    sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
-                                        LockParams.numberOfUsers,
-                                    outLen);
+    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_YearDaySchedules, reinterpret_cast<uint8_t *>(mYeardaySchedule),
+                                     sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
+                                         LockParams.numberOfUsers,
+                                     outLen);
 
-    EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_HolidaySchedules, reinterpret_cast<uint8_t *>(&(mHolidaySchedule)),
-                                    sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules, outLen);
+    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_HolidaySchedules, reinterpret_cast<uint8_t *>(&(mHolidaySchedule)),
+                                     sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules, outLen);
 
     return true;
 }
@@ -219,7 +219,7 @@ void LockManager::StartTimer(uint32_t aTimeoutMs)
 {
     if (xTimerIsTimerActive(sLockTimer))
     {
-        EFR32_LOG("app timer already started!");
+        SILABS_LOG("app timer already started!");
         CancelTimer();
     }
 
@@ -228,7 +228,7 @@ void LockManager::StartTimer(uint32_t aTimeoutMs)
     // cannot immediately be sent to the timer command queue.
     if (xTimerChangePeriod(sLockTimer, (aTimeoutMs / portTICK_PERIOD_MS), 100) != pdPASS)
     {
-        EFR32_LOG("sLockTimer timer start() failed");
+        SILABS_LOG("sLockTimer timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
@@ -237,7 +237,7 @@ void LockManager::CancelTimer(void)
 {
     if (xTimerStop(sLockTimer, 0) == pdFAIL)
     {
-        EFR32_LOG("sLockTimer stop() failed");
+        SILABS_LOG("sLockTimer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 }
@@ -386,14 +386,14 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
     userInStorage.credentials = chip::Span<const DlCredential>(mCredentials[userIndex], totalCredentials);
 
     // Save user information in NVM flash
-    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&mLockUsers),
-                                     sizeof(EmberAfPluginDoorLockUserInfo) * LockParams.numberOfUsers);
+    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&mLockUsers),
+                                      sizeof(EmberAfPluginDoorLockUserInfo) * LockParams.numberOfUsers);
 
-    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_UserCredentials, reinterpret_cast<const uint8_t *>(mCredentials),
-                                     sizeof(DlCredential) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser);
+    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_UserCredentials, reinterpret_cast<const uint8_t *>(mCredentials),
+                                      sizeof(DlCredential) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser);
 
-    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_LockUserName, reinterpret_cast<const uint8_t *>(mUserNames),
-                                     sizeof(mUserNames));
+    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_LockUserName, reinterpret_cast<const uint8_t *>(mUserNames),
+                                      sizeof(mUserNames));
 
     ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", endpointId, userIndex);
 
@@ -473,11 +473,11 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
     credentialInStorage.credentialData = chip::ByteSpan{ mCredentialData[credentialIndex], credentialData.size() };
 
     // Save credential information in NVM flash
-    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
-                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * LockParams.numberOfCredentialsPerUser);
+    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
+                                      sizeof(EmberAfPluginDoorLockCredentialInfo) * LockParams.numberOfCredentialsPerUser);
 
-    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
-                                     sizeof(mCredentialData));
+    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
+                                      sizeof(mCredentialData));
 
     ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]", to_underlying(credentialType));
 
@@ -532,9 +532,9 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     scheduleInStorage.status               = status;
 
     // Save schedule information in NVM flash
-    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *>(mWeekdaySchedule),
-                                     sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
-                                         LockParams.numberOfUsers);
+    SILABSConfig::WriteConfigValueBin(
+        SILABSConfig::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *>(mWeekdaySchedule),
+        sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser * LockParams.numberOfUsers);
 
     return DlStatus::kSuccess;
 }
@@ -581,9 +581,9 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
     scheduleInStorage.status                  = status;
 
     // Save schedule information in NVM flash
-    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *>(mYeardaySchedule),
-                                     sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
-                                         LockParams.numberOfUsers);
+    SILABSConfig::WriteConfigValueBin(
+        SILABSConfig::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *>(mYeardaySchedule),
+        sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser * LockParams.numberOfUsers);
 
     return DlStatus::kSuccess;
 }
@@ -625,9 +625,9 @@ DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
     scheduleInStorage.status                  = status;
 
     // Save schedule information in NVM flash
-    EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_HolidaySchedules,
-                                     reinterpret_cast<const uint8_t *>(&(mHolidaySchedule)),
-                                     sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules);
+    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_HolidaySchedules,
+                                      reinterpret_cast<const uint8_t *>(&(mHolidaySchedule)),
+                                      sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules);
 
     return DlStatus::kSuccess;
 }

@@ -14,30 +14,30 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "EFR32DeviceAttestationCreds.h"
+#include "SilabsDeviceAttestationCreds.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
-#include "efr32_creds.h"
 #include "psa/crypto.h"
+#include "silabs_creds.h"
 
 extern uint8_t __attestation_credentials_base[];
 
 namespace chip {
 namespace Credentials {
-namespace EFR32 {
+namespace Silabs {
 
 namespace {
 
-class DeviceAttestationCredsEFR32 : public DeviceAttestationCredentialsProvider
+class DeviceAttestationCredsSilabs : public DeviceAttestationCredentialsProvider
 {
 
 public:
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & out_buffer) override
     {
-        ByteSpan cd_span(((uint8_t *) __attestation_credentials_base) + EFR32_CREDENTIALS_CD_OFFSET, EFR32_CREDENTIALS_CD_SIZE);
+        ByteSpan cd_span(((uint8_t *) __attestation_credentials_base) + SILABS_CREDENTIALS_CD_OFFSET, SILABS_CREDENTIALS_CD_SIZE);
         return CopySpanToMutableSpan(cd_span, out_buffer);
     }
 
@@ -50,19 +50,21 @@ public:
 
     CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & out_buffer) override
     {
-        ByteSpan cert_span(((uint8_t *) __attestation_credentials_base) + EFR32_CREDENTIALS_DAC_OFFSET, EFR32_CREDENTIALS_DAC_SIZE);
+        ByteSpan cert_span(((uint8_t *) __attestation_credentials_base) + SILABS_CREDENTIALS_DAC_OFFSET,
+                           SILABS_CREDENTIALS_DAC_SIZE);
         return CopySpanToMutableSpan(cert_span, out_buffer);
     }
 
     CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer) override
     {
-        ByteSpan cert_span(((uint8_t *) __attestation_credentials_base) + EFR32_CREDENTIALS_PAI_OFFSET, EFR32_CREDENTIALS_PAI_SIZE);
+        ByteSpan cert_span(((uint8_t *) __attestation_credentials_base) + SILABS_CREDENTIALS_PAI_OFFSET,
+                           SILABS_CREDENTIALS_PAI_SIZE);
         return CopySpanToMutableSpan(cert_span, out_pai_buffer);
     }
 
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & message_to_sign, MutableByteSpan & out_buffer) override
     {
-        psa_key_id_t key_id   = EFR32_CREDENTIALS_DAC_KEY_ID;
+        psa_key_id_t key_id   = SILABS_CREDENTIALS_DAC_KEY_ID;
         uint8_t signature[64] = { 0 };
         size_t signature_size = sizeof(signature);
 
@@ -76,12 +78,12 @@ public:
 
 } // namespace
 
-DeviceAttestationCredentialsProvider * GetEFR32DacProvider()
+DeviceAttestationCredentialsProvider * GetSilabsDacProvider()
 {
-    static DeviceAttestationCredsEFR32 dac_provider;
+    static DeviceAttestationCredsSilabs dac_provider;
     return &dac_provider;
 }
 
-} // namespace EFR32
+} // namespace Silabs
 } // namespace Credentials
 } // namespace chip

@@ -26,7 +26,7 @@
 
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
-#include <platform/silabs/EFR32Config.h>
+#include <platform/silabs/SilabsConfig.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -34,7 +34,7 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the EFR32 platform.
  */
-class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::EFR32Config>
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::SILABSConfig>
 {
 public:
     // This returns an instance of this class.

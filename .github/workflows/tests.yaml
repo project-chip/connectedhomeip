@@ -460,7 +460,7 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: crash-core-linux-python-repl
+                  name: crash-core-linux-java-controller
                   path: /tmp/cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
@@ -468,7 +468,7 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: crash-objdir-linux-python-repl
+                  name: crash-objdir-linux-java-controller
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5

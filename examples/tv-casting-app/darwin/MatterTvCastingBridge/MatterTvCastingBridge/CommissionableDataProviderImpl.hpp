@@ -74,7 +74,7 @@ public:
 
     CHIP_ERROR GetSpake2pIterationCount(uint32_t & iterationCount) override
     {
-        if (mSetupDiscriminator > 0)
+        if (mSpake2pIterationCount > 0)
         {
             iterationCount = mSpake2pIterationCount;
         }

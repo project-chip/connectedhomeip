@@ -343,7 +343,7 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
 
     chip::Crypto::P256Keypair ephemeralKey;
-    CHIP_ERROR err = ephemeralKey.Initialize();
+    CHIP_ERROR err = ephemeralKey.Initialize(chip::Crypto::ECPKeyTarget::ECDSA);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;

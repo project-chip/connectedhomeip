@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Defines platform-specific event types and data for the Chip
- *          Device Layer on EFR32 platforms using the Silicon Labs SDK.
+ *          Device Layer on Silabs platforms using the Silicon Labs SDK.
  */
 
 #pragma once
@@ -35,7 +35,7 @@ namespace DeviceLayer {
 namespace DeviceEventType {
 
 /**
- * Enumerates EFR32 platform-specific event types that are visible to the application.
+ * Enumerates Silabs platform-specific event types that are visible to the application.
  */
 enum PublicPlatformSpecificEventTypes
 {
@@ -43,7 +43,7 @@ enum PublicPlatformSpecificEventTypes
 };
 
 /**
- * Enumerates EFR32 platform-specific event types that are internal to the Chip Device Layer.
+ * Enumerates Silabs platform-specific event types that are internal to the Chip Device Layer.
  */
 enum InternalPlatformSpecificEventTypes
 {
@@ -53,7 +53,7 @@ enum InternalPlatformSpecificEventTypes
 } // namespace DeviceEventType
 
 /**
- * Represents platform-specific event information for Silicon Labs EFR32 platforms.
+ * Represents platform-specific event information for Silicon Labs platforms.
  */
 
 struct ChipDevicePlatformEvent final

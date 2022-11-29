@@ -39,7 +39,7 @@ CHIP_ERROR MTRP256KeypairBridge::Init(id<MTRKeypair> keypair)
     return setPubkey();
 }
 
-CHIP_ERROR MTRP256KeypairBridge::Initialize()
+CHIP_ERROR MTRP256KeypairBridge::Initialize(ECPKeyTarget key_target)
 {
     if (!HasKeypair()) {
         return CHIP_ERROR_INCORRECT_STATE;

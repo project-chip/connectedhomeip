@@ -265,7 +265,7 @@ exit:
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
-void MatterContentLauncherPluginServerInitCallback(void)
+void MatterContentLauncherPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gContentLauncherAttrAccess);
 }

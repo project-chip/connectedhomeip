@@ -60,7 +60,7 @@ void ASN1Writer::Init(uint8_t * buf, size_t maxLen)
     mDeferredLengthCount = 0;
 }
 
-void ASN1Writer::InitNullWriter(void)
+void ASN1Writer::InitNullWriter()
 {
     mBuf                 = nullptr;
     mWritePoint          = nullptr;

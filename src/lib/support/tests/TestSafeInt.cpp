@@ -355,7 +355,7 @@ static const nlTest sTests[] = { NL_TEST_DEF_FN(TestCanCastTo_Int8),  NL_TEST_DE
                                  NL_TEST_DEF_FN(TestCanCastTo_Int32), NL_TEST_DEF_FN(TestCanCastTo_Int64),
                                  NL_TEST_DEF_FN(TestCastToSigned),    NL_TEST_SENTINEL() };
 
-int TestSafeInt(void)
+int TestSafeInt()
 {
     nlTestSuite theSuite = { "CHIP SafeInt tests", &sTests[0], nullptr, nullptr };
 

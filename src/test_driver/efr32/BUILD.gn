@@ -57,7 +57,7 @@ efr32_sdk("sdk") {
 
   defines = [
     "BOARD_ID=${silabs_board}",
-    "EFR32_LOG_ENABLED=1",
+    "SILABS_LOG_ENABLED=1",
     "PW_RPC_ENABLED",
 
     # Thread is built but test driver do not have the NETWORK_COMMISSIONING cluster or zap config.
