@@ -23,7 +23,11 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
+
     build_linux_gcc_debug:
         name: Build on Linux (gcc_debug)
         timeout-minutes: 85
@@ -125,6 +129,7 @@ jobs:
             #       path: out/
             #       # objdirs are big; don't hold on to them too long.
             #       retention-days: 5
+
     build_linux:
         name: Build on Linux (fake, gcc_release, clang, simulated)
         timeout-minutes: 150
@@ -219,7 +224,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
-                       --no-log-timestamps \
                        --compile-database out/sanitizers/compile_commands.json \
                        --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/' \
                        check \
@@ -228,7 +232,7 @@ jobs:
               timeout-minutes: 60
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps \
+                    "./scripts/build/build_examples.py \
                        --target linux-x64-minmdns-ipv6only-clang \
                        --target linux-x64-rpc-console \
                        build \
@@ -241,7 +245,7 @@ jobs:
               timeout-minutes: 60
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps \
+                    "./scripts/build/build_examples.py \
                        --target linux-x64-all-clusters-ipv6only-clang \
                        --target linux-x64-chip-tool-ipv6only-clang \
                        --pregen-dir ./zzz_pregenerated \
@@ -255,7 +259,7 @@ jobs:
               timeout-minutes: 15
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target linux-fake-tests build"
+                    "./scripts/build/build_examples.py --target linux-fake-tests build"
             - name: Uploading core files
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
@@ -295,6 +299,7 @@ jobs:
             # - name: Perform CodeQL Analysis
             #   if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
             #   uses: github/codeql-action/analyze@v1
+
     build_linux_python_lib:
         name: Build on Linux (python_lib)
         timeout-minutes: 60
@@ -430,7 +435,6 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
-                       --no-log-timestamps \
                        --compile-database out/default/compile_commands.json \
                        check \
                     "

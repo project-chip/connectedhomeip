@@ -147,4 +147,4 @@ def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs,
 
 
 if __name__ == '__main__':
-    main()
+    main(auto_envvar_prefix='CHIP')

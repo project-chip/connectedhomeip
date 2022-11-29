@@ -25,6 +25,9 @@ concurrency:
         'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     test_suites_linux:
         name: Test Suites - Linux
@@ -86,7 +89,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
-            - name: Validate that xml are parseable
+            - name: Validate that xml are parsable
               timeout-minutes: 10
               # The sub-items being run here are the same as the input XMLs listed
               # at src/app/zap-templates/zcl/zcl.json
@@ -96,9 +99,9 @@ jobs:
               # unit tests)
               #
               # Also note ordering: global attributes are parsed first because other XML files may
-              # reference these. 
+              # reference these.
               #
-              # TODO: some multipass/postprocess may be more appropriate to allow any ordering of 
+              # TODO: some multipass/postprocess may be more appropriate to allow any ordering of
               #       things.
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -225,6 +228,7 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+
     test_suites_darwin:
         name: Test Suites - Darwin
         timeout-minutes: 150
@@ -336,6 +340,7 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+
     repl_tests_linux:
         name: REPL Tests - Linux
         timeout-minutes: 130
@@ -408,6 +413,7 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+
     java_tests_linux:
         name: Java Tests - Linux
         timeout-minutes: 130

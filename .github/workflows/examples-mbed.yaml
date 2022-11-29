@@ -23,6 +23,9 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     mbedos:
         name: Mbed OS examples building
@@ -150,7 +153,7 @@ jobs:
                     mbed $APP_TARGET+$APP_PROFILE shell \
                     examples/ota-requestor-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-ota-requestor-app-example.elf \
                     /tmp/bloat_reports/
-            
+
             - name: Build unit tests
               # Temporarily disable build due to running out of flash space
               if: false

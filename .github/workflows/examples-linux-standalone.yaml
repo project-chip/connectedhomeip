@@ -22,13 +22,13 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     linux_standalone:
         name: Linux Standalone
         timeout-minutes: 90
-
-        env:
-            BUILD_TYPE: gn_linux
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -67,59 +67,75 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Build Standalone cert tool
               timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
-                  "./scripts/build/build_examples.py --no-log-timestamps \
-                      --target linux-x64-chip-cert \
-                      --target linux-arm64-chip-cert \
-                      build \
-                  "
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-chip-cert \
+                        build"
             - name: Build minmdns example with platform dns
               timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
-                  "./scripts/build/build_examples.py --no-log-timestamps --target linux-x64-address-resolve-tool-platform-mdns-ipv6only build"
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-address-resolve-tool-platform-mdns-ipv6only \
+                        build"
             - name: Build example Standalone Echo Client
               timeout-minutes: 10
               run: |
-                  scripts/examples/gn_build_example.sh examples/chip-tool out/chip_tool_debug
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-chip-tool \
+                        build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug chip-tool \
-                    out/chip_tool_debug/chip-tool \
+                    out/linux-x64-chip-tool/chip-tool \
                     /tmp/bloat_reports/
             - name: Build example Standalone Shell
               timeout-minutes: 10
               run: |
-                  scripts/examples/gn_build_example.sh examples/shell/standalone out/shell_debug
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-shell \
+                        build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug shell \
-                    out/shell_debug/chip-shell \
+                    out/linux-x64-shell/chip-shell \
                     /tmp/bloat_reports/
             - name: Build example Standalone All Clusters Server
               timeout-minutes: 10
               run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/all_clusters_debug
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-all-clusters \
+                        build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug all-clusters-app \
-                    out/all_clusters_debug/chip-all-clusters-app \
+                    out/linux-x64-all-clusters/chip-all-clusters-app \
                     /tmp/bloat_reports/
             - name: Build example Standalone All Clusters Mininal Server
               timeout-minutes: 10
               run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-minimal-app/linux out/all_clusters_minimal_debug
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-all-clusters-minimal \
+                        build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug all-clusters-minimal-app \
-                    out/all_clusters_minimal_debug/chip-all-clusters-minimal-app \
+                    out/linux-x64-all-clusters-minimal/chip-all-clusters-app \
                     /tmp/bloat_reports/
             - name: Build example TV app
               timeout-minutes: 10
               run: |
-                  scripts/examples/gn_build_example.sh examples/tv-app/linux out/tv_app_debug
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-tv-app \
+                        build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug tv-app \
-                    out/tv_app_debug/chip-tv-app \
+                    out/linux-x64-tv-app/chip-tv-app \
                     /tmp/bloat_reports/
             - name: Build example Standalone TV Casting App
               timeout-minutes: 10
@@ -135,37 +151,47 @@ jobs:
             - name: Build example lighting app with RPCs
               timeout-minutes: 10
               run: |
-                  scripts/examples/gn_build_example.sh examples/lighting-app/linux out/lighting_app_debug_rpc \
-                    'import("//with_pw_rpc.gni")'
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-light-rpc \
+                        build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug+rpc lighting-app \
-                    out/lighting_app_debug_rpc/chip-lighting-app \
+                    out/linux-x64-light-rpc/chip-lighting-app \
                     /tmp/bloat_reports/
             - name: Build example Standalone Bridge
               timeout-minutes: 10
               run: |
-                  scripts/examples/gn_build_example.sh examples/bridge-app/linux out/bridge_debug
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-bridge \
+                        build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    linux debug+rpc bridge-app \
-                    out/bridge_debug/chip-bridge-app \
+                    linux debug bridge-app \
+                    out/linux-x64-bridge/chip-bridge-app \
                     /tmp/bloat_reports/
             - name: Build example OTA Provider
               timeout-minutes: 10
               run: |
-                  scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota_provider_debug
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-ota-provider \
+                        build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug ota-provider-app \
-                    out/ota_provider_debug/chip-ota-provider-app \
+                    out/linux-x64-ota-provider/chip-ota-provider-app \
                     /tmp/bloat_reports/
             - name: Build example OTA Requestor
               timeout-minutes: 10
               run: |
-                  scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/ota_requestor_debug
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-ota-requestor \
+                        build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug ota-requestor-app \
-                    out/ota_requestor_debug/chip-ota-requestor-app \
+                    out/linux-x64-ota-requestor/chip-ota-requestor-app \
                     /tmp/bloat_reports/
-
             - name: Build example Standalone Lock App
               timeout-minutes: 10
               run: |
@@ -177,6 +203,7 @@ jobs:
                     linux debug lock-app \
                     out/linux-x64-lock/chip-lock-app \
                     /tmp/bloat_reports/
+
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v3
               if: ${{ !env.ACT }}

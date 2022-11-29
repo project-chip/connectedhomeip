@@ -22,6 +22,9 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     telink:
         name: Telink
@@ -57,7 +60,7 @@ jobs:
             - name: Build example Telink All Clusters App
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-all-clusters' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-all-clusters' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d all-clusters-app \
                     out/telink-tlsr9518adk80d-all-clusters/zephyr/zephyr.elf \
@@ -66,7 +69,7 @@ jobs:
             - name: Build example Telink All Clusters Minimal App
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-all-clusters-minimal' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-all-clusters-minimal' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d all-clusters-minimal-app \
                     out/telink-tlsr9518adk80d-all-clusters-minimal/zephyr/zephyr.elf \
@@ -75,7 +78,7 @@ jobs:
             - name: Build example Telink Lighting App
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-light' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-light' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d lighting-app \
                     out/telink-tlsr9518adk80d-light/zephyr/zephyr.elf \
@@ -84,7 +87,7 @@ jobs:
             - name: Build example Telink Light Switch App
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-light-switch' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-light-switch' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d light-switch-app \
                     out/telink-tlsr9518adk80d-light-switch/zephyr/zephyr.elf \
@@ -93,7 +96,7 @@ jobs:
             - name: Build example Telink OTA Requestor App
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-ota-requestor' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-ota-requestor' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d ota-requestor-app \
                     out/telink-tlsr9518adk80d-ota-requestor/zephyr/zephyr.elf \
@@ -102,7 +105,7 @@ jobs:
             - name: Build example Telink Thermostat App
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target 'telink-tlsr9518adk80d-thermostat' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-thermostat' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d thermostat \
                     out/telink-tlsr9518adk80d-thermostat/zephyr/zephyr.elf \

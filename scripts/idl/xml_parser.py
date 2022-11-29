@@ -76,4 +76,4 @@ if __name__ == '__main__':
             print("Data:")
             pprint.pp(data)
 
-    main()
+    main(auto_envvar_prefix='CHIP')

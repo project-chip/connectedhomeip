@@ -197,4 +197,4 @@ def main(compile_commands_glob, scanning_destination, mapping_file_dir,
 
 
 if __name__ == '__main__':
-    main()
+    main(auto_envvar_prefix='CHIP')

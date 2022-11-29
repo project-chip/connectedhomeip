@@ -25,6 +25,9 @@ concurrency:
         'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     test_suites_chip_tool_darwin:
         name: Test Suites - Darwin

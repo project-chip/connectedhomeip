@@ -22,6 +22,9 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     imx:
         name: Linux i.MX Build
@@ -45,18 +48,25 @@ jobs:
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
 
-            - name: Build App
+            - name: Bootstrap
+              run: scripts/build/gn_bootstrap.sh
+
+            - name: Build lighting-app
               timeout-minutes: 30
               run: |
-                  ./scripts/examples/imxlinux_example.sh \
-                  examples/lighting-app/linux/ examples/lighting-app/linux/out/aarch64
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target imx-lighting-app \
+                        build"
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build chip-tool
               timeout-minutes: 30
               run: |
-                  ./scripts/examples/imxlinux_example.sh \
-                  examples/chip-tool examples/chip-tool/out/aarch64
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target imx-chip-tool \
+                        build"
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build thermostat
@@ -64,8 +74,8 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target imx-thermostat build \
-                     "
+                        --target imx-thermostat \
+                        build"
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build all-cluster
@@ -73,8 +83,8 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                         --target imx-all-clusters-app build \
-                     "
+                        --target imx-all-clusters-app \
+                        build"
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build all-cluster-minimal
@@ -82,8 +92,8 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                         --target imx-all-clusters-minimal-app build \
-                     "
+                        --target imx-all-clusters-minimal-app \
+                        build"
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build ota-provider-app
@@ -91,7 +101,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                         --target imx-ota-provider-app build
-                     "
+                        --target imx-ota-provider-app \
+                        build"
             - name: Clean out build output
               run: rm -rf ./out

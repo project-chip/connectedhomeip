@@ -22,6 +22,9 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     nrfconnect:
         name: nRF Connect SDK
@@ -209,7 +212,7 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf7002dk_nrf5340_cpuapp light-switch-app \
                     examples/light-switch-app/nrfconnect/build/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/                    
+                    /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Lighting App on nRF7002 PDK
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
               timeout-minutes: 20
@@ -218,7 +221,7 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf7002dk_nrf5340_cpuapp lighting-app \
                     examples/light-switch-app/nrfconnect/build/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/                    
+                    /tmp/bloat_reports/
             - name: Build example nRF Connect SDK All Clusters App on nRF7002 PDK
               timeout-minutes: 20
               run: |
