@@ -138,7 +138,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestPtr(void)
+int TestPtr()
 {
     nlTestSuite theSuite = { "IP", sTests, nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

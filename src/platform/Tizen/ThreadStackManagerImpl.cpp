@@ -21,17 +21,38 @@
  *          for Tizen platform.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/internal/DeviceNetworkInfo.h>
+/**
+ * Note: ThreadStackManager requires ConnectivityManager to be defined
+ *       beforehand, otherwise we will face circular dependency between them. */
+#include <platform/ConnectivityManager.h>
 
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <platform/PlatformManager.h>
+/**
+ * Note: Use public include for ThreadStackManager which includes our local
+ *       platform/<PLATFORM>/ThreadStackManagerImpl.h after defining interface
+ *       class. */
 #include <platform/ThreadStackManager.h>
-#include <platform/Tizen/NetworkCommissioningDriver.h>
 
-#include "ThreadStackManagerImpl.h"
+#include <endian.h>
+
+#include <cstring>
+
+#include <thread.h>
+
+#include <app/AttributeAccessInterface.h>
+#include <inet/IPAddress.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/dnssd/Constants.h>
 #include <lib/dnssd/platform/Dnssd.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
+#include <lib/support/ThreadOperationalDataset.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <platform/NetworkCommissioning.h>
+#include <platform/PlatformManager.h>
+
+#include <platform/Tizen/ThreadStackManagerImpl.h>
 
 namespace chip {
 namespace DeviceLayer {

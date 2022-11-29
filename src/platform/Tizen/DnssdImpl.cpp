@@ -16,23 +16,32 @@
  */
 
 #include "DnssdImpl.h"
-#include "MainLoop.h"
 
 #include <algorithm>
+#include <cerrno>
+#include <cstdlib>
 #include <cstring>
-#include <net/if.h>
 #include <sstream>
+#include <string>
 #include <utility>
 
+// Note: Include dns-sd-internal.h is needed, this source file uses some undocumented functions.
+#include <dns-sd-internal.h>
+#include <dns-sd.h>
+#include <glib.h>
 #include <lib/dnssd/platform/Dnssd.h>
-#include <lib/support/CHIPMem.h>
+#include <net/if.h>
+
+#include <inet/InetBuildConfig.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/Span.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/PlatformManager.h>
 
-#include <dns-sd-internal.h>
-#include <glib.h>
+#include "MainLoop.h"
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
 #endif

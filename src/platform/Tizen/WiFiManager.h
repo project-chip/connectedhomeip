@@ -17,12 +17,16 @@
 
 #pragma once
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <platform/NetworkCommissioning.h>
-#include <platform/internal/DeviceNetworkInfo.h>
+#include <cstddef>
+#include <cstdint>
 
 #include <glib.h>
 #include <wifi-manager.h>
+
+#include <lib/core/CHIPError.h>
+#include <platform/NetworkCommissioning.h>
+
+#include "platform/internal/DeviceNetworkInfo.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -103,5 +107,3 @@ inline WiFiManager & WiFiMgr()
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI

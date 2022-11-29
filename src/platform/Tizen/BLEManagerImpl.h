@@ -23,11 +23,23 @@
 
 #pragma once
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <utility>
 
 #include <bluetooth.h>
 #include <glib.h>
-#include <sys/param.h>
+
+#include <ble/Ble.h>
+#include <ble/CHIPBleServiceData.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/SetupDiscriminator.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <system/SystemLayer.h>
+#include <system/SystemPacketBuffer.h>
 
 #include "ChipDeviceScanner.h"
 
@@ -263,5 +275,3 @@ inline bool BLEManagerImpl::_IsAdvertising()
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

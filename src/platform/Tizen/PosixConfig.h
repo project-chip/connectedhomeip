@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include <functional>
-#include <inttypes.h>
+#include <cstdint>
+#include <cstring>
 
 #include <lib/core/CHIPError.h>
 

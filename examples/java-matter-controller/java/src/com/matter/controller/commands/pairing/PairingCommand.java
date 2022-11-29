@@ -163,18 +163,18 @@ public abstract class PairingCommand extends MatterCommand
       throw new RuntimeException(e);
     }
 
-    addArgument("node-id", 0, Long.MAX_VALUE, mNodeId, null);
+    addArgument("node-id", 0, Long.MAX_VALUE, mNodeId, null, false);
 
     switch (networkType) {
       case NONE:
       case ETHERNET:
         break;
       case WIFI:
-        addArgument("ssid", mSSID, null);
-        addArgument("password", mPassword, null);
+        addArgument("ssid", mSSID, null, false);
+        addArgument("password", mPassword, null, false);
         break;
       case THREAD:
-        addArgument("operationalDataset", mOperationalDataset, null);
+        addArgument("operationalDataset", mOperationalDataset, null, false);
         break;
     }
 
@@ -184,29 +184,29 @@ public abstract class PairingCommand extends MatterCommand
       case CODE:
       case CODE_PASE_ONLY:
         Only:
-        addArgument("payload", mOnboardingPayload, null);
-        addArgument("discover-once", mDiscoverOnce, null);
-        addArgument("use-only-onnetwork-discovery", mUseOnlyOnNetworkDiscovery, null);
+        addArgument("payload", mOnboardingPayload, null, false);
+        addArgument("discover-once", mDiscoverOnce, null, false);
+        addArgument("use-only-onnetwork-discovery", mUseOnlyOnNetworkDiscovery, null, false);
         break;
       case BLE:
-        addArgument("setup-pin-code", 0, 134217727, mSetupPINCode, null);
-        addArgument("discriminator", (short) 0, (short) 4096, mDiscriminator, null);
+        addArgument("setup-pin-code", 0, 134217727, mSetupPINCode, null, false);
+        addArgument("discriminator", (short) 0, (short) 4096, mDiscriminator, null, false);
         break;
       case ON_NETWORK:
-        addArgument("setup-pin-code", 0, 134217727, mSetupPINCode, null);
+        addArgument("setup-pin-code", 0, 134217727, mSetupPINCode, null, false);
         break;
       case SOFT_AP:
         AP:
-        addArgument("setup-pin-code", 0, 134217727, mSetupPINCode, null);
-        addArgument("discriminator", (short) 0, (short) 4096, mDiscriminator, null);
-        addArgument("device-remote-ip", mRemoteAddr);
-        addArgument("device-remote-port", (short) 0, Short.MAX_VALUE, mRemotePort, null);
+        addArgument("setup-pin-code", 0, 134217727, mSetupPINCode, null, false);
+        addArgument("discriminator", (short) 0, (short) 4096, mDiscriminator, null, false);
+        addArgument("device-remote-ip", mRemoteAddr, false);
+        addArgument("device-remote-port", (short) 0, Short.MAX_VALUE, mRemotePort, null, false);
         break;
       case ETHERNET:
-        addArgument("setup-pin-code", 0, 134217727, mSetupPINCode, null);
-        addArgument("discriminator", (short) 0, (short) 4096, mDiscriminator, null);
-        addArgument("device-remote-ip", mRemoteAddr);
-        addArgument("device-remote-port", (short) 0, Short.MAX_VALUE, mRemotePort, null);
+        addArgument("setup-pin-code", 0, 134217727, mSetupPINCode, null, false);
+        addArgument("discriminator", (short) 0, (short) 4096, mDiscriminator, null, false);
+        addArgument("device-remote-ip", mRemoteAddr, false);
+        addArgument("device-remote-port", (short) 0, Short.MAX_VALUE, mRemotePort, null, false);
         break;
     }
 
@@ -214,28 +214,28 @@ public abstract class PairingCommand extends MatterCommand
       case NONE:
         break;
       case SHORT_DISCRIMINATOR:
-        addArgument("discriminator", (short) 0, (short) 4096, mDiscriminator, null);
+        addArgument("discriminator", (short) 0, (short) 4096, mDiscriminator, null, false);
         break;
       case LONG_DISCRIMINATOR:
-        addArgument("discriminator", (short) 0, (short) 4096, mDiscriminator, null);
+        addArgument("discriminator", (short) 0, (short) 4096, mDiscriminator, null, false);
         break;
       case VENDOR_ID:
-        addArgument("vendor-id", (short) 0, Short.MAX_VALUE, mDiscoveryFilterCode, null);
+        addArgument("vendor-id", (short) 0, Short.MAX_VALUE, mDiscoveryFilterCode, null, false);
         break;
       case COMPRESSED_FABRIC_ID:
-        addArgument("fabric-id", 0, Long.MAX_VALUE, mDiscoveryFilterCode, null);
+        addArgument("fabric-id", 0, Long.MAX_VALUE, mDiscoveryFilterCode, null, false);
         break;
       case COMMISSIONING_MODE:
       case COMMISSIONER:
         break;
       case DEVICE_TYPE:
-        addArgument("device-type", (short) 0, Short.MAX_VALUE, mDiscoveryFilterCode, null);
+        addArgument("device-type", (short) 0, Short.MAX_VALUE, mDiscoveryFilterCode, null, false);
         break;
       case INSTANCE_NAME:
-        addArgument("name", mDiscoveryFilterInstanceName, null);
+        addArgument("name", mDiscoveryFilterInstanceName, null, false);
         break;
     }
 
-    addArgument("timeout", (long) 0, Long.MAX_VALUE, mTimeoutMillis, null);
+    addArgument("timeout", (long) 0, Long.MAX_VALUE, mTimeoutMillis, null, false);
   }
 }

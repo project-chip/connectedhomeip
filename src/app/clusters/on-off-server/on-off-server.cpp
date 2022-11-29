@@ -433,7 +433,7 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
     return true;
 }
 
-uint32_t OnOffServer::calculateNextWaitTimeMS(void)
+uint32_t OnOffServer::calculateNextWaitTimeMS()
 {
     const chip::System::Clock::Timestamp currentTime = chip::System::SystemClock().GetMonotonicTimestamp();
     chip::System::Clock::Timestamp waitTime          = UPDATE_TIME_MS;

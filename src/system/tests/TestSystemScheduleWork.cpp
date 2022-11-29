@@ -96,7 +96,7 @@ static int TestTeardown(void * aContext)
     return (SUCCESS);
 }
 
-int TestSystemScheduleWork(void)
+int TestSystemScheduleWork()
 {
     // Run test suit againt one lContext.
     nlTestRunner(&kTheSuite, nullptr);

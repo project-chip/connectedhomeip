@@ -50,7 +50,7 @@ shared_library("CHIPController") {
   } else if (current_os == "linux") {
     include_dirs += [ "/usr/include/python3.9" ]
   } else {
-    assert(false, "OS not supprted.")
+    assert(false, "OS not supported.")
   }
 
   sources = [

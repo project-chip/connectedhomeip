@@ -14,6 +14,7 @@
 
 import os
 from enum import Enum, auto
+import shlex
 
 from .gn import GnBuilder
 
@@ -115,16 +116,30 @@ class Efr32Builder(GnBuilder):
                  runner,
                  app: Efr32App = Efr32App.LIGHT,
                  board: Efr32Board = Efr32Board.BRD4161A,
+                 chip_build_libshell: bool = False,
+                 chip_logging: bool = True,
+                 chip_openthread_ftd: bool = True,
+                 enable_heap_monitoring: bool = False,
+                 enable_openthread_cli: bool = True,
+                 show_qr_code: bool = False,
                  enable_rpcs: bool = False,
                  enable_ota_requestor: bool = False,
                  enable_sed: bool = False,
-                 enable_low_power: bool = False
+                 enable_low_power: bool = False,
+                 enable_wifi: bool = False,
+                 enable_rs911x: bool = False,
+                 enable_wf200: bool = False,
+                 enable_wifi_ipv4: bool = False,
+                 enable_additional_data_advertising: bool = False,
+                 enable_ot_lib: bool = False,
+                 enable_ot_coap_lib: bool = False
                  ):
         super(Efr32Builder, self).__init__(
             root=app.BuildRoot(root),
             runner=runner)
         self.app = app
         self.extra_gn_options = ['silabs_board="%s"' % board.GnArgName()]
+        self.dotfile = ''
 
         if enable_rpcs:
             self.extra_gn_options.append('is_debug=false import("//with_pw_rpc.gni")')
@@ -138,6 +153,52 @@ class Efr32Builder(GnBuilder):
         if enable_low_power:
             self.extra_gn_options.append(
                 'chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true')
+
+        if chip_build_libshell:
+            self.extra_gn_options.append('chip_build_libshell=true')
+
+        if chip_logging == False:
+            self.extra_gn_options.append('chip_logging=false')
+
+        if chip_openthread_ftd == False:
+            self.extra_gn_options.append('chip_openthread_ftd=false')
+
+        if enable_heap_monitoring:
+            self.extra_gn_options.append('enable_heap_monitoring=true')
+
+        if enable_openthread_cli == False:
+            self.extra_gn_options.append('enable_openthread_cli=false')
+
+        if show_qr_code:
+            self.extra_gn_options.append('show_qr_code=true')
+
+        if enable_wifi:
+            self.dotfile += self.root + '/build_for_wifi_gnfile.gn'
+            if board == Efr32Board.BRD4161A:
+                self.extra_gn_options.append('is_debug=false chip_logging=false')
+            else:
+                self.extra_gn_options.append('disable_lcd=true use_external_flash=false')
+
+            if enable_rs911x:
+                self.extra_gn_options.append('use_rs911x=true')
+            elif enable_wf200:
+                self.extra_gn_options.append('use_wf200=true')
+            else:
+                raise Exception('Wifi usage: ...-wifi-[rs911x|wf200]-...')
+
+        if enable_wifi_ipv4:
+            self.extra_gn_options.append('chip_enable_wifi_ipv4=true')
+
+        if enable_additional_data_advertising:
+            self.extra_gn_options.append('chip_enable_additional_data_advertising=true chip_enable_rotating_device_id=true')
+
+        if enable_ot_lib:
+            self.extra_gn_options.append(
+                'use_silabs_thread_lib=true chip_openthread_target="../silabs:ot-efr32-cert" openthread_external_platform=""')
+
+        if enable_ot_coap_lib:
+            self.extra_gn_options.append(
+                'use_silabs_thread_lib=true chip_openthread_target="../silabs:ot-efr32-cert" use_thread_coap_lib=true openthread_external_platform=""')
 
     def GnBuildArgs(self):
         return self.extra_gn_options
@@ -163,3 +224,33 @@ class Efr32Builder(GnBuilder):
                       name] = os.path.join(self.output_dir, name)
 
         return items
+
+    def generate(self):
+        cmd = [
+            'gn', 'gen', '--check', '--fail-on-unused-args',
+            '--export-compile-commands',
+            '--root=%s' % self.root
+        ]
+        if self.dotfile:
+            cmd += ['--dotfile=%s' % self.dotfile]
+
+        extra_args = self.GnBuildArgs()
+        if extra_args:
+            cmd += ['--args=%s' % ' '.join(extra_args)]
+
+        cmd += [self.output_dir]
+
+        title = 'Generating ' + self.identifier
+        extra_env = self.GnBuildEnv()
+
+        if extra_env:
+            # convert the command into a bash command that includes
+            # setting environment variables
+            cmd = [
+                'bash', '-c', '\n' + ' '.join(
+                    ['%s="%s" \\\n' % (key, value) for key, value in extra_env.items()] +
+                    [shlex.join(cmd)]
+                )
+            ]
+
+        self._Execute(cmd, title=title)

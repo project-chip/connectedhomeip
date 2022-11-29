@@ -30,13 +30,14 @@ public final class CloseSessionCommand extends MatterCommand {
 
   public CloseSessionCommand(ChipDeviceController controller, CredentialsIssuer credsIssuer) {
     super(controller, "close-session", credsIssuer);
-    addArgument("destination-id", 0, Long.MAX_VALUE, mDestinationId, null);
+    addArgument("destination-id", 0, Long.MAX_VALUE, mDestinationId, null, false);
     addArgument(
         "timeout",
         (short) 0,
         Short.MAX_VALUE,
         mTimeoutSecs,
-        "Time, in seconds, before this command is considered to have timed out.");
+        "Time, in seconds, before this command is considered to have timed out.",
+        false);
   }
 
   @Override

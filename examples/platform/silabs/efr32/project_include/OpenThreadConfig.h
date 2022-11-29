@@ -36,6 +36,31 @@
 // Enable use of external heap allocator (calloc/free) for OpenThread.
 #define OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE 1
 
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#define OPENTHREAD_CONFIG_PARENT_SEARCH_ENABLE 0
+// In seconds
+#define OPENTHREAD_CONFIG_MLE_CHILD_TIMEOUT_DEFAULT (SL_SLEEP_TIME_MS / 1000)
+#endif
+
+/****Uncomment below section for OpenThread Debug logs*/
+// #define OPENTHREAD_CONFIG_LOG_LEVEL OT_LOG_LEVEL_DEBG
+
+// #ifndef OPENTHREAD_CONFIG_LOG_CLI
+// #define OPENTHREAD_CONFIG_LOG_CLI                   1
+// #endif
+
+// #ifndef OPENTHREAD_CONFIG_LOG_PKT_DUMP
+// #define OPENTHREAD_CONFIG_LOG_PKT_DUMP              1
+// #endif
+
+// #ifndef OPENTHREAD_CONFIG_LOG_PLATFORM
+// #define OPENTHREAD_CONFIG_LOG_PLATFORM              1
+// #endif
+
+// #ifndef OPENTHREAD_CONFIG_LOG_PREPEND_LEVEL
+// #define OPENTHREAD_CONFIG_LOG_PREPEND_LEVEL         1
+// #endif
+
 // EFR32MG21A020F1024IM32 has 96k of RAM. Reduce the number of buffers to
 // conserve RAM for this Series 2 part.
 #if defined(EFR32MG21)

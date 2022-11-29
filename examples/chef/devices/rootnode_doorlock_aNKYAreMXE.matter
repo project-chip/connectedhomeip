@@ -1631,11 +1631,11 @@ endpoint 1 {
     ram      attribute wrongCodeEntryLimit default = 3;
     ram      attribute userCodeTemporaryDisableTime default = 10;
     ram      attribute sendPINOverTheAir;
-    ram      attribute requirePINforRemoteOperation;
+    ram      attribute requirePINforRemoteOperation default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0001;
+    ram      attribute featureMap default = 0x0081;
     ram      attribute clusterRevision default = 6;
   }
 }
