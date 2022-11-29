@@ -23,7 +23,7 @@
 
 using namespace chip;
 
-void emberAfThermostatClusterClientInitCallback(void)
+void emberAfThermostatClusterClientInitCallback()
 {
     // TODO
 }

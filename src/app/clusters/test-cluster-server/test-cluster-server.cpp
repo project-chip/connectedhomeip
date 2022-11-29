@@ -995,7 +995,7 @@ bool emberAfUnitTestingClusterTestSimpleOptionalArgumentRequestCallback(
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
-void MatterUnitTestingPluginServerInitCallback(void)
+void MatterUnitTestingPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }

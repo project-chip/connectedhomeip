@@ -100,7 +100,7 @@ bool MainLoop::Init(initFn_t initFn, gpointer userData)
     return true;
 }
 
-void MainLoop::Deinit(void)
+void MainLoop::Deinit()
 {
     for (auto & loopData : mLoopData)
     {
@@ -144,7 +144,7 @@ bool MainLoop::AsyncRequest(asyncFn_t asyncFn, gpointer asyncUserData, guint tim
     return true;
 }
 
-MainLoop & MainLoop::Instance(void)
+MainLoop & MainLoop::Instance()
 {
     static MainLoop sMainLoop;
     return sMainLoop;

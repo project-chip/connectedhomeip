@@ -622,7 +622,7 @@ static const nlTest sTests[] = { NL_TEST_DEF_FN(TestCD_EncodeDecode),
                                  NL_TEST_DEF_FN(TestCD_DefaultCdTrustStore),
                                  NL_TEST_SENTINEL() };
 
-int TestCertificationDeclaration(void)
+int TestCertificationDeclaration()
 {
     nlTestSuite theSuite = { "CHIP Certification Declaration tests", &sTests[0], nullptr, nullptr };
 

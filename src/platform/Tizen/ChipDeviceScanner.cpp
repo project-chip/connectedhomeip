@@ -167,7 +167,7 @@ exit:
     return false;
 }
 
-static bool __IsScanFilterSupported(void)
+static bool __IsScanFilterSupported()
 {
     // Tizen API: bt_adapter_le_is_scan_filter_supported() is currently internal
     // Defaulting to true
@@ -221,7 +221,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceScanner::StopChipScan(void)
+CHIP_ERROR ChipDeviceScanner::StopChipScan()
 {
     int ret = BT_ERROR_NONE;
     ReturnErrorCodeIf(!mIsScanning, CHIP_ERROR_INCORRECT_STATE);
@@ -245,7 +245,7 @@ CHIP_ERROR ChipDeviceScanner::StopChipScan(void)
     return CHIP_NO_ERROR;
 }
 
-void ChipDeviceScanner::UnRegisterScanFilter(void)
+void ChipDeviceScanner::UnRegisterScanFilter()
 {
     if (mScanFilter)
     {

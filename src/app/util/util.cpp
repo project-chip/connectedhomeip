@@ -174,7 +174,7 @@ void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
     emAfCallInits();
 }
 
-void emberAfTick(void)
+void emberAfTick()
 {
     // Call the AFV2-specific per-endpoint callbacks
     // Anything that defines callbacks as void *TickCallback(void) is called in
@@ -217,7 +217,7 @@ void MatterFanControlPluginServerInitCallback() {}
 // such as after a leave network. This allows zcl utils to clear state
 // that should not be kept when changing networks
 // ****************************************
-void emberAfStackDown(void)
+void emberAfStackDown()
 {
     emberAfRegistrationAbortCallback();
 }
@@ -264,7 +264,7 @@ void emberAfDecodeAndPrintCluster(ClusterId cluster)
 // If it is invalid, we just return the
 // EMBER_AF_NULL_MANUFACTURER_CODE, which we tend to use
 // for references to the standard library.
-uint16_t emberAfGetMfgCodeFromCurrentCommand(void)
+uint16_t emberAfGetMfgCodeFromCurrentCommand()
 {
     if (emberAfCurrentCommand() != nullptr)
     {
@@ -296,7 +296,7 @@ void emberAfSetRetryOverride(EmberAfRetryOverride value)
     emberAfApsRetryOverride = value;
 }
 
-EmberAfRetryOverride emberAfGetRetryOverride(void)
+EmberAfRetryOverride emberAfGetRetryOverride()
 {
     return (EmberAfRetryOverride) emberAfApsRetryOverride;
 }
@@ -330,7 +330,7 @@ void emberAfSetDisableDefaultResponse(EmberAfDisableDefaultResponse value)
     }
 }
 
-EmberAfDisableDefaultResponse emberAfGetDisableDefaultResponse(void)
+EmberAfDisableDefaultResponse emberAfGetDisableDefaultResponse()
 {
     return (EmberAfDisableDefaultResponse) emAfDisableDefaultResponse;
 }

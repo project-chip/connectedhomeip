@@ -135,7 +135,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestIP(void)
+int TestIP()
 {
     nlTestSuite theSuite = { "IP", sTests, &Setup, &Teardown };
     nlTestRunner(&theSuite, nullptr);

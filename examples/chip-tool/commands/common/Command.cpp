@@ -803,7 +803,7 @@ const char * Command::GetArgumentDescription(size_t index) const
     return nullptr;
 }
 
-const char * Command::GetAttribute(void) const
+const char * Command::GetAttribute() const
 {
     size_t argsCount = mArgs.size();
     for (size_t i = 0; i < argsCount; i++)
@@ -818,7 +818,7 @@ const char * Command::GetAttribute(void) const
     return nullptr;
 }
 
-const char * Command::GetEvent(void) const
+const char * Command::GetEvent() const
 {
     size_t argsCount = mArgs.size();
     for (size_t i = 0; i < argsCount; i++)

@@ -96,7 +96,7 @@ uint8_t mockAttribute4[256]  = {
 
 } // namespace
 
-uint16_t emberAfEndpointCount(void)
+uint16_t emberAfEndpointCount()
 {
     return ArraySize(endpoints);
 }
