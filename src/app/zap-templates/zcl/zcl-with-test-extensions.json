@@ -25,6 +25,7 @@
         "chip-ota.xml",
         "chip-types.xml",
         "channel-cluster.xml",
+        "client-monitoring-cluster.xml",
         "clusters-extensions.xml",
         "content-launch-cluster.xml",
         "descriptor-cluster.xml",
