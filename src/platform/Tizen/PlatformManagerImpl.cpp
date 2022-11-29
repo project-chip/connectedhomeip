@@ -23,13 +23,22 @@
  *          for Tizen platforms.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include <platform/DeviceInstanceInfoProvider.h>
+/**
+ * Note: Use public include for PlatformManager which includes our local
+ *       platform/<PLATFORM>/PlatformManager.h after defining interface
+ *       class. */
 #include <platform/PlatformManager.h>
+
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/Tizen/DeviceInstanceInfoProviderImpl.h>
-#include <platform/Tizen/DiagnosticDataProviderImpl.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
+
+#include "PosixConfig.h"
+#include "platform/internal/GenericPlatformManagerImpl.h"
+#include "platform/internal/GenericPlatformManagerImpl.ipp"
+#include "platform/internal/GenericPlatformManagerImpl_POSIX.h"
+#include "platform/internal/GenericPlatformManagerImpl_POSIX.ipp"
 
 namespace chip {
 namespace DeviceLayer {

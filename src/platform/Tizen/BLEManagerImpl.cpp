@@ -21,15 +21,47 @@
  *          Provides an implementation of the BLEManager singleton object
  *          for Tizen platforms.
  */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <ble/CHIPBleServiceData.h>
-#include <platform/internal/BLEManager.h>
+/**
+ * Note: BLEManager requires ConnectivityManager to be defined beforehand,
+ *       otherwise we will face circular dependency between them. */
+#include <platform/ConnectivityManager.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+/**
+ * Note: Use public include for BLEManager which includes our local
+ *       platform/<PLATFORM>/BLEManagerImpl.h after defining interface class. */
+#include "platform/internal/BLEManager.h"
 
-#include "MainLoop.h"
+#include <strings.h>
+
+#include <cstdint>
+#include <cstring>
+#include <memory>
+#include <string>
+#include <type_traits>
+#include <utility>
+
 #include <bluetooth.h>
+#include <glib.h>
+
+#include <ble/Ble.h>
+#include <ble/CHIPBleServiceData.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/SetupDiscriminator.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/ConfigurationManager.h>
+#include <platform/PlatformManager.h>
+#include <system/SystemClock.h>
+#include <system/SystemLayer.h>
+#include <system/SystemPacketBuffer.h>
+
+#include "CHIPDevicePlatformEvent.h"
+#include "ChipDeviceScanner.h"
+#include "MainLoop.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -1383,5 +1415,3 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

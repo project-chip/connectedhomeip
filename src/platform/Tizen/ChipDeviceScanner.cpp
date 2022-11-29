@@ -22,14 +22,18 @@
  */
 
 #include "ChipDeviceScanner.h"
-#include <platform/CHIPDeviceLayer.h>
-#include <sys/param.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include <cstdint>
+#include <cstring>
+#include <utility>
+
+#include <bluetooth.h>
+
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include "MainLoop.h"
-#include <lib/support/logging/CHIPLogging.h>
-#include <system/SystemTimer.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -308,5 +312,3 @@ exit:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

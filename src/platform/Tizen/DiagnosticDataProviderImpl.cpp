@@ -21,11 +21,9 @@
  *          for Tizen platform.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include "DiagnosticDataProviderImpl.h"
 
-#include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/Tizen/DiagnosticDataProviderImpl.h>
 
 namespace chip {
 namespace DeviceLayer {

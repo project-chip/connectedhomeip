@@ -57,6 +57,7 @@ RUN set -x \
     ninja-build \
     openjdk-8-jdk \
     pkg-config \
+    python-is-python3 \
     python3.9 \
     python3.9-dev \
     python3.9-venv \
@@ -118,6 +119,30 @@ RUN set -x \
     && make install \
     && cd ../.. \
     && rm -rf bloaty \
+    && : # last line
+
+# Need newer version of include-what-you-use
+RUN set -x \
+    && apt-get update \
+    # Install build and runtime requirements for IWYU
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing clang-12 libclang-12-dev \
+    # Build and install IWYU
+    && git clone --depth=1 --branch=clang_12 https://github.com/include-what-you-use/include-what-you-use.git \
+    && mkdir -p include-what-you-use/build \
+    && cd include-what-you-use/build \
+    && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_PREFIX_PATH=/usr/lib/llvm-12 -DIWYU_LINK_CLANG_DYLIB=OFF .. \
+    && make -j8 \
+    && make install \
+    # Save clang-12 files, so we can restore them after build dependencies cleanup
+    && tar -cf clang-12-files.tar $(dpkg -L libclang-common-12-dev |grep /include) /usr/lib/llvm-12/lib/libLLVM-12.so.1 \
+    # Cleanup build dependencies
+    && apt autoremove -fy clang-12 libclang-12-dev \
+    && rm -rf /var/lib/apt/lists/ \
+    # Restore clang-12 files
+    && tar -xf clang-12-files.tar -C / \
+    # Cleanup
+    && cd ../.. \
+    && rm -rf include-what-you-use \
     && : # last line
 
 # Build glib-2.0 from source with enabled thread sanitizer. This is needed for

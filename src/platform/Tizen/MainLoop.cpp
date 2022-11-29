@@ -16,6 +16,10 @@
 
 #include "MainLoop.h"
 
+#include <iterator>
+#include <memory>
+#include <utility>
+
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 

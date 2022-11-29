@@ -17,32 +17,42 @@
  *    limitations under the License.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
+/**
+ * Note: Use public include for ConnectivityManager which includes our local
+ *       platform/<PLATFORM>/ConnectivityManagerImpl.h after defining interface
+ *       class. */
 #include <platform/ConnectivityManager.h>
-#include <platform/internal/BLEManager.h>
 
-#include <cstdlib>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <wifi-manager.h>
+#endif
 
+#include <inet/InetBuildConfig.h>
+#include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <system/SystemClock.h>
+#include <system/SystemLayer.h>
 
-#include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
-
+#include "platform/internal/GenericConnectivityManagerImpl_UDP.ipp"
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-#include <platform/internal/GenericConnectivityManagerImpl_TCP.ipp>
+#include "platform/internal/GenericConnectivityManagerImpl_TCP.ipp"
 #endif
-
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
+#include "platform/internal/GenericConnectivityManagerImpl_BLE.ipp"
 #endif
-
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
+#include "platform/internal/GenericConnectivityManagerImpl_Thread.ipp"
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include "platform/internal/GenericConnectivityManagerImpl_WiFi.ipp"
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
+#include "WiFiManager.h"
 #endif
 
 namespace chip {
