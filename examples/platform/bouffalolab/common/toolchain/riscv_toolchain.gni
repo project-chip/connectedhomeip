@@ -23,9 +23,9 @@ template("riscv_toolchain") {
     _tool_name_root = ""
 
     if ("linux" == host_os) {
-      _tool_name_root = "${root_build_dir}/../../${bouffalolab_toolchain}/Linux/bin/riscv64-unknown-elf-"
+      _tool_name_root = "${bouffalolab_sdk_root}/toolchain/riscv/Linux/bin/riscv64-unknown-elf-"
     } else if ("mac" == host_os || "darwin" == host_os) {
-      _tool_name_root = "${root_build_dir}/../../${bouffalolab_toolchain}/Darwin/bin/riscv64-unknown-elf-"
+      _tool_name_root = "${bouffalolab_sdk_root}/toolchain/riscv/Darwin/bin/riscv64-unknown-elf-"
     }
 
     ar = _tool_name_root + "ar"

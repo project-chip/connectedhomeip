@@ -38,9 +38,11 @@ declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = true
 
+  # OTA periodic query timeout in seconds
+  ota_periodic_query_timeout = 86400
+
   config_cache_size = 8192
 
-  # Monitor & log memory usage at runtime.
   enable_heap_monitoring = false
 
   board = "BL706-IoT-DVK"
