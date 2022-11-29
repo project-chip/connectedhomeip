@@ -28,6 +28,7 @@ class NrfApp(Enum):
     SHELL = auto()
     PUMP = auto()
     PUMP_CONTROLLER = auto()
+    SWITCH = auto()
     WINDOW_COVERING = auto()
     UNIT_TESTS = auto()
 
