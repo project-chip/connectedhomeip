@@ -215,7 +215,7 @@ inline bool areStartUpModeAndCurrentModeNonVolatile(EndpointId endpointId)
 
 } // namespace
 
-void MatterModeSelectPluginServerInitCallback(void)
+void MatterModeSelectPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gModeSelectAttrAccess);
 }

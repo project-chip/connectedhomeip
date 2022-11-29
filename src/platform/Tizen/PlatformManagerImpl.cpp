@@ -36,7 +36,7 @@ namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
-CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
+CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
 

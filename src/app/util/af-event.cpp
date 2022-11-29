@@ -37,7 +37,7 @@ struct EmberEventData
     /** The control structure for the event. */
     EmberEventControl * control;
     /** The procedure to call when the event fires. */
-    void (*handler)(void);
+    void (*handler)();
 };
 
 // *****************************************************************************

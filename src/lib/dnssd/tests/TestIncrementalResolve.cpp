@@ -437,7 +437,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestChipDnsSdIncrementalResolve(void)
+int TestChipDnsSdIncrementalResolve()
 {
     nlTestSuite theSuite = { "IncrementalResolve", &sTests[0], nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

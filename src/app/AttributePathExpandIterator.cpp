@@ -36,7 +36,7 @@ using namespace chip;
 // Note: Some of the generated files that depended by af.h are gen_config.h and gen_tokens.h
 typedef uint8_t EmberAfClusterMask;
 
-extern uint16_t emberAfEndpointCount(void);
+extern uint16_t emberAfEndpointCount();
 extern uint16_t emberAfIndexFromEndpoint(EndpointId endpoint);
 extern uint8_t emberAfClusterCount(EndpointId endpoint, bool server);
 extern uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::ClusterId cluster);

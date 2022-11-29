@@ -52,7 +52,7 @@ static void TestDeferUsage(nlTestSuite * inSuite, void * inContext)
  */
 static const nlTest sTests[] = { NL_TEST_DEF_FN(TestDeferUsage), NL_TEST_SENTINEL() };
 
-int TestDefer(void)
+int TestDefer()
 {
     nlTestSuite theSuite = { "CHIP Defer tests", &sTests[0], nullptr, nullptr };
 

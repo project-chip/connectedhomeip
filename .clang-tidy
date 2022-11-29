@@ -1,6 +1,7 @@
 ---
 Checks: >
   bugprone-*,
+  modernize-redundant-void-arg,
   modernize-use-bool-literals,
   modernize-use-nullptr,
   performance-for-range-copy,
