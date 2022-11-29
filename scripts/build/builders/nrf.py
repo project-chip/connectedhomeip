@@ -28,6 +28,7 @@ class NrfApp(Enum):
     SHELL = auto()
     PUMP = auto()
     PUMP_CONTROLLER = auto()
+    SWITCH = auto()
     WINDOW_COVERING = auto()
     UNIT_TESTS = auto()
 
@@ -38,6 +39,8 @@ class NrfApp(Enum):
             return 'examples/all-clusters-minimal-app'
         elif self == NrfApp.LIGHT:
             return 'examples/lighting-app'
+        elif self == NrfApp.SWITCH:
+            return 'light-switch-app'
         elif self == NrfApp.LOCK:
             return 'examples/lock-app'
         elif self == NrfApp.SHELL:
@@ -60,6 +63,8 @@ class NrfApp(Enum):
             return 'chip-nrf-all-clusters-minimal-example'
         elif self == NrfApp.LIGHT:
             return 'chip-nrf-lighting-example'
+        elif self == NrfApp.SWITCH:
+            return 'chip-nrf-light-switch-example'
         elif self == NrfApp.LOCK:
             return 'chip-nrf-lock-example'
         elif self == NrfApp.SHELL:
@@ -82,6 +87,8 @@ class NrfApp(Enum):
             return 'chip-nrfconnect-all-clusters-minimal-app-example'
         elif self == NrfApp.LIGHT:
             return 'chip-nrfconnect-lighting-example'
+        elif self == NrfApp.SWITCH:
+            return 'chip-nrfconnect-switch-example'
         elif self == NrfApp.LOCK:
             return 'chip-nrfconnect-lock-example'
         elif self == NrfApp.SHELL:

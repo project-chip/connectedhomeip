@@ -251,6 +251,7 @@ def BuildNrfTarget():
         TargetPart('all-clusters-minimal', app=NrfApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('lock', app=NrfApp.LOCK),
         TargetPart('light', app=NrfApp.LIGHT),
+        TargetPart('light-switch', app=NrfApp.SWITCH),
         TargetPart('shell', app=NrfApp.SHELL),
         TargetPart('pump', app=NrfApp.PUMP),
         TargetPart('pump-controller', app=NrfApp.PUMP_CONTROLLER),
