@@ -138,30 +138,28 @@
 
 - (void)testRunItemsAfterDrain
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Work item called after drain"];
+    XCTestExpectation * expectation1 = [self expectationWithDescription:@"First work item caled"];
+    XCTestExpectation * expectation2 = [self expectationWithDescription:@"Second work item called after drain"];
 
     MTRAsyncCallbackWorkQueue * workQueue = [[MTRAsyncCallbackWorkQueue alloc] initWithContext:nil queue:dispatch_get_main_queue()];
 
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-
-    MTRAsyncCallbackQueueWorkItem * workItem1 = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_main_queue()];
+    MTRAsyncCallbackQueueWorkItem * workItem1 =
+        [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
     MTRAsyncCallbackReadyHandler readyHandler1 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
         [workItem1 endWork];
-        // asynchronously signal semaphore to ensure the queue has finished draining
-        dispatch_async(dispatch_get_main_queue(), ^{
-            dispatch_semaphore_signal(sema);
-        });
+        [expectation1 fulfill];
     };
     workItem1.readyHandler = readyHandler1;
     workItem1.cancelHandler = ^{
     };
     [workQueue enqueueWorkItem:workItem1];
 
-    XCTAssertEqual(dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC)), 0);
+    [self waitForExpectations:@[ expectation1 ] timeout:5];
 
-    MTRAsyncCallbackQueueWorkItem * workItem2 = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_main_queue()];
+    MTRAsyncCallbackQueueWorkItem * workItem2 =
+        [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
     MTRAsyncCallbackReadyHandler readyHandler2 = ^(MTRDevice * _Nonnull device, NSUInteger retryCount) {
-        [expectation fulfill];
+        [expectation2 fulfill];
         [workItem2 endWork];
     };
     workItem2.readyHandler = readyHandler2;
