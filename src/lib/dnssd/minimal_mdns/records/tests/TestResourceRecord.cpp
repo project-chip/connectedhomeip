@@ -281,7 +281,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestResourceRecord(void)
+int TestResourceRecord()
 {
     nlTestSuite theSuite = { "ResourceRecord", sTests, nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

@@ -44,7 +44,7 @@ chip::TestPersistentStorageDelegate gStorage;
 chip::PersistentStorageOperationalKeystore gOperationalKeystore;
 chip::Credentials::PersistentStorageOpCertStore gOpCertStore;
 
-void InitializeChip(void)
+void InitializeChip()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::FabricTable::InitParams fabricTableInitParams;
@@ -84,7 +84,7 @@ exit:
     }
 }
 
-void ShutdownChip(void)
+void ShutdownChip()
 {
     gMessageCounterManager.Shutdown();
     gExchangeManager.Shutdown();

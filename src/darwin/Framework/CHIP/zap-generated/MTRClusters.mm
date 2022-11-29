@@ -26,6 +26,7 @@
 #import "MTRCommandPayloadsObjc.h"
 #import "MTRDevice.h"
 #import "MTRDevice_Internal.h"
+#import "MTRLogging.h"
 #import "MTRStructsObjc.h"
 
 #include <lib/support/CHIPListUtils.h>
@@ -67,12 +68,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Identify Identify dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Identify Identify completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -91,6 +94,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Identify Identify enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -116,12 +120,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Identify TriggerEffect dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Identify TriggerEffect completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -143,6 +149,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Identify TriggerEffect enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -289,12 +296,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Groups AddGroup dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRGroupsClusterAddGroupResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("Groups AddGroup completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, GroupsClusterAddGroupResponseCallbackType successCb,
@@ -314,6 +323,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Groups AddGroup enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -340,12 +350,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Groups ViewGroup dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRGroupsClusterViewGroupResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("Groups ViewGroup completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -364,6 +376,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Groups ViewGroup enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -390,12 +403,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Groups GetGroupMembership dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRGroupsClusterGetGroupMembershipResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("Groups GetGroupMembership completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -436,6 +451,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Groups GetGroupMembership enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -462,12 +478,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Groups RemoveGroup dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRGroupsClusterRemoveGroupResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("Groups RemoveGroup completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -487,6 +505,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Groups RemoveGroup enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -521,12 +540,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Groups RemoveAllGroups dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Groups RemoveAllGroups completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -544,6 +565,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Groups RemoveAllGroups enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -569,12 +591,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Groups AddGroupIfIdentifying dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Groups AddGroupIfIdentifying completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -594,6 +618,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Groups AddGroupIfIdentifying enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -779,12 +804,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Scenes AddScene dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRScenesClusterAddSceneResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("Scenes AddScene completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, ScenesClusterAddSceneResponseCallbackType successCb,
@@ -880,6 +907,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Scenes AddScene enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -906,12 +934,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Scenes ViewScene dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRScenesClusterViewSceneResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("Scenes ViewScene completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -931,6 +961,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Scenes ViewScene enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -957,12 +988,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Scenes RemoveScene dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRScenesClusterRemoveSceneResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("Scenes RemoveScene completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -983,6 +1016,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Scenes RemoveScene enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1009,12 +1043,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Scenes RemoveAllScenes dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRScenesClusterRemoveAllScenesResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("Scenes RemoveAllScenes completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -1034,6 +1070,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Scenes RemoveAllScenes enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1060,12 +1097,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Scenes StoreScene dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRScenesClusterStoreSceneResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("Scenes StoreScene completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -1085,6 +1124,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Scenes StoreScene enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1110,12 +1150,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Scenes RecallScene dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Scenes RecallScene completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -1144,6 +1186,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Scenes RecallScene enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1170,12 +1213,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Scenes GetSceneMembership dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRScenesClusterGetSceneMembershipResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("Scenes GetSceneMembership completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -1195,6 +1240,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Scenes GetSceneMembership enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1221,12 +1267,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Scenes EnhancedAddScene dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRScenesClusterEnhancedAddSceneResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("Scenes EnhancedAddScene completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -1323,6 +1371,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Scenes EnhancedAddScene enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1349,12 +1398,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Scenes EnhancedViewScene dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRScenesClusterEnhancedViewSceneResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("Scenes EnhancedViewScene completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -1375,6 +1426,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Scenes EnhancedViewScene enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1401,12 +1453,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Scenes CopyScene dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRScenesClusterCopySceneResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("Scenes CopyScene completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -1429,6 +1483,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Scenes CopyScene enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1712,12 +1767,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("OnOff Off dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("OnOff Off completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -1735,6 +1792,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("OnOff Off enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1766,12 +1824,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("OnOff On dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("OnOff On completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -1789,6 +1849,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("OnOff On enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1820,12 +1881,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("OnOff Toggle dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("OnOff Toggle completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -1843,6 +1906,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("OnOff Toggle enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1868,12 +1932,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("OnOff OffWithEffect dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("OnOff OffWithEffect completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -1895,6 +1961,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("OnOff OffWithEffect enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1929,12 +1996,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("OnOff OnWithRecallGlobalScene dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("OnOff OnWithRecallGlobalScene completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -1952,6 +2021,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("OnOff OnWithRecallGlobalScene enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1977,12 +2047,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("OnOff OnWithTimedOff dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("OnOff OnWithTimedOff completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2004,6 +2076,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("OnOff OnWithTimedOff enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2391,12 +2464,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("LevelControl MoveToLevel dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("LevelControl MoveToLevel completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2425,6 +2500,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("LevelControl MoveToLevel enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2450,12 +2526,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("LevelControl Move dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("LevelControl Move completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2485,6 +2563,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("LevelControl Move enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2510,12 +2589,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("LevelControl Step dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("LevelControl Step completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2546,6 +2627,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("LevelControl Step enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2571,12 +2653,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("LevelControl Stop dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("LevelControl Stop completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2598,6 +2682,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("LevelControl Stop enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2623,12 +2708,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("LevelControl MoveToLevelWithOnOff dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("LevelControl MoveToLevelWithOnOff completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2657,6 +2744,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("LevelControl MoveToLevelWithOnOff enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2682,12 +2770,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("LevelControl MoveWithOnOff dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("LevelControl MoveWithOnOff completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2717,6 +2807,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("LevelControl MoveWithOnOff enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2742,12 +2833,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("LevelControl StepWithOnOff dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("LevelControl StepWithOnOff completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2778,6 +2871,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("LevelControl StepWithOnOff enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2803,12 +2897,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("LevelControl StopWithOnOff dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("LevelControl StopWithOnOff completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2830,6 +2926,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("LevelControl StopWithOnOff enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2855,12 +2952,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("LevelControl MoveToClosestFrequency dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("LevelControl MoveToClosestFrequency completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2879,6 +2978,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("LevelControl MoveToClosestFrequency enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -3894,12 +3994,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Actions InstantAction dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Actions InstantAction completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -3922,6 +4024,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Actions InstantAction enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -3947,12 +4050,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Actions InstantActionWithTransition dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Actions InstantActionWithTransition completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -3976,6 +4081,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Actions InstantActionWithTransition enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4001,12 +4107,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Actions StartAction dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Actions StartAction completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4029,6 +4137,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Actions StartAction enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4054,12 +4163,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Actions StartActionWithDuration dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Actions StartActionWithDuration completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4083,6 +4194,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Actions StartActionWithDuration enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4108,12 +4220,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Actions StopAction dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Actions StopAction completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4136,6 +4250,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Actions StopAction enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4161,12 +4276,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Actions PauseAction dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Actions PauseAction completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4189,6 +4306,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Actions PauseAction enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4214,12 +4332,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Actions PauseActionWithDuration dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Actions PauseActionWithDuration completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4243,6 +4363,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Actions PauseActionWithDuration enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4268,12 +4389,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Actions ResumeAction dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Actions ResumeAction completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4296,6 +4419,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Actions ResumeAction enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4321,12 +4445,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Actions EnableAction dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Actions EnableAction completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4349,6 +4475,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Actions EnableAction enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4374,12 +4501,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Actions EnableActionWithDuration dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Actions EnableActionWithDuration completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4403,6 +4532,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Actions EnableActionWithDuration enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4428,12 +4558,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Actions DisableAction dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Actions DisableAction completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4456,6 +4588,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Actions DisableAction enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4481,12 +4614,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Actions DisableActionWithDuration dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Actions DisableActionWithDuration completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4510,6 +4645,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Actions DisableActionWithDuration enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4754,12 +4890,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Basic MfgSpecificPing dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Basic MfgSpecificPing completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4777,6 +4915,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Basic MfgSpecificPing enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -5105,12 +5244,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("OtaSoftwareUpdateProvider QueryImage dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("OtaSoftwareUpdateProvider QueryImage completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -5172,6 +5313,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("OtaSoftwareUpdateProvider QueryImage enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -5198,12 +5340,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("OtaSoftwareUpdateProvider ApplyUpdateRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("OtaSoftwareUpdateProvider ApplyUpdateRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -5224,6 +5368,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("OtaSoftwareUpdateProvider ApplyUpdateRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -5249,12 +5394,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("OtaSoftwareUpdateProvider NotifyUpdateApplied dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("OtaSoftwareUpdateProvider NotifyUpdateApplied completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -5274,6 +5421,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("OtaSoftwareUpdateProvider NotifyUpdateApplied enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -5408,12 +5556,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("OtaSoftwareUpdateRequestor AnnounceOtaProvider dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("OtaSoftwareUpdateRequestor AnnounceOtaProvider completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -5441,6 +5591,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("OtaSoftwareUpdateRequestor AnnounceOtaProvider enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -6314,12 +6465,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("GeneralCommissioning ArmFailSafe dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("GeneralCommissioning ArmFailSafe completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -6340,6 +6493,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("GeneralCommissioning ArmFailSafe enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -6366,12 +6520,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("GeneralCommissioning SetRegulatoryConfig dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("GeneralCommissioning SetRegulatoryConfig completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -6394,6 +6550,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("GeneralCommissioning SetRegulatoryConfig enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -6433,12 +6590,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("GeneralCommissioning CommissioningComplete dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("GeneralCommissioning CommissioningComplete completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -6457,6 +6616,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("GeneralCommissioning CommissioningComplete enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -6670,12 +6830,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("NetworkCommissioning ScanNetworks dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("NetworkCommissioning ScanNetworks completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -6709,6 +6871,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("NetworkCommissioning ScanNetworks enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -6735,12 +6898,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("NetworkCommissioning AddOrUpdateWiFiNetwork dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("NetworkCommissioning AddOrUpdateWiFiNetwork completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -6765,6 +6930,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("NetworkCommissioning AddOrUpdateWiFiNetwork enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -6791,12 +6957,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("NetworkCommissioning AddOrUpdateThreadNetwork dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("NetworkCommissioning AddOrUpdateThreadNetwork completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -6820,6 +6988,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("NetworkCommissioning AddOrUpdateThreadNetwork enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -6846,12 +7015,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("NetworkCommissioning RemoveNetwork dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("NetworkCommissioning RemoveNetwork completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -6875,6 +7046,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("NetworkCommissioning RemoveNetwork enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -6901,12 +7073,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("NetworkCommissioning ConnectNetwork dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("NetworkCommissioning ConnectNetwork completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -6930,6 +7104,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("NetworkCommissioning ConnectNetwork enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -6956,12 +7131,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("NetworkCommissioning ReorderNetwork dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("NetworkCommissioning ReorderNetwork completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -6986,6 +7163,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("NetworkCommissioning ReorderNetwork enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -7255,12 +7433,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DiagnosticLogs RetrieveLogsRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("DiagnosticLogs RetrieveLogsRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -7283,6 +7463,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DiagnosticLogs RetrieveLogsRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -7389,12 +7570,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("GeneralDiagnostics TestEventTrigger dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("GeneralDiagnostics TestEventTrigger completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -7414,6 +7597,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("GeneralDiagnostics TestEventTrigger enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -7597,12 +7781,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("SoftwareDiagnostics ResetWatermarks dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("SoftwareDiagnostics ResetWatermarks completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -7620,6 +7806,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("SoftwareDiagnostics ResetWatermarks enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -7772,12 +7959,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ThreadNetworkDiagnostics ResetCounts dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ThreadNetworkDiagnostics ResetCounts completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -7795,6 +7984,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ThreadNetworkDiagnostics ResetCounts enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -8436,12 +8626,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("WiFiNetworkDiagnostics ResetCounts dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("WiFiNetworkDiagnostics ResetCounts completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -8459,6 +8651,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("WiFiNetworkDiagnostics ResetCounts enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -8687,12 +8880,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("EthernetNetworkDiagnostics ResetCounts dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("EthernetNetworkDiagnostics ResetCounts completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -8710,6 +8905,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("EthernetNetworkDiagnostics ResetCounts enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9189,12 +9385,15 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("AdministratorCommissioning OpenCommissioningWindow dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO(
+                    "AdministratorCommissioning OpenCommissioningWindow completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -9220,6 +9419,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("AdministratorCommissioning OpenCommissioningWindow enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9245,12 +9445,16 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO(
+            "AdministratorCommissioning OpenBasicCommissioningWindow dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO(
+                    "AdministratorCommissioning OpenBasicCommissioningWindow completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -9272,6 +9476,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("AdministratorCommissioning OpenBasicCommissioningWindow enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9306,12 +9511,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("AdministratorCommissioning RevokeCommissioning dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("AdministratorCommissioning RevokeCommissioning completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -9332,6 +9539,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("AdministratorCommissioning RevokeCommissioning enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9490,12 +9698,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("OperationalCredentials AttestationRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTROperationalCredentialsClusterAttestationResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("OperationalCredentials AttestationRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -9515,6 +9725,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("OperationalCredentials AttestationRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9541,12 +9752,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("OperationalCredentials CertificateChainRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("OperationalCredentials CertificateChainRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -9566,6 +9779,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("OperationalCredentials CertificateChainRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9592,12 +9806,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("OperationalCredentials CSRRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTROperationalCredentialsClusterCSRResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("OperationalCredentials CSRRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -9621,6 +9837,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("OperationalCredentials CSRRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9647,12 +9864,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("OperationalCredentials AddNOC dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("OperationalCredentials AddNOC completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -9680,6 +9899,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("OperationalCredentials AddNOC enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9706,12 +9926,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("OperationalCredentials UpdateNOC dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("OperationalCredentials UpdateNOC completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -9735,6 +9957,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("OperationalCredentials UpdateNOC enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9761,12 +9984,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("OperationalCredentials UpdateFabricLabel dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("OperationalCredentials UpdateFabricLabel completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -9786,6 +10011,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("OperationalCredentials UpdateFabricLabel enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9812,12 +10038,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("OperationalCredentials RemoveFabric dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("OperationalCredentials RemoveFabric completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -9837,6 +10065,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("OperationalCredentials RemoveFabric enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9862,12 +10091,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("OperationalCredentials AddTrustedRootCertificate dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("OperationalCredentials AddTrustedRootCertificate completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -9886,6 +10117,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("OperationalCredentials AddTrustedRootCertificate enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -10141,12 +10373,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("GroupKeyManagement KeySetWrite dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("GroupKeyManagement KeySetWrite completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -10204,6 +10438,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("GroupKeyManagement KeySetWrite enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -10230,12 +10465,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("GroupKeyManagement KeySetRead dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("GroupKeyManagement KeySetRead completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -10255,6 +10492,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("GroupKeyManagement KeySetRead enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -10280,12 +10518,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("GroupKeyManagement KeySetRemove dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("GroupKeyManagement KeySetRemove completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -10304,6 +10544,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("GroupKeyManagement KeySetRemove enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -10330,12 +10571,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("GroupKeyManagement KeySetReadAllIndices dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("GroupKeyManagement KeySetReadAllIndices completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -10376,6 +10619,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("GroupKeyManagement KeySetReadAllIndices enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -10809,12 +11053,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ModeSelect ChangeToMode dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ModeSelect ChangeToMode completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -10833,6 +11079,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ModeSelect ChangeToMode enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11020,12 +11267,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DoorLock LockDoor dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("DoorLock LockDoor completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11052,6 +11301,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DoorLock LockDoor enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11077,12 +11327,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DoorLock UnlockDoor dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("DoorLock UnlockDoor completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11109,6 +11361,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DoorLock UnlockDoor enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11134,12 +11387,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DoorLock UnlockWithTimeout dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("DoorLock UnlockWithTimeout completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11165,6 +11420,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DoorLock UnlockWithTimeout enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11190,12 +11446,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DoorLock SetWeekDaySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("DoorLock SetWeekDaySchedule completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11221,6 +11479,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DoorLock SetWeekDaySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11247,12 +11506,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DoorLock GetWeekDaySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("DoorLock GetWeekDaySchedule completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -11273,6 +11534,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DoorLock GetWeekDaySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11298,12 +11560,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DoorLock ClearWeekDaySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("DoorLock ClearWeekDaySchedule completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11323,6 +11587,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DoorLock ClearWeekDaySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11348,12 +11613,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DoorLock SetYearDaySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("DoorLock SetYearDaySchedule completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11375,6 +11642,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DoorLock SetYearDaySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11401,12 +11669,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DoorLock GetYearDaySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("DoorLock GetYearDaySchedule completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -11427,6 +11697,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DoorLock GetYearDaySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11452,12 +11723,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DoorLock ClearYearDaySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("DoorLock ClearYearDaySchedule completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11477,6 +11750,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DoorLock ClearYearDaySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11502,12 +11776,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DoorLock SetHolidaySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("DoorLock SetHolidaySchedule completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11530,6 +11806,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DoorLock SetHolidaySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11556,12 +11833,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DoorLock GetHolidaySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("DoorLock GetHolidaySchedule completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -11581,6 +11860,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DoorLock GetHolidaySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11606,12 +11886,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DoorLock ClearHolidaySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("DoorLock ClearHolidaySchedule completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11630,6 +11912,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DoorLock ClearHolidaySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11655,12 +11938,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DoorLock SetUser dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("DoorLock SetUser completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11717,6 +12002,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DoorLock SetUser enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11742,12 +12028,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DoorLock GetUser dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRDoorLockClusterGetUserResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("DoorLock GetUser completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -11766,6 +12054,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DoorLock GetUser enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11791,12 +12080,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DoorLock ClearUser dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("DoorLock ClearUser completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11818,6 +12109,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DoorLock ClearUser enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11844,12 +12136,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DoorLock SetCredential dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRDoorLockClusterSetCredentialResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("DoorLock SetCredential completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -11898,6 +12192,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DoorLock SetCredential enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11924,12 +12219,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DoorLock GetCredentialStatus dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("DoorLock GetCredentialStatus completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -11952,6 +12249,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DoorLock GetCredentialStatus enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11977,12 +12275,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("DoorLock ClearCredential dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("DoorLock ClearCredential completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -12011,6 +12311,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("DoorLock ClearCredential enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -12963,12 +13264,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("WindowCovering UpOrOpen dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("WindowCovering UpOrOpen completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -12986,6 +13289,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("WindowCovering UpOrOpen enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -13020,12 +13324,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("WindowCovering DownOrClose dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("WindowCovering DownOrClose completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -13043,6 +13349,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("WindowCovering DownOrClose enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -13077,12 +13384,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("WindowCovering StopMotion dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("WindowCovering StopMotion completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -13100,6 +13409,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("WindowCovering StopMotion enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -13125,12 +13435,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("WindowCovering GoToLiftValue dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("WindowCovering GoToLiftValue completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -13149,6 +13461,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("WindowCovering GoToLiftValue enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -13174,12 +13487,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("WindowCovering GoToLiftPercentage dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("WindowCovering GoToLiftPercentage completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -13198,6 +13513,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("WindowCovering GoToLiftPercentage enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -13223,12 +13539,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("WindowCovering GoToTiltValue dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("WindowCovering GoToTiltValue completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -13247,6 +13565,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("WindowCovering GoToTiltValue enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -13272,12 +13591,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("WindowCovering GoToTiltPercentage dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("WindowCovering GoToTiltPercentage completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -13296,6 +13617,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("WindowCovering GoToTiltPercentage enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -13685,12 +14007,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("BarrierControl BarrierControlGoToPercent dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("BarrierControl BarrierControlGoToPercent completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -13709,6 +14033,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("BarrierControl BarrierControlGoToPercent enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -13743,12 +14068,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("BarrierControl BarrierControlStop dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("BarrierControl BarrierControlStop completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -13766,6 +14093,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("BarrierControl BarrierControlStop enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -14424,12 +14752,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Thermostat SetpointRaiseLower dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Thermostat SetpointRaiseLower completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -14449,6 +14779,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Thermostat SetpointRaiseLower enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -14474,12 +14805,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Thermostat SetWeeklySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Thermostat SetWeeklySchedule completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -14536,6 +14869,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Thermostat SetWeeklySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -14562,12 +14896,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Thermostat GetWeeklySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("Thermostat GetWeeklySchedule completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -14590,6 +14926,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Thermostat GetWeeklySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -14624,12 +14961,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Thermostat ClearWeeklySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Thermostat ClearWeeklySchedule completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -14647,6 +14986,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Thermostat ClearWeeklySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16152,12 +16492,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl MoveToHue dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl MoveToHue completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16181,6 +16523,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl MoveToHue enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16206,12 +16549,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl MoveHue dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl MoveHue completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16234,6 +16579,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl MoveHue enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16259,12 +16605,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl StepHue dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl StepHue completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16288,6 +16636,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl StepHue enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16313,12 +16662,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl MoveToSaturation dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl MoveToSaturation completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16340,6 +16691,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl MoveToSaturation enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16365,12 +16717,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl MoveSaturation dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl MoveSaturation completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16393,6 +16747,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl MoveSaturation enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16418,12 +16773,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl StepSaturation dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl StepSaturation completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16447,6 +16804,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl StepSaturation enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16472,12 +16830,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl MoveToHueAndSaturation dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl MoveToHueAndSaturation completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16500,6 +16860,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl MoveToHueAndSaturation enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16525,12 +16886,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl MoveToColor dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl MoveToColor completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16553,6 +16916,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl MoveToColor enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16578,12 +16942,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl MoveColor dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl MoveColor completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16605,6 +16971,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl MoveColor enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16630,12 +16997,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl StepColor dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl StepColor completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16658,6 +17027,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl StepColor enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16683,12 +17053,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl MoveToColorTemperature dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl MoveToColorTemperature completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16710,6 +17082,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl MoveToColorTemperature enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16735,12 +17108,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl EnhancedMoveToHue dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl EnhancedMoveToHue completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16764,6 +17139,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl EnhancedMoveToHue enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16789,12 +17165,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl EnhancedMoveHue dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl EnhancedMoveHue completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16817,6 +17195,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl EnhancedMoveHue enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16842,12 +17221,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl EnhancedStepHue dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl EnhancedStepHue completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16871,6 +17252,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl EnhancedStepHue enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16896,12 +17278,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl EnhancedMoveToHueAndSaturation dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl EnhancedMoveToHueAndSaturation completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16924,6 +17308,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl EnhancedMoveToHueAndSaturation enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16949,12 +17334,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl ColorLoopSet dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl ColorLoopSet completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16981,6 +17368,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl ColorLoopSet enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -17006,12 +17394,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl StopMoveStep dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl StopMoveStep completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -17031,6 +17421,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl StopMoveStep enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -17056,12 +17447,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl MoveColorTemperature dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl MoveColorTemperature completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -17086,6 +17479,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl MoveColorTemperature enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -17111,12 +17505,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ColorControl StepColorTemperature dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ColorControl StepColorTemperature completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -17142,6 +17538,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ColorControl StepColorTemperature enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -19456,12 +19853,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Channel ChangeChannel dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRChannelClusterChangeChannelResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("Channel ChangeChannel completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -19481,6 +19880,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Channel ChangeChannel enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -19506,12 +19906,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Channel ChangeChannelByNumber dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Channel ChangeChannelByNumber completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -19531,6 +19933,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Channel ChangeChannelByNumber enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -19556,12 +19959,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("Channel SkipChannel dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("Channel SkipChannel completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -19580,6 +19985,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("Channel SkipChannel enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -19730,12 +20136,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("TargetNavigator NavigateTarget dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("TargetNavigator NavigateTarget completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -19759,6 +20167,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("TargetNavigator NavigateTarget enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -19889,12 +20298,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("MediaPlayback Play dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("MediaPlayback Play completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -19913,6 +20324,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("MediaPlayback Play enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -19946,12 +20358,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("MediaPlayback Pause dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("MediaPlayback Pause completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -19970,6 +20384,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("MediaPlayback Pause enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20006,12 +20421,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("MediaPlayback StopPlayback dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("MediaPlayback StopPlayback completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20030,6 +20447,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("MediaPlayback StopPlayback enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20066,12 +20484,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("MediaPlayback StartOver dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("MediaPlayback StartOver completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20090,6 +20510,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("MediaPlayback StartOver enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20123,12 +20544,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("MediaPlayback Previous dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("MediaPlayback Previous completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20147,6 +20570,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("MediaPlayback Previous enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20180,12 +20604,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("MediaPlayback Next dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("MediaPlayback Next completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20204,6 +20630,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("MediaPlayback Next enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20237,12 +20664,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("MediaPlayback Rewind dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("MediaPlayback Rewind completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20261,6 +20690,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("MediaPlayback Rewind enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20297,12 +20727,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("MediaPlayback FastForward dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("MediaPlayback FastForward completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20321,6 +20753,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("MediaPlayback FastForward enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20347,12 +20780,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("MediaPlayback SkipForward dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("MediaPlayback SkipForward completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20372,6 +20807,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("MediaPlayback SkipForward enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20398,12 +20834,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("MediaPlayback SkipBackward dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("MediaPlayback SkipBackward completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20423,6 +20861,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("MediaPlayback SkipBackward enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20449,12 +20888,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("MediaPlayback Seek dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("MediaPlayback Seek completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20474,6 +20915,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("MediaPlayback Seek enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20855,12 +21297,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("MediaInput SelectInput dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("MediaInput SelectInput completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -20879,6 +21323,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("MediaInput SelectInput enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20913,12 +21358,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("MediaInput ShowInputStatus dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("MediaInput ShowInputStatus completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -20936,6 +21383,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("MediaInput ShowInputStatus enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20970,12 +21418,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("MediaInput HideInputStatus dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("MediaInput HideInputStatus completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -20993,6 +21443,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("MediaInput HideInputStatus enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -21018,12 +21469,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("MediaInput RenameInput dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("MediaInput RenameInput completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -21043,6 +21496,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("MediaInput RenameInput enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -21214,12 +21668,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("LowPower Sleep dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("LowPower Sleep completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -21237,6 +21693,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("LowPower Sleep enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -21348,12 +21805,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("KeypadInput SendKey dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRKeypadInputClusterSendKeyResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("KeypadInput SendKey completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -21373,6 +21832,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("KeypadInput SendKey enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -21479,12 +21939,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ContentLauncher LaunchContent dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRContentLauncherClusterLaunchResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("ContentLauncher LaunchContent completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -21561,6 +22023,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ContentLauncher LaunchContent enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -21587,12 +22050,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ContentLauncher LaunchURL dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRContentLauncherClusterLaunchResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("ContentLauncher LaunchURL completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -21710,6 +22175,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ContentLauncher LaunchURL enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -21867,12 +22333,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("AudioOutput SelectOutput dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("AudioOutput SelectOutput completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -21891,6 +22359,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("AudioOutput SelectOutput enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -21916,12 +22385,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("AudioOutput RenameOutput dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("AudioOutput RenameOutput completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -21941,6 +22412,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("AudioOutput RenameOutput enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -22069,12 +22541,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ApplicationLauncher LaunchApp dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("ApplicationLauncher LaunchApp completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -22099,6 +22573,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ApplicationLauncher LaunchApp enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -22125,12 +22600,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ApplicationLauncher StopApp dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("ApplicationLauncher StopApp completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -22151,6 +22628,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ApplicationLauncher StopApp enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -22177,12 +22655,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ApplicationLauncher HideApp dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("ApplicationLauncher HideApp completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -22203,6 +22683,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ApplicationLauncher HideApp enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -22502,12 +22983,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("AccountLogin GetSetupPIN dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRAccountLoginClusterGetSetupPINResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("AccountLogin GetSetupPIN completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -22530,6 +23013,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("AccountLogin GetSetupPIN enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -22555,12 +23039,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("AccountLogin Login dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("AccountLogin Login completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -22583,6 +23069,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("AccountLogin Login enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -22614,12 +23101,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("AccountLogin Logout dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("AccountLogin Logout completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -22640,6 +23129,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("AccountLogin Logout enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -22783,12 +23273,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ElectricalMeasurement GetProfileInfoCommand dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("ElectricalMeasurement GetProfileInfoCommand completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -22806,6 +23298,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ElectricalMeasurement GetProfileInfoCommand enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -22831,12 +23324,15 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("ElectricalMeasurement GetMeasurementProfileCommand dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO(
+                    "ElectricalMeasurement GetMeasurementProfileCommand completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -22857,6 +23353,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("ElectricalMeasurement GetMeasurementProfileCommand enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -24220,12 +24717,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting Test dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("UnitTesting Test completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -24243,6 +24742,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting Test enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -24277,12 +24777,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestNotHandled dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("UnitTesting TestNotHandled completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -24300,6 +24802,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestNotHandled enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -24336,12 +24839,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestSpecific dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestSpecificResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("UnitTesting TestSpecific completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -24360,6 +24865,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestSpecific enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -24394,12 +24900,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestUnknownCommand dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("UnitTesting TestUnknownCommand completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -24417,6 +24925,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestUnknownCommand enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -24443,12 +24952,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestAddArguments dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("UnitTesting TestAddArguments completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -24469,6 +24980,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestAddArguments enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -24495,12 +25007,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestSimpleArgumentRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("UnitTesting TestSimpleArgumentRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -24520,6 +25034,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestSimpleArgumentRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -24547,12 +25062,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestStructArrayArgumentRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("UnitTesting TestStructArrayArgumentRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -24783,6 +25300,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestStructArrayArgumentRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -24809,12 +25327,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestStructArgumentRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("UnitTesting TestStructArgumentRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -24841,6 +25361,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestStructArgumentRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -24867,12 +25388,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestNestedStructArgumentRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("UnitTesting TestNestedStructArgumentRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -24903,6 +25426,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestNestedStructArgumentRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -24929,12 +25453,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestListStructArgumentRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("UnitTesting TestListStructArgumentRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -24984,6 +25510,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestListStructArgumentRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -25010,12 +25537,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestListInt8UArgumentRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("UnitTesting TestListInt8UArgumentRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -25056,6 +25585,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestListInt8UArgumentRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -25082,12 +25612,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestNestedStructListArgumentRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("UnitTesting TestNestedStructListArgumentRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -25215,6 +25747,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestNestedStructListArgumentRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -25242,12 +25775,15 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestListNestedStructListArgumentRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO(
+                    "UnitTesting TestListNestedStructListArgumentRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -25400,6 +25936,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestListNestedStructListArgumentRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -25426,12 +25963,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestListInt8UReverseRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("UnitTesting TestListInt8UReverseRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -25472,6 +26011,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestListInt8UReverseRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -25498,12 +26038,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestEnumsRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestEnumsResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("UnitTesting TestEnumsRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -25524,6 +26066,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestEnumsRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -25550,12 +26093,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestNullableOptionalRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("UnitTesting TestNullableOptionalRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -25585,6 +26130,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestNullableOptionalRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -25613,12 +26159,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestComplexNullableOptionalRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("UnitTesting TestComplexNullableOptionalRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -25807,6 +26355,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestComplexNullableOptionalRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -25833,12 +26382,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting SimpleStructEchoRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterSimpleStructResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("UnitTesting SimpleStructEchoRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -25865,6 +26416,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting SimpleStructEchoRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -25899,12 +26451,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TimedInvokeRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("UnitTesting TimedInvokeRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -25925,6 +26479,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TimedInvokeRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -25950,12 +26505,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestSimpleOptionalArgumentRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(error);
+                MTR_LOG_INFO("UnitTesting TestSimpleOptionalArgumentRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -25979,6 +26536,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestSimpleOptionalArgumentRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -26005,12 +26563,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestEmitTestEventRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("UnitTesting TestEmitTestEventRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -26032,6 +26592,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestEmitTestEventRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -26061,12 +26622,14 @@ using chip::SessionHandle;
     }
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTR_LOG_INFO("UnitTesting TestEmitTestFabricScopedEventRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge(
             self.callbackQueue,
             ^(id _Nullable value, NSError * _Nullable error) {
                 completion(value, error);
+                MTR_LOG_INFO("UnitTesting TestEmitTestFabricScopedEventRequest completion value %@ error %@ endWork", value, error);
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -26086,6 +26649,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
+    MTR_LOG_INFO("UnitTesting TestEmitTestFabricScopedEventRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {

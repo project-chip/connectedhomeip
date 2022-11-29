@@ -658,7 +658,7 @@ static int TestTeardown(void * aContext)
     return (SUCCESS);
 }
 
-int TestSystemTimer(void)
+int TestSystemTimer()
 {
     return chip::ExecuteTestsWithContext<TestContext>(&kTheSuite);
 }
