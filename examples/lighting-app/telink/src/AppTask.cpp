@@ -457,6 +457,30 @@ void AppTask::UpdateClusterState()
     }
 }
 
+void AppTask::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
+{
+    if (!btnPressed)
+    {
+        return;
+    }
+
+    switch (btnId)
+    {
+    case kButtonId_LightingAction:
+        LightingActionButtonEventHandler();
+        break;
+    case kButtonId_FactoryReset:
+        FactoryResetButtonEventHandler();
+        break;
+    case kButtonId_StartThread:
+        StartThreadButtonEventHandler();
+        break;
+    case kButtonId_StartBleAdv:
+        StartBleAdvButtonEventHandler();
+        break;
+    }
+}
+
 void AppTask::InitButtons(void)
 {
     sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
