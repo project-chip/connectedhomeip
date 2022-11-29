@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2022 Silabs.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,17 +19,20 @@
 
 #pragma once
 
-#include <stdint.h>
-
+// SiWx917 Logging
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void uartConsoleInit(void);
-int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength);
-int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead);
+void silabsInitLog(void);
 
+void efr32Log(const char * aFormat, ...);
+#define SILABS_LOG(...) efr32Log(__VA_ARGS__);
+void appError(int err);
 
 #ifdef __cplusplus
-} // extern "C"
+}
+
+#include <lib/core/CHIPError.h>
+void appError(CHIP_ERROR error);
 #endif

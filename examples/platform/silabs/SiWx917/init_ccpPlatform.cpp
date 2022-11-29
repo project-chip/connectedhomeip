@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,19 +17,30 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#include <stdint.h>
+#include "AppConfig.h"
+#include <lib/support/CHIPPlatformMemory.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include <assert.h>
+#include <string.h>
 
-void uartConsoleInit(void);
-int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength);
-int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead);
+#include <mbedtls/platform.h>
 
+#include "init_ccpPlatform.h"
+
+void initAntenna(void);
+
+void init_ccpPlatform(void)
+{
+
+#if SILABS_LOG_ENABLED
+    silabsInitLog();
+#endif
+}
 
 #ifdef __cplusplus
-} // extern "C"
+}
 #endif

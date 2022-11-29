@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2022 Silabs.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,19 +17,20 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include "siwx917_utils.h"
+#include "init_ccpPlatform.h"
 
-#include <stdint.h>
+#include <matter_config.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+void appError(int err)
+{
+    SILABS_LOG("!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
+    portDISABLE_INTERRUPTS();
+    while (true)
+        ;
+}
 
-void uartConsoleInit(void);
-int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength);
-int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead);
-
-
-#ifdef __cplusplus
-} // extern "C"
-#endif
+void appError(CHIP_ERROR error)
+{
+    appError(static_cast<int>(error.AsInteger()));
+}
