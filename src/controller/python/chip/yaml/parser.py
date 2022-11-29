@@ -62,12 +62,10 @@ class _VariableToSave:
 
 class _ExpectedResponse:
     def __init__(self, value, response_type, context: _ExecutionContext):
-        self._load_expected_response_in_verify = None
         self._expected_response_type = response_type
         self._expected_response = None
-        self._variable_storage = context.variable_storage
-        if isinstance(value, str) and self._variable_storage.is_key_saved(value):
-            self._load_expected_response_in_verify = value
+        if isinstance(value, str) and context.variable_storage.is_key_saved(value):
+            self._expected_response = context.variable_storage.load(value)
         else:
             self._expected_response = Converter.parse_and_convert_yaml_value(
                 value, response_type, context.config_values, inline_cast_dict_to_struct=True)
@@ -76,15 +74,12 @@ class _ExpectedResponse:
         if (self._expected_response_type is None):
             return True
 
-        if self._load_expected_response_in_verify is not None:
-            self._expected_response = self._variable_storage.load(
-                self._load_expected_response_in_verify)
-
-        if isinstance(self._expected_response_type, float32):
+        if self._expected_response_type is float32:
             if not math.isclose(self._expected_response, response, rel_tol=1e-6):
                 logger.error(f"Expected response {self._expected_response} didn't match "
                              f"actual object {response}")
                 return False
+            return True
 
         if (self._expected_response != response):
             logger.error(f"Expected response {self._expected_response} didn't match "
@@ -388,31 +383,6 @@ class YamlTestParser:
                                           variable_storage=VariableStorage(),
                                           config_values=self._config)
 
-        for item in self._raw_data['tests']:
-            # This currently behaves differently than the c++ version. We are evaluating if test
-            # is disabled before anything else, allowing for incorrectly named commands.
-            if item.get('disabled'):
-                logger.info(f"Test is disabled, skipping {item['label']}")
-                continue
-
-            action = None
-            cluster = self._config['cluster']
-            # Some of the tests contain 'cluster over-rides' that refer to a different
-            # cluster than that specified in 'config'.
-            if (item.get('cluster')):
-                cluster = item.get('cluster').replace(' ', '').replace('/', '')
-            if item['command'] == 'writeAttribute':
-                action = self._attribute_write_action_factory(item, cluster)
-            elif item['command'] == 'readAttribute':
-                action = self._attribute_read_action_factory(item, cluster)
-            else:
-                action = self._invoke_action_factory(item, cluster)
-
-            if action is not None:
-                self._base_action_test_list.append(action)
-            else:
-                logger.warn(f"Failed to parse {item['label']}")
-
     def _invoke_action_factory(self, item: dict, cluster: str):
         '''Parse cluster command from yaml test configuration.
 
@@ -458,10 +428,33 @@ class YamlTestParser:
         except ParsingError:
             return None
 
-    def execute_tests(self, dev_ctrl: ChipDeviceCtrl):
-        '''Executes parsed YAML tests.'''
+    def parse_and_execute_test(self, dev_ctrl: ChipDeviceCtrl):
+        '''Parse and execute YAML tests.'''
         self._context.variable_storage.clear()
-        for idx, action in enumerate(self._base_action_test_list):
-            logger.info(f'test: {idx} -- Executing{action.label}')
+        test_step = 0
+        for item in self._raw_data['tests']:
+            # This currently behaves differently than the c++ version. We are evaluating if test
+            # is disabled before anything else, allowing for incorrectly named commands.
+            if item.get('disabled'):
+                logger.info(f"Test is disabled, skipping {item['label']}")
+                continue
 
-            action.run_action(dev_ctrl, self._config['endpoint'], self._config['nodeId'])
+            action = None
+            cluster = self._config['cluster']
+            # Some of the tests contain 'cluster over-rides' that refer to a different
+            # cluster than that specified in 'config'.
+            if (item.get('cluster')):
+                cluster = item.get('cluster').replace(' ', '').replace('/', '')
+            if item['command'] == 'writeAttribute':
+                action = self._attribute_write_action_factory(item, cluster)
+            elif item['command'] == 'readAttribute':
+                action = self._attribute_read_action_factory(item, cluster)
+            else:
+                action = self._invoke_action_factory(item, cluster)
+
+            if action is not None:
+                logger.info(f'test: {test_step} -- Executing{action.label}')
+                action.run_action(dev_ctrl, self._config['endpoint'], self._config['nodeId'])
+                test_step += 1
+            else:
+                logger.warn(f"Failed to parse {item['label']}")

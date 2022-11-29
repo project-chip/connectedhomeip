@@ -16,6 +16,7 @@
 #
 
 from abc import ABC, abstractmethod
+from chip.clusters.Types import NullValue
 import chip.yaml.format_converter as Converter
 from .variable_storage import VariableStorage
 
@@ -37,18 +38,14 @@ class _LoadableConstraint(BaseConstraint):
     '''Constraints where value might be stored in VariableStorage needing runtime load.'''
 
     def __init__(self, value, field_type, variable_storage: VariableStorage, config_values: dict):
-        self._variable_storage = variable_storage
-        # When not none _indirect_value_key is binding a name to the constraint value, and the
-        # actual value can only be looked-up dynamically, which is why this is a key name.
-        self._indirect_value_key = None
         self._value = None
 
         if value is None:
-            # Default values set above is all we need here.
+            # Default value set above is all we need here.
             return
 
-        if isinstance(value, str) and self._variable_storage.is_key_saved(value):
-            self._indirect_value_key = value
+        if isinstance(value, str) and variable_storage.is_key_saved(value):
+            self._value = variable_storage.load(value)
         else:
             self._value = Converter.parse_and_convert_yaml_value(
                 value, field_type, config_values)
@@ -58,8 +55,6 @@ class _LoadableConstraint(BaseConstraint):
 
         This method accounts for getting the runtime saved value from DUT previous responses.
         '''
-        if self._indirect_value_key:
-            return self._variable_storage.load(self._indirect_value_key)
         return self._value
 
 
@@ -117,6 +112,9 @@ class _ConstraintMinValue(_LoadableConstraint):
         super().__init__(min_value, field_type, variable_storage, config_values)
 
     def is_met(self, response) -> bool:
+        # Codegen c++ code will automatically pass min value check is response is NullValue
+        if response == NullValue:
+            return True
         min_value = self.get_value()
         return response >= min_value
 
@@ -127,6 +125,9 @@ class _ConstraintMaxValue(_LoadableConstraint):
         super().__init__(max_value, field_type, variable_storage, config_values)
 
     def is_met(self, response) -> bool:
+        # Codegen c++ code will automatically pass max value check is response is NullValue
+        if response == NullValue:
+            return True
         max_value = self.get_value()
         return response <= max_value
 
