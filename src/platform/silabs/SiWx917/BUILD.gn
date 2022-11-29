@@ -28,7 +28,6 @@ if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
 }
 
-
 static_library("SiWx917") {
   sources = [
     "${silabs_platform_dir}/BLEManagerImpl.h",
@@ -54,6 +53,9 @@ static_library("SiWx917") {
     "ConfigurationManagerImpl.cpp",
     "KeyValueStoreManagerImpl.cpp",
     "PlatformManagerImpl.cpp",
+    "bluetooth/rsi_ble_config.h",
+    "bluetooth/wfx_sl_ble_init.c",
+    "bluetooth/wfx_sl_ble_init.h",
   ]
 
   # TODO: OTA on CCP platform
@@ -66,8 +68,6 @@ static_library("SiWx917") {
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
-
-
   # Add pigweed KVS
   deps = [
     "$dir_pw_kvs:crc16",
@@ -77,7 +77,6 @@ static_library("SiWx917") {
     "$dir_pw_checksum",
     "$dir_pw_kvs",
   ]
-
 
   if (chip_enable_wifi) {
     sources += [

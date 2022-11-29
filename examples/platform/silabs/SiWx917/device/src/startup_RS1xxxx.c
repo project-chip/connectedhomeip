@@ -15,24 +15,22 @@
  *    limitations under the License.
  */
 
-#include "system_RS1xxxx.h"
 #include "rsi_ps_ram_func.h"
+#include "system_RS1xxxx.h"
 #include "system_si917.h"
-
 
 /*----------Stack Configuration-----------------------------------------------*/
 #define STACK_SIZE 0x00000C00 /*!< Stack size (in Words)           */
 __attribute__((section(".co_stack"))) unsigned long pulStack[STACK_SIZE];
 
-
-#define EXT_IRQ_COUNT              98             /**< Number of External (NVIC) interrupts */ //senthil copied from "efr32mg12p432f1024gl125.h"
-#define TOTAL_INTERRUPTS    (16 + EXT_IRQ_COUNT)
+#define EXT_IRQ_COUNT 98 /**< Number of External (NVIC) interrupts */ // senthil copied from "efr32mg12p432f1024gl125.h"
+#define TOTAL_INTERRUPTS (16 + EXT_IRQ_COUNT)
 
 #ifndef __INITIAL_SP
-#define __INITIAL_SP              __StackTop
+#define __INITIAL_SP __StackTop
 #endif
 #ifndef __VECTOR_TABLE_ATTRIBUTE
-#define __VECTOR_TABLE_ATTRIBUTE  __attribute__((used, section(".vectors")))
+#define __VECTOR_TABLE_ATTRIBUTE __attribute__((used, section(".vectors")))
 #endif
 
 /*----------Macro definition--------------------------------------------------*/
@@ -186,127 +184,127 @@ static void Default_Handler(void); /*!< Default exception handler            */
 //(void *)0x300001
 /*CCP new */
 extern const tVectorEntry __VECTOR_TABLE[TOTAL_INTERRUPTS];
-const tVectorEntry __VECTOR_TABLE[TOTAL_INTERRUPTS]  __attribute__((aligned(512))) __VECTOR_TABLE_ATTRIBUTE = {
-  /* Cortex-M Exception Handlers */
-  { .topOfStack = &__INITIAL_SP },           /* Initial Stack Pointer */
-  /*{ (void *)&pulStack[STACK_SIZE - 1] },*/
-  { (void *)0x300001 },              /* Reset Handler : IN CCP Platform system start
-                                                    from bootloader which inturn call reset handler */
-  { NMI_Handler               },              /* NMI Handler */
-  { HardFault_Handler         },              /* Hard Fault Handler */
-  { MemManage_Handler         },              /* MPU Fault Handler */
-  { BusFault_Handler          },              /* Bus Fault Handler */
-  { UsageFault_Handler        },              /* Usage Fault Handler */
-  { 0           },              /* Reserved */
-  { 0           },              /* Reserved */
-  { 0           },              /* Reserved */
-  { 0           },              /* Reserved */
-  { SVC_Handler               },              /* SVCall Handler */
-  { DebugMon_Handler          },              /* Debug Monitor Handler */
-  { 0 },                       /* Application properties*/
-  { PendSV_Handler            },              /* PendSV Handler */
-  { SysTick_Handler           },              /* SysTick Handler */
+const tVectorEntry __VECTOR_TABLE[TOTAL_INTERRUPTS] __attribute__((aligned(512))) __VECTOR_TABLE_ATTRIBUTE = {
+    /* Cortex-M Exception Handlers */
+    { .topOfStack = &__INITIAL_SP }, /* Initial Stack Pointer */
+    /*{ (void *)&pulStack[STACK_SIZE - 1] },*/
+    { (void *) 0x300001 },  /* Reset Handler : IN CCP Platform system start
+                                           from bootloader which inturn call reset handler */
+    { NMI_Handler },        /* NMI Handler */
+    { HardFault_Handler },  /* Hard Fault Handler */
+    { MemManage_Handler },  /* MPU Fault Handler */
+    { BusFault_Handler },   /* Bus Fault Handler */
+    { UsageFault_Handler }, /* Usage Fault Handler */
+    { 0 },                  /* Reserved */
+    { 0 },                  /* Reserved */
+    { 0 },                  /* Reserved */
+    { 0 },                  /* Reserved */
+    { SVC_Handler },        /* SVCall Handler */
+    { DebugMon_Handler },   /* Debug Monitor Handler */
+    { 0 },                  /* Application properties*/
+    { PendSV_Handler },     /* PendSV Handler */
+    { SysTick_Handler },    /* SysTick Handler */
 
-  /* External interrupts */
+    /* External interrupts */
 
-  { IRQ000_Handler            },              /* 0 */
-  { IRQ001_Handler        },              /* 1 */
-  { IRQ002_Handler          },              /* 2 */
-  { IRQ003_Handler          },              /* 3 */
-  { IRQ004_Handler            },              /* 4 */
-  { IRQ005_Handler          },              /* 5 */
-  { IRQ006_Handler        },              /* 6 */
-  { IRQ007_Handler        },              /* 7 */
-  { IRQ008_Handler           },              /* 8 */
-  { IRQ009_Handler           },              /* 9 */
-  { IRQ010_Handler      },              /* 10 */
-  { IRQ011_Handler         },              /* 11 */
-  { IRQ012_Handler      },              /* 12 */
-  { IRQ013_Handler      },              /* 13 */
-  { IRQ014_Handler          },              /* 14 */
-  { IRQ015_Handler           },              /* 15 */
-  { IRQ016_Handler          },              /* 16 */
-  { IRQ017_Handler           },              /* 17 */
-  { IRQ018_Handler       },              /* 18 */
-  { IRQ019_Handler         },              /* 19 */
-  { IRQ020_Handler      },              /* 20 */
-  { IRQ021_Handler      },              /* 21 */
-  { IRQ022_Handler        },              /* 22 */
-  { IRQ023_Handler          },              /* 23 */
-  { IRQ024_Handler            },              /* 24 */
-  { IRQ025_Handler            },              /* 25 */
-  { IRQ026_Handler        },              /* 26 */
-  { IRQ027_Handler       },              /* 27 */
-  { IRQ028_Handler            },              /* 28 */
-  { IRQ029_Handler       },              /* 29 */
-  { (void *)&__StackTop - 0x0c           },              /* 30 */
-  { IRQ031_Handler          },              /* 31 */
-  { RSI_Default_Reset_Handler      },              /* 32 */
-  { IRQ033_Handler        },              /* 33 */
-  { IRQ034_Handler          },              /* 34 */
-  { HIF1_IRQHandler            },              /* 35 */
-  { HIF2_IRQHandler        },              /* 36 */
-  { IRQ037_Handler        },              /* 37 */
-  { IRQ038_Handler          },              /* 38 */
-  { IRQ039_Handler          },              /* 39 */
-  { RSI_PS_RestoreCpuContext      },              /* 40 */
-  { IRQ041_Handler      },              /* 41 */
-  { IRQ042_Handler           },              /* 42 */
-  { (void *)0x10AD10AD      },              /* 43 */
-  { IRQ044_Handler      },              /* 44 */
-  { 0          },              /* 45 */
-  { IRQ046_Handler           },              /* 46 */
-  { IRQ047_Handler        },              /* 47 */
-  { IRQ048_Handler        },              /* 48 */
-  { IRQ049_Handler          },              /* 49 */
-  { IRQ050_Handler           },              /* 50 - Reserved */
-  { IRQ051_Handler           },
-  { IRQ052_Handler           },
-  { IRQ053_Handler           },
-  { IRQ054_Handler           },
-  { IRQ055_Handler           },
-  { IRQ056_Handler           },
-  { IRQ057_Handler           },
-  { IRQ058_Handler           },
-  { IRQ059_Handler           },
-  { IRQ060_Handler           },
-  { IRQ061_Handler           },
-  { IRQ062_Handler           },
-  { IRQ063_Handler           },
-  { IRQ064_Handler           },
-  { 0           },
-  { IRQ066_Handler           },
-  { 0           },
-  { IRQ068_Handler           },
-  { IRQ069_Handler           },
-  { 0           },
-  { IRQ071_Handler           },
-  { IRQ072_Handler           },
-  { IRQ073_Handler           },
-  { IRQ074_Handler           },
-  { IRQ075_Handler           },
-  { IRQ076_Handler           },
-  { 0           },
-  { 0           },
-  { IRQ079_Handler           },
-  { IRQ080_Handler           },
-  { 0           },
-  { IRQ082_Handler           },
-  { IRQ083_Handler           },
-  { IRQ084_Handler           },
-  { IRQ085_Handler           },
-  { IRQ086_Handler           },
-  { IRQ087_Handler           },
-  { IRQ088_Handler           },
-  { IRQ089_Handler           },
-  { IRQ090_Handler           },
-  { IRQ091_Handler           },
-  { IRQ092_Handler           },
-  { IRQ093_Handler           },
-  { 0           },
-  { IRQ095_Handler           },
-  { 0           },
-  { IRQ097_Handler           },
+    { IRQ000_Handler },              /* 0 */
+    { IRQ001_Handler },              /* 1 */
+    { IRQ002_Handler },              /* 2 */
+    { IRQ003_Handler },              /* 3 */
+    { IRQ004_Handler },              /* 4 */
+    { IRQ005_Handler },              /* 5 */
+    { IRQ006_Handler },              /* 6 */
+    { IRQ007_Handler },              /* 7 */
+    { IRQ008_Handler },              /* 8 */
+    { IRQ009_Handler },              /* 9 */
+    { IRQ010_Handler },              /* 10 */
+    { IRQ011_Handler },              /* 11 */
+    { IRQ012_Handler },              /* 12 */
+    { IRQ013_Handler },              /* 13 */
+    { IRQ014_Handler },              /* 14 */
+    { IRQ015_Handler },              /* 15 */
+    { IRQ016_Handler },              /* 16 */
+    { IRQ017_Handler },              /* 17 */
+    { IRQ018_Handler },              /* 18 */
+    { IRQ019_Handler },              /* 19 */
+    { IRQ020_Handler },              /* 20 */
+    { IRQ021_Handler },              /* 21 */
+    { IRQ022_Handler },              /* 22 */
+    { IRQ023_Handler },              /* 23 */
+    { IRQ024_Handler },              /* 24 */
+    { IRQ025_Handler },              /* 25 */
+    { IRQ026_Handler },              /* 26 */
+    { IRQ027_Handler },              /* 27 */
+    { IRQ028_Handler },              /* 28 */
+    { IRQ029_Handler },              /* 29 */
+    { (void *) &__StackTop - 0x0c }, /* 30 */
+    { IRQ031_Handler },              /* 31 */
+    { RSI_Default_Reset_Handler },   /* 32 */
+    { IRQ033_Handler },              /* 33 */
+    { IRQ034_Handler },              /* 34 */
+    { HIF1_IRQHandler },             /* 35 */
+    { HIF2_IRQHandler },             /* 36 */
+    { IRQ037_Handler },              /* 37 */
+    { IRQ038_Handler },              /* 38 */
+    { IRQ039_Handler },              /* 39 */
+    { RSI_PS_RestoreCpuContext },    /* 40 */
+    { IRQ041_Handler },              /* 41 */
+    { IRQ042_Handler },              /* 42 */
+    { (void *) 0x10AD10AD },         /* 43 */
+    { IRQ044_Handler },              /* 44 */
+    { 0 },                           /* 45 */
+    { IRQ046_Handler },              /* 46 */
+    { IRQ047_Handler },              /* 47 */
+    { IRQ048_Handler },              /* 48 */
+    { IRQ049_Handler },              /* 49 */
+    { IRQ050_Handler },              /* 50 - Reserved */
+    { IRQ051_Handler },
+    { IRQ052_Handler },
+    { IRQ053_Handler },
+    { IRQ054_Handler },
+    { IRQ055_Handler },
+    { IRQ056_Handler },
+    { IRQ057_Handler },
+    { IRQ058_Handler },
+    { IRQ059_Handler },
+    { IRQ060_Handler },
+    { IRQ061_Handler },
+    { IRQ062_Handler },
+    { IRQ063_Handler },
+    { IRQ064_Handler },
+    { 0 },
+    { IRQ066_Handler },
+    { 0 },
+    { IRQ068_Handler },
+    { IRQ069_Handler },
+    { 0 },
+    { IRQ071_Handler },
+    { IRQ072_Handler },
+    { IRQ073_Handler },
+    { IRQ074_Handler },
+    { IRQ075_Handler },
+    { IRQ076_Handler },
+    { 0 },
+    { 0 },
+    { IRQ079_Handler },
+    { IRQ080_Handler },
+    { 0 },
+    { IRQ082_Handler },
+    { IRQ083_Handler },
+    { IRQ084_Handler },
+    { IRQ085_Handler },
+    { IRQ086_Handler },
+    { IRQ087_Handler },
+    { IRQ088_Handler },
+    { IRQ089_Handler },
+    { IRQ090_Handler },
+    { IRQ091_Handler },
+    { IRQ092_Handler },
+    { IRQ093_Handler },
+    { 0 },
+    { IRQ095_Handler },
+    { 0 },
+    { IRQ097_Handler },
 };
 
 /**
@@ -316,86 +314,84 @@ const tVectorEntry __VECTOR_TABLE[TOTAL_INTERRUPTS]  __attribute__((aligned(512)
  */
 void Default_Reset_Handler(void)
 {
-  /*Generic Default reset handler for CM4 */
-  while (1)
-    ;
+    /*Generic Default reset handler for CM4 */
+    while (1)
+        ;
 }
-
-
 
 void Copy_Table()
 {
-  uint32_t        *pSrc, *pDest;
-  extern uint32_t __etext;
-  extern uint32_t __data_start__;
-  extern uint32_t __data_end__;
-  pSrc  = &__etext;
-  pDest = &__data_start__;
+    uint32_t *pSrc, *pDest;
+    extern uint32_t __etext;
+    extern uint32_t __data_start__;
+    extern uint32_t __data_end__;
+    pSrc  = &__etext;
+    pDest = &__data_start__;
 
-  for (; pDest < &__data_end__; ) {
-    *pDest++ = *pSrc++;
-  }
+    for (; pDest < &__data_end__;)
+    {
+        *pDest++ = *pSrc++;
+    }
 }
 
 void Zero_Table()
 {
-  uint32_t        *pDest;
-  extern uint32_t __bss_start__;
-  extern uint32_t __bss_end__;
-  pDest = &__bss_start__;
+    uint32_t * pDest;
+    extern uint32_t __bss_start__;
+    extern uint32_t __bss_end__;
+    pDest = &__bss_start__;
 
-  for (; pDest < &__bss_end__; ) {
-    *pDest++ = 0UL;
-  }
+    for (; pDest < &__bss_end__;)
+    {
+        *pDest++ = 0UL;
+    }
 }
 void Reset_Handler(void)
 {
 #ifndef __NO_SYSTEM_INIT
-  SystemInit();                    /* CMSIS System Initialization */
+    SystemInit(); /* CMSIS System Initialization */
 #endif
 
 #ifdef BOOTLOADER_ENABLE
-  SystemInit2();
+    SystemInit2();
 #endif /* BOOTLOADER_ENABLE */
 
-#if defined (__GNUC__) && defined (__START)
-  Copy_Table();
-  Zero_Table();
-  __START();
+#if defined(__GNUC__) && defined(__START)
+    Copy_Table();
+    Zero_Table();
+    __START();
 #else
-#if 0 //senthil_ccp
+#if 0 // senthil_ccp
   __PROGRAM_START();               /* Enter PreMain (C library entry point) */
 #else
-  Copy_Table();
-  Zero_Table();
-  _start();
+    Copy_Table();
+    Zero_Table();
+    _start();
 #endif
 #endif /* __GNUC__ */
 }
 
-
-
 void RSI_Default_Reset_Handler(void)
 {
 #ifndef __NO_SYSTEM_INIT
-  SystemInit();                    /* CMSIS System Initialization */
+    SystemInit(); /* CMSIS System Initialization */
 #endif
 
 #ifdef BOOTLOADER_ENABLE
-  SystemInit2();
+    SystemInit2();
 #endif /* BOOTLOADER_ENABLE */
 
-#if defined (__GNUC__) && defined (__START)
-  Copy_Table();
-  Zero_Table();
-  __START();
+#if defined(__GNUC__) && defined(__START)
+    Copy_Table();
+    Zero_Table();
+    __START();
 #else
-#if 0 //senthil_ccp
+#if 0 // senthil_ccp
   __PROGRAM_START();               /* Enter PreMain (C library entry point) */
 #else
-  Copy_Table();
-  Zero_Table();
-  _start();
+    Copy_Table();
+    Zero_Table();
+    _start();
 #endif
 #endif /* __GNUC__ */
 }
@@ -525,9 +521,10 @@ void RSI_Default_Reset_Handler(void)
  */
 static void Default_Handler(void)
 {
-  /* Go into an infinite loop. */
-  while (1) {
-  }
+    /* Go into an infinite loop. */
+    while (1)
+    {
+    }
 }
 
 /*********************** (C) COPYRIGHT 2009 Coocox ************END OF FILE*****/

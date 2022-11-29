@@ -30,7 +30,6 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/silabs/SilabsConfig.h>
 
-
 #include "core_cm4.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION

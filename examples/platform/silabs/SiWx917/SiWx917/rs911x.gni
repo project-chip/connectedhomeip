@@ -24,7 +24,8 @@ rs911x_plat_incs = [
   "${wifi_sdk_dir}",
   "${wifi_sdk_dir}/hal",
   "${wiseconnect_sdk_root}/platforms/si91x/hal/inc",
-#  "${wiseconnect_sdk_root}/sapi/include",
+
+  #  "${wiseconnect_sdk_root}/sapi/include",
   "${chip_root}/src/platform/silabs/SiWx917",
   "${chip_root}/src/platform/silabs/SiWx917/bluetooth",
   "${examples_plat_dir}/SiWx917",
@@ -40,7 +41,8 @@ rs911x_src_sapi = [
   "${wiseconnect_sdk_root}/sapi/common/rsi_apis_rom.c",
   "${wiseconnect_sdk_root}/sapi/common/rsi_common_apis.c",
   "${wiseconnect_sdk_root}/sapi/common/rsi_device_init_apis.c",
-#  "${wiseconnect_sdk_root}/sapi/common/rsi_wisemcu_hardware_setup.c",
+
+  #  "${wiseconnect_sdk_root}/sapi/common/rsi_wisemcu_hardware_setup.c",
   "${wiseconnect_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_frame_rd_wr.c",
   "${wiseconnect_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_functs.c",
   "${wiseconnect_sdk_root}/sapi/driver/device_interface/spi/rsi_spi_iface_init.c",
@@ -70,15 +72,17 @@ rs911x_src_sapi = [
 ]
 
 foreach(src_file, rs911x_src_sapi) {
-  rs911x_cflags += [ "-Wno-empty-body" ,
-                     "-Wno-cpp" ,
-                     "-Wno-missing-braces",
-                     "-Wno-sign-compare",
-                     "-Wno-error",
-                     "-Wno-unknown-warning-option",
-                     "-Wno-unused-variable",
-                     "-Wno-implicit-function-declaration",
-                     "-Wno-unused-function"]
+  rs911x_cflags += [
+    "-Wno-empty-body",
+    "-Wno-cpp",
+    "-Wno-missing-braces",
+    "-Wno-sign-compare",
+    "-Wno-error",
+    "-Wno-unknown-warning-option",
+    "-Wno-unused-variable",
+    "-Wno-implicit-function-declaration",
+    "-Wno-unused-function",
+  ]
 }
 
 rs911x_inc_plat = [
@@ -87,7 +91,7 @@ rs911x_inc_plat = [
   "${examples_plat_dir}/SiWx917/hal",
   "${wiseconnect_sdk_root}/sapi/include",
 
-   #CCP Platfrom
+  #CCP Platfrom
   "${wiseconnect_sdk_root}/platforms/si91x/hal/inc",
   "${wiseconnect_sdk_root}/platforms/si91x/boards/brd4325a/inc",
   "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/inc",
@@ -125,12 +129,13 @@ rs911x_defs = [
   "RS911X_WIFI",
   "RSI_WLAN_ENABLE",
   "RSI_WITH_OS",
-  "RSI_M4_INTERFACE", #Enable CCP bus Interface
+  "RSI_M4_INTERFACE",  #Enable CCP bus Interface
   "RSI_WLAN_API_ENABLE",
   "HMAC_512",
   "LITTLE_ENDIAN_ORDER",
   "_CHIP_9118",
-#  "ROM_WIRELESS"
+
+  #  "ROM_WIRELESS"
   #__CC_ARM DEBUG_UART _CHIP_9118   LITTLE_ENDIAN_ORDER HMAC_512
 ]
 rs911x_sock_defs = [

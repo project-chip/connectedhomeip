@@ -53,11 +53,11 @@
 /*=======================================================================*/
 //! Feature frame parameters
 /*=======================================================================*/
-#define PLL_MODE        0
-#define RF_TYPE         1 //! 0 - External RF 1- Internal RF
-#define WIRELESS_MODE   0
-#define ENABLE_PPP      0
-#define AFE_TYPE        1
+#define PLL_MODE 0
+#define RF_TYPE 1 //! 0 - External RF 1- Internal RF
+#define WIRELESS_MODE 0
+#define ENABLE_PPP 0
+#define AFE_TYPE 1
 #define FEATURE_ENABLES 0
 /*=======================================================================*/
 //! Band command paramters
@@ -126,7 +126,7 @@
 #define RSI_BG_SCAN_ENABLE RSI_ENABLE
 
 //! RSI_ENABLE or RSI_DISABLE instant BG scan
-#define RSI_INSTANT_BG 1 //RSI_DISABLE
+#define RSI_INSTANT_BG 1 // RSI_DISABLE
 
 //! BG scan threshold value
 #define RSI_BG_SCAN_THRESHOLD 63
@@ -315,16 +315,16 @@
 //! RSI_ENABLE or RSI_DISABLE High performance socket
 #define HIGH_PERFORMANCE_ENABLE RSI_ENABLE //@ RSI_ENABLE or RSI_DISABLE High performance socket
 
-#define TOTAL_SOCKETS                   1  //@ Total number of sockets. TCP TX + TCP RX + UDP TX + UDP RX
-#define TOTAL_TCP_SOCKETS               1  //@ Total TCP sockets. TCP TX + TCP RX
-#define TOTAL_UDP_SOCKETS               0  //@ Total UDP sockets. UDP TX + UDP RX
-#define TCP_TX_ONLY_SOCKETS             0  //@ Total TCP TX only sockets. TCP TX
-#define TCP_RX_ONLY_SOCKETS             1  //@ Total TCP RX only sockets. TCP RX
-#define UDP_TX_ONLY_SOCKETS             0  //@ Total UDP TX only sockets. UDP TX
-#define UDP_RX_ONLY_SOCKETS             0  //@ Total UDP RX only sockets. UDP RX
-#define TCP_RX_HIGH_PERFORMANCE_SOCKETS 1  //@ Total TCP RX High Performance sockets
-#define TCP_RX_WINDOW_SIZE_CAP          10 //@ TCP RX Window size
-#define TCP_RX_WINDOW_DIV_FACTOR        10 //@ TCP RX Window division factor
+#define TOTAL_SOCKETS 1                   //@ Total number of sockets. TCP TX + TCP RX + UDP TX + UDP RX
+#define TOTAL_TCP_SOCKETS 1               //@ Total TCP sockets. TCP TX + TCP RX
+#define TOTAL_UDP_SOCKETS 0               //@ Total UDP sockets. UDP TX + UDP RX
+#define TCP_TX_ONLY_SOCKETS 0             //@ Total TCP TX only sockets. TCP TX
+#define TCP_RX_ONLY_SOCKETS 1             //@ Total TCP RX only sockets. TCP RX
+#define UDP_TX_ONLY_SOCKETS 0             //@ Total UDP TX only sockets. UDP TX
+#define UDP_RX_ONLY_SOCKETS 0             //@ Total UDP RX only sockets. UDP RX
+#define TCP_RX_HIGH_PERFORMANCE_SOCKETS 1 //@ Total TCP RX High Performance sockets
+#define TCP_RX_WINDOW_SIZE_CAP 10         //@ TCP RX Window size
+#define TCP_RX_WINDOW_DIV_FACTOR 10       //@ TCP RX Window division factor
 /*=======================================================================*/
 
 //! Socket Create parameters
@@ -440,7 +440,7 @@
 //! To configure channel number
 #define RSI_CONFIG_CLIENT_CHANNEL 0
 //! To configure security type
-#define RSI_CONFIG_CLIENT_SECURITY_TYPE 0 //RSI_WPA
+#define RSI_CONFIG_CLIENT_SECURITY_TYPE 0 // RSI_WPA
 //! To configure encryption type
 #define RSI_CONFIG_CLIENT_ENCRYPTION_TYPE 0
 //! To configure PSK
@@ -487,7 +487,7 @@
 //! To Configure scan channel feature bitmap
 #define RSI_CONFIG_EAP_SCAN_FEAT_BITMAP 0
 //! scan channel bit map in 2.4GHz band,valid if given channel to scan is 0
-#define RSI_CONFIG_EAP_CHAN_MAGIC_CODE 0 //0x4321
+#define RSI_CONFIG_EAP_CHAN_MAGIC_CODE 0 // 0x4321
 //! scan channel bit map in 2.4GHz band,valid if given channel to scan is 0
 #define RSI_CONFIG_EAP_SCAN_CHAN_BITMAP_2_4_GHZ 0
 //! scan channle bit map in 5GHz band ,valid if given channel to scan is 0

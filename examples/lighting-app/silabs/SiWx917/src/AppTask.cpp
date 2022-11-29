@@ -21,8 +21,6 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 
-
-
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
@@ -41,8 +39,6 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-
-
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_LIGHT_SWITCH &sl_button_btn1
 
@@ -50,8 +46,6 @@ using namespace chip;
 using namespace ::chip::DeviceLayer;
 
 namespace {
-
-
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 
@@ -137,16 +131,16 @@ CHIP_ERROR AppTask::Init()
         appError(err);
     }
 
-/* TODO 
-    err = LightMgr().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        SILABS_LOG("LightMgr::Init() failed");
-        appError(err);
-    }
+    /* TODO
+        err = LightMgr().Init();
+        if (err != CHIP_NO_ERROR)
+        {
+            SILABS_LOG("LightMgr::Init() failed");
+            appError(err);
+        }
 
-    LightMgr().SetCallbacks(ActionInitiated, ActionCompleted);
-*/
+        LightMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+    */
 
     return err;
 }
@@ -235,7 +229,6 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
         }
     }
 }
-
 
 void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {

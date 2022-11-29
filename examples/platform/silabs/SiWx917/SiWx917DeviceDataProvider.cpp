@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "SIWx917DeviceDataProvider.h"
+#include "SiWx917DeviceDataProvider.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Base64.h>
 #include <platform/silabs/SilabsConfig.h>

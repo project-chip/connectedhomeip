@@ -32,7 +32,7 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
-#include "SIWx917DeviceDataProvider.h"
+#include "SiWx917DeviceDataProvider.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
@@ -44,7 +44,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-
 
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
@@ -79,7 +78,6 @@ TimerHandle_t sLightTimer;
 
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
-
 
 #ifdef SL_WIFI
 app::Clusters::NetworkCommissioning::Instance
@@ -248,7 +246,6 @@ void BaseApplication::FunctionEventHandler(AppEvent * aEvent)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 
         mFunction = kFunction_FactoryReset;
-
     }
     else if (mFunctionTimerActive && mFunction == kFunction_FactoryReset)
     {

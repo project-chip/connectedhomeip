@@ -25,6 +25,7 @@ declare_args() {
   efr32_sdk_root = "${chip_root}/third_party/silabs/gecko_sdk"
   sdk_support_root = "${chip_root}/third_party/silabs/matter_support"
   wiseconnect_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
+  examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 
   # Build openthread with prebuilt silabs lib
   use_silabs_thread_lib = false
@@ -114,6 +115,7 @@ template("efr32_sdk") {
       "HARD_FAULT_LOG_ENABLE",
       "CORTEXM3_EFM32_MICRO",
       "SILABS_LOG_ENABLED=1",
+
       #Matter required at least 40960 but SiWx917 SoC requires an extra 20k to resolve nvm3_open() error, Need to be checked.
       "NVM3_DEFAULT_NVM_SIZE=73728",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
@@ -132,12 +134,11 @@ template("efr32_sdk") {
       "RSI_ARM_CM4F",
       "RSI_BLE_ENABLE=1",
       "BRD4325A",
-      "CHIP_9117"
+      "CHIP_9117",
+      "RS91X_BLE_ENABLE=1",
     ]
 
-
     defines += board_defines
-
 
     if (defined(invoker.enable_sleepy_device)) {
       if (invoker.enable_sleepy_device) {
@@ -180,14 +181,11 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emdrv/uartdrv/inc",
         "${efr32_sdk_root}/platform/emdrv/uartdrv/config",
         "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
+        "${efr32_sdk_root}/platform/common/errno/inc",
       ]
     }
 
-    }
-
-    libs += [
-        "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a",
-    ]
+    libs += [ "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a" ]
 
     cflags = []
     foreach(include_dir, _include_dirs) {
@@ -230,54 +228,55 @@ template("efr32_sdk") {
   source_set(sdk_target_name) {
     sources = [
       "${examples_plat_dir}/device/src/startup_RS1xxxx.c",
-       ### nvm3 for ccp platform ###
+      "${sdk_support_root}/platform/emdrv/nvm3/src/ccp_flash_dev.c",
+      "${sdk_support_root}/platform/emdrv/nvm3/src/ccp_flash_intf.c",
+      "${sdk_support_root}/platform/emdrv/nvm3/src/ccp_flash_prg.c",
+      "${sdk_support_root}/platform/emdrv/nvm3/src/nvm3_default.c",
+
+      ### nvm3 for ccp platform ###
       "${sdk_support_root}/platform/emdrv/nvm3/src/nvm3_hal_flash_ccp.c",
       "${sdk_support_root}/platform/emdrv/nvm3/src/nvm3_lock.c",
-      "${sdk_support_root}/platform/emdrv/nvm3/src/nvm3_default.c",
-      "${sdk_support_root}/platform/emdrv/nvm3/src/ccp_flash_intf.c",
-      "${sdk_support_root}/platform/emdrv/nvm3/src/ccp_flash_dev.c",
-      "${sdk_support_root}/platform/emdrv/nvm3/src/ccp_flash_prg.c",
 
       ######## CCP Platform #########
       "${wiseconnect_sdk_root}/platforms/si91x/boards/brd4325a/src/rsi_board.c",
+
       #"${wiseconnect_sdk_root}/platforms/si91x/boards/brd4325a/src/syscalls.c",
       "${wiseconnect_sdk_root}/platforms/si91x/core/chip/src/rsi_deepsleep_commonflash.c",
       "${wiseconnect_sdk_root}/platforms/si91x/core/chip/src/rsi_ps_ram_func.c",
       "${wiseconnect_sdk_root}/platforms/si91x/core/chip/src/rsi_system_config.c",
       "${wiseconnect_sdk_root}/platforms/si91x/core/chip/src/system_RS1xxxx.c",
+
       #"${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver/UDMA.c",
       #"${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver/USART.c",
 
       "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/clock_update.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_comparator.c",
       "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_egpio.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_udma_wrapper.c",
       "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_udma.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_udma_wrapper.c",
       "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_usart.c",
       "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_ipmu.c",
       "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_pll.c",
       "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_power_save.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_processor_sensor.c",
       "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_rtc.c",
       "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_temp_sensor.c",
       "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_time_period.c",
       "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_ulpss_clk.c",
-
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_comparator.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_processor_sensor.c",
       "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_wwdt.c",
-      "${wiseconnect_sdk_root}/third_party/freertos/portable/GCC/ARM_CM4F/port.c",
       "${wiseconnect_sdk_root}/third_party/freertos/croutine.c",
       "${wiseconnect_sdk_root}/third_party/freertos/event_groups.c",
       "${wiseconnect_sdk_root}/third_party/freertos/list.c",
+      "${wiseconnect_sdk_root}/third_party/freertos/portable/GCC/ARM_CM4F/port.c",
       "${wiseconnect_sdk_root}/third_party/freertos/queue.c",
       "${wiseconnect_sdk_root}/third_party/freertos/stream_buffer.c",
       "${wiseconnect_sdk_root}/third_party/freertos/tasks.c",
       "${wiseconnect_sdk_root}/third_party/freertos/timers.c",
 
-
       # Bluetooth
       "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
-      "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
       "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
+      "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
       "${wiseconnect_sdk_root}/sapi/driver/rsi_bt_ble.c",
 
       # mbedtls
@@ -310,7 +309,6 @@ template("efr32_sdk") {
       "${chip_root}/third_party/mbedtls/repo/library/x509_create.c",
       "${chip_root}/third_party/mbedtls/repo/library/x509write_csr.c",
     ]
-
 
     public_deps = [
       ":si917_mbedtls_config",

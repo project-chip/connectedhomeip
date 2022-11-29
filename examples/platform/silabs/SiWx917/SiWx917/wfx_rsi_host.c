@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
+#include "stdbool.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "stdbool.h"
 
 #include "sl_status.h"
 
@@ -67,7 +67,8 @@ sl_status_t wfx_wifi_start(void)
     return SL_STATUS_OK;
 }
 
-int32_t wfx_rsi_platform(){
+int32_t wfx_rsi_platform()
+{
     return wfx_rsi_init_platform();
 }
 

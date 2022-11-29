@@ -23,24 +23,25 @@
 #ifdef RSI_WITH_OS
 /* FreeRTOS includes. */
 #include "FreeRTOS.h"
+#include "StackMacros.h"
 #include "task.h"
 #include "timers.h"
-#include "StackMacros.h"
 
 #if defined(SysTick)
 #undef SysTick_Handler
 /* FreeRTOS SysTick interrupt handler prototype */
-extern void SysTick_Handler     (void);
+extern void SysTick_Handler(void);
 /* FreeRTOS tick timer interrupt handler prototype */
-extern void xPortSysTickHandler (void);
-#endif  /* SysTick */
+extern void xPortSysTickHandler(void);
+#endif /* SysTick */
 #endif
 
-static volatile uint32_t _dwTickCount; //systick cout variable
+static volatile uint32_t _dwTickCount; // systick cout variable
 
 /*===================================================*/
 /**
- * @fn           int32_t rsi_timer_start(uint8_t timer_no, uint8_t mode,uint8_t type,uint32_t duration,void (* rsi_timer_expiry_handler)())
+ * @fn           int32_t rsi_timer_start(uint8_t timer_no, uint8_t mode,uint8_t type,uint32_t duration,void (*
+ * rsi_timer_expiry_handler)())
  * @brief        Starts and configures timer
  * @param[in]    timer_node, timer node to be configured.
  * @param[in]    mode , mode of the timer
@@ -58,20 +59,16 @@ static volatile uint32_t _dwTickCount; //systick cout variable
  *
  */
 
-int32_t rsi_timer_start(uint8_t timer_node,
-                        uint8_t mode,
-                        uint8_t type,
-                        uint32_t duration,
-                        void (*rsi_timer_expiry_handler)(void))
+int32_t rsi_timer_start(uint8_t timer_node, uint8_t mode, uint8_t type, uint32_t duration, void (*rsi_timer_expiry_handler)(void))
 {
 
-  //! Initialise the timer
+    //! Initialise the timer
 
-  //! register the call back
+    //! register the call back
 
-  //! Start timer
+    //! Start timer
 
-  return 0;
+    return 0;
 }
 
 /*===================================================*/
@@ -89,9 +86,9 @@ int32_t rsi_timer_start(uint8_t timer_node,
 int32_t rsi_timer_stop(uint8_t timer_node)
 {
 
-  //! Stop the timer
+    //! Stop the timer
 
-  return 0;
+    return 0;
 }
 
 /*===================================================*/
@@ -108,11 +105,11 @@ int32_t rsi_timer_stop(uint8_t timer_node)
 uint32_t rsi_timer_read(uint8_t timer_node)
 {
 
-  volatile uint32_t timer_val = 0;
+    volatile uint32_t timer_val = 0;
 
-  //! read the timer and return timer value
+    //! read the timer and return timer value
 
-  return timer_val;
+    return timer_val;
 }
 
 /*===================================================*/
@@ -128,9 +125,9 @@ uint32_t rsi_timer_read(uint8_t timer_node)
 void rsi_delay_us(uint32_t delay_us)
 {
 
-  //! call the API for delay in micro seconds
+    //! call the API for delay in micro seconds
 
-  return;
+    return;
 }
 
 /*===================================================*/
@@ -146,9 +143,9 @@ void rsi_delay_us(uint32_t delay_us)
 void rsi_delay_ms1(uint32_t delay_ms)
 {
 
-  //! call the API for delay in milli seconds
+    //! call the API for delay in milli seconds
 
-  return;
+    return;
 }
 
 /*===================================================*/
@@ -164,11 +161,12 @@ void rsi_delay_ms1(uint32_t delay_ms)
 
 void SysTick_Handler(void)
 {
-  _dwTickCount++;
+    _dwTickCount++;
 #ifdef RSI_WITH_OS
-  if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) {
-    xPortSysTickHandler();
-  }
+    if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+    {
+        xPortSysTickHandler();
+    }
 #endif
 }
 /*===================================================*/
@@ -184,7 +182,7 @@ void SysTick_Handler(void)
 
 uint32_t GetTickCount(void)
 {
-  return _dwTickCount; // gets the tick count from systic ISR
+    return _dwTickCount; // gets the tick count from systic ISR
 }
 
 /*===================================================*/
@@ -200,14 +198,15 @@ uint32_t GetTickCount(void)
 
 void rsi_delay_ms(uint32_t delay_ms)
 {
-  uint32_t start;
+    uint32_t start;
 
-  if (delay_ms == 0)
+    if (delay_ms == 0)
+        return;
+    start = rsi_hal_gettickcount();
+    do
+    {
+    } while (rsi_hal_gettickcount() - start < delay_ms);
     return;
-  start = rsi_hal_gettickcount();
-  do {
-  } while (rsi_hal_gettickcount() - start < delay_ms);
-  return;
 }
 
 /*===================================================*/
@@ -215,11 +214,11 @@ void rsi_delay_ms(uint32_t delay_ms)
  * @fn           uint32_t rsi_hal_gettickcount()
  * @brief        provides a tick value in milliseconds
  * @return       tick value
- * @description  This HAL API should contain the code to read the timer tick count value in milliseconds 
+ * @description  This HAL API should contain the code to read the timer tick count value in milliseconds
  *
  */
 
 uint32_t rsi_hal_gettickcount(void)
 {
-  return GetTickCount();
+    return GetTickCount();
 }

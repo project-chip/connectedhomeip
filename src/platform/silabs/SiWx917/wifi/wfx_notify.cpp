@@ -19,7 +19,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #include "AppConfig.h"
 
 #include "FreeRTOS.h"

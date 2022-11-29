@@ -20,8 +20,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-
 #include "wfx_host_events.h"
 #include "wifi_config.h"
 

@@ -87,7 +87,6 @@ public:
     static SilabsLCD & GetLCD(void);
 #endif
 
-
     /**
      * @brief Function called to start the LED light timer
      */

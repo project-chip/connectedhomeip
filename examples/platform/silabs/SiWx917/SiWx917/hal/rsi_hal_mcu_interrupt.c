@@ -15,18 +15,17 @@
  *    limitations under the License.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "task.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
 #include "rsi_driver.h"
-
 
 /*===================================================*/
 /**
@@ -41,9 +40,9 @@
 void rsi_hal_intr_config(void (*rsi_interrupt_handler)(void))
 {
 
-  // Configure interrupt pin/register in input mode and register the interrupt handler
+    // Configure interrupt pin/register in input mode and register the interrupt handler
 
-  return;
+    return;
 }
 /*===================================================*/
 /**
@@ -56,8 +55,8 @@ void rsi_hal_intr_config(void (*rsi_interrupt_handler)(void))
  */
 void rsi_hal_intr_mask(void)
 {
-  // Mask/disable mask
-  return;
+    // Mask/disable mask
+    return;
 }
 
 /*===================================================*/
@@ -71,9 +70,9 @@ void rsi_hal_intr_mask(void)
  */
 void rsi_hal_intr_unmask(void)
 {
-  // WFX_RSI_LOG ("RSI:Enable IRQ (mask=%x)", GPIO_IntGetEnabled ());
-  // Unmask/Enable the interrupt
-  return;
+    // WFX_RSI_LOG ("RSI:Enable IRQ (mask=%x)", GPIO_IntGetEnabled ());
+    // Unmask/Enable the interrupt
+    return;
 }
 
 /*===================================================*/
@@ -87,8 +86,8 @@ void rsi_hal_intr_unmask(void)
  */
 void rsi_hal_intr_clear(void)
 {
-  // Clear the interrupt
-  return;
+    // Clear the interrupt
+    return;
 }
 
 /*===================================================*/
@@ -103,9 +102,9 @@ void rsi_hal_intr_clear(void)
 uint8_t rsi_hal_intr_pin_status(void)
 {
 
-  volatile uint8_t status = 0;
+    volatile uint8_t status = 0;
 
-  // Return interrupt pin  status(high(1) /low (0))
+    // Return interrupt pin  status(high(1) /low (0))
 
-  return status;
+    return status;
 }

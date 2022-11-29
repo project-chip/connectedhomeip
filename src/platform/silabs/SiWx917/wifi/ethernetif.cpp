@@ -21,7 +21,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #ifndef WF200_WIFI
 #include "FreeRTOS.h"
 #include "event_groups.h"
@@ -177,7 +176,6 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
     }
 }
 
-
 static SemaphoreHandle_t ethout_sem;
 /*****************************************************************************
  *  @fn  static err_t low_level_output(struct netif *netif, struct pbuf *p)
@@ -282,7 +280,6 @@ void wfx_host_received_sta_frame_cb(uint8_t * buf, int len)
         low_level_input(ifp, buf, len);
     }
 }
-
 
 /*****************************************************************************
  *  @fn  err_t sta_ethernetif_init(struct netif *netif)
