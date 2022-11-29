@@ -21,6 +21,8 @@ from pathlib import Path
 import sys
 import subprocess
 import logging
+import multiprocessing
+
 from dataclasses import dataclass
 
 CHIP_ROOT_DIR = os.path.realpath(
@@ -113,6 +115,11 @@ def setupArgumentsParser():
                         help="Don't do any generation, just log what targets would be generated (default: False)")
     parser.add_argument('--run-bootstrap', default=None, action='store_true',
                         help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
+
+    parser.add_argument('--parallel', action='store_true')
+    parser.add_argument('--no-parallel', action='store_false', dest='parallel')
+    parser.set_defaults(parallel=True)
+
     return parser.parse_args()
 
 
@@ -253,6 +260,14 @@ def getTargets(type, test_target):
     return targets
 
 
+def _ParallelGenerateOne(target):
+    """
+    Helper method to be passed to multiprocessing parallel generation of
+    items.
+    """
+    target.generate()
+
+
 def main():
     logging.basicConfig(
         level=logging.INFO,
@@ -269,8 +284,15 @@ def main():
         if args.run_bootstrap:
             subprocess.check_call(os.path.join(CHIP_ROOT_DIR, "scripts/tools/zap/zap_bootstrap.sh"), shell=True)
 
-        for target in targets:
-            target.generate()
+        if args.parallel:
+            # Ensure each zap run is independent
+            os.environ['ZAP_TEMPSTATE'] = '1'
+            with multiprocessing.Pool() as pool:
+                for _ in pool.imap_unordered(_ParallelGenerateOne, targets):
+                    pass
+        else:
+            for target in targets:
+                target.generate()
 
 
 if __name__ == '__main__':
