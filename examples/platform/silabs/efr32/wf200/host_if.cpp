@@ -550,7 +550,7 @@ static void wfx_events_task(void * p_arg)
                 if (!is_commissioned)
                 {
                     SILABS_LOG("%s: First commissioning, retry after %d sec", __func__, (WLAN_RETRY_TIMER / WLAN_MIN_RETRY_TIMER));
-                    if(retryJoin < MAX_JOIN_RETRIES_COUNT)
+                    if (retryJoin < MAX_JOIN_RETRIES_COUNT)
                         vTaskDelay(WLAN_RETRY_TIMER);
                 }
                 else
@@ -564,7 +564,8 @@ static void wfx_events_task(void * p_arg)
                         SILABS_LOG("%s: Next attempt after %d Seconds", __func__, (WLAN_MAX_RETRY_TIMER / WLAN_MIN_RETRY_TIMER));
                     }
 
-                    vTaskDelay(retryInterval < WLAN_MAX_RETRY_TIMER ? pdMS_TO_TICKS(retryInterval) : pdMS_TO_TICKS(retryInterval = WLAN_MAX_RETRY_TIMER));
+                    vTaskDelay(retryInterval < WLAN_MAX_RETRY_TIMER ? pdMS_TO_TICKS(retryInterval)
+                                                                    : pdMS_TO_TICKS(retryInterval = WLAN_MAX_RETRY_TIMER));
                     retryInterval += retryInterval;
                 }
                 SILABS_LOG("WFX sending the connect command");

@@ -221,7 +221,8 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
                 WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (WLAN_MAX_RETRY_TIMER / WLAN_MIN_RETRY_TIMER));
             }
 
-            vTaskDelay(retryInterval < WLAN_MAX_RETRY_TIMER ? pdMS_TO_TICKS(retryInterval) : pdMS_TO_TICKS(retryInterval = WLAN_MAX_RETRY_TIMER));
+            vTaskDelay(retryInterval < WLAN_MAX_RETRY_TIMER ? pdMS_TO_TICKS(retryInterval)
+                                                            : pdMS_TO_TICKS(retryInterval = WLAN_MAX_RETRY_TIMER));
             retryInterval += retryInterval;
             xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
         }
@@ -516,7 +517,7 @@ static void wfx_rsi_do_join(void)
                 wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
                 WFX_RSI_LOG("%s: rsi_wlan_connect_async failed with status: %02x on try %d", __func__, status,
                             wfx_rsi.join_retries);
-                
+
                 if (!is_commissioned) // At comissioning time
                 {
                     WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (WLAN_RETRY_TIMER / WLAN_MIN_RETRY_TIMER));
@@ -533,7 +534,8 @@ static void wfx_rsi_do_join(void)
                         WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (WLAN_MAX_RETRY_TIMER / WLAN_MIN_RETRY_TIMER));
                     }
 
-                    vTaskDelay(retryInterval < WLAN_MAX_RETRY_TIMER ? pdMS_TO_TICKS(retryInterval) : pdMS_TO_TICKS(retryInterval = WLAN_MAX_RETRY_TIMER));
+                    vTaskDelay(retryInterval < WLAN_MAX_RETRY_TIMER ? pdMS_TO_TICKS(retryInterval)
+                                                                    : pdMS_TO_TICKS(retryInterval = WLAN_MAX_RETRY_TIMER));
                     retryInterval += retryInterval;
                 }
                 wfx_rsi.join_retries++;
