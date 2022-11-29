@@ -58,7 +58,7 @@
 	path = third_party/freertos/repo
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
 	branch  = V10.3.1-kernel-only
-	platforms = ameba,cc13x2_26x2,bl602,efr32,esp32,k32w0,infineon,qpg
+	platforms = ameba,cc13x2_26x2,bouffalolab,efr32,esp32,k32w0,infineon,qpg
 [submodule "simw-top-mini"]
 	path = third_party/simw-top-mini/repo
 	url = https://github.com/NXP/plug-and-trust.git
@@ -264,11 +264,6 @@
 [submodule "third_party/boringssl/repo/src"]
 	path = third_party/boringssl/repo/src
 	url = https://github.com/google/boringssl.git
-[submodule "boufalolab_repo"]
-	path = third_party/bouffalolab/repo
-	url = https://github.com/bouffalolab/bl_iot_sdk.git
-	branch = master
-	platforms = bouffalolab,bl602
 [submodule "third_party/mt793x_sdk/filogic"]
 	path = third_party/mt793x_sdk/filogic
 	url = https://github.com/MediaTek-Labs/genio-matter-bsp.git
@@ -293,4 +288,9 @@
 	path = third_party/open-iot-sdk/storage
 	url = https://git.gitlab.arm.com/iot/open-iot-sdk/storage.git
 	branch = main
-    platforms = openiotsdk
+	platforms = openiotsdk
+[submodule "bouffalolab_sdk"]
+	path = third_party/bouffalolab/repo
+	url = https://github.com/bouffalolab/bl_iot_sdk_tiny.git
+        branch = main
+        platforms = bouffalolab
