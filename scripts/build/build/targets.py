@@ -207,7 +207,20 @@ def BuildEfr32Target():
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('with-ota-requestor', enable_ota_requestor=True)
     target.AppendModifier('sed', enable_sed=True)
-    target.AppendModifier('low-power', enable_low_power=True)
+    target.AppendModifier('low-power', enable_low_power=True).OnlyIfRe('-sed')
+    target.AppendModifier('shell', chip_build_libshell=True)
+    target.AppendModifier('no_logging', chip_logging=False)
+    target.AppendModifier('openthread_mtd', chip_openthread_ftd=False)
+    target.AppendModifier('enable_heap_monitoring', enable_heap_monitoring=True)
+    target.AppendModifier('no_openthread_cli', enable_openthread_cli=False)
+    target.AppendModifier('show_qr_code', show_qr_code=True).ExceptIfRe('-low-power')
+    target.AppendModifier('wifi', enable_wifi=True)
+    target.AppendModifier('rs911x', enable_rs911x=True).OnlyIfRe('-wifi')
+    target.AppendModifier('wf200', enable_wf200=True).OnlyIfRe('-wifi')
+    target.AppendModifier('wifi_ipv4', enable_wifi_ipv4=True).OnlyIfRe('-wifi')
+    target.AppendModifier('additional_data_advertising', enable_additional_data_advertising=True)
+    target.AppendModifier('use_ot_lib', enable_ot_lib=True).ExceptIfRe('-(wifi|use_ot_coap_lib)')
+    target.AppendModifier('use_ot_coap_lib', enable_ot_coap_lib=True).ExceptIfRe('-(wifi|use_ot_lib)')
 
     return target
 
@@ -536,4 +549,6 @@ BUILD_TARGETS = [
     BuildQorvoTarget(),
     BuildTizenTarget(),
     BuildTelinkTarget(),
+
+
 ]
