@@ -81,7 +81,7 @@ static_library("Darwin") {
     ]
   }
 
-  if (chip_disable_platform_kvs == false) {
+  if (!chip_disable_platform_kvs) {
     sources += [
       "DeviceInstanceInfoProviderImpl.cpp",
       "DeviceInstanceInfoProviderImpl.h",

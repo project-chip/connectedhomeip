@@ -57,7 +57,7 @@ if (chip_system_config_locking == "") {
     chip_system_config_locking = "freertos"
   } else if (current_os == "mbed") {
     chip_system_config_locking = "mbed"
-  } else if (chip_system_config_use_dispatch == false) {
+  } else if (!chip_system_config_use_dispatch) {
     chip_system_config_locking = "posix"
   } else {
     chip_system_config_locking = "none"
