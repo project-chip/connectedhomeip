@@ -17,6 +17,24 @@ import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
+static_library("helpers") {
+  include_dirs = [
+    "mock"
+  ]
+
+  sources = [
+    "ClusterTestContext.h",
+    "UnifyBridgeContext.cpp",
+    "UnifyBridgeContext.h",
+  ]
+
+  deps = [
+    "//:unify-matter-bridge-lib",
+    "${chip_root}/src/app/tests:helpers",
+    "${nlunit_test_root}:nlunit-test",
+  ]
+}
+
 chip_test_suite("tests") {
   output_name = "unifyMatterBridgeTests"
 
@@ -29,16 +47,18 @@ chip_test_suite("tests") {
     # "TestClusterTranslator.cpp",
     "TestDeviceMapper.cpp",
     "TestExample.cpp",
+    "TestLevelControl.cpp",
     "TestNodeStateMonitor.cpp",
+    "TestOnOff.cpp",
     "TestOnOffCommandsHandler.cpp",
     "TestTemperatureMeasurement.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
 
-
   public_deps = [
     "//:unify-matter-bridge-lib",
+    ":helpers",
     "${chip_root}/src/lib/support:testing",
     "${nlunit_test_root}:nlunit-test",
   ]
