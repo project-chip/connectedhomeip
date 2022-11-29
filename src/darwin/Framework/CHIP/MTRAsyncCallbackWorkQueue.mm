@@ -59,8 +59,15 @@
         _context = context;
         _queue = queue;
         _items = [NSMutableArray array];
+        MTR_LOG_INFO("MTRAsyncCallbackWorkQueue init for context %@", context);
     }
     return self;
+}
+
+- (NSString *)description
+{
+    return [NSString
+        stringWithFormat:@"MTRAsyncCallbackWorkQueue context: %@ items count: %lu", self.context, (unsigned long) self.items.count];
 }
 
 - (void)enqueueWorkItem:(MTRAsyncCallbackQueueWorkItem *)item
@@ -80,6 +87,8 @@
     _items = nil;
     os_unfair_lock_unlock(&_lock);
 
+    MTR_LOG_INFO(
+        "MTRAsyncCallbackWorkQueue invalidate for context %@ items count: %lu", _context, (unsigned long) invalidateItems.count);
     for (MTRAsyncCallbackQueueWorkItem * item in invalidateItems) {
         [item cancel];
     }
@@ -94,7 +103,7 @@
     if (!self.runningWorkItemCount) {
         // something is wrong with state - nothing is currently running
         os_unfair_lock_unlock(&_lock);
-        MTR_LOG_ERROR("endWork: no work is running on work queue");
+        MTR_LOG_ERROR("MTRAsyncCallbackWorkQueue endWork: no work is running on work queue");
         return;
     }
 
@@ -104,7 +113,7 @@
     if (firstWorkItem != workItem) {
         // something is wrong with this work item - should not be currently running
         os_unfair_lock_unlock(&_lock);
-        MTR_LOG_ERROR("endWork: work item is not first on work queue");
+        MTR_LOG_ERROR("MTRAsyncCallbackWorkQueue endWork: work item is not first on work queue");
         return;
     }
 
@@ -138,11 +147,14 @@
         return;
     }
 
-    // when "concurrency width" is implemented this will be incremented instead
-    self.runningWorkItemCount = 1;
+    // only proceed to mark queue as running if there are items to run
+    if (self.items.count) {
+        // when "concurrency width" is implemented this will be incremented instead
+        self.runningWorkItemCount = 1;
 
-    MTRAsyncCallbackQueueWorkItem * workItem = self.items.firstObject;
-    [workItem callReadyHandlerWithContext:self.context];
+        MTRAsyncCallbackQueueWorkItem * workItem = self.items.firstObject;
+        [workItem callReadyHandlerWithContext:self.context];
+    }
 }
 @end
 
