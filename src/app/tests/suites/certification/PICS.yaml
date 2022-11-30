@@ -4588,14 +4588,14 @@ PICS:
 
     - label: "Does the DUT(server) support the ReachableChanged event?"
       id: BINFO.S.E03
-    
+
     #Features
     - label: "Does the device implement the Wi-Fi related features ?"
       id: CNET.S.F00
-    
+
     - label: "Does the device implement the Thread related features"
       id: CNET.S.F01
-    
+
     - label: "Does the device implement the Ethernet related features ?"
       id: CNET.S.F02
 
