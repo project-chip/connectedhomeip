@@ -48,24 +48,6 @@
 
 #include <algorithm>
 
-#ifdef CONFIG_CHIP_LIB_SHELL
-#include <zephyr/shell/shell.h>
-
-static int cmd_telink_factoryreset(const struct shell * shell, size_t argc, char ** argv)
-{
-    ARG_UNUSED(argc);
-    ARG_UNUSED(argv);
-
-    shell_print(shell, "Performing factoryreset ...");
-    chip::Server::GetInstance().ScheduleFactoryReset();
-    return 0;
-}
-
-SHELL_STATIC_SUBCMD_SET_CREATE(sub_demo, SHELL_CMD(factoryreset, NULL, "Reset NVS partition command.", cmd_telink_factoryreset),
-                               SHELL_SUBCMD_SET_END);
-SHELL_CMD_REGISTER(matter, &sub_demo, "Telink Matter commands", NULL);
-#endif
-
 LOG_MODULE_DECLARE(app);
 
 using namespace ::chip;
