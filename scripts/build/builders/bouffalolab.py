@@ -88,6 +88,8 @@ class BouffalolabBuilder(GnBuilder):
         if enable_rpcs:
             self.argsOpt.append('import("//with_pw_rpc.gni")')
 
+        self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])
+
     def GnBuildArgs(self):
         return self.argsOpt
 

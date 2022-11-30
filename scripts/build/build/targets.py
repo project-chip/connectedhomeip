@@ -618,7 +618,8 @@ def TizenTargets():
 def Bl602Targets():
     target = Target('bl602', Bl602Builder)
 
-    yield target.Extend('light', board=Bl602Board.BL602BOARD, app=Bl602App.LIGHT)
+    yield target.Extend('light', board=Bl602Board.BL602BOARD, app=Bl602App.LIGHT, baudrate=115200)
+    yield target.Extend('light-2m-uart', board=Bl602Board.BL602BOARD, app=Bl602App.LIGHT, baudrate=2000000)
 
 
 def BouffalolabTargets():

@@ -43,6 +43,8 @@ declare_args() {
 
   # OTA periodic query timeout in seconds
   ota_periodic_query_timeout = 86400
+
+  baudrate = 115200
 }
 
 show_qr_code = false
@@ -68,8 +70,8 @@ bl602_sdk("sdk") {
     "CONFIG_PSM_EASYFLASH_SIZE=16384",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
     "OTA_PERIODIC_QUERY_TIMEOUT=${ota_periodic_query_timeout}",
+    "UART_BAUDRATE=${baudrate}",
   ]
-
   if (chip_enable_pw_rpc) {
     defines += [ "PW_RPC_ENABLED" ]
   }
@@ -112,6 +114,8 @@ bl602_executable("lighting_app") {
   } else {
     defines = [ "BOARD_ID=1" ]
   }
+
+  defines += [ "UART_BAUDRATE=${baudrate}" ]
 
   if (show_qr_code) {
     sources += [ "${examples_plat_dir}/display/lcd.c" ]
