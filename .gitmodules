@@ -268,11 +268,6 @@
 [submodule "third_party/boringssl/repo/src"]
 	path = third_party/boringssl/repo/src
 	url = https://github.com/google/boringssl.git
-[submodule "boufalolab_repo"]
-	path = third_party/bouffalolab/repo
-	url = https://github.com/bouffalolab/bl_iot_sdk.git
-	branch = master
-	platforms = bouffalolab,bl602
 [submodule "third_party/mt793x_sdk/filogic"]
 	path = third_party/mt793x_sdk/filogic
 	url = https://github.com/MediaTek-Labs/genio-matter-bsp.git
@@ -288,3 +283,6 @@
 	url = https://github.com/matter-mtk/genio-matter-lwip.git
 	branch = main
 	platforms = genio
+[submodule "bouffalolab_sdk"]
+	path = third_party/bouffalolab/repo
+	url = https://github.com/bouffalolab/bl_iot_sdk_tiny.git
