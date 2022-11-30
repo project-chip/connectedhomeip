@@ -1084,20 +1084,6 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         return;
     }
 
-    // if the OnOff feature is not supported, the effect on LevelControl is ignored
-    if (!HasFeature(endpoint, chip::app::Clusters::LevelControl::LevelControlFeature::kOnOff))
-    {
-        emberAfLevelControlClusterPrintln("OnOff feature not supported, ignore LevelControlEffect");
-        if (!newValue)
-        {
-            // OnOff server expects LevelControl to handle the OnOff attribute change,
-            // when going to off state. The attribute is set directly rather
-            // than using setOnOff function to avoid misleading comments in log.
-            OnOff::Attributes::OnOff::Set(endpoint, OnOff::Commands::Off::Id);
-        }
-        return;
-    }
-
     uint8_t minimumLevelAllowedForTheDevice = state->minLevel;
 
     // "Temporarily store CurrentLevel."
@@ -1312,7 +1298,7 @@ static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoin
 
 void emberAfPluginLevelControlClusterServerPostInitCallback(EndpointId endpoint) {}
 
-bool HasFeature(chip::EndpointId endpoint, chip::app::Clusters::LevelControl::LevelControlFeature feature)
+bool LevelControlHasFeature(EndpointId endpoint, LevelControlFeature feature)
 {
     bool success;
     uint32_t featureMap;
