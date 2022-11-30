@@ -26,7 +26,7 @@
 /****************************************************************************
  * @fn  void spi_drv_reinit()
  * @brief
- *     Re-Intializes SPI driver to required baudrate 
+ *     Re-Intializes SPI driver to required baudrate
  * @param[in] None
  * @return returns void
  *****************************************************************************/
@@ -47,7 +47,7 @@ void spi_drv_reinit(uint32_t baudrate)
 /****************************************************************************
  * @fn  void set_spi_baudrate()
  * @brief
- *     Setting the appropriate SPI baudrate 
+ *     Setting the appropriate SPI baudrate
  * @param[in] None
  * @return returns void
  *****************************************************************************/
@@ -118,7 +118,7 @@ void pre_bootloader_spi_transfer(void)
 /****************************************************************************
  * @fn  void post_bootloader_spi_transfer()
  * @brief
- *     De-Assert EXT SPI flash CS pin and release semaphore 
+ *     De-Assert EXT SPI flash CS pin and release semaphore
  * @param[in] None
  * @return returns void
  *****************************************************************************/

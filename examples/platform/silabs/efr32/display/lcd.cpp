@@ -134,7 +134,7 @@ int SilabsLCD::Update(void)
     #if (defined(EFR32MG24) && defined(WF200_WIFI))
     post_lcd_spi_transfer();
     #endif
-    /* 
+    /*
      * TO-DO; Above logic can be optimised by writing a common API
      */
     return status;
