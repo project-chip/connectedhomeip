@@ -409,7 +409,8 @@ private:
                                                   attributeID:(NSNumber *)attributeID
                                                        params:(MTRReadParams *)params
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice read %@ %@ %@", endpointID, clusterID, attributeID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice read %u %@ %@ %@", _deviceController.fabricIndex, endpointID, clusterID, attributeID];
     // Create work item, set ready handler to perform task, then enqueue the work
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:_queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
@@ -460,7 +461,8 @@ private:
                expectedValueInterval:(NSNumber *)expectedValueInterval
                    timedWriteTimeout:(NSNumber * _Nullable)timeout
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice write %@ %@ %@", endpointID, clusterID, attributeID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice write %u %@ %@ %@", _deviceController.fabricIndex, endpointID, clusterID, attributeID];
     if (timeout) {
         timeout = MTRClampedNumber(timeout, @(1), @(UINT16_MAX));
     }
@@ -504,7 +506,8 @@ private:
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %@ %@ %@", endpointID, clusterID, commandID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %@ %@ %@", _deviceController.fabricIndex, endpointID, clusterID, commandID];
     if (timeout) {
         timeout = MTRClampedNumber(timeout, @(1), @(UINT16_MAX));
     }
