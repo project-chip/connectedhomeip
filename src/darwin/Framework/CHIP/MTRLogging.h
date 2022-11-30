@@ -26,7 +26,7 @@ typedef NS_ENUM(NSInteger, MTRLogType) {
     MTRLogTypeDetail = 3,
 };
 
-typedef void (^MTRLogCallback)(MTRLogType type, NSString * component, NSString * message);
+typedef void (^MTRLogCallback)(MTRLogType type, NSString * moduleName, NSString * message);
 
 /**
  * Arranges for log messages from the Matter stack to be delivered to a callback block.
@@ -34,7 +34,9 @@ typedef void (^MTRLogCallback)(MTRLogType type, NSString * component, NSString *
  * @param logTypeThreshold only messages up to (and including) the specified log type will be delivered
  * @param callback the block to call, or nil to disable the log callback.
  *
- * Note: The callback block may be called concurrently and/or from arbitrary threads.
+ * The callback block may be called concurrently and/or from arbitrary threads.
+ * It SHALL NOT call back directly or indirectly into any Matter APIs,
+ * nor block the calling thread for a non-trivial amount of time.
  */
 MTR_EXTERN MTR_NEWLY_AVAILABLE void MTRSetLogCallback(MTRLogType logTypeThreshold, MTRLogCallback _Nullable callback);
 

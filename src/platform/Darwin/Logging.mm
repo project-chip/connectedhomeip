@@ -55,7 +55,7 @@ namespace Logging {
             if (os_log_type_enabled(logger, type)) {
                 auto size = span.size();
                 auto data = span.data();
-                NSMutableString * string = [[NSMutableString alloc] initWithCapacity:(size * 5 + size / 8)];
+                NSMutableString * string = [[NSMutableString alloc] initWithCapacity:(size * 6)]; // 6 characters per byte
                 for (size_t i = 0; i < size; i++) {
                     [string appendFormat:((i % 8 != 7) ? @"0x%02x, " : @"0x%02x,\n"), data[i]];
                 }

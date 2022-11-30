@@ -33,7 +33,7 @@ static_assert(MTRLogTypeDetail == (NSInteger) kLogCategory_Detail, "MTRLogType* 
 static os_unfair_lock logCallbackLock = OS_UNFAIR_LOCK_INIT;
 static MTRLogCallback logCallback = nil;
 
-static void MTRLogCallbackTrampoline(const char * component, uint8_t category, const char * format, va_list args)
+static void MTRLogCallbackTrampoline(const char * moduleName, uint8_t category, const char * format, va_list args)
 {
     os_unfair_lock_lock(&logCallbackLock);
     MTRLogCallback callback = logCallback;
@@ -49,7 +49,7 @@ static void MTRLogCallbackTrampoline(const char * component, uint8_t category, c
 #pragma clang diagnostic pop
 
     auto type = std::min(static_cast<MTRLogType>(category), MTRLogTypeDetail); // hide kLogCategory_Automation
-    callback(type, @(component), message);
+    callback(type, @(moduleName), message);
 }
 
 void MTRSetLogCallback(MTRLogType logTypeThreshold, MTRLogCallback _Nullable callback)
