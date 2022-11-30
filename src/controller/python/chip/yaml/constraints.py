@@ -112,7 +112,7 @@ class _ConstraintMinValue(_LoadableConstraint):
         super().__init__(min_value, field_type, variable_storage, config_values)
 
     def is_met(self, response) -> bool:
-        # Codegen c++ code will automatically pass min value check is response is NullValue
+        # Codegen c++ code will automatically pass min value check if response is NullValue
         if response == NullValue:
             return True
         min_value = self.get_value()
@@ -125,7 +125,7 @@ class _ConstraintMaxValue(_LoadableConstraint):
         super().__init__(max_value, field_type, variable_storage, config_values)
 
     def is_met(self, response) -> bool:
-        # Codegen c++ code will automatically pass max value check is response is NullValue
+        # Codegen c++ code will automatically pass max value check if response is NullValue
         if response == NullValue:
             return True
         max_value = self.get_value()
