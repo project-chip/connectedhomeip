@@ -38,7 +38,7 @@ import chip.yaml
     default=0x12344321,
     help='Node ID to use when commissioning device')
 def main(setup_code, yaml_path, node_id):
-    exit(-1)
+    # Setting up python enviroment for running YAML CI tests using python parser.
     chip_stack_storage = tempfile.NamedTemporaryFile()
     chip.native.Init()
     chip_stack = ChipStack(chip_stack_storage.name)
@@ -53,11 +53,16 @@ def main(setup_code, yaml_path, node_id):
 
     ca_list = certificate_authority_manager.activeCaList
 
+    # Creating and commissioning to a single controller to match what is currently done when
+    # running.
     devCtrl = ca_list[0].adminList[0].NewController()
     devCtrl.CommissionWithCode(setup_code, node_id)
 
+    # Parsing and executing test.
     parsed_test = chip.yaml.parser.YamlTestParser(yaml_path)
     parsed_test.execute_tests(devCtrl)
+
+    # Tearing down chip stack. If not done in the correct order test will fail.
     certificate_authority_manager.Shutdown()
     chip_stack.Shutdown()
 
