@@ -117,7 +117,11 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         }
         else
         {
+#if defined(__GNUC__) && (__GNUC__ >= 12) // -Werror=dangling-pointer= observed with GNU 12.1.0
+            ChipLogError(Controller, "Country code is too large");
+#else
             ChipLogError(Controller, "Country code is too large: %u", static_cast<unsigned>(code.size()));
+#endif
         }
     }
 

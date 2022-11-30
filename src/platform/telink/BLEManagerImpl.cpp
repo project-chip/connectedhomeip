@@ -262,7 +262,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     if (!BLERadioInitialized) {
     	/* Block IEEE802154 */
     	/* @todo: move to RadioSwitch module*/
-    	const struct device * radio_dev = device_get_binding(CONFIG_NET_CONFIG_IEEE802154_DEV_NAME);
+    	const struct device * radio_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_ieee802154));
     	__ASSERT(radio_dev != NULL, "Fail to get radio device");
     	b91_deinit(radio_dev);
 
@@ -952,7 +952,7 @@ void BLEManagerImpl::SwitchToIeee802154(void)
     // irq_disable(IRQ1_SYSTIMER);
     BLERadioInitialized = false;
 
-    const struct device * radio_dev = device_get_binding(CONFIG_NET_CONFIG_IEEE802154_DEV_NAME);
+    const struct device * radio_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_ieee802154));
     __ASSERT(radio_dev != NULL, "Fail to get radio device");
 
     /* Init IEEE802154 */
