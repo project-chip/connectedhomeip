@@ -26,6 +26,7 @@ static_library("helpers") {
     "ClusterTestContext.h",
     "UnifyBridgeContext.cpp",
     "UnifyBridgeContext.h",
+    "TestGroupCommandTranslatorHelper.h",
   ]
 
   deps = [
@@ -48,6 +49,8 @@ chip_test_suite("tests") {
     "TestDeviceMapper.cpp",
     "TestExample.cpp",
     "TestLevelControl.cpp",
+    "TestGroupTranslator.cpp",
+    "TestGroupCommandTranslator.cpp",
     "TestNodeStateMonitor.cpp",
     "TestOnOff.cpp",
     "TestOnOffCommandsHandler.cpp",

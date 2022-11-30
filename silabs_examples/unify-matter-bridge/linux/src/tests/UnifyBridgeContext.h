@@ -25,6 +25,7 @@
 #include <app/tests/AppTestContext.h>
 
 // Mocks
+#include "MockGroupTranslator.hpp"
 #include "MockNodeStateMonitor.hpp"
 #include "MockUnifyMqtt.hpp"
 
@@ -46,7 +47,9 @@ class UnifyBridgeContext : public chip::Test::AppContext
     typedef chip::Test::AppContext Super;
 
 public:
-    UnifyBridgeContext() : mMqttHandler(), mNodeStateMonitor(mDeviceTranslator, mEmberInterface) {}
+    UnifyBridgeContext() :
+        mMqttHandler(), mNodeStateMonitor(mDeviceTranslator, mEmberInterface), mGroupTranslator(m_matter_data_storage)
+    {}
 
     /// Initialize the underlying layers.
     CHIP_ERROR Init() override;
@@ -56,8 +59,10 @@ public:
 
     UnifyEmberInterface mEmberInterface;
     device_translator mDeviceTranslator;
+    matter_data_storage m_matter_data_storage;
     Test::MockUnifyMqtt mMqttHandler;
     Test::MockNodeStateMonitor mNodeStateMonitor;
+    Test::MockGroupTranslator mGroupTranslator;
 };
 
 } // namespace Test

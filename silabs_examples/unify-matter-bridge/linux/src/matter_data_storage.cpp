@@ -27,7 +27,6 @@ matter_data_storage & matter_data_storage::instance()
 }
 
 // Persist the assigned dynamic endpoint mapping
-template <>
 bool matter_data_storage::persist_data(endpoint_mapping & key_value)
 {
     if (!key_value.matter_endpoint.has_value())
@@ -45,7 +44,6 @@ bool matter_data_storage::persist_data(endpoint_mapping & key_value)
 }
 
 // Persist the group mapping
-template <>
 bool matter_data_storage::persist_data(group_mapping & key_value)
 {
     if (!key_value.unify_group_id.has_value())
@@ -53,7 +51,8 @@ bool matter_data_storage::persist_data(group_mapping & key_value)
         sl_log_info(LOG_TAG, "The unify group id is not provided");
         return false;
     }
-    std::string key = std::to_string(key_value.matter_group_id);
+    // The key value is the matter fabric idex and group id (i.e., fabric_index-group_id)
+    std::string key = std::to_string(key_value.fabric_index) + "-" + std::to_string(key_value.matter_group_id);
     if (chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Put(key.c_str(), key_value.unify_group_id.value()) ==
         CHIP_NO_ERROR)
     {
@@ -63,7 +62,6 @@ bool matter_data_storage::persist_data(group_mapping & key_value)
 }
 
 // Get the persisted dynamic endpoint
-template <>
 bool matter_data_storage::get_persisted_data(endpoint_mapping & key_value)
 {
     std::string key = std::string(key_value.unify_unid) + "-" + std::to_string(key_value.unify_endpoint);
@@ -77,10 +75,10 @@ bool matter_data_storage::get_persisted_data(endpoint_mapping & key_value)
 }
 
 // Get the persisted group mapping
-template <>
 bool matter_data_storage::get_persisted_data(group_mapping & key_value)
 {
-    std::string key = std::to_string(key_value.matter_group_id);
+    // The key value is the matter fabric idex and group id (i.e., fabric_index-group_id)
+    std::string key = std::to_string(key_value.fabric_index) + "-" + std::to_string(key_value.matter_group_id);
     uint16_t unify_group_id;
     if (chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Get(key.c_str(), &unify_group_id) == CHIP_NO_ERROR)
     {
@@ -102,7 +100,8 @@ void matter_data_storage::remove_persisted_data(endpoint_mapping & key)
 template <>
 void matter_data_storage::remove_persisted_data(group_mapping & key)
 {
-    std::string keys = std::to_string(key.matter_group_id);
+    // The key value is the matter fabric idex and group id (i.e., fabric_index-group_id)
+    std::string keys = std::to_string(key.fabric_index) + "-" + std::to_string(key.matter_group_id);
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Delete(keys.c_str());
 }
 

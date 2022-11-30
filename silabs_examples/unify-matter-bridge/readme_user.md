@@ -160,14 +160,6 @@ chip-tool groupsettings add-keysets 0x0042 0 0x000000000021dfe0 hex:d0d1d2d3d4d5
 chip-tool groupsettings bind-keyset 0x0001 0x0042
 ```
 
-As Matter is based on IPv6 and the group message will be sent as a multicast message, a multicast route must be set up 
-to tell the Linux kernel what interface to send the
-group message to.
-
-```bash
-sudo route add -6 ff35:40:fd00::/24 dev eth0
-```
-
 Finally, a multicast command may be sent using the chip-tool.
 
 ```bash

@@ -27,11 +27,19 @@ namespace unify::matter_bridge {
 class GroupClusterCommandHandler : public command_translator_interface
 {
 public:
-    GroupClusterCommandHandler(const matter_node_state_monitor & node_state_monitor, UnifyMqtt &unify_mqtt) :
-        command_translator_interface(node_state_monitor, chip::app::Clusters::Groups::Id, "Groups", unify_mqtt)
-    {}
+    GroupClusterCommandHandler(const matter_node_state_monitor & node_state_monitor, UnifyMqtt & unify_mqtt,
+                               group_translator & group_translator) :
+        command_translator_interface(node_state_monitor, chip::app::Clusters::Groups::Id, "Groups", unify_mqtt, group_translator),
+        m_group_translator(group_translator)
+    {
+        group_translator.register_unify_group_mqtt_message();
+    }
     // CommandHandlerInterface
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext) override;
+
+private:
+    void RemoveAllGroups(chip::FabricIndex fabric_index);
+    group_translator &m_group_translator;
 };
 
 } // namespace unify::matter_bridge

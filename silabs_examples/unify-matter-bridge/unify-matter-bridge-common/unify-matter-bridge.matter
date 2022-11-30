@@ -50,6 +50,65 @@ server cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
+server cluster Groups = 4 {
+  bitmap GroupClusterFeature : BITMAP32 {
+    kGroupNames = 0x1;
+  }
+
+  readonly attribute bitmap8 nameSupport = 0;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AddGroupRequest {
+    group_id groupId = 0;
+    CHAR_STRING groupName = 1;
+  }
+
+  request struct ViewGroupRequest {
+    group_id groupId = 0;
+  }
+
+  request struct GetGroupMembershipRequest {
+    group_id groupList[] = 0;
+  }
+
+  request struct RemoveGroupRequest {
+    group_id groupId = 0;
+  }
+
+  request struct AddGroupIfIdentifyingRequest {
+    group_id groupId = 0;
+    CHAR_STRING groupName = 1;
+  }
+
+  response struct AddGroupResponse = 0 {
+    ENUM8 status = 0;
+    group_id groupId = 1;
+  }
+
+  response struct ViewGroupResponse = 1 {
+    ENUM8 status = 0;
+    group_id groupId = 1;
+    CHAR_STRING groupName = 2;
+  }
+
+  response struct GetGroupMembershipResponse = 2 {
+    nullable INT8U capacity = 0;
+    group_id groupList[] = 1;
+  }
+
+  response struct RemoveGroupResponse = 3 {
+    ENUM8 status = 0;
+    group_id groupId = 1;
+  }
+
+  fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
+  fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
+  fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
+  fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
+  fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
+  fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
+}
+
 server cluster Descriptor = 29 {
   struct DeviceTypeStruct {
     devtype_id type = 0;
@@ -1161,6 +1220,11 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 2;
+  }
+
+  server cluster Groups {
+    ram      attribute nameSupport;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster Descriptor {

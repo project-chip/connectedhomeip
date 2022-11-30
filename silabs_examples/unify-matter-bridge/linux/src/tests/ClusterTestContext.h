@@ -66,7 +66,7 @@ public:
             ctx->mAttributeHandler.emplace(ctx->mNodeStateMonitor, ctx->mMqttHandler);
 
         if (!ctx->mCommandHandler)
-            ctx->mCommandHandler.emplace(ctx->mNodeStateMonitor, ctx->mMqttHandler);
+            ctx->mCommandHandler.emplace(ctx->mNodeStateMonitor, ctx->mMqttHandler, ctx->mGroupTranslator);
 
         return SUCCESS;
     }

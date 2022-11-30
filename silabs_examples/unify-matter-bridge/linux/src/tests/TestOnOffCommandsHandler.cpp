@@ -7,6 +7,7 @@
 #include <lib/support/UnitTestRegistration.h>
 
 // Mocks
+#include "MockMatterDataStorage.hpp"
 #include "MockNodeStateMonitor.hpp"
 #include "MockUnifyMqtt.hpp"
 
@@ -40,7 +41,9 @@ void TestOnOffClusterCommandHandler(nlTestSuite * inSuite, void * aContext)
     // Execute command ON with onoff device
     Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator, ember_interface);
     Test::MockUnifyMqtt mqtt_publish_test;
-    OnOffClusterCommandHandler on_cmd_handler(test_matter_node_state_monitor, mqtt_publish_test);
+    Test::MockMatterDataStorage mock_data_storage;
+    group_translator test_group_translator(mock_data_storage);
+    OnOffClusterCommandHandler on_cmd_handler(test_matter_node_state_monitor, mqtt_publish_test, test_group_translator);
 
     // Create a node with cluster endpoints resembling On/Off.
     const std::string node_id = "zw-0x0002";

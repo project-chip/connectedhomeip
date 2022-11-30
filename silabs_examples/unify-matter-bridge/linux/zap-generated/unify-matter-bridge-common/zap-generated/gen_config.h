@@ -30,6 +30,7 @@
 
 /**** Cluster endpoint counts ****/
 #define EMBER_AF_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_GROUPS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_DESCRIPTOR_CLUSTER_SERVER_ENDPOINT_COUNT (2)
 #define EMBER_AF_BINDING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_BINDING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
@@ -57,6 +58,11 @@
 #define ZCL_USING_IDENTIFY_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_IDENTIFY_SERVER
 #define EMBER_AF_PLUGIN_IDENTIFY
+
+// Use this macro to check if the server side of the Groups cluster is included
+#define ZCL_USING_GROUPS_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_GROUPS_SERVER
+#define EMBER_AF_PLUGIN_GROUPS
 
 // Use this macro to check if the server side of the Descriptor cluster is included
 #define ZCL_USING_DESCRIPTOR_CLUSTER_SERVER

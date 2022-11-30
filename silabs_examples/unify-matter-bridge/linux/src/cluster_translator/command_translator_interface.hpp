@@ -34,9 +34,9 @@ class command_translator_interface : public chip::app::CommandHandlerInterface
 {
 public:
     command_translator_interface(const matter_node_state_monitor & node_state_monitor, chip::ClusterId id, const char * name,
-                                 UnifyMqtt & unify_mqtt) :
+                                 UnifyMqtt & unify_mqtt, group_translator & group_translator) :
         chip::app::CommandHandlerInterface(chip::Optional<chip::EndpointId>::Missing(), id),
-        m_node_state_monitor(node_state_monitor), cluster_name(name), m_unify_mqtt(unify_mqtt)
+        m_node_state_monitor(node_state_monitor), cluster_name(name), m_unify_mqtt(unify_mqtt), m_group_translator(group_translator)
     {
         chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this);
     }
@@ -67,7 +67,8 @@ public:
             {
                 auto matter_group_id =
                     ctxt.mCommandHandler.GetExchangeContext()->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
-                auto unify_group_id = group_translator::instance().get_unify_group({ matter_group_id });
+                chip::FabricIndex fabric_index = ctxt.mCommandHandler.GetExchangeContext()->GetSessionHandle()->GetFabricIndex();
+                auto unify_group_id            = m_group_translator.get_unify_group({ matter_group_id, fabric_index });
                 if (unify_group_id)
                 {
                     topic = "ucl/by-group/" + std::to_string(unify_group_id.value());
@@ -115,7 +116,7 @@ public:
         {
             auto matter_group_id =
                 ctxt.mCommandHandler.GetExchangeContext()->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
-            auto unify_group_id = group_translator::instance().get_unify_group({ matter_group_id });
+            auto unify_group_id = m_group_translator.get_unify_group({ matter_group_id });
             if (unify_group_id)
             {
                 send_group_command_callback(unify_group_id.value(), command_data);
@@ -133,6 +134,7 @@ protected:
     const matter_node_state_monitor & m_node_state_monitor;
     const char * cluster_name;
     UnifyMqtt & m_unify_mqtt;
+    group_translator & m_group_translator;
 };
 
 } // namespace unify::matter_bridge

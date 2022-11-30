@@ -11,69 +11,68 @@
  *
  *****************************************************************************/
 #include "group_translator.hpp"
-#include "matter_data_storage.hpp"
 #include <optional>
-#include <sstream>
-#include <sstream>
 #include <regex>
+#include <sstream>
 
-namespace unify::matter_bridge
-{
+namespace unify::matter_bridge {
 
-std::optional<unify_group_t>
-  group_translator::get_unify_group(const matter_group &group)
+std::optional<unify_group_t> group_translator::get_unify_group(const matter_group & group)
 {
-  matter_data_storage::group_mapping group_info = {group.group};
-  if (matter_data_storage::instance().get_persisted_data(group_info)) {
-    return group_info.unify_group_id.value();
-  } else {
-    return std::nullopt;
-  }
-}
-
-bool group_translator::add_matter_group(const matter_group &group)
-{
-  while (allocated_unify_groups.count(last_allocated_group)) {
-    last_allocated_group++;
-    if (last_allocated_group == std::numeric_limits<unify_group_t>::max()) {
-      return false;
+    matter_data_storage::group_mapping group_info = { group.group, group.fabric_index };
+    if (m_matter_data_storage.get_persisted_data(group_info))
+    {
+        return group_info.unify_group_id.value();
     }
-  }
-  matter_data_storage::group_mapping group_info
-    = {group.group, last_allocated_group};
-  matter_data_storage::instance().persist_data(group_info);
-  return true;
+    else
+    {
+        return std::nullopt;
+    }
 }
 
-void group_translator::remove_matter_group(const matter_group &group)
+bool group_translator::add_matter_group(const matter_group & group)
 {
-  auto ug = get_unify_group(group);
-  if (ug) {
-    matter_data_storage::group_mapping group_info = {group.group};
-    matter_data_storage::instance().remove_persisted_data(group_info);
-  }
+    while (allocated_unify_groups.count(last_allocated_group))
+    {
+        last_allocated_group++;
+        if (last_allocated_group == std::numeric_limits<unify_group_t>::max())
+        {
+            return false;
+        }
+    }
+    matter_data_storage::group_mapping group_info = { group.group, group.fabric_index, last_allocated_group };
+    return (m_matter_data_storage.persist_data(group_info));
 }
 
-void group_translator::register_unify_group(const unify_group_t &group)
+void group_translator::remove_matter_group(const matter_group & group)
 {
-  allocated_unify_groups.insert(group);
+    auto ug = get_unify_group(group);
+    if (ug)
+    {
+        matter_data_storage::group_mapping group_info = { group.group, group.fabric_index };
+        m_matter_data_storage.remove_persisted_data(group_info);
+    }
 }
 
-void group_translator::on_mqtt_message_cb(const char *topic,
-                                          const char *message,
-                                          const size_t message_length)
+void group_translator::register_unify_group(const unify_group_t & group)
 {
-  std::regex rgx("ucl/by-group"
-                 "/([^/]*)"  // group id
-                 "/NodeList"
-                 "/([^/]*)");
-  std::smatch match;
-  std::string topic_str(topic);
-  if (!std::regex_search(topic_str, match, rgx)) {
-    return;
-  }
-  const std::string &group_id = match.str(1);
-  const unify_group_t group   = std::stoi(group_id);
-  group_translator::register_unify_group(group);
+    allocated_unify_groups.insert(group);
 }
-}  // namespace unify::matter_bridge
+
+void group_translator::on_mqtt_message_cb(const char * topic, const char * message, const size_t message_length)
+{
+    std::regex rgx("ucl/by-group"
+                   "/([^/]*)" // group id
+                   "/NodeList"
+                   "/([^/]*)");
+    std::smatch match;
+    std::string topic_str(topic);
+    if (!std::regex_search(topic_str, match, rgx))
+    {
+        return;
+    }
+    const std::string & group_id = match.str(1);
+    const unify_group_t group    = std::stoi(group_id);
+    group_translator::register_unify_group(group);
+}
+} // namespace unify::matter_bridge

@@ -36,9 +36,9 @@ class {{asUpperCamelCase label}}ClusterCommandHandler : public command_translato
 {
   public:
   {{asUpperCamelCase label}}ClusterCommandHandler(
-    const matter_node_state_monitor &node_state_monitor, UnifyMqtt &unify_mqtt) :
+    const matter_node_state_monitor &node_state_monitor, UnifyMqtt &unify_mqtt, group_translator &group_translator_m) :
     command_translator_interface(node_state_monitor,
-                                 chip::app::Clusters::{{asUpperCamelCase label}}::Id,"{{matterClusterConversion label}}", unify_mqtt)
+                                 chip::app::Clusters::{{asUpperCamelCase label}}::Id,"{{matterClusterConversion label}}", unify_mqtt, group_translator_m)
   {}
   void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext
                     &HandlerContext) override;

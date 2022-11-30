@@ -30,6 +30,8 @@ namespace unify::matter_bridge {
 class matter_data_storage
 {
 public:
+    matter_data_storage () {}
+    virtual ~matter_data_storage() {}
     struct endpoint_mapping
     {
         const char * unify_unid;
@@ -39,6 +41,7 @@ public:
     struct group_mapping
     {
         uint16_t matter_group_id;
+        uint8_t fabric_index;
         std::optional<uint16_t> unify_group_id;
     };
     /**
@@ -49,9 +52,8 @@ public:
      * @return true if the data is persisted
      * @return false if the data is not persisted
      */
-    template <typename T>
-    bool persist_data(T & key_value);
-
+    virtual bool persist_data(group_mapping & key_value);
+    virtual bool persist_data(endpoint_mapping & key_value);
     /**
      * @brief Get the persisted dynamic endpoint
      *
@@ -61,14 +63,14 @@ public:
      *         the key_value struct
      * @return false if the key is not found in the data storage
      */
-    template <typename T>
-    bool get_persisted_data(T & key_value);
+    virtual bool get_persisted_data(endpoint_mapping & key_value);
+    virtual bool get_persisted_data(group_mapping & key_value);
     /**
      * @brief remove the persisted data
      *
      * @param key key
      */
-    template <typename T>
+    template<typename T>
     void remove_persisted_data(T & key);
 
     static matter_data_storage & instance();
