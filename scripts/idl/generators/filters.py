@@ -13,6 +13,8 @@
 # limitations under the License.
 
 import stringcase
+import re
+from typing import Callable, List
 
 
 def normalize_acronyms(s: str) -> str:
@@ -22,6 +24,53 @@ def normalize_acronyms(s: str) -> str:
        strings such as WiFi should not be WI_FI but rather WIFI
     """
     return s.replace('WiFi', 'Wifi').replace('WI_FI', 'WIFI')
+
+
+WORD_SPLIT_RE = re.compile('[- /_]')
+
+def _splitWords(s: str) -> List[str]:
+    """
+    Split a string into its underlying words
+    """
+    return [word for word in WORD_SPLIT_RE.split(s) if word]
+
+
+def _splitIntoWords(s: str, preserve_acronyms: bool, transform: Callable[[str], str]) -> List[str]:
+    """
+    Splits a list of items into transform(lowercase(word)) except for acronyms.
+    """
+    parts = []
+    for word in _splitWords(s):
+        if not preserve_acronyms or (word != word.upper()):
+            word = transform(word.lower())
+        parts.append(word)
+
+    return parts
+
+
+def asUpperCamelCase(s: str, preserve_acronyms: bool = True) -> str:
+    """
+    Generates a camel case string from a split word. Specifically:
+      - words are considered separated by space/_/-/slash
+      - each individual word will be be camel-cased
+      - acronyms are considered anything that is FULLUPPERCASE
+
+    Resulting camel case has all first letters of words as upper case.
+    """
+    return "".join(_splitIntoWords(s, preserve_acronyms=preserve_acronyms,transform=str.title))
+
+def asLowerCamelCase(s: str, preserve_acronyms: bool = True) -> str:
+    """
+    Same as asUpperCamelCase except first word is lowercased EXCEPT if it is
+    an acronym.
+    """
+    words = _splitIntoWords(s, preserve_acronyms=preserve_acronyms,transform=str.title)
+    if not preserve_acronyms or words[0].upper() != words[0]:
+        words[0] = words[0][0].lower() + words[0][1:]
+
+    return ''.join(words)
+
+
 
 
 def RegisterCommonFilters(filtermap):
@@ -42,3 +91,8 @@ def RegisterCommonFilters(filtermap):
     filtermap['spinalcase'] = stringcase.spinalcase
 
     filtermap['normalize_acronyms'] = normalize_acronyms
+
+
+    # equivalence methods from zap templates. These are expected to
+    # be identical with zap
+    filtermap['asUpperCamelCase'] = asUpperCamelCase

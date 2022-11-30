@@ -94,6 +94,7 @@ pw_python_package("idl") {
     "test_matter_idl_parser.py",
     "test_generators.py",
     "test_xml_parser.py",
+    "generators/test_filters.py",
   ]
 
   # TODO: at a future time consider enabling all (* or missing) here to get
