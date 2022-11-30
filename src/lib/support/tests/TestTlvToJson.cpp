@@ -147,7 +147,7 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
     ByteSpan byteSpan(byteBuf);
     EncodeAndValidate(byteSpan,
                       "{\n"
-                      "   \"value\" : \"AQIDBP/+mYjdzQ==\"\n"
+                      "   \"value\" : \"base64:AQIDBP/+mYjdzQ==\"\n"
                       "}\n");
 
     DataModel::Nullable<uint8_t> nullValue;
@@ -170,7 +170,7 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                       "      \"0\" : 20,\n"
                       "      \"1\" : true,\n"
                       "      \"2\" : 0,\n"
-                      "      \"3\" : \"AQIDBP/+mYjdzQ==\",\n"
+                      "      \"3\" : \"base64:AQIDBP/+mYjdzQ==\",\n"
                       "      \"4\" : \"hello\",\n"
                       "      \"5\" : 0,\n"
                       "      \"6\" : 1.0,\n"
@@ -200,7 +200,7 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                       "         \"0\" : 20,\n"
                       "         \"1\" : true,\n"
                       "         \"2\" : 0,\n"
-                      "         \"3\" : \"AQIDBP/+mYjdzQ==\",\n"
+                      "         \"3\" : \"base64:AQIDBP/+mYjdzQ==\",\n"
                       "         \"4\" : \"hello\",\n"
                       "         \"5\" : 0,\n"
                       "         \"6\" : 1.0,\n"
@@ -210,7 +210,7 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                       "         \"0\" : 20,\n"
                       "         \"1\" : true,\n"
                       "         \"2\" : 0,\n"
-                      "         \"3\" : \"AQIDBP/+mYjdzQ==\",\n"
+                      "         \"3\" : \"base64:AQIDBP/+mYjdzQ==\",\n"
                       "         \"4\" : \"hello\",\n"
                       "         \"5\" : 0,\n"
                       "         \"6\" : 1.0,\n"
