@@ -81,7 +81,7 @@ if [[ ${*/--no-cache//} != "${*}" ]]; then
     BUILD_ARGS+=(--no-cache)
 fi
 
-[[ ${*/--skip-build//} == "${*}" ]] || {
+[[ ${*/--skip-build//} != "${*}" ]] || {
     docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
     docker image prune --force
 }
