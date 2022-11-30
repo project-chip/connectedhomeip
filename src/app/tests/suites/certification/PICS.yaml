@@ -3714,10 +3714,10 @@ PICS:
       id: DGTHREAD.S.A0039
 
     - label: "Does the DUT-server support the Delay attribute?"
-      id: DGTHREAD.S.A003A
+      id: DGTHREAD.S.A003a
 
     - label: "Does the DUT-server support the SecurityPolicy attribute?"
-      id: DGTHREAD.S.A003B
+      id: DGTHREAD.S.A003b
 
     - label: "Does the DUT-server support the ChannelPage0Mask attribute?"
       id: DGTHREAD.S.A003c
