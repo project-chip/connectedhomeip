@@ -75,9 +75,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                 completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeIdentifyID,
-                                     (unsigned int) MTRCommandIDTypeClusterIdentifyCommandIdentifyID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeIdentifyID, (unsigned int) MTRCommandIDTypeClusterIdentifyCommandIdentifyID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -130,9 +130,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeIdentifyID,
-                                     (unsigned int) MTRCommandIDTypeClusterIdentifyCommandTriggerEffectID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeIdentifyID, (unsigned int) MTRCommandIDTypeClusterIdentifyCommandTriggerEffectID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -309,9 +309,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                 completion:(void (^)(MTRGroupsClusterAddGroupResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeGroupsID,
-                                     (unsigned int) MTRCommandIDTypeClusterGroupsCommandAddGroupID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandAddGroupID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -366,9 +366,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                  completion:
                      (void (^)(MTRGroupsClusterViewGroupResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeGroupsID,
-                                     (unsigned int) MTRCommandIDTypeClusterGroupsCommandViewGroupID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandViewGroupID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -422,9 +422,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                           completion:(void (^)(MTRGroupsClusterGetGroupMembershipResponseParams * _Nullable data,
                                          NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeGroupsID,
-                                     (unsigned int) MTRCommandIDTypeClusterGroupsCommandGetGroupMembershipID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandGetGroupMembershipID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -500,9 +500,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                    completion:
                        (void (^)(MTRGroupsClusterRemoveGroupResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeGroupsID,
-                                     (unsigned int) MTRCommandIDTypeClusterGroupsCommandRemoveGroupID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandRemoveGroupID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -565,9 +565,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeGroupsID,
-                                     (unsigned int) MTRCommandIDTypeClusterGroupsCommandRemoveAllGroupsID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandRemoveAllGroupsID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -619,8 +619,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                              completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeGroupsID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeGroupsID,
                                      (unsigned int) MTRCommandIDTypeClusterGroupsCommandAddGroupIfIdentifyingID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -835,9 +835,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                 completion:(void (^)(MTRScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeScenesID,
-                                     (unsigned int) MTRCommandIDTypeClusterScenesCommandAddSceneID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandAddSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -968,9 +968,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                  completion:
                      (void (^)(MTRScenesClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeScenesID,
-                                     (unsigned int) MTRCommandIDTypeClusterScenesCommandViewSceneID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandViewSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -1025,9 +1025,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                    completion:
                        (void (^)(MTRScenesClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeScenesID,
-                                     (unsigned int) MTRCommandIDTypeClusterScenesCommandRemoveSceneID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandRemoveSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -1083,9 +1083,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                        completion:(void (^)(MTRScenesClusterRemoveAllScenesResponseParams * _Nullable data,
                                       NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeScenesID,
-                                     (unsigned int) MTRCommandIDTypeClusterScenesCommandRemoveAllScenesID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandRemoveAllScenesID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -1140,9 +1140,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   completion:
                       (void (^)(MTRScenesClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeScenesID,
-                                     (unsigned int) MTRCommandIDTypeClusterScenesCommandStoreSceneID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandStoreSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -1196,9 +1196,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeScenesID,
-                                     (unsigned int) MTRCommandIDTypeClusterScenesCommandRecallSceneID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandRecallSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -1262,9 +1262,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                           completion:(void (^)(MTRScenesClusterGetSceneMembershipResponseParams * _Nullable data,
                                          NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeScenesID,
-                                     (unsigned int) MTRCommandIDTypeClusterScenesCommandGetSceneMembershipID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandGetSceneMembershipID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -1319,9 +1319,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         completion:(void (^)(MTRScenesClusterEnhancedAddSceneResponseParams * _Nullable data,
                                        NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeScenesID,
-                                     (unsigned int) MTRCommandIDTypeClusterScenesCommandEnhancedAddSceneID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandEnhancedAddSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -1453,9 +1453,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                          completion:(void (^)(MTRScenesClusterEnhancedViewSceneResponseParams * _Nullable data,
                                         NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeScenesID,
-                                     (unsigned int) MTRCommandIDTypeClusterScenesCommandEnhancedViewSceneID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandEnhancedViewSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -1511,9 +1511,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                  completion:
                      (void (^)(MTRScenesClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeScenesID,
-                                     (unsigned int) MTRCommandIDTypeClusterScenesCommandCopySceneID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandCopySceneID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -1828,9 +1828,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeOnOffID,
-                                     (unsigned int) MTRCommandIDTypeClusterOnOffCommandOffID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandOffID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -1888,9 +1888,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeOnOffID,
-                                     (unsigned int) MTRCommandIDTypeClusterOnOffCommandOnID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandOnID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -1948,9 +1948,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeOnOffID,
-                                     (unsigned int) MTRCommandIDTypeClusterOnOffCommandToggleID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandToggleID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -2002,9 +2002,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeOnOffID,
-                                     (unsigned int) MTRCommandIDTypeClusterOnOffCommandOffWithEffectID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandOffWithEffectID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -2069,8 +2069,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeOnOffID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeOnOffID,
                                      (unsigned int) MTRCommandIDTypeClusterOnOffCommandOnWithRecallGlobalSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -2123,9 +2123,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                       completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeOnOffID,
-                                     (unsigned int) MTRCommandIDTypeClusterOnOffCommandOnWithTimedOffID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandOnWithTimedOffID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -2543,9 +2543,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeLevelControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveToLevelID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveToLevelID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -2608,9 +2608,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeLevelControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -2674,9 +2674,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeLevelControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStepID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStepID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -2741,9 +2741,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeLevelControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStopID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStopID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -2799,9 +2799,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeLevelControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveToLevelWithOnOffID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeLevelControlID,
+                  (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveToLevelWithOnOffID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -2864,9 +2865,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeLevelControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveWithOnOffID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveWithOnOffID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -2930,9 +2931,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeLevelControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStepWithOnOffID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStepWithOnOffID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -2997,9 +2998,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeLevelControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStopWithOnOffID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStopWithOnOffID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -3055,9 +3056,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                               completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeLevelControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveToClosestFrequencyID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeLevelControlID,
+                  (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveToClosestFrequencyID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -4119,9 +4121,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
-                                     (unsigned int) MTRCommandIDTypeClusterActionsCommandInstantActionID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandInstantActionID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -4178,8 +4180,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                    completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
                                      (unsigned int) MTRCommandIDTypeClusterActionsCommandInstantActionWithTransitionID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -4238,9 +4240,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
-                                     (unsigned int) MTRCommandIDTypeClusterActionsCommandStartActionID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandStartActionID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -4297,8 +4299,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
                                      (unsigned int) MTRCommandIDTypeClusterActionsCommandStartActionWithDurationID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -4357,9 +4359,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                   completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
-                                     (unsigned int) MTRCommandIDTypeClusterActionsCommandStopActionID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandStopActionID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -4416,9 +4418,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
-                                     (unsigned int) MTRCommandIDTypeClusterActionsCommandPauseActionID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandPauseActionID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -4475,8 +4477,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
                                      (unsigned int) MTRCommandIDTypeClusterActionsCommandPauseActionWithDurationID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -4535,9 +4537,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
-                                     (unsigned int) MTRCommandIDTypeClusterActionsCommandResumeActionID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandResumeActionID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -4594,9 +4596,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
-                                     (unsigned int) MTRCommandIDTypeClusterActionsCommandEnableActionID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandEnableActionID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -4653,8 +4655,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                 completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
                                      (unsigned int) MTRCommandIDTypeClusterActionsCommandEnableActionWithDurationID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -4713,9 +4715,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
-                                     (unsigned int) MTRCommandIDTypeClusterActionsCommandDisableActionID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandDisableActionID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -4772,8 +4774,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                  completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
                                      (unsigned int) MTRCommandIDTypeClusterActionsCommandDisableActionWithDurationID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -5051,9 +5053,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeBasicID,
-                                     (unsigned int) MTRCommandIDTypeClusterBasicCommandMfgSpecificPingID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeBasicID, (unsigned int) MTRCommandIDTypeClusterBasicCommandMfgSpecificPingID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -5408,9 +5410,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   completion:(void (^)(MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
                                  NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeOtaSoftwareUpdateProviderID,
-                                     (unsigned int) MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandQueryImageID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOtaSoftwareUpdateProviderID,
+                  (unsigned int) MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandQueryImageID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -5507,9 +5510,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                           completion:(void (^)(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
                                          NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeOtaSoftwareUpdateProviderID,
-                                     (unsigned int) MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandApplyUpdateRequestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOtaSoftwareUpdateProviderID,
+                  (unsigned int) MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandApplyUpdateRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -5564,9 +5568,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeOtaSoftwareUpdateProviderID,
-                                     (unsigned int) MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandNotifyUpdateAppliedID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOtaSoftwareUpdateProviderID,
+                  (unsigned int) MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandNotifyUpdateAppliedID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -5732,9 +5737,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeOtaSoftwareUpdateRequestorID,
-                                     (unsigned int) MTRCommandIDTypeClusterOtaSoftwareUpdateRequestorCommandAnnounceOtaProviderID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOtaSoftwareUpdateRequestorID,
+                  (unsigned int) MTRCommandIDTypeClusterOtaSoftwareUpdateRequestorCommandAnnounceOtaProviderID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -6647,9 +6653,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                    completion:(void (^)(MTRGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable data,
                                   NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeGeneralCommissioningID,
-                                     (unsigned int) MTRCommandIDTypeClusterGeneralCommissioningCommandArmFailSafeID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeGeneralCommissioningID,
+                  (unsigned int) MTRCommandIDTypeClusterGeneralCommissioningCommandArmFailSafeID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -6705,9 +6712,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                            completion:(void (^)(MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams * _Nullable data,
                                           NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeGeneralCommissioningID,
-                                     (unsigned int) MTRCommandIDTypeClusterGeneralCommissioningCommandSetRegulatoryConfigID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeGeneralCommissioningID,
+                  (unsigned int) MTRCommandIDTypeClusterGeneralCommissioningCommandSetRegulatoryConfigID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -6778,9 +6786,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                  (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
                                      NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeGeneralCommissioningID,
-                                     (unsigned int) MTRCommandIDTypeClusterGeneralCommissioningCommandCommissioningCompleteID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeGeneralCommissioningID,
+                  (unsigned int) MTRCommandIDTypeClusterGeneralCommissioningCommandCommissioningCompleteID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -7021,9 +7030,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                     completion:(void (^)(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data,
                                    NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeNetworkCommissioningID,
-                                     (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandScanNetworksID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeNetworkCommissioningID,
+                  (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandScanNetworksID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -7092,9 +7102,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                               completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                              NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeNetworkCommissioningID,
-                                     (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandAddOrUpdateWiFiNetworkID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeNetworkCommissioningID,
+                  (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandAddOrUpdateWiFiNetworkID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -7154,9 +7165,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                 completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                                NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeNetworkCommissioningID,
-                                     (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandAddOrUpdateThreadNetworkID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeNetworkCommissioningID,
+                  (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandAddOrUpdateThreadNetworkID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -7215,9 +7227,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                      completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                     NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeNetworkCommissioningID,
-                                     (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandRemoveNetworkID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeNetworkCommissioningID,
+                  (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandRemoveNetworkID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -7276,9 +7289,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                       completion:(void (^)(MTRNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable data,
                                      NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeNetworkCommissioningID,
-                                     (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandConnectNetworkID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeNetworkCommissioningID,
+                  (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandConnectNetworkID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -7337,9 +7351,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                       completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                      NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeNetworkCommissioningID,
-                                     (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandReorderNetworkID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeNetworkCommissioningID,
+                  (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandReorderNetworkID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -7642,9 +7657,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                            completion:(void (^)(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data,
                                           NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDiagnosticLogsID,
-                                     (unsigned int) MTRCommandIDTypeClusterDiagnosticLogsCommandRetrieveLogsRequestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeDiagnosticLogsID,
+                  (unsigned int) MTRCommandIDTypeClusterDiagnosticLogsCommandRetrieveLogsRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -7782,9 +7798,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeGeneralDiagnosticsID,
-                                     (unsigned int) MTRCommandIDTypeClusterGeneralDiagnosticsCommandTestEventTriggerID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeGeneralDiagnosticsID,
+                  (unsigned int) MTRCommandIDTypeClusterGeneralDiagnosticsCommandTestEventTriggerID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -7996,9 +8013,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeSoftwareDiagnosticsID,
-                                     (unsigned int) MTRCommandIDTypeClusterSoftwareDiagnosticsCommandResetWatermarksID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeSoftwareDiagnosticsID,
+                  (unsigned int) MTRCommandIDTypeClusterSoftwareDiagnosticsCommandResetWatermarksID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -8177,9 +8195,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeThreadNetworkDiagnosticsID,
-                                     (unsigned int) MTRCommandIDTypeClusterThreadNetworkDiagnosticsCommandResetCountsID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeThreadNetworkDiagnosticsID,
+                  (unsigned int) MTRCommandIDTypeClusterThreadNetworkDiagnosticsCommandResetCountsID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -8847,9 +8866,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeWiFiNetworkDiagnosticsID,
-                                     (unsigned int) MTRCommandIDTypeClusterWiFiNetworkDiagnosticsCommandResetCountsID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeWiFiNetworkDiagnosticsID,
+                  (unsigned int) MTRCommandIDTypeClusterWiFiNetworkDiagnosticsCommandResetCountsID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -9104,9 +9124,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeEthernetNetworkDiagnosticsID,
-                                     (unsigned int) MTRCommandIDTypeClusterEthernetNetworkDiagnosticsCommandResetCountsID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeEthernetNetworkDiagnosticsID,
+                  (unsigned int) MTRCommandIDTypeClusterEthernetNetworkDiagnosticsCommandResetCountsID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -9613,8 +9634,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                completion:(MTRStatusCompletion)completion
 {
     NSString * logPrefix =
-        [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                  (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeAdministratorCommissioningID,
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeAdministratorCommissioningID,
                   (unsigned int) MTRCommandIDTypeClusterAdministratorCommissioningCommandOpenCommissioningWindowID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -9676,8 +9697,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                     completion:(MTRStatusCompletion)completion
 {
     NSString * logPrefix =
-        [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                  (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeAdministratorCommissioningID,
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeAdministratorCommissioningID,
                   (unsigned int) MTRCommandIDTypeClusterAdministratorCommissioningCommandOpenBasicCommissioningWindowID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -9743,9 +9764,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeAdministratorCommissioningID,
-                                     (unsigned int) MTRCommandIDTypeClusterAdministratorCommissioningCommandRevokeCommissioningID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeAdministratorCommissioningID,
+                  (unsigned int) MTRCommandIDTypeClusterAdministratorCommissioningCommandRevokeCommissioningID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -9933,9 +9955,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                           completion:(void (^)(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data,
                                          NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
-                                     (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
+                  (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -9990,9 +10013,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                completion:(void (^)(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data,
                                               NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
-                                     (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandCertificateChainRequestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
+                  (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandCertificateChainRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -10047,9 +10071,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   completion:(void (^)(MTROperationalCredentialsClusterCSRResponseParams * _Nullable data,
                                  NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
-                                     (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandCSRRequestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
+                  (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandCSRRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -10108,9 +10133,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                               NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
-                                     (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandAddNOCID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
+                  (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandAddNOCID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -10173,9 +10199,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                  completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                 NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
-                                     (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateNOCID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
+                  (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateNOCID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -10234,9 +10261,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                          completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                         NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
-                                     (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateFabricLabelID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
+                  (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateFabricLabelID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -10291,9 +10319,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                     completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                    NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
-                                     (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandRemoveFabricID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
+                  (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandRemoveFabricID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -10348,8 +10377,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                  completion:(MTRStatusCompletion)completion
 {
     NSString * logPrefix =
-        [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                  (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
                   (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandAddTrustedRootCertificateID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -10633,9 +10662,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeGroupKeyManagementID,
-                                     (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetWriteID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeGroupKeyManagementID,
+                  (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetWriteID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -10728,9 +10758,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   completion:(void (^)(MTRGroupKeyManagementClusterKeySetReadResponseParams * _Nullable data,
                                  NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeGroupKeyManagementID,
-                                     (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeGroupKeyManagementID,
+                  (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -10784,9 +10815,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeGroupKeyManagementID,
-                                     (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetRemoveID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeGroupKeyManagementID,
+                  (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetRemoveID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -10840,9 +10872,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                             completion:(void (^)(MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data,
                                            NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeGroupKeyManagementID,
-                                     (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadAllIndicesID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeGroupKeyManagementID,
+                  (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadAllIndicesID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -11325,9 +11358,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeModeSelectID,
-                                     (unsigned int) MTRCommandIDTypeClusterModeSelectCommandChangeToModeID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeModeSelectID, (unsigned int) MTRCommandIDTypeClusterModeSelectCommandChangeToModeID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -11542,9 +11575,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                 completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
-                                     (unsigned int) MTRCommandIDTypeClusterDoorLockCommandLockDoorID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandLockDoorID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -11605,9 +11638,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                   completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
-                                     (unsigned int) MTRCommandIDTypeClusterDoorLockCommandUnlockDoorID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandUnlockDoorID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -11668,8 +11701,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                          completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandUnlockWithTimeoutID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -11730,8 +11763,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetWeekDayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -11793,8 +11826,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                           completion:(void (^)(MTRDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable data,
                                          NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetWeekDayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -11850,8 +11883,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearWeekDayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -11906,8 +11939,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetYearDayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -11965,8 +11998,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                           completion:(void (^)(MTRDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data,
                                          NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetYearDayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -12022,8 +12055,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearYearDayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -12078,8 +12111,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetHolidayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -12138,8 +12171,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                           completion:(void (^)(MTRDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data,
                                          NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetHolidayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -12194,8 +12227,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearHolidayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -12249,9 +12282,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
-                                     (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetUserID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetUserID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -12342,9 +12375,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(void (^)(MTRDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
-                                     (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetUserID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetUserID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -12397,9 +12430,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                  completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
-                                     (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearUserID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearUserID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -12456,9 +12489,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                      completion:(void (^)(MTRDoorLockClusterSetCredentialResponseParams * _Nullable data,
                                     NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
-                                     (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetCredentialID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetCredentialID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -12542,8 +12575,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                            completion:(void (^)(MTRDoorLockClusterGetCredentialStatusResponseParams * _Nullable data,
                                           NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetCredentialStatusID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -12601,8 +12634,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
                                      (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearCredentialID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -13593,9 +13626,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                 completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID,
-                                     (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandUpOrOpenID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeWindowCoveringID, (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandUpOrOpenID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -13656,9 +13689,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID,
-                                     (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandDownOrCloseID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeWindowCoveringID, (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandDownOrCloseID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -13719,9 +13752,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                   completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID,
-                                     (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandStopMotionID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeWindowCoveringID, (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandStopMotionID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -13773,9 +13806,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID,
-                                     (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToLiftValueID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeWindowCoveringID,
+                  (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToLiftValueID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -13828,9 +13862,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID,
-                                     (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToLiftPercentageID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeWindowCoveringID,
+                  (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToLiftPercentageID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -13883,9 +13918,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID,
-                                     (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltValueID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeWindowCoveringID,
+                  (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltValueID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -13938,9 +13974,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID,
-                                     (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltPercentageID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeWindowCoveringID,
+                  (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltPercentageID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -14357,9 +14394,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                  completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeBarrierControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterBarrierControlCommandBarrierControlGoToPercentID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeBarrierControlID,
+                  (unsigned int) MTRCommandIDTypeClusterBarrierControlCommandBarrierControlGoToPercentID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -14421,9 +14459,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeBarrierControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterBarrierControlCommandBarrierControlStopID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeBarrierControlID,
+                  (unsigned int) MTRCommandIDTypeClusterBarrierControlCommandBarrierControlStopID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -15108,9 +15147,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeThermostatID,
-                                     (unsigned int) MTRCommandIDTypeClusterThermostatCommandSetpointRaiseLowerID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeThermostatID, (unsigned int) MTRCommandIDTypeClusterThermostatCommandSetpointRaiseLowerID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -15164,9 +15203,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                          completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeThermostatID,
-                                     (unsigned int) MTRCommandIDTypeClusterThermostatCommandSetWeeklyScheduleID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeThermostatID, (unsigned int) MTRCommandIDTypeClusterThermostatCommandSetWeeklyScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -15258,9 +15297,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                          completion:(void (^)(MTRThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data,
                                         NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeThermostatID,
-                                     (unsigned int) MTRCommandIDTypeClusterThermostatCommandGetWeeklyScheduleID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeThermostatID, (unsigned int) MTRCommandIDTypeClusterThermostatCommandGetWeeklyScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -15326,9 +15365,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeThermostatID,
-                                     (unsigned int) MTRCommandIDTypeClusterThermostatCommandClearWeeklyScheduleID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeThermostatID, (unsigned int) MTRCommandIDTypeClusterThermostatCommandClearWeeklyScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -16860,9 +16899,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                  completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToHueID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToHueID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -16920,9 +16959,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveHueID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveHueID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -16979,9 +17018,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepHueID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepHueID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -17039,9 +17078,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToSaturationID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToSaturationID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -17097,9 +17136,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                       completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveSaturationID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveSaturationID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -17156,9 +17195,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                       completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepSaturationID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepSaturationID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -17216,9 +17255,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                               completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToHueAndSaturationID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeColorControlID,
+                  (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToHueAndSaturationID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -17275,9 +17315,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToColorID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToColorID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -17334,9 +17374,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                  completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveColorID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveColorID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -17392,9 +17432,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                  completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepColorID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepColorID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -17451,9 +17491,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                               completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToColorTemperatureID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeColorControlID,
+                  (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToColorTemperatureID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -17509,9 +17550,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                          completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedMoveToHueID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeColorControlID,
+                  (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedMoveToHueID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -17569,9 +17611,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedMoveHueID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedMoveHueID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -17628,9 +17670,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedStepHueID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedStepHueID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -17688,9 +17730,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                       completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedMoveToHueAndSaturationID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeColorControlID,
+                  (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedMoveToHueAndSaturationID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -17747,9 +17790,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandColorLoopSetID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandColorLoopSetID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -17810,9 +17853,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandStopMoveStepID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandStopMoveStepID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -17866,9 +17909,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveColorTemperatureID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeColorControlID,
+                  (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveColorTemperatureID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -17927,9 +17971,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
-                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepColorTemperatureID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeColorControlID,
+                  (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepColorTemperatureID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -20333,9 +20378,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                      completion:(void (^)(MTRChannelClusterChangeChannelResponseParams * _Nullable data,
                                     NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeChannelID,
-                                     (unsigned int) MTRCommandIDTypeClusterChannelCommandChangeChannelID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeChannelID, (unsigned int) MTRCommandIDTypeClusterChannelCommandChangeChannelID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -20389,8 +20434,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                              completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeChannelID,
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u",
+                                     self.device.deviceController.fabricIndex, _endpoint, (unsigned int) MTRClusterIDTypeChannelID,
                                      (unsigned int) MTRCommandIDTypeClusterChannelCommandChangeChannelByNumberID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -20445,9 +20490,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeChannelID,
-                                     (unsigned int) MTRCommandIDTypeClusterChannelCommandSkipChannelID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeChannelID, (unsigned int) MTRCommandIDTypeClusterChannelCommandSkipChannelID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -20625,9 +20670,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                       completion:(void (^)(MTRTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
                                      NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeTargetNavigatorID,
-                                     (unsigned int) MTRCommandIDTypeClusterTargetNavigatorCommandNavigateTargetID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeTargetNavigatorID,
+                  (unsigned int) MTRCommandIDTypeClusterTargetNavigatorCommandNavigateTargetID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -20790,9 +20836,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                completion:
                    (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
-                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandPlayID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandPlayID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -20853,9 +20899,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                completion:
                    (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
-                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandPauseID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandPauseID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -20919,9 +20965,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                     completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                    NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
-                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandStopPlaybackID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandStopPlaybackID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -20985,9 +21031,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                  completion:
                      (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
-                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandStartOverID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandStartOverID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -21048,9 +21094,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 completion:
                     (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
-                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandPreviousID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandPreviousID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -21111,9 +21157,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                completion:
                    (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
-                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandNextID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandNextID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -21174,9 +21220,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                completion:
                    (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
-                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandRewindID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandRewindID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -21240,9 +21286,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                    completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                   NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
-                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandFastForwardID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandFastForwardID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -21296,9 +21342,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                    completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                   NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
-                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandSkipForwardID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandSkipForwardID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -21353,9 +21399,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                     completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                    NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
-                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandSkipBackwardID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandSkipBackwardID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -21410,9 +21456,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                completion:
                    (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
-                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandSeekID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandSeekID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -21822,9 +21868,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeMediaInputID,
-                                     (unsigned int) MTRCommandIDTypeClusterMediaInputCommandSelectInputID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeMediaInputID, (unsigned int) MTRCommandIDTypeClusterMediaInputCommandSelectInputID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -21886,9 +21932,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeMediaInputID,
-                                     (unsigned int) MTRCommandIDTypeClusterMediaInputCommandShowInputStatusID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeMediaInputID, (unsigned int) MTRCommandIDTypeClusterMediaInputCommandShowInputStatusID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -21949,9 +21995,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeMediaInputID,
-                                     (unsigned int) MTRCommandIDTypeClusterMediaInputCommandHideInputStatusID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeMediaInputID, (unsigned int) MTRCommandIDTypeClusterMediaInputCommandHideInputStatusID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -22003,9 +22049,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeMediaInputID,
-                                     (unsigned int) MTRCommandIDTypeClusterMediaInputCommandRenameInputID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeMediaInputID, (unsigned int) MTRCommandIDTypeClusterMediaInputCommandRenameInputID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -22205,9 +22251,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeLowPowerID,
-                                     (unsigned int) MTRCommandIDTypeClusterLowPowerCommandSleepID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeLowPowerID, (unsigned int) MTRCommandIDTypeClusterLowPowerCommandSleepID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -22345,9 +22391,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                completion:
                    (void (^)(MTRKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeKeypadInputID,
-                                     (unsigned int) MTRCommandIDTypeClusterKeypadInputCommandSendKeyID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeKeypadInputID, (unsigned int) MTRCommandIDTypeClusterKeypadInputCommandSendKeyID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -22482,9 +22528,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                      completion:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
                                     NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeContentLauncherID,
-                                     (unsigned int) MTRCommandIDTypeClusterContentLauncherCommandLaunchContentID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeContentLauncherID,
+                  (unsigned int) MTRCommandIDTypeClusterContentLauncherCommandLaunchContentID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -22596,9 +22643,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                  completion:
                      (void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeContentLauncherID,
-                                     (unsigned int) MTRCommandIDTypeClusterContentLauncherCommandLaunchURLID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeContentLauncherID, (unsigned int) MTRCommandIDTypeClusterContentLauncherCommandLaunchURLID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -22882,9 +22929,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeAudioOutputID,
-                                     (unsigned int) MTRCommandIDTypeClusterAudioOutputCommandSelectOutputID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeAudioOutputID, (unsigned int) MTRCommandIDTypeClusterAudioOutputCommandSelectOutputID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -22937,9 +22984,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeAudioOutputID,
-                                     (unsigned int) MTRCommandIDTypeClusterAudioOutputCommandRenameOutputID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeAudioOutputID, (unsigned int) MTRCommandIDTypeClusterAudioOutputCommandRenameOutputID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -23096,9 +23143,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                  completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                                 NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeApplicationLauncherID,
-                                     (unsigned int) MTRCommandIDTypeClusterApplicationLauncherCommandLaunchAppID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeApplicationLauncherID,
+                  (unsigned int) MTRCommandIDTypeClusterApplicationLauncherCommandLaunchAppID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -23158,9 +23206,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                               NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeApplicationLauncherID,
-                                     (unsigned int) MTRCommandIDTypeClusterApplicationLauncherCommandStopAppID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeApplicationLauncherID,
+                  (unsigned int) MTRCommandIDTypeClusterApplicationLauncherCommandStopAppID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -23216,9 +23265,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                               NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeApplicationLauncherID,
-                                     (unsigned int) MTRCommandIDTypeClusterApplicationLauncherCommandHideAppID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeApplicationLauncherID,
+                  (unsigned int) MTRCommandIDTypeClusterApplicationLauncherCommandHideAppID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -23547,9 +23597,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                    completion:(void (^)(MTRAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
                                   NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeAccountLoginID,
-                                     (unsigned int) MTRCommandIDTypeClusterAccountLoginCommandGetSetupPINID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeAccountLoginID, (unsigned int) MTRCommandIDTypeClusterAccountLoginCommandGetSetupPINID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -23606,9 +23656,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeAccountLoginID,
-                                     (unsigned int) MTRCommandIDTypeClusterAccountLoginCommandLoginID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeAccountLoginID, (unsigned int) MTRCommandIDTypeClusterAccountLoginCommandLoginID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -23671,9 +23721,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeAccountLoginID,
-                                     (unsigned int) MTRCommandIDTypeClusterAccountLoginCommandLogoutID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeAccountLoginID, (unsigned int) MTRCommandIDTypeClusterAccountLoginCommandLogoutID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -23846,9 +23896,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                              completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeElectricalMeasurementID,
-                                     (unsigned int) MTRCommandIDTypeClusterElectricalMeasurementCommandGetProfileInfoCommandID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeElectricalMeasurementID,
+                  (unsigned int) MTRCommandIDTypeClusterElectricalMeasurementCommandGetProfileInfoCommandID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -23901,8 +23952,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                     completion:(MTRStatusCompletion)completion
 {
     NSString * logPrefix =
-        [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                  (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeElectricalMeasurementID,
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeElectricalMeasurementID,
                   (unsigned int) MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileCommandID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -25296,9 +25347,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -25359,9 +25410,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                       completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNotHandledID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNotHandledID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -25424,9 +25475,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                     completion:(void (^)(MTRUnitTestingClusterTestSpecificResponseParams * _Nullable data,
                                    NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestSpecificID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestSpecificID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -25488,9 +25539,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestUnknownCommandID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestUnknownCommandID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -25543,9 +25594,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         completion:(void (^)(MTRUnitTestingClusterTestAddArgumentsResponseParams * _Nullable data,
                                        NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestAddArgumentsID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestAddArgumentsID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -25601,9 +25652,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                  completion:(void (^)(MTRUnitTestingClusterTestSimpleArgumentResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestSimpleArgumentRequestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID,
+                  (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestSimpleArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -25659,9 +25711,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                           (void (^)(MTRUnitTestingClusterTestStructArrayArgumentResponseParams * _Nullable data,
                                               NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestStructArrayArgumentRequestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID,
+                  (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestStructArrayArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -25927,9 +25980,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                  completion:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestStructArgumentRequestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID,
+                  (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestStructArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -25991,9 +26045,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                        completion:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
                                                       NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNestedStructArgumentRequestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID,
+                  (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNestedStructArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -26059,9 +26114,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                      completion:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
                                                     NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListStructArgumentRequestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID,
+                  (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListStructArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -26146,9 +26202,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                     completion:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
                                                    NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListInt8UArgumentRequestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID,
+                  (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListInt8UArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -26224,9 +26281,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                            completion:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
                                                           NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNestedStructListArgumentRequestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID,
+                  (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNestedStructListArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -26391,8 +26449,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                                               NSError * _Nullable error))completion
 {
     NSString * logPrefix =
-        [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                  (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID,
                   (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListNestedStructListArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
@@ -26581,9 +26639,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                    completion:(void (^)(MTRUnitTestingClusterTestListInt8UReverseResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListInt8UReverseRequestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID,
+                  (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListInt8UReverseRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -26659,9 +26718,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                         completion:(void (^)(MTRUnitTestingClusterTestEnumsResponseParams * _Nullable data,
                                        NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestEnumsRequestID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestEnumsRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -26717,9 +26776,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                    completion:(void (^)(MTRUnitTestingClusterTestNullableOptionalResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNullableOptionalRequestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID,
+                  (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNullableOptionalRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -26786,9 +26846,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                                   MTRUnitTestingClusterTestComplexNullableOptionalResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestComplexNullableOptionalRequestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID,
+                  (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestComplexNullableOptionalRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -27012,9 +27073,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                completion:(void (^)(MTRUnitTestingClusterSimpleStructResponseParams * _Nullable data,
                                               NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandSimpleStructEchoRequestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID,
+                  (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandSimpleStructEchoRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -27084,9 +27146,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTimedInvokeRequestID];
+    NSString * logPrefix = [NSString
+        stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+        (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTimedInvokeRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -27141,9 +27203,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                          completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestSimpleOptionalArgumentRequestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID,
+                  (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestSimpleOptionalArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -27202,9 +27265,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                 completion:(void (^)(MTRUnitTestingClusterTestEmitTestEventResponseParams * _Nullable data,
                                                NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                                     (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
-                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestEventRequestID];
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID,
+                  (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestEventRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -27265,8 +27329,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                                 NSError * _Nullable error))completion
 {
     NSString * logPrefix =
-        [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex,
-                  (unsigned short) _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+        [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID,
                   (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestFabricScopedEventRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
