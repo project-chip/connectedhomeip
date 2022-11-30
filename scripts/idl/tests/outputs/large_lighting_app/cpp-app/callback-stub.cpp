@@ -1,5 +1,5 @@
 #include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/Constants.h>
 
@@ -10,85 +10,85 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
-    case ZCL_ACCESS_CONTROL_CLUSTER_ID:
+    case app::Clusters::AccessControl::Id:
         emberAfAccessControlClusterInitCallback(endpoint);
         break;
-    case ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_ID:
+    case app::Clusters::AdministratorCommissioning::Id:
         emberAfAdministratorCommissioningClusterInitCallback(endpoint);
         break;
-    case ZCL_BASIC_CLUSTER_ID:
+    case app::Clusters::Basic::Id:
         emberAfBasicClusterInitCallback(endpoint);
         break;
-    case ZCL_COLOR_CONTROL_CLUSTER_ID:
+    case app::Clusters::ColorControl::Id:
         emberAfColorControlClusterInitCallback(endpoint);
         break;
-    case ZCL_DESCRIPTOR_CLUSTER_ID:
+    case app::Clusters::Descriptor::Id:
         emberAfDescriptorClusterInitCallback(endpoint);
         break;
-    case ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID:
+    case app::Clusters::DiagnosticLogs::Id:
         emberAfDiagnosticLogsClusterInitCallback(endpoint);
         break;
-    case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+    case app::Clusters::EthernetNetworkDiagnostics::Id:
         emberAfEthernetNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
-    case ZCL_FIXED_LABEL_CLUSTER_ID:
+    case app::Clusters::FixedLabel::Id:
         emberAfFixedLabelClusterInitCallback(endpoint);
         break;
-    case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
+    case app::Clusters::GeneralCommissioning::Id:
         emberAfGeneralCommissioningClusterInitCallback(endpoint);
         break;
-    case ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID:
+    case app::Clusters::GeneralDiagnostics::Id:
         emberAfGeneralDiagnosticsClusterInitCallback(endpoint);
         break;
-    case ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID:
+    case app::Clusters::GroupKeyManagement::Id:
         emberAfGroupKeyManagementClusterInitCallback(endpoint);
         break;
-    case ZCL_GROUPS_CLUSTER_ID:
+    case app::Clusters::Groups::Id:
         emberAfGroupsClusterInitCallback(endpoint);
         break;
-    case ZCL_IDENTIFY_CLUSTER_ID:
+    case app::Clusters::Identify::Id:
         emberAfIdentifyClusterInitCallback(endpoint);
         break;
-    case ZCL_LEVEL_CONTROL_CLUSTER_ID:
+    case app::Clusters::LevelControl::Id:
         emberAfLevelControlClusterInitCallback(endpoint);
         break;
-    case ZCL_LOCALIZATION_CONFIGURATION_CLUSTER_ID:
+    case app::Clusters::LocalizationConfiguration::Id:
         emberAfLocalizationConfigurationClusterInitCallback(endpoint);
         break;
-    case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
+    case app::Clusters::NetworkCommissioning::Id:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
         break;
-    case ZCL_OCCUPANCY_SENSING_CLUSTER_ID:
+    case app::Clusters::OccupancySensing::Id:
         emberAfOccupancySensingClusterInitCallback(endpoint);
         break;
-    case ZCL_ON_OFF_CLUSTER_ID:
+    case app::Clusters::OnOff::Id:
         emberAfOnOffClusterInitCallback(endpoint);
         break;
-    case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
+    case app::Clusters::OperationalCredentials::Id:
         emberAfOperationalCredentialsClusterInitCallback(endpoint);
         break;
-    case ZCL_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_ID:
+    case app::Clusters::OtaSoftwareUpdateProvider::Id:
         emberAfOtaSoftwareUpdateProviderClusterInitCallback(endpoint);
         break;
-    case ZCL_OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_ID:
+    case app::Clusters::OtaSoftwareUpdateRequestor::Id:
         emberAfOtaSoftwareUpdateRequestorClusterInitCallback(endpoint);
         break;
-    case ZCL_SOFTWARE_DIAGNOSTICS_CLUSTER_ID:
+    case app::Clusters::SoftwareDiagnostics::Id:
         emberAfSoftwareDiagnosticsClusterInitCallback(endpoint);
         break;
-    case ZCL_SWITCH_CLUSTER_ID:
+    case app::Clusters::Switch::Id:
         emberAfSwitchClusterInitCallback(endpoint);
         break;
-    case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+    case app::Clusters::ThreadNetworkDiagnostics::Id:
         emberAfThreadNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
-    case ZCL_TIME_FORMAT_LOCALIZATION_CLUSTER_ID:
+    case app::Clusters::TimeFormatLocalization::Id:
         emberAfTimeFormatLocalizationClusterInitCallback(endpoint);
         break;
-    case ZCL_USER_LABEL_CLUSTER_ID:
+    case app::Clusters::UserLabel::Id:
         emberAfUserLabelClusterInitCallback(endpoint);
         break;
-    case ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+    case app::Clusters::WiFiNetworkDiagnostics::Id:
         emberAfWiFiNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
     default:
