@@ -184,6 +184,16 @@
  */
 - (void)disconnect:(dispatch_queue_t _Nonnull)clientQueue requestSentHandler:(nullable void (^)())requestSentHandler;
 
+/**
+ @brief Initialize the Matter server and reconnect to a previously connected Video Player (if any)
+ */
+- (void)initMatterServer;
+
+/**
+ @brief Stop the Matter server
+ */
+- (void)stopMatterServer;
+
 /*!
  @brief Send a ContentLauncher:LaunchURL request to a TV
 

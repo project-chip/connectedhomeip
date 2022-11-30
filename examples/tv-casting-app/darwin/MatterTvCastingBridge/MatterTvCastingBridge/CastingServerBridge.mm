@@ -42,6 +42,10 @@
 
 @property chip::Credentials::DeviceAttestationCredentialsProvider * deviceAttestationCredentialsProvider;
 
+@property chip::CommonCaseDeviceServerInitParams * serverInitParams;
+
+@property TargetVideoPlayerInfo * previouslyConnectedVideoPlayer;
+
 // queue used to serialize all work performed by the CastingServerBridge
 @property (atomic) dispatch_queue_t chipWorkQueue;
 
@@ -211,14 +215,14 @@
     }
 
     // init app Server
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    err = initParams.InitializeStaticResourcesBeforeServerInit();
+    _serverInitParams = new chip::CommonCaseDeviceServerInitParams();
+    err = _serverInitParams->InitializeStaticResourcesBeforeServerInit();
     if (err != CHIP_NO_ERROR) {
         ChipLogError(AppServer, "InitializeStaticResourcesBeforeServerInit failed: %s", ErrorStr(err));
         return;
     }
 
-    err = chip::Server::GetInstance().Init(initParams);
+    err = chip::Server::GetInstance().Init(*_serverInitParams);
     if (err != CHIP_NO_ERROR) {
         ChipLogError(AppServer, "chip::Server init failed: %s", ErrorStr(err));
         return;
@@ -419,10 +423,9 @@
     ChipLogProgress(AppServer, "CastingServerBridge().getActiveTargetVideoPlayers() called");
 
     dispatch_async(_chipWorkQueue, ^{
-        NSMutableArray * videoPlayers = nil;
+        NSMutableArray * videoPlayers = [NSMutableArray new];
         TargetVideoPlayerInfo * cppTargetVideoPlayerInfo = CastingServer::GetInstance()->GetActiveTargetVideoPlayer();
-        if (cppTargetVideoPlayerInfo != nullptr) {
-            videoPlayers = [NSMutableArray new];
+        if (cppTargetVideoPlayerInfo != nullptr && cppTargetVideoPlayerInfo->IsInitialized()) {
             videoPlayers[0] = [ConversionUtils convertToObjCVideoPlayerFrom:cppTargetVideoPlayerInfo];
         }
 
@@ -504,6 +507,79 @@
         dispatch_async(clientQueue, ^{
             requestSentHandler();
         });
+    });
+}
+
+- (void)initMatterServer
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().initMatterServer() called");
+
+    dispatch_sync(_chipWorkQueue, ^{
+        // Initialize the Matter server
+        CHIP_ERROR err = chip::Server::GetInstance().Init(*self->_serverInitParams);
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(AppServer, "chip::Server init failed: %s", ErrorStr(err));
+            return;
+        }
+
+        // Now reconnect to the VideoPlayer the casting app was previously connected to (if any)
+        if (self->_previouslyConnectedVideoPlayer != nil) {
+            ChipLogProgress(
+                AppServer, "CastingServerBridge().initMatterServer() reconnecting to previously connected VideoPlayer...");
+            err = CastingServer::GetInstance()->VerifyOrEstablishConnection(
+                *(self->_previouslyConnectedVideoPlayer), [](TargetVideoPlayerInfo * cppTargetVideoPlayerInfo) {},
+                [](CHIP_ERROR err) {}, [](TargetEndpointInfo * cppTargetEndpointInfo) {});
+        }
+    });
+}
+
+- (void)stopMatterServer
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().stopMatterServer() called");
+
+    dispatch_sync(_chipWorkQueue, ^{
+        // capture pointer to previouslyConnectedVideoPlayer, to be deleted
+        TargetVideoPlayerInfo * videoPlayerForDeletion
+            = self->_previouslyConnectedVideoPlayer == nil ? nil : self->_previouslyConnectedVideoPlayer;
+
+        // On shutting down the Matter server, the casting app will be automatically disconnected from any Video Players it was
+        // connected to. Save the VideoPlayer that the casting app was targetting and connected to, so we can reconnect to it on
+        // re-starting the Matter server.
+        TargetVideoPlayerInfo * currentTargetVideoPlayerInfo = CastingServer::GetInstance()->GetActiveTargetVideoPlayer();
+        if (currentTargetVideoPlayerInfo != nil && currentTargetVideoPlayerInfo->IsInitialized()
+            && currentTargetVideoPlayerInfo->GetOperationalDeviceProxy() != nil) {
+            self->_previouslyConnectedVideoPlayer = new TargetVideoPlayerInfo();
+            self->_previouslyConnectedVideoPlayer->Initialize(currentTargetVideoPlayerInfo->GetNodeId(),
+                currentTargetVideoPlayerInfo->GetFabricIndex(), nullptr, nullptr, currentTargetVideoPlayerInfo->GetVendorId(),
+                currentTargetVideoPlayerInfo->GetProductId(), currentTargetVideoPlayerInfo->GetDeviceType(),
+                currentTargetVideoPlayerInfo->GetDeviceName(), currentTargetVideoPlayerInfo->GetNumIPs(),
+                const_cast<chip::Inet::IPAddress *>(currentTargetVideoPlayerInfo->GetIpAddresses()));
+
+            TargetEndpointInfo * prevEndpoints = self->_previouslyConnectedVideoPlayer->GetEndpoints();
+            if (prevEndpoints != nullptr) {
+                for (size_t i = 0; i < kMaxNumberOfEndpoints; i++) {
+                    prevEndpoints[i].Reset();
+                }
+            }
+            TargetEndpointInfo * currentEndpoints = currentTargetVideoPlayerInfo->GetEndpoints();
+            for (size_t i = 0; i < kMaxNumberOfEndpoints && currentEndpoints[i].IsInitialized(); i++) {
+                prevEndpoints[i].Initialize(currentEndpoints[i].GetEndpointId());
+                chip::ClusterId * currentClusters = currentEndpoints[i].GetClusters();
+                for (size_t j = 0; j < kMaxNumberOfClustersPerEndpoint && currentClusters[j] != chip::kInvalidClusterId; j++) {
+                    prevEndpoints[i].AddCluster(currentClusters[j]);
+                }
+            }
+        } else {
+            self->_previouslyConnectedVideoPlayer = nil;
+        }
+
+        // Now shutdown the Matter server
+        chip::Server::GetInstance().Shutdown();
+
+        // Delete the old previouslyConnectedVideoPlayer, if non-nil
+        if (videoPlayerForDeletion != nil) {
+            delete videoPlayerForDeletion;
+        }
     });
 }
 
