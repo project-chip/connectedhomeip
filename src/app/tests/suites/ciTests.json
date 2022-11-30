@@ -3,10 +3,15 @@
         "TestAccessControlCluster",
         "Test_TC_ACL_1_1",
         "Test_TC_ACL_2_1",
-        "Test_TC_ACL_2_2"
+        "Test_TC_ACL_2_2",
+        "Test_TC_ACL_2_3"
     ],
     "BooleanState": ["Test_TC_BOOL_1_1", "Test_TC_BOOL_2_1"],
     "Binding": ["Test_TC_BIND_1_1"],
+    "BridgedDeviceBasicInformation": [
+        "Test_TC_BRBINFO_1_1",
+        "Test_TC_BRBINFO_2_1"
+    ],
     "Actions": ["Test_TC_ACT_1_1"],
     "ColorControl": [
         "Test_TC_CC_1_1",
@@ -90,6 +95,7 @@
         "Test_TC_APBSC_1_10",
         "Test_TC_CONTENTLAUNCHER_1_11",
         "Test_TC_ALOGIN_1_12",
+        "Test_TC_ALOGIN_12_1",
         "Test_TC_LOWPOWER_2_1",
         "Test_TC_KEYPADINPUT_3_2",
         "Test_TC_KEYPADINPUT_3_3",
@@ -102,6 +108,7 @@
         "Test_TC_MEDIAINPUT_3_11",
         "Test_TC_MEDIAINPUT_3_12",
         "Test_TC_MEDIAINPUT_3_13",
+        "Test_TC_WAKEONLAN_4_1",
         "Test_TC_CHANNEL_5_1",
         "Test_TC_CHANNEL_5_2",
         "Test_TC_CHANNEL_5_3",
@@ -240,6 +247,7 @@
         "Test_TC_DRLK_2_3",
         "Test_TC_DRLK_2_4",
         "Test_TC_DRLK_2_5",
+        "Test_TC_DRLK_2_6",
         "Test_TC_DRLK_2_7",
         "Test_TC_DRLK_2_9"
     ],
@@ -253,6 +261,7 @@
     "collection": [
         "AccessControl",
         "BooleanState",
+        "BridgedDeviceBasicInformation",
         "Actions",
         "Binding",
         "ColorControl",
