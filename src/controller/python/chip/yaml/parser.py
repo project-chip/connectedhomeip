@@ -350,9 +350,9 @@ class WriteAttributeAction(BaseAction):
 
 
 class YamlTestParser:
-    '''Parses the test YAMLs and converts to a more natural Pythonic representation.
+    '''Parses and execute the test YAMLs
 
-    The parser also permits execution of those tests there-after.
+    Parser converts YAML to Pythonic representation for executing.
     '''
 
     def __init__(self, yaml_path: str):
@@ -429,7 +429,11 @@ class YamlTestParser:
             return None
 
     def parse_and_execute_test(self, dev_ctrl: ChipDeviceCtrl):
-        '''Parse and execute YAML tests.'''
+        '''Parse and execute YAML tests.
+
+        Parsing and execution are interleaved. Before step 2 is parsed this will have already
+        Parsed and executed test step 1.
+        '''
         self._context.variable_storage.clear()
         test_step = 0
         for item in self._raw_data['tests']:
