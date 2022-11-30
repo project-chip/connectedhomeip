@@ -2363,6 +2363,8 @@ NS_ASSUME_NONNULL_BEGIN
         _clientNodeId = @(0);
 
         _iCid = @(0);
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -2373,14 +2375,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.clientNodeId = self.clientNodeId;
     other.iCid = self.iCid;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: clientNodeId:%@; iCid:%@; >", NSStringFromClass([self class]), _clientNodeId, _iCid];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientNodeId:%@; iCid:%@; fabricIndex:%@; >",
+                                             NSStringFromClass([self class]), _clientNodeId, _iCid, _fabricIndex];
     return descriptionString;
 }
 

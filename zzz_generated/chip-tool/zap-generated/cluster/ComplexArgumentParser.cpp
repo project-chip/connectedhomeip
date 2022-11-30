@@ -1014,6 +1014,12 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "ICid");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.ICid, value["ICid"]));
 
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -1021,6 +1027,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ClientMonitoring::Stru
 {
     ComplexArgumentParser::Finalize(request.clientNodeId);
     ComplexArgumentParser::Finalize(request.ICid);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::Type & request,

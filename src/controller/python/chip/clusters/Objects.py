@@ -12993,10 +12993,12 @@ class ClientMonitoring(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="clientNodeId", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="ICid", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             clientNodeId: 'uint' = 0
             ICid: 'uint' = 0
+            fabricIndex: 'uint' = 0
 
 
 

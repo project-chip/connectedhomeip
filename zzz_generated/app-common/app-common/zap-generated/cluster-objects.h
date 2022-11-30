@@ -12679,19 +12679,29 @@ enum class Fields
 {
     kClientNodeId = 0,
     kICid         = 1,
+    kFabricIndex  = 254,
 };
 
 struct Type
 {
 public:
-    chip::NodeId clientNodeId = static_cast<chip::NodeId>(0);
-    uint64_t ICid             = static_cast<uint64_t>(0);
+    chip::NodeId clientNodeId     = static_cast<chip::NodeId>(0);
+    uint64_t ICid                 = static_cast<uint64_t>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const;
 };
 
 using DecodableType = Type;
