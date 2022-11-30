@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,8 +26,9 @@
 
 // ==================== Platform Adaptations ====================
 
-#define BLE_CONNECTION_OBJECT uint16_t
-#define BLE_CONNECTION_UNINITIALIZED ((uint16_t) 0xFFFF)
+struct bt_conn;
+#define BLE_CONNECTION_OBJECT bt_conn *
+#define BLE_CONNECTION_UNINITIALIZED nullptr
 #define BLE_MAX_RECEIVE_WINDOW_SIZE 5
 
 // ========== Platform-specific Configuration Overrides =========

@@ -129,10 +129,6 @@ if (CONFIG_CHIP_LIB_SHELL)
     list(APPEND CHIP_LIBRARIES -lCHIPShell)
 endif()
 
-if (CONFIG_TELINK_BLE_LIB)
-    list(APPEND CHIP_LIBRARIES -lB91_ble_lib)
-endif()
-
 # Set up CHIP project configuration file
 
 if (CONFIG_CHIP_PROJECT_CONFIG)
@@ -276,7 +272,6 @@ target_include_directories(chip INTERFACE
     ${CHIP_ROOT}/src/include
     ${CHIP_ROOT}/src/lib
     ${CHIP_ROOT}/third_party/nlassert/repo/include
-    ${CHIP_ROOT}/third_party/telink_sdk
     ${CMAKE_CURRENT_BINARY_DIR}/gen/include
 )
 target_link_directories(chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)
@@ -286,10 +281,6 @@ endif()
 
 if (CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER)
     target_include_directories(chip INTERFACE ${CHIP_ROOT}/examples/providers)
-endif()
-
-if (CONFIG_TELINK_BLE_LIB)
-    target_link_directories(chip INTERFACE ${CHIP_ROOT}/third_party/telink_sdk/repo/eagle_ble_sdk/proj_lib)
 endif()
 
 target_link_libraries(chip INTERFACE -Wl,--start-group ${CHIP_LIBRARIES} -Wl,--end-group)
