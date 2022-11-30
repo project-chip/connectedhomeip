@@ -28,6 +28,7 @@ def normalize_acronyms(s: str) -> str:
 
 WORD_SPLIT_RE = re.compile('[- /_]')
 
+
 def _splitWords(s: str) -> List[str]:
     """
     Split a string into its underlying words
@@ -57,20 +58,19 @@ def asUpperCamelCase(s: str, preserve_acronyms: bool = True) -> str:
 
     Resulting camel case has all first letters of words as upper case.
     """
-    return "".join(_splitIntoWords(s, preserve_acronyms=preserve_acronyms,transform=str.title))
+    return "".join(_splitIntoWords(s, preserve_acronyms=preserve_acronyms, transform=str.title))
+
 
 def asLowerCamelCase(s: str, preserve_acronyms: bool = True) -> str:
     """
     Same as asUpperCamelCase except first word is lowercased EXCEPT if it is
     an acronym.
     """
-    words = _splitIntoWords(s, preserve_acronyms=preserve_acronyms,transform=str.title)
+    words = _splitIntoWords(s, preserve_acronyms=preserve_acronyms, transform=str.title)
     if not preserve_acronyms or words[0].upper() != words[0]:
         words[0] = words[0][0].lower() + words[0][1:]
 
     return ''.join(words)
-
-
 
 
 def RegisterCommonFilters(filtermap):
@@ -91,7 +91,6 @@ def RegisterCommonFilters(filtermap):
     filtermap['spinalcase'] = stringcase.spinalcase
 
     filtermap['normalize_acronyms'] = normalize_acronyms
-
 
     # equivalence methods from zap templates. These are expected to
     # be identical with zap
