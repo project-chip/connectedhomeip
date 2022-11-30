@@ -57,7 +57,8 @@ class Bl602Builder(GnBuilder):
                  root,
                  runner,
                  app: Bl602App = Bl602App.LIGHT,
-                 board: Bl602Board = Bl602Board.BL602BOARD):
+                 board: Bl602Board = Bl602Board.BL602BOARD,
+                 baudrate=115200):
         super(Bl602Builder, self).__init__(
             root=os.path.join(root, 'examples',
                               app.ExampleName(), 'bouffalolab', 'bl602'),
@@ -72,11 +73,12 @@ class Bl602Builder(GnBuilder):
 
         self.app = app
         self.board = board
+        self.baudrate = baudrate
 
         self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])
 
     def GnBuildArgs(self):
-        return self.argsOpt + ['bl602_board="%s"' % self.board.GnArgName()]
+        return self.argsOpt + ['bl602_board="%s"' % self.board.GnArgName()] + ['baudrate=%d' % self.baudrate]
 
     def build_outputs(self):
         items = {

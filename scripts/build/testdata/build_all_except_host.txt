@@ -149,7 +149,10 @@ gn gen --check --fail-on-unused-args {out}/android-x86-tv-server '--args=target_
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating bl602-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" bl602_board="BL-HWC-G1"' {out}/bl602-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" bl602_board="BL-HWC-G1" baudrate="115200"' {out}/bl602-light
+
+# Generating bl602-light-2m-uart
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" bl602_board="BL-HWC-G1" baudrate="2000000"' {out}/bl602-light-2m-uart
 
 # Generating bouffalolab-BL706-IoT-DVK-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL706-IoT-DVK" module_type="BL706C-22"' {out}/bouffalolab-BL706-IoT-DVK-light

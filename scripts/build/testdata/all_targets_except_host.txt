@@ -18,6 +18,7 @@ android-x64-tv-server
 android-x86-chip-tool
 android-x86-tv-server
 bl602-light
+bl602-light-2m-uart
 bouffalolab-BL706-IoT-DVK-light
 bouffalolab-BL706-IoT-DVK-light-rpc
 bouffalolab-BL706-NIGHT-LIGHT-light

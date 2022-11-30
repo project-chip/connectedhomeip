@@ -168,8 +168,6 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err;
 
     log_info("App Task entered\r\n");
-    log_async_init();
-    enable_async_log();
 
     err = sWiFiNetworkCommissioningInstance.Init();
     if (CHIP_NO_ERROR != err)
