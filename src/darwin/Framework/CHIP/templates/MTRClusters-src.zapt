@@ -66,7 +66,7 @@ static void MTRClustersLogCompletion(NSString *logPrefix, id value, NSError *err
 {{/unless}}
 - (void){{asLowerCamelCase name}}WithParams: (MTR{{>cluster}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %hu %u %u", self.device.deviceController.fabricIndex, (unsigned short)_endpoint, (unsigned int)MTRClusterIDType{{asUpperCamelCase parent.name}}ID, (unsigned int)MTRCommandIDTypeCluster{{asUpperCamelCase parent.name}}Command{{asUpperCamelCase name}}ID];
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %" PRIu16 " %u %u", self.device.deviceController.fabricIndex, _endpoint, (unsigned int)MTRClusterIDType{{asUpperCamelCase parent.name}}ID, (unsigned int)MTRCommandIDTypeCluster{{asUpperCamelCase parent.name}}Command{{asUpperCamelCase name}}ID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber *timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
