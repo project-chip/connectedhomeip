@@ -17,7 +17,7 @@ virtualenv
 # Infineon
 -r requirements.infineon.txt
 
-# Infineon
+# TI
 -r requirements.ti.txt
 
 # cirque tests
