@@ -73,6 +73,8 @@ class Bl602Builder(GnBuilder):
         self.app = app
         self.board = board
 
+        self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])
+
     def GnBuildArgs(self):
         return self.argsOpt + ['bl602_board="%s"' % self.board.GnArgName()]
 

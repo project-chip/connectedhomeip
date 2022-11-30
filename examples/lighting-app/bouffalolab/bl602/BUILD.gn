@@ -35,9 +35,10 @@ declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = true
 
-  # OTA periodic query timeout in seconds
-  ota_periodic_query_timeout = 86400
+  # PIN code for PASE session establishment.
+  setupPinCode = 20202021
 
+  # Monitor & log memory usage at runtime.
   enable_heap_monitoring = false
 
   # OTA periodic query timeout in seconds
