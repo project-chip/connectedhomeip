@@ -170,8 +170,9 @@ Additionally, individual code regeneration can be done using
 `./scripts/tools/zap/generate.py`:
 
 ```bash
-/scripts/tools/zap/generate.py examples/bridge-app/bridge-common/bridge-app.zap -o zzz_generated/bridge-app/zap-g
-enerated
+/scripts/tools/zap/generate.py                       \
+    examples/bridge-app/bridge-common/bridge-app.zap \
+    -o zzz_generated/bridge-app/zap-generated
 ```
 
 ### `*.matter` code generation
