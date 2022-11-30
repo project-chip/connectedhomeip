@@ -32,8 +32,6 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <type_traits>
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -50,13 +48,6 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     friend BLEManager;
 
 private:
-    // As a result of https://github.com/zephyrproject-rtos/zephyr/issues/29357, BLE indication
-    // callback parameter type has changed in recent Zephyr revisions. Select the compatible type
-    // below to support both versions for now.
-    using IndicationAttrType =
-        std::conditional_t<std::is_same<bt_gatt_indicate_func_t, void (*)(bt_conn *, bt_gatt_indicate_params *, uint8_t)>::value,
-                           bt_gatt_indicate_params *, const bt_gatt_attr *>;
-
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
@@ -73,22 +64,22 @@ private:
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
-    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId);
-    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId);
-    bool CloseConnection(BLE_CONNECTION_OBJECT conId);
-    uint16_t GetMTU(BLE_CONNECTION_OBJECT conId) const;
+    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId) override;
+    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId) override;
+    bool CloseConnection(BLE_CONNECTION_OBJECT conId) override;
+    uint16_t GetMTU(BLE_CONNECTION_OBJECT conId) const override;
     bool SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                        PacketBufferHandle pBuf);
+                        PacketBufferHandle pBuf) override;
     bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                          PacketBufferHandle pBuf);
+                          PacketBufferHandle pBuf) override;
     bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                         PacketBufferHandle pBuf);
+                         PacketBufferHandle pBuf) override;
     bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
-                          const ChipBleUUID * charId);
+                          const ChipBleUUID * charId) override;
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
-    void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId);
+    void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
 
     // ===== Private members reserved for use by this class only.
 
@@ -149,7 +140,7 @@ private:
     static void DriveBLEState(intptr_t arg);
 
     // Below callbacks run from the system workqueue context and have a limited stack capacity.
-    static void HandleTXIndicated(bt_conn * conn, IndicationAttrType attr, uint8_t err);
+    static void HandleTXIndicated(bt_conn * conn, bt_gatt_indicate_params * attr, uint8_t err);
     static void HandleConnect(bt_conn * conn, uint8_t err);
     static void HandleDisconnect(bt_conn * conn, uint8_t reason);
     static void HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param);

@@ -109,7 +109,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
 
     if (params.GetCountryCode().HasValue())
     {
-        auto & code = params.GetCountryCode().Value();
+        auto code = params.GetCountryCode().Value();
         MutableCharSpan copiedCode(mCountryCode);
         if (CopyCharSpanToMutableCharSpan(code, copiedCode) == CHIP_NO_ERROR)
         {
@@ -117,11 +117,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         }
         else
         {
-#if defined(__GNUC__) && (__GNUC__ >= 12) // -Werror=dangling-pointer= observed with GNU 12.1.0
-            ChipLogError(Controller, "Country code is too large");
-#else
             ChipLogError(Controller, "Country code is too large: %u", static_cast<unsigned>(code.size()));
-#endif
         }
     }
 

@@ -818,7 +818,7 @@ ssize_t BLEManagerImpl::HandleTXCCCWrite(struct bt_conn * conId, const struct bt
     return sizeof(value);
 }
 
-void BLEManagerImpl::HandleTXIndicated(struct bt_conn * conId, IndicationAttrType, uint8_t err)
+void BLEManagerImpl::HandleTXIndicated(struct bt_conn * conId, struct bt_gatt_indicate_params * attr, uint8_t err)
 {
     ChipDeviceEvent event;
 
