@@ -589,6 +589,20 @@ static constexpr CommandId Id = 0x00000005;
 } // namespace Commands
 } // namespace GroupKeyManagement
 
+namespace ClientMonitoring {
+namespace Commands {
+
+namespace RegisterClientMonitoring {
+static constexpr CommandId Id = 0x00000000;
+} // namespace RegisterClientMonitoring
+
+namespace StayAwakeRequest {
+static constexpr CommandId Id = 0x00000001;
+} // namespace StayAwakeRequest
+
+} // namespace Commands
+} // namespace ClientMonitoring
+
 namespace ModeSelect {
 namespace Commands {
 

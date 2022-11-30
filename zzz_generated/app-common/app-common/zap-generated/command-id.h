@@ -183,6 +183,10 @@
 #define ZCL_KEY_SET_READ_ALL_INDICES_COMMAND_ID (0x04)
 #define ZCL_KEY_SET_READ_ALL_INDICES_RESPONSE_COMMAND_ID (0x05)
 
+// Commands for cluster: Client Monitoring
+#define ZCL_REGISTER_CLIENT_MONITORING_COMMAND_ID (0x00)
+#define ZCL_STAY_AWAKE_REQUEST_COMMAND_ID (0x01)
+
 // Commands for cluster: Mode Select
 #define ZCL_CHANGE_TO_MODE_COMMAND_ID (0x00)
 

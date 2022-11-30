@@ -3649,6 +3649,60 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+@implementation MTRClientMonitoringClusterRegisterClientMonitoringParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clientRegistrationData = [MTRClientMonitoringClusterMonitoringRegistration new];
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRClientMonitoringClusterRegisterClientMonitoringParams alloc] init];
+
+    other.clientRegistrationData = self.clientRegistrationData;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: clientRegistrationData:%@; >", NSStringFromClass([self class]), _clientRegistrationData];
+    return descriptionString;
+}
+
+@end
+@implementation MTRClientMonitoringClusterStayAwakeRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRClientMonitoringClusterStayAwakeRequestParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
 @implementation MTRModeSelectClusterChangeToModeParams
 - (instancetype)init
 {

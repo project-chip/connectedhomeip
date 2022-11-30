@@ -648,6 +648,14 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+@interface MTRClientMonitoringClusterMonitoringRegistration : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull clientNodeId;
+@property (nonatomic, copy) NSNumber * _Nonnull iCid;
+
+- (instancetype)init;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+@end
+
 @interface MTRModeSelectClusterSemanticTag : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull mfgCode;
 @property (nonatomic, copy) NSNumber * _Nonnull value;
