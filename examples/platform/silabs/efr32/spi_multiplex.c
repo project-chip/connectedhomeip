@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
+#include "spi_multiplex.h"
 #include "dmadrv.h"
 #include "em_bus.h"
 #include "em_cmu.h"
 #include "em_gpio.h"
 #include "em_ldma.h"
 #include "em_usart.h"
-#include "spi_multiplex.h"
 
 /****************************************************************************
  * @fn  void spi_drv_reinit()
@@ -61,7 +61,7 @@ void set_spi_baudrate(peripheraltype_t pr_type)
     {
         spi_drv_reinit(EXP_HDR_BIT_RATE);
     }
-    else if(pr_type == EXT_SPIFLASH)
+    else if (pr_type == EXT_SPIFLASH)
     {
         spi_drv_reinit(SPI_FLASH_BIT_RATE);
     }
@@ -74,7 +74,7 @@ void set_spi_baudrate(peripheraltype_t pr_type)
  * @param[in] None
  * @return returns void
  *****************************************************************************/
-void  spiflash_cs_assert(void)
+void spiflash_cs_assert(void)
 {
     GPIO_PinOutClear(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
 }
@@ -102,7 +102,7 @@ void pre_bootloader_spi_transfer(void)
 {
     if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
     {
-        return ;
+        return;
     }
     /*
      * CS for Expansion header controlled within GSDK,
@@ -142,9 +142,9 @@ void pre_lcd_spi_transfer(void)
 {
     if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
     {
-        return ;
+        return;
     }
-    if(pr_type != LCD)
+    if (pr_type != LCD)
     {
         pr_type = LCD;
         set_spi_baudrate(pr_type);

@@ -247,7 +247,7 @@ sl_status_t sl_wfx_host_spi_transfer_no_cs_assert(sl_wfx_host_bus_transfer_type_
 {
     sl_status_t result = SL_STATUS_FAIL;
 #if defined(EFR32MG24)
-    if(pr_type != EXP_HDR)
+    if (pr_type != EXP_HDR)
     {
         pr_type = EXP_HDR;
         set_spi_baudrate(pr_type);

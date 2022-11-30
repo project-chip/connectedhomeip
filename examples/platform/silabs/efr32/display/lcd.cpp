@@ -72,7 +72,7 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
     }
 
 #if (defined(EFR32MG24) && defined(WF200_WIFI))
-    if(pr_type != LCD)
+    if (pr_type != LCD)
     {
         pr_type = LCD;
     }
@@ -127,13 +127,13 @@ int SilabsLCD::DrawPixel(void * pContext, int32_t x, int32_t y)
 int SilabsLCD::Update(void)
 {
     int status;
-    #if (defined(EFR32MG24) && defined(WF200_WIFI))
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
     pre_lcd_spi_transfer();
-    #endif
+#endif
     status = DMD_updateDisplay();
-    #if (defined(EFR32MG24) && defined(WF200_WIFI))
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
     post_lcd_spi_transfer();
-    #endif
+#endif
     /*
      * TO-DO; Above logic can be optimised by writing a common API
      */
@@ -200,14 +200,14 @@ void SilabsLCD::WriteQRCode()
             }
         }
     }
-    #if (defined(EFR32MG24) && defined(WF200_WIFI))
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
     pre_lcd_spi_transfer();
-    #endif
+#endif
 
     DMD_updateDisplay();
-    #if (defined(EFR32MG24) && defined(WF200_WIFI))
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
     post_lcd_spi_transfer();
-    #endif
+#endif
 }
 
 void SilabsLCD::SetQRCode(uint8_t * str, uint32_t size)
