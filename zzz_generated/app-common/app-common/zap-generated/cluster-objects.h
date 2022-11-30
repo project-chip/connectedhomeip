@@ -12677,8 +12677,8 @@ namespace Structs {
 namespace MonitoringRegistration {
 enum class Fields
 {
-    kClientNodeId = 0,
-    kICid         = 1,
+    kClientNodeId = 1,
+    kICid         = 2,
     kFabricIndex  = 254,
 };
 
@@ -12728,7 +12728,8 @@ namespace Commands {
 namespace RegisterClientMonitoring {
 enum class Fields
 {
-    kClientRegistrationData = 0,
+    kClientNodeId = 0,
+    kICid         = 1,
 };
 
 struct Type
@@ -12738,7 +12739,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RegisterClientMonitoring::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
 
-    Structs::MonitoringRegistration::Type clientRegistrationData;
+    chip::NodeId clientNodeId = static_cast<chip::NodeId>(0);
+    uint64_t ICid             = static_cast<uint64_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -12753,7 +12755,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::RegisterClientMonitoring::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
 
-    Structs::MonitoringRegistration::DecodableType clientRegistrationData;
+    chip::NodeId clientNodeId = static_cast<chip::NodeId>(0);
+    uint64_t ICid             = static_cast<uint64_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RegisterClientMonitoring

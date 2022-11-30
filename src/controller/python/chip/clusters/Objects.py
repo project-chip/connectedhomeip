@@ -12991,8 +12991,8 @@ class ClientMonitoring(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="clientNodeId", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="ICid", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="clientNodeId", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="ICid", Tag=2, Type=uint),
                             ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
@@ -13014,10 +13014,12 @@ class ClientMonitoring(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="clientRegistrationData", Tag=0, Type=ClientMonitoring.Structs.MonitoringRegistration),
+                            ClusterObjectFieldDescriptor(Label="clientNodeId", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="ICid", Tag=1, Type=uint),
                     ])
 
-            clientRegistrationData: 'ClientMonitoring.Structs.MonitoringRegistration' = field(default_factory=lambda: ClientMonitoring.Structs.MonitoringRegistration())
+            clientNodeId: 'uint' = 0
+            ICid: 'uint' = 0
 
         @dataclass
         class StayAwakeRequest(ClusterCommand):

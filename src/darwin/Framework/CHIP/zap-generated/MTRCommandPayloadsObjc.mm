@@ -3654,7 +3654,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _clientRegistrationData = [MTRClientMonitoringClusterMonitoringRegistration new];
+        _clientNodeId = @(0);
+
+        _iCid = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -3664,7 +3666,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRClientMonitoringClusterRegisterClientMonitoringParams alloc] init];
 
-    other.clientRegistrationData = self.clientRegistrationData;
+    other.clientNodeId = self.clientNodeId;
+    other.iCid = self.iCid;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -3673,7 +3676,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: clientRegistrationData:%@; >", NSStringFromClass([self class]), _clientRegistrationData];
+        [NSString stringWithFormat:@"<%@: clientNodeId:%@; iCid:%@; >", NSStringFromClass([self class]), _clientNodeId, _iCid];
     return descriptionString;
 }
 

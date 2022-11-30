@@ -3690,10 +3690,10 @@ class ClientMonitoringRegisterClientMonitoring : public ClusterCommand
 {
 public:
     ClientMonitoringRegisterClientMonitoring(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("register-client-monitoring", credsIssuerConfig),
-        mComplex_ClientRegistrationData(&mRequest.clientRegistrationData)
+        ClusterCommand("register-client-monitoring", credsIssuerConfig)
     {
-        AddArgument("ClientRegistrationData", &mComplex_ClientRegistrationData);
+        AddArgument("ClientNodeId", 0, UINT64_MAX, &mRequest.clientNodeId);
+        AddArgument("ICid", 0, UINT64_MAX, &mRequest.ICid);
         ClusterCommand::AddArguments();
     }
 
@@ -3713,8 +3713,6 @@ public:
 
 private:
     chip::app::Clusters::ClientMonitoring::Commands::RegisterClientMonitoring::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::Type>
-        mComplex_ClientRegistrationData;
 };
 
 /*

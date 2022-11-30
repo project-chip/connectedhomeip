@@ -2775,7 +2775,9 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
 @end
 @interface MTRClientMonitoringClusterRegisterClientMonitoringParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRClientMonitoringClusterMonitoringRegistration * _Nonnull clientRegistrationData;
+@property (nonatomic, copy) NSNumber * _Nonnull clientNodeId;
+
+@property (nonatomic, copy) NSNumber * _Nonnull iCid;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
