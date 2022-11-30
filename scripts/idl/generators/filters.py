@@ -95,3 +95,4 @@ def RegisterCommonFilters(filtermap):
     # equivalence methods from zap templates. These are expected to
     # be identical with zap
     filtermap['asUpperCamelCase'] = asUpperCamelCase
+    filtermap['asLowerCamelCase'] = asLowerCamelCase
