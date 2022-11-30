@@ -16890,6 +16890,16 @@ typedef NS_ENUM(uint8_t, MTRPumpConfigurationAndControlPumpOperationMode) {
     MTRPumpConfigurationAndControlPumpOperationModeLocal = 0x03,
 };
 
+typedef NS_OPTIONS(uint32_t, MTRPumpConfigurationAndControlPumpFeature) {
+    MTRPumpConfigurationAndControlPumpFeatureConstantPressure = 0x1,
+    MTRPumpConfigurationAndControlPumpFeatureCompensatedPressure = 0x2,
+    MTRPumpConfigurationAndControlPumpFeatureConstantFlow = 0x4,
+    MTRPumpConfigurationAndControlPumpFeatureConstantSpeed = 0x8,
+    MTRPumpConfigurationAndControlPumpFeatureConstantTemperature = 0x10,
+    MTRPumpConfigurationAndControlPumpFeatureAutomatic = 0x20,
+    MTRPumpConfigurationAndControlPumpFeatureLocal = 0x40,
+};
+
 typedef NS_OPTIONS(uint16_t, MTRPumpConfigurationAndControlPumpStatus) {
     MTRPumpConfigurationAndControlPumpStatusDeviceFault = 0x1,
     MTRPumpConfigurationAndControlPumpStatusSupplyfault = 0x2,
