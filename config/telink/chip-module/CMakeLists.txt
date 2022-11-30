@@ -193,6 +193,7 @@ chip_gn_arg_string("zephyr_cxx"                             ${CMAKE_CXX_COMPILER
 chip_gn_arg_bool  ("is_debug"                               CONFIG_DEBUG)
 chip_gn_arg_bool  ("chip_enable_openthread"                 CONFIG_NET_L2_OPENTHREAD)
 chip_gn_arg_bool  ("chip_openthread_ftd"                    CONFIG_OPENTHREAD_FTD)
+chip_gn_arg_bool  ("chip_config_network_layer_ble"          CONFIG_BT)
 chip_gn_arg_bool  ("chip_inet_config_enable_ipv4"           CONFIG_NET_IPV4)
 chip_gn_arg_bool  ("chip_enable_ota_requestor"              CONFIG_CHIP_OTA_REQUESTOR)
 chip_gn_arg_bool  ("chip_build_tests"                       CONFIG_CHIP_BUILD_TESTS)
@@ -272,6 +273,8 @@ target_include_directories(chip INTERFACE
     ${CHIP_ROOT}/src/include
     ${CHIP_ROOT}/src/lib
     ${CHIP_ROOT}/third_party/nlassert/repo/include
+    ${CHIP_ROOT}/third_party/nlio/repo/include
+    ${CHIP_ROOT}/zzz_generated/app-common
     ${CMAKE_CURRENT_BINARY_DIR}/gen/include
 )
 target_link_directories(chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)
