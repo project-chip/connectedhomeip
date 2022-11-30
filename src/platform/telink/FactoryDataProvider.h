@@ -46,7 +46,8 @@ struct ExternalFlashFactoryData
 {
     CHIP_ERROR GetFactoryDataPartition(uint8_t *& data, size_t & dataSize)
     {
-        int ret = flash_read(mFlashDevice, FIXED_PARTITION_OFFSET(factory_partition), mFactoryDataBuffer, FIXED_PARTITION_SIZE(factory_partition));
+        int ret = flash_read(mFlashDevice, FIXED_PARTITION_OFFSET(factory_partition), mFactoryDataBuffer,
+                             FIXED_PARTITION_SIZE(factory_partition));
 
         if (ret != 0)
         {

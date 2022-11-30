@@ -144,8 +144,8 @@ bool BLERadioInitialized;
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     ThreadConnectivityReady = false;
-    BLERadioInitialized = false;
-	mconId = NULL;
+    BLERadioInitialized     = false;
+    mconId                  = NULL;
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
@@ -259,17 +259,18 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    if (!BLERadioInitialized) {
-    	/* Block IEEE802154 */
-    	/* @todo: move to RadioSwitch module*/
-    	const struct device * radio_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_ieee802154));
-    	__ASSERT(radio_dev != NULL, "Fail to get radio device");
-    	b91_deinit(radio_dev);
+    if (!BLERadioInitialized)
+    {
+        /* Block IEEE802154 */
+        /* @todo: move to RadioSwitch module*/
+        const struct device * radio_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_ieee802154));
+        __ASSERT(radio_dev != NULL, "Fail to get radio device");
+        b91_deinit(radio_dev);
 
-    	/* Init BLE stack */
-    	err = bt_enable(NULL);
-    	VerifyOrReturnError(err == 0, MapErrorZephyr(err));
-    	BLERadioInitialized = true;
+        /* Init BLE stack */
+        err = bt_enable(NULL);
+        VerifyOrReturnError(err == 0, MapErrorZephyr(err));
+        BLERadioInitialized = true;
     }
 
     bt_le_adv_param advParams =
@@ -449,7 +450,7 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(const ChipDeviceEvent * event)
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
-	mconId = connEvent->BtConn;
+    mconId = connEvent->BtConn;
     bt_conn_unref(connEvent->BtConn);
 
     return CHIP_NO_ERROR;
@@ -884,7 +885,7 @@ ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gat
 
 void BLEManagerImpl::BLEConnDisconnect(System::Layer * layer, void * param)
 {
-	int error = bt_conn_disconnect(BLEMgrImpl().mconId, BT_HCI_ERR_LOCALHOST_TERM_CONN);
+    int error = bt_conn_disconnect(BLEMgrImpl().mconId, BT_HCI_ERR_LOCALHOST_TERM_CONN);
     if (error)
     {
         ChipLogError(DeviceLayer, "Failed to close BLE connection, error: %d", error);
