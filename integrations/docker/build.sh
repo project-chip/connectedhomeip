@@ -82,8 +82,8 @@ if [[ ${*/--no-cache//} != "${*}" ]]; then
 fi
 
 [[ ${*/--skip-build//} == "${*}" ]] || {
-  docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
-  docker image prune --force
+    docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
+    docker image prune --force
 }
 
 [[ ${*/--latest//} != "${*}" ]] && {
