@@ -176,12 +176,32 @@ enerated
 
 ### `*.matter` code generation
 
-Currently `*.matter` code generation is done at compile time.
+`*.matter` code generation can be done either at compile time or it can use
+pre-generated output.
 
 Rules for how `codegen.py` is invoked and how includes/sources are set are
 defined at:
 
 -   `src/app/chip_data_model.cmake`
--   `build/chip/esp32/esp32_codegen.cmake` (support for 2-pass cmake builds used
-    by the Espressif `idf.py` build system)
 -   `src/app/chip_data_model.gni`
+
+Additionally, `build/chip/esp32/esp32_codegen.cmake` adds processing support for
+the 2-pass cmake builds used by the Espressif `idf.py` build system.
+
+## Pre-generation
+
+Code pre-generation can be used:
+
+-   when compile-time code generation is not desirable. This may be for
+    importing into build systems that do not have the pre-requisites to run code
+    generation at build time or to save the code generation time at the expense
+    of running code generation for every possible zap/generation type
+-   To check changes in generated code across versions, beyond the comparisons
+    of golden image tests in `scripts/idl/tests`
+
+The script to trigger code pre-generation is `scripts/code_pregenerate.py` and
+requires the pre-generation output directory as an argument
+
+```bash
+scripts/code_pregenerate.py ${OUTPUT_DIRECTORY:-./zzz_pregenerated/}
+```
