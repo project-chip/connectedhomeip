@@ -42,11 +42,6 @@
     ],
     "templates": [
         {
-            "path": "templates/app/callback-stub-src.zapt",
-            "name": "ZCL callback-stub source",
-            "output": "callback-stub.cpp"
-        },
-        {
             "path": "templates/app/endpoint_config.zapt",
             "name": "ZCL endpoint configuration",
             "output": "endpoint_config.h"

@@ -42,7 +42,7 @@ IGNORE: Set[str] = {
     '/platform/Beken/',
     '/platform/Infineon/CYW30739/',
     '/platform/Darwin/',
-    '/platform/EFR32/',
+    '/platform/silabs/',
     '/platform/ESP32/',
     '/platform/fake/',
     '/platform/Linux/',
@@ -152,4 +152,6 @@ ALLOW: Dict[str, Set[str]] = {
     # Not really for embedded consumers; uses std::queue to keep track
     # of a list of discovered things.
     'src/controller/SetUpCodePairer.h': {'queue'},
+
+    'src/controller/ExamplePersistentStorage.cpp': {'fstream'}
 }

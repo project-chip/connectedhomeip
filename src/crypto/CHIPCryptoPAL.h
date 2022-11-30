@@ -170,6 +170,12 @@ enum class SupportedECPKeyTypes : uint8_t
     ECP256R1 = 0,
 };
 
+enum class ECPKeyTarget : uint8_t
+{
+    ECDH  = 0,
+    ECDSA = 1,
+};
+
 /** @brief Safely clears the first `len` bytes of memory area `buf`.
  * @param buf Pointer to a memory buffer holding secret data that must be cleared.
  * @param len Specifies secret data size in bytes.
@@ -385,7 +391,7 @@ public:
      * @brief Initialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Initialize() = 0;
+    virtual CHIP_ERROR Initialize(ECPKeyTarget key_target) = 0;
 
     /**
      * @brief Serialize the keypair.
@@ -410,7 +416,7 @@ public:
      * @brief Initialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Initialize() override;
+    CHIP_ERROR Initialize(ECPKeyTarget key_target) override;
 
     /**
      * @brief Serialize the keypair.

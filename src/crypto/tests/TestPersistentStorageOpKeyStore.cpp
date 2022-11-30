@@ -206,7 +206,7 @@ void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)
 
     Crypto::P256Keypair * ephemeralKeypair = opKeyStore.AllocateEphemeralKeypairForCASE();
     NL_TEST_ASSERT(inSuite, ephemeralKeypair != nullptr);
-    NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize());
+    NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA));
 
     NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig));
     NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Pubkey().ECDSA_validate_msg_signature(message, sizeof(message), sig));

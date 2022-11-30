@@ -32,6 +32,7 @@ if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W" AND BOOT_ENABLED)
     list(REMOVE_ITEM MBED_TARGET_LABELS CM0P_SLEEP)
     list(REMOVE_ITEM MBED_TARGET_DEFINITIONS COMPONENT_CM0P_SLEEP=1)
 endif()
+include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
 project(${APP_TARGET})
 
@@ -60,6 +61,11 @@ target_sources(${APP_TARGET} PRIVATE
                ${SHELL_COMMON}/cmd_server.cpp
                ${SHELL_COMMON}/globals.cpp
                ${MBED_COMMON}/util/DFUManager.cpp
+)
+
+chip_configure_data_model(${APP_TARGET}
+    ZAP_FILE ${CHIP_ROOT}/examples/ota-requestor-app/ota-requestor-common/ota-requestor-app.zap
+    GEN_DIR ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated
 )
 
 target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-emac chip)

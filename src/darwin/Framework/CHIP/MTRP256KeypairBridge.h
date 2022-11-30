@@ -31,7 +31,7 @@ public:
 
     bool HasKeypair() const { return mKeypair != nil; };
 
-    CHIP_ERROR Initialize() override;
+    CHIP_ERROR Initialize(chip::Crypto::ECPKeyTarget key_target) override;
 
     CHIP_ERROR Serialize(chip::Crypto::P256SerializedKeypair & output) const override;
 

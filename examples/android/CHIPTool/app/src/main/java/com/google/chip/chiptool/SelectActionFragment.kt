@@ -109,15 +109,21 @@ class SelectActionFragment : Fragment() {
   }
 
   private fun hasLocationPermission(): Boolean {
-    val locationPermissionState =
-      ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-    var blePermissionState = 1
+    val locationPermissionGranted =
+      ContextCompat.checkSelfPermission(
+        requireContext(),
+        Manifest.permission.ACCESS_FINE_LOCATION
+      ) == PackageManager.PERMISSION_GRANTED
+
+    // Android 12 new permission
+    var bleScanPermissionGranted = true
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-      blePermissionState =
-        ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_SCAN)
+      bleScanPermissionGranted =
+        ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_SCAN) ==
+          PackageManager.PERMISSION_GRANTED
     }
 
-    return PackageManager.PERMISSION_GRANTED == (locationPermissionState + blePermissionState)
+    return locationPermissionGranted && bleScanPermissionGranted
   }
 
 

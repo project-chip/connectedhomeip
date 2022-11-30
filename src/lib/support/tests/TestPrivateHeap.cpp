@@ -353,7 +353,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestPrivateHeap(void)
+int TestPrivateHeap()
 {
     nlTestSuite theSuite = { "PrivateHeap", sTests, nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

@@ -68,7 +68,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR CHIPP256KeypairBridge::Initialize()
+CHIP_ERROR CHIPP256KeypairBridge::Initialize(ECPKeyTarget key_target)
 {
     if (HasKeypair())
     {

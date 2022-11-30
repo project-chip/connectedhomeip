@@ -237,7 +237,7 @@ const nlTest sTests[] = { NL_TEST_DEF("TestConverter", TestConverter), NL_TEST_S
 
 } // namespace
 
-int TestTlvJson(void)
+int TestTlvJson()
 {
     nlTestSuite theSuite = { "TlvJson", sTests, Initialize, Finalize };
     nlTestRunner(&theSuite, nullptr);

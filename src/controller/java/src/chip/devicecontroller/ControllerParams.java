@@ -9,6 +9,7 @@ public final class ControllerParams {
   private final int udpListenPort;
   private final int controllerVendorId;
   private final int failsafeTimerSeconds;
+  private final int caseFailsafeTimerSeconds;
   private final boolean attemptNetworkScanWiFi;
   private final boolean attemptNetworkScanThread;
   private final boolean skipCommissioningComplete;
@@ -27,6 +28,7 @@ public final class ControllerParams {
     this.udpListenPort = builder.udpListenPort;
     this.controllerVendorId = builder.controllerVendorId;
     this.failsafeTimerSeconds = builder.failsafeTimerSeconds;
+    this.caseFailsafeTimerSeconds = builder.caseFailsafeTimerSeconds;
     this.attemptNetworkScanWiFi = builder.attemptNetworkScanWiFi;
     this.attemptNetworkScanThread = builder.attemptNetworkScanThread;
     this.skipCommissioningComplete = builder.skipCommissioningComplete;
@@ -53,6 +55,10 @@ public final class ControllerParams {
 
   public int getFailsafeTimerSeconds() {
     return failsafeTimerSeconds;
+  }
+
+  public int getCASEFailsafeTimerSeconds() {
+    return caseFailsafeTimerSeconds;
   }
 
   public boolean getAttemptNetworkScanWiFi() {
@@ -116,6 +122,7 @@ public final class ControllerParams {
     private int udpListenPort = LEGACY_GLOBAL_CHIP_PORT + 1;
     private int controllerVendorId = 0xFFFF;
     private int failsafeTimerSeconds = 30;
+    private int caseFailsafeTimerSeconds = 0;
     private boolean attemptNetworkScanWiFi = false;
     private boolean attemptNetworkScanThread = false;
     private boolean skipCommissioningComplete = false;
@@ -165,6 +172,24 @@ public final class ControllerParams {
         throw new IllegalArgumentException("failsafeTimerSeconds must be between 0 and 900");
       }
       this.failsafeTimerSeconds = failsafeTimerSeconds;
+      return this;
+    }
+
+    /**
+     * Sets the CASEFailsafeExpirySeconds duration passed to ChipDeviceCommissioner's
+     * CommissioningParameters. After PASE session has finished, the failsafe is rearmed with the
+     * specified expiry before continuing commissioning.
+     *
+     * <p>Note: If CASEFailsafeExpirySeconds is not set (or is 0), the failsafe will not be rearmed.
+     *
+     * @param caseFailsafeExpirySeconds
+     * @return
+     */
+    public Builder setCASEFailsafeTimerSeconds(int failsafeTimerSeconds) {
+      if (failsafeTimerSeconds < 1 || failsafeTimerSeconds > 900) {
+        throw new IllegalArgumentException("failsafeTimerSeconds must be between 0 and 900");
+      }
+      this.caseFailsafeTimerSeconds = failsafeTimerSeconds;
       return this;
     }
 

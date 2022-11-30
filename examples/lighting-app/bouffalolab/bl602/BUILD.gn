@@ -38,17 +38,16 @@ declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = true
 
-  # PIN code for PASE session establishment.
-  setupPinCode = 20202021
-
-  # Monitor & log memory usage at runtime.
-  enable_heap_monitoring = false
-
   # OTA periodic query timeout in seconds
   ota_periodic_query_timeout = 86400
 
-  board = "BL602-IoT-Matter-V1"
+  enable_heap_monitoring = false
 
+  setupPinCode = 20202021
+  setupDiscriminator = 3840
+
+  board = "BL602-IoT-Matter-V1"
+  module_type = "BL602"
   baudrate = 2000000
 }
 
@@ -196,7 +195,6 @@ bl602_executable("lighting_app") {
     sources += [ "${examples_plat_common_dir}/plat/OTAConfig.cpp" ]
   }
 
-  print(defines)
   ldscript = "${examples_plat_dir}/ldscripts/flash_rom.ld"
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]

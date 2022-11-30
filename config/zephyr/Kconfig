@@ -112,7 +112,7 @@ config CHIP_ENABLE_PAIRING_AUTOSTART
 
 config CHIP_ENABLE_DNSSD_SRP
 	bool "Enable support for service registration"
-	default y
+	default y if NET_L2_OPENTHREAD
 	imply OPENTHREAD_ECDSA
 	imply OPENTHREAD_SRP_CLIENT
 	help
@@ -154,10 +154,10 @@ config CHIP_SED_ACTIVE_INTERVAL
 endif # CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
 
 config CHIP_THREAD_SSED
-	  bool "Enable Thread Synchronized Sleepy End Device support"
-	  depends on OPENTHREAD_CSL_RECEIVER && CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
-	  help
-		Enables Thread Synchronized Sleepy End Device support in Matter.
+	bool "Enable Thread Synchronized Sleepy End Device support"
+	depends on OPENTHREAD_CSL_RECEIVER && CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
+	help
+	Enables Thread Synchronized Sleepy End Device support in Matter.
 
 config CHIP_OTA_REQUESTOR
 	bool "Enable OTA requestor"

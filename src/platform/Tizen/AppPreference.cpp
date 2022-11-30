@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,10 +16,21 @@
  */
 
 #include "AppPreference.h"
-#include <app_preference.h>
-#include <lib/support/Base64.h>
-#include <lib/support/CHIPMem.h>
+
+#include <algorithm>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
 #include <memory>
+#include <utility>
+
+#include <app_preference.h>
+#include <tizen.h>
+
+#include <lib/support/Base64.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -54,7 +65,7 @@ CHIP_ERROR GetData(const char * key, void * data, size_t dataSize, size_t * getD
     }
     if (err != PREFERENCE_ERROR_NONE)
     {
-        ChipLogError(DeviceLayer, "Failed to get preference [%s]: %s", key, get_error_message(err));
+        ChipLogError(DeviceLayer, "Failed to get preference [%s]: %s", StringOrNullMarker(key), get_error_message(err));
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -96,7 +107,7 @@ CHIP_ERROR SaveData(const char * key, const void * data, size_t dataSize)
     }
     if (err != PREFERENCE_ERROR_NONE)
     {
-        ChipLogError(DeviceLayer, "Failed to set preference [%s]: %s", key, get_error_message(err));
+        ChipLogError(DeviceLayer, "Failed to set preference [%s]: %s", StringOrNullMarker(key), get_error_message(err));
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -113,7 +124,7 @@ CHIP_ERROR RemoveData(const char * key)
     }
     if (err != PREFERENCE_ERROR_NONE)
     {
-        ChipLogError(DeviceLayer, "Failed to remove preference [%s]: %s", key, get_error_message(err));
+        ChipLogError(DeviceLayer, "Failed to remove preference [%s]: %s", StringOrNullMarker(key), get_error_message(err));
         return CHIP_ERROR_INCORRECT_STATE;
     }
 

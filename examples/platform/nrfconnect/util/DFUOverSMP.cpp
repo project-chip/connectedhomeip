@@ -55,10 +55,10 @@ void DFUOverSMP::Init(DFUOverSMPRestartAdvertisingHandler startAdvertisingCb)
         switch (opcode)
         {
         case MGMT_EVT_OP_CMD_RECV:
-            GetFlashHandler().DoAction(FlashHandler::Action::WAKE_UP);
+            GetFlashHandler().DoAction(ExternalFlashManager::Action::WAKE_UP);
             break;
         case MGMT_EVT_OP_CMD_DONE:
-            GetFlashHandler().DoAction(FlashHandler::Action::SLEEP);
+            GetFlashHandler().DoAction(ExternalFlashManager::Action::SLEEP);
             break;
         default:
             break;

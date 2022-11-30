@@ -13,7 +13,7 @@ FROM connectedhomeip/chip-build-k32w:${VERSION} AS k32w
 FROM connectedhomeip/chip-build-imx:${VERSION} AS imx
 FROM connectedhomeip/chip-build-ti:${VERSION} AS ti
 FROM connectedhomeip/chip-build-openiotsdk:${VERSION} AS openiotsdk
-FROM connectedhomeip/chip-build-zap:${VERSION} AS zap
+FROM connectedhomeip/chip-build-bouffalolab:${VERSION} AS bouffalolab
 FROM connectedhomeip/chip-build:${VERSION}
 
 # qemu-src copied over because qemu directory contains symlinks to the src
@@ -34,7 +34,7 @@ COPY --from=mbedos /opt/openocd/ /opt/openocd/
 COPY --from=p6 /opt/ModusToolbox /opt/ModusToolbox
 
 COPY --from=telink /opt/telink/zephyrproject /opt/telink/zephyrproject
-COPY --from=telink /opt/telink/zephyr-sdk-0.13.2 /opt/telink/zephyr-sdk-0.13.2
+COPY --from=telink /opt/telink/zephyr-sdk-0.15.2 /opt/telink/zephyr-sdk-0.15.2
 
 COPY --from=tizen /opt/tizen-sdk /opt/tizen-sdk
 
@@ -51,7 +51,7 @@ COPY --from=ti /opt/ti/sysconfig_1.13.0 /opt/ti/sysconfig_1.13.0
 COPY --from=openiotsdk /opt/gcc-arm-none-eabi-10.3-2021.10/ /opt/gcc-arm-none-eabi-10.3-2021.10/
 COPY --from=openiotsdk /opt/FVP_Corstone_SSE-300/ /opt/FVP_Corstone_SSE-300/
 
-COPY --from=zap /opt/zap /opt/zap
+COPY --from=bouffalolab /opt/bouffalolab_sdk /opt/bouffalolab_sdk
 
 # Android license file "acceping" is done by writing license hashes
 # into the 'licenses' subfolder. This allows any user (in particular
@@ -102,14 +102,16 @@ ENV QEMU_ESP32=/opt/espressif/qemu/xtensa-softmmu/qemu-system-xtensa
 ENV QEMU_ESP32_DIR=/opt/espressif/qemu
 ENV SYSROOT_AARCH64=/opt/ubuntu-21.04-aarch64-sysroot
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
-ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.13.2
+ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.15.2
 ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.13.0
 ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 
 ENV TIZEN_VERSION 6.0
 ENV TIZEN_SDK_ROOT /opt/tizen-sdk
+ENV TIZEN_SDK_TOOLCHAIN $TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2
 ENV TIZEN_SDK_SYSROOT $TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/mobile/rootstraps/mobile-$TIZEN_VERSION-device.core
 
 ENV FVP_CORSTONE_300_PATH=/opt/FVP_Corstone_SSE-300
 ENV ARM_GCC_TOOLCHAIN_PATH=/opt/gcc-arm-none-eabi-10.3-2021.10
+ENV BOUFFALOLAB_SDK_ROOT=/opt/bouffalolab_sdk

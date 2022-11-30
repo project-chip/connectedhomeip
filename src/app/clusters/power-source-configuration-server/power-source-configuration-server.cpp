@@ -98,7 +98,7 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
 
 } // anonymous namespace
 
-void MatterPowerSourceConfigurationPluginServerInitCallback(void)
+void MatterPowerSourceConfigurationPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }

@@ -21,13 +21,21 @@
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/generic-callbacks.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/LockTracker.h>
 
-#include <app-common/zap-generated/attribute-type.h>
+// Attribute storage depends on knowing the current layout/setup of attributes
+// and corresponding callbacks. Specifically:
+//   - zap-generated/callback.h is needed because endpoint_config will call the
+//     corresponding callbacks (via GENERATED_FUNCTION_ARRAYS) and the include
+//     for it is:
+//       util/common.h
+//           -> util/af.h
+//           -> util/config.h
+//           -> zap-generated/endpoint_config.h
 #include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/ids/Attributes.h>
 
 using namespace chip;
 
@@ -102,7 +110,7 @@ static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterI
 //------------------------------------------------------------------------------
 
 // Initial configuration
-void emberAfEndpointConfigure(void)
+void emberAfEndpointConfigure()
 {
     uint16_t ep;
 
@@ -257,12 +265,12 @@ EndpointId emberAfClearDynamicEndpoint(uint16_t index)
     return ep;
 }
 
-uint16_t emberAfFixedEndpointCount(void)
+uint16_t emberAfFixedEndpointCount()
 {
     return FIXED_ENDPOINT_COUNT;
 }
 
-uint16_t emberAfEndpointCount(void)
+uint16_t emberAfEndpointCount()
 {
     return emberEndpointCount;
 }
@@ -349,7 +357,7 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
 }
 
 // Calls the init functions.
-void emAfCallInits(void)
+void emAfCallInits()
 {
     uint16_t index;
     for (index = 0; index < emberAfEndpointCount(); index++)

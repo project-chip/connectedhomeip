@@ -140,7 +140,7 @@ void MainLoop::DeleteData(LoopData * loopData)
     chip::Platform::Delete(loopData);
 }
 
-void MainLoop::Deinit(void)
+void MainLoop::Deinit()
 {
     std::vector<LoopData *>::const_iterator iter = mLoopData.cbegin();
     while (iter != mLoopData.cend())
@@ -203,7 +203,7 @@ gpointer MainLoop::ThreadStartLSMainLoopHandler(gpointer data)
     return NULL;
 }
 
-bool MainLoop::StartLSMainLoop(void)
+bool MainLoop::StartLSMainLoop()
 {
     bool result = true;
     LSError lserror;
@@ -238,7 +238,7 @@ bool MainLoop::StartLSMainLoop(void)
     return result;
 }
 
-MainLoop & MainLoop::Instance(void)
+MainLoop & MainLoop::Instance()
 {
     static MainLoop sMainLoop;
     return sMainLoop;

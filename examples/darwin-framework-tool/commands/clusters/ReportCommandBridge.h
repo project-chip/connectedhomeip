@@ -208,7 +208,7 @@ public:
 
         [device subscribeWithQueue:callbackQueue
             params:params
-            attributeCacheContainer:nil
+            clusterStateCacheContainer:nil
             attributeReportHandler:^(NSArray * value) {
                 SetCommandExitStatus(CHIP_NO_ERROR);
             }

@@ -57,11 +57,25 @@ _bootstrap_or_activate() {
 
     local _PW_BANNER_FUNC="_chip_bootstrap_banner"
 
+    # Force the Pigweed environment directory to be '.environment'
+    if [ -z "$PW_ENVIRONMENT_ROOT" ]; then
+        export PW_ENVIRONMENT_ROOT="$PW_PROJECT_ROOT/.environment"
+    fi
+
     export _PW_ACTUAL_ENVIRONMENT_ROOT="$(pw_get_env_root)"
     local _SETUP_SH="$_PW_ACTUAL_ENVIRONMENT_ROOT/activate.sh"
 
     export PW_DOCTOR_SKIP_CIPD_CHECKS=1
     export PATH # https://bugs.chromium.org/p/pigweed/issues/detail?id=281
+
+    if test -n "$GITHUB_ACTION"; then
+        mkdir -p "$_PW_ACTUAL_ENVIRONMENT_ROOT"
+        tee <<EOF >"${_PW_ACTUAL_ENVIRONMENT_ROOT}/pip.conf"
+[global]
+cache-dir = ${_PW_ACTUAL_ENVIRONMENT_ROOT}/pip-cache
+EOF
+        export PIP_CONFIG_FILE="$_PW_ACTUAL_ENVIRONMENT_ROOT/pip.conf"
+    fi
 
     if [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ] ||
         [ ! -f "$_SETUP_SH" ] ||

@@ -1,10 +1,13 @@
 package com.matter.controller.commands.pairing;
 
+import chip.devicecontroller.ChipDeviceController;
 import com.matter.controller.commands.common.CredentialsIssuer;
 
 public final class PairOnNetworkDeviceTypeCommand extends PairingCommand {
-  public PairOnNetworkDeviceTypeCommand(CredentialsIssuer credsIssue) {
+  public PairOnNetworkDeviceTypeCommand(
+      ChipDeviceController controller, CredentialsIssuer credsIssue) {
     super(
+        controller,
         "onnetwork-device-type",
         PairingModeType.ON_NETWORK,
         PairingNetworkType.NONE,

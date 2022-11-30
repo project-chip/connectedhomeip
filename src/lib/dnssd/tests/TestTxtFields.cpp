@@ -642,7 +642,7 @@ const nlTest sTests[] = { NL_TEST_DEF("TxtFieldKey", TestGetTxtFieldKey),       
 
 } // namespace
 
-int TestCHIPTxtFields(void)
+int TestCHIPTxtFields()
 {
     nlTestSuite theSuite = { "TxtFields", &sTests[0], nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

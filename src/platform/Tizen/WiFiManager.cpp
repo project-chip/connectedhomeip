@@ -15,14 +15,22 @@
  *    limitations under the License.
  */
 
-#include <platform/CHIPDeviceLayer.h>
+#include "WiFiManager.h"
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <memory>
+#include <utility>
+
+#include <tizen.h>
 #include <wifi-manager.h>
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
+
 #include "MainLoop.h"
-#include "WiFiManager.h"
 
 namespace {
 static constexpr const char * __WiFiDeviceStateToStr(wifi_manager_device_state_e state)
@@ -329,7 +337,7 @@ gboolean WiFiManager::_WiFiInitialize(gpointer userData)
     return true;
 }
 
-void WiFiManager::_WiFiDeinitialize(void)
+void WiFiManager::_WiFiDeinitialize()
 {
     int wifiErr = WIFI_MANAGER_ERROR_NONE;
 
@@ -421,7 +429,7 @@ gboolean WiFiManager::_WiFiConnect(GMainLoop * mainLoop, gpointer userData)
     return true;
 }
 
-void WiFiManager::_WiFiSetStates(void)
+void WiFiManager::_WiFiSetStates()
 {
     int wifiErr          = WIFI_MANAGER_ERROR_NONE;
     bool isWiFiActivated = false;
@@ -446,7 +454,7 @@ void WiFiManager::_WiFiSetStates(void)
     }
 }
 
-void WiFiManager::_WiFiSetCallbacks(void)
+void WiFiManager::_WiFiSetCallbacks()
 {
     int wifiErr = WIFI_MANAGER_ERROR_NONE;
 
@@ -493,7 +501,7 @@ void WiFiManager::_WiFiSetCallbacks(void)
     }
 }
 
-void WiFiManager::_WiFiUnsetCallbacks(void)
+void WiFiManager::_WiFiUnsetCallbacks()
 {
     int wifiErr = WIFI_MANAGER_ERROR_NONE;
 
@@ -558,7 +566,7 @@ void WiFiManager::_WiFiSetConnectionState(wifi_manager_connection_state_e connec
     ChipLogProgress(DeviceLayer, "Set WiFi connection state [%s]", __WiFiConnectionStateToStr(mConnectionState));
 }
 
-wifi_manager_ap_h WiFiManager::_WiFiGetFoundAP(void)
+wifi_manager_ap_h WiFiManager::_WiFiGetFoundAP()
 {
     int wifiErr               = WIFI_MANAGER_ERROR_NONE;
     wifi_manager_ap_h foundAp = nullptr;
@@ -576,7 +584,7 @@ wifi_manager_ap_h WiFiManager::_WiFiGetFoundAP(void)
     return foundAp;
 }
 
-void WiFiManager::Init(void)
+void WiFiManager::Init()
 {
     sInstance.mDeviceState     = WIFI_MANAGER_DEVICE_STATE_DEACTIVATED;
     sInstance.mModuleState     = WIFI_MANAGER_MODULE_STATE_DETACHED;
@@ -585,7 +593,7 @@ void WiFiManager::Init(void)
     MainLoop::Instance().Init(_WiFiInitialize);
 }
 
-void WiFiManager::Deinit(void)
+void WiFiManager::Deinit()
 {
     sInstance._WiFiDeinitialize();
     MainLoop::Instance().Deinit();
@@ -610,7 +618,7 @@ CHIP_ERROR WiFiManager::IsActivated(bool * isWiFiActivated)
     return err;
 }
 
-CHIP_ERROR WiFiManager::Activate(void)
+CHIP_ERROR WiFiManager::Activate()
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
     int wifiErr          = WIFI_MANAGER_ERROR_NONE;
@@ -633,7 +641,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR WiFiManager::Deactivate(void)
+CHIP_ERROR WiFiManager::Deactivate()
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
     int wifiErr          = WIFI_MANAGER_ERROR_NONE;
@@ -733,7 +741,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR WiFiManager::RemoveAllConfigs(void)
+CHIP_ERROR WiFiManager::RemoveAllConfigs()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     int wifiErr    = WIFI_MANAGER_ERROR_NONE;
@@ -867,4 +875,3 @@ CHIP_ERROR WiFiManager::GetConnectionState(wifi_manager_connection_state_e * con
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI

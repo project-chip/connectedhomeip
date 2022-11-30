@@ -17,4 +17,8 @@ public final class IPAddress {
   public String toString() {
     return address.toString();
   }
+
+  public String getHostAddress() {
+    return address.getHostAddress();
+  }
 }

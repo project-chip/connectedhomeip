@@ -18,7 +18,7 @@
 
 #include "DeviceInstanceInfoProviderImpl.h"
 
-#include <platform/Tizen/PosixConfig.h>
+#include "PosixConfig.h"
 
 namespace chip {
 namespace DeviceLayer {

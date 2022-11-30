@@ -703,9 +703,15 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         }
         else if (params.HasDiscriminator())
         {
+            // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
+            // for later.
+            mRendezvousParametersForDeviceDiscoveredOverBle = params;
+
             SetupDiscriminator discriminator;
             discriminator.SetLongValue(params.GetDiscriminator());
-            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(discriminator));
+            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(
+                              discriminator, this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError));
+            ExitNow(CHIP_NO_ERROR);
         }
         else
         {
@@ -739,6 +745,38 @@ exit:
 
     return err;
 }
+
+#if CONFIG_NETWORK_LAYER_BLE
+void DeviceCommissioner::OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_CONNECTION_OBJECT connObj)
+{
+    auto self   = static_cast<DeviceCommissioner *>(appState);
+    auto device = self->mDeviceInPASEEstablishment;
+
+    if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kBle)
+    {
+        auto remoteId = device->GetDeviceId();
+
+        auto params = self->mRendezvousParametersForDeviceDiscoveredOverBle;
+        params.SetConnectionObject(connObj);
+        self->mRendezvousParametersForDeviceDiscoveredOverBle = RendezvousParameters();
+
+        self->ReleaseCommissioneeDevice(device);
+        LogErrorOnFailure(self->EstablishPASEConnection(remoteId, params));
+    }
+}
+
+void DeviceCommissioner::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err)
+{
+    auto self   = static_cast<DeviceCommissioner *>(appState);
+    auto device = self->mDeviceInPASEEstablishment;
+
+    if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kBle)
+    {
+        self->ReleaseCommissioneeDevice(device);
+        self->mRendezvousParametersForDeviceDiscoveredOverBle = RendezvousParameters();
+    }
+}
+#endif // CONFIG_NETWORK_LAYER_BLE
 
 CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningParameters & params)
 {
@@ -1088,6 +1126,18 @@ void DeviceCommissioner::OnFailedToExtendedArmFailSafeDeviceAttestation(void * c
     CommissioningDelegate::CommissioningReport report;
     report.Set<AttestationErrorInfo>(commissioner->mAttestationResult);
     commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
+}
+
+void DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
+                                           Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
+                                           OnExtendFailsafeFailure onFailure)
+{
+    uint64_t breadcrumb = static_cast<uint64_t>(step);
+    GeneralCommissioning::Commands::ArmFailSafe::Type request;
+    request.expiryLengthSeconds = armFailSafeTimeout;
+    request.breadcrumb          = breadcrumb;
+    ChipLogProgress(Controller, "Arming failsafe (%u seconds)", request.expiryLengthSeconds);
+    SendCommand<GeneralCommissioningCluster>(proxy, request, onSuccess, onFailure, kRootEndpointId, commandTimeout);
 }
 
 void DeviceCommissioner::ExtendArmFailSafeForDeviceAttestation(const Credentials::DeviceAttestationVerifier::AttestationInfo & info,
@@ -2060,11 +2110,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     switch (step)
     {
     case CommissioningStage::kArmFailsafe: {
-        GeneralCommissioning::Commands::ArmFailSafe::Type request;
-        request.expiryLengthSeconds = params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeTimeout);
-        request.breadcrumb          = breadcrumb;
-        ChipLogProgress(Controller, "Arming failsafe (%u seconds)", request.expiryLengthSeconds);
-        SendCommand<GeneralCommissioningCluster>(proxy, request, OnArmFailSafe, OnBasicFailure, endpoint, timeout);
+        VerifyOrDie(endpoint == kRootEndpointId);
+        ExtendArmFailSafe(proxy, step, params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeTimeout), timeout, OnArmFailSafe,
+                          OnBasicFailure);
     }
     break;
     case CommissioningStage::kReadCommissioningInfo: {

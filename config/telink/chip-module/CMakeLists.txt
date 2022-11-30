@@ -91,6 +91,7 @@ macro(chip_gn_arg ARG VALUE)
     string(APPEND CHIP_GN_ARGS "--arg\n${ARG}\n${VALUE}\n")
 endmacro()
 
+
 # ==============================================================================
 # Prepare CHIP configuration based on the project Kconfig configuration
 # ==============================================================================
@@ -126,10 +127,6 @@ endif()
 
 if (CONFIG_CHIP_LIB_SHELL)
     list(APPEND CHIP_LIBRARIES -lCHIPShell)
-endif()
-
-if (CONFIG_CHIP_PW_RPC)
-    list(APPEND CHIP_LIBRARIES -lPwRpc)
 endif()
 
 if (CONFIG_TELINK_BLE_LIB)
@@ -226,6 +223,14 @@ if (CHIP_PROJECT_CONFIG)
     chip_gn_arg_string("chip_project_config_include"        ${CHIP_PROJECT_CONFIG})
     chip_gn_arg_string("chip_system_project_config_include" ${CHIP_PROJECT_CONFIG})
 endif()
+
+if (CONFIG_CHIP_PW_RPC)
+    set(PIGWEED_DIR "//third_party/pigweed/repo")
+    chip_gn_arg_string("pw_assert_BACKEND" ${PIGWEED_DIR}/pw_assert_log:check_backend)
+    chip_gn_arg_string("pw_log_BACKEND" ${PIGWEED_DIR}/pw_log_basic)
+    chip_gn_arg("pw_build_LINK_DEPS" [\"${PIGWEED_DIR}/pw_assert:impl\",\ \"${PIGWEED_DIR}/pw_log:impl\"])
+endif()
+
 if (CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER)
     chip_gn_arg_bool("chip_build_example_providers" "true")
     list(APPEND CHIP_LIBRARIES -lMatterDeviceInfoProviderExample)

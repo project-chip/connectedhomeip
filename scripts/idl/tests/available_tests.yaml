@@ -62,3 +62,12 @@ bridge:
 cpp-app:
     inputs/several_clusters.matter:
         app/PluginApplicationCallbacks.h: outputs/several_clusters/cpp-app/PluginApplicationCallbacks.h
+        app/callback-stub.cpp: outputs/several_clusters/cpp-app/callback-stub.cpp
+
+    inputs/large_all_clusters_app.matter:
+        app/PluginApplicationCallbacks.h: outputs/large_all_clusters_app/cpp-app/PluginApplicationCallbacks.h
+        app/callback-stub.cpp: outputs/large_all_clusters_app/cpp-app/callback-stub.cpp
+
+    inputs/large_lighting_app.matter:
+        app/PluginApplicationCallbacks.h: outputs/large_lighting_app/cpp-app/PluginApplicationCallbacks.h
+        app/callback-stub.cpp: outputs/large_lighting_app/cpp-app/callback-stub.cpp

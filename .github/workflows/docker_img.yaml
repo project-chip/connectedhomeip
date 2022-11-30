@@ -57,7 +57,6 @@ jobs:
                     - "-openiotsdk"
                     # NOTE: vscode image consumes ~52 GB disk space but GitHub-hosted runners provide ~10 GB free disk space(https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources)
                     #- "-vscode"
-                    - "-zap"
         steps:
             - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout

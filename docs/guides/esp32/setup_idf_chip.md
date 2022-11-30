@@ -1,6 +1,6 @@
-# Setup ESP-IDF and CHIP Environment
+# Setup ESP-IDF and Matter Environment
 
-Setting up IDF and CHIP environment is one time setup.
+Setting up IDF and Matter environment is one time setup.
 
 ## Setup ESP-IDF (Espressif IoT Development Framework)
 
@@ -50,7 +50,7 @@ step.
     $ ./install.sh
     ```
 
-## Setup CHIP environment
+## Setup Matter environment
 
 ### Install Prerequisites
 
@@ -77,5 +77,5 @@ source scripts/bootstrap.sh
 
 ---
 
-Once IDF and CHIP environment is set up, head over to
+Once IDF and Matter environment is set up, head over to
 [application building and commissioning guide](build_app_and_commission.md).
