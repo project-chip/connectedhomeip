@@ -14,6 +14,7 @@
 #    limitations under the License.
 
 import click
+import tempfile
 
 from chip import ChipDeviceCtrl
 from chip.ChipStack import *
@@ -32,27 +33,33 @@ import chip.yaml
     '--yaml-path',
     default=None,
     help='yaml-path')
-def main(setup_code, yaml_path):
+@click.option(
+    '--node-id',
+    default=0x12344321,
+    help='Node ID to use when commissioning device')
+def main(setup_code, yaml_path, node_id):
+    exit(-1)
+    chip_stack_storage = tempfile.NamedTemporaryFile()
     chip.native.Init()
-    chipStack = ChipStack("/tmp/repl-storage.json")
-    certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack, chipStack.GetStorageManager())
-    certificateAuthorityManager.LoadAuthoritiesFromStorage()
+    chip_stack = ChipStack(chip_stack_storage.name)
+    certificate_authority_manager = chip.CertificateAuthority.CertificateAuthorityManager(chip_stack, chipStack.GetStorageManager())
+    certificate_authority_manager.LoadAuthoritiesFromStorage()
 
-    if (len(certificateAuthorityManager.activeCaList) == 0):
-        ca = certificateAuthorityManager.NewCertificateAuthority()
+    if len(certificate_authority_manager.activeCaList) == 0:
+        ca = certificate_authority_manager.NewCertificateAuthority()
         ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
-    elif (len(certificateAuthorityManager.activeCaList[0].adminList) == 0):
-        certificateAuthorityManager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
+    elif len(certificate_authority_manager.activeCaList[0].adminList) == 0:
+        certificate_authority_manager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
 
-    caList = certificateAuthorityManager.activeCaList
+    ca_list = certificate_authority_manager.activeCaList
 
-    devCtrl = caList[0].adminList[0].NewController()
-    devCtrl.CommissionWithCode(setup_code, 0x12344321)
+    devCtrl = ca_list[0].adminList[0].NewController()
+    devCtrl.CommissionWithCode(setup_code, node_id)
 
     parsed_test = chip.yaml.parser.YamlTestParser(yaml_path)
     parsed_test.execute_tests(devCtrl)
-    certificateAuthorityManager.Shutdown()
-    chipStack.Shutdown()
+    certificate_authority_manager.Shutdown()
+    chip_stack.Shutdown()
 
 
 if __name__ == '__main__':
