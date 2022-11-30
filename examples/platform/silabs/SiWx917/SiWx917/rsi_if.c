@@ -103,7 +103,7 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
  *********************************************************************/
 int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
 {
-    /* TODO : Place holder untill we have similar functionality
+    /* TODO : Place holder until we have similar functionality
      *        available for SiWx917
      */
     int32_t status = 0;
@@ -120,7 +120,7 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
  *********************************************************************/
 int32_t wfx_rsi_reset_count()
 {
-    /* TODO : Place holder untill we have similar functionality
+    /* TODO : Place holder until we have similar functionality
      *        available for SiWx917
      */
     int32_t status = 0;
@@ -419,7 +419,7 @@ static void wfx_rsi_do_join(void)
         wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTING;
 
         /* Try to connect Wifi with given Credentials
-         * untill there is a success or maximum number of tries allowed
+         * until there is a success or maximum number of tries allowed
          */
         while (++wfx_rsi.join_retries < WFX_RSI_CONFIG_MAX_JOIN)
         {
@@ -601,9 +601,9 @@ void wfx_rsi_task(void * arg)
             wfx_lwip_set_sta_link_up();
 #endif /* !RS911X_SOCKETS */
             /* We need to get AP Mac - TODO */
-            // Uncomment once the hook into MATTER is moved to IP connectivty instead
+            // Uncomment once the hook into MATTER is moved to IP connectivity instead
             // of AP connectivity. wfx_connected_notify(0, &wfx_rsi.ap_mac); // This
-            // is independant of IP connectivity.
+            // is independent of IP connectivity.
         }
         if (flags & WFX_EVT_STA_DISCONN)
         {

@@ -121,7 +121,7 @@ static void wfx_host_gpio_init(void)
  * @brief
  *       set the configuration of spi
  * @param[in]  usart:
- * @return  returns 0 if sucessful,
+ * @return  returns 0 if successful,
  *         -1 otherwise
  * **********************************************************************/
 static int sl_wfx_host_spi_set_config(void * usart)

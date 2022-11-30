@@ -130,7 +130,7 @@ uint32_t rsi_rtc_get_hal_timer_frequency(void)
     /* CMU_PrescToLog2 converts prescaler dividend to a logarithmic value. It only works for even
      * numbers equal to 2^n.
      * An unscaled dividend (dividend = argument + 1).
-     * So we need to send argument substracted by 1
+     * So we need to send argument subtracted by 1
      */
     return (CMU_ClockFreqGet(cmuClock_RTCC) >> (CMU_PrescToLog2(SL_SLEEPTIMER_FREQ_DIVIDER - 1)));
 }
@@ -150,7 +150,7 @@ void rsi_rtc_init_timer(void)
     /* CMU_PrescToLog2 converts prescaler dividend to a logarithmic value. It only works for even
      * numbers equal to 2^n.
      * An unscaled dividend (dividend = argument + 1).
-     * So we need to send argument substracted by 1
+     * So we need to send argument subtracted by 1
      */
     rtcc_init.presc = (RTCC_CntPresc_TypeDef)(CMU_PrescToLog2(SL_SLEEPTIMER_FREQ_DIVIDER - 1));
 
