@@ -88,9 +88,6 @@ MTR_NEWLY_DEPRECATED("Please use {{objCEnumName (asUpperCamelCase ../name preser
 {{/unless}}
 ;
 
-{{#if (isStrEqual (asUpperCamelCase ../name) "UnitTesting")}}
-
-{{/if}}
 {{/zcl_enums}}
 {{#zcl_bitmaps}}
 {{#*inline "bitmapDef"}}
@@ -100,29 +97,26 @@ typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName labe
    {{/zcl_bitmap_items}}
 }
 {{! TODO: We need a better setup for the API_AVALABLE annotations here; this does not scale at all sanely. }}
-{{#if (isStrEqual (asUpperCamelCase ../name) "Switch")}}
+{{#if (isStrEqual (asUpperCamelCase clusterName) "Switch")}}
 {{#if (isStrEqual (asUpperCamelCase label) "SwitchFeature")}}
 API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 {{/if}}
 {{/if}}
-{{#if (isStrEqual (asUpperCamelCase ../name) "MediaPlayback")}}
+{{#if (isStrEqual (asUpperCamelCase clusterName) "MediaPlayback")}}
 {{#if (isStrEqual (asUpperCamelCase label) "MediaPlaybackFeature")}}
 API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 {{/if}}
 {{/if}}
-{{#if (isStrEqual (asUpperCamelCase clusterName) "UnitTesting")}}
-MTR_NEWLY_AVAILABLE
-{{else if (isStrEqual (asUpperCamelCase clusterName) "TestCluster")}}
-MTR_NEWLY_DEPRECATED("Please use {{objCEnumName "UnitTesting" label}}")
-{{/if}}
-;
 {{/inline}}
-{{> bitmapDef name=name clusterName=../name label=label}}
+{{> bitmapDef name=name clusterName=(asUpperCamelCase ../name preserveAcronyms=true) label=label}}
+{{#unless (isStrEqual (asUpperCamelCase ../name preserveAcronyms=true) (compatClusterNameRemapping ../name))}}
+MTR_NEWLY_AVAILABLE;
 
-{{#if (isStrEqual (asUpperCamelCase ../name) "UnitTesting")}}
-{{> bitmapDef name=name clusterName="TestCluster" label=label}}
+{{> bitmapDef name=name clusterName=(compatClusterNameRemapping ../name) label=label}}
+MTR_NEWLY_DEPRECATED("Please use {{objCEnumName (asUpperCamelCase ../name preserveAcronyms=true) label}}")
+{{/unless}}
+;
 
-{{/if}}
 {{/zcl_bitmaps}}
 {{/zcl_clusters}}
 
@@ -153,21 +147,21 @@ MTR_NEWLY_DEPRECATED("Please use {{objCEnumName "UnitTesting" label}}")
   CompletionHandler:
 {{~/if_is_fabric_scoped_struct~}}
 (void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))completionHandler {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}}
-  MTR_NEWLY_DEPRECATED("Please use read{{>attribute}}With{{#if_is_fabric_scoped_struct type}}Params:completion:{{else}}Completion:{{/if_is_fabric_scoped_struct}}");
+  MTR_NEWLY_DEPRECATED("Please use readAttribute{{asUpperCamelCase name preserveAcronyms=true}}With{{#if_is_fabric_scoped_struct type}}Params:completion:{{else}}Completion:{{/if_is_fabric_scoped_struct}}");
 {{#if isWritableAttribute}}
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name compatRemapClusterName=true}})value completionHandler:(MTRStatusCompletion)completionHandler {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}}
-  MTR_NEWLY_DEPRECATED("Please use write{{>attribute}}WithValue:completion:");
+  MTR_NEWLY_DEPRECATED("Please use writeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue:completion:");
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name compatRemapClusterName=true}})value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}}
-  MTR_NEWLY_DEPRECATED("Please use write{{>attribute}}WithValue:params:completion:");
+  MTR_NEWLY_DEPRECATED("Please use writeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue:params:completion:");
 {{/if}}
 {{#if isReportableAttribute}}
 {{! TODO: We need a better setup for the API_AVALABLE annotations here; this does not scale at all sanely. }}
 - (void) subscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval
        params:(MTRSubscribeParams * _Nullable)params
 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))reportHandler {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}}
-  MTR_NEWLY_DEPRECATED("Please use subscribe{{>attribute}}WithParams:subscriptionEstablished:");
+  MTR_NEWLY_DEPRECATED("Please use subscribeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithParams:subscriptionEstablished:");
 + (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))completionHandler {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}}
-  MTR_NEWLY_DEPRECATED("Please use read{{>attribute}}WithAttributeCache:endpoint:queue:completion:");
+  MTR_NEWLY_DEPRECATED("Please use readAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithAttributeCache:endpoint:queue:completion:");
 {{/if}}
 {{/chip_server_cluster_attributes}}
 
