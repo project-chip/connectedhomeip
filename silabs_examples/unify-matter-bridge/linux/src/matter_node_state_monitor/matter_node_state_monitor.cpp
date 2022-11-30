@@ -186,6 +186,17 @@ void matter_node_state_monitor::erase_mapper_endpoint(const std::string unid, ch
   }
 }
 
+void matter_node_state_monitor::display_map()
+{
+  sl_log_debug(LOG_TAG, "Unify Unid|\tUnify Endpoint|\tMatter Endpoint\n");
+  for (auto ep = bridged_endpoints.begin(); ep != bridged_endpoints.end(); ep++) {
+      sl_log_debug(LOG_TAG, "%s | %d | %d",
+                   ep->second.unify_unid.c_str(), 
+                   ep->second.unify_endpoint,
+                   ep->second.matter_endpoint);
+  }
+}
+
 void matter_node_state_monitor::register_dynamic_endpoint(const struct bridged_endpoint &bridge)
 {
   uint16_t index = unify_ember_interface.emberAfGetDynamicIndexFromEndpointUnify(bridge.matter_endpoint);

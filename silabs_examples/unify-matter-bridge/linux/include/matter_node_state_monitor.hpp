@@ -124,9 +124,14 @@ public:
      * @brief Get the supported cluster from matter endpoint id
      *
      * @param endpoint
-     * @return std::set<chip::ClusterId>
+     * @return std::set<chip::ClusterId> 
      */
     std::set<chip::ClusterId> get_supported_cluster(chip::EndpointId endpoint);
+
+    /**
+     * @brief Display mapping of Matter endpoints to Unify UNID/endpoints 
+     */
+    void display_map();
 
 protected:
     /**

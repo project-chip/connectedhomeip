@@ -126,6 +126,7 @@ int main(int argc, char * argv[])
     device_translator matter_device_translator;
     UnifyEmberInterface ember_interface;
     matter_node_state_monitor node_state_monitor(matter_device_translator, ember_interface);
+    set_matter_node_state_monitor_for_cli(node_state_monitor);
     UnifyMqtt unify_mqtt_handler;
 
     // Initializing Group cluster command handler

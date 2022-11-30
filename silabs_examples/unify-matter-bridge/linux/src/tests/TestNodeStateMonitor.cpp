@@ -120,8 +120,9 @@ static void TestNodeStateMonitorAddingNode(nlTestSuite * inSuite, void * aContex
     // Adding the same node again triggers everything again except registering a new dynamic endpoint
     node_state_monitor.call_on_unify_node_added(node);
     NL_TEST_ASSERT(inSuite, test_data.state_update_called == 8);
-    // This fails - we blindly adds bridged endpoints without checking if they are already added
+    // This fails - we blindly add bridged endpoints without checking if they are already added
     NL_TEST_ASSERT(inSuite, node_state_monitor.bridged_endpoints_count() == 2);
+    node_state_monitor.display_map();
 }
 
 static void TestNodeStateMonitoringStateChangingNode(nlTestSuite * inSuite, void * aContext)
@@ -257,6 +258,7 @@ static void TestMultipleListeners(nlTestSuite * inSuite, void * aContext)
     NL_TEST_ASSERT(inSuite, listener_1_called == 2);
     NL_TEST_ASSERT(inSuite, listener_2_called == 2);
     NL_TEST_ASSERT(inSuite, listener_1_unify_endpoint_id == listener_2_unify_endpoint_id);
+    node_state_monitor.display_map();
 }
 
 static void TestEmberInterfaceNodeAdded(nlTestSuite * inSuite, void * aContext)
@@ -349,6 +351,7 @@ static void TestEmberInterfaceNodeAdded(nlTestSuite * inSuite, void * aContext)
     }
     NL_TEST_ASSERT(inSuite, dimmable_light_device_id_present);
     NL_TEST_ASSERT(inSuite, device_is_a_bridge_device);
+    node_state_monitor.display_map();
 }
 
 class TestContext
