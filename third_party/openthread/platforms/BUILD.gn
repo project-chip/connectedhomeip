@@ -57,7 +57,7 @@ static_library("libopenthread-platform-utils") {
 
   public_deps = [ "${openthread_root}/src/core:libopenthread_core_headers" ]
 
-  if (chip_enable_segger_rtt == true) {
+  if (chip_enable_segger_rtt) {
     sources += [
       "${openthread_root}/examples/platforms/utils/logging_rtt.c",
       "${openthread_root}/examples/platforms/utils/logging_rtt.h",
