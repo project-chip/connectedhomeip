@@ -1503,7 +1503,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTROtaSoftwareUpdateProviderClusterQueryImageParams : NSObject <NSCopying>
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateProviderClusterQueryImageParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull vendorId;
 
@@ -1539,7 +1540,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams : NSObject <NSCopying>
+
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImageParams")
+@interface MTROtaSoftwareUpdateProviderClusterQueryImageParams : MTROTASoftwareUpdateProviderClusterQueryImageParams
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateProviderClusterQueryImageResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull status;
 
@@ -1576,7 +1583,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams : NSObject <NSCopying>
+
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImageResponseParams")
+@interface MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams : MTROTASoftwareUpdateProviderClusterQueryImageResponseParams
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSData * _Nonnull updateToken;
 
@@ -1600,7 +1613,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams : NSObject <NSCopying>
+
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams")
+@interface MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams : MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull action;
 
@@ -1625,7 +1644,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams : NSObject <NSCopying>
+
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams")
+@interface MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams
+    : MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSData * _Nonnull updateToken;
 
@@ -1649,7 +1675,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams : NSObject <NSCopying>
+
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams")
+@interface MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
+    : MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull providerNodeId;
 
@@ -1679,6 +1712,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams")
+@interface MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams
+    : MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams
+@end
+
 @interface MTRGeneralCommissioningClusterArmFailSafeParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull expiryLengthSeconds;

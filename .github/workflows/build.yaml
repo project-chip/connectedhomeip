@@ -229,12 +229,28 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --no-log-timestamps \
-                       --target linux-x64-all-clusters-ipv6only-clang \
-                       --target linux-x64-chip-tool-ipv6only-clang \
                        --target linux-x64-minmdns-ipv6only-clang \
                        --target linux-x64-rpc-console \
                        build \
                     "
+            - name: Create a pre-generate directory and ensure compile-time codegen would fail
+              run: |
+                  ./scripts/run_in_build_env.sh "./scripts/codepregen.py ./zzz_pregenerated"
+                  mv scripts/codegen.py scripts/codegen.py.renamed
+            - name: Build using build_examples.py (pregen)
+              timeout-minutes: 60
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --no-log-timestamps \
+                       --target linux-x64-all-clusters-ipv6only-clang \
+                       --target linux-x64-chip-tool-ipv6only-clang \
+                       --pregen-dir ./zzz_pregenerated \
+                       build \
+                    "
+            - name: Undo code pre-generation changes (make compile time codegen work again)
+              run: |
+                  rm -rf ./zzz_pregenerated
+                  mv scripts/codegen.py.renamed scripts/codegen.py
             - name: Run fake linux tests with build_examples
               timeout-minutes: 15
               run: |

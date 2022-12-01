@@ -141,6 +141,8 @@ else
         exit 1
     fi
 
+    optArgs=$optArgs' bouffalolab_sdk_root="'$BOUFFALOLAB_SDK_ROOT'"'
+
     example_dir=$MATTER_ROOT/examples/$example_name/bouffalolab/$bouffalo_chip
     output_dir=$MATTER_ROOT/$output_folder
 

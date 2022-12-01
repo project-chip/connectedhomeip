@@ -76,6 +76,10 @@ public abstract class Command {
     return mArgs.size();
   }
 
+  public final boolean getArgumentIsOptional(int index) {
+    return mArgs.get(index).isOptional();
+  }
+
   /**
    * @brief Get argument description if it exists
    * @return A pointer to an Optional where the argument description will be stored

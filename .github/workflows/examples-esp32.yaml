@@ -71,11 +71,29 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --enable-flashbundle \
                         --target esp32-m5stack-all-clusters \
-                        --target esp32-m5stack-all-clusters-minimal \
-                        --target esp32-m5stack-all-clusters-rpc-ipv6only \
                         build \
                         --copy-artifacts-to out/artifacts \
                      "
+            - name: Prepare code pregen and ensure compile time pregen not possible
+              run: |
+                  ./scripts/run_in_build_env.sh "./scripts/codepregen.py ./zzz_pregenerated"
+                  mv scripts/codegen.py scripts/codegen.py.renamed
+            - name: Build some M5Stack variations with pregen
+              timeout-minutes: 60
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --enable-flashbundle \
+                        --target esp32-m5stack-all-clusters-minimal \
+                        --target esp32-m5stack-all-clusters-rpc-ipv6only \
+                        --pregen-dir ./zzz_pregenerated \
+                        build \
+                        --copy-artifacts-to out/artifacts \
+                     "
+            - name: Undo code pregeneration changes
+              run: |
+                  rm -rf ./zzz_pregenerated
+                  mv scripts/codegen.py.renamed scripts/codegen.py
             - name: Prepare bloat report
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \

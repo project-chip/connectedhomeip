@@ -189,7 +189,8 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTROtaSoftwareUpdateRequestorClusterProviderLocation : NSObject <NSCopying>
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateRequestorClusterProviderLocation : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull providerNodeID;
 @property (nonatomic, copy) NSNumber * _Nonnull endpoint;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
@@ -198,7 +199,12 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent : NSObject <NSCopying>
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterProviderLocation")
+@interface MTROtaSoftwareUpdateRequestorClusterProviderLocation : MTROTASoftwareUpdateRequestorClusterProviderLocation
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateRequestorClusterStateTransitionEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull previousState;
 @property (nonatomic, copy, getter=getNewState) NSNumber * _Nonnull newState;
 @property (nonatomic, copy) NSNumber * _Nonnull reason;
@@ -208,7 +214,12 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent : NSObject <NSCopying>
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterStateTransitionEvent")
+@interface MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent : MTROTASoftwareUpdateRequestorClusterStateTransitionEvent
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
 @property (nonatomic, copy) NSNumber * _Nonnull productID;
 
@@ -216,7 +227,12 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent : NSObject <NSCopying>
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent")
+@interface MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent : MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
 @property (nonatomic, copy) NSNumber * _Nonnull bytesDownloaded;
 @property (nonatomic, copy) NSNumber * _Nullable progressPercent;
@@ -224,6 +240,10 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
+@end
+
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent")
+@interface MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent : MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent
 @end
 
 @interface MTRPowerSourceClusterBatChargeFaultChangeType : NSObject <NSCopying>

@@ -51,21 +51,30 @@ template("chip_data_model") {
     _idl = string_replace(invoker.zap_file, ".zap", ".matter")
   }
 
-  chip_codegen("${_data_model_name}_codegen") {
-    input = _idl
-    generator = "cpp-app"
-    outputs = [
-      "app/PluginApplicationCallbacks.h",
-      "app/callback-stub.cpp",
-    ]
-  }
-
   config("${_data_model_name}_config") {
     include_dirs = []
 
     if (defined(invoker.zap_pregenerated_dir)) {
       include_dirs += [ "${invoker.zap_pregenerated_dir}/.." ]
     }
+  }
+
+  chip_codegen("${_data_model_name}_codegen") {
+    input = _idl
+    generator = "cpp-app"
+
+    outputs = [
+      "app/PluginApplicationCallbacks.h",
+      "app/callback-stub.cpp",
+    ]
+
+    public_configs = [ ":${_data_model_name}_config" ]
+
+    if (!defined(deps)) {
+      deps = []
+    }
+
+    deps += [ "${chip_root}/src/app/common:cluster-objects" ]
   }
 
   _use_default_im_dispatch = !defined(invoker.use_default_im_dispatch) ||
@@ -84,7 +93,10 @@ template("chip_data_model") {
       sources = []
     }
 
-    sources += get_target_outputs(":${_data_model_name}_codegen")
+    if (!defined(deps)) {
+      deps = []
+    }
+    deps += [ ":${_data_model_name}_codegen" ]
 
     sources += [
       "${_app_root}/clusters/barrier-control-server/barrier-control-server.h",
