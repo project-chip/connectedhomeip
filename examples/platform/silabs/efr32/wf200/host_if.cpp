@@ -549,7 +549,8 @@ static void wfx_events_task(void * p_arg)
 
                 if (!is_disconnection_event)
                 {
-                    SILABS_LOG("%s: First commissioning, retry after %d sec", __func__, (WLAN_RETRY_TIMER_MS / WLAN_MIN_RETRY_TIMER_MS));
+                    SILABS_LOG("%s: First commissioning, retry after %d sec", __func__,
+                               (WLAN_RETRY_TIMER_MS / WLAN_MIN_RETRY_TIMER_MS));
                     if (retryJoin < MAX_JOIN_RETRIES_COUNT)
                         vTaskDelay(WLAN_RETRY_TIMER_MS);
                 }
@@ -561,7 +562,8 @@ static void wfx_events_task(void * p_arg)
                     }
                     else
                     {
-                        SILABS_LOG("%s: Next attempt after %d Seconds", __func__, (WLAN_MAX_RETRY_TIMER_MS / WLAN_MIN_RETRY_TIMER_MS));
+                        SILABS_LOG("%s: Next attempt after %d Seconds", __func__,
+                                   (WLAN_MAX_RETRY_TIMER_MS / WLAN_MIN_RETRY_TIMER_MS));
                     }
 
                     vTaskDelay(retryInterval < WLAN_MAX_RETRY_TIMER_MS ? pdMS_TO_TICKS(retryInterval)

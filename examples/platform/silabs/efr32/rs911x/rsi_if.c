@@ -531,7 +531,8 @@ static void wfx_rsi_do_join(void)
                     }
                     else
                     {
-                        WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (WLAN_MAX_RETRY_TIMER_MS / WLAN_MIN_RETRY_TIMER_MS));
+                        WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__,
+                                    (WLAN_MAX_RETRY_TIMER_MS / WLAN_MIN_RETRY_TIMER_MS));
                     }
 
                     vTaskDelay(retryInterval < WLAN_MAX_RETRY_TIMER_MS ? pdMS_TO_TICKS(retryInterval)
