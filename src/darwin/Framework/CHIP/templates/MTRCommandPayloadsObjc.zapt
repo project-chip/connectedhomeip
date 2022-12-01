@@ -7,10 +7,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{#zcl_clusters}}
 {{#zcl_commands}}
-{{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}
+{{#unless (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name))}}
 MTR_NEWLY_AVAILABLE
-{{/if}}
-@interface MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params : NSObject <NSCopying>
+{{else}}
+{{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (asUpperCamelCase name))}}
+MTR_NEWLY_AVAILABLE
+{{/unless}}
+{{/unless}}
+@interface MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params : NSObject <NSCopying>
 {{#zcl_command_arguments}}
 
 {{! Override the getter name because some of our properties start with things
@@ -36,13 +40,20 @@ MTR_NEWLY_AVAILABLE
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-{{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}
+{{#*inline "deprecatedDecl"}}
 
-MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingCluster{{asUpperCamelCase name}}Params")
-@interface MTRTestClusterCluster{{asUpperCamelCase name}}Params : MTRUnitTestingCluster{{asUpperCamelCase name}}Params
+MTR_NEWLY_DEPRECATED("Please use MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params")
+@interface MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase name}}Params : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name}}Params
 @end
 
-{{/if}}
+{{/inline}}
+{{#unless (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name))}}
+{{> deprecatedDecl}}
+{{else}}
+{{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (asUpperCamelCase name))}}
+{{> deprecatedDecl}}
+{{/unless}}
+{{/unless}}
 {{/zcl_commands}}
 {{/zcl_clusters}}
 

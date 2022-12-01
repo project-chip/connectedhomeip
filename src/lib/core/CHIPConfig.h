@@ -375,6 +375,16 @@
 #endif // CHIP_AUTOMATION_LOGGING
 
 /**
+ *  @def CHIP_LOG_FILTERING
+ *
+ *  @brief
+ *    If asserted (1), enable runtime log level configuration.
+ */
+#ifndef CHIP_LOG_FILTERING
+#define CHIP_LOG_FILTERING 1
+#endif
+
+/**
  * CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE
  *
  * The maximum size (in bytes) of a log message

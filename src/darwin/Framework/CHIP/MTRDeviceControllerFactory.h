@@ -44,6 +44,9 @@ MTR_NEWLY_AVAILABLE
 /*
  * OTA Provider delegate to be called when an OTA Requestor is requesting a software update.
  * Defaults to nil.
+ *
+ * Calls to this delegate can happen on an arbitrary thread, but will not happen
+ * concurrently.
  */
 @property (nonatomic, strong, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
 

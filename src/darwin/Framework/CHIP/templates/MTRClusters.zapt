@@ -16,30 +16,42 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster {{name}}
  *    {{description}}
  */
-{{#if (isStrEqual (asUpperCamelCase name) "UnitTesting")}}
+{{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
 MTR_NEWLY_AVAILABLE
-{{/if}}
-@interface MTRCluster{{asUpperCamelCase name}} : MTRCluster
+{{/unless}}
+@interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 {{#chip_cluster_commands}}
-- (void){{asLowerCamelCase name}}WithParams:(MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion MTR_NEWLY_AVAILABLE;
+{{~#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "command"}}{{asUpperCamelCase name preserveAcronyms=true}}{{/inline~}}
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{>cluster}}Cluster{{>command}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion MTR_NEWLY_AVAILABLE;
 {{#unless (hasArguments)}}
 - (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion MTR_NEWLY_AVAILABLE;
 {{/unless}}
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-{{!Backwards compat for now: Treat DeviceTypeList as DeviceList.  Ideally we would have both, not just DeviceList. }}
-{{#*inline "attribute"}}Attribute{{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}{{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeList")}}DeviceList{{else}}{{asUpperCamelCase name}}{{/if}}{{else}}{{asUpperCamelCase name}}{{/if}}{{/inline}}
-{{! TODO: We need a better setup for the API_AVALABLE annotations here; this does not scale at all sanely. }}
-- (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}};
+{{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
+{{#*inline "availability"}}
+{{#if (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (asUpperCamelCase name))}}
+  {{#if (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) "Descriptor")}}
+    {{#if (isStrEqual (asUpperCamelCase name preserveAcronyms=true) "DeviceTypeList")}}
+      MTR_NEWLY_AVAILABLE
+    {{/if}}
+  {{/if}}
+{{else}}
+  MTR_NEWLY_AVAILABLE
+{{/if}}
+{{/inline}}
+{{! TODO: We need a better setup for the API_AVAILABLE annotations here; this does not scale at all sanely. }}
+- (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {{> availability}};
 {{#if isWritableAttribute}}
-- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}};
-- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}};
+- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs {{> availability}};
+- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params {{> availability}};
 {{/if}}
 {{/chip_server_cluster_attributes}}
 
@@ -50,9 +62,14 @@ MTR_NEWLY_AVAILABLE
 
 {{/chip_client_clusters}}
 
-MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
-@interface MTRClusterTestCluster : MTRClusterUnitTesting
+{{#chip_client_clusters includeAll=true}}
+{{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
+MTR_NEWLY_DEPRECATED("Please use MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}")
+@interface MTRCluster{{compatClusterNameRemapping name}} : MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
 @end
+
+{{/unless}}
+{{/chip_client_clusters}}
 
 {{#chip_client_clusters includeAll=true}}
 @interface MTRCluster{{compatClusterNameRemapping name}} (Deprecated)
@@ -67,6 +84,27 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
 - (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapClusterName=true}})completionHandler MTR_NEWLY_DEPRECATED("Please use {{asLowerCamelCase name}}WithExpectedValues:expectedValueIntervalMs:completion:");
 {{/unless}}
 {{/chip_cluster_commands}}
+{{~#chip_server_cluster_attributes}}
+{{~!Backwards compat for now: Treat DeviceTypeList as DeviceList.  That's OK, since all these bits are deprecated. ~}}
+{{~#*inline "attribute"}}Attribute{{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}{{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeList")}}DeviceList{{else}}{{asUpperCamelCase name}}{{/if}}{{else}}{{asUpperCamelCase name}}{{/if}}{{/inline~}}
+{{~! TODO: We need a better setup for the API_AVAILABLE annotations here; this does not scale at all sanely. ~}}
+{{~#*inline "attributeDecls"}}
+- (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}} MTR_NEWLY_DEPRECATED("Please use readAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithParams on MTRCluster{{asUpperCamelCase parent.name preserveAcronyms=true}}");
+{{#if isWritableAttribute}}
+- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}} MTR_NEWLY_DEPRECATED("Please use writeAtribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue on MTRCluster{{asUpperCamelCase parent.name preserveAcronyms=true}}");
+- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}} MTR_NEWLY_DEPRECATED("Please use writeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue on MTRCluster{{asUpperCamelCase parent.name preserveAcronyms=true}}");
+{{/if}}
+{{/inline~}}
+{{#if (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (asUpperCamelCase name))}}
+  {{#if (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) "Descriptor")}}
+    {{#if (isStrEqual (asUpperCamelCase name preserveAcronyms=true) "DeviceTypeList")}}
+      {{> attributeDecls}}
+    {{/if}}
+  {{/if}}
+{{else}}
+  {{> attributeDecls}}
+{{/if}}
+{{/chip_server_cluster_attributes}}
 @end
 
 {{/chip_client_clusters}}

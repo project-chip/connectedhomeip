@@ -444,9 +444,8 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
     int threadErr;
 
     threadErr = thread_get_extended_address(mThreadInstance, &extAddr);
-    VerifyOrReturnError(
-        threadErr == THREAD_ERROR_NONE,
-        (ChipLogError(DeviceLayer, "thread_get_extended_address() failed. ret: %d", threadErr), CHIP_ERROR_INTERNAL));
+    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "thread_get_extended_address() failed. ret: %d", threadErr));
 
     extAddr = htobe64(extAddr);
     memcpy(buf, &extAddr, sizeof(extAddr));
@@ -592,8 +591,8 @@ CHIP_ERROR ThreadStackManagerImpl::_SetupSrpHost(const char * aHostName)
 
     /* Get external ip address */
     threadErr = thread_get_ipaddr(mThreadInstance, _ThreadIpAddressCb, THREAD_IPADDR_TYPE_MLEID, nullptr);
-    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE,
-                        (ChipLogError(DeviceLayer, "thread_get_ipaddr() failed. ret: %d", threadErr), CHIP_ERROR_INTERNAL));
+    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "thread_get_ipaddr() failed. ret: %d", threadErr));
 
     return CHIP_NO_ERROR;
 }

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public final class CommandManager {
   private final ArrayList<Command> mCommandMgr = new ArrayList<Command>();
@@ -96,7 +97,7 @@ public final class CommandManager {
       command.initArguments(temp.length, temp);
       command.run();
     } catch (IllegalArgumentException e) {
-      System.out.println("Arguments init failed with exception: " + e.getMessage());
+      showCommand(args[0], command);
     } catch (Exception e) {
       System.out.println("Run command failed with exception: " + e.getMessage());
     }
@@ -243,5 +244,46 @@ public final class CommandManager {
     }
     System.out.println(
         "  +-------------------------------------------------------------------------------------+");
+  }
+
+  private void showCommand(String clusterName, Command command) {
+    System.out.println("Usage:");
+
+    String arguments = command.getName();
+    String description = "";
+
+    int argumentsCount = command.getArgumentsCount();
+    for (int i = 0; i < argumentsCount; i++) {
+      String arg = "";
+      boolean isOptional = command.getArgumentIsOptional(i);
+      if (isOptional) {
+        arg += "[--";
+      }
+      arg += command.getArgumentName(i);
+      if (isOptional) {
+        arg += "]";
+      }
+      arguments += " ";
+      arguments += arg;
+
+      Optional<String> argDescription = command.getArgumentDescription(i);
+      if (argDescription.isPresent()) {
+        description += "\n";
+        description += arg;
+        description += ":\n  ";
+        description += argDescription.get();
+        description += "\n";
+      }
+    }
+    System.out.format("  java-matter-controller %s %s\n", clusterName, arguments);
+
+    Optional<String> helpText = command.getHelpText();
+    if (helpText.isPresent()) {
+      System.out.format("\n%s\n", helpText.get());
+    }
+
+    if (!description.isEmpty()) {
+      System.out.println(description);
+    }
   }
 }

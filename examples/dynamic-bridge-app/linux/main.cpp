@@ -23,7 +23,6 @@
 #include <app-common/zap-generated/af-structs.h>
 
 #include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
 #include <app/chip-zcl-zpro-codec.h>

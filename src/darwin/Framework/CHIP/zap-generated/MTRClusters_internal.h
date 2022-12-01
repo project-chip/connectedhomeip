@@ -83,12 +83,12 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterOtaSoftwareUpdateProvider ()
+@interface MTRClusterOTASoftwareUpdateProvider ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterOtaSoftwareUpdateRequestor ()
+@interface MTRClusterOTASoftwareUpdateRequestor ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
@@ -278,7 +278,7 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterWakeOnLan ()
+@interface MTRClusterWakeOnLAN ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end
