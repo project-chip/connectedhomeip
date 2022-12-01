@@ -164,6 +164,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET_EFR32=1",
         "CHIP_DEVICE_LAYER_TARGET=silabs",
       ]
+    } else if (chip_device_platform == "SiWx917") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_EFR32=1",
+        "CHIP_DEVICE_LAYER_TARGET=silabs",
+      ]
     } else if (chip_device_platform == "esp32") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_ESP32=1",
@@ -410,6 +415,8 @@ if (chip_device_platform != "none") {
       _platform_target = "Darwin"
     } else if (chip_device_platform == "efr32") {
       _platform_target = "silabs/EFR32"
+    } else if (chip_device_platform == "SiWx917") {
+      _platform_target = "silabs/SiWx917"
     } else if (chip_device_platform == "esp32") {
       _platform_target = "ESP32"
     } else if (chip_device_platform == "k32w0") {

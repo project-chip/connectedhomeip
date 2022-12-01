@@ -22,17 +22,13 @@ import("${chip_root}/src/crypto/crypto.gni")
 
 silabs_platform_dir = "${chip_root}/src/platform/silabs"
 
-assert(chip_device_platform == "efr32")
+assert(chip_device_platform == "SiWx917")
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
 }
 
-if (chip_crypto == "platform") {
-  import("//build_overrides/mbedtls.gni")
-}
-
-static_library("EFR32") {
+static_library("SiWx917") {
   sources = [
     "${silabs_platform_dir}/BLEManagerImpl.h",
     "${silabs_platform_dir}/BlePlatformConfig.h",
@@ -57,32 +53,20 @@ static_library("EFR32") {
     "ConfigurationManagerImpl.cpp",
     "KeyValueStoreManagerImpl.cpp",
     "PlatformManagerImpl.cpp",
+    "bluetooth/rsi_ble_config.h",
+    "bluetooth/wfx_sl_ble_init.c",
+    "bluetooth/wfx_sl_ble_init.h",
   ]
 
+  # TODO: OTA on CCP platform
   if (chip_enable_ota_requestor) {
     sources += [
-      "OTAImageProcessorImpl.cpp",
-      "OTAImageProcessorImpl.h",
+      #"OTAImageProcessorImpl.cpp",
+      #"OTAImageProcessorImpl.h",
     ]
   }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
-
-  # Add platform crypto implementation
-  if (chip_crypto == "platform") {
-    sources += [
-      "CHIPCryptoPALPsaEfr32.cpp",
-      "Efr32OpaqueKeypair.h",
-      "Efr32PsaOpaqueKeypair.cpp",
-      "Efr32PsaOperationalKeystore.cpp",
-      "Efr32PsaOperationalKeystore.h",
-    ]
-
-    public_deps += [
-      "${chip_root}/src/crypto",
-      "${mbedtls_root}:mbedtls",
-    ]
-  }
 
   # Add pigweed KVS
   deps = [
@@ -93,27 +77,6 @@ static_library("EFR32") {
     "$dir_pw_checksum",
     "$dir_pw_kvs",
   ]
-  if (chip_enable_openthread) {
-    public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
-
-    deps += [ "${chip_root}/third_party/openthread:openthread_cli" ]
-
-    sources += [
-      "${silabs_platform_dir}/ThreadStackManagerImpl.h",
-      "../../OpenThread/OpenThreadUtils.cpp",
-      "ConnectivityManagerImpl.cpp",
-      "ThreadStackManagerImpl.cpp",
-    ]
-
-    if (chip_mdns == "platform") {
-      sources += [ "../../OpenThread/DnssdImpl.cpp" ]
-      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
-    }
-
-    public_configs = [
-      "${chip_root}/src/lib/address_resolve:default_address_resolve_config",
-    ]
-  }
 
   if (chip_enable_wifi) {
     sources += [
