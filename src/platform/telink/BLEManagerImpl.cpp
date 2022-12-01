@@ -272,7 +272,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         /* Init BLE stack */
         err = bt_enable(NULL);
         VerifyOrReturnError(err == 0, MapErrorZephyr(err));
-        (void)bt_set_name(bt_dev_name);
+        (void) bt_set_name(bt_dev_name);
         BLERadioInitialized = true;
     }
 
