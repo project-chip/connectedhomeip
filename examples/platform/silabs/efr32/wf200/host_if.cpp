@@ -98,8 +98,8 @@ bool hasNotifiedIPV4             = false;
 bool hasNotifiedWifiConnectivity = false;
 static uint8_t retryJoin         = 0;
 bool retryInProgress             = false;
-bool is_commissioned             = false;
-static uint32_t retryInterval    = WLAN_MIN_RETRY_TIMER;
+bool is_disconnection_event      = false;
+static uint32_t retryInterval    = WLAN_MIN_RETRY_TIMER_MS;
 
 #ifdef SL_WFX_CONFIG_SCAN
 static struct scan_result_holder
@@ -396,7 +396,7 @@ static void sl_wfx_connect_callback(sl_wfx_connect_ind_body_t connect_indication
     }
     }
 
-    if ((status != WFM_STATUS_SUCCESS) && (!is_commissioned ? (retryJoin < MAX_JOIN_RETRIES_COUNT) : true))
+    if ((status != WFM_STATUS_SUCCESS) && (!is_disconnection_event ? (retryJoin < MAX_JOIN_RETRIES_COUNT) : true))
     {
         retryJoin += 1;
         retryInProgress = false;
@@ -547,25 +547,25 @@ static void wfx_events_task(void * p_arg)
                     SILABS_LOG("%s: Station not provisioned", __func__);
                 }
 
-                if (!is_commissioned)
+                if (!is_disconnection_event)
                 {
-                    SILABS_LOG("%s: First commissioning, retry after %d sec", __func__, (WLAN_RETRY_TIMER / WLAN_MIN_RETRY_TIMER));
+                    SILABS_LOG("%s: First commissioning, retry after %d sec", __func__, (WLAN_RETRY_TIMER_MS / WLAN_MIN_RETRY_TIMER_MS));
                     if (retryJoin < MAX_JOIN_RETRIES_COUNT)
-                        vTaskDelay(WLAN_RETRY_TIMER);
+                        vTaskDelay(WLAN_RETRY_TIMER_MS);
                 }
                 else
                 {
-                    if (retryInterval < WLAN_MAX_RETRY_TIMER)
+                    if (retryInterval < WLAN_MAX_RETRY_TIMER_MS)
                     {
-                        SILABS_LOG("%s: Next attempt after %d Seconds", __func__, (retryInterval / WLAN_MIN_RETRY_TIMER));
+                        SILABS_LOG("%s: Next attempt after %d Seconds", __func__, (retryInterval / WLAN_MIN_RETRY_TIMER_MS));
                     }
                     else
                     {
-                        SILABS_LOG("%s: Next attempt after %d Seconds", __func__, (WLAN_MAX_RETRY_TIMER / WLAN_MIN_RETRY_TIMER));
+                        SILABS_LOG("%s: Next attempt after %d Seconds", __func__, (WLAN_MAX_RETRY_TIMER_MS / WLAN_MIN_RETRY_TIMER_MS));
                     }
 
-                    vTaskDelay(retryInterval < WLAN_MAX_RETRY_TIMER ? pdMS_TO_TICKS(retryInterval)
-                                                                    : pdMS_TO_TICKS(retryInterval = WLAN_MAX_RETRY_TIMER));
+                    vTaskDelay(retryInterval < WLAN_MAX_RETRY_TIMER_MS ? pdMS_TO_TICKS(retryInterval)
+                                                                       : pdMS_TO_TICKS(retryInterval = WLAN_MAX_RETRY_TIMER_MS));
                     retryInterval += retryInterval;
                 }
                 SILABS_LOG("WFX sending the connect command");
@@ -622,9 +622,9 @@ static void wfx_events_task(void * p_arg)
             hasNotifiedWifiConnectivity = false;
             SILABS_LOG("WIFI: Connected to AP");
             wifi_extra |= WE_ST_STA_CONN;
-            is_commissioned = true;
-            retryJoin       = 0;
-            retryInterval   = WLAN_MIN_RETRY_TIMER;
+            is_disconnection_event = true;
+            retryJoin              = 0;
+            retryInterval          = WLAN_MIN_RETRY_TIMER_MS;
             wfx_lwip_set_sta_link_up();
 #ifdef SLEEP_ENABLED
             if (!(wfx_get_wifi_state() & SL_WFX_AP_INTERFACE_UP))
