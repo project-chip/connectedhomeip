@@ -25,12 +25,6 @@ public:
     // Gets the list of available attributes for this cluster.
     virtual std::vector<AttributeInterface *> GetAttributes() = 0;
 
-    virtual chip::CommandId * GetIncomingCommandList()
-    {
-        return nullptr;
-    }
-    virtual chip::CommandId * GetOutgoingCommandList()
-    {
-        return nullptr;
-    };
+    virtual chip::CommandId * GetIncomingCommandList() { return nullptr; }
+    virtual chip::CommandId * GetOutgoingCommandList() { return nullptr; };
 };

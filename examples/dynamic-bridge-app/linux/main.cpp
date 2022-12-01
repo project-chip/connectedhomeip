@@ -126,8 +126,7 @@ CHIP_ERROR CommonAttributeAccessInterface::Write(const chip::app::ConcreteDataAt
     return c->ForwardWriteToBridge(aPath, aDecoder);
 }
 
-CHIP_ERROR CommonAttributeAccessInterface::Read(const chip::app::ConcreteReadAttributePath & aPath,
-                                                chip::TLV::TLVWriter & writer)
+CHIP_ERROR CommonAttributeAccessInterface::Read(const chip::app::ConcreteReadAttributePath & aPath, chip::TLV::TLVWriter & writer)
 {
     CommonCluster * c = FindCluster(aPath);
     if (!c)
@@ -190,16 +189,40 @@ std::unique_ptr<GeneratedCluster> CreateCluster(chip::ClusterId id)
     return nullptr;
 }
 
-void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const Span<const char> *) { wr.PutString(chip::TLV::Tag(), buffer, (uint32_t) strlen(buffer)); }
-void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const ByteSpan *) { wr.PutBytes(chip::TLV::Tag(), (const uint8_t *) buffer, (uint32_t) strlen(buffer)); }
-void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const float *) { wr.Put(chip::TLV::Tag(), (float) atof(buffer)); }
-void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const double *) { wr.Put(chip::TLV::Tag(), atof(buffer)); }
-void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const int64_t *) { wr.Put(chip::TLV::Tag(), (int64_t) strtoll(buffer, nullptr, 10)); }
-void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const uint64_t *) { wr.Put(chip::TLV::Tag(), (uint64_t) strtoll(buffer, nullptr, 10)); }
-void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const bool *) { wr.PutBoolean(chip::TLV::Tag(), (*buffer) ? true : false); }
+void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const Span<const char> *)
+{
+    wr.PutString(chip::TLV::Tag(), buffer, (uint32_t) strlen(buffer));
+}
+void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const ByteSpan *)
+{
+    wr.PutBytes(chip::TLV::Tag(), (const uint8_t *) buffer, (uint32_t) strlen(buffer));
+}
+void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const float *)
+{
+    wr.Put(chip::TLV::Tag(), (float) atof(buffer));
+}
+void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const double *)
+{
+    wr.Put(chip::TLV::Tag(), atof(buffer));
+}
+void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const int64_t *)
+{
+    wr.Put(chip::TLV::Tag(), (int64_t) strtoll(buffer, nullptr, 10));
+}
+void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const uint64_t *)
+{
+    wr.Put(chip::TLV::Tag(), (uint64_t) strtoll(buffer, nullptr, 10));
+}
+void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const bool *)
+{
+    wr.PutBoolean(chip::TLV::Tag(), (*buffer) ? true : false);
+}
 
-template<typename T>
-void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const T *) { wr.Put(chip::TLV::Tag(), (int64_t) strtoll(buffer, nullptr, 10)); }
+template <typename T>
+void ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const T *)
+{
+    wr.Put(chip::TLV::Tag(), (int64_t) strtoll(buffer, nullptr, 10));
+}
 
 void WriteValueToBuffer(const bool & value, uint8_t * buffer, const uint16_t & maxReadLength)
 {
@@ -207,7 +230,7 @@ void WriteValueToBuffer(const bool & value, uint8_t * buffer, const uint16_t & m
         *buffer = value ? 1 : 0;
 }
 
-template<typename T>
+template <typename T>
 void WriteValueToBuffer(const T & value, uint8_t * buffer, const uint16_t & maxReadLength)
 {
     size_t value_size = sizeof(value);
@@ -217,7 +240,7 @@ void WriteValueToBuffer(const T & value, uint8_t * buffer, const uint16_t & maxR
     }
 }
 
-template<typename T>
+template <typename T>
 void WriteValueToBuffer(chip::TLV::TLVReader & reader, uint8_t * buffer, const uint16_t & maxReadLength)
 {
     T v;
@@ -227,14 +250,14 @@ void WriteValueToBuffer(chip::TLV::TLVReader & reader, uint8_t * buffer, const u
 
 // if `read` is true, read from `buffer`, and write to `data`
 // otherwise, read from `data`, and write to `buffer`
-template<typename T>
+template <typename T>
 void ReadOrWriteBuffer(std::vector<uint8_t> * data, uint8_t * buffer, uint16_t maxReadLength, bool read)
 {
     if (read)
     {
         chip::TLV::TLVWriter wr;
         wr.Init(data->data(), data->size());
-        ReadValueFromBuffer(wr, (char *)buffer, (const T *) nullptr);
+        ReadValueFromBuffer(wr, (char *) buffer, (const T *) nullptr);
         wr.Finalize();
         data->resize(wr.GetLengthWritten());
     }
@@ -247,7 +270,8 @@ void ReadOrWriteBuffer(std::vector<uint8_t> * data, uint8_t * buffer, uint16_t m
     }
 }
 
-void ReadOrWriteBufferForType(std::vector<uint8_t> * data, uint8_t * buffer, EmberAfAttributeType type, uint16_t maxReadLength, bool read)
+void ReadOrWriteBufferForType(std::vector<uint8_t> * data, uint8_t * buffer, EmberAfAttributeType type, uint16_t maxReadLength,
+                              bool read)
 {
     switch (type)
     {
@@ -300,7 +324,6 @@ void ReadOrWriteBufferForType(std::vector<uint8_t> * data, uint8_t * buffer, Emb
     }
 }
 
-
 bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                 const Actions::Commands::InstantAction::DecodableType & commandData)
 {
@@ -328,10 +351,8 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     // read the attribute and write it to `data`
     chip::TLV::TLVWriter writer;
     writer.Init(data.data(), data.size());
-    CHIP_ERROR err = static_cast<CommonAttributeAccessInterface *>(accessInterface)->Read(
-        chip::app::ConcreteDataAttributePath(endpoint, clusterId, attributeMetadata->attributeId),
-        writer
-    );
+    CHIP_ERROR err = static_cast<CommonAttributeAccessInterface *>(accessInterface)
+                         ->Read(chip::app::ConcreteDataAttributePath(endpoint, clusterId, attributeMetadata->attributeId), writer);
     if (err != CHIP_NO_ERROR)
         return EMBER_ZCL_STATUS_FAILURE;
     writer.Finalize();
@@ -344,7 +365,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 }
 
 EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
@@ -366,7 +387,8 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
     reader.Init(data.data(), data.size());
     reader.Next();
     chip::app::AttributeValueDecoder decoder(reader, chip::Access::SubjectDescriptor());
-    CHIP_ERROR err = accessInterface->Write(chip::app::ConcreteReadAttributePath(endpoint, clusterId, attributeMetadata->attributeId), decoder);
+    CHIP_ERROR err =
+        accessInterface->Write(chip::app::ConcreteReadAttributePath(endpoint, clusterId, attributeMetadata->attributeId), decoder);
     if (err != CHIP_NO_ERROR)
         return EMBER_ZCL_STATUS_FAILURE;
 
