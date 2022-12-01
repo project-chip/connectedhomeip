@@ -661,7 +661,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROtaSoftwareUpdateRequestorClusterProviderLocation
+@implementation MTROTASoftwareUpdateRequestorClusterProviderLocation
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -677,7 +677,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTROtaSoftwareUpdateRequestorClusterProviderLocation alloc] init];
+    auto other = [[MTROTASoftwareUpdateRequestorClusterProviderLocation alloc] init];
 
     other.providerNodeID = self.providerNodeID;
     other.endpoint = self.endpoint;
@@ -695,7 +695,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent
+@implementation MTROtaSoftwareUpdateRequestorClusterProviderLocation : MTROTASoftwareUpdateRequestorClusterProviderLocation
+@end
+
+@implementation MTROTASoftwareUpdateRequestorClusterStateTransitionEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -713,7 +716,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent alloc] init];
+    auto other = [[MTROTASoftwareUpdateRequestorClusterStateTransitionEvent alloc] init];
 
     other.previousState = self.previousState;
     other.newState = self.newState;
@@ -733,7 +736,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent
+@implementation MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent : MTROTASoftwareUpdateRequestorClusterStateTransitionEvent
+@end
+
+@implementation MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -747,7 +753,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent alloc] init];
+    auto other = [[MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent alloc] init];
 
     other.softwareVersion = self.softwareVersion;
     other.productID = self.productID;
@@ -764,7 +770,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent
+@implementation MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent : MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent
+@end
+
+@implementation MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -782,7 +791,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent alloc] init];
+    auto other = [[MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent alloc] init];
 
     other.softwareVersion = self.softwareVersion;
     other.bytesDownloaded = self.bytesDownloaded;
@@ -800,6 +809,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent : MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent
 @end
 
 @implementation MTRPowerSourceClusterBatChargeFaultChangeType

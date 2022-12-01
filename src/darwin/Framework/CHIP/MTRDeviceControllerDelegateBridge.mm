@@ -18,6 +18,7 @@
 #import "MTRDeviceControllerDelegateBridge.h"
 #import "MTRDeviceController.h"
 #import "MTRError_Internal.h"
+#import "MTRLogging_Internal.h"
 
 MTRDeviceControllerDelegateBridge::MTRDeviceControllerDelegateBridge(void)
     : mDelegate(nil)
@@ -59,7 +60,7 @@ MTRCommissioningStatus MTRDeviceControllerDelegateBridge::MapStatus(chip::Contro
 
 void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
-    NSLog(@"DeviceControllerDelegate status updated: %d", status);
+    MTR_LOG_DEFAULT("DeviceControllerDelegate status updated: %d", status);
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     MTRDeviceController * strongController = mController;
@@ -75,7 +76,7 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
 
 void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error)
 {
-    NSLog(@"DeviceControllerDelegate Pairing complete. Status %s", chip::ErrorStr(error));
+    MTR_LOG_DEFAULT("DeviceControllerDelegate Pairing complete. Status %s", chip::ErrorStr(error));
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     MTRDeviceController * strongController = mController;
@@ -91,14 +92,14 @@ void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error)
 
 void MTRDeviceControllerDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
 {
-    NSLog(@"DeviceControllerDelegate Pairing deleted. Status %s", chip::ErrorStr(error));
+    MTR_LOG_DEFAULT("DeviceControllerDelegate Pairing deleted. Status %s", chip::ErrorStr(error));
 
     // This is never actually called; just do nothing.
 }
 
 void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR error)
 {
-    NSLog(@"DeviceControllerDelegate Commissioning complete. NodeId %llu Status %s", nodeId, chip::ErrorStr(error));
+    MTR_LOG_DEFAULT("DeviceControllerDelegate Commissioning complete. NodeId %llu Status %s", nodeId, chip::ErrorStr(error));
 
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     MTRDeviceController * strongController = mController;

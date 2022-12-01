@@ -19,9 +19,9 @@
 #include "app/util/common.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
@@ -35,6 +35,7 @@
 #endif
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Scenes;
 
 uint8_t emberAfPluginScenesServerEntriesInUse = 0;
@@ -88,8 +89,8 @@ void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
     {
         // The high bit of Name Support indicates whether scene names are supported.
         uint8_t nameSupport = EMBER_BIT(7);
-        writeServerAttribute(endpoint, ZCL_SCENES_CLUSTER_ID, ZCL_SCENE_NAME_SUPPORT_ATTRIBUTE_ID, "name support",
-                             (uint8_t *) &nameSupport, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+        writeServerAttribute(endpoint, Scenes::Id, ZCL_SCENE_NAME_SUPPORT_ATTRIBUTE_ID, "name support", (uint8_t *) &nameSupport,
+                             ZCL_BITMAP8_ATTRIBUTE_TYPE);
     }
 #endif
 #if !defined(EMBER_AF_PLUGIN_SCENES_USE_TOKENS) || defined(EZSP_HOST)
@@ -110,7 +111,7 @@ void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
 
 EmberAfStatus emberAfScenesSetSceneCountAttribute(EndpointId endpoint, uint8_t newCount)
 {
-    return writeServerAttribute(endpoint, ZCL_SCENES_CLUSTER_ID, ZCL_SCENE_COUNT_ATTRIBUTE_ID, "scene count", (uint8_t *) &newCount,
+    return writeServerAttribute(endpoint, Scenes::Id, ZCL_SCENE_COUNT_ATTRIBUTE_ID, "scene count", (uint8_t *) &newCount,
                                 ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
@@ -120,22 +121,22 @@ EmberAfStatus emberAfScenesMakeValid(EndpointId endpoint, uint8_t sceneId, Group
     bool valid = true;
 
     // scene ID
-    status = writeServerAttribute(endpoint, ZCL_SCENES_CLUSTER_ID, ZCL_CURRENT_SCENE_ATTRIBUTE_ID, "current scene",
-                                  (uint8_t *) &sceneId, ZCL_INT8U_ATTRIBUTE_TYPE);
+    status = writeServerAttribute(endpoint, Scenes::Id, ZCL_CURRENT_SCENE_ATTRIBUTE_ID, "current scene", (uint8_t *) &sceneId,
+                                  ZCL_INT8U_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         return status;
     }
 
     // group ID
-    status = writeServerAttribute(endpoint, ZCL_SCENES_CLUSTER_ID, ZCL_CURRENT_GROUP_ATTRIBUTE_ID, "current group",
-                                  (uint8_t *) &groupId, ZCL_INT16U_ATTRIBUTE_TYPE);
+    status = writeServerAttribute(endpoint, Scenes::Id, ZCL_CURRENT_GROUP_ATTRIBUTE_ID, "current group", (uint8_t *) &groupId,
+                                  ZCL_INT16U_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         return status;
     }
 
-    status = writeServerAttribute(endpoint, ZCL_SCENES_CLUSTER_ID, ZCL_SCENE_VALID_ATTRIBUTE_ID, "scene valid", (uint8_t *) &valid,
+    status = writeServerAttribute(endpoint, Scenes::Id, ZCL_SCENE_VALID_ATTRIBUTE_ID, "scene valid", (uint8_t *) &valid,
                                   ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     return status;
 }
@@ -143,7 +144,7 @@ EmberAfStatus emberAfScenesMakeValid(EndpointId endpoint, uint8_t sceneId, Group
 EmberAfStatus emberAfScenesClusterMakeInvalidCallback(EndpointId endpoint)
 {
     bool valid = false;
-    return writeServerAttribute(endpoint, ZCL_SCENES_CLUSTER_ID, ZCL_SCENE_VALID_ATTRIBUTE_ID, "scene valid", (uint8_t *) &valid,
+    return writeServerAttribute(endpoint, Scenes::Id, ZCL_SCENE_VALID_ATTRIBUTE_ID, "scene valid", (uint8_t *) &valid,
                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
@@ -259,8 +260,7 @@ bool emberAfScenesClusterRemoveSceneCallback(app::CommandHandler * commandObj, c
     if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY)
     {
         {
-            app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ZCL_SCENES_CLUSTER_ID,
-                                              ZCL_REMOVE_SCENE_RESPONSE_COMMAND_ID };
+            app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), Scenes::Id, ZCL_REMOVE_SCENE_RESPONSE_COMMAND_ID };
             TLV::TLVWriter * writer       = nullptr;
             SuccessOrExit(err = commandObj->PrepareCommand(path));
             VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -312,8 +312,7 @@ bool emberAfScenesClusterRemoveAllScenesCallback(app::CommandHandler * commandOb
     if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY)
     {
         {
-            app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ZCL_SCENES_CLUSTER_ID,
-                                              ZCL_REMOVE_ALL_SCENES_RESPONSE_COMMAND_ID };
+            app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), Scenes::Id, ZCL_REMOVE_ALL_SCENES_RESPONSE_COMMAND_ID };
             TLV::TLVWriter * writer       = nullptr;
             SuccessOrExit(err = commandObj->PrepareCommand(path));
             VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -347,8 +346,7 @@ bool emberAfScenesClusterStoreSceneCallback(app::CommandHandler * commandObj, co
     if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY)
     {
         {
-            app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ZCL_SCENES_CLUSTER_ID,
-                                              ZCL_STORE_SCENE_RESPONSE_COMMAND_ID };
+            app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), Scenes::Id, ZCL_STORE_SCENE_RESPONSE_COMMAND_ID };
             TLV::TLVWriter * writer       = nullptr;
             SuccessOrExit(err = commandObj->PrepareCommand(path));
             VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -443,8 +441,7 @@ bool emberAfScenesClusterGetSceneMembershipCallback(app::CommandHandler * comman
     }
 
     {
-        app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ZCL_SCENES_CLUSTER_ID,
-                                          ZCL_GET_SCENE_MEMBERSHIP_RESPONSE_COMMAND_ID };
+        app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), Scenes::Id, ZCL_GET_SCENE_MEMBERSHIP_RESPONSE_COMMAND_ID };
         TLV::TLVWriter * writer       = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(path));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -502,69 +499,64 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(chip::FabricIndex fa
     // When creating a new entry or refreshing an existing one, the extension
     // fields are updated with the current state of other clusters on the device.
 #ifdef ZCL_USING_ON_OFF_CLUSTER_SERVER
-    entry.hasOnOffValue = readServerAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, "on/off",
-                                              (uint8_t *) &entry.onOffValue, sizeof(entry.onOffValue));
+    entry.hasOnOffValue = readServerAttribute(endpoint, OnOff::Id, ZCL_ON_OFF_ATTRIBUTE_ID, "on/off", (uint8_t *) &entry.onOffValue,
+                                              sizeof(entry.onOffValue));
 #endif
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
-    entry.hasCurrentLevelValue =
-        readServerAttribute(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, "current level",
-                            (uint8_t *) &entry.currentLevelValue, sizeof(entry.currentLevelValue));
+    entry.hasCurrentLevelValue = readServerAttribute(endpoint, LevelControl::Id, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, "current level",
+                                                     (uint8_t *) &entry.currentLevelValue, sizeof(entry.currentLevelValue));
 #endif
 #ifdef ZCL_USING_THERMOSTAT_CLUSTER_SERVER
-    entry.hasOccupiedCoolingSetpointValue = readServerAttribute(
-        endpoint, ZCL_THERMOSTAT_CLUSTER_ID, ZCL_OCCUPIED_COOLING_SETPOINT_ATTRIBUTE_ID, "occupied cooling setpoint",
-        (uint8_t *) &entry.occupiedCoolingSetpointValue, sizeof(entry.occupiedCoolingSetpointValue));
-    entry.hasOccupiedHeatingSetpointValue = readServerAttribute(
-        endpoint, ZCL_THERMOSTAT_CLUSTER_ID, ZCL_OCCUPIED_HEATING_SETPOINT_ATTRIBUTE_ID, "occupied heating setpoint",
-        (uint8_t *) &entry.occupiedHeatingSetpointValue, sizeof(entry.occupiedHeatingSetpointValue));
-    entry.hasSystemModeValue = readServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, ZCL_SYSTEM_MODE_ATTRIBUTE_ID, "system mode",
+    entry.hasOccupiedCoolingSetpointValue =
+        readServerAttribute(endpoint, Thermostat::Id, ZCL_OCCUPIED_COOLING_SETPOINT_ATTRIBUTE_ID, "occupied cooling setpoint",
+                            (uint8_t *) &entry.occupiedCoolingSetpointValue, sizeof(entry.occupiedCoolingSetpointValue));
+    entry.hasOccupiedHeatingSetpointValue =
+        readServerAttribute(endpoint, Thermostat::Id, ZCL_OCCUPIED_HEATING_SETPOINT_ATTRIBUTE_ID, "occupied heating setpoint",
+                            (uint8_t *) &entry.occupiedHeatingSetpointValue, sizeof(entry.occupiedHeatingSetpointValue));
+    entry.hasSystemModeValue = readServerAttribute(endpoint, Thermostat::Id, ZCL_SYSTEM_MODE_ATTRIBUTE_ID, "system mode",
                                                    (uint8_t *) &entry.systemModeValue, sizeof(entry.systemModeValue));
 #endif
 #ifdef ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
-    entry.hasCurrentXValue = readServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID,
-                                                 "current x", (uint8_t *) &entry.currentXValue, sizeof(entry.currentXValue));
-    entry.hasCurrentYValue = readServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID,
-                                                 "current y", (uint8_t *) &entry.currentYValue, sizeof(entry.currentYValue));
-    entry.hasEnhancedCurrentHueValue = readServerAttribute(
-        endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_ENHANCED_CURRENT_HUE_ATTRIBUTE_ID, "enhanced current hue",
-        (uint8_t *) &entry.enhancedCurrentHueValue, sizeof(entry.enhancedCurrentHueValue));
+    entry.hasCurrentXValue = readServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID, "current x",
+                                                 (uint8_t *) &entry.currentXValue, sizeof(entry.currentXValue));
+    entry.hasCurrentYValue = readServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID, "current y",
+                                                 (uint8_t *) &entry.currentYValue, sizeof(entry.currentYValue));
+    entry.hasEnhancedCurrentHueValue =
+        readServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_ENHANCED_CURRENT_HUE_ATTRIBUTE_ID, "enhanced current hue",
+                            (uint8_t *) &entry.enhancedCurrentHueValue, sizeof(entry.enhancedCurrentHueValue));
     entry.hasCurrentSaturationValue =
-        readServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
-                            "current saturation", (uint8_t *) &entry.currentSaturationValue, sizeof(entry.currentSaturationValue));
+        readServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID, "current saturation",
+                            (uint8_t *) &entry.currentSaturationValue, sizeof(entry.currentSaturationValue));
     entry.hasColorLoopActiveValue =
-        readServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_ACTIVE_ATTRIBUTE_ID,
-                            "color loop active", (uint8_t *) &entry.colorLoopActiveValue, sizeof(entry.colorLoopActiveValue));
-    entry.hasColorLoopDirectionValue = readServerAttribute(
-        endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_DIRECTION_ATTRIBUTE_ID, "color loop direction",
-        (uint8_t *) &entry.colorLoopDirectionValue, sizeof(entry.colorLoopDirectionValue));
+        readServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_COLOR_LOOP_ACTIVE_ATTRIBUTE_ID, "color loop active",
+                            (uint8_t *) &entry.colorLoopActiveValue, sizeof(entry.colorLoopActiveValue));
+    entry.hasColorLoopDirectionValue =
+        readServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_COLOR_LOOP_DIRECTION_ATTRIBUTE_ID, "color loop direction",
+                            (uint8_t *) &entry.colorLoopDirectionValue, sizeof(entry.colorLoopDirectionValue));
     entry.hasColorLoopTimeValue =
-        readServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_TIME_ATTRIBUTE_ID,
-                            "color loop time", (uint8_t *) &entry.colorLoopTimeValue, sizeof(entry.colorLoopTimeValue));
-    entry.hasColorTemperatureMiredsValue = readServerAttribute(
-        endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID, "color temp mireds",
-        (uint8_t *) &entry.colorTemperatureMiredsValue, sizeof(entry.colorTemperatureMiredsValue));
+        readServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_COLOR_LOOP_TIME_ATTRIBUTE_ID, "color loop time",
+                            (uint8_t *) &entry.colorLoopTimeValue, sizeof(entry.colorLoopTimeValue));
+    entry.hasColorTemperatureMiredsValue =
+        readServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID, "color temp mireds",
+                            (uint8_t *) &entry.colorTemperatureMiredsValue, sizeof(entry.colorTemperatureMiredsValue));
 #endif // ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
 #ifdef ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
-    entry.hasLockStateValue = readServerAttribute(endpoint, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_LOCK_STATE_ATTRIBUTE_ID, "lock state",
+    entry.hasLockStateValue = readServerAttribute(endpoint, DoorLock::Id, ZCL_LOCK_STATE_ATTRIBUTE_ID, "lock state",
                                                   (uint8_t *) &entry.lockStateValue, sizeof(entry.lockStateValue));
 #endif
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
-    entry.hasCurrentPositionLiftPercentageValue =
-        readServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID,
-                            "currentPositionLiftPercentage", (uint8_t *) &entry.currentPositionLiftPercentageValue,
-                            sizeof(entry.currentPositionLiftPercentageValue));
-    entry.hasCurrentPositionTiltPercentageValue =
-        readServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID,
-                            "currentPositionTiltPercentage", (uint8_t *) &entry.currentPositionTiltPercentageValue,
-                            sizeof(entry.currentPositionTiltPercentageValue));
-    entry.hasTargetPositionLiftPercent100thsValue =
-        readServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID,
-                            "targetPositionLiftPercent100ths", (uint8_t *) &entry.targetPositionLiftPercent100thsValue,
-                            sizeof(entry.targetPositionLiftPercent100thsValue));
-    entry.hasTargetPositionTiltPercent100thsValue =
-        readServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID,
-                            "targetPositionTiltPercent100ths", (uint8_t *) &entry.targetPositionTiltPercent100thsValue,
-                            sizeof(entry.targetPositionTiltPercent100thsValue));
+    entry.hasCurrentPositionLiftPercentageValue = readServerAttribute(
+        endpoint, WindowCovering::Id, ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID, "currentPositionLiftPercentage",
+        (uint8_t *) &entry.currentPositionLiftPercentageValue, sizeof(entry.currentPositionLiftPercentageValue));
+    entry.hasCurrentPositionTiltPercentageValue = readServerAttribute(
+        endpoint, WindowCovering::Id, ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID, "currentPositionTiltPercentage",
+        (uint8_t *) &entry.currentPositionTiltPercentageValue, sizeof(entry.currentPositionTiltPercentageValue));
+    entry.hasTargetPositionLiftPercent100thsValue = readServerAttribute(
+        endpoint, WindowCovering::Id, ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID, "targetPositionLiftPercent100ths",
+        (uint8_t *) &entry.targetPositionLiftPercent100thsValue, sizeof(entry.targetPositionLiftPercent100thsValue));
+    entry.hasTargetPositionTiltPercent100thsValue = readServerAttribute(
+        endpoint, WindowCovering::Id, ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID, "targetPositionTiltPercent100ths",
+        (uint8_t *) &entry.targetPositionTiltPercent100thsValue, sizeof(entry.targetPositionTiltPercent100thsValue));
 #endif
 
     // When creating a new entry, the name is set to the null string (i.e., the
@@ -610,76 +602,76 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::FabricIndex fab
 #ifdef ZCL_USING_ON_OFF_CLUSTER_SERVER
             if (entry.hasOnOffValue)
             {
-                writeServerAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, "on/off",
-                                     (uint8_t *) &entry.onOffValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+                writeServerAttribute(endpoint, OnOff::Id, ZCL_ON_OFF_ATTRIBUTE_ID, "on/off", (uint8_t *) &entry.onOffValue,
+                                     ZCL_BOOLEAN_ATTRIBUTE_TYPE);
             }
 #endif
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
             if (entry.hasCurrentLevelValue)
             {
-                writeServerAttribute(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, "current level",
+                writeServerAttribute(endpoint, LevelControl::Id, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, "current level",
                                      (uint8_t *) &entry.currentLevelValue, ZCL_INT8U_ATTRIBUTE_TYPE);
             }
 #endif
 #ifdef ZCL_USING_THERMOSTAT_CLUSTER_SERVER
             if (entry.hasOccupiedCoolingSetpointValue)
             {
-                writeServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, ZCL_OCCUPIED_COOLING_SETPOINT_ATTRIBUTE_ID,
+                writeServerAttribute(endpoint, Thermostat::Id, ZCL_OCCUPIED_COOLING_SETPOINT_ATTRIBUTE_ID,
                                      "occupied cooling setpoint", (uint8_t *) &entry.occupiedCoolingSetpointValue,
                                      ZCL_INT16S_ATTRIBUTE_TYPE);
             }
             if (entry.hasOccupiedHeatingSetpointValue)
             {
-                writeServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, ZCL_OCCUPIED_HEATING_SETPOINT_ATTRIBUTE_ID,
+                writeServerAttribute(endpoint, Thermostat::Id, ZCL_OCCUPIED_HEATING_SETPOINT_ATTRIBUTE_ID,
                                      "occupied heating setpoint", (uint8_t *) &entry.occupiedHeatingSetpointValue,
                                      ZCL_INT16S_ATTRIBUTE_TYPE);
             }
             if (entry.hasSystemModeValue)
             {
-                writeServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, ZCL_SYSTEM_MODE_ATTRIBUTE_ID, "system mode",
+                writeServerAttribute(endpoint, Thermostat::Id, ZCL_SYSTEM_MODE_ATTRIBUTE_ID, "system mode",
                                      (uint8_t *) &entry.systemModeValue, ZCL_INT8U_ATTRIBUTE_TYPE);
             }
 #endif
 #ifdef ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
             if (entry.hasCurrentXValue)
             {
-                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID, "current x",
+                writeServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID, "current x",
                                      (uint8_t *) &entry.currentXValue, ZCL_INT16U_ATTRIBUTE_TYPE);
             }
             if (entry.hasCurrentYValue)
             {
-                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID, "current y",
+                writeServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID, "current y",
                                      (uint8_t *) &entry.currentYValue, ZCL_INT16U_ATTRIBUTE_TYPE);
             }
 
             if (entry.hasEnhancedCurrentHueValue)
             {
-                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_ENHANCED_CURRENT_HUE_ATTRIBUTE_ID,
+                writeServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_ENHANCED_CURRENT_HUE_ATTRIBUTE_ID,
                                      "enhanced current hue", (uint8_t *) &entry.enhancedCurrentHueValue, ZCL_INT16U_ATTRIBUTE_TYPE);
             }
             if (entry.hasCurrentSaturationValue)
             {
-                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+                writeServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
                                      "current saturation", (uint8_t *) &entry.currentSaturationValue, ZCL_INT8U_ATTRIBUTE_TYPE);
             }
             if (entry.hasColorLoopActiveValue)
             {
-                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_ACTIVE_ATTRIBUTE_ID,
+                writeServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_COLOR_LOOP_ACTIVE_ATTRIBUTE_ID,
                                      "color loop active", (uint8_t *) &entry.colorLoopActiveValue, ZCL_INT8U_ATTRIBUTE_TYPE);
             }
             if (entry.hasColorLoopDirectionValue)
             {
-                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_DIRECTION_ATTRIBUTE_ID,
+                writeServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_COLOR_LOOP_DIRECTION_ATTRIBUTE_ID,
                                      "color loop direction", (uint8_t *) &entry.colorLoopDirectionValue, ZCL_INT8U_ATTRIBUTE_TYPE);
             }
             if (entry.hasColorLoopTimeValue)
             {
-                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_TIME_ATTRIBUTE_ID,
-                                     "color loop time", (uint8_t *) &entry.colorLoopTimeValue, ZCL_INT16U_ATTRIBUTE_TYPE);
+                writeServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_COLOR_LOOP_TIME_ATTRIBUTE_ID, "color loop time",
+                                     (uint8_t *) &entry.colorLoopTimeValue, ZCL_INT16U_ATTRIBUTE_TYPE);
             }
             if (entry.hasColorTemperatureMiredsValue)
             {
-                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID,
+                writeServerAttribute(endpoint, ColorControl::Id, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID,
                                      "color temp mireds", (uint8_t *) &entry.colorTemperatureMiredsValue,
                                      ZCL_INT16U_ATTRIBUTE_TYPE);
             }
@@ -687,34 +679,34 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::FabricIndex fab
 #ifdef ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
             if (entry.hasLockStateValue)
             {
-                writeServerAttribute(endpoint, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_LOCK_STATE_ATTRIBUTE_ID, "lock state",
+                writeServerAttribute(endpoint, DoorLock::Id, ZCL_LOCK_STATE_ATTRIBUTE_ID, "lock state",
                                      (uint8_t *) &entry.lockStateValue, ZCL_INT8U_ATTRIBUTE_TYPE);
             }
 #endif
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
             if (entry.hasCurrentPositionLiftPercentageValue)
             {
-                writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID,
+                writeServerAttribute(endpoint, WindowCovering::Id, ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID,
                                      "CurrentPositionLiftPercentage", (uint8_t *) &entry.currentPositionLiftPercentageValue,
                                      ZCL_INT8U_ATTRIBUTE_TYPE);
             }
             if (entry.hasCurrentPositionTiltPercentageValue)
             {
-                writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID,
+                writeServerAttribute(endpoint, WindowCovering::Id, ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID,
                                      "CurrentPositionTiltPercentage", (uint8_t *) &entry.currentPositionTiltPercentageValue,
                                      ZCL_INT8U_ATTRIBUTE_TYPE);
             }
             if (entry.hasTargetPositionLiftPercent100thsValue)
             {
-                writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID,
-                                     ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID, "TargetPositionLiftPercent100ths",
-                                     (uint8_t *) &entry.targetPositionLiftPercent100thsValue, ZCL_INT16U_ATTRIBUTE_TYPE);
+                writeServerAttribute(endpoint, WindowCovering::Id, ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID,
+                                     "TargetPositionLiftPercent100ths", (uint8_t *) &entry.targetPositionLiftPercent100thsValue,
+                                     ZCL_INT16U_ATTRIBUTE_TYPE);
             }
             if (entry.hasTargetPositionTiltPercent100thsValue)
             {
-                writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID,
-                                     ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID, "TargetPositionTiltPercent100ths",
-                                     (uint8_t *) &entry.targetPositionTiltPercent100thsValue, ZCL_INT16U_ATTRIBUTE_TYPE);
+                writeServerAttribute(endpoint, WindowCovering::Id, ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID,
+                                     "TargetPositionTiltPercent100ths", (uint8_t *) &entry.targetPositionTiltPercent100thsValue,
+                                     ZCL_INT16U_ATTRIBUTE_TYPE);
             }
 #endif
             emberAfScenesMakeValid(endpoint, sceneId, groupId);
@@ -837,7 +829,7 @@ bool emberAfPluginScenesServerParseAddScene(
         {
 #if 0
 #ifdef ZCL_USING_ON_OFF_CLUSTER_SERVER
-        case ZCL_ON_OFF_CLUSTER_ID:
+        case OnOff::Id:
             // We only know of one extension for the On/Off cluster and it is just one
             // byte, which means we can skip some logic for this cluster.  If other
             // extensions are added in this cluster, more logic will be needed here.
@@ -846,7 +838,7 @@ bool emberAfPluginScenesServerParseAddScene(
             break;
 #endif
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
-        case ZCL_LEVEL_CONTROL_CLUSTER_ID:
+        case LevelControl::Id:
             // We only know of one extension for the Level Control cluster and it is
             // just one byte, which means we can skip some logic for this cluster.  If
             // other extensions are added in this cluster, more logic will be needed
@@ -856,7 +848,7 @@ bool emberAfPluginScenesServerParseAddScene(
             break;
 #endif
 #ifdef ZCL_USING_THERMOSTAT_CLUSTER_SERVER
-        case ZCL_THERMOSTAT_CLUSTER_ID:
+        case Thermostat::Id:
             if (length < 2)
             {
                 break;
@@ -886,7 +878,7 @@ bool emberAfPluginScenesServerParseAddScene(
             break;
 #endif
 #ifdef ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
-        case ZCL_COLOR_CONTROL_CLUSTER_ID:
+        case ColorControl::Id:
             if (length < 2)
             {
                 break;
@@ -960,7 +952,7 @@ bool emberAfPluginScenesServerParseAddScene(
             break;
 #endif // ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
 #ifdef ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
-        case ZCL_DOOR_LOCK_CLUSTER_ID:
+        case DoorLock::Id:
             // We only know of one extension for the Door Lock cluster and it is just
             // one byte, which means we can skip some logic for this cluster.  If
             // other extensions are added in this cluster, more logic will be needed
@@ -970,7 +962,7 @@ bool emberAfPluginScenesServerParseAddScene(
             break;
 #endif
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
-        case ZCL_WINDOW_COVERING_CLUSTER_ID:
+        case WindowCovering::Id:
             // If we're here, we know we have at least one byte, so we can skip the
             // length check for the first field.
             entry.hasCurrentPositionLiftPercentageValue = true;
@@ -1041,10 +1033,10 @@ kickout:
         return true;
     }
     {
-        app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ZCL_SCENES_CLUSTER_ID, ZCL_ADD_SCENE_RESPONSE_COMMAND_ID };
+        app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), Scenes::Id, ZCL_ADD_SCENE_RESPONSE_COMMAND_ID };
         if (enhanced)
         {
-            path = { emberAfCurrentEndpoint(), ZCL_SCENES_CLUSTER_ID, ZCL_ENHANCED_ADD_SCENE_RESPONSE_COMMAND_ID };
+            path = { emberAfCurrentEndpoint(), Scenes::Id, ZCL_ENHANCED_ADD_SCENE_RESPONSE_COMMAND_ID };
         }
         TLV::TLVWriter * writer = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(path));
@@ -1097,10 +1089,10 @@ bool emberAfPluginScenesServerParseViewScene(app::CommandHandler * commandObj, c
     // The status, group id, and scene id are always included in the response, but
     // the transition time, name, and extension fields are only included if the
     // scene was found.
-    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ZCL_SCENES_CLUSTER_ID, ZCL_VIEW_SCENE_RESPONSE_COMMAND_ID };
+    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), Scenes::Id, ZCL_VIEW_SCENE_RESPONSE_COMMAND_ID };
     if (enhanced)
     {
-        path = { emberAfCurrentEndpoint(), ZCL_SCENES_CLUSTER_ID, ZCL_ENHANCED_VIEW_SCENE_RESPONSE_COMMAND_ID };
+        path = { emberAfCurrentEndpoint(), Scenes::Id, ZCL_ENHANCED_VIEW_SCENE_RESPONSE_COMMAND_ID };
     }
     TLV::TLVWriter * writer = nullptr;
     SuccessOrExit(err = commandObj->PrepareCommand(path));
@@ -1135,7 +1127,7 @@ bool emberAfPluginScenesServerParseViewScene(app::CommandHandler * commandObj, c
     #ifdef ZCL_USING_ON_OFF_CLUSTER_SERVER
             if (entry.hasOnOffValue)
             {
-                emberAfPutInt16uInResp(ZCL_ON_OFF_CLUSTER_ID);
+                emberAfPutInt16uInResp(OnOff::Id);
                 emberAfPutInt8uInResp(1); // length
                 emberAfPutInt8uInResp(entry.onOffValue);
             }
@@ -1143,7 +1135,7 @@ bool emberAfPluginScenesServerParseViewScene(app::CommandHandler * commandObj, c
     #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
             if (entry.hasCurrentLevelValue)
             {
-                emberAfPutInt16uInResp(ZCL_LEVEL_CONTROL_CLUSTER_ID);
+                emberAfPutInt16uInResp(LevelControl::Id);
                 emberAfPutInt8uInResp(1); // length
                 emberAfPutInt8uInResp(entry.currentLevelValue);
             }
@@ -1152,7 +1144,7 @@ bool emberAfPluginScenesServerParseViewScene(app::CommandHandler * commandObj, c
             if (entry.hasOccupiedCoolingSetpointValue)
             {
                 uint8_t * length;
-                emberAfPutInt16uInResp(ZCL_THERMOSTAT_CLUSTER_ID);
+                emberAfPutInt16uInResp(Thermostat::Id);
                 length = &appResponseData[appResponseLength];
                 emberAfPutInt8uInResp(0); // temporary length
                 emberAfPutInt16sInResp(entry.occupiedCoolingSetpointValue);
@@ -1173,7 +1165,7 @@ bool emberAfPluginScenesServerParseViewScene(app::CommandHandler * commandObj, c
             if (entry.hasCurrentXValue)
             {
                 uint8_t * length;
-                emberAfPutInt16uInResp(ZCL_COLOR_CONTROL_CLUSTER_ID);
+                emberAfPutInt16uInResp(ColorControl::Id);
                 length = &appResponseData[appResponseLength];
                 emberAfPutInt8uInResp(0); // temporary length
                 emberAfPutInt16uInResp(entry.currentXValue);
@@ -1221,7 +1213,7 @@ bool emberAfPluginScenesServerParseViewScene(app::CommandHandler * commandObj, c
     #ifdef ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
             if (entry.hasLockStateValue)
             {
-                emberAfPutInt16uInResp(ZCL_DOOR_LOCK_CLUSTER_ID);
+                emberAfPutInt16uInResp(DoorLock::Id);
                 emberAfPutInt8uInResp(1); // length
                 emberAfPutInt8uInResp(entry.lockStateValue);
             }
@@ -1230,7 +1222,7 @@ bool emberAfPluginScenesServerParseViewScene(app::CommandHandler * commandObj, c
             if (entry.hasCurrentPositionLiftPercentageValue)
             {
                 uint8_t * length;
-                emberAfPutInt16uInResp(ZCL_WINDOW_COVERING_CLUSTER_ID);
+                emberAfPutInt16uInResp(WindowCovering::Id);
                 length = &appResponseData[appResponseLength];
                 emberAfPutInt8uInResp(0); // temporary length
                 emberAfPutInt8uInResp(entry.currentPositionLiftPercentageValue);

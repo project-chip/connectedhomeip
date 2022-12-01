@@ -58,38 +58,38 @@ public abstract class MatterCommand extends Command {
     this.mChipDeviceController = controller;
 
     addArgument(
-        "--paa-trust-store-path",
+        "paa-trust-store-path",
         mPaaTrustStorePath,
         "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
             + "directory.",
         true);
     addArgument(
-        "--cd-trust-store-path",
+        "cd-trust-store-path",
         mCDTrustStorePath,
         "Path to directory holding CD certificate information.  Can be absolute or relative to the current working "
             + "directory.",
         true);
     addArgument(
-        "--commissioner-name",
+        "commissioner-name",
         mCommissionerName,
         "Name of fabric to use. Valid values are \"alpha\", \"beta\", \"gamma\", and integers greater than or equal to "
             + "4.  The default if not specified is \"alpha\".",
         true);
     addArgument(
-        "--commissioner-nodeid",
+        "commissioner-nodeid",
         0,
         Long.MAX_VALUE,
         mCommissionerNodeId,
-        "The node id to use for chip-tool.  If not provided, kTestControllerNodeId (112233, 0x1B669) will be used.",
+        "The node id to use for java-matter-controller.  If not provided, kTestControllerNodeId (112233, 0x1B669) will be used.",
         true);
     addArgument(
-        "--use-max-sized-certs",
+        "use-max-sized-certs",
         mUseMaxSizedCerts,
         "Maximize the size of operational certificates. If not provided or 0 (\"false\"), normally sized operational "
             + "certificates are generated.",
         true);
     addArgument(
-        "--only-allow-trusted-cd-keys",
+        "only-allow-trusted-cd-keys",
         mOnlyAllowTrustedCdKeys,
         "Only allow trusted CD verifying keys (disallow test keys). If not provided or 0 (\"false\"), untrusted CD "
             + "verifying keys are allowed. If 1 (\"true\"), test keys are disallowed.",

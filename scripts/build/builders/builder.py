@@ -24,8 +24,12 @@ from dataclasses import dataclass
 class BuilderOptions:
     # Enable flashbundle generation stage
     enable_flashbundle: bool = False
+
     # Allow to wrap default build command
     pw_command_launcher: str = None
+
+    # Locations where files are pre-generated
+    pregen_dir: str = None
 
 
 class Builder(ABC):

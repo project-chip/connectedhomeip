@@ -23,7 +23,7 @@
 #import "MTRDeviceControllerOverXPC_Internal.h"
 #import "MTRDeviceControllerXPCConnection.h"
 #import "MTRError.h"
-#import "MTRLogging.h"
+#import "MTRLogging_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
