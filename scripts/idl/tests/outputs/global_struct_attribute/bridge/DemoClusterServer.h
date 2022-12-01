@@ -8,8 +8,8 @@ struct DemoClusterCluster : public GeneratedCluster
 {
 
   DemoClusterCluster() :
-      mSingleLabel(chip::CharSpan("singleLabel"), 32, ATTRIBUTE_MASK_WRITABLE, ZCL_STRUCT_ATTRIBUTE_TYPE, sizeof(LabelStruct)),
-      mSomeLabels(chip::CharSpan("someLabels"), 33, ATTRIBUTE_MASK_WRITABLE, ZCL_ARRAY_ATTRIBUTE_TYPE, sizeof(LabelStruct))
+      mSingleLabel(chip::CharSpan("singleLabel"), 32, ATTRIBUTE_MASK_WRITABLE | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZCL_STRUCT_ATTRIBUTE_TYPE, sizeof(LabelStruct)),
+      mSomeLabels(chip::CharSpan("someLabels"), 33, ATTRIBUTE_MASK_WRITABLE | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZCL_ARRAY_ATTRIBUTE_TYPE, sizeof(LabelStruct))
   {
   }
 

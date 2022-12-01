@@ -8,7 +8,7 @@ struct SecondCluster : public GeneratedCluster
 {
 
   SecondCluster() :
-      mSomeBytes(chip::CharSpan("someBytes"), 123, 0, ZCL_OCTET_STRING_ATTRIBUTE_TYPE, 32)
+      mSomeBytes(chip::CharSpan("someBytes"), 123, 0 | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZCL_OCTET_STRING_ATTRIBUTE_TYPE, 32)
   {
   }
 
