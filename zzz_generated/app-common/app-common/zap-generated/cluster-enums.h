@@ -1028,9 +1028,6 @@ namespace ProxyValid {
 namespace BooleanState {
 } // namespace BooleanState
 
-namespace ClientMonitoring {
-} // namespace ClientMonitoring
-
 namespace ModeSelect {
 
 // Bitmap for ModeSelectFeature
@@ -2275,6 +2272,9 @@ namespace AccountLogin {
 
 namespace ElectricalMeasurement {
 } // namespace ElectricalMeasurement
+
+namespace ClientMonitoring {
+} // namespace ClientMonitoring
 
 namespace UnitTesting {
 

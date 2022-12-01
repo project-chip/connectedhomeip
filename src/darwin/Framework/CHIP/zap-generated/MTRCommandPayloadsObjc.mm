@@ -3649,63 +3649,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRClientMonitoringClusterRegisterClientMonitoringParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _clientNodeId = @(0);
-
-        _iCid = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRClientMonitoringClusterRegisterClientMonitoringParams alloc] init];
-
-    other.clientNodeId = self.clientNodeId;
-    other.iCid = self.iCid;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: clientNodeId:%@; iCid:%@; >", NSStringFromClass([self class]), _clientNodeId, _iCid];
-    return descriptionString;
-}
-
-@end
-@implementation MTRClientMonitoringClusterStayAwakeRequestParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRClientMonitoringClusterStayAwakeRequestParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
 @implementation MTRModeSelectClusterChangeToModeParams
 - (instancetype)init
 {
@@ -7049,6 +6992,63 @@ NS_ASSUME_NONNULL_BEGIN
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeId:%@; startTime:%@; numberOfIntervals:%@; >",
                                              NSStringFromClass([self class]), _attributeId, _startTime, _numberOfIntervals];
+    return descriptionString;
+}
+
+@end
+@implementation MTRClientMonitoringClusterRegisterClientMonitoringParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clientNodeId = @(0);
+
+        _iCid = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRClientMonitoringClusterRegisterClientMonitoringParams alloc] init];
+
+    other.clientNodeId = self.clientNodeId;
+    other.iCid = self.iCid;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: clientNodeId:%@; iCid:%@; >", NSStringFromClass([self class]), _clientNodeId, _iCid];
+    return descriptionString;
+}
+
+@end
+@implementation MTRClientMonitoringClusterStayAwakeRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRClientMonitoringClusterStayAwakeRequestParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
     return descriptionString;
 }
 

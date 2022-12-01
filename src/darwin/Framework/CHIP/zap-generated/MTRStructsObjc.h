@@ -648,15 +648,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTRClientMonitoringClusterMonitoringRegistration : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull clientNodeId;
-@property (nonatomic, copy) NSNumber * _Nonnull iCid;
-@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-@end
-
 @interface MTRModeSelectClusterSemanticTag : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull mfgCode;
 @property (nonatomic, copy) NSNumber * _Nonnull value;
@@ -974,6 +965,15 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @interface MTRApplicationBasicClusterApplicationBasicApplication : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull catalogVendorId;
 @property (nonatomic, copy) NSString * _Nonnull applicationId;
+
+- (instancetype)init;
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+@end
+
+@interface MTRClientMonitoringClusterMonitoringRegistration : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull clientNodeId;
+@property (nonatomic, copy) NSNumber * _Nonnull iCid;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
