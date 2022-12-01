@@ -674,8 +674,11 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     VerifyOrReturnValue(_otaProviderDelegateBridge != nil, controller);
     VerifyOrReturnValue([_controllers count] == 1, controller);
 
-    auto systemState = _controllerFactory->GetSystemState();
-    CHIP_ERROR err = _otaProviderDelegateBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr());
+    __block CHIP_ERROR err;
+    dispatch_sync(_chipWorkQueue, ^{
+        auto systemState = _controllerFactory->GetSystemState();
+        err = _otaProviderDelegateBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr());
+    });
     if (CHIP_NO_ERROR != err) {
         MTR_LOG_ERROR("Failed to init provider delegate bridge: %" CHIP_ERROR_FORMAT, err.Format());
         [controller shutdown];
@@ -711,19 +714,23 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     [_controllers removeObject:controller];
 
     if ([_controllers count] == 0) {
-        if (_otaProviderDelegateBridge) {
-            _otaProviderDelegateBridge->Shutdown();
-        }
-
         // That was our last controller.  Stop the event loop before it
         // shuts down, because shutdown of the last controller will tear
         // down most of the world.
         DeviceLayer::PlatformMgrImpl().StopEventLoopTask();
 
+        if (_otaProviderDelegateBridge) {
+            _otaProviderDelegateBridge->Shutdown();
+        }
+
         [controller shutDownCppController];
     } else {
         // Do the controller shutdown on the Matter work queue.
         dispatch_sync(_chipWorkQueue, ^{
+            if (_otaProviderDelegateBridge) {
+                _otaProviderDelegateBridge->ControllerShuttingDown(controller);
+            }
+
             [controller shutDownCppController];
         });
     }

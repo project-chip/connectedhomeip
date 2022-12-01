@@ -28,7 +28,14 @@ public:
     ~MTROTAProviderDelegateBridge();
 
     CHIP_ERROR Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeManager);
+
+    // Shutdown must be called after the event loop has been stopped, since it
+    // touches Matter objects.
     void Shutdown();
+
+    // ControllerShuttingDown must be called on the Matter work queue, since it
+    // touches Matter objects.
+    void ControllerShuttingDown(MTRDeviceController * controller);
 
     void HandleQueryImage(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -60,7 +67,7 @@ private:
         MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams * commandParams);
 
     _Nullable id<MTROTAProviderDelegate> mDelegate;
-    dispatch_queue_t mWorkQueue;
+    dispatch_queue_t mDelegateNotificationQueue;
 };
 
 NS_ASSUME_NONNULL_END
