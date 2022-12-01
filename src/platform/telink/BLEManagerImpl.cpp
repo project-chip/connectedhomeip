@@ -261,6 +261,8 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     if (!BLERadioInitialized)
     {
+        char bt_dev_name[CONFIG_BT_DEVICE_NAME_MAX];
+        strncpy(bt_dev_name, bt_get_name(), sizeof(bt_dev_name));
         /* Block IEEE802154 */
         /* @todo: move to RadioSwitch module*/
         const struct device * radio_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_ieee802154));
@@ -270,6 +272,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         /* Init BLE stack */
         err = bt_enable(NULL);
         VerifyOrReturnError(err == 0, MapErrorZephyr(err));
+        (void)bt_set_name(bt_dev_name);
         BLERadioInitialized = true;
     }
 
