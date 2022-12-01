@@ -41,9 +41,6 @@ using namespace chip;
 //------------------------------------------------------------------------------
 // Globals
 
-// Storage and functions for turning on and off devices
-bool afDeviceEnabled[MAX_ENDPOINT_COUNT];
-
 #ifdef EMBER_AF_ENABLE_STATISTICS
 // a variable containing the number of messages send from the utilities
 // since emberAfInit was called.
@@ -82,21 +79,6 @@ EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 #endif
 
 //------------------------------------------------------------------------------
-
-// Device enabled/disabled functions
-
-void emberAfSetDeviceEnabled(EndpointId endpoint, bool enabled)
-{
-    uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index != 0xFFFF && index < sizeof(afDeviceEnabled))
-    {
-        afDeviceEnabled[index] = enabled;
-    }
-#ifdef ZCL_USING_BASIC_CLUSTER_DEVICE_ENABLED_ATTRIBUTE
-    emberAfWriteServerAttribute(endpoint, app::Clusters::Basic::Id, ZCL_DEVICE_ENABLED_ATTRIBUTE_ID, (uint8_t *) &enabled,
-                                ZCL_BOOLEAN_ATTRIBUTE_TYPE);
-#endif
-}
 
 // Is the device identifying?
 bool emberAfIsDeviceIdentifying(EndpointId endpoint)
@@ -166,8 +148,6 @@ void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
         emberAfInitializeAttributes(EMBER_BROADCAST_ENDPOINT);
         // emberAfPopNetworkIndex();
     }
-
-    memset(afDeviceEnabled, true, emberAfEndpointCount());
 
     MATTER_PLUGINS_INIT
 
