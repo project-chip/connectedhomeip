@@ -392,45 +392,43 @@ void AppTask::LockActionEventHandler(AppEvent * event)
 
     switch (event->Type)
     {
-        case AppEvent::kEventType_Lock:
+    case AppEvent::kEventType_Lock: {
+        action = static_cast<LockManager::Action_t>(event->LockEvent.Action);
+        actor  = event->LockEvent.Actor;
+        break;
+    }
+
+    case AppEvent::kEventType_Button: {
+
+        P6_LOG("%s [Action: %d]", __FUNCTION__, event->ButtonEvent.Action);
+
+        if (event->ButtonEvent.Action == APP_BUTTON_LONG_PRESS)
         {
-            action = static_cast<LockManager::Action_t>(event->LockEvent.Action);
-            actor  = event->LockEvent.Actor;
-            break;
+            P6_LOG("Sending a lock jammed event");
+
+            /* Generating Door Lock Jammed event */
+            DoorLockServer::Instance().SendLockAlarmEvent(1 /* Endpoint Id */, DlAlarmCode::kLockJammed);
+
+            return;
         }
-
-        case AppEvent::kEventType_Button:
+        else
         {
-
-            P6_LOG("%s [Action: %d]", __FUNCTION__, event->ButtonEvent.Action);
-
-            if (event->ButtonEvent.Action == APP_BUTTON_LONG_PRESS)
+            if (LockMgr().NextState() == true)
             {
-                P6_LOG("Sending a lock jammed event");
-
-                /* Generating Door Lock Jammed event */
-                DoorLockServer::Instance().SendLockAlarmEvent(1 /* Endpoint Id */, DlAlarmCode::kLockJammed);
-
-                return;
+                action = LockManager::LOCK_ACTION;
             }
             else
             {
-                if (LockMgr().NextState() == true)
-                {
-                    action = LockManager::LOCK_ACTION;
-                }
-                else
-                {
-                    action = LockManager::UNLOCK_ACTION;
-                }
-
-                actor = AppEvent::kEventType_Button;
+                action = LockManager::UNLOCK_ACTION;
             }
-            break;
-        }
 
-        default:
-            return;
+            actor = AppEvent::kEventType_Button;
+        }
+        break;
+    }
+
+    default:
+        return;
     }
 
     if (!LockMgr().InitiateAction(actor, action))

@@ -181,7 +181,7 @@ bool LockManager::InitiateAction(int32_t aActor, Action_t aAction)
     bool action_initiated = false;
     State_t new_state;
 
-    if(aAction == LOCK_JAMMED)
+    if (aAction == LOCK_JAMMED)
     {
         ChipLogProgress(Zcl, "Sending a lock jammed event");
 

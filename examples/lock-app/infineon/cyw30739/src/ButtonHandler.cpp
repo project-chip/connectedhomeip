@@ -68,13 +68,14 @@ wiced_result_t app_button_init(void)
     return result;
 }
 
-void app_button_event_handler(const button_manager_button_t *button_mgr, button_manager_event_t event,
+void app_button_event_handler(const button_manager_button_t * button_mgr, button_manager_event_t event,
                               button_manager_button_state_t state)
 {
     bool initiated = false;
     LockManager::Action_t action;
 
-    ChipLogProgress(Zcl, "app_button_event_handler. button=%d, event=%d, state=%d\n", button_mgr[ON_OFF_BUTTON].configuration->button, event, state);
+    ChipLogProgress(Zcl, "app_button_event_handler. button=%d, event=%d, state=%d\n",
+                    button_mgr[ON_OFF_BUTTON].configuration->button, event, state);
 
     /* This app is intersted in PLATFORM_BUTTON_1 only */
     if (button_mgr[0].configuration->button != PLATFORM_BUTTON_1)
@@ -90,7 +91,7 @@ void app_button_event_handler(const button_manager_button_t *button_mgr, button_
     {
         action = (LockMgr().NextState() == true) ? LockManager::LOCK_ACTION : LockManager::UNLOCK_ACTION;
     }
-    else if(event == BUTTON_LONG_DURATION_EVENT)
+    else if (event == BUTTON_LONG_DURATION_EVENT)
     {
         action = LockManager::LOCK_JAMMED;
     }
