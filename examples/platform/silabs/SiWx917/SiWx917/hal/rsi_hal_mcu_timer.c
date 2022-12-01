@@ -200,7 +200,8 @@ void rsi_delay_ms(uint32_t delay_ms)
 {
     uint64_t waitTime = rsi_hal_gettickcount() + delay_ms;
 
-    while (waitTime > rsi_hal_gettickcount()){
+    while (waitTime > rsi_hal_gettickcount())
+    {
         // we busy wait
     }
 }
