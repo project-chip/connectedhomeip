@@ -261,7 +261,7 @@
 {
     ChipLogProgress(AppServer, "CastingServerBridge().getDiscoveredCommissioner() called");
 
-    dispatch_async(_chipWorkQueue, ^{
+    dispatch_sync(_chipWorkQueue, ^{
         chip::Optional<TargetVideoPlayerInfo *> associatedConnectableVideoPlayer;
         DiscoveredNodeData * commissioner = nil;
         const chip::Dnssd::DiscoveredNodeData * cppDiscoveredNodeData
@@ -275,7 +275,7 @@
             }
         }
 
-        dispatch_async(clientQueue, ^{
+        dispatch_sync(clientQueue, ^{
             discoveredCommissionerHandler(commissioner);
         });
     });
