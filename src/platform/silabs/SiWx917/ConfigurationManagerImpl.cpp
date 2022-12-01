@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Provides the implementation of the Device Layer ConfigurationManager object
- *          for EFR32 platforms using the Silicon Labs SDK.
+ *          for SiWx917 platforms using the Silicon Labs SDK.
  */
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -30,7 +30,7 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/silabs/SilabsConfig.h>
 
-#include "em_rmu.h"
+#include "core_cm4.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #include "wfx_host_events.h"
@@ -60,8 +60,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     IncreaseBootCount();
     // It is possible to configure the possible reset sources with RMU_ResetControl
     // In this case, we keep Reset control at default setting
-    rebootCause = RMU_ResetCauseGet();
-    RMU_ResetCauseClear();
 
     err = CHIP_NO_ERROR;
 

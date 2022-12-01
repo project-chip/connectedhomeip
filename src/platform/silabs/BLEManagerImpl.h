@@ -26,10 +26,22 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include "FreeRTOS.h"
+#include "timers.h"
+#ifdef RS91X_BLE_ENABLE
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include <rsi_ble.h>
+#include <rsi_ble_apis.h>
+#include <rsi_bt_common.h>
+#ifdef __cplusplus
+}
+#endif
+#else
 #include "gatt_db.h"
 #include "sl_bgapi.h"
 #include "sl_bt_api.h"
-#include "timers.h"
+#endif // RS91X_BLE_ENABLE
 
 namespace chip {
 namespace DeviceLayer {
@@ -45,6 +57,16 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
 
 public:
     void HandleBootEvent(void);
+
+#ifdef RS91X_BLE_ENABLE
+    void HandleConnectEvent(void);
+    void HandleConnectionCloseEvent(uint16_t reason);
+    void HandleWriteEvent(rsi_ble_event_write_t evt);
+    void UpdateMtu(rsi_ble_event_mtu_t evt);
+    void HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId);
+    void HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt);
+    void HandleSoftTimerEvent(void);
+#else
     void HandleConnectEvent(volatile sl_bt_msg_t * evt);
     void HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt);
     void HandleWriteEvent(volatile sl_bt_msg_t * evt);
@@ -53,8 +75,16 @@ public:
     void HandleTXCharCCCDWrite(volatile sl_bt_msg_t * evt);
     void HandleSoftTimerEvent(volatile sl_bt_msg_t * evt);
 
+#endif // RS91X_BLE_ENABLE
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+#ifdef RS91X_BLE_ENABLE
+    static void HandleC3ReadRequest(void);
+#else
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     static void HandleC3ReadRequest(volatile sl_bt_msg_t * evt);
+#endif
+#endif
 #endif
 
 private:
@@ -125,7 +155,9 @@ private:
 
     struct CHIPoBLEConState
     {
+#ifndef RS91X_BLE_ENABLE
         bd_addr address;
+#endif
         uint16_t mtu : 10;
         uint16_t allocated : 1;
         uint16_t subscribed : 1;
@@ -153,7 +185,12 @@ private:
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     CHIP_ERROR EncodeAdditionalDataTlv();
 #endif
+
+#ifdef RS91X_BLE_ENABLE
+    void HandleRXCharWrite(rsi_ble_event_write_t * evt);
+#else
     void HandleRXCharWrite(volatile sl_bt_msg_t * evt);
+#endif
     bool RemoveConnection(uint8_t connectionHandle);
     void AddConnection(uint8_t connectionHandle, uint8_t bondingHandle);
     void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);

@@ -16,7 +16,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
-import("${chip_root}/examples/platform/silabs/efr32/args.gni")
+import("${chip_root}/examples/platform/silabs/SiWx917/args.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 
 # ARM architecture flags will be set based on silabs_family.
@@ -26,12 +26,7 @@ mbedtls_target = "${efr32_sdk_build_root}:efr32_sdk"
 
 openthread_external_mbedtls = mbedtls_target
 
-# default to platform crypto implementation but allow commandline override
-if (chip_crypto == "") {
-  chip_crypto = "platform"
-}
-
-chip_device_platform = "efr32"
+chip_device_platform = "SiWx917"
 
 #Net work configuration OpenThread
 lwip_platform = "efr32"
@@ -44,7 +39,7 @@ chip_with_lwip = false
 chip_build_tests = false
 
 # Transitional CommissionableDataProvider not used anymore
-# examples/platform/silabs/efr32/EFR32DeviceDataProvider is now used.
+# examples/platform/silabs/SiWx917/SiWx917DeviceDataProvider is now used.
 chip_use_transitional_commissionable_data_provider = false
 
 openthread_root = "${chip_root}/third_party/openthread/ot-efr32/openthread"
