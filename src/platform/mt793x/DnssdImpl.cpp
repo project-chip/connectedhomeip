@@ -201,8 +201,6 @@ namespace Dnssd {
 #define SERVICE_DOMAIN ("local")
 
 MdnsContexts MdnsContexts::sInstance;
-static std::vector<DNSServiceRef> clients;
-static TXTRecordRef PublishTxtRecord;
 static DNSServiceRef BrowseClient = NULL;
 static TaskHandle_t gResolveTask = NULL;
 static EventGroupHandle_t gResolveTaskWakeEvent;
