@@ -627,6 +627,7 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     {
         ChipLogError(SecureChannel, "CASE failed to match destination ID with local fabrics");
         ChipLogByteSpan(SecureChannel, destinationIdentifier);
+        ExitNow();
     }
 
     // ParseSigma1 ensures that:
