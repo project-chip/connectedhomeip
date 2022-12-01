@@ -37,7 +37,7 @@
 #include <lib/dnssd/Advertiser.h>
 
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #endif
 
 static const char * TAG = "app-devicecallbacks";
@@ -165,13 +165,13 @@ void AppDeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpoi
         if (attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID)
         {
             hue = *value;
-            emberAfReadServerAttribute(endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+            emberAfReadServerAttribute(endpointId, Clusters::ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
                                        &saturation, sizeof(uint8_t));
         }
         else
         {
             saturation = *value;
-            emberAfReadServerAttribute(endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID, &hue,
+            emberAfReadServerAttribute(endpointId, Clusters::ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID, &hue,
                                        sizeof(uint8_t));
         }
         statusLED1.SetColor(hue, saturation);
