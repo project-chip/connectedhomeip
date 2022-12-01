@@ -18977,18 +18977,18 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
 
 - (void)readAttributeDeviceListWithCompletionHandler:
     (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
-    MTR_NEWLY_DEPRECATED("Please use readAttributeDeviceListWithCompletion:");
+    MTR_NEWLY_DEPRECATED("Please use readAttributeDeviceTypeListWithCompletion:");
 - (void)subscribeAttributeDeviceListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                         maxInterval:(NSNumber * _Nonnull)maxInterval
                                              params:(MTRSubscribeParams * _Nullable)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
-    MTR_NEWLY_DEPRECATED("Please use subscribeAttributeDeviceListWithParams:subscriptionEstablished:");
+    MTR_NEWLY_DEPRECATED("Please use subscribeAttributeDeviceTypeListWithParams:subscriptionEstablished:");
 + (void)readAttributeDeviceListWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                          endpoint:(NSNumber *)endpoint
                                             queue:(dispatch_queue_t)queue
                                 completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
-    MTR_NEWLY_DEPRECATED("Please use readAttributeDeviceListWithAttributeCache:endpoint:queue:completion:");
+    MTR_NEWLY_DEPRECATED("Please use readAttributeDeviceTypeListWithAttributeCache:endpoint:queue:completion:");
 
 - (void)readAttributeServerListWithCompletionHandler:
     (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
@@ -19243,25 +19243,25 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
 
 - (void)readAttributeAclWithParams:(MTRReadParams * _Nullable)params
                  completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
-    MTR_NEWLY_DEPRECATED("Please use readAttributeAclWithParams:completion:");
+    MTR_NEWLY_DEPRECATED("Please use readAttributeACLWithParams:completion:");
 - (void)writeAttributeAclWithValue:(NSArray * _Nonnull)value
                  completionHandler:(MTRStatusCompletion)completionHandler
-    MTR_NEWLY_DEPRECATED("Please use writeAttributeAclWithValue:completion:");
+    MTR_NEWLY_DEPRECATED("Please use writeAttributeACLWithValue:completion:");
 - (void)writeAttributeAclWithValue:(NSArray * _Nonnull)value
                             params:(MTRWriteParams * _Nullable)params
                  completionHandler:(MTRStatusCompletion)completionHandler
-    MTR_NEWLY_DEPRECATED("Please use writeAttributeAclWithValue:params:completion:");
+    MTR_NEWLY_DEPRECATED("Please use writeAttributeACLWithValue:params:completion:");
 - (void)subscribeAttributeAclWithMinInterval:(NSNumber * _Nonnull)minInterval
                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                       params:(MTRSubscribeParams * _Nullable)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
-    MTR_NEWLY_DEPRECATED("Please use subscribeAttributeAclWithParams:subscriptionEstablished:");
+    MTR_NEWLY_DEPRECATED("Please use subscribeAttributeACLWithParams:subscriptionEstablished:");
 + (void)readAttributeAclWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                   endpoint:(NSNumber *)endpoint
                                      queue:(dispatch_queue_t)queue
                          completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
-    MTR_NEWLY_DEPRECATED("Please use readAttributeAclWithAttributeCache:endpoint:queue:completion:");
+    MTR_NEWLY_DEPRECATED("Please use readAttributeACLWithAttributeCache:endpoint:queue:completion:");
 
 - (void)readAttributeExtensionWithParams:(MTRReadParams * _Nullable)params
                        completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
@@ -32044,14 +32044,14 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
 
 - (void)readAttributePirOccupiedToUnoccupiedDelayWithCompletionHandler:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
-    MTR_NEWLY_DEPRECATED("Please use readAttributePirOccupiedToUnoccupiedDelayWithCompletion:");
+    MTR_NEWLY_DEPRECATED("Please use readAttributePIROccupiedToUnoccupiedDelayWithCompletion:");
 - (void)writeAttributePirOccupiedToUnoccupiedDelayWithValue:(NSNumber * _Nonnull)value
                                           completionHandler:(MTRStatusCompletion)completionHandler
-    MTR_NEWLY_DEPRECATED("Please use writeAttributePirOccupiedToUnoccupiedDelayWithValue:completion:");
+    MTR_NEWLY_DEPRECATED("Please use writeAttributePIROccupiedToUnoccupiedDelayWithValue:completion:");
 - (void)writeAttributePirOccupiedToUnoccupiedDelayWithValue:(NSNumber * _Nonnull)value
                                                      params:(MTRWriteParams * _Nullable)params
                                           completionHandler:(MTRStatusCompletion)completionHandler
-    MTR_NEWLY_DEPRECATED("Please use writeAttributePirOccupiedToUnoccupiedDelayWithValue:params:completion:");
+    MTR_NEWLY_DEPRECATED("Please use writeAttributePIROccupiedToUnoccupiedDelayWithValue:params:completion:");
 - (void)subscribeAttributePirOccupiedToUnoccupiedDelayWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                params:(MTRSubscribeParams * _Nullable)params
@@ -32059,24 +32059,24 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
                                                   (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                         reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                           NSError * _Nullable error))reportHandler
-    MTR_NEWLY_DEPRECATED("Please use subscribeAttributePirOccupiedToUnoccupiedDelayWithParams:subscriptionEstablished:");
+    MTR_NEWLY_DEPRECATED("Please use subscribeAttributePIROccupiedToUnoccupiedDelayWithParams:subscriptionEstablished:");
 + (void)readAttributePirOccupiedToUnoccupiedDelayWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                                            endpoint:(NSNumber *)endpoint
                                                               queue:(dispatch_queue_t)queue
                                                   completionHandler:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completionHandler
-    MTR_NEWLY_DEPRECATED("Please use readAttributePirOccupiedToUnoccupiedDelayWithAttributeCache:endpoint:queue:completion:");
+    MTR_NEWLY_DEPRECATED("Please use readAttributePIROccupiedToUnoccupiedDelayWithAttributeCache:endpoint:queue:completion:");
 
 - (void)readAttributePirUnoccupiedToOccupiedDelayWithCompletionHandler:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
-    MTR_NEWLY_DEPRECATED("Please use readAttributePirUnoccupiedToOccupiedDelayWithCompletion:");
+    MTR_NEWLY_DEPRECATED("Please use readAttributePIRUnoccupiedToOccupiedDelayWithCompletion:");
 - (void)writeAttributePirUnoccupiedToOccupiedDelayWithValue:(NSNumber * _Nonnull)value
                                           completionHandler:(MTRStatusCompletion)completionHandler
-    MTR_NEWLY_DEPRECATED("Please use writeAttributePirUnoccupiedToOccupiedDelayWithValue:completion:");
+    MTR_NEWLY_DEPRECATED("Please use writeAttributePIRUnoccupiedToOccupiedDelayWithValue:completion:");
 - (void)writeAttributePirUnoccupiedToOccupiedDelayWithValue:(NSNumber * _Nonnull)value
                                                      params:(MTRWriteParams * _Nullable)params
                                           completionHandler:(MTRStatusCompletion)completionHandler
-    MTR_NEWLY_DEPRECATED("Please use writeAttributePirUnoccupiedToOccupiedDelayWithValue:params:completion:");
+    MTR_NEWLY_DEPRECATED("Please use writeAttributePIRUnoccupiedToOccupiedDelayWithValue:params:completion:");
 - (void)subscribeAttributePirUnoccupiedToOccupiedDelayWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                params:(MTRSubscribeParams * _Nullable)params
@@ -32084,24 +32084,24 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
                                                   (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                         reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                           NSError * _Nullable error))reportHandler
-    MTR_NEWLY_DEPRECATED("Please use subscribeAttributePirUnoccupiedToOccupiedDelayWithParams:subscriptionEstablished:");
+    MTR_NEWLY_DEPRECATED("Please use subscribeAttributePIRUnoccupiedToOccupiedDelayWithParams:subscriptionEstablished:");
 + (void)readAttributePirUnoccupiedToOccupiedDelayWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                                            endpoint:(NSNumber *)endpoint
                                                               queue:(dispatch_queue_t)queue
                                                   completionHandler:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completionHandler
-    MTR_NEWLY_DEPRECATED("Please use readAttributePirUnoccupiedToOccupiedDelayWithAttributeCache:endpoint:queue:completion:");
+    MTR_NEWLY_DEPRECATED("Please use readAttributePIRUnoccupiedToOccupiedDelayWithAttributeCache:endpoint:queue:completion:");
 
 - (void)readAttributePirUnoccupiedToOccupiedThresholdWithCompletionHandler:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
-    MTR_NEWLY_DEPRECATED("Please use readAttributePirUnoccupiedToOccupiedThresholdWithCompletion:");
+    MTR_NEWLY_DEPRECATED("Please use readAttributePIRUnoccupiedToOccupiedThresholdWithCompletion:");
 - (void)writeAttributePirUnoccupiedToOccupiedThresholdWithValue:(NSNumber * _Nonnull)value
                                               completionHandler:(MTRStatusCompletion)completionHandler
-    MTR_NEWLY_DEPRECATED("Please use writeAttributePirUnoccupiedToOccupiedThresholdWithValue:completion:");
+    MTR_NEWLY_DEPRECATED("Please use writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:completion:");
 - (void)writeAttributePirUnoccupiedToOccupiedThresholdWithValue:(NSNumber * _Nonnull)value
                                                          params:(MTRWriteParams * _Nullable)params
                                               completionHandler:(MTRStatusCompletion)completionHandler
-    MTR_NEWLY_DEPRECATED("Please use writeAttributePirUnoccupiedToOccupiedThresholdWithValue:params:completion:");
+    MTR_NEWLY_DEPRECATED("Please use writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:params:completion:");
 - (void)subscribeAttributePirUnoccupiedToOccupiedThresholdWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                               maxInterval:(NSNumber * _Nonnull)maxInterval
                                                                    params:(MTRSubscribeParams * _Nullable)params
@@ -32109,13 +32109,13 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
                                                       (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                             reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                               NSError * _Nullable error))reportHandler
-    MTR_NEWLY_DEPRECATED("Please use subscribeAttributePirUnoccupiedToOccupiedThresholdWithParams:subscriptionEstablished:");
+    MTR_NEWLY_DEPRECATED("Please use subscribeAttributePIRUnoccupiedToOccupiedThresholdWithParams:subscriptionEstablished:");
 + (void)readAttributePirUnoccupiedToOccupiedThresholdWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                                                endpoint:(NSNumber *)endpoint
                                                                   queue:(dispatch_queue_t)queue
                                                       completionHandler:(void (^)(NSNumber * _Nullable value,
                                                                             NSError * _Nullable error))completionHandler
-    MTR_NEWLY_DEPRECATED("Please use readAttributePirUnoccupiedToOccupiedThresholdWithAttributeCache:endpoint:queue:completion:");
+    MTR_NEWLY_DEPRECATED("Please use readAttributePIRUnoccupiedToOccupiedThresholdWithAttributeCache:endpoint:queue:completion:");
 
 - (void)readAttributeUltrasonicOccupiedToUnoccupiedDelayWithCompletionHandler:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
