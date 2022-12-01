@@ -1010,7 +1010,9 @@ namespace {
 class ExpectErrorExchangeDelegate : public ExchangeDelegate
 {
 public:
-    ExpectErrorExchangeDelegate(nlTestSuite * suite) : mSuite(suite) {}
+    ExpectErrorExchangeDelegate(nlTestSuite * suite, uint16_t expectedProtocolCode) :
+        mSuite(suite), mExpectedProtocolCode(expectedProtocolCode)
+    {}
 
 private:
     CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
@@ -1026,7 +1028,7 @@ private:
 
         NL_TEST_ASSERT(mSuite, statusReport.GetProtocolId() == SecureChannel::Id);
         NL_TEST_ASSERT(mSuite, statusReport.GetGeneralCode() == GeneralStatusCode::kFailure);
-        NL_TEST_ASSERT(mSuite, statusReport.GetProtocolCode() == kProtocolCodeNoSharedRoot);
+        NL_TEST_ASSERT(mSuite, statusReport.GetProtocolCode() == mExpectedProtocolCode);
         return CHIP_NO_ERROR;
     }
 
@@ -1035,6 +1037,7 @@ private:
     Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
 
     nlTestSuite * mSuite;
+    uint16_t mExpectedProtocolCode;
 };
 } // anonymous namespace
 
@@ -1069,7 +1072,7 @@ void TestCASESession::Sigma1BadDestinationIdTest(nlTestSuite * inSuite, void * i
     err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(MsgType::CASE_Sigma1, &caseSession);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ExpectErrorExchangeDelegate delegate(inSuite);
+    ExpectErrorExchangeDelegate delegate(inSuite, SecureChannel::kProtocolCodeNoSharedRoot);
     ExchangeContext * exchange = ctx.GetExchangeManager().NewContext(session.Value(), &delegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
