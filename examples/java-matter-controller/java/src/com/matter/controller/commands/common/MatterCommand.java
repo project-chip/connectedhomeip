@@ -19,21 +19,12 @@
 package com.matter.controller.commands.common;
 
 import chip.devicecontroller.ChipDeviceController;
-import com.matter.controller.config.PersistentStorage;
-import com.matter.controller.config.PersistentStorageOpCertStore;
-import com.matter.controller.config.PersistentStorageOperationalKeystore;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class MatterCommand extends Command {
   private final ChipDeviceController mChipDeviceController;
-  private final PersistentStorage mDefaultStorage = new PersistentStorage();
-  private final PersistentStorage mCommissionerStorage = new PersistentStorage();
-  private final PersistentStorageOperationalKeystore mOperationalKeystore =
-      new PersistentStorageOperationalKeystore();
-  private final PersistentStorageOpCertStore mOpCertStore = new PersistentStorageOpCertStore();
-
   private final Optional<CredentialsIssuer> mCredIssuerCmds;
   private final StringBuffer mCommissionerName = new StringBuffer();
   private final StringBuffer mPaaTrustStorePath = new StringBuffer();
@@ -104,23 +95,10 @@ public abstract class MatterCommand extends Command {
   /////////// Command Interface /////////
   @Override
   public void run() throws Exception {
-    // TODO: setup chip storage from Java, currently it is using example one from chip-tool
-    // maybeSetUpStack();
     runCommand();
-    // maybeTearDownStack();
   }
 
   protected abstract void runCommand();
-
-  private void maybeSetUpStack() throws Exception {
-    mDefaultStorage.init();
-    mOperationalKeystore.init(mDefaultStorage);
-    mOpCertStore.init(mDefaultStorage);
-  }
-
-  private void maybeTearDownStack() {
-    // ToDo:We need to call DeviceController::Shutdown()
-  }
 
   public void setTestResult(String result) {
     mTestResult = Optional.of(result);
