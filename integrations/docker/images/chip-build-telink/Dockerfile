@@ -11,13 +11,19 @@ RUN set -x \
 
 # Setup toolchain
 RUN set -x \
-    && wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.13.2/zephyr-toolchain-riscv64-0.13.2-linux-x86_64-setup.run -O /tmp/zephyr-toolchain-riscv64-setup.run \
-    && chmod +x /tmp/zephyr-toolchain-riscv64-setup.run \
-    && /tmp/zephyr-toolchain-riscv64-setup.run -- -d /opt/telink/zephyr-sdk-0.13.2 \
+    && mkdir /opt/telink \
+    && cd /opt/telink \
+    && wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.15.2/zephyr-sdk-0.15.2_linux-x86_64.tar.gz \
+    && wget -O - https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.15.2/sha256.sum | shasum --check --ignore-missing \
+    && tar xvf zephyr-sdk-0.15.2_linux-x86_64.tar.gz \
+    && rm -rf zephyr-sdk-0.15.2_linux-x86_64.tar.gz \
+    && cd zephyr-sdk-0.15.2 \
+    && ./setup.sh -t riscv64-zephyr-elf -h -c \
+    && cd / \
     && : # last line
 
 # Setup Zephyr
-ARG ZEPHYR_REVISION=dac17979d626bb820268660b4272a56d04d8083b
+ARG ZEPHYR_REVISION=2901439a086f8202e63dc6f66a590021bb8e15d3
 WORKDIR /opt/telink/zephyrproject
 RUN set -x \
     && python3 -m pip install -U --no-cache-dir \
@@ -29,16 +35,19 @@ RUN set -x \
     && west init -l \
     && cd .. \
     && west update -o=--depth=1 -n -f smart \
+    && cd modules/hal/telink \
+    && git submodule update --init \
+    && cd ../../../ \
     && west zephyr-export \
     && : # last line
 
 FROM connectedhomeip/chip-build:${VERSION}
 
-COPY --from=build /opt/telink/zephyr-sdk-0.13.2/ /opt/telink/zephyr-sdk-0.13.2/
+COPY --from=build /opt/telink/zephyr-sdk-0.15.2/ /opt/telink/zephyr-sdk-0.15.2/
 COPY --from=build /opt/telink/zephyrproject/ /opt/telink/zephyrproject/
 
 ENV ZEPHYR_TOOLCHAIN_VARIANT=zephyr
-ENV ZEPHYR_SDK_INSTALL_DIR=/opt/telink/zephyr-sdk-0.13.2
+ENV ZEPHYR_SDK_INSTALL_DIR=/opt/telink/zephyr-sdk-0.15.2
 
 RUN set -x \
     && apt-get update \

@@ -1416,17 +1416,17 @@ NS_ASSUME_NONNULL_BEGIN
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeAclWithParams:(MTRReadParams * _Nullable)params
+- (void)readAttributeACLWithParams:(MTRReadParams * _Nullable)params
                         completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)writeAttributeAclWithValue:(NSArray * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-- (void)writeAttributeAclWithValue:(NSArray * _Nonnull)value
+- (void)writeAttributeACLWithValue:(NSArray * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeACLWithValue:(NSArray * _Nonnull)value
                             params:(MTRWriteParams * _Nullable)params
                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-- (void)subscribeAttributeAclWithParams:(MTRSubscribeParams *)params
+- (void)subscribeAttributeACLWithParams:(MTRSubscribeParams *)params
                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                           reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
     MTR_NEWLY_AVAILABLE;
-+ (void)readAttributeAclWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
++ (void)readAttributeACLWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                      endpoint:(NSNumber *)endpoint
                                         queue:(dispatch_queue_t)queue
                                    completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
@@ -2030,19 +2030,20 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster OTA Software Update Provider
  *    Provides an interface for providing OTA software updates
  */
-@interface MTRBaseClusterOtaSoftwareUpdateProvider : MTRCluster
+MTR_NEWLY_AVAILABLE
+@interface MTRBaseClusterOTASoftwareUpdateProvider : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
-- (void)queryImageWithParams:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
-                  completion:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+- (void)queryImageWithParams:(MTROTASoftwareUpdateProviderClusterQueryImageParams *)params
+                  completion:(void (^)(MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)applyUpdateRequestWithParams:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
-                          completion:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+- (void)applyUpdateRequestWithParams:(MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
+                          completion:(void (^)(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
                                          NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)notifyUpdateAppliedWithParams:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
+- (void)notifyUpdateAppliedWithParams:(MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
@@ -2114,13 +2115,14 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster OTA Software Update Requestor
  *    Provides an interface for downloading and applying OTA software updates
  */
-@interface MTRBaseClusterOtaSoftwareUpdateRequestor : MTRCluster
+MTR_NEWLY_AVAILABLE
+@interface MTRBaseClusterOTASoftwareUpdateRequestor : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
-- (void)announceOtaProviderWithParams:(MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
+- (void)announceOtaProviderWithParams:(MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeDefaultOtaProvidersWithParams:(MTRReadParams * _Nullable)params
@@ -11013,58 +11015,58 @@ labels.
                                                          completion:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributePirOccupiedToUnoccupiedDelayWithCompletion:(void (^)(NSNumber * _Nullable value,
+- (void)readAttributePIROccupiedToUnoccupiedDelayWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)writeAttributePirOccupiedToUnoccupiedDelayWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributePIROccupiedToUnoccupiedDelayWithValue:(NSNumber * _Nonnull)value
                                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-- (void)writeAttributePirOccupiedToUnoccupiedDelayWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributePIROccupiedToUnoccupiedDelayWithValue:(NSNumber * _Nonnull)value
                                                      params:(MTRWriteParams * _Nullable)params
                                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-- (void)subscribeAttributePirOccupiedToUnoccupiedDelayWithParams:(MTRSubscribeParams *)params
+- (void)subscribeAttributePIROccupiedToUnoccupiedDelayWithParams:(MTRSubscribeParams *)params
                                          subscriptionEstablished:
                                              (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
-+ (void)readAttributePirOccupiedToUnoccupiedDelayWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
++ (void)readAttributePIROccupiedToUnoccupiedDelayWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                                               endpoint:(NSNumber *)endpoint
                                                                  queue:(dispatch_queue_t)queue
                                                             completion:(void (^)(NSNumber * _Nullable value,
                                                                            NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributePirUnoccupiedToOccupiedDelayWithCompletion:(void (^)(NSNumber * _Nullable value,
+- (void)readAttributePIRUnoccupiedToOccupiedDelayWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)writeAttributePirUnoccupiedToOccupiedDelayWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributePIRUnoccupiedToOccupiedDelayWithValue:(NSNumber * _Nonnull)value
                                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-- (void)writeAttributePirUnoccupiedToOccupiedDelayWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributePIRUnoccupiedToOccupiedDelayWithValue:(NSNumber * _Nonnull)value
                                                      params:(MTRWriteParams * _Nullable)params
                                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-- (void)subscribeAttributePirUnoccupiedToOccupiedDelayWithParams:(MTRSubscribeParams *)params
+- (void)subscribeAttributePIRUnoccupiedToOccupiedDelayWithParams:(MTRSubscribeParams *)params
                                          subscriptionEstablished:
                                              (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
-+ (void)readAttributePirUnoccupiedToOccupiedDelayWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
++ (void)readAttributePIRUnoccupiedToOccupiedDelayWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                                               endpoint:(NSNumber *)endpoint
                                                                  queue:(dispatch_queue_t)queue
                                                             completion:(void (^)(NSNumber * _Nullable value,
                                                                            NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributePirUnoccupiedToOccupiedThresholdWithCompletion:(void (^)(NSNumber * _Nullable value,
+- (void)readAttributePIRUnoccupiedToOccupiedThresholdWithCompletion:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)writeAttributePirUnoccupiedToOccupiedThresholdWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:(NSNumber * _Nonnull)value
                                                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-- (void)writeAttributePirUnoccupiedToOccupiedThresholdWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:(NSNumber * _Nonnull)value
                                                          params:(MTRWriteParams * _Nullable)params
                                                      completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-- (void)subscribeAttributePirUnoccupiedToOccupiedThresholdWithParams:(MTRSubscribeParams *)params
+- (void)subscribeAttributePIRUnoccupiedToOccupiedThresholdWithParams:(MTRSubscribeParams *)params
                                              subscriptionEstablished:
                                                  (MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                        reportHandler:(void (^)(NSNumber * _Nullable value,
                                                                          NSError * _Nullable error))reportHandler
     MTR_NEWLY_AVAILABLE;
-+ (void)readAttributePirUnoccupiedToOccupiedThresholdWithClusterStateCache:
++ (void)readAttributePIRUnoccupiedToOccupiedThresholdWithClusterStateCache:
             (MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                                                   endpoint:(NSNumber *)endpoint
                                                                      queue:(dispatch_queue_t)queue
@@ -11267,7 +11269,8 @@ labels.
  * Cluster Wake on LAN
  *    This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol.
  */
-@interface MTRBaseClusterWakeOnLan : MTRCluster
+MTR_NEWLY_AVAILABLE
+@interface MTRBaseClusterWakeOnLAN : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -15899,6 +15902,18 @@ MTR_NEWLY_AVAILABLE
 
 @end
 
+MTR_NEWLY_DEPRECATED("Please use MTRBaseClusterOTASoftwareUpdateProvider")
+@interface MTRBaseClusterOtaSoftwareUpdateProvider : MTRBaseClusterOTASoftwareUpdateProvider
+@end
+
+MTR_NEWLY_DEPRECATED("Please use MTRBaseClusterOTASoftwareUpdateRequestor")
+@interface MTRBaseClusterOtaSoftwareUpdateRequestor : MTRBaseClusterOTASoftwareUpdateRequestor
+@end
+
+MTR_NEWLY_DEPRECATED("Please use MTRBaseClusterWakeOnLAN")
+@interface MTRBaseClusterWakeOnLan : MTRBaseClusterWakeOnLAN
+@end
+
 MTR_NEWLY_DEPRECATED("Please use MTRBaseClusterUnitTesting")
 @interface MTRBaseClusterTestCluster : MTRBaseClusterUnitTesting
 @end
@@ -16050,31 +16065,65 @@ typedef NS_OPTIONS(uint16_t, MTRActionsCommandBits) {
     MTRActionsCommandBitsDisableActionWithDuration = 0x800,
 };
 
+typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateProviderOTAApplyUpdateAction) {
+    MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed = 0x00,
+    MTROTASoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction = 0x01,
+    MTROTASoftwareUpdateProviderOTAApplyUpdateActionDiscontinue = 0x02,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateProviderOTAApplyUpdateAction) {
     MTROtaSoftwareUpdateProviderOTAApplyUpdateActionProceed = 0x00,
     MTROtaSoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction = 0x01,
     MTROtaSoftwareUpdateProviderOTAApplyUpdateActionDiscontinue = 0x02,
-};
+} MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderOTAApplyUpdateAction");
+
+typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateProviderOTADownloadProtocol) {
+    MTROTASoftwareUpdateProviderOTADownloadProtocolBDXSynchronous = 0x00,
+    MTROTASoftwareUpdateProviderOTADownloadProtocolBDXAsynchronous = 0x01,
+    MTROTASoftwareUpdateProviderOTADownloadProtocolHTTPS = 0x02,
+    MTROTASoftwareUpdateProviderOTADownloadProtocolVendorSpecific = 0x03,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateProviderOTADownloadProtocol) {
     MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous = 0x00,
     MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXAsynchronous = 0x01,
     MTROtaSoftwareUpdateProviderOTADownloadProtocolHTTPS = 0x02,
     MTROtaSoftwareUpdateProviderOTADownloadProtocolVendorSpecific = 0x03,
-};
+} MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderOTADownloadProtocol");
+
+typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateProviderOTAQueryStatus) {
+    MTROTASoftwareUpdateProviderOTAQueryStatusUpdateAvailable = 0x00,
+    MTROTASoftwareUpdateProviderOTAQueryStatusBusy = 0x01,
+    MTROTASoftwareUpdateProviderOTAQueryStatusNotAvailable = 0x02,
+    MTROTASoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported = 0x03,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateProviderOTAQueryStatus) {
     MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable = 0x00,
     MTROtaSoftwareUpdateProviderOTAQueryStatusBusy = 0x01,
     MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable = 0x02,
     MTROtaSoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported = 0x03,
-};
+} MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderOTAQueryStatus");
+
+typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateRequestorOTAAnnouncementReason) {
+    MTROTASoftwareUpdateRequestorOTAAnnouncementReasonSimpleAnnouncement = 0x00,
+    MTROTASoftwareUpdateRequestorOTAAnnouncementReasonUpdateAvailable = 0x01,
+    MTROTASoftwareUpdateRequestorOTAAnnouncementReasonUrgentUpdateAvailable = 0x02,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateRequestorOTAAnnouncementReason) {
     MTROtaSoftwareUpdateRequestorOTAAnnouncementReasonSimpleAnnouncement = 0x00,
     MTROtaSoftwareUpdateRequestorOTAAnnouncementReasonUpdateAvailable = 0x01,
     MTROtaSoftwareUpdateRequestorOTAAnnouncementReasonUrgentUpdateAvailable = 0x02,
-};
+} MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorOTAAnnouncementReason");
+
+typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateRequestorOTAChangeReason) {
+    MTROTASoftwareUpdateRequestorOTAChangeReasonUnknown = 0x00,
+    MTROTASoftwareUpdateRequestorOTAChangeReasonSuccess = 0x01,
+    MTROTASoftwareUpdateRequestorOTAChangeReasonFailure = 0x02,
+    MTROTASoftwareUpdateRequestorOTAChangeReasonTimeOut = 0x03,
+    MTROTASoftwareUpdateRequestorOTAChangeReasonDelayByProvider = 0x04,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateRequestorOTAChangeReason) {
     MTROtaSoftwareUpdateRequestorOTAChangeReasonUnknown = 0x00,
@@ -16082,7 +16131,19 @@ typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateRequestorOTAChangeReason) {
     MTROtaSoftwareUpdateRequestorOTAChangeReasonFailure = 0x02,
     MTROtaSoftwareUpdateRequestorOTAChangeReasonTimeOut = 0x03,
     MTROtaSoftwareUpdateRequestorOTAChangeReasonDelayByProvider = 0x04,
-};
+} MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorOTAChangeReason");
+
+typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateRequestorOTAUpdateState) {
+    MTROTASoftwareUpdateRequestorOTAUpdateStateUnknown = 0x00,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateIdle = 0x01,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateQuerying = 0x02,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnQuery = 0x03,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateDownloading = 0x04,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateApplying = 0x05,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnApply = 0x06,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateRollingBack = 0x07,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnUserConsent = 0x08,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateRequestorOTAUpdateState) {
     MTROtaSoftwareUpdateRequestorOTAUpdateStateUnknown = 0x00,
@@ -16094,7 +16155,7 @@ typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateRequestorOTAUpdateState) {
     MTROtaSoftwareUpdateRequestorOTAUpdateStateDelayedOnApply = 0x06,
     MTROtaSoftwareUpdateRequestorOTAUpdateStateRollingBack = 0x07,
     MTROtaSoftwareUpdateRequestorOTAUpdateStateDelayedOnUserConsent = 0x08,
-};
+} MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorOTAUpdateState");
 
 typedef NS_ENUM(uint8_t, MTRTimeFormatLocalizationCalendarType) {
     MTRTimeFormatLocalizationCalendarTypeBuddhist = 0x00,

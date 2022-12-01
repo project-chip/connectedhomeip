@@ -129,6 +129,7 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/include",
       "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver",
       "${bl602_sdk_root}/components/network/dns_server/include",
+      "${bl602_sdk_root}/components/network/rfparam_adapter_tmp/rftlv",
 
       "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Inc",
       "${bl602_sdk_root}/components/security/blcrypto_suite/inc/blcrypto_suite",
@@ -259,6 +260,7 @@ template("bl602_sdk") {
       #include defines
       "OS_USING_FREERTOS",
       "BL602_MATTER_SUPPORT",
+      "PBUF_POOL_SIZE=20",
       "TD_DIAGNOSIS_STA",
       "CONFIG_ENABLE_IPV6_ADDR_CALLBACK",
       "CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT",
@@ -320,6 +322,7 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/stage/easyflash4/src/ef_utils.c",
       "${bl602_sdk_root}/components/sys/blmtd/bl_mtd.c",
       "${bl602_sdk_root}/components/sys/blota/bl_sys_ota_cli.c",
+      "${bl602_sdk_root}/components/utils/src/utils_hex.c",
       "${bl602_sdk_root}/components/utils/src/utils_hexdump.c",
       "${bl602_sdk_root}/components/utils/src/utils_sha256.c",
       "${chip_root}/third_party/mbedtls/repo/library/aes.c",
@@ -548,6 +551,7 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/utils/src/utils_rbtree.c",
 
       #rebase add
+      "${bl602_sdk_root}/components/network/rfparam_adapter_tmp/rftlv/phy_rftlv.c",
       "${bl602_sdk_root}/components/network/wifi_hosal/port/wifi_hosal_bl602.c",
       "${bl602_sdk_root}/components/network/wifi_hosal/wifi_hosal.c",
       "${bl602_sdk_root}/components/os/bl_os_adapter/bl_os_adapter/bl_os_hal.c",

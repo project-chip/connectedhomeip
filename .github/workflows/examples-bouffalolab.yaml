@@ -31,7 +31,7 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: connectedhomeip/chip-build:0.6.06
+      image: connectedhomeip/chip-build-bouffalolab:0.6.12
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:
@@ -44,7 +44,7 @@ jobs:
           attempt_limit: 3
           attempt_delay: 2000
       - name: Checkout submodules
-        run: scripts/checkout_submodules.py --shallow --platform bl602
+        run: scripts/checkout_submodules.py --shallow --platform bouffalolab --recursive
 
       - name: Set up environment for size reports
         if: ${{ !env.ACT }}
@@ -87,7 +87,7 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: connectedhomeip/chip-build:0.6.06
+      image: connectedhomeip/chip-build-bouffalolab:0.6.12
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:
@@ -100,7 +100,7 @@ jobs:
           attempt_limit: 3
           attempt_delay: 2000
       - name: Checkout submodules
-        run: scripts/checkout_submodules.py --shallow --platform bouffalolab
+        run: scripts/checkout_submodules.py --shallow --platform bouffalolab --recursive
 
       - name: Set up environment for size reports
         if: ${{ !env.ACT }}

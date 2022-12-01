@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,12 +16,28 @@
  *    limitations under the License.
  */
 
-#import <os/log.h>
+#import <Matter/MTRDefines.h>
 
-#define MTR_LOG_FAULT(format, ...) os_log_fault(OS_LOG_DEFAULT, format, ##__VA_ARGS__)
-#define MTR_LOG_ERROR(format, ...) os_log_error(OS_LOG_DEFAULT, format, ##__VA_ARGS__)
-#define MTR_LOG_INFO(format, ...) os_log_info(OS_LOG_DEFAULT, format, ##__VA_ARGS__)
-#define MTR_LOG_DEBUG(format, ...) os_log_debug(OS_LOG_DEFAULT, format, ##__VA_ARGS__)
+NS_ASSUME_NONNULL_BEGIN
 
-#define MTR_LOG_METHOD_ENTRY()                                                                                                     \
-    ({ os_log_debug(OS_LOG_DEFAULT, "[<%@: %p> %@]", NSStringFromClass([self class]), self, NSStringFromSelector(_cmd)); })
+typedef NS_ENUM(NSInteger, MTRLogType) {
+    MTRLogTypeError = 1,
+    MTRLogTypeProgress = 2,
+    MTRLogTypeDetail = 3,
+};
+
+typedef void (^MTRLogCallback)(MTRLogType type, NSString * moduleName, NSString * message);
+
+/**
+ * Arranges for log messages from the Matter stack to be delivered to a callback block.
+ *
+ * @param logTypeThreshold only messages up to (and including) the specified log type will be delivered
+ * @param callback the block to call, or nil to disable the log callback.
+ *
+ * The callback block may be called concurrently and/or from arbitrary threads.
+ * It SHALL NOT call back directly or indirectly into any Matter APIs,
+ * nor block the calling thread for a non-trivial amount of time.
+ */
+MTR_EXTERN MTR_NEWLY_AVAILABLE void MTRSetLogCallback(MTRLogType logTypeThreshold, MTRLogCallback _Nullable callback);
+
+NS_ASSUME_NONNULL_END

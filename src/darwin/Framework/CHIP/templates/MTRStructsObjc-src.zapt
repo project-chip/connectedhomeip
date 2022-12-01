@@ -38,22 +38,24 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 {{/inline}}
 
-{{> interfaceImpl interfaceName=(concat "MTR" (asUpperCamelCase parent.name) "Cluster" (asUpperCamelCase name))}}
+{{> interfaceImpl interfaceName=(concat "MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true))}}
 
 {{!Backwards compat for now: Add a DeviceType thing that is API-compatible with DeviceTypeStruct. }}
 {{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}
 {{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeStruct")}}
 {{> interfaceImpl interfaceName="MTRDescriptorClusterDeviceType"}}
 {{/if}}
-{{else if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}
-@implementation MTRTestClusterCluster{{asUpperCamelCase name}} : MTRUnitTestingCluster{{asUpperCamelCase name}}
+{{else}}
+{{#unless (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name))}}
+@implementation MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase name}} : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}
 @end
+{{/unless}}
 {{/if}}
 
 {{/zcl_structs}}
 
 {{#zcl_events}}
-@implementation MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event
+@implementation MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event
 - (instancetype)init
 {
   if (self = [super init]) {
@@ -66,7 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-  auto other = [[MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event alloc] init];
+  auto other = [[MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event alloc] init];
 
   {{#zcl_event_fields}}
   other.{{asStructPropertyName name}} = self.{{asStructPropertyName name}};
@@ -82,11 +84,11 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-{{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}
+{{#unless (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name))}}
 
-@implementation MTRTestClusterCluster{{asUpperCamelCase name}}Event : MTRUnitTestingCluster{{asUpperCamelCase name}}Event
+@implementation MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase name}}Event : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event
 @end
-{{/if}}
+{{/unless}}
 
 {{/zcl_events}}
 

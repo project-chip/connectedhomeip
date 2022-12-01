@@ -105,7 +105,7 @@ const char * ESP32Config::GetPartitionLabelByNamespace(const char * ns)
     {
         return CHIP_DEVICE_CONFIG_CHIP_CONFIG_NAMESPACE_PARTITION;
     }
-    else if (strcmp(ns, kConfigNamespace_ChipCounters))
+    else if (strcmp(ns, kConfigNamespace_ChipCounters) == 0)
     {
         return CHIP_DEVICE_CONFIG_CHIP_COUNTERS_NAMESPACE_PARTITION;
     }

@@ -40,5 +40,7 @@ struct ChipDeviceEvent;
 #define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME 1
 #define CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS 1
 #define CHIP_SYSTEM_CONFIG_POOL_USE_HEAP 1
+#define CHIP_SYSTEM_CONFIG_PLATFORM_LOG 1
+#define CHIP_SYSTEM_CONFIG_PLATFORM_LOG_INCLUDE <platform/Darwin/Logging.h>
 
 // ========== Platform-specific Configuration Overrides =========

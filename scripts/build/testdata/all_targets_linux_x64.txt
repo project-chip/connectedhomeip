@@ -14,7 +14,7 @@ infineon-psoc6-{lock,light,all-clusters,all-clusters-minimal}[-ota][-updateimage
 k32w-{light,shell,lock,contact}[-se05x][-no-ble][-no-ota][-low-power][-nologs]
 mbed-cy8cproto_062_4343w-{lock,light,all-clusters,all-clusters-minimal,pigweed,shell}[-release][-develop][-debug]
 mw320-all-clusters-app
-nrf-{nrf5340dk,nrf52840dk,nrf52840dongle}-{all-clusters,all-clusters-minimal,lock,light,shell,pump,pump-controller}[-rpc]
+nrf-{nrf5340dk,nrf52840dk,nrf52840dongle}-{all-clusters,all-clusters-minimal,lock,light,light-switch,shell,pump,pump-controller}[-rpc]
 nrf-native-posix-64-tests
 qpg-qpg6105-{lock,light,shell,persistent-storage}
 tizen-arm-{all-clusters,all-clusters-minimal,chip-tool,light}[-no-ble][-no-wifi][-asan]

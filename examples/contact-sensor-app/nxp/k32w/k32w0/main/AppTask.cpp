@@ -32,7 +32,7 @@
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/attribute-storage.h>
 
 /* OTA related includes */
@@ -854,7 +854,7 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     uint8_t newValue = ContactSensorMgr().IsContactClosed();
 
     // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_BOOLEAN_STATE_CLUSTER_ID, ZCL_STATE_VALUE_ATTRIBUTE_ID,
+    EmberAfStatus status = emberAfWriteAttribute(1, app::Clusters::BooleanState::Id, ZCL_STATE_VALUE_ATTRIBUTE_ID,
                                                  (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -873,7 +873,8 @@ void AppTask::UpdateDeviceStateInternal(intptr_t arg)
     bool stateValueAttrValue = 0;
 
     /* get onoff attribute value */
-    (void) emberAfReadAttribute(1, ZCL_BOOLEAN_STATE_CLUSTER_ID, ZCL_STATE_VALUE_ATTRIBUTE_ID, (uint8_t *) &stateValueAttrValue, 1);
+    (void) emberAfReadAttribute(1, app::Clusters::BooleanState::Id, ZCL_STATE_VALUE_ATTRIBUTE_ID, (uint8_t *) &stateValueAttrValue,
+                                1);
 #if !cPWR_UsePowerDownMode
     /* set the device state */
     sContactSensorLED.Set(stateValueAttrValue);

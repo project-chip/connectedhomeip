@@ -18,8 +18,8 @@
 #include "app/util/common.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/print-cluster.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
@@ -51,8 +51,8 @@ uint32_t afNumPktsSent;
 #endif
 
 const EmberAfClusterName zclClusterNames[] = {
-    CLUSTER_IDS_TO_NAMES              // defined in print-cluster.h
-    { ZCL_NULL_CLUSTER_ID, nullptr }, // terminator
+    CLUSTER_IDS_TO_NAMES            // defined in print-cluster.h
+    { kInvalidClusterId, nullptr }, // terminator
 };
 
 // A pointer to the current command being processed
@@ -93,7 +93,7 @@ void emberAfSetDeviceEnabled(EndpointId endpoint, bool enabled)
         afDeviceEnabled[index] = enabled;
     }
 #ifdef ZCL_USING_BASIC_CLUSTER_DEVICE_ENABLED_ATTRIBUTE
-    emberAfWriteServerAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_DEVICE_ENABLED_ATTRIBUTE_ID, (uint8_t *) &enabled,
+    emberAfWriteServerAttribute(endpoint, app::Clusters::Basic::Id, ZCL_DEVICE_ENABLED_ATTRIBUTE_ID, (uint8_t *) &enabled,
                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 #endif
 }
@@ -103,7 +103,7 @@ bool emberAfIsDeviceIdentifying(EndpointId endpoint)
 {
 #ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
     uint16_t identifyTime;
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, app::Clusters::Identify::Id, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
                                                       (uint8_t *) &identifyTime, sizeof(identifyTime));
     return (status == EMBER_ZCL_STATUS_SUCCESS && 0 < identifyTime);
 #else
@@ -230,7 +230,7 @@ uint16_t emberAfFindClusterNameIndex(ClusterId cluster)
 {
     static_assert(sizeof(ClusterId) == 4, "May need to adjust our index type or somehow define it in terms of cluster id type");
     uint16_t index = 0;
-    while (zclClusterNames[index].id != ZCL_NULL_CLUSTER_ID)
+    while (zclClusterNames[index].id != kInvalidClusterId)
     {
         if (zclClusterNames[index].id == cluster)
         {

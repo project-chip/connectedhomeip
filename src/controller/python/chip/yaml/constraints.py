@@ -36,7 +36,7 @@ class BaseConstraint(ABC):
 class _LoadableConstraint(BaseConstraint):
     '''Constraints where value might be stored in VariableStorage needing runtime load.'''
 
-    def __init__(self, value, field_type, variable_storage: VariableStorage):
+    def __init__(self, value, field_type, variable_storage: VariableStorage, config_values: dict):
         self._variable_storage = variable_storage
         # When not none _indirect_value_key is binding a name to the constraint value, and the
         # actual value can only be looked-up dynamically, which is why this is a key name.
@@ -50,8 +50,8 @@ class _LoadableConstraint(BaseConstraint):
         if isinstance(value, str) and self._variable_storage.is_key_saved(value):
             self._indirect_value_key = value
         else:
-            self._value = Converter.convert_yaml_type(
-                value, field_type)
+            self._value = Converter.parse_and_convert_yaml_value(
+                value, field_type, config_values)
 
     def get_value(self):
         '''Gets the current value of the constraint.
@@ -112,8 +112,9 @@ class _ConstraintIsLowerCase(BaseConstraint):
 
 
 class _ConstraintMinValue(_LoadableConstraint):
-    def __init__(self, min_value, field_type, variable_storage: VariableStorage):
-        super().__init__(min_value, field_type, variable_storage)
+    def __init__(self, min_value, field_type, variable_storage: VariableStorage,
+                 config_values: dict):
+        super().__init__(min_value, field_type, variable_storage, config_values)
 
     def is_met(self, response) -> bool:
         min_value = self.get_value()
@@ -121,8 +122,9 @@ class _ConstraintMinValue(_LoadableConstraint):
 
 
 class _ConstraintMaxValue(_LoadableConstraint):
-    def __init__(self, max_value, field_type, variable_storage: VariableStorage):
-        super().__init__(max_value, field_type, variable_storage)
+    def __init__(self, max_value, field_type, variable_storage: VariableStorage,
+                 config_values: dict):
+        super().__init__(max_value, field_type, variable_storage, config_values)
 
     def is_met(self, response) -> bool:
         max_value = self.get_value()
@@ -162,16 +164,17 @@ class _ConstraintHasMaskClear(BaseConstraint):
 
 
 class _ConstraintNotValue(_LoadableConstraint):
-    def __init__(self, not_value, field_type, variable_storage: VariableStorage):
-        super().__init__(not_value, field_type, variable_storage)
+    def __init__(self, not_value, field_type, variable_storage: VariableStorage,
+                 config_values: dict):
+        super().__init__(not_value, field_type, variable_storage, config_values)
 
     def is_met(self, response) -> bool:
         not_value = self.get_value()
         return response != not_value
 
 
-def get_constraints(constraints, field_type,
-                    variable_storage: VariableStorage) -> list[BaseConstraint]:
+def get_constraints(constraints, field_type, variable_storage: VariableStorage,
+                    config_values: dict) -> list[BaseConstraint]:
     _constraints = []
     if 'hasValue' in constraints:
         _constraints.append(_ConstraintHasValue(constraints.get('hasValue')))
@@ -193,11 +196,11 @@ def get_constraints(constraints, field_type,
 
     if 'minValue' in constraints:
         _constraints.append(_ConstraintMinValue(
-            constraints.get('minValue'), field_type, variable_storage))
+            constraints.get('minValue'), field_type, variable_storage, config_values))
 
     if 'maxValue' in constraints:
         _constraints.append(_ConstraintMaxValue(
-            constraints.get('maxValue'), field_type, variable_storage))
+            constraints.get('maxValue'), field_type, variable_storage, config_values))
 
     if 'contains' in constraints:
         _constraints.append(_ConstraintContains(constraints.get('contains')))
@@ -213,6 +216,6 @@ def get_constraints(constraints, field_type,
 
     if 'notValue' in constraints:
         _constraints.append(_ConstraintNotValue(
-            constraints.get('notValue'), field_type, variable_storage))
+            constraints.get('notValue'), field_type, variable_storage, config_values))
 
     return _constraints

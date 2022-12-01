@@ -107,6 +107,8 @@ class BouffalolabBuilder(GnBuilder):
         elif enable_shell:
             self.argsOpt.append('chip_build_libshell=true')
 
+        self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])
+
     def GnBuildArgs(self):
         return self.argsOpt
 
