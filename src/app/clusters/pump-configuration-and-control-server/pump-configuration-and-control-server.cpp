@@ -51,6 +51,40 @@ private:
 
 PumpConfigurationAndControlAttrAccess gAttrAccess;
 
+CHIP_ERROR PumpConfigurationAndControlAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    emberAfDebugPrintln("Reading from PCC");
+
+    VerifyOrDie(aPath.mClusterId == PumpConfigurationAndControl::Id);
+
+    switch (aPath.mAttributeId)
+    {
+    default:
+        break;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PumpConfigurationAndControlAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    emberAfDebugPrintln("Writing to PCC");
+
+    VerifyOrDie(aPath.mClusterId == PumpConfigurationAndControl::Id);
+
+    switch (aPath.mAttributeId)
+    {
+    default:
+        break;
+    }
+    return CHIP_NO_ERROR;
+}
+} // namespace
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace PumpConfigurationAndControl {
+
 // Enum for RemoteSensorType
 enum class RemoteSensorType : uint8_t
 {
@@ -68,7 +102,7 @@ static RemoteSensorType detectRemoteSensorConnected()
     return RemoteSensorType::kNoSensor;
 }
 
-static void setEffectiveOperationAndControlMode(EndpointId endpoint)
+static void setEffectiveModes(EndpointId endpoint)
 {
     PumpControlMode controlMode;
     PumpOperationMode operationMode;
@@ -242,36 +276,7 @@ static void setEffectiveOperationAndControlMode(EndpointId endpoint)
     }
 }
 
-CHIP_ERROR PumpConfigurationAndControlAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    emberAfDebugPrintln("Reading from PCC");
-
-    VerifyOrDie(aPath.mClusterId == PumpConfigurationAndControl::Id);
-
-    switch (aPath.mAttributeId)
-    {
-    default:
-        break;
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PumpConfigurationAndControlAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    emberAfDebugPrintln("Writing to PCC");
-
-    VerifyOrDie(aPath.mClusterId == PumpConfigurationAndControl::Id);
-
-    switch (aPath.mAttributeId)
-    {
-    default:
-        break;
-    }
-    return CHIP_NO_ERROR;
-}
-} // namespace
-
-bool PumpHasFeature(EndpointId endpoint, PumpFeature feature)
+bool HasFeature(EndpointId endpoint, PumpFeature feature)
 {
     bool hasFeature;
     uint32_t featureMap;
@@ -279,6 +284,11 @@ bool PumpHasFeature(EndpointId endpoint, PumpFeature feature)
 
     return hasFeature ? ((featureMap & to_underlying(feature)) != 0) : false;
 }
+
+} // namespace PumpConfigurationAndControl
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 // SDK Callbacks
 
@@ -305,37 +315,37 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
         switch (controlMode)
         {
         case PumpControlMode::kConstantFlow:
-            if (!PumpHasFeature(attributePath.mEndpointId, PumpFeature::kConstantFlow))
+            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kConstantFlow))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case PumpControlMode::kConstantPressure:
-            if (!PumpHasFeature(attributePath.mEndpointId, PumpFeature::kConstantPressure))
+            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kConstantPressure))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case PumpControlMode::kConstantSpeed:
-            if (!PumpHasFeature(attributePath.mEndpointId, PumpFeature::kConstantSpeed))
+            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kConstantSpeed))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case PumpControlMode::kConstantTemperature:
-            if (!PumpHasFeature(attributePath.mEndpointId, PumpFeature::kConstantTemperature))
+            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kConstantTemperature))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case PumpControlMode::kProportionalPressure:
-            if (!PumpHasFeature(attributePath.mEndpointId, PumpFeature::kCompensatedPressure))
+            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kCompensatedPressure))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case PumpControlMode::kAutomatic:
-            if (!PumpHasFeature(attributePath.mEndpointId, PumpFeature::kAutomatic))
+            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kAutomatic))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
@@ -356,19 +366,19 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
         switch (operationMode)
         {
         case PumpOperationMode::kMinimum:
-            if (!PumpHasFeature(attributePath.mEndpointId, PumpFeature::kConstantSpeed))
+            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kConstantSpeed))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case PumpOperationMode::kMaximum:
-            if (!PumpHasFeature(attributePath.mEndpointId, PumpFeature::kConstantSpeed))
+            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kConstantSpeed))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case PumpOperationMode::kLocal:
-            if (!PumpHasFeature(attributePath.mEndpointId, PumpFeature::kLocal))
+            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kLocal))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
@@ -396,14 +406,10 @@ void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(cons
 
     switch (attributePath.mAttributeId)
     {
-    case Attributes::ControlMode::Id: {
-        setEffectiveOperationAndControlMode(attributePath.mEndpointId);
-    }
-    break;
-    case Attributes::OperationMode::Id: {
-        setEffectiveOperationAndControlMode(attributePath.mEndpointId);
-    }
-    break;
+    case Attributes::ControlMode::Id:
+    case Attributes::OperationMode::Id:
+        setEffectiveModes(attributePath.mEndpointId);
+        break;
     default:
         emberAfDebugPrintln("PCC Server: unhandled attribute ID");
     }
