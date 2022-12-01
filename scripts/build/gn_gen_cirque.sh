@@ -29,7 +29,7 @@ env
 
 cd "$ROOT_PATH"
 
-echo "Ensure submodules for lunux builds are set"
+echo "Ensure submodules for Linux builds are checked out"
 .scripts/checkout_submodules.py --shallow --platform linux
 
 echo "Setup build environment"
