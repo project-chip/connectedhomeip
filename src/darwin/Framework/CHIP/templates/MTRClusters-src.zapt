@@ -12,7 +12,7 @@
 #import "MTRCluster_internal.h"
 #import "MTRStructsObjc.h"
 #import "MTRCommandPayloadsObjc.h"
-#import "MTRLogging.h"
+#import "MTRLogging_Internal.h"
 
 #include <lib/support/CHIPListUtils.h>
 #include <platform/CHIPDeviceLayer.h>
