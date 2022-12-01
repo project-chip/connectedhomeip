@@ -198,15 +198,11 @@ uint32_t GetTickCount(void)
 
 void rsi_delay_ms(uint32_t delay_ms)
 {
-    uint32_t start;
+    uint64_t waitTime = rsi_hal_gettickcount() + delay_ms;
 
-    if (delay_ms == 0)
-        return;
-    start = rsi_hal_gettickcount();
-    do
-    {
-    } while (rsi_hal_gettickcount() - start < delay_ms);
-    return;
+    while (waitTime > rsi_hal_gettickcount()){
+        // we busy wait
+    }
 }
 
 /*===================================================*/

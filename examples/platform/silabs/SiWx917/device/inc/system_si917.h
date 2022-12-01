@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef SYSTEM_EFR32_H
-#define SYSTEM_EFR32_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,14 +25,14 @@ extern "C" {
 #include <stdint.h>
 //#include "cmsis_gcc.h"
 
-/***************************************************************************/ /**
-                                                                               * @addtogroup Parts
-                                                                               * @{
-                                                                               ******************************************************************************/
-/***************************************************************************/ /**
-                                                                               * @addtogroup EFR32 EFR32
-                                                                               * @{
-                                                                               ******************************************************************************/
+/*******************************************************************************
+ * @addtogroup Parts
+ * @{
+ ******************************************************************************/
+/*******************************************************************************
+ * @addtogroup EFR32 EFR32
+ * @{
+ ******************************************************************************/
 
 /*******************************************************************************
  ******************************   TYPEDEFS   ***********************************
@@ -123,22 +122,22 @@ void SYSCFG_IRQHandler(void);    /**< SYSCFG IRQ Handler */
 
 uint32_t SystemCoreClockGet(void);
 
-/***************************************************************************/ /**
-                                                                               * @brief
-                                                                               *   Update CMSIS SystemCoreClock variable.
-                                                                               *
-                                                                               * @details
-                                                                               *   CMSIS defines a global variable SystemCoreClock
-                                                                               *that shall hold the core frequency in Hz. If the
-                                                                               *core frequency is dynamically changed, the variable
-                                                                               *must be kept updated in order to be CMSIS compliant.
-                                                                               *
-                                                                               *   Notice that only if changing the core clock
-                                                                               *frequency through the EFR CMU API, this variable
-                                                                               *will be kept updated. This function is only provided
-                                                                               *   for CMSIS compliance and if a user modifies the
-                                                                               *the core clock outside the CMU API.
-                                                                               ******************************************************************************/
+/*******************************************************************************
+ * @brief
+ *   Update CMSIS SystemCoreClock variable.
+ *
+ * @details
+ *   CMSIS defines a global variable SystemCoreClock
+ *that shall hold the core frequency in Hz. If the
+ *core frequency is dynamically changed, the variable
+ *must be kept updated in order to be CMSIS compliant.
+ *
+ *   Notice that only if changing the core clock
+ *frequency through the EFR CMU API, this variable
+ *will be kept updated. This function is only provided
+ *   for CMSIS compliance and if a user modifies the
+ *the core clock outside the CMU API.
+ ******************************************************************************/
 #ifndef CCP_SI917_BRINGUP
 static __INLINE void SystemCoreClockUpdate(void)
 {
@@ -166,4 +165,3 @@ void SystemLFXOClockSet(uint32_t freq);
 #ifdef __cplusplus
 }
 #endif
-#endif /* SYSTEM_EFR32_H */

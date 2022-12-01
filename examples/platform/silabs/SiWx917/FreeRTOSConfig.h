@@ -189,11 +189,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configSUPPORT_DYNAMIC_ALLOCATION (1)
 
 #ifndef configTOTAL_HEAP_SIZE
-#ifdef SL_WIFI
-#define configTOTAL_HEAP_SIZE ((size_t)(50 * 1024))
-#else
-#define configTOTAL_HEAP_SIZE ((size_t)(20 * 1024))
-#endif
+#define configTOTAL_HEAP_SIZE ((size_t)(34 * 1024))
 #endif // configTOTAL_HEAP_SIZE
 
 /* Optional functions - most linkers will remove unused functions anyway. */
