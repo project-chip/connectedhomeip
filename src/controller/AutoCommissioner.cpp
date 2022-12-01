@@ -247,7 +247,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         // TODO(cecille): device attestation casues operational cert provisioning to happen, This should be a separate stage.
         // For thread and wifi, this should go to network setup then enable. For on-network we can skip right to finding the
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
-        if (mNeedsNetworkSetup)
+        if (mParams.GetNeedsNetworkSetup().ValueOr(false))
         {
             // if there is a WiFi or a Thread endpoint, then perform scan
             if (IsScanNeeded())
@@ -392,9 +392,6 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
     mStopCommissioning       = false;
     mCommissioner            = commissioner;
     mCommissioneeDeviceProxy = proxy;
-    mNeedsNetworkSetup =
-        mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType() ==
-        Transport::Type::kBle;
     CHIP_ERROR err               = CHIP_NO_ERROR;
     CommissioningStage nextStage = GetNextCommissioningStage(CommissioningStage::kSecurePairing, err);
     mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, nextStage, mParams, this, GetEndpoint(nextStage),

@@ -101,6 +101,7 @@ CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
         auto threadCredentials = commissioningParams.GetThreadOperationalDataset();
         auto wiFiCredentials   = commissioningParams.GetWiFiCredentials();
         mUseOnlyOnNetworkDiscovery.SetValue(!threadCredentials.HasValue() && !wiFiCredentials.HasValue());
+        commissioningParams.SetNeedsNetworkSetup(!mUseOnlyOnNetworkDiscovery.Value());
     }
     DiscoveryType discoveryType = mUseOnlyOnNetworkDiscovery.Value() ? DiscoveryType::kDiscoveryNetworkOnly : DiscoveryType::kAll;
 
@@ -119,7 +120,11 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
     else
     {
         auto commissioningParams = GetCommissioningParameters();
-        err                      = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
+        if (mPairingMode == PairingMode::Ble || mPairingMode == PairingMode::SoftAP)
+        {
+            commissioningParams.SetNeedsNetworkSetup(true);
+        }
+        err = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
     }
     return err;
 }

@@ -101,7 +101,6 @@ private:
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
     char mCountryCode[CommissioningParameters::kMaxCountryCodeLen];
 
-    bool mNeedsNetworkSetup = false;
     ReadCommissioningInfo mDeviceCommissioningInfo;
 
     // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
