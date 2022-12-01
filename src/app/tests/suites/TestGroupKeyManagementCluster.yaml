@@ -354,9 +354,7 @@ tests:
       command: "readAttribute"
       attribute: "GroupKeyMap"
       response:
-        value: [
-                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
-               ]
+          value: [{ FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 }]
     - label: "Remove keyset 2"
       command: "KeySetRemove"
       arguments:
@@ -370,4 +368,4 @@ tests:
       command: "readAttribute"
       attribute: "GroupKeyMap"
       response:
-        value: []
+          value: []
