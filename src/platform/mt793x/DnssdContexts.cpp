@@ -33,7 +33,6 @@ namespace {
 constexpr uint8_t kDnssdKeyMaxSize          = 32;
 constexpr uint8_t kDnssdTxtRecordMaxEntries = 20;
 
-
 std::string GetHostNameWithoutDomain(const char * hostnameWithDomain)
 {
     std::string hostname(hostnameWithDomain);
@@ -46,7 +45,6 @@ std::string GetHostNameWithoutDomain(const char * hostnameWithDomain)
     return hostname;
 }
 
-
 std::string GetFullTypeWithoutSubTypes(std::string fullType)
 {
     size_t position = fullType.find(",");
@@ -57,7 +55,6 @@ std::string GetFullTypeWithoutSubTypes(std::string fullType)
 
     return fullType;
 }
-
 
 void GetTextEntries(DnssdService & service, const unsigned char * data, uint16_t len)
 {
@@ -96,7 +93,6 @@ void GetTextEntries(DnssdService & service, const unsigned char * data, uint16_t
     }
 }
 
-
 DNSServiceProtocol GetProtocol(const chip::Inet::IPAddressType & addressType)
 {
 #if INET_CONFIG_ENABLE_IPV4
@@ -117,7 +113,6 @@ DNSServiceProtocol GetProtocol(const chip::Inet::IPAddressType & addressType)
 #endif
 }
 } // namespace
-
 
 namespace chip {
 namespace Dnssd {
@@ -142,7 +137,6 @@ CHIP_ERROR GenericContext::Finalize(DNSServiceErrorType err)
     return Error::ToChipError(err);
 }
 
-
 RegisterContext::RegisterContext(const char * sType, const char * instanceName, DnssdPublishCallback cb, void * cbContext)
 {
     type     = ContextType::Register;
@@ -153,14 +147,12 @@ RegisterContext::RegisterContext(const char * sType, const char * instanceName, 
     mInstanceName = instanceName;
 }
 
-
 void RegisterContext::DispatchFailure(DNSServiceErrorType err)
 {
     ChipLogError(Discovery, "Mdns: Register failure (%s)", Error::ToString(err));
     callback(context, nullptr, nullptr, Error::ToChipError(err));
     MdnsContexts::GetInstance().Remove(this);
 }
-
 
 void RegisterContext::DispatchSuccess()
 {
@@ -171,7 +163,6 @@ void RegisterContext::DispatchSuccess()
     // registered against the dns daemon. Register the records mapping the hostname to our IP.
     // mHostNameRegistrar.Register();
 }
-
 
 CHIP_ERROR MdnsContexts::GetRegisterContextOfType(const char * type, RegisterContext ** context)
 {
@@ -191,7 +182,6 @@ CHIP_ERROR MdnsContexts::GetRegisterContextOfType(const char * type, RegisterCon
     return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-
 MdnsContexts::~MdnsContexts()
 {
     std::vector<GenericContext *>::const_iterator iter = mContexts.cbegin();
@@ -201,7 +191,6 @@ MdnsContexts::~MdnsContexts()
         mContexts.erase(iter);
     }
 }
-
 
 CHIP_ERROR MdnsContexts::Add(GenericContext * context, DNSServiceRef sdRef)
 {
@@ -218,7 +207,6 @@ CHIP_ERROR MdnsContexts::Add(GenericContext * context, DNSServiceRef sdRef)
 
     return CHIP_NO_ERROR;
 }
-
 
 CHIP_ERROR MdnsContexts::Remove(GenericContext * context)
 {
@@ -242,7 +230,6 @@ CHIP_ERROR MdnsContexts::Remove(GenericContext * context)
     return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-
 CHIP_ERROR MdnsContexts::RemoveAllOfType(ContextType type)
 {
     bool found = false;
@@ -264,7 +251,6 @@ CHIP_ERROR MdnsContexts::RemoveAllOfType(ContextType type)
     return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-
 void MdnsContexts::Delete(GenericContext * context)
 {
     if (context->serviceRef != nullptr)
@@ -273,7 +259,6 @@ void MdnsContexts::Delete(GenericContext * context)
     }
     chip::Platform::Delete(context);
 }
-
 
 CHIP_ERROR MdnsContexts::Has(GenericContext * context)
 {
@@ -290,7 +275,6 @@ CHIP_ERROR MdnsContexts::Has(GenericContext * context)
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-
 GenericContext * MdnsContexts::GetBySockFd(int fd)
 {
     std::vector<GenericContext *>::iterator iter;
@@ -305,7 +289,6 @@ GenericContext * MdnsContexts::GetBySockFd(int fd)
 
     return NULL;
 }
-
 
 int MdnsContexts::GetSelectFd(fd_set * pSelectFd)
 {
@@ -326,7 +309,6 @@ int MdnsContexts::GetSelectFd(fd_set * pSelectFd)
     return maxFd;
 }
 
-
 BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol)
 {
     type         = ContextType::Browse;
@@ -336,7 +318,6 @@ BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServ
     mSelectCount = 0;
 }
 
-
 void BrowseContext::DispatchFailure(DNSServiceErrorType err)
 {
     ChipLogError(Discovery, "Mdns: Browse failure (%s)", Error::ToString(err));
@@ -344,13 +325,11 @@ void BrowseContext::DispatchFailure(DNSServiceErrorType err)
     MdnsContexts::GetInstance().Remove(this);
 }
 
-
 void BrowseContext::DispatchSuccess()
 {
     callback(context, services.data(), services.size(), true, CHIP_NO_ERROR);
     MdnsContexts::GetInstance().Remove(this);
 }
-
 
 ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType)
 {
@@ -361,9 +340,7 @@ ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::
     mSelectCount = 0;
 }
 
-
 ResolveContext::~ResolveContext() {}
-
 
 void ResolveContext::DispatchFailure(DNSServiceErrorType err)
 {
@@ -371,7 +348,6 @@ void ResolveContext::DispatchFailure(DNSServiceErrorType err)
     callback(context, nullptr, Span<Inet::IPAddress>(), Error::ToChipError(err));
     MdnsContexts::GetInstance().Remove(this);
 }
-
 
 void ResolveContext::DispatchSuccess()
 {
@@ -392,7 +368,6 @@ void ResolveContext::DispatchSuccess()
 
     MdnsContexts::GetInstance().Remove(this);
 }
-
 
 CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct sockaddr * address)
 {
@@ -435,7 +410,6 @@ CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct socka
     return err;
 }
 
-
 CHIP_ERROR ResolveContext::OnNewLocalOnlyAddress()
 {
     struct sockaddr_in sockaddr;
@@ -450,7 +424,6 @@ CHIP_ERROR ResolveContext::OnNewLocalOnlyAddress()
     return OnNewAddress(kDNSServiceInterfaceIndexLocalOnly, reinterpret_cast<struct sockaddr *>(&sockaddr));
 }
 
-
 bool ResolveContext::HasAddress()
 {
     for (auto & interface : interfaces)
@@ -463,7 +436,6 @@ bool ResolveContext::HasAddress()
 
     return false;
 }
-
 
 void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostnameWithDomain, uint16_t port,
                                     uint16_t txtLen, const unsigned char * txtRecord)
@@ -534,19 +506,16 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
     interfaces.insert(std::make_pair(interfaceId, std::move(interface)));
 }
 
-
 bool ResolveContext::HasInterface()
 {
     return interfaces.size();
 }
-
 
 InterfaceInfo::InterfaceInfo()
 {
     service.mTextEntrySize = 0;
     service.mTextEntries   = nullptr;
 }
-
 
 InterfaceInfo::InterfaceInfo(InterfaceInfo && other) :
     service(std::move(other.service)), addresses(std::move(other.addresses)),
@@ -557,7 +526,6 @@ InterfaceInfo::InterfaceInfo(InterfaceInfo && other) :
     other.service.mTextEntrySize = 0;
     other.service.mTextEntries   = nullptr;
 }
-
 
 InterfaceInfo::~InterfaceInfo()
 {

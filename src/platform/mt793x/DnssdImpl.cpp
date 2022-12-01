@@ -42,21 +42,19 @@
 #include "platform/CHIPDeviceLayer.h"
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::Dnssd;
-
 
 extern "C" {
 extern void mDNSPlatformWriteLogRedirect(void (*)(const char *, const char *));
 }
 
-
 namespace {
-constexpr const char * kLocalDot    = "local.";
-constexpr const char * kProtocolTcp = "._tcp";
-constexpr const char * kProtocolUdp = "._udp";
+constexpr const char * kLocalDot        = "local.";
+constexpr const char * kProtocolTcp     = "._tcp";
+constexpr const char * kProtocolUdp     = "._udp";
 static constexpr uint32_t kTimeoutMilli = 3000;
 static constexpr size_t kMaxResults     = 20;
 
@@ -66,18 +64,15 @@ constexpr DNSServiceFlags kGetAddrInfoFlags     = kDNSServiceFlagsTimeout | kDNS
 constexpr DNSServiceFlags kResolveFlags         = kDNSServiceFlagsShareConnection;
 constexpr DNSServiceFlags kReconfirmRecordFlags = 0;
 
-
 bool IsSupportedProtocol(DnssdServiceProtocol protocol)
 {
     return (protocol == DnssdServiceProtocol::kDnssdProtocolUdp) || (protocol == DnssdServiceProtocol::kDnssdProtocolTcp);
 }
 
-
 uint32_t GetInterfaceId(chip::Inet::InterfaceId interfaceId)
 {
-    return interfaceId.IsPresent() ? (uint32_t)(void *)interfaceId.GetPlatformInterface() : kDNSServiceInterfaceIndexAny;
+    return interfaceId.IsPresent() ? (uint32_t)(void *) interfaceId.GetPlatformInterface() : kDNSServiceInterfaceIndexAny;
 }
-
 
 std::string GetFullType(const char * type, DnssdServiceProtocol protocol)
 {
@@ -87,12 +82,10 @@ std::string GetFullType(const char * type, DnssdServiceProtocol protocol)
     return typeBuilder.str();
 }
 
-
 std::string GetFullType(const DnssdService * service)
 {
     return GetFullType(service->mType, service->mProtocol);
 }
-
 
 std::string GetFullTypeWithSubTypes(const char * type, DnssdServiceProtocol protocol, const char * subTypes[], size_t subTypeSize)
 {
@@ -106,7 +99,6 @@ std::string GetFullTypeWithSubTypes(const char * type, DnssdServiceProtocol prot
     }
     return typeBuilder.str();
 }
-
 
 std::string GetFullTypeWithSubTypes(const char * type, DnssdServiceProtocol protocol)
 {
@@ -122,18 +114,15 @@ std::string GetFullTypeWithSubTypes(const char * type, DnssdServiceProtocol prot
     return fullType;
 }
 
-
 std::string GetFullTypeWithSubTypes(const DnssdService * service)
 {
     return GetFullTypeWithSubTypes(service->mType, service->mProtocol, service->mSubTypes, service->mSubTypeSize);
 }
 
-
 std::string GetHostNameWithDomain(const char * hostname)
 {
     return std::string(hostname) + '.' + kLocalDot;
 }
-
 
 void LogOnFailure(const char * name, DNSServiceErrorType err)
 {
@@ -142,7 +131,6 @@ void LogOnFailure(const char * name, DNSServiceErrorType err)
         ChipLogError(Discovery, "%s (%s)", name, Error::ToString(err));
     }
 }
-
 
 class ScopedTXTRecord
 {
@@ -194,7 +182,6 @@ private:
 };
 } // namespace
 
-
 namespace chip {
 namespace Dnssd {
 
@@ -202,15 +189,13 @@ namespace Dnssd {
 
 MdnsContexts MdnsContexts::sInstance;
 static DNSServiceRef BrowseClient = NULL;
-static TaskHandle_t gResolveTask = NULL;
+static TaskHandle_t gResolveTask  = NULL;
 static EventGroupHandle_t gResolveTaskWakeEvent;
-
 
 void ChipDnssdMdnsLog(const char * level, const char * msg)
 {
     ChipLogProgress(ServiceProvisioning, "%s %s", StringOrNullMarker(level), StringOrNullMarker(msg));
 }
-
 
 static void OnRegister(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErrorType err, const char * name, const char * type,
                        const char * domain, void * context)
@@ -220,7 +205,6 @@ static void OnRegister(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErr
     auto sdCtx = reinterpret_cast<RegisterContext *>(context);
     sdCtx->Finalize(err);
 };
-
 
 CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t interfaceId, const char * type, const char * name,
                     uint16_t port, ScopedTXTRecord & record, Inet::IPAddressType addressType, const char * hostname)
@@ -249,7 +233,6 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
     return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
 }
 
-
 static void mdnsd_entry(void * not_used)
 {
     ChipLogProgress(ServiceProvisioning, "mdnsd_entry start");
@@ -257,7 +240,6 @@ static void mdnsd_entry(void * not_used)
     ChipLogProgress(ServiceProvisioning, "mdnsd_entry return");
     vTaskDelete(NULL);
 }
-
 
 CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
@@ -289,18 +271,15 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
     return error;
 }
 
-
 void ChipDnssdShutdown(void)
 {
     ChipLogProgress(ServiceProvisioning, "shutdown mdnsd_task not implemented");
 }
 
-
 static const char * GetProtocolString(DnssdServiceProtocol protocol)
 {
     return protocol == DnssdServiceProtocol::kDnssdProtocolTcp ? "_tcp" : "_udp";
 }
-
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
@@ -320,7 +299,6 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
                     hostname.c_str());
 }
 
-
 CHIP_ERROR ChipDnssdRemoveServices()
 {
     auto err = MdnsContexts::GetInstance().RemoveAllOfType(ContextType::Register);
@@ -331,12 +309,10 @@ CHIP_ERROR ChipDnssdRemoveServices()
     return err;
 }
 
-
 CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 {
     return CHIP_NO_ERROR;
 }
-
 
 void ChipDNSServiceBrowseReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode,
                                const char * serviceName, const char * regtype, const char * replyDomain, void * context)
@@ -349,7 +325,6 @@ void ChipDNSServiceBrowseReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint3
 
     ChipBrowseHandler(NULL, &service, 1, true, CHIP_NO_ERROR);
 }
-
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
                            chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
@@ -377,12 +352,10 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
     return error;
 }
 
-
 CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
-
 
 static void resolve_client_task(void * parameter)
 {
@@ -447,7 +420,6 @@ static void resolve_client_task(void * parameter)
     vTaskDelete(NULL);
 }
 
-
 static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceId, DNSServiceErrorType err,
                           const char * hostname, const struct sockaddr * address, uint32_t ttl, void * context)
 {
@@ -467,7 +439,6 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
         sdCtx->Finalize();
     }
 }
-
 
 static void GetAddrInfo(ResolveContext * sdCtx)
 {
@@ -489,7 +460,6 @@ static void GetAddrInfo(ResolveContext * sdCtx)
         VerifyOrReturn(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
     }
 }
-
 
 void ChipDNSServiceResolveReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode,
                                 const char * fullname, const char * hosttarget, uint16_t port,
@@ -514,7 +484,6 @@ void ChipDNSServiceResolveReply(DNSServiceRef sdRef, DNSServiceFlags flags, uint
         }
     }
 }
-
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
                             void * context)
@@ -572,7 +541,6 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
 
     return error;
 }
-
 
 CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
 {

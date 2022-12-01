@@ -33,7 +33,6 @@ enum class ContextType
     Resolve,
 };
 
-
 struct GenericContext
 {
     ContextType type;
@@ -48,9 +47,7 @@ struct GenericContext
     virtual void DispatchSuccess()                        = 0;
 };
 
-
 struct RegisterContext;
-
 
 class MdnsContexts
 {
@@ -93,7 +90,6 @@ private:
     std::vector<GenericContext *> mContexts;
 };
 
-
 struct RegisterContext : public GenericContext
 {
     DnssdPublishCallback callback;
@@ -111,7 +107,6 @@ struct RegisterContext : public GenericContext
     bool matches(const char * sType) { return mType.compare(sType) == 0; }
 };
 
-
 struct BrowseContext : public GenericContext
 {
     DnssdBrowseCallback callback;
@@ -124,7 +119,6 @@ struct BrowseContext : public GenericContext
     void DispatchFailure(DNSServiceErrorType err) override;
     void DispatchSuccess() override;
 };
-
 
 struct InterfaceInfo
 {
@@ -139,7 +133,6 @@ struct InterfaceInfo
     std::vector<Inet::IPAddress> addresses;
     std::string fullyQualifiedDomainName;
 };
-
 
 struct ResolveContext : public GenericContext
 {
