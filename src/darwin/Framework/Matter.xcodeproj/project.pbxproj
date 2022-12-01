@@ -37,6 +37,7 @@
 		3CF134AB289D8DF70017A19E /* MTRAttestationInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CF134AA289D8DF70017A19E /* MTRAttestationInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3CF134AD289D8E570017A19E /* MTRAttestationInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CF134AC289D8E570017A19E /* MTRAttestationInfo.mm */; };
 		3CF134AF289D90FF0017A19E /* MTRNOCChainIssuer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CF134AE289D90FF0017A19E /* MTRNOCChainIssuer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3D69868529383096007314E7 /* com.csa.matter.plist in Copy Logging Preferences */ = {isa = PBXBuildFile; fileRef = 3D69868029382EF4007314E7 /* com.csa.matter.plist */; };
 		3DECCB6E29347D2D00585AEC /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DECCB6D29347D2C00585AEC /* Security.framework */; };
 		3DECCB702934AECD00585AEC /* MTRLogging.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DECCB6F2934AC1C00585AEC /* MTRLogging.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3DECCB722934AFE200585AEC /* MTRLogging.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3DECCB712934AFE200585AEC /* MTRLogging.mm */; };
@@ -150,6 +151,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		3D69868429383083007314E7 /* Copy Logging Preferences */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = "$(SYSTEM_LIBRARY_DIR)/Preferences/Logging/Subsystems";
+			dstSubfolderSpec = 0;
+			files = (
+				3D69868529383096007314E7 /* com.csa.matter.plist in Copy Logging Preferences */,
+			);
+			name = "Copy Logging Preferences";
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		1E748B3828941A44008A1BE8 /* MTRTestOTAProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRTestOTAProvider.m; sourceTree = "<group>"; };
 		1E748B3928941A45008A1BE8 /* MTRTestOTAProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestOTAProvider.h; sourceTree = "<group>"; };
@@ -182,6 +197,7 @@
 		3CF134AA289D8DF70017A19E /* MTRAttestationInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRAttestationInfo.h; sourceTree = "<group>"; };
 		3CF134AC289D8E570017A19E /* MTRAttestationInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRAttestationInfo.mm; sourceTree = "<group>"; };
 		3CF134AE289D90FF0017A19E /* MTRNOCChainIssuer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRNOCChainIssuer.h; sourceTree = "<group>"; };
+		3D69868029382EF4007314E7 /* com.csa.matter.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = com.csa.matter.plist; sourceTree = "<group>"; };
 		3DECCB6D29347D2C00585AEC /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/System/Library/Frameworks/Security.framework; sourceTree = DEVELOPER_DIR; };
 		3DECCB6F2934AC1C00585AEC /* MTRLogging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRLogging.h; sourceTree = "<group>"; };
 		3DECCB712934AFE200585AEC /* MTRLogging.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRLogging.mm; sourceTree = "<group>"; };
@@ -345,6 +361,22 @@
 			name = CHIPGeneratedFiles;
 			sourceTree = "<group>";
 		};
+		3D69867E29382E58007314E7 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				3D69867F29382EAD007314E7 /* Logging */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		3D69867F29382EAD007314E7 /* Logging */ = {
+			isa = PBXGroup;
+			children = (
+				3D69868029382EF4007314E7 /* com.csa.matter.plist */,
+			);
+			path = Logging;
+			sourceTree = "<group>";
+		};
 		B20252832459E34F00F97062 = {
 			isa = PBXGroup;
 			children = (
@@ -368,6 +400,7 @@
 		B202528F2459E34F00F97062 /* CHIP */ = {
 			isa = PBXGroup;
 			children = (
+				3D69867E29382E58007314E7 /* Resources */,
 				1EDCE543289049A100E41EC9 /* MTROTAHeader.h */,
 				1EDCE544289049A100E41EC9 /* MTROTAHeader.mm */,
 				27A53C1527FBC6920053F131 /* MTRAttestationTrustStoreBridge.h */,
@@ -594,6 +627,7 @@
 				B20252892459E34F00F97062 /* Sources */,
 				B202528A2459E34F00F97062 /* Frameworks */,
 				B202528B2459E34F00F97062 /* Resources */,
+				3D69868429383083007314E7 /* Copy Logging Preferences */,
 			);
 			buildRules = (
 			);
