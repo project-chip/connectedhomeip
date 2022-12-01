@@ -19,7 +19,7 @@ limitations under the License.
     <domain name="CHIP"/>
 
     <struct name = "MonitoringRegistration" isFabricScoped="true">
-        <cluster code="0x0046"/>
+        <cluster code="0x1046"/>
         <item fieldId="1" name="ClientNodeId" type="node_id"/>
         <item fieldId="2" name="ICid" type="INT64U"/>
     </struct>
@@ -27,7 +27,7 @@ limitations under the License.
     <cluster>
         <domain>General</domain>
         <name>Client Monitoring</name>
-        <code>0x0046</code>
+        <code>0x1046</code>
         <define>CLIENT_MONITORING_CLUSTER</define>
         <description>Client Monitoring allows for ensuring that listed clients meet the required monitoring conditions on the server.</description>
         <attribute side="server" code="0x00" define="IDLE_MODE_INTERVAL" type="INT32U" min="0x12C" max="0X5265C00" default="0x12C" writable="false" optional="false" isNullable="false">IdleModeInterval</attribute>
@@ -35,7 +35,7 @@ limitations under the License.
         <attribute side="server" code="0x02" define="ACTIVE_MODE_THRESHOLD" type="INT16U" min="0x12C" max="0xEA60" default="0xFA0" writable="false" optional="false" isNullable="false">ActiveModeThreshold</attribute>
 
         <!-- TODO: Revisit the number of entries per fabric-->
-        <attribute side="server" code="0x03" define="REGISTERED_CLIENTS" type="ARRAY" entryType="MonitoringRegistration" length="4" writable="false" optional="false" isNullable="false">RegisteredClients</attribute>
+        <attribute side="server" code="0x03" define="EXPECTED_CLIENTS" type="ARRAY" entryType="MonitoringRegistration" length="4" writable="false" optional="false" isNullable="false">ExpectedClients</attribute>
 
         <command source="client" code="0x00" name="RegisterClientMonitoring" optional="false">
             <description> Register a client to the end device </description>
