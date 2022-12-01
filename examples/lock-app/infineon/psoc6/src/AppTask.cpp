@@ -392,28 +392,45 @@ void AppTask::LockActionEventHandler(AppEvent * event)
 
     switch (event->Type)
     {
-    case AppEvent::kEventType_Lock: {
-        action = static_cast<LockManager::Action_t>(event->LockEvent.Action);
-        actor  = event->LockEvent.Actor;
-        break;
-    }
-
-    case AppEvent::kEventType_Button: {
-        if (LockMgr().NextState() == true)
+        case AppEvent::kEventType_Lock:
         {
-            action = LockManager::LOCK_ACTION;
-        }
-        else
-        {
-            action = LockManager::UNLOCK_ACTION;
+            action = static_cast<LockManager::Action_t>(event->LockEvent.Action);
+            actor  = event->LockEvent.Actor;
+            break;
         }
 
-        actor = AppEvent::kEventType_Button;
-        break;
-    }
+        case AppEvent::kEventType_Button:
+        {
 
-    default:
-        return;
+            P6_LOG("%s [Action: %d]", __FUNCTION__, event->ButtonEvent.Action);
+
+            if (event->ButtonEvent.Action == APP_BUTTON_LONG_PRESS)
+            {
+                P6_LOG("Sending a lock jammed event");
+
+                /* Generating Door Lock Jammed event */
+                DoorLockServer::Instance().SendLockAlarmEvent(1 /* Endpoint Id */, DlAlarmCode::kLockJammed);
+
+                return;
+            }
+            else
+            {
+                if (LockMgr().NextState() == true)
+                {
+                    action = LockManager::LOCK_ACTION;
+                }
+                else
+                {
+                    action = LockManager::UNLOCK_ACTION;
+                }
+
+                actor = AppEvent::kEventType_Button;
+            }
+            break;
+        }
+
+        default:
+            return;
     }
 
     if (!LockMgr().InitiateAction(actor, action))
