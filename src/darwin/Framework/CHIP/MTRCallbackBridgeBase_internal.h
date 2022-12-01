@@ -27,6 +27,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <transport/SessionHandle.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * Bridge that allows invoking a given MTRActionBlock on the Matter queue, after
  * communication with the device in question has been established, as far as we
@@ -35,11 +37,7 @@
 class MTRCallbackBridgeBase {
 };
 
-// TODO: ADD NS_ASSUME_NONNULL_BEGIN to this header.  When that happens, note
-// that in MTRActionBlock the two callback pointers are nonnull and the two
-// arguments of MTRResponseHandler are both nullable.
-
-typedef void (^MTRResponseHandler)(id value, NSError * error);
+typedef void (^MTRResponseHandler)(id _Nullable value, NSError * _Nullable error);
 typedef void (*MTRErrorCallback)(void * context, CHIP_ERROR error);
 
 /**
@@ -85,7 +83,7 @@ public:
      * Construct a callback bridge, which can then have DispatchAction() called
      * on it.
      */
-    MTRCallbackBridge(dispatch_queue_t queue, MTRResponseHandler handler, MTRActionBlock action, T OnSuccessFn)
+    MTRCallbackBridge(dispatch_queue_t queue, MTRResponseHandler handler, MTRActionBlock _Nonnull action, T OnSuccessFn)
         : mQueue(queue)
         , mHandler(handler)
         , mAction(action)
@@ -130,7 +128,7 @@ public:
      * Does not attempt to establish any sessions to devices.  Must not be used
      * with any action blocks that need a session.
      */
-    void DispatchLocalAction(MTRLocalActionBlock action)
+    void DispatchLocalAction(MTRLocalActionBlock _Nonnull action)
     {
         LogRequestStart();
 
@@ -187,8 +185,8 @@ public:
         ChipLogDetail(Controller, "%s", mCookie.UTF8String);
     }
 
-    void MaybeDoAction(
-        chip::Messaging::ExchangeManager * exchangeManager, const chip::Optional<chip::SessionHandle> & session, NSError * error)
+    void MaybeDoAction(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
+        const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error)
     {
         // Make sure we don't hold on to our action longer than we have to.
         auto action = mAction;
@@ -213,7 +211,7 @@ public:
 
     static void OnFailureFn(void * context, CHIP_ERROR error) { DispatchFailure(context, [MTRError errorForCHIPErrorCode:error]); }
 
-    static void DispatchSuccess(void * context, id value) { DispatchCallbackResult(context, nil, value); }
+    static void DispatchSuccess(void * context, id _Nullable value) { DispatchCallbackResult(context, nil, value); }
 
     static void DispatchFailure(void * context, NSError * error) { DispatchCallbackResult(context, error, nil); }
 
@@ -241,7 +239,7 @@ protected:
     dispatch_queue_t mQueue;
 
 private:
-    static void DispatchCallbackResult(void * context, NSError * error, id value)
+    static void DispatchCallbackResult(void * context, NSError * _Nullable error, id _Nullable value)
     {
         MTRCallbackBridge * callbackBridge = static_cast<MTRCallbackBridge *>(context);
         if (!callbackBridge) {
@@ -267,7 +265,7 @@ private:
     }
 
     MTRResponseHandler mHandler;
-    MTRActionBlock mAction;
+    MTRActionBlock _Nullable mAction;
     bool mKeepAlive = false;
 
     T mSuccess;
@@ -277,3 +275,5 @@ private:
     NSDate * mRequestTime;
     NSString * mCookie;
 };
+
+NS_ASSUME_NONNULL_END
