@@ -36,12 +36,20 @@
     {{! Maybe we should add a check for properties in the expected object (other
         than "global") that are not present in the struct ? }}
   {{else}}
-    VerifyOrReturn(CheckValue{{#if (isString type)}}AsString{{/if}}("{{label}}", {{actual}}, 
+    VerifyOrReturn(CheckValue{{#if (isString type)}}AsString{{/if}}("{{label}}", {{actual}},
       {{~#if (chip_tests_variables_has expected)}}{{expected}}
+      {{~else if (chip_tests_config_has expected)}}
+        m{{asUpperCamelCase expected}}.HasValue() ?
+        {{#if (isCharString type)}}
+          [[NSString alloc] initWithBytes:m{{asUpperCamelCase expected}}.Value().data() length:m{{asUpperCamelCase expected}}.Value().size() encoding:NSUTF8StringEncoding] : @"{{chip_tests_config_get_default_value expected}}"
+        {{else if (isOctetString type)}}
+          [NSData dataWithBytes:m{{asUpperCamelCase expected}}.Value().data() length:m{{asUpperCamelCase expected}}.Value().size()] : {{> octetStringValue value=(chip_tests_config_get_default_value expected)}}
+        {{else}}
+          m{{asUpperCamelCase expected}}.Value() : {{asTypedExpressionFromObjectiveC (chip_tests_config_get_default_value expected) type}}
+        {{/if}}
       {{~else if (isOctetString type)}}
         {{> octetStringValue value=expected}}
       {{~else if (isCharString type)}}@"{{expected}}"
-      {{else if (chip_tests_config_has expected)}}m{{asUpperCamelCase expected}}.HasValue() ? m{{asUpperCamelCase expected}}.Value() : {{asTypedLiteral (chip_tests_config_get_default_value expected) (chip_tests_config_get_type expected)}}
       {{~else}}{{asTypedExpressionFromObjectiveC expected type}}
       {{~/if}}));
   {{/if_is_struct}}

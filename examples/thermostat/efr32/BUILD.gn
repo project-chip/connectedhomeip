@@ -32,7 +32,8 @@ if (chip_enable_pw_rpc) {
 assert(current_os == "freertos")
 
 efr32_project_dir = "${chip_root}/examples/thermostat/efr32"
-examples_plat_dir = "${chip_root}/examples/platform/efr32"
+examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
 declare_args() {
   # Dump memory usage at link time.
@@ -59,6 +60,10 @@ declare_args() {
 
   # Argument to Disable IPv4 for wifi(rs911)
   chip_enable_wifi_ipv4 = false
+
+  # Enable the temperature sensor
+  # Some boards do not have a temperature sensor
+  use_temp_sensor = silabs_board != "BRD2703A" && silabs_board != "BRD4319A"
 }
 
 declare_args() {
@@ -76,7 +81,7 @@ assert(!(use_wf200 && chip_enable_openthread))
 if (chip_enable_wifi) {
   assert(use_rs911x || use_wf200)
   enable_openthread_cli = false
-  import("${chip_root}/src/platform/EFR32/wifi_args.gni")
+  import("${chip_root}/src/platform/silabs/EFR32/wifi_args.gni")
 }
 
 # ThunderBoards, Explorer Kit and MGM240L do not support LCD (No LCD)
@@ -88,7 +93,7 @@ if (silabs_board == "BRD4166A" || silabs_board == "BRD2601B" ||
 
 # WiFi settings
 if (chip_enable_wifi) {
-  wifi_sdk_dir = "${chip_root}/src/platform/EFR32/wifi"
+  wifi_sdk_dir = "${chip_root}/src/platform/silabs/EFR32/wifi"
   efr32_lwip_defs = [ "LWIP_NETIF_API=1" ]
   if (lwip_ipv4) {
     efr32_lwip_defs += [
@@ -129,10 +134,11 @@ efr32_sdk("sdk") {
   ]
 
   include_dirs = [
-    "${chip_root}/src/platform/EFR32",
+    "${chip_root}/src/platform/silabs/EFR32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
+    "${examples_common_plat_dir}",
   ]
 
   defines = [
@@ -172,6 +178,18 @@ efr32_sdk("sdk") {
       defines += [ "SL_WFX_CONFIG_SCAN" ]
     }
   }
+  if (use_temp_sensor) {
+    include_dirs += [
+      "${efr32_sdk_root}/platform/driver/i2cspm/inc",
+      "${efr32_sdk_root}/app/bluetooth/common/sensor_rht",
+      "${efr32_sdk_root}/app/bluetooth/common/sensor_rht/config",
+      "${efr32_sdk_root}/hardware/driver/si70xx/inc",
+      "${efr32_sdk_root}/app/bluetooth/common/sensor_select",
+      "${efr32_sdk_root}/platform/common/config",
+    ]
+
+    defines += [ "USE_TEMP_SENSOR" ]
+  }
 }
 
 efr32_executable("thermostat_app") {
@@ -180,18 +198,33 @@ efr32_executable("thermostat_app") {
   defines = []
 
   sources = [
+    "${examples_common_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/BaseApplication.cpp",
     "${examples_plat_dir}/efr32_utils.cpp",
-    "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/matter_config.cpp",
     "src/AppTask.cpp",
+    "src/SensorManager.cpp",
+    "src/TemperatureManager.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
   ]
 
   if (use_wstk_leds) {
     sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
+  }
+
+  if (use_temp_sensor) {
+    sources += [
+      "${efr32_sdk_root}/app/bluetooth/common/sensor_rht/sl_sensor_rht.c",
+      "${efr32_sdk_root}/app/bluetooth/common/sensor_select/sl_sensor_select.c",
+      "${efr32_sdk_root}/hardware/driver/si70xx/src/sl_si70xx.c",
+      "${efr32_sdk_root}/platform/common/src/sl_status.c",
+      "${efr32_sdk_root}/platform/driver/i2cspm/src/sl_i2cspm.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_i2c.c",
+      "${examples_plat_dir}/TemperatureSensor.cpp",
+      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_i2cspm_init.c",
+    ]
   }
 
   if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
@@ -268,6 +301,7 @@ efr32_executable("thermostat_app") {
     sources += [
       "${examples_plat_dir}/display/demo-ui.c",
       "${examples_plat_dir}/display/lcd.cpp",
+      "src/ThermostatUI.cpp",
     ]
     include_dirs += [ "${examples_plat_dir}/display" ]
     defines += [
@@ -293,8 +327,8 @@ efr32_executable("thermostat_app") {
     sources += [
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
       "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-      "${examples_plat_dir}/PigweedLogger.cpp",
-      "${examples_plat_dir}/Rpc.cpp",
+      "${examples_common_plat_dir}/PigweedLogger.cpp",
+      "${examples_common_plat_dir}/Rpc.cpp",
     ]
 
     deps += [
@@ -318,7 +352,7 @@ efr32_executable("thermostat_app") {
   }
 
   if (enable_heap_monitoring) {
-    sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]
+    sources += [ "${examples_common_plat_dir}/MemMonitoring.cpp" ]
     defines += [ "HEAP_MONITORING" ]
   }
 

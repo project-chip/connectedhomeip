@@ -355,7 +355,7 @@ static void TestCD_CMSSignAndVerify(nlTestSuite * inSuite, void * inContext)
 
     // Test with random key
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, CMS_Sign(cdContentIn, signerKeyId, keypair, signedMessage) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, CMS_Verify(signedMessage, keypair.Pubkey(), cdContentOut) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, cdContentIn.data_equal(cdContentOut));
@@ -622,7 +622,7 @@ static const nlTest sTests[] = { NL_TEST_DEF_FN(TestCD_EncodeDecode),
                                  NL_TEST_DEF_FN(TestCD_DefaultCdTrustStore),
                                  NL_TEST_SENTINEL() };
 
-int TestCertificationDeclaration(void)
+int TestCertificationDeclaration()
 {
     nlTestSuite theSuite = { "CHIP Certification Declaration tests", &sTests[0], nullptr, nullptr };
 

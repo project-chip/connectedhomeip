@@ -17,7 +17,7 @@
 
 #import "MTRThreadOperationalDataset.h"
 
-#include "MTRLogging.h"
+#include "MTRLogging_Internal.h"
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 

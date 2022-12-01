@@ -487,7 +487,7 @@ CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t 
 #endif // CHIP_DISABLE_PLATFORM_KVS
 }
 
-void ConfigurationManagerImpl::RunConfigUnitTest(void)
+void ConfigurationManagerImpl::RunConfigUnitTest()
 {
 #if CHIP_DISABLE_PLATFORM_KVS
     return;

@@ -149,7 +149,6 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/zzz_generated/all-clusters-app/zap-generated/callback-stub.cpp
     ${chip_dir}/zzz_generated/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
 
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
@@ -235,6 +234,7 @@ target_link_libraries(${chip_main} PUBLIC
     pw_hdlc
     pw_log
     pw_rpc.server
+    pw_sys_io
     pw_trace_tokenized
     pw_trace_tokenized.trace_buffer
     pw_trace_tokenized.rpc_service
@@ -256,6 +256,7 @@ list(
     -DUSE_ZAP_CONFIG
     -DCHIP_HAVE_CONFIG_H
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
+    -DCHIP_SHELL_MAX_TOKENS=11
 )
 
 if (matter_enable_persistentstorage_audit)

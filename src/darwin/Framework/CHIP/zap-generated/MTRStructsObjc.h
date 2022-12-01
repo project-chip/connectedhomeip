@@ -189,7 +189,8 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTROtaSoftwareUpdateRequestorClusterProviderLocation : NSObject <NSCopying>
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateRequestorClusterProviderLocation : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull providerNodeID;
 @property (nonatomic, copy) NSNumber * _Nonnull endpoint;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
@@ -198,7 +199,12 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent : NSObject <NSCopying>
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterProviderLocation")
+@interface MTROtaSoftwareUpdateRequestorClusterProviderLocation : MTROTASoftwareUpdateRequestorClusterProviderLocation
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateRequestorClusterStateTransitionEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull previousState;
 @property (nonatomic, copy, getter=getNewState) NSNumber * _Nonnull newState;
 @property (nonatomic, copy) NSNumber * _Nonnull reason;
@@ -208,7 +214,12 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent : NSObject <NSCopying>
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterStateTransitionEvent")
+@interface MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent : MTROTASoftwareUpdateRequestorClusterStateTransitionEvent
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
 @property (nonatomic, copy) NSNumber * _Nonnull productID;
 
@@ -216,7 +227,12 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent : NSObject <NSCopying>
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent")
+@interface MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent : MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
 @property (nonatomic, copy) NSNumber * _Nonnull bytesDownloaded;
 @property (nonatomic, copy) NSNumber * _Nullable progressPercent;
@@ -224,6 +240,10 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
+@end
+
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent")
+@interface MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent : MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent
 @end
 
 @interface MTRPowerSourceClusterBatChargeFaultChangeType : NSObject <NSCopying>
@@ -950,7 +970,8 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTRTestClusterClusterSimpleStruct : NSObject <NSCopying>
+MTR_NEWLY_AVAILABLE
+@interface MTRUnitTestingClusterSimpleStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull a;
 @property (nonatomic, copy) NSNumber * _Nonnull b;
 @property (nonatomic, copy) NSNumber * _Nonnull c;
@@ -964,13 +985,17 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTRTestClusterClusterTestFabricScoped : NSObject <NSCopying>
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterSimpleStruct")
+@interface MTRTestClusterClusterSimpleStruct : MTRUnitTestingClusterSimpleStruct
+@end
+MTR_NEWLY_AVAILABLE
+@interface MTRUnitTestingClusterTestFabricScoped : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull fabricSensitiveInt8u;
 @property (nonatomic, copy) NSNumber * _Nullable optionalFabricSensitiveInt8u;
 @property (nonatomic, copy) NSNumber * _Nullable nullableFabricSensitiveInt8u;
 @property (nonatomic, copy) NSNumber * _Nullable nullableOptionalFabricSensitiveInt8u;
 @property (nonatomic, copy) NSString * _Nonnull fabricSensitiveCharString;
-@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nonnull fabricSensitiveStruct;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull fabricSensitiveStruct;
 @property (nonatomic, copy) NSArray * _Nonnull fabricSensitiveInt8uList;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
 
@@ -978,16 +1003,20 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTRTestClusterClusterNullablesAndOptionalsStruct : NSObject <NSCopying>
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestFabricScoped")
+@interface MTRTestClusterClusterTestFabricScoped : MTRUnitTestingClusterTestFabricScoped
+@end
+MTR_NEWLY_AVAILABLE
+@interface MTRUnitTestingClusterNullablesAndOptionalsStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nullable nullableInt;
 @property (nonatomic, copy) NSNumber * _Nullable optionalInt;
 @property (nonatomic, copy) NSNumber * _Nullable nullableOptionalInt;
 @property (nonatomic, copy) NSString * _Nullable nullableString;
 @property (nonatomic, copy) NSString * _Nullable optionalString;
 @property (nonatomic, copy) NSString * _Nullable nullableOptionalString;
-@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nullable nullableStruct;
-@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nullable optionalStruct;
-@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nullable nullableOptionalStruct;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableStruct;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable optionalStruct;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableOptionalStruct;
 @property (nonatomic, copy) NSArray * _Nullable nullableList;
 @property (nonatomic, copy) NSArray * _Nullable optionalList;
 @property (nonatomic, copy) NSArray * _Nullable nullableOptionalList;
@@ -996,19 +1025,27 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTRTestClusterClusterNestedStruct : NSObject <NSCopying>
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterNullablesAndOptionalsStruct")
+@interface MTRTestClusterClusterNullablesAndOptionalsStruct : MTRUnitTestingClusterNullablesAndOptionalsStruct
+@end
+MTR_NEWLY_AVAILABLE
+@interface MTRUnitTestingClusterNestedStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull a;
 @property (nonatomic, copy) NSNumber * _Nonnull b;
-@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nonnull c;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull c;
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTRTestClusterClusterNestedStructList : NSObject <NSCopying>
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterNestedStruct")
+@interface MTRTestClusterClusterNestedStruct : MTRUnitTestingClusterNestedStruct
+@end
+MTR_NEWLY_AVAILABLE
+@interface MTRUnitTestingClusterNestedStructList : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull a;
 @property (nonatomic, copy) NSNumber * _Nonnull b;
-@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nonnull c;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull c;
 @property (nonatomic, copy) NSArray * _Nonnull d;
 @property (nonatomic, copy) NSArray * _Nonnull e;
 @property (nonatomic, copy) NSArray * _Nonnull f;
@@ -1018,14 +1055,22 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTRTestClusterClusterDoubleNestedStructList : NSObject <NSCopying>
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterNestedStructList")
+@interface MTRTestClusterClusterNestedStructList : MTRUnitTestingClusterNestedStructList
+@end
+MTR_NEWLY_AVAILABLE
+@interface MTRUnitTestingClusterDoubleNestedStructList : NSObject <NSCopying>
 @property (nonatomic, copy) NSArray * _Nonnull a;
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTRTestClusterClusterTestListStructOctet : NSObject <NSCopying>
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterDoubleNestedStructList")
+@interface MTRTestClusterClusterDoubleNestedStructList : MTRUnitTestingClusterDoubleNestedStructList
+@end
+MTR_NEWLY_AVAILABLE
+@interface MTRUnitTestingClusterTestListStructOctet : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull member1;
 @property (nonatomic, copy) NSData * _Nonnull member2;
 
@@ -1033,11 +1078,16 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTRTestClusterClusterTestEventEvent : NSObject <NSCopying>
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListStructOctet")
+@interface MTRTestClusterClusterTestListStructOctet : MTRUnitTestingClusterTestListStructOctet
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRUnitTestingClusterTestEventEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull arg1;
 @property (nonatomic, copy) NSNumber * _Nonnull arg2;
 @property (nonatomic, copy) NSNumber * _Nonnull arg3;
-@property (nonatomic, copy) MTRTestClusterClusterSimpleStruct * _Nonnull arg4;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg4;
 @property (nonatomic, copy) NSArray * _Nonnull arg5;
 @property (nonatomic, copy) NSArray * _Nonnull arg6;
 
@@ -1045,11 +1095,20 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
-@interface MTRTestClusterClusterTestFabricScopedEventEvent : NSObject <NSCopying>
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEventEvent")
+@interface MTRTestClusterClusterTestEventEvent : MTRUnitTestingClusterTestEventEvent
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRUnitTestingClusterTestFabricScopedEventEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
 
 - (instancetype)init;
 - (id)copyWithZone:(NSZone * _Nullable)zone;
+@end
+
+MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestFabricScopedEventEvent")
+@interface MTRTestClusterClusterTestFabricScopedEventEvent : MTRUnitTestingClusterTestFabricScopedEventEvent
 @end
 
 NS_ASSUME_NONNULL_END

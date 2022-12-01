@@ -14,7 +14,7 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/pigweed.gni")
-
+import("${build_root}/chip/java/config.gni")
 import("${build_root}/config/compiler/compiler.gni")
 import("${build_root}/config/sysroot.gni")
 import("${build_root}/config/target.gni")
@@ -194,9 +194,8 @@ config("optimize_default") {
 config("disabled_warnings") {
   cflags = [
     "-Wno-deprecated-declarations",
-    "-Wno-unknown-warning-option",
-    "-Wno-maybe-uninitialized",
     "-Wno-missing-field-initializers",
+    "-Wno-unknown-warning-option",
     "-Wno-unused-parameter",
   ]
   if (!is_debug) {
@@ -205,8 +204,9 @@ config("disabled_warnings") {
   }
   if (!is_clang) {
     cflags += [
-      "-Wno-psabi",
       "-Wno-cast-function-type",
+      "-Wno-psabi",
+      "-Wno-maybe-uninitialized",
     ]
   }
 }
@@ -248,6 +248,10 @@ config("strict_warnings") {
     ]
   }
 
+  if (build_java_matter_controller) {
+    cflags -= [ "-Wshadow" ]
+  }
+
   cflags_cc = [ "-Wnon-virtual-dtor" ]
 
   ldflags = []
@@ -287,9 +291,12 @@ config("disabled_warnings_third_party") {
   cflags = [
     "-Wno-unused",
     "-Wno-format",
-    "-Wno-maybe-uninitialized",
     "-Wno-address",
   ]
+
+  if (!is_clang) {
+    cflags += [ "-Wno-maybe-uninitialized" ]
+  }
 }
 
 config("warnings_third_party") {

@@ -183,6 +183,33 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+template <size_t N>
+CHIP_ERROR extractProtocol(const char * serviceType, char (&outServiceName)[N], DnssdServiceProtocol & outProtocol)
+{
+    const char * dotPos = strrchr(serviceType, '.');
+    ReturnErrorCodeIf(dotPos == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    size_t lengthWithoutProtocol = static_cast<size_t>(dotPos - serviceType);
+    ReturnErrorCodeIf(lengthWithoutProtocol + 1 > N, CHIP_ERROR_INVALID_ARGUMENT);
+
+    memcpy(outServiceName, serviceType, lengthWithoutProtocol);
+    outServiceName[lengthWithoutProtocol] = '\0'; // Set a null terminator
+
+    outProtocol = DnssdServiceProtocol::kDnssdProtocolUnknown;
+    if (strcmp("._tcp", dotPos) == 0)
+    {
+        outProtocol = DnssdServiceProtocol::kDnssdProtocolTcp;
+    }
+    else if (strcmp("._udp", dotPos) == 0)
+    {
+        outProtocol = DnssdServiceProtocol::kDnssdProtocolUdp;
+    }
+
+    ReturnErrorCodeIf(outProtocol == DnssdServiceProtocol::kDnssdProtocolUnknown, CHIP_ERROR_INVALID_ARGUMENT);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ChipDnssdResolve(DnssdService * service, Inet::InterfaceId interface, DnssdResolveCallback callback, void * context)
 {
     VerifyOrReturnError(service != nullptr && callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -316,7 +343,10 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring hostName, 
     DnssdService service = {};
     CopyString(service.mName, jniInstanceName.c_str());
     CopyString(service.mHostName, jnihostName.c_str());
-    CopyString(service.mType, jniServiceType.c_str());
+
+    VerifyOrReturn(extractProtocol(jniServiceType.c_str(), service.mType, service.mProtocol) == CHIP_NO_ERROR,
+                   dispatch(CHIP_ERROR_INVALID_ARGUMENT));
+
     service.mPort          = static_cast<uint16_t>(port);
     service.mInterface     = iface;
     service.mTextEntrySize = 0;
@@ -412,7 +442,8 @@ void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callback
                        dispatch(CHIP_ERROR_INVALID_ARGUMENT));
 
         CopyString(service[i].mName, jniInstanceName.c_str());
-        CopyString(service[i].mType, jniServiceType.c_str());
+        VerifyOrReturn(extractProtocol(jniServiceType.c_str(), service[i].mType, service[i].mProtocol) == CHIP_NO_ERROR,
+                       dispatch(CHIP_ERROR_INVALID_ARGUMENT));
     }
 
     dispatch(CHIP_NO_ERROR, service, size);

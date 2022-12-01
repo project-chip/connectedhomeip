@@ -1,3 +1,9 @@
+# Deprecation notice
+
+chip-device-ctrl is no longer maintained and should not be used.
+
+Matter-repl is the current python controller implementation.
+
 # Working with Python CHIP Controller
 
 The Python CHIP Controller is a tool that allows to commission a Matter device
@@ -624,10 +630,10 @@ ZCL cluster commands.
 ```python
 # devCtrl.WriteAttribute(<nodeid>, [(<endpointid>, Clusters.<cluster>.Attributes.<attribute>(value=<attribute value>))])
 # e.g.
-await devCtrl.WriteAttribute(1, [(1, Clusters.TestCluster.Attributes.Int8u(value=1))])
-await devCtrl.WriteAttribute(1, [(1, Clusters.TestCluster.Attributes.Boolean(value=True))])
-await devCtrl.WriteAttribute(1, [(1, Clusters.TestCluster.Attributes.OctetString(value=b'123123\x00'))])
-await devCtrl.WriteAttribute(1, [(1, Clusters.TestCluster.Attributes.CharString(value='233233'))])
+await devCtrl.WriteAttribute(1, [(1, Clusters.UnitTesting.Attributes.Int8u(value=1))])
+await devCtrl.WriteAttribute(1, [(1, Clusters.UnitTesting.Attributes.Boolean(value=True))])
+await devCtrl.WriteAttribute(1, [(1, Clusters.UnitTesting.Attributes.OctetString(value=b'123123\x00'))])
+await devCtrl.WriteAttribute(1, [(1, Clusters.UnitTesting.Attributes.CharString(value='233233'))])
 ```
 
 ### `zclsubscribe <Cluster> <Attribute> <Nodeid> <Endpoint> <MinInterval> <MaxInterval>`

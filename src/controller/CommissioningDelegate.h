@@ -56,6 +56,9 @@ enum CommissioningStage : uint8_t
     /// ScanNetworks can happen anytime after kArmFailsafe.
     /// However, the cirque tests fail if it is earlier in the list
     kScanNetworks,
+    /// Waiting for the higher layer to provide network credentials before continuing the workflow.
+    /// Call CHIPDeviceController::NetworkCredentialsReady() when CommissioningParameters is populated with
+    /// network credentials to use in kWiFiNetworkSetup or kThreadNetworkSetup steps.
     kNeedsNetworkCreds,
 };
 
@@ -104,6 +107,15 @@ public:
     // default kDefaultFailsafeTimeout.
     // This value should be set before running PerformCommissioningStep for the kArmFailsafe step.
     const Optional<uint16_t> GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
+
+    // Value to use when re-setting the commissioning failsafe timer immediately prior to operational discovery.
+    // If a CASE failsafe timer value is passed in as part of the commissioning parameters, then the failsafe timer
+    // will be reset using this value before operational discovery begins. If not supplied, then the AutoCommissioner
+    // will not automatically reset the failsafe timer before operational discovery begins. It can be useful for the
+    // commissioner to set the CASE failsafe timer to a small value (ex. 30s) when the regular failsafe timer is set
+    // to a larger value to accommodate user interaction during setup (network credential selection, user consent
+    // after device attestation).
+    const Optional<uint16_t> GetCASEFailsafeTimerSeconds() const { return mCASEFailsafeTimerSeconds; }
 
     // The location (indoor/outdoor) of the node being commissioned.
     // The node regulartory location (indoor/outdoor) should be set by the commissioner explicitly as it may be different than the
@@ -234,6 +246,12 @@ public:
     CommissioningParameters & SetFailsafeTimerSeconds(uint16_t seconds)
     {
         mFailsafeTimerSeconds.SetValue(seconds);
+        return *this;
+    }
+
+    CommissioningParameters & SetCASEFailsafeTimerSeconds(uint16_t seconds)
+    {
+        mCASEFailsafeTimerSeconds.SetValue(seconds);
         return *this;
     }
 
@@ -410,6 +428,7 @@ public:
 private:
     // Items that can be set by the commissioner
     Optional<uint16_t> mFailsafeTimerSeconds;
+    Optional<uint16_t> mCASEFailsafeTimerSeconds;
     Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mDeviceRegulatoryLocation;
     Optional<ByteSpan> mCSRNonce;
     Optional<ByteSpan> mAttestationNonce;

@@ -501,7 +501,7 @@ private:
     InteractionType mInteractionType = InteractionType::Read;
     Timestamp mEventTimestamp;
 
-    bool mDoCaseOnNextResub = true;
+    bool mForceCaseOnNextResub = true;
 
     chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;

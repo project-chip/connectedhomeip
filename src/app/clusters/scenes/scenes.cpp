@@ -147,7 +147,7 @@ EmberAfStatus emberAfScenesClusterMakeInvalidCallback(EndpointId endpoint)
                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
-void emAfPluginScenesServerPrintInfo(void)
+void emAfPluginScenesServerPrintInfo()
 {
     uint8_t i;
     EmberAfSceneTableEntry entry;

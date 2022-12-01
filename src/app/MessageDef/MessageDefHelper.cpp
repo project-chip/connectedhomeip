@@ -33,7 +33,7 @@
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK && CHIP_DETAIL_LOGGING
+#if CHIP_CONFIG_IM_PRETTY_PRINT && CHIP_DETAIL_LOGGING
 // this is used to run in signle thread for IM message debug purpose
 namespace {
 uint32_t gPrettyPrintingDepthLevel = 0;
@@ -98,7 +98,7 @@ void DecreaseDepth()
 }
 #endif
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
 CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLabel)
 {
     if (aDepth == 0)
@@ -260,8 +260,7 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
 
     return CHIP_NO_ERROR;
 }
-
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 }; // namespace app
 }; // namespace chip

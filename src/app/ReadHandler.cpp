@@ -46,6 +46,11 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
     VerifyOrDie(apExchangeContext != nullptr);
 
     mExchangeCtx.Grab(apExchangeContext);
+#if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
+    // TODO: this should be replaced by a pointer to the InteractionModelEngine that created the ReadHandler
+    // once InteractionModelEngine is no longer a singleton (see issue 23625)
+    mExchangeMgr = apExchangeContext->GetExchangeMgr();
+#endif // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
 
     mInteractionType            = aInteractionType;
     mLastWrittenEventsBytes     = 0;
@@ -185,7 +190,11 @@ CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aSt
     {
         VerifyOrReturnLogError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
+#if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
+        auto exchange = mExchangeMgr->NewContext(mSessionHandle.Get().Value(), this);
+#else  // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
         auto exchange = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
+#endif // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
         VerifyOrReturnLogError(exchange != nullptr, CHIP_ERROR_INCORRECT_STATE);
         mExchangeCtx.Grab(exchange);
     }
@@ -205,7 +214,11 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     {
         VerifyOrReturnLogError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
+#if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
+        auto exchange = mExchangeMgr->NewContext(mSessionHandle.Get().Value(), this);
+#else  // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
         auto exchange = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
+#endif // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
         VerifyOrReturnLogError(exchange != nullptr, CHIP_ERROR_INCORRECT_STATE);
         mExchangeCtx.Grab(exchange);
     }
@@ -304,8 +317,8 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     reader.Init(std::move(aPayload));
 
     ReturnErrorOnFailure(readRequestParser.Init(reader));
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnErrorOnFailure(readRequestParser.CheckSchemaValidity());
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    readRequestParser.PrettyPrint();
 #endif
 
     err = readRequestParser.GetAttributeRequests(&attributePathListParser);
@@ -557,8 +570,8 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
 
     SubscribeRequestMessage::Parser subscribeRequestParser;
     ReturnErrorOnFailure(subscribeRequestParser.Init(reader));
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnErrorOnFailure(subscribeRequestParser.CheckSchemaValidity());
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    subscribeRequestParser.PrettyPrint();
 #endif
 
     AttributePathIBs::Parser attributePathListParser;

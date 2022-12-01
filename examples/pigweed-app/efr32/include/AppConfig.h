@@ -39,9 +39,9 @@
 extern "C" {
 #endif
 
-void efr32InitLog(void);
+void silabsInitLog(void);
 void efr32Log(const char * aFormat, ...);
-#define EFR32_LOG(...) efr32Log(__VA_ARGS__);
+#define SILABS_LOG(...) efr32Log(__VA_ARGS__);
 void appError(int err);
 
 #ifdef __cplusplus

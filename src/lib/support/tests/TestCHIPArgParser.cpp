@@ -759,7 +759,7 @@ static void ENFORCE_FORMAT(1, 2) HandleArgError(const char * msg, ...)
     sCallbackRecordCount++;
 }
 
-int TestCHIPArgParser(void)
+int TestCHIPArgParser()
 {
     if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
     {

@@ -1827,7 +1827,7 @@ public class ChipStructs {
     }
   }
 
-  public static class TestClusterClusterSimpleStruct {
+  public static class UnitTestingClusterSimpleStruct {
     public Integer a;
     public Boolean b;
     public Integer c;
@@ -1837,7 +1837,7 @@ public class ChipStructs {
     public Float g;
     public Double h;
 
-    public TestClusterClusterSimpleStruct(
+    public UnitTestingClusterSimpleStruct(
         Integer a, Boolean b, Integer c, byte[] d, String e, Integer f, Float g, Double h) {
       this.a = a;
       this.b = b;
@@ -1852,7 +1852,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("TestClusterClusterSimpleStruct {\n");
+      output.append("UnitTestingClusterSimpleStruct {\n");
       output.append("\ta: ");
       output.append(a);
       output.append("\n");
@@ -1882,23 +1882,23 @@ public class ChipStructs {
     }
   }
 
-  public static class TestClusterClusterTestFabricScoped {
+  public static class UnitTestingClusterTestFabricScoped {
     public Integer fabricSensitiveInt8u;
     public Optional<Integer> optionalFabricSensitiveInt8u;
     public @Nullable Integer nullableFabricSensitiveInt8u;
     public @Nullable Optional<Integer> nullableOptionalFabricSensitiveInt8u;
     public String fabricSensitiveCharString;
-    public ChipStructs.TestClusterClusterSimpleStruct fabricSensitiveStruct;
+    public ChipStructs.UnitTestingClusterSimpleStruct fabricSensitiveStruct;
     public ArrayList<Object> fabricSensitiveInt8uList;
     public Integer fabricIndex;
 
-    public TestClusterClusterTestFabricScoped(
+    public UnitTestingClusterTestFabricScoped(
         Integer fabricSensitiveInt8u,
         Optional<Integer> optionalFabricSensitiveInt8u,
         @Nullable Integer nullableFabricSensitiveInt8u,
         @Nullable Optional<Integer> nullableOptionalFabricSensitiveInt8u,
         String fabricSensitiveCharString,
-        ChipStructs.TestClusterClusterSimpleStruct fabricSensitiveStruct,
+        ChipStructs.UnitTestingClusterSimpleStruct fabricSensitiveStruct,
         ArrayList<Object> fabricSensitiveInt8uList,
         Integer fabricIndex) {
       this.fabricSensitiveInt8u = fabricSensitiveInt8u;
@@ -1914,7 +1914,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("TestClusterClusterTestFabricScoped {\n");
+      output.append("UnitTestingClusterTestFabricScoped {\n");
       output.append("\tfabricSensitiveInt8u: ");
       output.append(fabricSensitiveInt8u);
       output.append("\n");
@@ -1944,30 +1944,30 @@ public class ChipStructs {
     }
   }
 
-  public static class TestClusterClusterNullablesAndOptionalsStruct {
+  public static class UnitTestingClusterNullablesAndOptionalsStruct {
     public @Nullable Integer nullableInt;
     public Optional<Integer> optionalInt;
     public @Nullable Optional<Integer> nullableOptionalInt;
     public @Nullable String nullableString;
     public Optional<String> optionalString;
     public @Nullable Optional<String> nullableOptionalString;
-    public @Nullable ChipStructs.TestClusterClusterSimpleStruct nullableStruct;
-    public Optional<ChipStructs.TestClusterClusterSimpleStruct> optionalStruct;
-    public @Nullable Optional<ChipStructs.TestClusterClusterSimpleStruct> nullableOptionalStruct;
+    public @Nullable ChipStructs.UnitTestingClusterSimpleStruct nullableStruct;
+    public Optional<ChipStructs.UnitTestingClusterSimpleStruct> optionalStruct;
+    public @Nullable Optional<ChipStructs.UnitTestingClusterSimpleStruct> nullableOptionalStruct;
     public @Nullable ArrayList<Object> nullableList;
     public Optional<ArrayList<Object>> optionalList;
     public @Nullable Optional<ArrayList<Object>> nullableOptionalList;
 
-    public TestClusterClusterNullablesAndOptionalsStruct(
+    public UnitTestingClusterNullablesAndOptionalsStruct(
         @Nullable Integer nullableInt,
         Optional<Integer> optionalInt,
         @Nullable Optional<Integer> nullableOptionalInt,
         @Nullable String nullableString,
         Optional<String> optionalString,
         @Nullable Optional<String> nullableOptionalString,
-        @Nullable ChipStructs.TestClusterClusterSimpleStruct nullableStruct,
-        Optional<ChipStructs.TestClusterClusterSimpleStruct> optionalStruct,
-        @Nullable Optional<ChipStructs.TestClusterClusterSimpleStruct> nullableOptionalStruct,
+        @Nullable ChipStructs.UnitTestingClusterSimpleStruct nullableStruct,
+        Optional<ChipStructs.UnitTestingClusterSimpleStruct> optionalStruct,
+        @Nullable Optional<ChipStructs.UnitTestingClusterSimpleStruct> nullableOptionalStruct,
         @Nullable ArrayList<Object> nullableList,
         Optional<ArrayList<Object>> optionalList,
         @Nullable Optional<ArrayList<Object>> nullableOptionalList) {
@@ -1988,7 +1988,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("TestClusterClusterNullablesAndOptionalsStruct {\n");
+      output.append("UnitTestingClusterNullablesAndOptionalsStruct {\n");
       output.append("\tnullableInt: ");
       output.append(nullableInt);
       output.append("\n");
@@ -2030,13 +2030,13 @@ public class ChipStructs {
     }
   }
 
-  public static class TestClusterClusterNestedStruct {
+  public static class UnitTestingClusterNestedStruct {
     public Integer a;
     public Boolean b;
-    public ChipStructs.TestClusterClusterSimpleStruct c;
+    public ChipStructs.UnitTestingClusterSimpleStruct c;
 
-    public TestClusterClusterNestedStruct(
-        Integer a, Boolean b, ChipStructs.TestClusterClusterSimpleStruct c) {
+    public UnitTestingClusterNestedStruct(
+        Integer a, Boolean b, ChipStructs.UnitTestingClusterSimpleStruct c) {
       this.a = a;
       this.b = b;
       this.c = c;
@@ -2045,7 +2045,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("TestClusterClusterNestedStruct {\n");
+      output.append("UnitTestingClusterNestedStruct {\n");
       output.append("\ta: ");
       output.append(a);
       output.append("\n");
@@ -2060,20 +2060,20 @@ public class ChipStructs {
     }
   }
 
-  public static class TestClusterClusterNestedStructList {
+  public static class UnitTestingClusterNestedStructList {
     public Integer a;
     public Boolean b;
-    public ChipStructs.TestClusterClusterSimpleStruct c;
-    public ArrayList<ChipStructs.TestClusterClusterSimpleStruct> d;
+    public ChipStructs.UnitTestingClusterSimpleStruct c;
+    public ArrayList<ChipStructs.UnitTestingClusterSimpleStruct> d;
     public ArrayList<Object> e;
     public ArrayList<byte[]> f;
     public ArrayList<Object> g;
 
-    public TestClusterClusterNestedStructList(
+    public UnitTestingClusterNestedStructList(
         Integer a,
         Boolean b,
-        ChipStructs.TestClusterClusterSimpleStruct c,
-        ArrayList<ChipStructs.TestClusterClusterSimpleStruct> d,
+        ChipStructs.UnitTestingClusterSimpleStruct c,
+        ArrayList<ChipStructs.UnitTestingClusterSimpleStruct> d,
         ArrayList<Object> e,
         ArrayList<byte[]> f,
         ArrayList<Object> g) {
@@ -2089,7 +2089,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("TestClusterClusterNestedStructList {\n");
+      output.append("UnitTestingClusterNestedStructList {\n");
       output.append("\ta: ");
       output.append(a);
       output.append("\n");
@@ -2116,18 +2116,18 @@ public class ChipStructs {
     }
   }
 
-  public static class TestClusterClusterDoubleNestedStructList {
-    public ArrayList<ChipStructs.TestClusterClusterNestedStructList> a;
+  public static class UnitTestingClusterDoubleNestedStructList {
+    public ArrayList<ChipStructs.UnitTestingClusterNestedStructList> a;
 
-    public TestClusterClusterDoubleNestedStructList(
-        ArrayList<ChipStructs.TestClusterClusterNestedStructList> a) {
+    public UnitTestingClusterDoubleNestedStructList(
+        ArrayList<ChipStructs.UnitTestingClusterNestedStructList> a) {
       this.a = a;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("TestClusterClusterDoubleNestedStructList {\n");
+      output.append("UnitTestingClusterDoubleNestedStructList {\n");
       output.append("\ta: ");
       output.append(a);
       output.append("\n");
@@ -2136,11 +2136,11 @@ public class ChipStructs {
     }
   }
 
-  public static class TestClusterClusterTestListStructOctet {
+  public static class UnitTestingClusterTestListStructOctet {
     public Long member1;
     public byte[] member2;
 
-    public TestClusterClusterTestListStructOctet(Long member1, byte[] member2) {
+    public UnitTestingClusterTestListStructOctet(Long member1, byte[] member2) {
       this.member1 = member1;
       this.member2 = member2;
     }
@@ -2148,7 +2148,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("TestClusterClusterTestListStructOctet {\n");
+      output.append("UnitTestingClusterTestListStructOctet {\n");
       output.append("\tmember1: ");
       output.append(member1);
       output.append("\n");

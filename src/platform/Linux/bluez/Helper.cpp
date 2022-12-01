@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -155,7 +155,7 @@ static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint
     serviceUUID = g_variant_builder_end(&serviceUUIDsBuilder);
 
     debugStr = g_variant_print(serviceData, TRUE);
-    ChipLogDetail(DeviceLayer, "SET service data to %s", debugStr);
+    ChipLogDetail(DeviceLayer, "SET service data to %s", StringOrNullMarker(debugStr));
     g_free(debugStr);
 
     bluez_leadvertisement1_set_type_(adv, (apEndpoint->mType & BLUEZ_ADV_TYPE_CONNECTABLE) ? "peripheral" : "broadcast");
@@ -463,7 +463,7 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
 #if CHIP_ERROR_LOGGING
         errStr = strerror(errno);
 #endif // CHIP_ERROR_LOGGING
-        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", errStr, __func__);
+        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(errStr), __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
         goto exit;
     }
@@ -544,7 +544,7 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
 #if CHIP_ERROR_LOGGING
         errStr = strerror(errno);
 #endif // CHIP_ERROR_LOGGING
-        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", errStr, __func__);
+        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(errStr), __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
         goto exit;
     }
@@ -1438,7 +1438,7 @@ static ConnectionDataBundle * MakeConnectionDataBundle(BLE_CONNECTION_OBJECT apC
 
 CHIP_ERROR SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf)
 {
-    VerifyOrReturnError(!apBuf.IsNull(), (ChipLogError(DeviceLayer, "apBuf is NULL in %s", __func__), CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(!apBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(DeviceLayer, "apBuf is NULL in %s", __func__));
     return PlatformMgrImpl().ScheduleOnGLibMainLoopThread(BluezC2Indicate, MakeConnectionDataBundle(apConn, apBuf));
 }
 
@@ -1476,33 +1476,32 @@ CHIP_ERROR CloseBluezConnection(BLE_CONNECTION_OBJECT apConn)
 CHIP_ERROR StartBluezAdv(BluezEndpoint * apEndpoint)
 {
     CHIP_ERROR err = PlatformMgrImpl().ScheduleOnGLibMainLoopThread(BluezAdvStart, apEndpoint);
-    VerifyOrReturnError(err == CHIP_NO_ERROR,
-                        (ChipLogError(Ble, "Failed to schedule BluezAdvStart() on CHIPoBluez thread"), CHIP_ERROR_INCORRECT_STATE));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Ble, "Failed to schedule BluezAdvStart() on CHIPoBluez thread"));
     return err;
 }
 
 CHIP_ERROR StopBluezAdv(BluezEndpoint * apEndpoint)
 {
     CHIP_ERROR err = PlatformMgrImpl().ScheduleOnGLibMainLoopThread(BluezAdvStop, apEndpoint);
-    VerifyOrReturnError(err == CHIP_NO_ERROR,
-                        (ChipLogError(Ble, "Failed to schedule BluezAdvStop() on CHIPoBluez thread"), CHIP_ERROR_INCORRECT_STATE));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Ble, "Failed to schedule BluezAdvStop() on CHIPoBluez thread"));
     return err;
 }
 
 CHIP_ERROR BluezAdvertisementSetup(BluezEndpoint * apEndpoint)
 {
     CHIP_ERROR err = PlatformMgrImpl().ScheduleOnGLibMainLoopThread(BluezAdvSetup, apEndpoint);
-    VerifyOrReturnError(err == CHIP_NO_ERROR,
-                        (ChipLogError(Ble, "Failed to schedule BluezAdvSetup() on CHIPoBluez thread"), CHIP_ERROR_INCORRECT_STATE));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Ble, "Failed to schedule BluezAdvSetup() on CHIPoBluez thread"));
     return err;
 }
 
 CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint)
 {
     CHIP_ERROR err = PlatformMgrImpl().ScheduleOnGLibMainLoopThread(BluezPeripheralRegisterApp, apEndpoint);
-    VerifyOrReturnError(
-        err == CHIP_NO_ERROR,
-        (ChipLogError(Ble, "Failed to schedule BluezPeripheralRegisterApp() on CHIPoBluez thread"), CHIP_ERROR_INCORRECT_STATE));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Ble, "Failed to schedule BluezPeripheralRegisterApp() on CHIPoBluez thread"));
     return err;
 }
 
@@ -1631,7 +1630,7 @@ exit:
 
 CHIP_ERROR BluezSendWriteRequest(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf)
 {
-    VerifyOrReturnError(!apBuf.IsNull(), (ChipLogError(DeviceLayer, "apBuf is NULL in %s", __func__), CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(!apBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(DeviceLayer, "apBuf is NULL in %s", __func__));
     return PlatformMgrImpl().ScheduleOnGLibMainLoopThread(SendWriteRequestImpl, MakeConnectionDataBundle(apConn, apBuf));
 }
 

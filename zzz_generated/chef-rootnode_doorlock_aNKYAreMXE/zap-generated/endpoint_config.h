@@ -309,8 +309,8 @@
               ZAP_MIN_MAX_DEFAULTS_INDEX(3) }, /* UserCodeTemporaryDisableTime */                                                  \
             { 0x00000032, ZAP_TYPE(BOOLEAN), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) }, /* SendPINOverTheAir */     \
             { 0x00000033, ZAP_TYPE(BOOLEAN), 1, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                      \
-              ZAP_SIMPLE_DEFAULT(0) },                                            /* RequirePINforRemoteOperation */               \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* FeatureMap */                                 \
+              ZAP_SIMPLE_DEFAULT(1) },                                            /* RequirePINforRemoteOperation */               \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0x0081) }, /* FeatureMap */                                 \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(6) },        /* ClusterRevision */                            \
     }
 

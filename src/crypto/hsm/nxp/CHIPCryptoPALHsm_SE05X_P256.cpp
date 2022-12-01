@@ -63,7 +63,7 @@ P256KeypairHSM::~P256KeypairHSM()
     }
 }
 
-CHIP_ERROR P256KeypairHSM::Initialize()
+CHIP_ERROR P256KeypairHSM::Initialize(ECPKeyTarget key_target)
 {
     sss_object_t keyObject = { 0 };
     uint8_t pubkey[128]    = {

@@ -54,7 +54,7 @@ using namespace chip::DeviceLayer;
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define OTA_START_TRIGGER_TIMEOUT 1500
 
-#define APP_TASK_STACK_SIZE (3 * 1024)
+#define APP_TASK_STACK_SIZE (2 * 1024)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 #define QPG_LOCK_ENDPOINT_ID (1)
@@ -135,6 +135,8 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    PlatformMgr().AddEventHandler(MatterEventHandler, 0);
+
     ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
     // Init ZCL Data Model and start server
@@ -165,6 +167,8 @@ CHIP_ERROR AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
+    UpdateLEDs();
+
     return err;
 }
 
@@ -172,62 +176,13 @@ void AppTask::AppTaskMain(void * pvParameter)
 {
     AppEvent event;
 
-    CHIP_ERROR err = sAppTask.Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "AppTask.Init() failed: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-
-    ChipLogProgress(NotSpecified, "App Task started");
-
     while (true)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
+        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
         while (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);
             eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
-        }
-
-        // Collect connectivity and configuration state from the CHIP stack. Because
-        // the CHIP event loop is being run in a separate task, the stack must be
-        // locked while these values are queried.  However we use a non-blocking
-        // lock request (TryLockCHIPStack()) to avoid blocking other UI activities
-        // when the CHIP task is busy (e.g. with a long crypto operation).
-        if (PlatformMgr().TryLockChipStack())
-        {
-            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
-            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
-            PlatformMgr().UnlockChipStack();
-        }
-
-        // Update the status LED if factory reset has not been initiated.
-        //
-        // If system has "full connectivity", keep the LED On constantly.
-        //
-        // If thread and service provisioned, but not attached to the thread network
-        // yet OR no connectivity to the service OR subscriptions are not fully
-        // established THEN blink the LED Off for a short period of time.
-        //
-        // If the system has ble connection(s) uptill the stage above, THEN blink
-        // the LEDs at an even rate of 100ms.
-        //
-        // Otherwise, blink the LED ON for a very short time.
-        if (sAppTask.mFunction != kFunction_FactoryReset)
-        {
-            if (sIsThreadProvisioned && sIsThreadEnabled)
-            {
-                qvIO_LedBlink(SYSTEM_STATE_LED, 950, 50);
-            }
-            else if (sHaveBLEConnections)
-            {
-                qvIO_LedBlink(SYSTEM_STATE_LED, 100, 100);
-            }
-            else
-            {
-                qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
-            }
         }
     }
 }
@@ -554,5 +509,64 @@ void AppTask::UpdateClusterState(void)
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: updating DoorLock %x", status);
+    }
+}
+
+void AppTask::UpdateLEDs(void)
+{
+    // If system has "full connectivity", keep the LED On constantly.
+    //
+    // If thread and service provisioned, but not attached to the thread network
+    // yet OR no connectivity to the service OR subscriptions are not fully
+    // established THEN blink the LED Off for a short period of time.
+    //
+    // If the system has ble connection(s) uptill the stage above, THEN blink
+    // the LEDs at an even rate of 100ms.
+    //
+    // Otherwise, blink the LED ON for a very short time.
+    if (sIsThreadProvisioned && sIsThreadEnabled)
+    {
+        qvIO_LedBlink(SYSTEM_STATE_LED, 950, 50);
+    }
+    else if (sHaveBLEConnections)
+    {
+        qvIO_LedBlink(SYSTEM_STATE_LED, 100, 100);
+    }
+    else
+    {
+        qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
+    }
+}
+
+void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
+{
+    switch (event->Type)
+    {
+    case DeviceEventType::kServiceProvisioningChange: {
+        sIsThreadProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
+        UpdateLEDs();
+        break;
+    }
+
+    case DeviceEventType::kThreadConnectivityChange: {
+        sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
+        UpdateLEDs();
+        break;
+    }
+
+    case DeviceEventType::kCHIPoBLEConnectionEstablished: {
+        sHaveBLEConnections = true;
+        UpdateLEDs();
+        break;
+    }
+
+    case DeviceEventType::kCHIPoBLEConnectionClosed: {
+        sHaveBLEConnections = false;
+        UpdateLEDs();
+        break;
+    }
+
+    default:
+        break;
     }
 }

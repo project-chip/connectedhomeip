@@ -16,7 +16,7 @@ name: Log Commands Tests
 
 config:
     nodeId: 0x12344321
-    cluster: "Test Cluster"
+    cluster: "Unit Testing"
     endpoint: 1
 
 tests:

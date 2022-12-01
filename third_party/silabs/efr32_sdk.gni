@@ -35,6 +35,11 @@ declare_args() {
   # Use Silabs factory data provider example.
   # Users can implement their own.
   use_efr32_factory_data_provider = true
+
+  # Enable Segger System View
+  use_system_view = false
+
+  sleep_time_ms = 3300000  # 55 mins sleep
 }
 
 # Explorer Kit and MGM240L do not have external flash
@@ -171,7 +176,7 @@ template("efr32_sdk") {
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
       "CORTEXM3_EFM32_MICRO",
-      "EFR32_LOG_ENABLED=1",
+      "SILABS_LOG_ENABLED=1",
       "NVM3_DEFAULT_NVM_SIZE=40960",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
@@ -195,6 +200,17 @@ template("efr32_sdk") {
       #"__STACK_SIZE=0",
     ]
 
+    if (use_system_view) {
+      _include_dirs += [
+        "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10/Config/Cortex-M",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Config/",
+      ]
+
+      defines += [ "SL_SYSTEM_VIEW=1" ]
+    }
+
     defines += board_defines
 
     if (use_wstk_leds) {
@@ -209,6 +225,7 @@ template("efr32_sdk") {
           "CHIP_DEVICE_CONFIG_ENABLE_SED=1",
           "SL_CATALOG_POWER_MANAGER_PRESENT",
           "SL_CATALOG_SLEEPTIMER_PRESENT",
+          "SL_SLEEP_TIME_MS=${sleep_time_ms}",
         ]
       }
     }
@@ -383,8 +400,8 @@ template("efr32_sdk") {
     # system to recompile mbedTLS (= the SDK) when the mbedTLS config gets
     # edited.
     sources = [
-      "${chip_root}/src/platform/EFR32/efr32-chip-mbedtls-config.h",
-      "${chip_root}/src/platform/EFR32/efr32-mbedtls-psa-crypto-config.h",
+      "${chip_root}/src/platform/silabs/EFR32/efr32-chip-mbedtls-config.h",
+      "${chip_root}/src/platform/silabs/EFR32/efr32-mbedtls-psa-crypto-config.h",
     ]
 
     public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
@@ -570,6 +587,14 @@ template("efr32_sdk") {
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_event_handler.c",
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_simple_button_instances.c",
     ]
+
+    if (use_system_view) {
+      sources += [
+        "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER/SEGGER_SYSVIEW.c",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10/Config/Cortex-M/SEGGER_SYSVIEW_Config_FreeRTOS.c",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10/SEGGER_SYSVIEW_FreeRTOS.c",
+      ]
+    }
 
     if (use_wstk_leds) {
       sources += [

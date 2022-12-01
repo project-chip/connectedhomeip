@@ -299,8 +299,6 @@ def main() -> int:
                       action="store_true", dest="do_interact")
     parser.add_option("-m", "--menuconfig", help="runs menuconfig on platforms that support it",
                       action="store_true", dest="do_menuconfig")
-    parser.add_option("", "--bootstrap_zap", help="installs zap dependencies",
-                      action="store_true", dest="do_bootstrap_zap")
     parser.add_option("-z", "--zap", help="runs zap to generate data model & interaction model artifacts",
                       action="store_true", dest="do_run_zap")
     parser.add_option("-g", "--zapgui", help="runs zap GUI display to allow editing of data model",
@@ -353,29 +351,6 @@ def main() -> int:
     options, _ = parser.parse_args(sys.argv[1:])
 
     splash()
-
-    #
-    # ZAP bootstrapping
-    #
-
-    if options.do_bootstrap_zap:
-        if sys.platform == "linux" or sys.platform == "linux2":
-            flush_print("Installing ZAP OS package dependencies")
-            install_deps_cmd = """\
-            sudo apt-get install nodejs node-yargs npm
-            libpixman-1-dev libcairo2-dev libpango1.0-dev node-pre-gyp
-            libjpeg9-dev libgif-dev node-typescript"""
-            shell.run_cmd(unwrap_cmd(install_deps_cmd))
-        if sys.platform == "darwin":
-            flush_print(
-                "Installation of ZAP OS packages not supported on MacOS")
-        if sys.platform == "win32":
-            flush_print(
-                "Installation of ZAP OS packages not supported on Windows")
-
-        flush_print("Running NPM to install ZAP Node.JS dependencies")
-        shell.run_cmd(
-            f"cd {_REPO_BASE_PATH}/third_party/zap/repo/ && npm install")
 
     #
     # CI

@@ -44,22 +44,15 @@ def get_field_info(definition: Field, cluster: Cluster, idl: Idl):
     context = create_lookup_context(idl, cluster)
     actual = ParseDataType(definition.data_type, context)
 
-    orig = actual
-    is_enum = type(actual) == IdlEnumType
-
-    if type(actual) == IdlEnumType:
-        actual = actual.base_type
-    elif type(actual) == IdlBitmapType:
+    if type(actual) == IdlEnumType or type(actual) == IdlBitmapType:
         actual = actual.base_type
 
     if type(actual) == BasicString:
         return 'OctetString', 'char', actual.max_length, \
-            'ZCL_%s_ATTRIBUTE_TYPE' % orig.idl_name.upper()
+            'ZCL_%s_ATTRIBUTE_TYPE' % actual.idl_name.upper()
 
     if type(actual) == BasicInteger:
-        name = orig.idl_name.upper()
-        if is_enum:
-            name = actual.idl_name.upper()
+        name = actual.idl_name.upper()
         ty = "int%d_t" % actual.power_of_two_bits
         if not actual.is_signed:
             ty = "u" + ty

@@ -112,16 +112,21 @@ void PWMDevice::SetLevel(uint8_t aLevel)
 {
     LOG_INF("Setting brightness level to %u", aLevel);
     mLevel = aLevel;
-    UpdateLight();
+    ApplyLevel();
 }
 
 void PWMDevice::Set(bool aOn)
 {
     mState = aOn ? kState_On : kState_Off;
-    UpdateLight();
+    ApplyLevel();
 }
 
-void PWMDevice::UpdateLight()
+void PWMDevice::SuppressOutput()
+{
+    pwm_set_pulse_dt(mPwmDevice, 0);
+}
+
+void PWMDevice::ApplyLevel()
 {
     const uint8_t maxEffectiveLevel = mMaxLevel - mMinLevel;
     const uint8_t effectiveLevel    = mState == kState_On ? chip::min<uint8_t>(mLevel - mMinLevel, maxEffectiveLevel) : 0;

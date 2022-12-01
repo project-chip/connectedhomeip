@@ -171,6 +171,14 @@ private:
      */
     void ExpireFailSafeIfArmed();
 
+    /**
+     * Helpers to ensure the right attribute reporting happens when our state is
+     * updated.
+     */
+    void UpdateWindowStatus(app::Clusters::AdministratorCommissioning::CommissioningWindowStatus aNewStatus);
+    void UpdateOpenerVendorId(app::DataModel::Nullable<VendorId> aNewOpenerVendorId);
+    void UpdateOpenerFabricIndex(app::DataModel::Nullable<FabricIndex> aNewOpenerFabricIndex);
+
     AppDelegate * mAppDelegate = nullptr;
     Server * mServer           = nullptr;
 

@@ -44,7 +44,7 @@ static uint8_t * zeroLenBytePtr = (uint8_t *) &zeroLenByte;
 // Utilities for adding bytes to the response buffer: appResponseData. These
 // functions take care of incrementing appResponseLength.
 
-void emberAfClearResponseData(void)
+void emberAfClearResponseData()
 {
     emberAfResponseType = ZCL_UTIL_RESP_NORMAL;
     // To prevent accidentally sending to someone else,
