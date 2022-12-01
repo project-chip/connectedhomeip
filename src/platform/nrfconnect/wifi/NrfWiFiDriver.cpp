@@ -147,12 +147,20 @@ CHIP_ERROR NrfWiFiDriver::CommitConfiguration()
 
 CHIP_ERROR NrfWiFiDriver::RevertConfiguration()
 {
+    LoadFromStorage();
+
     if (WiFiManager::StationStatus::CONNECTING <= WiFiManager::Instance().GetStationStatus())
     {
+        WiFiManager::WiFiInfo wifiInfo;
+        ReturnErrorOnFailure(WiFiManager::Instance().GetWiFiInfo(wifiInfo));
+        if (mStagingNetwork.GetSsidSpan().data_equal(ByteSpan(wifiInfo.mSsid, wifiInfo.mSsidLen)))
+        {
+            // we are already connected to this network, so return prematurely
+            return CHIP_NO_ERROR;
+        }
+
         WiFiManager::Instance().Disconnect();
     }
-
-    LoadFromStorage();
 
     if (mStagingNetwork.IsConfigured())
     {
