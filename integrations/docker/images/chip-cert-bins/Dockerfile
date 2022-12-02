@@ -216,8 +216,8 @@ RUN case ${TARGETPLATFORM} in \
 			--target linux-x64-lock-ipv6only \
 			build \
 			&& mv out/linux-x64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
-			&& mv out/linux-x64-all-clusters-minimal-ipv6only/chip-all-clusters-minimal-app out/chip-all-clusters-minimal-app \
-                        && mv out/linux-x64-bridge-ipv6only/chip-bridge-app out/chip-bridge-app \
+			&& mv out/linux-x64-all-clusters-minimal-ipv6only/chip-all-clusters-app out/chip-all-clusters-minimal-app \
+            && mv out/linux-x64-bridge-ipv6only/chip-bridge-app out/chip-bridge-app \
 			&& mv out/linux-x64-tv-app-ipv6only/chip-tv-app out/chip-tv-app \
 			&& mv out/linux-x64-tv-casting-app-ipv6only/chip-tv-casting-app out/chip-tv-casting-app \
 			&& mv out/linux-x64-light-ipv6only/chip-lighting-app out/chip-lighting-app \
@@ -242,8 +242,8 @@ RUN case ${TARGETPLATFORM} in \
 			--target linux-arm64-lock-ipv6only \
 			build \
 			&& mv out/linux-arm64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
-			&& mv out/linux-arm64-all-clusters-minimal-ipv6only/chip-all-clusters-minimal-app out/chip-all-clusters-minimal-app \
-                        && mv out/linux-arm64-bridge-ipv6only/chip-bridge-app out/chip-bridge-app \
+			&& mv out/linux-arm64-all-clusters-minimal-ipv6only/chip-all-clusters-app out/chip-all-clusters-minimal-app \
+            && mv out/linux-arm64-bridge-ipv6only/chip-bridge-app out/chip-bridge-app \
 			&& mv out/linux-arm64-tv-app-ipv6only/chip-tv-app out/chip-tv-app \
 			&& mv out/linux-arm64-tv-casting-app-ipv6only/chip-tv-casting-app out/chip-tv-casting-app \
 			&& mv out/linux-arm64-light-ipv6only/chip-lighting-app out/chip-lighting-app \
