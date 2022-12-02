@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
   bouffalolab:
-    name: Bouffalo Lab examples building
+    name: Bouffalo Lab
     timeout-minutes: 90
 
     runs-on: ubuntu-latest
