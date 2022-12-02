@@ -216,7 +216,7 @@ static bool IsNullValue(const uint8_t * data, uint16_t dataLen, bool isAttribute
 //           device is not found in the attribute table)
 // - EMBER_ZCL_STATUS_INVALID_DATA_TYPE: if the data type passed in doesnt match the type
 //           stored in the attribute table
-// - EMBER_ZCL_STATUS_READ_ONLY: if the attribute isnt writable
+// - EMBER_ZCL_STATUS_UNSUPPORTED_WRITE: if the attribute isnt writable
 // - EMBER_ZCL_STATUS_CONSTRAINT_ERROR: if the value is set out of the allowable range for
 //           the attribute
 // - EMBER_ZCL_STATUS_SUCCESS: if the attribute was found and successfully written
@@ -267,7 +267,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         {
             emberAfAttributesPrintln("%pattr not writable", "WRITE ERR: ");
             emberAfAttributesFlush();
-            return EMBER_ZCL_STATUS_READ_ONLY;
+            return EMBER_ZCL_STATUS_UNSUPPORTED_WRITE;
         }
     }
 
