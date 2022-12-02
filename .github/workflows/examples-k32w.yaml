@@ -34,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-k32w:0.6.06
+            image: connectedhomeip/chip-build-k32w:0.6.17
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -67,7 +67,7 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Build examples
-              timeout-minutes: 30
+              timeout-minutes: 40
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
