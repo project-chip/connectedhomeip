@@ -200,9 +200,6 @@ SHELL ["/bin/bash", "-c"]
 # Records Matter SDK commit hash to include in the image.
 RUN git rev-parse HEAD > /root/.sdk-sha-version
 
-# TODO: below the build of linux-arm64-all-clusters-minimal-ipv6only/linux-x64-all-clusters-minimal-ipv6only
-#       is NOT performed because the given SHA does not build minimal and
-#       builds the regular all-clusters app instead.
 RUN case ${TARGETPLATFORM} in \
         "linux/amd64") \
             set -x \
@@ -259,8 +256,7 @@ RUN case ${TARGETPLATFORM} in \
         *) ;; \
     esac
 
-# Development
-# Only keep the cli version, since `zap` is 143MB and not usable (UI)
+# ZAP Development install, so that it runs on both x64 and arm64
 ENV ZAP_VERSION=v2022.11.29-nightly
 RUN set -x \
     && mkdir -p /opt/zap-${ZAP_VERSION} \
