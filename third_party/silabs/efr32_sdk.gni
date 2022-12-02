@@ -40,6 +40,8 @@ declare_args() {
   use_system_view = false
 
   sleep_time_ms = 3300000  # 55 mins sleep
+
+  use_silabs_sw_versioning = true
 }
 
 # Explorer Kit and MGM240L do not have external flash
@@ -199,6 +201,15 @@ template("efr32_sdk") {
 
       #"__STACK_SIZE=0",
     ]
+
+    if (use_silabs_sw_versioning) {
+      formatted_version =
+          exec_script("${chip_root}/scripts/tools/silabs/format_sw_version.py",
+                      [],
+                      "trim string")
+
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${formatted_version}\"" ]
+    }
 
     if (use_system_view) {
       _include_dirs += [

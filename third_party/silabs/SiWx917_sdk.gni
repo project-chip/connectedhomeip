@@ -37,6 +37,11 @@ declare_args() {
   # Use Silabs factory data provider example.
   # Users can implement their own.
   use_efr32_factory_data_provider = true
+
+  # Enable Segger System View
+  use_system_view = false
+
+  use_silabs_sw_versioning = true
 }
 
 # Explorer Kit and MGM240L do not have external flash
@@ -137,6 +142,26 @@ template("efr32_sdk") {
       "CHIP_9117",
       "RS91X_BLE_ENABLE=1",
     ]
+
+    if (use_silabs_sw_versioning) {
+      formatted_version =
+          exec_script("${chip_root}/scripts/tools/silabs/format_sw_version.py",
+                      [],
+                      "trim string")
+
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${formatted_version}\"" ]
+    }
+
+    if (use_system_view) {
+      _include_dirs += [
+        "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10/Config/Cortex-M",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Config/",
+      ]
+
+      defines += [ "SL_SYSTEM_VIEW=1" ]
+    }
 
     defines += board_defines
 
