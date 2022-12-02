@@ -2965,7 +2965,7 @@ tests:
           "Send a command that takes an optional parameter but do not set it."
       command: "TestSimpleOptionalArgumentRequest"
       response:
-          error: INVALID_VALUE
+          error: CONSTRAINT_ERROR
 
     - label:
           "Send a command that takes an optional parameter but do not set it."

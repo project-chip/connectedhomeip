@@ -217,7 +217,7 @@ static bool IsNullValue(const uint8_t * data, uint16_t dataLen, bool isAttribute
 // - EMBER_ZCL_STATUS_INVALID_DATA_TYPE: if the data type passed in doesnt match the type
 //           stored in the attribute table
 // - EMBER_ZCL_STATUS_READ_ONLY: if the attribute isnt writable
-// - EMBER_ZCL_STATUS_INVALID_VALUE: if the value is set out of the allowable range for
+// - EMBER_ZCL_STATUS_CONSTRAINT_ERROR: if the value is set out of the allowable range for
 //           the attribute
 // - EMBER_ZCL_STATUS_SUCCESS: if the attribute was found and successfully written
 //
@@ -272,7 +272,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     }
 
     // if the value the attribute is being set to is out of range
-    // return EMBER_ZCL_STATUS_INVALID_VALUE
+    // return EMBER_ZCL_STATUS_CONSTRAINT_ERROR
     if ((metadata->mask & ATTRIBUTE_MASK_MIN_MAX) != 0U)
     {
         EmberAfDefaultAttributeValue minv = metadata->defaultValue.ptrToMinMaxValue->minValue;
@@ -309,7 +309,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
             // null value is always in-range for a nullable attribute.
             (!metadata->IsNullable() || !IsNullValue(data, dataLen, isAttributeSigned)))
         {
-            return EMBER_ZCL_STATUS_INVALID_VALUE;
+            return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
         }
     }
 
