@@ -222,9 +222,9 @@ chip-tool groupsettings bind-keyset 0x4141 0xAAAA
 
 To use the Client to send Matter commands, run the built executable and pass it
 the target cluster name, the target command name, the Group Id in Node Id form
-(`0xffffffffffffXXXX`) and an used endpoint Id. Take note that Only commands
-and attributes write can be send with Group Id. Also note that a group ACL needs
-to be installed before a command sent to the group will be accepted. See
+(`0xffffffffffffXXXX`) and an used endpoint Id. Take note that Only commands and
+attributes write can be send with Group Id. Also note that a group ACL needs to
+be installed before a command sent to the group will be accepted. See
 [the access control guide](../../docs/guides/access-control-guide.md#installing-a-group-acl)
 
 E.G. sending to group Id 0x4141
