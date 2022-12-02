@@ -188,7 +188,9 @@ WORKDIR /root/connectedhomeip/
 RUN git checkout ${COMMITHASH}
 RUN ./scripts/checkout_submodules.py --shallow --platform linux
 RUN scripts/build/gn_bootstrap.sh
-RUN source scripts/activate.sh \
+SHELL ["/bin/bash", "-c"]
+RUN set -x && \
+    source scripts/activate.sh \
     && gn gen out/debug --args='chip_mdns="platform" chip_inet_config_enable_ipv4=false' \
     && ninja -C out/debug
 
