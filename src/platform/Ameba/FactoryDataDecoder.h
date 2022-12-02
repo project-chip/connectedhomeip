@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+
 namespace chip {
 namespace DeviceLayer {
 

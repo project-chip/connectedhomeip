@@ -538,7 +538,6 @@ CHIP_ERROR FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & 
     err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
 
-exit:
     if (err != CHIP_NO_ERROR && err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND && err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
         ChipLogError(DeviceLayer, "Invalid manufacturing date: %s", mFactoryData.dii.mfg_date.value);
