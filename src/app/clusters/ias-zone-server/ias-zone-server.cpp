@@ -268,7 +268,7 @@ EmberAfStatus emberAfPluginIasZoneClusterSetEnrollmentMethod(EndpointId endpoint
     if (emberAfIasZoneClusterAmIEnrolled(endpoint))
     {
         emberAfIasZoneClusterPrintln("Error: Already enrolled");
-        status = EMBER_ZCL_STATUS_NOT_AUTHORIZED;
+        status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS;
     }
     else if (!isValidEnrollmentMode(method))
     {

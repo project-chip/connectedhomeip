@@ -545,7 +545,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                     if (!emberAfAttributeWriteAccessCallback(attRecord->endpoint, attRecord->clusterId,
                                                                              am->attributeId))
                                     {
-                                        return EMBER_ZCL_STATUS_NOT_AUTHORIZED;
+                                        return EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS;
                                     }
                                 }
                                 else
@@ -560,7 +560,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                     if (!emberAfAttributeReadAccessCallback(attRecord->endpoint, attRecord->clusterId,
                                                                             am->attributeId))
                                     {
-                                        return EMBER_ZCL_STATUS_NOT_AUTHORIZED;
+                                        return EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS;
                                     }
                                 }
 
