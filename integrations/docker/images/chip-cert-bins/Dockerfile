@@ -8,20 +8,20 @@ ARG COMMITHASH=21245f42393e63dbb16fb4d99d8bf96aef7ae0fc
 RUN case ${TARGETPLATFORM} in \
         "linux/amd64") \
             echo "Building for linux/amd64" \
-	    ;; \
+        ;; \
         "linux/arm64") \
             echo "Building for linux/arm64" \
-	    ;; \
+        ;; \
         *) \
-	    if [ -z "$TARGETPLATFORM" ] ;\
-	    then \
-	        echo "TARGETPLATFORM not defined! Please run from buildkit (buildx)." \
-		&& return 1 ;\
-	    else \
-	        echo "Unsupported platform ${TARGETPLATFORM}." \
-		&& return 1 ;\
-	    fi \
-	    ;; \
+        if [ -z "$TARGETPLATFORM" ] ;\
+        then \
+            echo "TARGETPLATFORM not defined! Please run from buildkit (buildx)." \
+        && return 1 ;\
+        else \
+            echo "Unsupported platform ${TARGETPLATFORM}." \
+        && return 1 ;\
+        fi \
+        ;; \
     esac
 
 # Below should be the same as chip-build except arm64 logic for cmake and node.
@@ -108,9 +108,9 @@ RUN case ${TARGETPLATFORM} in \
             && exec bash \
             ;; \
         *) \
-	    test -n "$TARGETPLATFORM" \
-	    echo "Unsupported platform ${TARGETPLATFORM}" \
-	;; \
+        test -n "$TARGETPLATFORM" \
+        echo "Unsupported platform ${TARGETPLATFORM}" \
+    ;; \
     esac
 
 # Python 3 and PIP
@@ -156,28 +156,28 @@ RUN set -x \
 RUN case ${TARGETPLATFORM} in \
         "linux/amd64") \
             set -x \
-			&& mkdir node_js \
-			&& cd node_js \
-			&& wget https://nodejs.org/dist/v12.19.0/node-v12.19.0-linux-x64.tar.xz \
-			&& tar xfvJ node-v12.19.0-linux-x64.tar.xz \
-			&& mv node-v12.19.0-linux-x64 /opt/ \
-			&& ln -s /opt/node-v12.19.0-linux-x64 /opt/node \
-			&& ln -s /opt/node/bin/* /usr/bin \
-			&& cd .. \
-			&& rm -rf node_js \
-			;; \
+            && mkdir node_js \
+            && cd node_js \
+            && wget https://nodejs.org/dist/v12.19.0/node-v12.19.0-linux-x64.tar.xz \
+            && tar xfvJ node-v12.19.0-linux-x64.tar.xz \
+            && mv node-v12.19.0-linux-x64 /opt/ \
+            && ln -s /opt/node-v12.19.0-linux-x64 /opt/node \
+            && ln -s /opt/node/bin/* /usr/bin \
+            && cd .. \
+            && rm -rf node_js \
+            ;; \
         "linux/arm64")\
             set -x \
-			&& mkdir node_js \
-			&& cd node_js \
-			&& wget https://nodejs.org/dist/v12.19.0/node-v12.19.0-linux-arm64.tar.xz \
-			&& tar xfvJ node-v12.19.0-linux-arm64.tar.xz \
-			&& mv node-v12.19.0-linux-arm64 /opt/ \
-			&& ln -s /opt/node-v12.19.0-linux-arm64 /opt/node \
-			&& ln -s /opt/node/bin/* /usr/bin \
-			&& cd .. \
-			&& rm -rf node_js \
-			;; \
+            && mkdir node_js \
+            && cd node_js \
+            && wget https://nodejs.org/dist/v12.19.0/node-v12.19.0-linux-arm64.tar.xz \
+            && tar xfvJ node-v12.19.0-linux-arm64.tar.xz \
+            && mv node-v12.19.0-linux-arm64 /opt/ \
+            && ln -s /opt/node-v12.19.0-linux-arm64 /opt/node \
+            && ln -s /opt/node/bin/* /usr/bin \
+            && cd .. \
+            && rm -rf node_js \
+            ;; \
         *) ;; \
     esac
 
@@ -206,52 +206,52 @@ RUN git rev-parse HEAD > /root/.sdk-sha-version
 RUN case ${TARGETPLATFORM} in \
         "linux/amd64") \
             set -x \
-			&& source scripts/activate.sh \
-			&& scripts/build/build_examples.py \
-			--target linux-x64-all-clusters-ipv6only \
-			--target linux-x64-bridge-ipv6only \
-			--target linux-x64-tv-app-ipv6only \
-			--target linux-x64-tv-casting-app-ipv6only \
-			--target linux-x64-light-ipv6only \
-			--target linux-x64-thermostat-ipv6only \
-			--target linux-x64-ota-provider-ipv6only \
-			--target linux-x64-ota-requestor-ipv6only \
-			--target linux-x64-lock-ipv6only \
-			build \
-			&& mv out/linux-x64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
+            && source scripts/activate.sh \
+            && scripts/build/build_examples.py \
+            --target linux-x64-all-clusters-ipv6only \
+            --target linux-x64-bridge-ipv6only \
+            --target linux-x64-tv-app-ipv6only \
+            --target linux-x64-tv-casting-app-ipv6only \
+            --target linux-x64-light-ipv6only \
+            --target linux-x64-thermostat-ipv6only \
+            --target linux-x64-ota-provider-ipv6only \
+            --target linux-x64-ota-requestor-ipv6only \
+            --target linux-x64-lock-ipv6only \
+            build \
+            && mv out/linux-x64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
             && mv out/linux-x64-bridge-ipv6only/chip-bridge-app out/chip-bridge-app \
-			&& mv out/linux-x64-tv-app-ipv6only/chip-tv-app out/chip-tv-app \
-			&& mv out/linux-x64-tv-casting-app-ipv6only/chip-tv-casting-app out/chip-tv-casting-app \
-			&& mv out/linux-x64-light-ipv6only/chip-lighting-app out/chip-lighting-app \
-			&& mv out/linux-x64-thermostat-ipv6only/thermostat-app out/thermostat-app \
-			&& mv out/linux-x64-ota-provider-ipv6only/chip-ota-provider-app out/chip-ota-provider-app \
-			&& mv out/linux-x64-ota-requestor-ipv6only/chip-ota-requestor-app out/chip-ota-requestor-app \
-			&& mv out/linux-x64-lock-ipv6only/chip-lock-app out/chip-lock-app \
-		        ;; \
+            && mv out/linux-x64-tv-app-ipv6only/chip-tv-app out/chip-tv-app \
+            && mv out/linux-x64-tv-casting-app-ipv6only/chip-tv-casting-app out/chip-tv-casting-app \
+            && mv out/linux-x64-light-ipv6only/chip-lighting-app out/chip-lighting-app \
+            && mv out/linux-x64-thermostat-ipv6only/thermostat-app out/thermostat-app \
+            && mv out/linux-x64-ota-provider-ipv6only/chip-ota-provider-app out/chip-ota-provider-app \
+            && mv out/linux-x64-ota-requestor-ipv6only/chip-ota-requestor-app out/chip-ota-requestor-app \
+            && mv out/linux-x64-lock-ipv6only/chip-lock-app out/chip-lock-app \
+                ;; \
         "linux/arm64")\
             set -x \
-			&& source scripts/activate.sh \
-			&& scripts/build/build_examples.py \
-			--target linux-arm64-all-clusters-ipv6only \
-			--target linux-arm64-bridge-ipv6only \
-			--target linux-arm64-tv-app-ipv6only \
-			--target linux-arm64-tv-casting-app-ipv6only \
-			--target linux-arm64-light-ipv6only \
-			--target linux-arm64-thermostat-ipv6only \
-			--target linux-arm64-ota-provider-ipv6only \
-			--target linux-arm64-ota-requestor-ipv6only \
-			--target linux-arm64-lock-ipv6only \
-			build \
-			&& mv out/linux-arm64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
+            && source scripts/activate.sh \
+            && scripts/build/build_examples.py \
+            --target linux-arm64-all-clusters-ipv6only \
+            --target linux-arm64-bridge-ipv6only \
+            --target linux-arm64-tv-app-ipv6only \
+            --target linux-arm64-tv-casting-app-ipv6only \
+            --target linux-arm64-light-ipv6only \
+            --target linux-arm64-thermostat-ipv6only \
+            --target linux-arm64-ota-provider-ipv6only \
+            --target linux-arm64-ota-requestor-ipv6only \
+            --target linux-arm64-lock-ipv6only \
+            build \
+            && mv out/linux-arm64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
             && mv out/linux-arm64-bridge-ipv6only/chip-bridge-app out/chip-bridge-app \
-			&& mv out/linux-arm64-tv-app-ipv6only/chip-tv-app out/chip-tv-app \
-			&& mv out/linux-arm64-tv-casting-app-ipv6only/chip-tv-casting-app out/chip-tv-casting-app \
-			&& mv out/linux-arm64-light-ipv6only/chip-lighting-app out/chip-lighting-app \
-			&& mv out/linux-arm64-thermostat-ipv6only/thermostat-app out/thermostat-app \
-			&& mv out/linux-arm64-ota-provider-ipv6only/chip-ota-provider-app out/chip-ota-provider-app \
-			&& mv out/linux-arm64-ota-requestor-ipv6only/chip-ota-requestor-app out/chip-ota-requestor-app \
-			&& mv out/linux-arm64-lock-ipv6only/chip-lock-app out/chip-lock-app \
-			;; \
+            && mv out/linux-arm64-tv-app-ipv6only/chip-tv-app out/chip-tv-app \
+            && mv out/linux-arm64-tv-casting-app-ipv6only/chip-tv-casting-app out/chip-tv-casting-app \
+            && mv out/linux-arm64-light-ipv6only/chip-lighting-app out/chip-lighting-app \
+            && mv out/linux-arm64-thermostat-ipv6only/thermostat-app out/thermostat-app \
+            && mv out/linux-arm64-ota-provider-ipv6only/chip-ota-provider-app out/chip-ota-provider-app \
+            && mv out/linux-arm64-ota-requestor-ipv6only/chip-ota-requestor-app out/chip-ota-requestor-app \
+            && mv out/linux-arm64-lock-ipv6only/chip-lock-app out/chip-lock-app \
+            ;; \
         *) ;; \
     esac
 
