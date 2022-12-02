@@ -18,6 +18,8 @@ import glob
 import time
 
 
+# TODO(use scripts/idl/xml_parser.py for zap xml parsing)
+
 class ClustersDefinitions:
     def __init__(self, clusters_dir):
         self.__clusterIdToName = {}
@@ -91,7 +93,8 @@ class ClustersDefinitions:
                 command_code = command.get('code')
                 command_name = command.get('name')
 
-                base = 16 if command_code.startswith('0x') or command_code.startswith('0X') else 10
+                base = 16 if command_code.startswith(
+                    '0x') or command_code.startswith('0X') else 10
                 command_code = int(command_code, base=base)
                 self.__commandIdToName[cluster_code][command_code] = command_name
 
@@ -109,7 +112,8 @@ class ClustersDefinitions:
                 description = attribute.find('description')
                 attribute_name = description.text if description is not None else attribute.text
 
-                base = 16 if attribute_code.startswith('0x') or attribute_code.startswith('0X') else 10
+                base = 16 if attribute_code.startswith(
+                    '0x') or attribute_code.startswith('0X') else 10
                 attribute_code = int(attribute_code, base=base)
                 self.__attributeIdToName[cluster_code][attribute_code] = attribute_name
 
@@ -124,7 +128,8 @@ class ClustersDefinitions:
                 description = event.find('description')
                 event_name = description.text if description is not None else event.text
 
-                base = 16 if event_code.startswith('0x') or event_code.startswith('0X') else 10
+                base = 16 if event_code.startswith(
+                    '0x') or event_code.startswith('0X') else 10
                 event_code = int(event_code, base=base)
                 self.__eventIdToName[cluster_code][event_code] = event_name
 
@@ -154,7 +159,8 @@ class ClustersDefinitions:
 
         mapping = {}
         for mapping_index, arg in enumerate(args):
-            mapping[str(mapping_index)] = {'name': arg.get('name'), 'type': arg.get('type').lower()}
+            mapping[str(mapping_index)] = {'name': arg.get(
+                'name'), 'type': arg.get('type').lower()}
         return mapping
 
     def get_attribute_mapping(self, attribute_name):
@@ -192,7 +198,8 @@ class ClustersDefinitions:
         for item in items:
             if item.get('fieldId'):
                 mapping_index = int(item.get('fieldId'))
-            mapping[str(mapping_index)] = {'name': item.get('name'), 'type': item.get('type').lower()}
+            mapping[str(mapping_index)] = {'name': item.get(
+                'name'), 'type': item.get('type').lower()}
             mapping_index += 1
 
         return mapping
