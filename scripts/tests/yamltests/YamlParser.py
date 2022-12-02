@@ -278,7 +278,8 @@ class YamlTest:
                     if expected_value is None:
                         logger.success('Response', f'The test expectation "{expected_name} == {expected_value}" is true')
                     else:
-                        logger.error('Response', f'The test expects a value named "{expected_name}" but it does not exists in the response."')
+                        logger.error(
+                            'Response', f'The test expects a value named "{expected_name}" but it does not exists in the response."')
                     return
 
                 received_value = received_entry[expected_name]
@@ -596,7 +597,8 @@ class YamlTest:
             if type(expected_entry) is dict and type(received_entry) is dict:
                 expected_name = expected_entry['name']
                 if not expected_name in received_entry:
-                    logger.error('SaveAs', f'The test expects a value named "{expected_name}" but it does not exists in the response."')
+                    logger.error(
+                        'SaveAs', f'The test expects a value named "{expected_name}" but it does not exists in the response."')
                     continue
 
                 received_value = received_entry[expected_name]
