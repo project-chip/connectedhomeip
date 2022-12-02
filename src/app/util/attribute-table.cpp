@@ -406,7 +406,7 @@ EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, Attribut
     }
     else
     { // failed, print debug info
-        if (status == EMBER_ZCL_STATUS_INSUFFICIENT_SPACE)
+        if (status == EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED)
         {
             emberAfAttributesPrintln("READ: attribute size too large for caller");
             emberAfAttributesFlush();

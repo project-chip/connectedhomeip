@@ -491,7 +491,7 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(chip::FabricIndex fa
     // If the target index is still zero, the table is full.
     if (index == EMBER_AF_SCENE_TABLE_NULL_INDEX)
     {
-        return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+        return EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
     }
 
     emberAfPluginScenesServerRetrieveSceneEntry(entry, index);
@@ -758,7 +758,7 @@ bool emberAfPluginScenesServerParseAddScene(
     // If the target index is still zero, the table is full.
     if (index == EMBER_AF_SCENE_TABLE_NULL_INDEX)
     {
-        status = EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+        status = EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
         goto kickout;
     }
 
