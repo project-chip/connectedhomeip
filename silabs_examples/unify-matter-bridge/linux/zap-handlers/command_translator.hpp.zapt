@@ -31,17 +31,53 @@ namespace unify::matter_bridge
 {
 
 {{#zcl_clusters}}
-{{#if (supportedCluster label)}}
+{{#if (unifySupportedCluster code)}}
 class {{asUpperCamelCase label}}ClusterCommandHandler : public command_translator_interface
 {
   public:
   {{asUpperCamelCase label}}ClusterCommandHandler(
     const matter_node_state_monitor &node_state_monitor, UnifyMqtt &unify_mqtt, group_translator &group_translator_m) :
     command_translator_interface(node_state_monitor,
-                                 chip::app::Clusters::{{asUpperCamelCase label}}::Id,"{{matterClusterConversion label}}", unify_mqtt, group_translator_m)
+                                 chip::app::Clusters::{{asUpperCamelCase label}}::Id,"{{unifyClusterName code}}", unify_mqtt, group_translator_m)
   {}
   void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext
                     &HandlerContext) override;
+  
+  
+  {{#zcl_commands_source_client}}
+  {{#if (unifySupportedClusterCommand parent.code code) }}
+  
+  {{else}}
+  ///
+  /// The command {{label}} is not defined in UCL and must be manually handled
+  ///
+  virtual void Invoke_{{label}}( CommandHandlerInterface::HandlerContext &ctxt, chip::app::Clusters::{{asUpperCamelCase parent.label}}::Commands::{{asUpperCamelCase label}}::DecodableType data)
+  {{#isOptional}}
+   {
+    ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
+    ctxt.SetCommandHandled();
+  };
+  {{else}}
+  = 0;
+  {{/isOptional}}
+  {{/if}}
+  {{/zcl_commands_source_client}}
+
+
+  virtual CHIP_ERROR EnumerateAcceptedCommands(const chip::app::ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override
+  {
+    const chip::CommandId all_commands[] = { {{#zcl_commands_source_client}}{{code}},{{/zcl_commands_source_client}} };
+    for (const auto & cmd :  all_commands )
+    {
+        if (callback(cmd, context) != chip::Loop::Continue)
+        {
+            break;
+        }
+    }
+
+    return CHIP_NO_ERROR;
+  }
+
 };
 {{/if}}
 {{/zcl_clusters}}

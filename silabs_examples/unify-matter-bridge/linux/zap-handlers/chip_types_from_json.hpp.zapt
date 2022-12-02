@@ -16,169 +16,39 @@
 
 // Default translation
 template <typename T>
-std::optional<T> from_json(const nlohmann::json & value)
+std::optional<T> inline from_json(const nlohmann::json & value)
 {
-    return std::nullopt;
-}
-/***************************** Simple type Convertes **************/
-
-template<> inline
-std::optional<bool> from_json(const nlohmann::json  & value)
-{
-    return value;
+    return std::optional<T>(value);
 }
 
-template<> inline
-std::optional<int> from_json(const nlohmann::json  & value)
-{
-    return value;
+template<>
+std::optional<chip::Span<const char>> inline from_json(const nlohmann::json & value) {
+    std::string s = value.get<std::string>();
+    chip::Span<const char> span(s.c_str(),s.length());
+    return span;
 }
 
-template<> inline
-std::optional<std::string> from_json(const nlohmann::json & value)
-{
-    return value;
-}
 
-template <>
-inline std::optional<uint8_t> from_json(const nlohmann::json & value)
-{
-    return value;
-}
-template <>
-inline std::optional<uint16_t> from_json(const nlohmann::json & value)
-{
-    return value;
-}
-template <>
-inline std::optional<uint32_t> from_json(const nlohmann::json & value)
-{
-    return value;
-}
-template <>
-inline std::optional<uint64_t> from_json(const nlohmann::json & value)
-{
-    return value;
-}
-template <>
-inline std::optional<chip::app::DataModel::Nullable<int8_t>> from_json(const nlohmann::json & value)
-{
-    if (value.is_null())
-    {
-        return std::nullopt;
-    }
-    else
-    {
-        return chip::app::DataModel::Nullable<int8_t>(value);
-    }
-}
-template <>
-inline std::optional<chip::app::DataModel::Nullable<int16_t>> from_json(const nlohmann::json & value)
-{
-    if (value.is_null())
-    {
-        return std::nullopt;
-    }
-    else
-    {
-        return chip::app::DataModel::Nullable<int16_t>(value);
-    }
-}
-template <>
-inline std::optional<chip::app::DataModel::Nullable<int32_t>> from_json(const nlohmann::json & value)
-{
-    if (value.is_null())
-    {
-        return std::nullopt;
-    }
-    else
-    {
-        return chip::app::DataModel::Nullable<int32_t>(value);
-    }
-}
-template <>
-inline std::optional<chip::app::DataModel::Nullable<int64_t>> from_json(const nlohmann::json & value)
-{
-    if (value.is_null())
-    {
-        return std::nullopt;
-    }
-    else
-    {
-        return chip::app::DataModel::Nullable<int64_t>(value);
-    }
-}
-template <>
-inline std::optional<chip::app::DataModel::Nullable<uint8_t>> from_json(const nlohmann::json & value)
-{
-    if (value.is_null())
-    {
-        return std::nullopt;
-    }
-    else
-    {
-        return chip::app::DataModel::Nullable<uint8_t>(value);
-    }
-}
-template <>
-inline std::optional<chip::app::DataModel::Nullable<uint16_t>> from_json(const nlohmann::json & value)
-{
-    if (value.is_null())
-    {
-        return std::nullopt;
-    }
-    else
-    {
-        return chip::app::DataModel::Nullable<uint16_t>(value);
-    }
-}
-template <>
-inline std::optional<chip::app::DataModel::Nullable<uint32_t>> from_json(const nlohmann::json & value)
-{
-    if (value.is_null())
-    {
-        return std::nullopt;
-    }
-    else
-    {
-        return chip::app::DataModel::Nullable<uint32_t>(value);
-    }
-}
-template <>
-inline std::optional<chip::app::DataModel::Nullable<uint64_t>> from_json(const nlohmann::json & value)
-{
-    if (value.is_null())
-    {
-        return std::nullopt;
-    }
-    else
-    {
-        return chip::app::DataModel::Nullable<uint64_t>(value);
-    }
-}
-/***************************** Bitmap Converters **************/
 {{#zcl_clusters}}
-//{{#zcl_bitmaps}}
-//template<> inline nlohmann::json to_json(const chip::BitFlags<{{asUpperCamelCase parent.label}}::{{label}}, uint8_t>& value) {
-//    return "{\"no bitmap support\"}";
-//}
+{{#if (unifySupportedCluster code)}}
+  /***************************** Bitmap Converters **************/
+  {{#zcl_bitmaps}}
+  template<> inline std::optional<chip::BitMask<{{asUpperCamelCase parent.label}}::{{label}}>> from_json(const nlohmann::json& obj) {
+    chip::BitMask<{{asUpperCamelCase parent.label}}::{{label}}> r;
+    {{#zcl_bitmap_items}}
+    r.SetField({{asUpperCamelCase parent.parent.label}}::{{parent.label}}::k{{asUpperCamelCase label}}, obj.value("{{unifyBitmapValName this}}",false)); 
+    {{/zcl_bitmap_items}}
+    return r;
+  }
+  {{/zcl_bitmaps}}
 
-//{{/zcl_bitmaps}}
-
-/***************************** Struct Converters **************/
-//{{#zcl_structs}}
-//template<> inline nlohmann::json to_json(const {{asUpperCamelCase parent.label}}::Structs::{{name}}::Type& value) {
-//    return "no struct support";
-//}
-//
-//{{/zcl_structs}}
 
     {{#zcl_enums}}
 template<> inline std::optional<{{asUpperCamelCase parent.label}}::{{label}}> from_json(const nlohmann::json& value) {
     const std::map< std::string, {{asUpperCamelCase parent.label}}::{{label}}> 
         table = {
         {{#zcl_enum_items}}
-            { "{{asUpperCamelCase label}}" , {{asUpperCamelCase parent.parent.label}}::{{parent.label}}::k{{asUpperCamelCase label}} },
+            { "{{unifyEnumValName this}}" , {{asUpperCamelCase parent.parent.label}}::{{parent.label}}::k{{asUpperCamelCase label}} },
         {{/zcl_enum_items}}
         };
 
@@ -190,67 +60,5 @@ template<> inline std::optional<{{asUpperCamelCase parent.label}}::{{label}}> fr
     }
 }
     {{/zcl_enums}}
+{{/if}}
 {{/zcl_clusters}}
-
-// ZCL global enums
-{{#zcl_enums}}
-    {{#if (isStrEqual (asUpperCamelCase label) "LevelControlOptions")}}
-    // Because some bitmaps are defined as <enum> in Matter xml files, this handles translating bitmaps for them.
-    // TODO: Check if is enum instead of LevelControlOptions
-std::optional<uint8_t> from_json_{{label}}(const nlohmann::json & value)
-{
-    uint8_t bitmap_value = 0x00;
-    try {
-        {{#zcl_enum_items}}
-        if (value["{{matterToUclBitmapElem (asUpperCamelCase label)}}"].get<bool>()){
-        bitmap_value |= ZCL_BITMAP_{{as_delimited_macro parent.label}}_{{as_delimited_macro label}};
-        }
-        {{/zcl_enum_items}}
-        return bitmap_value;
-    } catch (const nlohmann::json::exception &e){
-        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
-        return std::nullopt;
-    }
-}
-    {{else}}
-        {{#if (overrideEnumType (asUpperCamelCase label))}}
-template<> inline std::optional<ZclEnum{{as_type label}}> from_json(const nlohmann::json& value) {
-            {{#zcl_enum_items}}
-                {{#first}}
-    const std::map<std::string, ZclEnum{{as_type parent.label}}> table = {
-                {{/first}}
-    { "{{label}}", ZCL_{{as_delimited_macro parent.label}}_{{as_delimited_macro label}} },
-                {{#last}}
-    };
-                {{/last}}
-            {{/zcl_enum_items}}
-
-    auto i  = table.find( value );
-    if( i != table.end() ) {
-        return i->second;
-    } else {
-        return std::nullopt;
-    }
-}
-    {{/if}}
-    {{/if}}
-{{/zcl_enums}}
-
-{{#zcl_bitmaps}}
-std::optional<{{asUnderlyingType name}}> from_json_{{asUpperCamelCase label}}(const nlohmann::json & value)
-{
-    {{asUnderlyingType name}} bitmap_value = 0x00;
-    try {
-        {{#zcl_bitmap_items}}
-        if (value["{{matterToUclBitmapElem (asUpperCamelCase label)}}"].get<bool>()){
-        bitmap_value |= ZCL_BITMAP_{{as_delimited_macro parent.label}}_{{as_delimited_macro label}};
-        }
-        {{/zcl_bitmap_items}}
-        return bitmap_value;
-    } catch (const nlohmann::json::exception &e){
-        sl_log_warning(LOG_TAG, "Failed to parse bitmap %s, error %s", value.dump().c_str(), e.what());
-        return std::nullopt;
-    }
-}
-
-{{/zcl_bitmaps}}

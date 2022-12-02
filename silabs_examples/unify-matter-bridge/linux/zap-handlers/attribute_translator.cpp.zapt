@@ -38,7 +38,7 @@ using namespace unify::matter_bridge;
 
 // ZCL cluster revision
 {{#zcl_clusters}}
-{{#if (supportedCluster label)}}
+{{#if (unifySupportedCluster code)}}
 {{#global_attribute_default code="0xFFFD"}}
 {{#if defaultValue}}
 constexpr uint16_t ZCL_{{asDelimitedMacro parent.label}}_REVISION = {{defaultValue}};
@@ -50,7 +50,7 @@ constexpr uint16_t ZCL_{{asDelimitedMacro parent.label}}_REVISION = 0;
 {{/zcl_clusters}}
 
 {{#zcl_clusters}}
-{{#if (supportedCluster label)}}
+{{#if (unifySupportedCluster code)}}
 CHIP_ERROR
 {{asUpperCamelCase label}}AttributeAccess::Read(const ConcreteReadAttributePath &aPath,
                            AttributeValueEncoder &aEncoder)
@@ -112,15 +112,19 @@ CHIP_ERROR {{asUpperCamelCase label}}AttributeAccess::Write(const ConcreteDataAt
 
   switch (aPath.mAttributeId) {
   {{#zcl_attributes_server}}
-  {{#if isWritable}}
-    case Attributes::{{asUpperCamelCase label}}::Id: {
+  {{#if isWritable }}
+  {{#if (unifySupportedClusterAttribute parent.code code)}}
+  case Attributes::{{asUpperCamelCase label}}::Id: {
 
-        Attributes::{{asUpperCamelCase label}}::TypeInfo::DecodableType value;
-        aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
-        attribute_name = std::string("{{asUpperCamelCase label}}");
-        break;
-    }
+      Attributes::{{asUpperCamelCase label}}::TypeInfo::DecodableType value;
+      aDecoder.Decode(value);
+      jsn["value"]   = to_json(value);
+      attribute_name = "{{unifyClusterAttributeName parent.code code}}";
+      break;
+  }
+  {{/if}}
+  {{else}}
+  // {{label}} is not supported by UCL
   {{/if}}
   {{/zcl_attributes_server}}
   }
@@ -129,15 +133,15 @@ CHIP_ERROR {{asUpperCamelCase label}}AttributeAccess::Write(const ConcreteDataAt
     std::string payload_str;
     std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep"
                   + std::to_string(unify_node->unify_endpoint)
-                  + "/{{matterClusterConversion label}}/Attributes/" + attribute_name + "/Desired";
+                  + "/{{unifyClusterName code}}/Attributes/" + attribute_name + "/Desired";
     payload_str = jsn.dump();
     m_unify_mqtt.Publish(topic,
                         payload_str,
                         true);
-    return CHIP_ERROR_NO_MESSAGE_HANDLER;
+    return CHIP_NO_ERROR;
   }
 
-  return CHIP_NO_ERROR;
+  return CHIP_ERROR_NO_MESSAGE_HANDLER;
 }
 
 void {{asUpperCamelCase label}}AttributeAccess::reported_updated(const bridged_endpoint *ep,
@@ -168,26 +172,14 @@ void {{asUpperCamelCase label}}AttributeAccess::reported_updated(const bridged_e
                                                          attribute_id.value());
   switch (attribute_id.value()) {
     {{#zcl_attributes_server}}
+    {{#if (unifySupportedClusterAttribute parent.code code)}}
     {{#if_is_struct type}}
     {{else if (canHaveSimpleAccessors this)}}
     // type is {{type}}
     case MN::{{asUpperCamelCase label}}::Id: {
-      {{#if_is_bitmap (asUpperCamelCase label)}}
-        {{#if (overrideBitmapType (asUpperCamelCase label))}}
-      std::optional<{{asUnderlyingType (asUpperCamelCase label)}}> value = from_json_{{asUpperCamelCase label}}(unify_value);
-        {{else}}
       using T = MN::{{asUpperCamelCase label}}::TypeInfo::Type;
       std::optional<T> value = from_json<T>(unify_value);
-        {{/if}}
-      {{else}}
-        {{#if (overrideEnumType (asUpperCamelCase label))}}
-      using T = ZclEnum{{asUpperCamelCase label}};
-        {{else}}
-      using T = MN::{{asUpperCamelCase label}}::TypeInfo::Type;
-        {{/if}}
-      std::optional<T> value = from_json<T>(unify_value);
-      {{/if_is_bitmap}}
-
+      
       if( value.has_value()) {
         sl_log_debug(LOG_TAG,"{{asUpperCamelCase label}} attribute value is %s",unify_value.dump().c_str());
         UN::{{asUpperCamelCase label}}::Set(attrpath, value.value());
@@ -199,6 +191,7 @@ void {{asUpperCamelCase label}}AttributeAccess::reported_updated(const bridged_e
       break;
     }
     {{/if_is_struct}}
+    {{/if}}
     {{/zcl_attributes_server}}
   }
 }

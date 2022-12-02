@@ -31,6 +31,8 @@
 // Third party library
 #include <nlunit-test.h>
 
+#include "TestHelpers.hpp"
+
 namespace unify::matter_bridge {
 namespace Test {
 /**
@@ -128,7 +130,7 @@ public:
                                            const typename T::Type & dataResponse) {
             if (happy)
             {
-                NL_TEST_ASSERT(sSuite, dataResponse == value);
+                NL_TEST_ASSERT(sSuite, dataResponse ==  value);
             }
             else
             {
@@ -144,6 +146,34 @@ public:
         DrainAndServiceIO();
 
         return err;
+    }
+
+    template <typename T>
+    inline void attribute_write_test(nlTestSuite * sSuite, const std::string & topic, const std::string & json_payload,
+                                     typename T::Type value)
+    {
+
+        auto sessionHandle = GetSessionBobToAlice();
+
+        bool onSuccessCbInvoked = false;
+        bool onFailureCbInvoked = false;
+
+        mMqttHandler.reset();
+
+        auto onSuccessCb = [&onSuccessCbInvoked](const chip::app::ConcreteAttributePath & attributePath) {
+            onSuccessCbInvoked = true;
+        };
+        auto onFailureCb = [&onFailureCbInvoked](const chip::app::ConcreteAttributePath * attributePath, CHIP_ERROR aError) {
+            onFailureCbInvoked = true;
+        };
+
+        chip::Controller::WriteAttribute<T>(sessionHandle, kEndpointId, value, onSuccessCb, onFailureCb);
+
+        DrainAndServiceIO();
+
+        NL_TEST_ASSERT_EQUAL(sSuite, true, onSuccessCbInvoked);
+        NL_TEST_ASSERT_EQUAL(sSuite, false, onFailureCbInvoked);
+        NL_TEST_ASSERT_EQUAL_JSON(sSuite, json_payload, mMqttHandler.publish_payload);
     }
 
     /**
@@ -175,7 +205,7 @@ public:
         if (err == CHIP_NO_ERROR)
         {
             NL_TEST_ASSERT(sSuite, mMqttHandler.publish_topic == topic);
-            NL_TEST_ASSERT(sSuite, mMqttHandler.publish_payload == json_payload);
+            NL_TEST_ASSERT_EQUAL_JSON(sSuite, json_payload,mMqttHandler.publish_payload);
         }
 
         return err;
@@ -198,7 +228,7 @@ public:
     inline CHIP_ERROR command_test(nlTestSuite * sSuite, const std::string & topic, const std::string & json_payload, T & request,
                                    typename T::ResponseType & response)
     {
-        auto onSuccessCb = [sSuite, &response](const chip::app::ConcreteCommandPath & commandPath,
+        auto onSuccessCb = [&response](const chip::app::ConcreteCommandPath & commandPath,
                                                const chip::app::StatusIB & aStatus,
                                                const typename T::ResponseType & dataResponse) { response = dataResponse; };
 

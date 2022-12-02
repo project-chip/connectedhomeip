@@ -126,7 +126,7 @@ static void TestOnOffCommandOffWithEffect(nlTestSuite * sSuite, void * apContext
     Clusters::OnOff::Commands::OffWithEffect::Type request;
     CHIP_ERROR err = ctx.command_test<Clusters::OnOff::Commands::OffWithEffect::Type>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/OnOff/Commands/OffWithEffect",
-        R"({"EffectId":"DelayedAllOff","EffectVariant":"FadeToOffIn0p8Seconds"})", request);
+        R"({"EffectIdentifier":"DelayedAllOff","EffectVariant":0})", request);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }
 
@@ -145,7 +145,7 @@ static void TestOnOffCommandOnWithTimedOff(nlTestSuite * sSuite, void * apContex
     Clusters::OnOff::Commands::OnWithTimedOff::Type request;
     CHIP_ERROR err = ctx.command_test<Clusters::OnOff::Commands::OnWithTimedOff::Type>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/OnOff/Commands/OnWithTimedOff",
-        R"({"OffWaitTime":0,"OnOffControl":"unknown value","OnTime":0})", request);
+        R"({"OffWaitTime":0,"OnOffControl":{"AcceptOnlyWhenOn":false},"OnTime":0})", request);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }
 

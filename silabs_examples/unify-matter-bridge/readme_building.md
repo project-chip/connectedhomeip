@@ -4,11 +4,11 @@ This build guide cross-compiles for armhf architecture to be run on Unify's refe
 
 > **Note:**
 > In the following subsections the commands should either be run on your local development machine or inside a running Docker container, as distinguished by the structure of the example.
+>
 > - _some-command_ should be executed on your local machine.
->   - _`dev-machine:~$ some-command`_ 
+>   - _`dev-machine:~$ some-command`_
 > - _some-other-command_ should be executed inside the Docker container.
 >   - _`root@docker:/<dir>$ some-other-command`_
-
 
 ## Download and Stage the uic Repo
 
@@ -90,6 +90,7 @@ root@docker:/matter/examples/chip-tool$ gn gen out/armhf --args='target_cpu="arm
 
 root@docker:/matter/examples/chip-tool$ ninja -C out/armhf
 ```
+
 After building, the chip-tool binary is located at `/matter/examples/chip-tool/out/armhf/obj/bin/chip-tool`.
 
 ## Unit Testing

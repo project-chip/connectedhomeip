@@ -40,7 +40,7 @@ constexpr uint8_t ZCL_STRUCT_ATTRIBUTE_TYPES_SIZE = 254;
 constexpr uint8_t ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE = 254;
 
 {{#zcl_clusters}}
-{{#if (supportedCluster label)}}
+{{#if (unifySupportedCluster code)}}
 
 {{#zcl_bitmaps}}
 constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
@@ -53,10 +53,8 @@ constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES_SIZE = ZCL_ENUM8
 {{/zcl_enums}}
 
 {{#zcl_structs}}
-{{#if (supportedStruct name)}}
 constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES = ZCL_STRUCT_ATTRIBUTE_TYPES;
 constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES_SIZE = ZCL_STRUCT_ATTRIBUTE_TYPES_SIZE;
-{{/if}}
 {{/zcl_structs}}
 
 {{/if}}
@@ -67,7 +65,7 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
   switch(cluster_id) 
   {
     {{#zcl_clusters}}
-     {{#if (supportedCluster label)}}
+      {{#if (unifySupportedCluster code)}}
       case chip::app::Clusters::{{asUpperCamelCase label}}::Id: {
         switch(attribute_id) 
         {

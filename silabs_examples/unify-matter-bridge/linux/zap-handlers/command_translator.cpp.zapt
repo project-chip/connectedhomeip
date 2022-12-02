@@ -28,8 +28,8 @@ using namespace unify::matter_bridge;
 #define LOG_TAG "matter_cluster_command_server"
 
 {{#zcl_clusters}}
-{{#if (supportedCluster label)}}
-
+{{#if (unifySupportedCluster code)}}
+// {{label}} : {{code}}
 void {{asUpperCamelCase label}}ClusterCommandHandler::InvokeCommand(
   CommandHandlerInterface::HandlerContext &ctxt)
 {
@@ -48,27 +48,33 @@ void {{asUpperCamelCase label}}ClusterCommandHandler::InvokeCommand(
     {{#zcl_commands_source_client}}
     case Commands::{{asUpperCamelCase label}}::Id:
     {
-    cmd = "{{asUpperCamelCase label}}";
     Commands::{{asUpperCamelCase label}}::DecodableType data;
+    {{#if (unifySupportedClusterCommand parent.code code) }}
+    cmd = "{{unifyClusterCommandName parent.code code}}"; // "{{asUpperCamelCase label}}";
     if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR){
       {{#zcl_command_arguments}}
         {{#isOptional}}
         if( data.{{asLowerCamelCase label}}.HasValue() ) {
           try {
-          payload["{{matterToUclBitmapElem (asUpperCamelCase label)}}"] = to_json(data.{{asLowerCamelCase label}}.Value());
+          payload["{{unifyClusterCommandArgument parent.parent.code parent.code index}}"] = to_json(data.{{asLowerCamelCase label}}.Value());
           } catch (std::exception &ex) {
           sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
           }
         }
         {{else}}
           try {
-          payload["{{matterToUclBitmapElem (asUpperCamelCase label)}}"] = to_json(data.{{asLowerCamelCase label}});
+          payload["{{unifyClusterCommandArgument parent.parent.code parent.code index}}"] = to_json(data.{{asLowerCamelCase label}});
           } catch (std::exception &ex) {
           sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
           }
         {{/isOptional}}      
         {{/zcl_command_arguments}}
       }
+    {{else}}
+    if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR){
+      Invoke_{{label}}(ctxt,data);
+    }
+    {{/if}}
     }
     break;
     {{/zcl_commands_source_client}}

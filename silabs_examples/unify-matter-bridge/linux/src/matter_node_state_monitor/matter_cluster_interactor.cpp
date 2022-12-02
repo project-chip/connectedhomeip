@@ -107,8 +107,9 @@ void cluster_interactor::build_matter_cluster(const std::unordered_map<std::stri
             if (auto attribute_id = translator.get_attribute_id(cluster_name, attribute))
             {
                 attr_type_size type_size = get_attribute_type_size(cluster_id.value(), attribute_id.value());
+                //TODO we should have the unify node state monitor detect if attributes are writable 
                 cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{
-                    attribute_id.value(), type_size.attrType, type_size.attrSize, CLUSTER_MASK_SERVER, ZAP_EMPTY_DEFAULT() });
+                    attribute_id.value(), type_size.attrType, type_size.attrSize, ATTRIBUTE_MASK_EXTERNAL_STORAGE | ATTRIBUTE_MASK_WRITABLE, ZAP_EMPTY_DEFAULT() });
             }
         }
         if (cluster_name == "Basic")

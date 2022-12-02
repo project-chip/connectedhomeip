@@ -34,11 +34,12 @@ config("unify-config") {
     "zap-generated/data_model_translator"
   ]
   ldflags = [ "-lboost_system" ] 
+  cflags = ["-Wno-unused-const-variable"]
 }
 
 config("coverage") {
   cflags = [ "-fprofile-arcs", "-ftest-coverage" ]
-  ldflags = cflags
+  
 }
 
 static_library("unify-matter-bridge-lib") {
@@ -78,7 +79,6 @@ static_library("unify-matter-bridge-lib") {
   if (use_coverage) {
     configs += [ ":coverage" ]
   }
-
 }
 
 executable("unify-matter-bridge") {

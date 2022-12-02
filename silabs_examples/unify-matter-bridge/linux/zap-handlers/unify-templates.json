@@ -1,11 +1,26 @@
 {
     "name": "Unify Templates",
     "version": "Unify-dotdot-v1",
+    "helpers": [
+        "partials/helper.js",
+        "common/ListHelper.js",
+        "common/StringHelper.js",
+        "common/ChipTypesHelper.js",
+        "common/attributes/Accessors.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js",
+        "unify-helper.js"
+    ],
     "templates": [
         {
             "path": "ucl_dotdot_test.md.zapt",
             "name": "Test UCL dotdot zap template",
             "output": "ucl_dotdot_test.md"
+        },
+        {
+            "path": "unify_support_model.js.zapt",
+            "name": "Test UCL dotdot zap template",
+            "output": "unify_support_model.js"
         }
     ]
 }

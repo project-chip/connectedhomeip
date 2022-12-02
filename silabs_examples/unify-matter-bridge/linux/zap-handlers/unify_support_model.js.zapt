@@ -1,0 +1,40 @@
+exports.model = {
+{{#zcl_clusters}} 
+  {{#if (supportedMappedClusterCode code)}}
+  {{code}}: {
+    name: "{{label}}",
+    commands: {
+      {{#zcl_commands_source_server}}
+      {{code}} : {
+        name : "{{label}}",
+        arguments : [
+          {{#zcl_command_arguments}}"{{label}}",{{/zcl_command_arguments}}
+        ],
+      },
+      {{/zcl_commands_source_server}}
+    },
+    attributes: {
+      {{#zcl_attributes_server}}
+      {{code}} : "{{label}}",
+      {{/zcl_attributes_server}}
+    },
+  },  
+  {{/if}}
+{{/zcl_clusters}}
+
+enums: {
+  {{#zcl_enums}}
+  "{{label}}" : [{{#zcl_enum_items}}"{{label}}",{{/zcl_enum_items}}]  , // {{parent.parent.code}}
+  {{/zcl_enums}}
+},
+
+bitmaps: {
+  {{#zcl_bitmaps}}
+  "{{label}}" : {
+    {{#zcl_bitmap_items}}
+    {{mask}} : "{{label}}",
+    {{/zcl_bitmap_items}}
+  },
+  {{/zcl_bitmaps}}
+  }
+}

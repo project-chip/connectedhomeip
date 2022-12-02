@@ -9,7 +9,9 @@
         "common/attributes/Accessors.js",
         "templates/app/helper.js",
         "templates/chip/helper.js",
-        "unify-helper.js"
+        "unify-helper.js",
+        "unify_support.js"
+
     ],
     "override": "../../../../src/app/zap-templates/common/override.js",
     "templates": [
@@ -68,6 +70,12 @@
             "path": "zcl_global_types.hpp.zapt",
             "name": "ZCL Global Enum and Bitmap types",
             "output": "zcl_global_types.hpp"
+        },
+        {
+            "path": "unify_support_model.js.zapt",
+            "name": "Test UCL dotdot zap template",
+            "output": "matter_support_model.js"
         }
+
     ]
 }

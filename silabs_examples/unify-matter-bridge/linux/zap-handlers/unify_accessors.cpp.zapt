@@ -20,7 +20,7 @@ namespace unify {
 namespace matter_bridge {
 
 {{#zcl_clusters}}
-{{#if (supportedCluster label)}}
+{{#if (unifySupportedCluster code)}}
 {{#zcl_attributes_server}}
 {{#first}}
 namespace {{asUpperCamelCase parent.label}} {
@@ -42,15 +42,18 @@ EmberAfStatus Get(const chip::app::ConcreteAttributePath& endpoint, {{zapTypeToE
     using Traits = NumericAttributeTraits<{{accessorTraitType type}}>;
     Traits::StorageType temp_storage;
 
-    cache.get<Traits::StorageType>(endpoint,temp_storage);    
-    auto tmp = Traits::StorageToWorking(temp_storage);
+    if(cache.get<Traits::StorageType>(endpoint,temp_storage)) {
+        auto tmp = Traits::StorageToWorking(temp_storage);
 
-    {{#if isNullable }}
-    value.SetNonNull(tmp);
-    {{else}}
-    value = tmp;
-    {{/if}}
-    return EMBER_ZCL_STATUS_SUCCESS;    
+        {{#if isNullable }}
+        value.SetNonNull(tmp);
+        {{else}}
+        value = tmp;
+        {{/if}}
+        return EMBER_ZCL_STATUS_SUCCESS;
+    } else {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
 }
 
 EmberAfStatus Set(const chip::app::ConcreteAttributePath& endpoint, const {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}& value)

@@ -13,14 +13,7 @@
 #define ZCL_BITMAP_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}}_OFFSET ({{asOffset value}})
         {{/zcl_enum_items}}
     {{else}}
-        {{#if (overrideEnumType (asUpperCamelCase label))}}
-// Enum for {{label}}
-typedef enum ZclEnum{{asType label}} : {{asUnderlyingZclType name}}  {
-            {{#zcl_enum_items}}
-{{indent}}ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}} = {{value}},
-            {{/zcl_enum_items}}
-} ZclEnum{{asType label}};
-        {{/if}}
+        
     {{/if}}
 {{/zcl_enums}}
 

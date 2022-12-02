@@ -20,50 +20,23 @@
 template <typename T>
 nlohmann::json inline to_json(const T & value)
 {
-    return "unknown value";
+    return value;
 }
 
-/***************************** Simple types Convertes **************/
+nlohmann::json inline to_json(const chip::Span<const char> & value)
+{
+    return std::string( value.data(), value.size());
+}
 
-template<>
-nlohmann::json inline to_json(const bool & value)
+nlohmann::json inline to_json(const chip::Span<const unsigned char> & value)
 {
-    return value;
+    return std::string( reinterpret_cast<const char*>(value.data()), value.size());
 }
-template<>
-nlohmann::json inline to_json(const int & value)
-{
-    return value;
-}
-template<>
-nlohmann::json inline to_json(const int16_t & value)
-{
-    return value;
-}
-template<>
-nlohmann::json inline to_json(const std::string & value)
-{
-    return value;
-}
-template<>
-nlohmann::json inline to_json(const uint8_t & value)
-{
-    return value;
-}
-template<>
-nlohmann::json inline to_json(const uint16_t & value)
-{
-    return value;
-}
-template<>
-nlohmann::json inline to_json(const uint32_t & value)
-{
-    return value;
-}
-template<>
-nlohmann::json inline to_json(const uint64_t & value)
-{
-    return value;
+
+
+template<typename T>
+nlohmann::json inline to_json(const chip::app::DataModel::DecodableList<T> & value) {
+    return "{}";   
 }
 
 template <typename T>
@@ -78,33 +51,38 @@ nlohmann::json inline to_json(chip::app::DataModel::Nullable<T> & value)
 
 /***************************** Bitmap Convertes **************/
 {{#zcl_clusters}}
-{{#if (supportedCluster label)}}
-
+{{#if (unifySupportedCluster code) }}
 /***************************** Bitmap Converter FIXME**************/
-//{{#zcl_bitmaps}}
-//template<> nlohmann::json to_json(const chip::BitFlags<{{asUpperCamelCase parent.label}}::{{label}}, uint8_t>& value) {
-//    return "{\"no bitmap support\"}";
-//}
-//{{/zcl_bitmaps}}
 
-/***************************** Struct Converted FIXME**************/
-//{{#zcl_structs}}
-//template<> nlohmann::json inline to_json(const {{asUpperCamelCase parent.label}}::Structs::{{name}}::Type& value) {
-//    return "no struct support";
-//}
-//{{/zcl_structs}}
+{{#zcl_bitmaps}}
+template<> nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::{{asUpperCamelCase parent.label}}::{{label}}>& value) {
+    using namespace chip::app::Clusters::{{asUpperCamelCase parent.label}};
+    nlohmann::json obj;
+    {{#if (unifyTypeExists label)}}
+{{#zcl_bitmap_items}} 
+    obj["{{unifyBitmapValName this}}"] = static_cast<bool>(value.GetField({{parent.label}}::k{{asUpperCamelCase label}}));
+{{/zcl_bitmap_items}}
+    return obj;
+    {{else}}
+    return static_cast<uint8_t>(value);
+    {{/if}}
+}
+{{/zcl_bitmaps}}
 
 {{#zcl_enums}}
 template<> nlohmann::json inline to_json(const chip::app::Clusters::{{asUpperCamelCase parent.label}}::{{label}}& value) {
+    using namespace chip::app::Clusters::{{asUpperCamelCase parent.label}};
+    {{#if (unifyTypeExists label)}}
     switch( value ) {
         {{#zcl_enum_items}}
-        case chip::app::Clusters::{{asUpperCamelCase parent.parent.label}}::{{parent.label}}::k{{asUpperCamelCase label}}: return "{{matterToUclBitmapElem (asUpperCamelCase label)}}";
+        case {{parent.label}}::k{{asUpperCamelCase label}}: return "{{unifyEnumValName this}}";
         {{/zcl_enum_items}}
         default: return "{}";
     }
+    {{else}}
+    return static_cast<uint8_t>(value);
+    {{/if}}
 }
-
 {{/zcl_enums}}
-
 {{/if}}
 {{/zcl_clusters}}

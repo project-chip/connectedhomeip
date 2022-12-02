@@ -25,7 +25,19 @@
 namespace unify::matter_bridge
 {
 {{#zcl_clusters}}
-{{#if (supportedCluster label)}}
+{{#if (unifySupportedCluster code)}}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/// Attribute Handler for the {{label}} cluster
+/// Please note that the following attributes are not defined in UCL, and they must be handled 
+/// by separate code
+{{#zcl_attributes_server}}
+{{#if (unifySupportedClusterAttribute parent.code code)}}
+{{else}}
+/// - {{label}} {{#isOptional}}(optional){{/isOptional}}
+{{/if}}
+{{/zcl_attributes_server}}
+///
 class {{asUpperCamelCase label}}AttributeAccess : public attribute_translator_interface
 {
   public:
@@ -45,9 +57,8 @@ class {{asUpperCamelCase label}}AttributeAccess : public attribute_translator_in
                           const std::string& attribute,
                           const nlohmann::json &unify_value) override;
 
-    std::vector<const char *> unify_cluster_names() const override {return std::vector<const char *>({ "{{matterClusterConversion label}}" });}
-
-    UnifyMqtt &m_unify_mqtt;
+   std::vector<const char *> unify_cluster_names() const override {return std::vector<const char *>({ "{{unifyClusterName code}}" });}
+   UnifyMqtt &m_unify_mqtt;   
 };
 {{/if}}
 {{/zcl_clusters}}

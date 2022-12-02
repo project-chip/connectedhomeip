@@ -40,6 +40,16 @@ CarbonMonoxide
 IASZone
 IASACE
 IASWD
+Metering
 ElectricalMeasurement
 Diagnostics
-TouchlinkCommissioning
+ProtocolController-RFTelemetry
+State
+Binding
+SystemMetrics
+ApplicationMonitoring
+NameAndLocation
+ConfigurationParameters
+AoXLocator
+AoXPositionEstimation
+ProtocolController-NetworkManagement

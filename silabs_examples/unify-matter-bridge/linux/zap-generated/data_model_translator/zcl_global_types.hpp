@@ -4,29 +4,6 @@
 #define __ZCL_GLOBAL_TYPES__
 
 // ZCL enums
-// Enum for ColorMode
-typedef enum ZclEnumColorMode : uint8_t
-{
-    ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION = 0,
-    ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y            = 1,
-    ZCL_COLOR_MODE_COLOR_TEMPERATURE                  = 2,
-} ZclEnumColorMode;
-// Enum for EnhancedColorMode
-typedef enum ZclEnumEnhancedColorMode : uint8_t
-{
-    ZCL_ENHANCED_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION          = 0,
-    ZCL_ENHANCED_COLOR_MODE_CURRENT_X_AND_CURRENT_Y                     = 1,
-    ZCL_ENHANCED_COLOR_MODE_COLOR_TEMPERATURE                           = 2,
-    ZCL_ENHANCED_COLOR_MODE_ENHANCED_CURRENT_HUE_AND_CURRENT_SATURATION = 3,
-} ZclEnumEnhancedColorMode;
-// Enum for OccupancySensorType
-typedef enum ZclEnumOccupancySensorType : uint8_t
-{
-    ZCL_OCCUPANCY_SENSOR_TYPE_PIR                = 0,
-    ZCL_OCCUPANCY_SENSOR_TYPE_ULTRASONIC         = 1,
-    ZCL_OCCUPANCY_SENSOR_TYPE_PIR_AND_ULTRASONIC = 2,
-    ZCL_OCCUPANCY_SENSOR_TYPE_PHYSICAL_CONTACT   = 3,
-} ZclEnumOccupancySensorType;
 
 // ZCL bitmaps
 #define ZCL_BITMAP_ALARM_MASK_GENERAL_HW_FAULT (1)

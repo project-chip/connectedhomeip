@@ -5,7 +5,6 @@
 // Chip components
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
-
 // Third party library
 #include <nlunit-test.h>
 
@@ -50,33 +49,13 @@ static int Initialize(void * context)
     return ctx->register_endpoint(ep);
 }
 
-static void TestLevelControlAttributeCurrentLevel(nlTestSuite * sSuite, void * apContext)
+static void TestLevelControlAttributeWrite(nlTestSuite * sSuite, void * apContext)
 {
+    using namespace chip::app::Clusters::LevelControl;
     TestContext & ctx = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    DataModel::Nullable<uint8_t> value;
-
-    // An empty json object is not acceptable here
-    err = ctx.attribute_test<Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo, false>(
-        sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Attributes/CurrentLevel/Reported", "({  })", value);
-    NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
-
-    // Non json object is also not acceptable
-    err = ctx.attribute_test<Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo, false>(
-        sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Attributes/CurrentLevel/Reported", "(Nisse)", value);
-    NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
-
-    // Unify SDK doesn't allow null value.
-    NL_TEST_ASSERT(sSuite, value.IsNull());
-    err = ctx.attribute_test<Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo, false>(
-        sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Attributes/CurrentLevel/Reported", R"({ "value": null })", value);
-    NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
-
-    value.SetNonNull((uint8_t) 42);
-    err = ctx.attribute_test<Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
-        sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Attributes/CurrentLevel/Reported", R"({ "value": 42 })", value);
-    NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
+    ctx.attribute_write_test<Attributes::OnLevel::TypeInfo>(sSuite,"Level/Attributes/OnLevel",R"({ "value": 3 })",Attributes::OnLevel::TypeInfo::Type(3));
 }
+
 
 static void TestLevelControlAttributeRemainingTime(nlTestSuite * sSuite, void * apContext)
 {
@@ -137,7 +116,7 @@ static void TestLevelControlAttributeOptions(nlTestSuite * sSuite, void * apCont
         R"({ "value": {"ExecuteIfOff":false,"CoupleColorTempToLevel":false } })", 0);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 
-    err = ctx.attribute_test<Clusters::LevelControl::Attributes::Options::TypeInfo, false>(
+    err = ctx.attribute_test<Clusters::LevelControl::Attributes::Options::TypeInfo>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Attributes/Options/Reported",
         R"({ "value": {"ExecuteIfOff":true,"CoupleColorTempToLevel":true } })", 3);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
@@ -218,7 +197,7 @@ static void TestLevelControlCommandMoveToLevel(nlTestSuite * sSuite, void * apCo
     Clusters::LevelControl::Commands::MoveToLevel::Type request;
     CHIP_ERROR err = ctx.command_test<Clusters::LevelControl::Commands::MoveToLevel::Type>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Commands/MoveToLevel",
-        R"({"Level":0,"OptionsMask":"unknown value","OptionsOverride":"unknown value","TransitionTime":null})", request);
+        R"({"Level":0,"OptionsMask":{"CoupleColorTempToLevel":false,"ExecuteIfOff":false},"OptionsOverride":{"CoupleColorTempToLevel":false,"ExecuteIfOff":false},"TransitionTime":null})", request);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }
 
@@ -228,7 +207,7 @@ static void TestLevelControlCommandMove(nlTestSuite * sSuite, void * apContext)
     Clusters::LevelControl::Commands::Move::Type request;
     CHIP_ERROR err = ctx.command_test<Clusters::LevelControl::Commands::Move::Type>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Commands/Move",
-        R"({"MoveMode":"Up","OptionsMask":"unknown value","OptionsOverride":"unknown value","Rate":null})", request);
+        R"({"MoveMode":"Up","OptionsMask":{"CoupleColorTempToLevel":false,"ExecuteIfOff":false},"OptionsOverride":{"CoupleColorTempToLevel":false,"ExecuteIfOff":false},"Rate":null})", request);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }
 
@@ -238,7 +217,7 @@ static void TestLevelControlCommandStep(nlTestSuite * sSuite, void * apContext)
     Clusters::LevelControl::Commands::Step::Type request;
     CHIP_ERROR err = ctx.command_test<Clusters::LevelControl::Commands::Step::Type>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Commands/Step",
-        R"({"OptionsMask":"unknown value","OptionsOverride":"unknown value","StepMode":"Up","StepSize":0,"TransitionTime":null})",
+        R"({"OptionsMask":{"CoupleColorTempToLevel":false,"ExecuteIfOff":false},"OptionsOverride":{"CoupleColorTempToLevel":false,"ExecuteIfOff":false},"StepMode":"Up","StepSize":0,"TransitionTime":null})",
         request);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }
@@ -249,7 +228,7 @@ static void TestLevelControlCommandStop(nlTestSuite * sSuite, void * apContext)
     Clusters::LevelControl::Commands::Stop::Type request;
     CHIP_ERROR err = ctx.command_test<Clusters::LevelControl::Commands::Stop::Type>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Commands/Stop",
-        R"({"OptionsMask":"unknown value","OptionsOverride":"unknown value"})", request);
+        R"({"OptionsMask":{"CoupleColorTempToLevel":false,"ExecuteIfOff":false},"OptionsOverride":{"CoupleColorTempToLevel":false,"ExecuteIfOff":false}})", request);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }
 
@@ -259,7 +238,7 @@ static void TestLevelControlCommandMoveToLevelWithOnOff(nlTestSuite * sSuite, vo
     Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type request;
     CHIP_ERROR err = ctx.command_test<Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Commands/MoveToLevelWithOnOff",
-        R"({"Level":0,"OptionsMask":"unknown value","OptionsOverride":"unknown value","TransitionTime":null})", request);
+        R"({"Level":0,"OptionsMask":{"CoupleColorTempToLevel":false,"ExecuteIfOff":false},"OptionsOverride":{"CoupleColorTempToLevel":false,"ExecuteIfOff":false},"TransitionTime":null})", request);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }
 
@@ -269,7 +248,7 @@ static void TestLevelControlCommandMoveWithOnOff(nlTestSuite * sSuite, void * ap
     Clusters::LevelControl::Commands::MoveWithOnOff::Type request;
     CHIP_ERROR err = ctx.command_test<Clusters::LevelControl::Commands::MoveWithOnOff::Type>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Commands/MoveWithOnOff",
-        R"({"MoveMode":"Up","OptionsMask":"unknown value","OptionsOverride":"unknown value","Rate":null})", request);
+        R"({"MoveMode":"Up","OptionsMask":{"CoupleColorTempToLevel":false,"ExecuteIfOff":false},"OptionsOverride":{"CoupleColorTempToLevel":false,"ExecuteIfOff":false},"Rate":null})", request);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }
 
@@ -279,7 +258,7 @@ static void TestLevelControlCommandStepWithOnOff(nlTestSuite * sSuite, void * ap
     Clusters::LevelControl::Commands::StepWithOnOff::Type request;
     CHIP_ERROR err = ctx.command_test<Clusters::LevelControl::Commands::StepWithOnOff::Type>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Commands/StepWithOnOff",
-        R"({"OptionsMask":"unknown value","OptionsOverride":"unknown value","StepMode":"Up","StepSize":0,"TransitionTime":null})",
+        R"({"OptionsMask":{"CoupleColorTempToLevel":false,"ExecuteIfOff":false},"OptionsOverride":{"CoupleColorTempToLevel":false,"ExecuteIfOff":false},"StepMode":"Up","StepSize":0,"TransitionTime":null})",
         request);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }
@@ -290,25 +269,25 @@ static void TestLevelControlCommandStopWithOnOff(nlTestSuite * sSuite, void * ap
     Clusters::LevelControl::Commands::StopWithOnOff::Type request;
     CHIP_ERROR err = ctx.command_test<Clusters::LevelControl::Commands::StopWithOnOff::Type>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Commands/StopWithOnOff",
-        R"({"OptionsMask":"unknown value","OptionsOverride":"unknown value"})", request);
+        R"({"OptionsMask":{"CoupleColorTempToLevel":false,"ExecuteIfOff":false},"OptionsOverride":{"CoupleColorTempToLevel":false,"ExecuteIfOff":false}})", request);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }
 
 static void TestLevelControlCommandMoveToClosestFrequency(nlTestSuite * sSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
-    Clusters::LevelControl::Commands::MoveToClosestFrequency::Type request;
-    CHIP_ERROR err = ctx.command_test<Clusters::LevelControl::Commands::MoveToClosestFrequency::Type>(
-        sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Commands/MoveToClosestFrequency", R"({"OptionsMask":0,"OptionsOverride":0})",
-        request);
-    NL_TEST_ASSERT(sSuite, err == CHIP_ERROR(0x00000581));
+    chip::app::Clusters::LevelControl::Commands::MoveToClosestFrequency::Type request;
+    request.frequency = 142;
+    ctx.command_test(sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Commands/MoveToClosestFrequency",
+        R"({"Frequency": 142})",
+        request
+    );
 }
 
 /**
  *   Test Suite. It lists all the test functions.
  */
 static const nlTest sTests[] = {
-    NL_TEST_DEF("LevelControl::TestLevelControlAttributeCurrentLevel", TestLevelControlAttributeCurrentLevel),
     NL_TEST_DEF("LevelControl::TestLevelControlAttributeRemainingTime", TestLevelControlAttributeRemainingTime),
     NL_TEST_DEF("LevelControl::TestLevelControlAttributeMinLevel", TestLevelControlAttributeMinLevel),
     NL_TEST_DEF("LevelControl::TestLevelControlAttributeMaxLevel", TestLevelControlAttributeMaxLevel),
@@ -327,6 +306,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("LevelControl::TestLevelControlAttributeAttributeList", TestLevelControlAttributeAttributeList),
     NL_TEST_DEF("LevelControl::TestLevelControlAttributeFeatureMap", TestLevelControlAttributeFeatureMap),
     NL_TEST_DEF("LevelControl::TestLevelControlAttributeClusterRevision", TestLevelControlAttributeClusterRevision),
+    NL_TEST_DEF("LevelControl::TestLevelControlCommandMoveToClosestFrequency", TestLevelControlCommandMoveToClosestFrequency),
     NL_TEST_DEF("LevelControl::TestLevelControlCommandMoveToLevel", TestLevelControlCommandMoveToLevel),
     NL_TEST_DEF("LevelControl::TestLevelControlCommandMove", TestLevelControlCommandMove),
     NL_TEST_DEF("LevelControl::TestLevelControlCommandStep", TestLevelControlCommandStep),
@@ -336,6 +316,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("LevelControl::TestLevelControlCommandStepWithOnOff", TestLevelControlCommandStepWithOnOff),
     NL_TEST_DEF("LevelControl::TestLevelControlCommandStopWithOnOff", TestLevelControlCommandStopWithOnOff),
     NL_TEST_DEF("LevelControl::TestLevelControlCommandMoveToClosestFrequency", TestLevelControlCommandMoveToClosestFrequency),
+    NL_TEST_DEF("LevelControl::TestLevelControlAttributeWrite", TestLevelControlAttributeWrite),
     NL_TEST_SENTINEL()
 };
 

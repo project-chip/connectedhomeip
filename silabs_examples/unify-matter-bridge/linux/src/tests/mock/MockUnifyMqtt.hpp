@@ -56,6 +56,16 @@ public:
     }
     int nNumerUicMqttUnsubscribeCall = 0;
     std::string unsubscribe_topic;
+
+    void reset() {
+        nNumerUicMqttPublishCall = 0;
+        publish_topic = std::string();
+        publish_payload = std::string();
+        nNumerUicMqttSubscribeCall = 0;
+        subscribe_topic = std::string();
+        nNumerUicMqttUnsubscribeCall = 0;
+        unsubscribe_topic = std::string();
+    }
 };
 
 } // namespace Test
