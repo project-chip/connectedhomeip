@@ -36,9 +36,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs {{#if (isStrEqual source "server")}}MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands"){{/if}};
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 {{#*inline "deprecatedDecl"}}
 

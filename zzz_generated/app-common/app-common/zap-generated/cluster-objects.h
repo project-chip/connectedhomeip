@@ -25185,6 +25185,228 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace ElectricalMeasurement
+namespace ClientMonitoring {
+namespace Structs {
+namespace MonitoringRegistration {
+enum class Fields
+{
+    kClientNodeId = 1,
+    kICid         = 2,
+    kFabricIndex  = 254,
+};
+
+struct Type
+{
+public:
+    chip::NodeId clientNodeId     = static_cast<chip::NodeId>(0);
+    uint64_t ICid                 = static_cast<uint64_t>(0);
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & writer, TLV::Tag tag, const Optional<FabricIndex> & accessingFabricIndex) const;
+};
+
+using DecodableType = Type;
+
+} // namespace MonitoringRegistration
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace RegisterClientMonitoring {
+struct Type;
+struct DecodableType;
+} // namespace RegisterClientMonitoring
+
+namespace StayAwakeRequest {
+struct Type;
+struct DecodableType;
+} // namespace StayAwakeRequest
+
+} // namespace Commands
+
+namespace Commands {
+namespace RegisterClientMonitoring {
+enum class Fields
+{
+    kClientNodeId = 0,
+    kICid         = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RegisterClientMonitoring::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+
+    chip::NodeId clientNodeId = static_cast<chip::NodeId>(0);
+    uint64_t ICid             = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RegisterClientMonitoring::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+
+    chip::NodeId clientNodeId = static_cast<chip::NodeId>(0);
+    uint64_t ICid             = static_cast<uint64_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RegisterClientMonitoring
+namespace StayAwakeRequest {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::StayAwakeRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::StayAwakeRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StayAwakeRequest
+} // namespace Commands
+
+namespace Attributes {
+
+namespace IdleModeInterval {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::IdleModeInterval::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace IdleModeInterval
+namespace ActiveModeInterval {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveModeInterval::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ActiveModeInterval
+namespace ActiveModeThreshold {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveModeThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ActiveModeThreshold
+namespace ExpectedClients {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ExpectedClients::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ExpectedClients
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+};
+} // namespace AcceptedCommandList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::IdleModeInterval::TypeInfo::DecodableType idleModeInterval       = static_cast<uint32_t>(0);
+        Attributes::ActiveModeInterval::TypeInfo::DecodableType activeModeInterval   = static_cast<uint32_t>(0);
+        Attributes::ActiveModeThreshold::TypeInfo::DecodableType activeModeThreshold = static_cast<uint16_t>(0);
+        Attributes::ExpectedClients::TypeInfo::DecodableType expectedClients;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace ClientMonitoring
 namespace UnitTesting {
 namespace Structs {
 namespace SimpleStruct {

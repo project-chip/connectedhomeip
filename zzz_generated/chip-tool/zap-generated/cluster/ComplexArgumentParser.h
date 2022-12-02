@@ -142,6 +142,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ModeSelect::Str
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & request);
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::Type & request,
                         Json::Value & value);
 

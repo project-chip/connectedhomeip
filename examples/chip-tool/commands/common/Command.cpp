@@ -17,8 +17,8 @@
  */
 
 #include "Command.h"
-#include "platform/PlatformManager.h"
 
+#include <functional>
 #include <netdb.h>
 #include <sstream>
 #include <sys/socket.h>

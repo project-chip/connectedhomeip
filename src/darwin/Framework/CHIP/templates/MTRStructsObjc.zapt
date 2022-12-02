@@ -12,9 +12,6 @@ NS_ASSUME_NONNULL_BEGIN
 {{#zcl_struct_items}}
 @property (nonatomic, copy{{#unless (isStrEqual (asGetterName label) (asStructPropertyName label))}}, getter={{asGetterName label}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName label}};
 {{/zcl_struct_items}}
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 {{/inline}}
 {{! TODO: We need a better setup for the API_AVALABLE annotations here; this does not scale at all sanely. }}
 {{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}
@@ -54,9 +51,6 @@ MTR_NEWLY_AVAILABLE
 {{#zcl_event_fields}}
 @property (nonatomic, copy{{#unless (isStrEqual (asGetterName name) (asStructPropertyName name))}}, getter={{asGetterName name}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName name}};
 {{/zcl_event_fields}}
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 {{#unless (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name))}}
 
