@@ -38,9 +38,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRIdentifyClusterTriggerEffectParams : NSObject <NSCopying>
 
@@ -62,9 +59,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterAddGroupParams : NSObject <NSCopying>
 
@@ -86,9 +80,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterAddGroupResponseParams : NSObject <NSCopying>
 
@@ -111,9 +102,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterViewGroupParams : NSObject <NSCopying>
 
@@ -133,9 +121,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterViewGroupResponseParams : NSObject <NSCopying>
 
@@ -160,9 +145,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterGetGroupMembershipParams : NSObject <NSCopying>
 
@@ -182,9 +164,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterGetGroupMembershipResponseParams : NSObject <NSCopying>
 
@@ -207,9 +186,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterRemoveGroupParams : NSObject <NSCopying>
 
@@ -229,9 +205,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterRemoveGroupResponseParams : NSObject <NSCopying>
 
@@ -254,9 +227,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterRemoveAllGroupsParams : NSObject <NSCopying>
 /**
@@ -274,9 +244,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupsClusterAddGroupIfIdentifyingParams : NSObject <NSCopying>
 
@@ -298,9 +265,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterAddSceneParams : NSObject <NSCopying>
 
@@ -328,9 +292,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterAddSceneResponseParams : NSObject <NSCopying>
 
@@ -355,9 +316,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterViewSceneParams : NSObject <NSCopying>
 
@@ -379,9 +337,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterViewSceneResponseParams : NSObject <NSCopying>
 
@@ -412,9 +367,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterRemoveSceneParams : NSObject <NSCopying>
 
@@ -436,9 +388,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterRemoveSceneResponseParams : NSObject <NSCopying>
 
@@ -463,9 +412,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterRemoveAllScenesParams : NSObject <NSCopying>
 
@@ -485,9 +431,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterRemoveAllScenesResponseParams : NSObject <NSCopying>
 
@@ -510,9 +453,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterStoreSceneParams : NSObject <NSCopying>
 
@@ -534,9 +474,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterStoreSceneResponseParams : NSObject <NSCopying>
 
@@ -561,9 +498,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterRecallSceneParams : NSObject <NSCopying>
 
@@ -587,9 +521,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterGetSceneMembershipParams : NSObject <NSCopying>
 
@@ -609,9 +540,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterGetSceneMembershipResponseParams : NSObject <NSCopying>
 
@@ -638,9 +566,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterEnhancedAddSceneParams : NSObject <NSCopying>
 
@@ -668,9 +593,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterEnhancedAddSceneResponseParams : NSObject <NSCopying>
 
@@ -695,9 +617,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterEnhancedViewSceneParams : NSObject <NSCopying>
 
@@ -719,9 +638,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterEnhancedViewSceneResponseParams : NSObject <NSCopying>
 
@@ -752,9 +668,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterCopySceneParams : NSObject <NSCopying>
 
@@ -782,9 +695,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRScenesClusterCopySceneResponseParams : NSObject <NSCopying>
 
@@ -809,9 +719,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROnOffClusterOffParams : NSObject <NSCopying>
 /**
@@ -829,9 +736,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROnOffClusterOnParams : NSObject <NSCopying>
 /**
@@ -849,9 +753,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROnOffClusterToggleParams : NSObject <NSCopying>
 /**
@@ -869,9 +770,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROnOffClusterOffWithEffectParams : NSObject <NSCopying>
 
@@ -893,9 +791,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROnOffClusterOnWithRecallGlobalSceneParams : NSObject <NSCopying>
 /**
@@ -913,9 +808,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROnOffClusterOnWithTimedOffParams : NSObject <NSCopying>
 
@@ -939,9 +831,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLevelControlClusterMoveToLevelParams : NSObject <NSCopying>
 
@@ -967,9 +856,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLevelControlClusterMoveParams : NSObject <NSCopying>
 
@@ -995,9 +881,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLevelControlClusterStepParams : NSObject <NSCopying>
 
@@ -1025,9 +908,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLevelControlClusterStopParams : NSObject <NSCopying>
 
@@ -1049,9 +929,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLevelControlClusterMoveToLevelWithOnOffParams : NSObject <NSCopying>
 
@@ -1077,9 +954,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLevelControlClusterMoveWithOnOffParams : NSObject <NSCopying>
 
@@ -1105,9 +979,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLevelControlClusterStepWithOnOffParams : NSObject <NSCopying>
 
@@ -1135,9 +1006,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLevelControlClusterStopWithOnOffParams : NSObject <NSCopying>
 
@@ -1159,9 +1027,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLevelControlClusterMoveToClosestFrequencyParams : NSObject <NSCopying>
 
@@ -1181,9 +1046,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterInstantActionParams : NSObject <NSCopying>
 
@@ -1205,9 +1067,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterInstantActionWithTransitionParams : NSObject <NSCopying>
 
@@ -1231,9 +1090,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterStartActionParams : NSObject <NSCopying>
 
@@ -1255,9 +1111,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterStartActionWithDurationParams : NSObject <NSCopying>
 
@@ -1281,9 +1134,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterStopActionParams : NSObject <NSCopying>
 
@@ -1305,9 +1155,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterPauseActionParams : NSObject <NSCopying>
 
@@ -1329,9 +1176,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterPauseActionWithDurationParams : NSObject <NSCopying>
 
@@ -1355,9 +1199,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterResumeActionParams : NSObject <NSCopying>
 
@@ -1379,9 +1220,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterEnableActionParams : NSObject <NSCopying>
 
@@ -1403,9 +1241,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterEnableActionWithDurationParams : NSObject <NSCopying>
 
@@ -1429,9 +1264,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterDisableActionParams : NSObject <NSCopying>
 
@@ -1453,9 +1285,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRActionsClusterDisableActionWithDurationParams : NSObject <NSCopying>
 
@@ -1479,9 +1308,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRBasicClusterMfgSpecificPingParams : NSObject <NSCopying>
 /**
@@ -1499,9 +1325,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 MTR_NEWLY_AVAILABLE
 @interface MTROTASoftwareUpdateProviderClusterQueryImageParams : NSObject <NSCopying>
@@ -1536,9 +1359,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImageParams")
@@ -1579,9 +1399,6 @@ MTR_NEWLY_AVAILABLE
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImageResponseParams")
@@ -1609,9 +1426,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams")
@@ -1640,9 +1454,6 @@ MTR_NEWLY_AVAILABLE
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams")
@@ -1671,9 +1482,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams")
@@ -1708,9 +1516,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams")
@@ -1738,9 +1543,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGeneralCommissioningClusterArmFailSafeResponseParams : NSObject <NSCopying>
 
@@ -1763,9 +1565,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGeneralCommissioningClusterSetRegulatoryConfigParams : NSObject <NSCopying>
 
@@ -1789,9 +1588,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams : NSObject <NSCopying>
 
@@ -1814,9 +1610,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGeneralCommissioningClusterCommissioningCompleteParams : NSObject <NSCopying>
 /**
@@ -1834,9 +1627,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGeneralCommissioningClusterCommissioningCompleteResponseParams : NSObject <NSCopying>
 
@@ -1859,9 +1649,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRNetworkCommissioningClusterScanNetworksParams : NSObject <NSCopying>
 
@@ -1883,9 +1670,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRNetworkCommissioningClusterScanNetworksResponseParams : NSObject <NSCopying>
 
@@ -1912,9 +1696,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams : NSObject <NSCopying>
 
@@ -1938,9 +1719,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams : NSObject <NSCopying>
 
@@ -1962,9 +1740,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRNetworkCommissioningClusterRemoveNetworkParams : NSObject <NSCopying>
 
@@ -1986,9 +1761,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRNetworkCommissioningClusterNetworkConfigResponseParams : NSObject <NSCopying>
 
@@ -2013,9 +1785,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRNetworkCommissioningClusterConnectNetworkParams : NSObject <NSCopying>
 
@@ -2037,9 +1806,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRNetworkCommissioningClusterConnectNetworkResponseParams : NSObject <NSCopying>
 
@@ -2064,9 +1830,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRNetworkCommissioningClusterReorderNetworkParams : NSObject <NSCopying>
 
@@ -2090,9 +1853,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDiagnosticLogsClusterRetrieveLogsRequestParams : NSObject <NSCopying>
 
@@ -2116,9 +1876,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDiagnosticLogsClusterRetrieveLogsResponseParams : NSObject <NSCopying>
 
@@ -2145,9 +1902,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGeneralDiagnosticsClusterTestEventTriggerParams : NSObject <NSCopying>
 
@@ -2169,9 +1923,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRSoftwareDiagnosticsClusterResetWatermarksParams : NSObject <NSCopying>
 /**
@@ -2189,9 +1940,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRThreadNetworkDiagnosticsClusterResetCountsParams : NSObject <NSCopying>
 /**
@@ -2209,9 +1957,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRWiFiNetworkDiagnosticsClusterResetCountsParams : NSObject <NSCopying>
 /**
@@ -2229,9 +1974,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTREthernetNetworkDiagnosticsClusterResetCountsParams : NSObject <NSCopying>
 /**
@@ -2249,9 +1991,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTimeSynchronizationClusterSetUtcTimeParams : NSObject <NSCopying>
 
@@ -2275,9 +2014,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRAdministratorCommissioningClusterOpenCommissioningWindowParams : NSObject <NSCopying>
 
@@ -2305,9 +2041,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams : NSObject <NSCopying>
 
@@ -2327,9 +2060,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRAdministratorCommissioningClusterRevokeCommissioningParams : NSObject <NSCopying>
 /**
@@ -2347,9 +2077,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterAttestationRequestParams : NSObject <NSCopying>
 
@@ -2369,9 +2096,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterAttestationResponseParams : NSObject <NSCopying>
 
@@ -2394,9 +2118,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterCertificateChainRequestParams : NSObject <NSCopying>
 
@@ -2416,9 +2137,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterCertificateChainResponseParams : NSObject <NSCopying>
 
@@ -2439,9 +2157,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterCSRRequestParams : NSObject <NSCopying>
 
@@ -2463,9 +2178,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterCSRResponseParams : NSObject <NSCopying>
 
@@ -2488,9 +2200,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterAddNOCParams : NSObject <NSCopying>
 
@@ -2518,9 +2227,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterUpdateNOCParams : NSObject <NSCopying>
 
@@ -2542,9 +2248,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterNOCResponseParams : NSObject <NSCopying>
 
@@ -2569,9 +2272,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterUpdateFabricLabelParams : NSObject <NSCopying>
 
@@ -2591,9 +2291,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterRemoveFabricParams : NSObject <NSCopying>
 
@@ -2613,9 +2310,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTROperationalCredentialsClusterAddTrustedRootCertificateParams : NSObject <NSCopying>
 
@@ -2635,9 +2329,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupKeyManagementClusterKeySetWriteParams : NSObject <NSCopying>
 
@@ -2657,9 +2348,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupKeyManagementClusterKeySetReadParams : NSObject <NSCopying>
 
@@ -2679,9 +2367,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupKeyManagementClusterKeySetReadResponseParams : NSObject <NSCopying>
 
@@ -2702,9 +2387,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupKeyManagementClusterKeySetRemoveParams : NSObject <NSCopying>
 
@@ -2724,9 +2406,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupKeyManagementClusterKeySetReadAllIndicesParams : NSObject <NSCopying>
 
@@ -2746,9 +2425,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams : NSObject <NSCopying>
 
@@ -2769,9 +2445,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRModeSelectClusterChangeToModeParams : NSObject <NSCopying>
 
@@ -2791,9 +2464,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterLockDoorParams : NSObject <NSCopying>
 
@@ -2813,9 +2483,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterUnlockDoorParams : NSObject <NSCopying>
 
@@ -2835,9 +2502,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterUnlockWithTimeoutParams : NSObject <NSCopying>
 
@@ -2859,9 +2523,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterSetWeekDayScheduleParams : NSObject <NSCopying>
 
@@ -2893,9 +2554,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetWeekDayScheduleParams : NSObject <NSCopying>
 
@@ -2917,9 +2575,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetWeekDayScheduleResponseParams : NSObject <NSCopying>
 
@@ -2954,9 +2609,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterClearWeekDayScheduleParams : NSObject <NSCopying>
 
@@ -2978,9 +2630,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterSetYearDayScheduleParams : NSObject <NSCopying>
 
@@ -3006,9 +2655,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetYearDayScheduleParams : NSObject <NSCopying>
 
@@ -3030,9 +2676,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetYearDayScheduleResponseParams : NSObject <NSCopying>
 
@@ -3061,9 +2704,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterClearYearDayScheduleParams : NSObject <NSCopying>
 
@@ -3085,9 +2725,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterSetHolidayScheduleParams : NSObject <NSCopying>
 
@@ -3113,9 +2750,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetHolidayScheduleParams : NSObject <NSCopying>
 
@@ -3135,9 +2769,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetHolidayScheduleResponseParams : NSObject <NSCopying>
 
@@ -3166,9 +2797,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterClearHolidayScheduleParams : NSObject <NSCopying>
 
@@ -3188,9 +2816,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterSetUserParams : NSObject <NSCopying>
 
@@ -3222,9 +2847,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetUserParams : NSObject <NSCopying>
 
@@ -3244,9 +2866,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetUserResponseParams : NSObject <NSCopying>
 
@@ -3285,9 +2904,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterClearUserParams : NSObject <NSCopying>
 
@@ -3307,9 +2923,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterSetCredentialParams : NSObject <NSCopying>
 
@@ -3339,9 +2952,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterSetCredentialResponseParams : NSObject <NSCopying>
 
@@ -3366,9 +2976,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetCredentialStatusParams : NSObject <NSCopying>
 
@@ -3388,9 +2995,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterGetCredentialStatusResponseParams : NSObject <NSCopying>
 
@@ -3419,9 +3023,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRDoorLockClusterClearCredentialParams : NSObject <NSCopying>
 
@@ -3441,9 +3042,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRWindowCoveringClusterUpOrOpenParams : NSObject <NSCopying>
 /**
@@ -3461,9 +3059,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRWindowCoveringClusterDownOrCloseParams : NSObject <NSCopying>
 /**
@@ -3481,9 +3076,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRWindowCoveringClusterStopMotionParams : NSObject <NSCopying>
 /**
@@ -3501,9 +3093,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRWindowCoveringClusterGoToLiftValueParams : NSObject <NSCopying>
 
@@ -3523,9 +3112,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRWindowCoveringClusterGoToLiftPercentageParams : NSObject <NSCopying>
 
@@ -3545,9 +3131,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRWindowCoveringClusterGoToTiltValueParams : NSObject <NSCopying>
 
@@ -3567,9 +3150,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRWindowCoveringClusterGoToTiltPercentageParams : NSObject <NSCopying>
 
@@ -3589,9 +3169,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRBarrierControlClusterBarrierControlGoToPercentParams : NSObject <NSCopying>
 
@@ -3611,9 +3188,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRBarrierControlClusterBarrierControlStopParams : NSObject <NSCopying>
 /**
@@ -3631,9 +3205,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRThermostatClusterSetpointRaiseLowerParams : NSObject <NSCopying>
 
@@ -3655,9 +3226,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRThermostatClusterGetWeeklyScheduleResponseParams : NSObject <NSCopying>
 
@@ -3684,9 +3252,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRThermostatClusterSetWeeklyScheduleParams : NSObject <NSCopying>
 
@@ -3712,9 +3277,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRThermostatClusterGetWeeklyScheduleParams : NSObject <NSCopying>
 
@@ -3736,9 +3298,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRThermostatClusterClearWeeklyScheduleParams : NSObject <NSCopying>
 /**
@@ -3756,9 +3315,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterMoveToHueParams : NSObject <NSCopying>
 
@@ -3786,9 +3342,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterMoveHueParams : NSObject <NSCopying>
 
@@ -3814,9 +3367,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterStepHueParams : NSObject <NSCopying>
 
@@ -3844,9 +3394,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterMoveToSaturationParams : NSObject <NSCopying>
 
@@ -3872,9 +3419,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterMoveSaturationParams : NSObject <NSCopying>
 
@@ -3900,9 +3444,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterStepSaturationParams : NSObject <NSCopying>
 
@@ -3930,9 +3471,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterMoveToHueAndSaturationParams : NSObject <NSCopying>
 
@@ -3960,9 +3498,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterMoveToColorParams : NSObject <NSCopying>
 
@@ -3990,9 +3525,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterMoveColorParams : NSObject <NSCopying>
 
@@ -4018,9 +3550,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterStepColorParams : NSObject <NSCopying>
 
@@ -4048,9 +3577,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterMoveToColorTemperatureParams : NSObject <NSCopying>
 
@@ -4076,9 +3602,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterEnhancedMoveToHueParams : NSObject <NSCopying>
 
@@ -4106,9 +3629,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterEnhancedMoveHueParams : NSObject <NSCopying>
 
@@ -4134,9 +3654,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterEnhancedStepHueParams : NSObject <NSCopying>
 
@@ -4164,9 +3681,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterEnhancedMoveToHueAndSaturationParams : NSObject <NSCopying>
 
@@ -4194,9 +3708,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterColorLoopSetParams : NSObject <NSCopying>
 
@@ -4228,9 +3739,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterStopMoveStepParams : NSObject <NSCopying>
 
@@ -4252,9 +3760,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterMoveColorTemperatureParams : NSObject <NSCopying>
 
@@ -4284,9 +3789,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRColorControlClusterStepColorTemperatureParams : NSObject <NSCopying>
 
@@ -4318,9 +3820,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRChannelClusterChangeChannelParams : NSObject <NSCopying>
 
@@ -4340,9 +3839,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRChannelClusterChangeChannelResponseParams : NSObject <NSCopying>
 
@@ -4365,9 +3861,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRChannelClusterChangeChannelByNumberParams : NSObject <NSCopying>
 
@@ -4389,9 +3882,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRChannelClusterSkipChannelParams : NSObject <NSCopying>
 
@@ -4411,9 +3901,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTargetNavigatorClusterNavigateTargetParams : NSObject <NSCopying>
 
@@ -4435,9 +3922,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRTargetNavigatorClusterNavigateTargetResponseParams : NSObject <NSCopying>
 
@@ -4460,9 +3944,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterPlayParams : NSObject <NSCopying>
 /**
@@ -4480,9 +3961,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterPauseParams : NSObject <NSCopying>
 /**
@@ -4500,9 +3978,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterStopPlaybackParams : NSObject <NSCopying>
 /**
@@ -4520,9 +3995,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterStartOverParams : NSObject <NSCopying>
 /**
@@ -4540,9 +4012,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterPreviousParams : NSObject <NSCopying>
 /**
@@ -4560,9 +4029,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterNextParams : NSObject <NSCopying>
 /**
@@ -4580,9 +4046,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterRewindParams : NSObject <NSCopying>
 /**
@@ -4600,9 +4063,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterFastForwardParams : NSObject <NSCopying>
 /**
@@ -4620,9 +4080,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterSkipForwardParams : NSObject <NSCopying>
 
@@ -4642,9 +4099,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterSkipBackwardParams : NSObject <NSCopying>
 
@@ -4664,9 +4118,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterPlaybackResponseParams : NSObject <NSCopying>
 
@@ -4689,9 +4140,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaPlaybackClusterSeekParams : NSObject <NSCopying>
 
@@ -4711,9 +4159,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaInputClusterSelectInputParams : NSObject <NSCopying>
 
@@ -4733,9 +4178,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaInputClusterShowInputStatusParams : NSObject <NSCopying>
 /**
@@ -4753,9 +4195,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaInputClusterHideInputStatusParams : NSObject <NSCopying>
 /**
@@ -4773,9 +4212,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRMediaInputClusterRenameInputParams : NSObject <NSCopying>
 
@@ -4797,9 +4233,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRLowPowerClusterSleepParams : NSObject <NSCopying>
 /**
@@ -4817,9 +4250,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRKeypadInputClusterSendKeyParams : NSObject <NSCopying>
 
@@ -4839,9 +4269,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRKeypadInputClusterSendKeyResponseParams : NSObject <NSCopying>
 
@@ -4862,9 +4289,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRContentLauncherClusterLaunchContentParams : NSObject <NSCopying>
 
@@ -4888,9 +4312,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRContentLauncherClusterLaunchURLParams : NSObject <NSCopying>
 
@@ -4914,9 +4335,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRContentLauncherClusterLaunchResponseParams : NSObject <NSCopying>
 
@@ -4939,9 +4357,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRAudioOutputClusterSelectOutputParams : NSObject <NSCopying>
 
@@ -4961,9 +4376,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRAudioOutputClusterRenameOutputParams : NSObject <NSCopying>
 
@@ -4985,9 +4397,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRApplicationLauncherClusterLaunchAppParams : NSObject <NSCopying>
 
@@ -5009,9 +4418,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRApplicationLauncherClusterStopAppParams : NSObject <NSCopying>
 
@@ -5031,9 +4437,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRApplicationLauncherClusterHideAppParams : NSObject <NSCopying>
 
@@ -5053,9 +4456,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRApplicationLauncherClusterLauncherResponseParams : NSObject <NSCopying>
 
@@ -5078,9 +4478,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRAccountLoginClusterGetSetupPINParams : NSObject <NSCopying>
 
@@ -5100,9 +4497,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRAccountLoginClusterGetSetupPINResponseParams : NSObject <NSCopying>
 
@@ -5123,9 +4517,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRAccountLoginClusterLoginParams : NSObject <NSCopying>
 
@@ -5147,9 +4538,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRAccountLoginClusterLogoutParams : NSObject <NSCopying>
 /**
@@ -5167,9 +4555,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams : NSObject <NSCopying>
 
@@ -5196,9 +4581,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRElectricalMeasurementClusterGetProfileInfoCommandParams : NSObject <NSCopying>
 /**
@@ -5216,9 +4598,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams : NSObject <NSCopying>
 
@@ -5249,9 +4628,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams : NSObject <NSCopying>
 
@@ -5275,9 +4651,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRClientMonitoringClusterRegisterClientMonitoringParams : NSObject <NSCopying>
 
@@ -5340,9 +4713,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestParams")
@@ -5369,9 +4739,6 @@ MTR_NEWLY_AVAILABLE
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSpecificResponseParams")
@@ -5395,9 +4762,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNotHandledParams")
@@ -5424,9 +4788,6 @@ MTR_NEWLY_AVAILABLE
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestAddArgumentsResponseParams")
@@ -5450,9 +4811,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSpecificParams")
@@ -5479,9 +4837,6 @@ MTR_NEWLY_AVAILABLE
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleArgumentResponseParams")
@@ -5505,9 +4860,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestUnknownCommandParams")
@@ -5544,9 +4896,6 @@ MTR_NEWLY_AVAILABLE
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentResponseParams")
@@ -5574,9 +4923,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestAddArgumentsParams")
@@ -5603,9 +4949,6 @@ MTR_NEWLY_AVAILABLE
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseResponseParams")
@@ -5631,9 +4974,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleArgumentRequestParams")
@@ -5662,9 +5002,6 @@ MTR_NEWLY_AVAILABLE
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsResponseParams")
@@ -5700,9 +5037,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentRequestParams")
@@ -5735,9 +5069,6 @@ MTR_NEWLY_AVAILABLE
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalResponseParams")
@@ -5763,9 +5094,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestStructArgumentRequestParams")
@@ -5846,9 +5174,6 @@ MTR_NEWLY_AVAILABLE
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptionalResponseParams")
@@ -5875,9 +5200,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructArgumentRequestParams")
@@ -5904,9 +5226,6 @@ MTR_NEWLY_AVAILABLE
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterBooleanResponseParams")
@@ -5932,9 +5251,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListStructArgumentRequestParams")
@@ -5961,9 +5277,6 @@ MTR_NEWLY_AVAILABLE
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterSimpleStructResponseParams")
@@ -5989,9 +5302,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UArgumentRequestParams")
@@ -6018,9 +5328,6 @@ MTR_NEWLY_AVAILABLE
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventResponseParams")
@@ -6046,9 +5353,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructListArgumentRequestParams")
@@ -6076,9 +5380,6 @@ MTR_NEWLY_AVAILABLE
  */
 @property (nonatomic, copy, nullable)
     NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams")
@@ -6105,9 +5406,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams")
@@ -6134,9 +5432,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseRequestParams")
@@ -6164,9 +5459,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsRequestParams")
@@ -6192,9 +5484,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalRequestParams")
@@ -6242,9 +5531,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptionalRequestParams")
@@ -6271,9 +5557,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterSimpleStructEchoRequestParams")
@@ -6297,9 +5580,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTimedInvokeRequestParams")
@@ -6325,9 +5605,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams")
@@ -6358,9 +5635,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventRequestParams")
@@ -6386,9 +5660,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams")
@@ -6422,9 +5693,6 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEv
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRFaultInjectionClusterFailRandomlyAtFaultParams : NSObject <NSCopying>
 
@@ -6448,9 +5716,6 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEv
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 NS_ASSUME_NONNULL_END

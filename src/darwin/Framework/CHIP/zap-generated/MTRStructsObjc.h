@@ -22,34 +22,22 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRScenesClusterAttributeValuePair : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nullable attributeId;
 @property (nonatomic, copy) NSArray * _Nonnull attributeValue;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRScenesClusterExtensionFieldSet : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull clusterId;
 @property (nonatomic, copy) NSArray * _Nonnull attributeValueList;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 @interface MTRDescriptorClusterDeviceTypeStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull type;
 @property (nonatomic, copy) NSNumber * _Nonnull revision;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRDescriptorClusterDeviceType : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull type;
 @property (nonatomic, copy) NSNumber * _Nonnull revision;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBindingClusterTargetStruct : NSObject <NSCopying>
@@ -58,18 +46,12 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 @property (nonatomic, copy) NSNumber * _Nullable endpoint;
 @property (nonatomic, copy) NSNumber * _Nullable cluster;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRAccessControlClusterTarget : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nullable cluster;
 @property (nonatomic, copy) NSNumber * _Nullable endpoint;
 @property (nonatomic, copy) NSNumber * _Nullable deviceType;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRAccessControlClusterAccessControlEntry : NSObject <NSCopying>
@@ -78,17 +60,11 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 @property (nonatomic, copy) NSArray * _Nullable subjects;
 @property (nonatomic, copy) NSArray * _Nullable targets;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRAccessControlClusterExtensionEntry : NSObject <NSCopying>
 @property (nonatomic, copy) NSData * _Nonnull data;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRAccessControlClusterAccessControlEntryChangedEvent : NSObject <NSCopying>
@@ -97,9 +73,6 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 @property (nonatomic, copy) NSNumber * _Nonnull changeType;
 @property (nonatomic, copy) MTRAccessControlClusterAccessControlEntry * _Nullable latestValue;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRAccessControlClusterAccessControlExtensionChangedEvent : NSObject <NSCopying>
@@ -108,9 +81,6 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 @property (nonatomic, copy) NSNumber * _Nonnull changeType;
 @property (nonatomic, copy) MTRAccessControlClusterExtensionEntry * _Nullable latestValue;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRActionsClusterActionStruct : NSObject <NSCopying>
@@ -120,9 +90,6 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 @property (nonatomic, copy) NSNumber * _Nonnull endpointListID;
 @property (nonatomic, copy) NSNumber * _Nonnull supportedCommands;
 @property (nonatomic, copy) NSNumber * _Nonnull state;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRActionsClusterEndpointListStruct : NSObject <NSCopying>
@@ -130,18 +97,12 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 @property (nonatomic, copy) NSString * _Nonnull name;
 @property (nonatomic, copy) NSNumber * _Nonnull type;
 @property (nonatomic, copy) NSArray * _Nonnull endpoints;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRActionsClusterStateChangedEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull actionID;
 @property (nonatomic, copy) NSNumber * _Nonnull invokeID;
 @property (nonatomic, copy, getter=getNewState) NSNumber * _Nonnull newState;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRActionsClusterActionFailedEvent : NSObject <NSCopying>
@@ -149,44 +110,26 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 @property (nonatomic, copy) NSNumber * _Nonnull invokeID;
 @property (nonatomic, copy, getter=getNewState) NSNumber * _Nonnull newState;
 @property (nonatomic, copy) NSNumber * _Nonnull error;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBasicClusterCapabilityMinimaStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull caseSessionsPerFabric;
 @property (nonatomic, copy) NSNumber * _Nonnull subscriptionsPerFabric;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBasicClusterStartUpEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBasicClusterShutDownEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBasicClusterLeaveEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBasicClusterReachableChangedEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull reachableNewValue;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_AVAILABLE
@@ -194,9 +137,6 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull providerNodeID;
 @property (nonatomic, copy) NSNumber * _Nonnull endpoint;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterProviderLocation")
@@ -209,9 +149,6 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy, getter=getNewState) NSNumber * _Nonnull newState;
 @property (nonatomic, copy) NSNumber * _Nonnull reason;
 @property (nonatomic, copy) NSNumber * _Nullable targetSoftwareVersion;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterStateTransitionEvent")
@@ -222,9 +159,6 @@ MTR_NEWLY_AVAILABLE
 @interface MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
 @property (nonatomic, copy) NSNumber * _Nonnull productID;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent")
@@ -237,9 +171,6 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull bytesDownloaded;
 @property (nonatomic, copy) NSNumber * _Nullable progressPercent;
 @property (nonatomic, copy) NSNumber * _Nullable platformCode;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent")
@@ -249,41 +180,26 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @interface MTRPowerSourceClusterBatChargeFaultChangeType : NSObject <NSCopying>
 @property (nonatomic, copy) NSArray * _Nonnull current;
 @property (nonatomic, copy) NSArray * _Nonnull previous;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPowerSourceClusterBatFaultChangeType : NSObject <NSCopying>
 @property (nonatomic, copy) NSArray * _Nonnull current;
 @property (nonatomic, copy) NSArray * _Nonnull previous;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPowerSourceClusterWiredFaultChangeType : NSObject <NSCopying>
 @property (nonatomic, copy) NSArray * _Nonnull current;
 @property (nonatomic, copy) NSArray * _Nonnull previous;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRGeneralCommissioningClusterBasicCommissioningInfo : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull failSafeExpiryLengthSeconds;
 @property (nonatomic, copy) NSNumber * _Nonnull maxCumulativeFailsafeSeconds;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRNetworkCommissioningClusterNetworkInfo : NSObject <NSCopying>
 @property (nonatomic, copy) NSData * _Nonnull networkID;
 @property (nonatomic, copy) NSNumber * _Nonnull connected;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRNetworkCommissioningClusterThreadInterfaceScanResult : NSObject <NSCopying>
@@ -295,9 +211,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) NSData * _Nonnull extendedAddress;
 @property (nonatomic, copy) NSNumber * _Nonnull rssi;
 @property (nonatomic, copy) NSNumber * _Nonnull lqi;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRNetworkCommissioningClusterWiFiInterfaceScanResult : NSObject <NSCopying>
@@ -307,9 +220,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) NSNumber * _Nonnull channel;
 @property (nonatomic, copy) NSNumber * _Nonnull wiFiBand;
 @property (nonatomic, copy) NSNumber * _Nonnull rssi;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRGeneralDiagnosticsClusterNetworkInterfaceType : NSObject <NSCopying>
@@ -321,40 +231,25 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) NSArray * _Nonnull iPv4Addresses;
 @property (nonatomic, copy) NSArray * _Nonnull iPv6Addresses;
 @property (nonatomic, copy) NSNumber * _Nonnull type;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRGeneralDiagnosticsClusterHardwareFaultChangeEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSArray * _Nonnull current;
 @property (nonatomic, copy) NSArray * _Nonnull previous;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRGeneralDiagnosticsClusterRadioFaultChangeEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSArray * _Nonnull current;
 @property (nonatomic, copy) NSArray * _Nonnull previous;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRGeneralDiagnosticsClusterNetworkFaultChangeEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSArray * _Nonnull current;
 @property (nonatomic, copy) NSArray * _Nonnull previous;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRGeneralDiagnosticsClusterBootReasonEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull bootReason;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRSoftwareDiagnosticsClusterThreadMetrics : NSObject <NSCopying>
@@ -363,18 +258,12 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) NSNumber * _Nullable stackFreeCurrent;
 @property (nonatomic, copy) NSNumber * _Nullable stackFreeMinimum;
 @property (nonatomic, copy) NSNumber * _Nullable stackSize;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRSoftwareDiagnosticsClusterSoftwareFaultEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull id;
 @property (nonatomic, copy) NSString * _Nullable name;
 @property (nonatomic, copy) NSData * _Nullable faultRecording;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRThreadNetworkDiagnosticsClusterNeighborTable : NSObject <NSCopying>
@@ -392,9 +281,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) NSNumber * _Nonnull fullThreadDevice;
 @property (nonatomic, copy) NSNumber * _Nonnull fullNetworkData;
 @property (nonatomic, copy) NSNumber * _Nonnull isChild;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRThreadNetworkDiagnosticsClusterOperationalDatasetComponents : NSObject <NSCopying>
@@ -410,9 +296,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) NSNumber * _Nonnull pskcPresent;
 @property (nonatomic, copy) NSNumber * _Nonnull securityPolicyPresent;
 @property (nonatomic, copy) NSNumber * _Nonnull channelMaskPresent;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRThreadNetworkDiagnosticsClusterRouteTable : NSObject <NSCopying>
@@ -426,149 +309,89 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) NSNumber * _Nonnull age;
 @property (nonatomic, copy) NSNumber * _Nonnull allocated;
 @property (nonatomic, copy) NSNumber * _Nonnull linkEstablished;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRThreadNetworkDiagnosticsClusterSecurityPolicy : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull rotationTime;
 @property (nonatomic, copy) NSNumber * _Nonnull flags;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRThreadNetworkDiagnosticsClusterConnectionStatusEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull connectionStatus;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSArray * _Nonnull current;
 @property (nonatomic, copy) NSArray * _Nonnull previous;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRWiFiNetworkDiagnosticsClusterDisconnectionEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull reasonCode;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRWiFiNetworkDiagnosticsClusterAssociationFailureEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull associationFailure;
 @property (nonatomic, copy) NSNumber * _Nonnull status;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRWiFiNetworkDiagnosticsClusterConnectionStatusEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull connectionStatus;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRTimeSynchronizationClusterDstOffsetType : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull offset;
 @property (nonatomic, copy) NSNumber * _Nonnull validStarting;
 @property (nonatomic, copy) NSNumber * _Nonnull validUntil;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRTimeSynchronizationClusterTimeZoneType : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull offset;
 @property (nonatomic, copy) NSNumber * _Nonnull validAt;
 @property (nonatomic, copy) NSString * _Nullable name;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBridgedDeviceBasicClusterStartUpEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBridgedDeviceBasicClusterShutDownEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBridgedDeviceBasicClusterLeaveEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBridgedDeviceBasicClusterReachableChangedEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull reachableNewValue;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRSwitchClusterSwitchLatchedEvent : NSObject <NSCopying>
 @property (nonatomic, copy, getter=getNewPosition) NSNumber * _Nonnull newPosition;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRSwitchClusterInitialPressEvent : NSObject <NSCopying>
 @property (nonatomic, copy, getter=getNewPosition) NSNumber * _Nonnull newPosition;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRSwitchClusterLongPressEvent : NSObject <NSCopying>
 @property (nonatomic, copy, getter=getNewPosition) NSNumber * _Nonnull newPosition;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRSwitchClusterShortReleaseEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull previousPosition;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRSwitchClusterLongReleaseEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull previousPosition;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRSwitchClusterMultiPressOngoingEvent : NSObject <NSCopying>
 @property (nonatomic, copy, getter=getNewPosition) NSNumber * _Nonnull newPosition;
 @property (nonatomic, copy) NSNumber * _Nonnull currentNumberOfPressesCounted;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRSwitchClusterMultiPressCompleteEvent : NSObject <NSCopying>
 @property (nonatomic, copy, getter=getNewPosition) NSNumber * _Nonnull newPosition;
 @property (nonatomic, copy) NSNumber * _Nonnull totalNumberOfPressesCounted;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTROperationalCredentialsClusterFabricDescriptor : NSObject <NSCopying>
@@ -578,18 +401,12 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) NSNumber * _Nonnull nodeId;
 @property (nonatomic, copy) NSString * _Nonnull label;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTROperationalCredentialsClusterNOCStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSData * _Nonnull noc;
 @property (nonatomic, copy) NSData * _Nullable icac;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRGroupKeyManagementClusterGroupInfoMapStruct : NSObject <NSCopying>
@@ -597,18 +414,12 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) NSArray * _Nonnull endpoints;
 @property (nonatomic, copy) NSString * _Nullable groupName;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRGroupKeyManagementClusterGroupKeyMapStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull groupId;
 @property (nonatomic, copy) NSNumber * _Nonnull groupKeySetID;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRGroupKeyManagementClusterGroupKeySetStruct : NSObject <NSCopying>
@@ -620,71 +431,44 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) NSNumber * _Nullable epochStartTime1;
 @property (nonatomic, copy) NSData * _Nullable epochKey2;
 @property (nonatomic, copy) NSNumber * _Nullable epochStartTime2;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRFixedLabelClusterLabelStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull label;
 @property (nonatomic, copy) NSString * _Nonnull value;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRUserLabelClusterLabelStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull label;
 @property (nonatomic, copy) NSString * _Nonnull value;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRBooleanStateClusterStateChangeEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull stateValue;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRModeSelectClusterSemanticTag : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull mfgCode;
 @property (nonatomic, copy) NSNumber * _Nonnull value;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRModeSelectClusterModeOptionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull label;
 @property (nonatomic, copy) NSNumber * _Nonnull mode;
 @property (nonatomic, copy) NSArray * _Nonnull semanticTags;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRDoorLockClusterDlCredential : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull credentialType;
 @property (nonatomic, copy) NSNumber * _Nonnull credentialIndex;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRDoorLockClusterDoorLockAlarmEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull alarmCode;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRDoorLockClusterDoorStateChangeEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull doorState;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRDoorLockClusterLockOperationEvent : NSObject <NSCopying>
@@ -694,9 +478,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) NSNumber * _Nullable fabricIndex;
 @property (nonatomic, copy) NSNumber * _Nullable sourceNode;
 @property (nonatomic, copy) NSArray * _Nullable credentials;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRDoorLockClusterLockOperationErrorEvent : NSObject <NSCopying>
@@ -707,9 +488,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) NSNumber * _Nullable fabricIndex;
 @property (nonatomic, copy) NSNumber * _Nullable sourceNode;
 @property (nonatomic, copy) NSArray * _Nullable credentials;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRDoorLockClusterLockUserChangeEvent : NSObject <NSCopying>
@@ -720,120 +498,63 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) NSNumber * _Nullable fabricIndex;
 @property (nonatomic, copy) NSNumber * _Nullable sourceNode;
 @property (nonatomic, copy) NSNumber * _Nullable dataIndex;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterSupplyVoltageLowEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterSupplyVoltageHighEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterPowerMissingPhaseEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterSystemPressureLowEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterSystemPressureHighEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterDryRunningEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterMotorTemperatureHighEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterPumpMotorFatalFailureEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterElectronicTemperatureHighEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterPumpBlockedEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterSensorFailureEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterElectronicNonFatalFailureEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterElectronicFatalFailureEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterGeneralFaultEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterLeakageEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterAirDetectionEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRPumpConfigurationAndControlClusterTurbineOperationEvent : NSObject <NSCopying>
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRThermostatClusterThermostatScheduleTransition : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
 @property (nonatomic, copy) NSNumber * _Nullable heatSetpoint;
 @property (nonatomic, copy) NSNumber * _Nullable coolSetpoint;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRChannelClusterChannelInfo : NSObject <NSCopying>
@@ -842,9 +563,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) NSString * _Nullable name;
 @property (nonatomic, copy) NSString * _Nullable callSign;
 @property (nonatomic, copy) NSString * _Nullable affiliateCallSign;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRChannelClusterLineupInfo : NSObject <NSCopying>
@@ -852,25 +570,16 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) NSString * _Nullable lineupName;
 @property (nonatomic, copy) NSString * _Nullable postalCode;
 @property (nonatomic, copy) NSNumber * _Nonnull lineupInfoType;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRTargetNavigatorClusterTargetInfo : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull identifier;
 @property (nonatomic, copy) NSString * _Nonnull name;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRMediaPlaybackClusterPlaybackPosition : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull updatedAt;
 @property (nonatomic, copy) NSNumber * _Nullable position;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRMediaInputClusterInputInfo : NSObject <NSCopying>
@@ -878,51 +587,33 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) NSNumber * _Nonnull inputType;
 @property (nonatomic, copy) NSString * _Nonnull name;
 @property (nonatomic, copy) NSString * _Nonnull descriptionString;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRContentLauncherClusterDimension : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull width;
 @property (nonatomic, copy) NSNumber * _Nonnull height;
 @property (nonatomic, copy) NSNumber * _Nonnull metric;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRContentLauncherClusterAdditionalInfo : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull name;
 @property (nonatomic, copy) NSString * _Nonnull value;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRContentLauncherClusterParameter : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull type;
 @property (nonatomic, copy) NSString * _Nonnull value;
 @property (nonatomic, copy) NSArray * _Nullable externalIDList;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRContentLauncherClusterContentSearch : NSObject <NSCopying>
 @property (nonatomic, copy) NSArray * _Nonnull parameterList;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRContentLauncherClusterStyleInformation : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nullable imageUrl;
 @property (nonatomic, copy) NSString * _Nullable color;
 @property (nonatomic, copy) MTRContentLauncherClusterDimension * _Nullable size;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRContentLauncherClusterBrandingInformation : NSObject <NSCopying>
@@ -932,42 +623,27 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) MTRContentLauncherClusterStyleInformation * _Nullable progressBar;
 @property (nonatomic, copy) MTRContentLauncherClusterStyleInformation * _Nullable splash;
 @property (nonatomic, copy) MTRContentLauncherClusterStyleInformation * _Nullable waterMark;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRAudioOutputClusterOutputInfo : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull index;
 @property (nonatomic, copy) NSNumber * _Nonnull outputType;
 @property (nonatomic, copy) NSString * _Nonnull name;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRApplicationLauncherClusterApplication : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull catalogVendorId;
 @property (nonatomic, copy) NSString * _Nonnull applicationId;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRApplicationLauncherClusterApplicationEP : NSObject <NSCopying>
 @property (nonatomic, copy) MTRApplicationLauncherClusterApplication * _Nonnull application;
 @property (nonatomic, copy) NSNumber * _Nullable endpoint;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRApplicationBasicClusterApplicationBasicApplication : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull catalogVendorId;
 @property (nonatomic, copy) NSString * _Nonnull applicationId;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 @interface MTRClientMonitoringClusterMonitoringRegistration : NSObject <NSCopying>
@@ -989,9 +665,6 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull f;
 @property (nonatomic, copy) NSNumber * _Nonnull g;
 @property (nonatomic, copy) NSNumber * _Nonnull h;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterSimpleStruct")
@@ -1007,9 +680,6 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull fabricSensitiveStruct;
 @property (nonatomic, copy) NSArray * _Nonnull fabricSensitiveInt8uList;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestFabricScoped")
@@ -1029,9 +699,6 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy) NSArray * _Nullable nullableList;
 @property (nonatomic, copy) NSArray * _Nullable optionalList;
 @property (nonatomic, copy) NSArray * _Nullable nullableOptionalList;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterNullablesAndOptionalsStruct")
@@ -1042,9 +709,6 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull a;
 @property (nonatomic, copy) NSNumber * _Nonnull b;
 @property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull c;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterNestedStruct")
@@ -1059,9 +723,6 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy) NSArray * _Nonnull e;
 @property (nonatomic, copy) NSArray * _Nonnull f;
 @property (nonatomic, copy) NSArray * _Nonnull g;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterNestedStructList")
@@ -1070,9 +731,6 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterNestedStructList")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterDoubleNestedStructList : NSObject <NSCopying>
 @property (nonatomic, copy) NSArray * _Nonnull a;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterDoubleNestedStructList")
@@ -1082,9 +740,6 @@ MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestListStructOctet : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull member1;
 @property (nonatomic, copy) NSData * _Nonnull member2;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListStructOctet")
@@ -1099,9 +754,6 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg4;
 @property (nonatomic, copy) NSArray * _Nonnull arg5;
 @property (nonatomic, copy) NSArray * _Nonnull arg6;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEventEvent")
@@ -1111,9 +763,6 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEventEvent")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestFabricScopedEventEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestFabricScopedEventEvent")
