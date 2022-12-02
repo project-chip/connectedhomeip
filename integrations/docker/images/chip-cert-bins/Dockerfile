@@ -186,9 +186,9 @@ RUN mkdir /root/connectedhomeip
 RUN git clone https://github.com/project-chip/connectedhomeip.git /root/connectedhomeip
 WORKDIR /root/connectedhomeip/
 RUN git checkout ${COMMITHASH}
-RUN scripts/build/gn_bootstrap.sh
-RUN gn gen out/debug --args='chip_mdns="platform" chip_inet_config_enable_ipv4=false'
-RUN ninja -C out/debug
+RUN scripts/build/gn_bootstrap.sh \
+    && gn gen out/debug --args='chip_mdns="platform" chip_inet_config_enable_ipv4=false' \
+    && ninja -C out/debug
 
 # Stage 2: Build.
 from chip-build-cert as chip-build-cert-bins
