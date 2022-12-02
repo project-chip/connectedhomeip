@@ -255,7 +255,18 @@ RUN case ${TARGETPLATFORM} in \
         *) ;; \
     esac
 
-RUN npm --prefix third_party/zap/repo/ ci
+# Install a known ZAP release
+# Only keep the cli version, since `zap` is 143MB and not usable (UI)
+ENV ZAP_VERSION=v2022.11.29-nightly
+RUN set -x \
+    && mkdir -p /opt/zap-${ZAP_VERSION} \
+    && cd /opt/zap-${ZAP_VERSION} \
+    && wget https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-linux.zip \
+    && unzip zap-linux.zip \
+    && rm zap-linux.zip \
+    && rm zap \
+    && ln -s /opt/zap-${ZAP_VERSION}/zap-cli /usr/bin/ \
+    && : # last line
 RUN scripts/examples/gn_build_test_example.sh app1
 
 RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true -i no
