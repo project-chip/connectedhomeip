@@ -21,7 +21,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
-#include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelEngine.h>
@@ -32,53 +31,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::PumpConfigurationAndControl;
-
-namespace {
-
-class PumpConfigurationAndControlAttrAccess : public AttributeAccessInterface
-{
-public:
-    // Register for the Pump Configuration And Control cluster on all endpoints.
-    PumpConfigurationAndControlAttrAccess() :
-        AttributeAccessInterface(Optional<EndpointId>::Missing(), PumpConfigurationAndControl::Id)
-    {}
-
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-
-private:
-};
-
-PumpConfigurationAndControlAttrAccess gAttrAccess;
-
-CHIP_ERROR PumpConfigurationAndControlAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    emberAfDebugPrintln("Reading from PCC");
-
-    VerifyOrDie(aPath.mClusterId == PumpConfigurationAndControl::Id);
-
-    switch (aPath.mAttributeId)
-    {
-    default:
-        break;
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PumpConfigurationAndControlAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    emberAfDebugPrintln("Writing to PCC");
-
-    VerifyOrDie(aPath.mClusterId == PumpConfigurationAndControl::Id);
-
-    switch (aPath.mAttributeId)
-    {
-    default:
-        break;
-    }
-    return CHIP_NO_ERROR;
-}
-} // namespace
 
 namespace chip {
 namespace app {
@@ -415,9 +367,4 @@ void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(cons
     }
 }
 
-void MatterPumpConfigurationAndControlPluginServerInitCallback()
-{
-    emberAfDebugPrintln("Initialize PCC Plugin Server Cluster.");
-
-    registerAttributeAccessOverride(&gAttrAccess);
-}
+void MatterPumpConfigurationAndControlPluginServerInitCallback() {}
