@@ -199,13 +199,16 @@ from chip-build-cert as chip-build-cert-bins
 SHELL ["/bin/bash", "-c"]
 # Records Matter SDK commit hash to include in the image.
 RUN git rev-parse HEAD > /root/.sdk-sha-version
+
+# TODO: below the build of linux-arm64-all-clusters-minimal-ipv6only/linux-x64-all-clusters-minimal-ipv6only
+#       is NOT performed because the given SHA does not build minimal and
+#       builds the regular all-clusters app instead.
 RUN case ${TARGETPLATFORM} in \
         "linux/amd64") \
             set -x \
 			&& source scripts/activate.sh \
 			&& scripts/build/build_examples.py \
 			--target linux-x64-all-clusters-ipv6only \
-			--target linux-x64-all-clusters-minimal-ipv6only \
 			--target linux-x64-bridge-ipv6only \
 			--target linux-x64-tv-app-ipv6only \
 			--target linux-x64-tv-casting-app-ipv6only \
@@ -216,7 +219,6 @@ RUN case ${TARGETPLATFORM} in \
 			--target linux-x64-lock-ipv6only \
 			build \
 			&& mv out/linux-x64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
-			&& mv out/linux-x64-all-clusters-minimal-ipv6only/chip-all-clusters-app out/chip-all-clusters-minimal-app \
             && mv out/linux-x64-bridge-ipv6only/chip-bridge-app out/chip-bridge-app \
 			&& mv out/linux-x64-tv-app-ipv6only/chip-tv-app out/chip-tv-app \
 			&& mv out/linux-x64-tv-casting-app-ipv6only/chip-tv-casting-app out/chip-tv-casting-app \
@@ -231,7 +233,6 @@ RUN case ${TARGETPLATFORM} in \
 			&& source scripts/activate.sh \
 			&& scripts/build/build_examples.py \
 			--target linux-arm64-all-clusters-ipv6only \
-			--target linux-arm64-all-clusters-minimal-ipv6only \
 			--target linux-arm64-bridge-ipv6only \
 			--target linux-arm64-tv-app-ipv6only \
 			--target linux-arm64-tv-casting-app-ipv6only \
@@ -242,7 +243,6 @@ RUN case ${TARGETPLATFORM} in \
 			--target linux-arm64-lock-ipv6only \
 			build \
 			&& mv out/linux-arm64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
-			&& mv out/linux-arm64-all-clusters-minimal-ipv6only/chip-all-clusters-app out/chip-all-clusters-minimal-app \
             && mv out/linux-arm64-bridge-ipv6only/chip-bridge-app out/chip-bridge-app \
 			&& mv out/linux-arm64-tv-app-ipv6only/chip-tv-app out/chip-tv-app \
 			&& mv out/linux-arm64-tv-casting-app-ipv6only/chip-tv-casting-app out/chip-tv-casting-app \
@@ -272,7 +272,6 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/debug/chip-tool chip-
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/debug/chip-shell chip-shell
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/debug/chip-cert chip-cert
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-app chip-all-clusters-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-all-clusters-minimal-app chip-all-clusters-minimal-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lighting-app chip-lighting-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-tv-casting-app chip-tv-casting-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-tv-app chip-tv-app
