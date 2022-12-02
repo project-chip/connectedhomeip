@@ -65,6 +65,10 @@ def build_darwin_framework(args):
             # Build Matter.framework as a static library
             "SUPPORTS_TEXT_BASED_API=NO",
             "MACH_O_TYPE=staticlib",
+            # Change visibility flags such that both darwin-framework-tool and Matter.framework
+            # are built with the same flags.
+            "GCC_INLINES_ARE_PRIVATE_EXTERN=NO",
+            "GCC_SYMBOLS_PRIVATE_EXTERN=NO",
         ]
     command_result = run_command(command)
 

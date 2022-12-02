@@ -143,20 +143,6 @@ executable("darwin-framework-tool") {
 
   deps = [
     ":build-darwin-framework",
-    "${chip_root}/src/app/tests/suites/commands/delay",
-
-    # IM is needed for MTRError
-    "${chip_root}/src/app/tests/suites/commands/interaction_model",
-
-    # Log is needed by tests UserPrompt and Log
-    "${chip_root}/src/app/tests/suites/commands/log",
-
-    # System is needed by tests FactoryReset etc..
-    "${chip_root}/src/app/tests/suites/commands/system",
-
-    # pics is needed by tests
-    "${chip_root}/src/app/tests/suites/pics",
-    "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/jsoncpp",
   ]
 
@@ -174,6 +160,60 @@ executable("darwin-framework-tool") {
     "Matter.framework",
     "Security.framework",
   ]
+
+  # When config_enable_yaml_tests=true the Matter SDK is pulled in as a dependency because the code of the test suite
+  # uses some helpers from the Matter SDK. As a result, the SDK is built twice. Once because of this dependency and once
+  # when the Matter.framework is built.
+  # It may results in different versions of the Matter SDK between the output binary and the linked Matter.framework.
+  #
+  # When config_enable_yaml_tests=false the Matter SDK is built once when the Matter.framework is built and the resulting
+  # libCHIP.a library is linked statically to the output binary.
+  if (config_enable_yaml_tests) {
+    deps += [
+      "${chip_root}/src/app/tests/suites/commands/delay",
+
+      # IM is needed for MTRError
+      "${chip_root}/src/app/tests/suites/commands/interaction_model",
+
+      # Log is needed by tests UserPrompt and Log
+      "${chip_root}/src/app/tests/suites/commands/log",
+
+      # System is needed by tests FactoryReset etc..
+      "${chip_root}/src/app/tests/suites/commands/system",
+
+      # pics is needed by tests
+      "${chip_root}/src/app/tests/suites/pics",
+    ]
+  } else {
+    include_dirs = [
+      "${chip_root}/config/standalone/",
+      "${chip_root}/src/",
+      "${chip_root}/src/include/",
+      "${chip_root}/third_party/nlassert/repo/include/",
+      "${chip_root}/third_party/nlio/repo/include/",
+      "${chip_root}/zzz_generated/app-common/",
+      "${root_gen_dir}/include",
+      "${root_out_dir}/macos_framework_output/Build/Intermediates.noindex/Matter.build/${output_sdk_type}/Matter.build/out/gen/include",
+    ]
+
+    defines = [
+      "CHIP_HAVE_CONFIG_H=1",
+      "CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
+    ]
+
+    frameworks += [
+      "CoreFoundation.framework",
+      "Foundation.framework",
+      "CoreBluetooth.framework",
+      "Network.framework",
+    ]
+
+    # Other SDKs are linked statically to Matter.framework but the macosx SDK is linked dynamically but needs some symbols that are
+    # not exposed by the dylib.
+    if (sdk == "macosx") {
+      libs = [ "${root_out_dir}/macos_framework_output/Build/Intermediates.noindex/Matter.build/${output_sdk_type}/Matter.build/out/lib/libCHIP.a" ]
+    }
+  }
 
   public_configs = [ ":config" ]
 
