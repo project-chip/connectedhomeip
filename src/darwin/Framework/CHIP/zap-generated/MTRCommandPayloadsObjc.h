@@ -4672,9 +4672,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 @interface MTRClientMonitoringClusterStayAwakeRequestParams : NSObject <NSCopying>
 /**
@@ -4692,9 +4689,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestParams : NSObject <NSCopying>

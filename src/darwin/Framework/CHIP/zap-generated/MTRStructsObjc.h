@@ -650,9 +650,6 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) NSNumber * _Nonnull clientNodeId;
 @property (nonatomic, copy) NSNumber * _Nonnull iCid;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 MTR_NEWLY_AVAILABLE
