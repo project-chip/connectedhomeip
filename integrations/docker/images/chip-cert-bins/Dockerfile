@@ -2,7 +2,7 @@
 FROM ubuntu:22.04 as chip-build-cert
 ARG TARGETPLATFORM
 # COMMITHASH defines the target commit to build from. May be passed in using --build-arg.
-ARG COMMITHASH=e556daac2e1ed3a141034a6dcc7e410e4cd1f8f6
+ARG COMMITHASH=21245f42393e63dbb16fb4d99d8bf96aef7ae0fc
 
 # Ensure TARGETPLATFORM is set
 RUN case ${TARGETPLATFORM} in \
@@ -252,6 +252,7 @@ RUN case ${TARGETPLATFORM} in \
         *) ;; \
     esac
 
+RUN cd third_party/zap/repo && npm ci
 RUN scripts/examples/gn_build_test_example.sh app1
 
 RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true -i no
