@@ -2,7 +2,7 @@
 FROM ubuntu:22.04 as chip-build-cert
 ARG TARGETPLATFORM
 # COMMITHASH defines the target commit to build from. May be passed in using --build-arg.
-ARG COMMITHASH=21245f42393e63dbb16fb4d99d8bf96aef7ae0fc
+ARG COMMITHASH=1e06479f412b78eea0dfbeacf7cad51d005b649b
 
 # Ensure TARGETPLATFORM is set
 RUN case ${TARGETPLATFORM} in \
@@ -209,6 +209,7 @@ RUN case ${TARGETPLATFORM} in \
             && source scripts/activate.sh \
             && scripts/build/build_examples.py \
             --target linux-x64-all-clusters-ipv6only \
+            --target linux-x64-all-clusters-minimal-ipv6only \
             --target linux-x64-bridge-ipv6only \
             --target linux-x64-tv-app-ipv6only \
             --target linux-x64-tv-casting-app-ipv6only \
@@ -219,6 +220,7 @@ RUN case ${TARGETPLATFORM} in \
             --target linux-x64-lock-ipv6only \
             build \
             && mv out/linux-x64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
+            && mv out/linux-x64-all-clusters-minimal-ipv6only/chip-all-clusters-minimal-app out/chip-all-clusters-minimal-app \
             && mv out/linux-x64-bridge-ipv6only/chip-bridge-app out/chip-bridge-app \
             && mv out/linux-x64-tv-app-ipv6only/chip-tv-app out/chip-tv-app \
             && mv out/linux-x64-tv-casting-app-ipv6only/chip-tv-casting-app out/chip-tv-casting-app \
@@ -233,6 +235,7 @@ RUN case ${TARGETPLATFORM} in \
             && source scripts/activate.sh \
             && scripts/build/build_examples.py \
             --target linux-arm64-all-clusters-ipv6only \
+            --target linux-arm64-all-clusters-minimal-ipv6only \
             --target linux-arm64-bridge-ipv6only \
             --target linux-arm64-tv-app-ipv6only \
             --target linux-arm64-tv-casting-app-ipv6only \
@@ -243,6 +246,7 @@ RUN case ${TARGETPLATFORM} in \
             --target linux-arm64-lock-ipv6only \
             build \
             && mv out/linux-arm64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
+            && mv out/linux-arm64-all-clusters-minimal-ipv6only/chip-all-clusters-minimal-app out/chip-all-clusters-minimal-app \
             && mv out/linux-arm64-bridge-ipv6only/chip-bridge-app out/chip-bridge-app \
             && mv out/linux-arm64-tv-app-ipv6only/chip-tv-app out/chip-tv-app \
             && mv out/linux-arm64-tv-casting-app-ipv6only/chip-tv-casting-app out/chip-tv-casting-app \
@@ -255,18 +259,17 @@ RUN case ${TARGETPLATFORM} in \
         *) ;; \
     esac
 
-# Install a known ZAP release
+# Development
 # Only keep the cli version, since `zap` is 143MB and not usable (UI)
 ENV ZAP_VERSION=v2022.11.29-nightly
 RUN set -x \
     && mkdir -p /opt/zap-${ZAP_VERSION} \
+    && git clone https://github.com/project-chip/zap.git /opt/zap-${ZAP_VERSION} \
     && cd /opt/zap-${ZAP_VERSION} \
-    && wget https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-linux.zip \
-    && unzip zap-linux.zip \
-    && rm zap-linux.zip \
-    && rm zap \
-    && ln -s /opt/zap-${ZAP_VERSION}/zap-cli /usr/bin/ \
-    && : # last line
+    && git checkout ${ZAP_VERSION} \
+    && npm config set user 0 \
+    && npm ci
+ENV ZAP_DEVELOPMENT_PATH=/opt/zap-${ZAP_VERSION}
 RUN scripts/examples/gn_build_test_example.sh app1
 
 RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true -i no
