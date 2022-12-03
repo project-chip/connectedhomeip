@@ -242,7 +242,6 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const Emb
 
     // Now enable the endpoint.
     emberAfEndpointEnableDisable(id, true);
-    emberAfSetDeviceEnabled(id, true);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
@@ -257,7 +256,6 @@ EndpointId emberAfClearDynamicEndpoint(uint16_t index)
         (emberAfEndpointIndexIsEnabled(index)))
     {
         ep = emAfEndpoints[index].endpoint;
-        emberAfSetDeviceEnabled(ep, false);
         emberAfEndpointEnableDisable(ep, false);
         emAfEndpoints[index].endpoint = kInvalidEndpointId;
     }

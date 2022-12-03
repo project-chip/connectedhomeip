@@ -107,20 +107,6 @@ extern "C" {
 
 #include <stdint.h>
 
-#include "RTE_Components.h"
-#include CMSIS_device_header
-
-#include "em_assert.h"
-#include "em_device.h"
-
-#if defined(SL_COMPONENT_CATALOG_PRESENT)
-#include "sl_component_catalog.h"
-#endif
-
-#if SL_SYSTEM_VIEW
-#include "SEGGER_SYSVIEW_FreeRTOS.h"
-#endif
-
 /*-----------------------------------------------------------
  * Application specific definitions.
  *
@@ -132,6 +118,8 @@ extern "C" {
  *
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
+
+extern uint32_t SystemCoreClock;
 
 /* Energy saving modes. */
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
@@ -148,7 +136,7 @@ extern "C" {
 #define configUSE_TICK_HOOK (1)
 #define configCHECK_FOR_STACK_OVERFLOW (2)
 #define configUSE_MALLOC_FAILED_HOOK (1)
-#define configUSE_IDLE_HOOK (1)
+#define configUSE_IDLE_HOOK (0)
 
 /* Main functions*/
 /* Run time stats gathering related definitions. */
@@ -185,13 +173,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configUSE_TICKLESS_IDLE_SIMPLE_DEBUG (1) /* See into vPortSuppressTicksAndSleep source code for explanation */
 #define configMAX_PRIORITIES (56)
 #define configMINIMAL_STACK_SIZE (320) /* Number of words to use for Idle and Timer stacks */
-
-#ifdef HEAP_MONITORING
-#define configMAX_TASK_NAME_LEN (24)
-#else
 #define configMAX_TASK_NAME_LEN (10)
-#endif // HEAP_MONITORING
-
 #define configUSE_16_BIT_TICKS (0)
 #define configIDLE_SHOULD_YIELD (1)
 #define configUSE_MUTEXES (1)
@@ -207,11 +189,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configSUPPORT_DYNAMIC_ALLOCATION (1)
 
 #ifndef configTOTAL_HEAP_SIZE
-#ifdef SL_WIFI
 #define configTOTAL_HEAP_SIZE ((size_t)(34 * 1024))
-#else
-#define configTOTAL_HEAP_SIZE ((size_t)(20 * 1024))
-#endif
 #endif // configTOTAL_HEAP_SIZE
 
 /* Optional functions - most linkers will remove unused functions anyway. */

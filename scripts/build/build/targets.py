@@ -97,7 +97,7 @@ def BuildHostTarget():
     app_parts = [
         TargetPart('rpc-console', app=HostApp.RPC_CONSOLE).OnlyIfRe(f'{native_board_name}-'),
         TargetPart('all-clusters', app=HostApp.ALL_CLUSTERS),
-        TargetPart('all-clusters-minimal', app=HostApp.ALL_CLUSTERS),
+        TargetPart('all-clusters-minimal', app=HostApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('chip-tool', app=HostApp.CHIP_TOOL),
         TargetPart('thermostat', app=HostApp.THERMOSTAT),
         TargetPart('java-matter-controller', app=HostApp.JAVA_MATTER_CONTROLLER),

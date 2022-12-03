@@ -661,7 +661,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROtaSoftwareUpdateRequestorClusterProviderLocation
+@implementation MTROTASoftwareUpdateRequestorClusterProviderLocation
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -677,7 +677,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTROtaSoftwareUpdateRequestorClusterProviderLocation alloc] init];
+    auto other = [[MTROTASoftwareUpdateRequestorClusterProviderLocation alloc] init];
 
     other.providerNodeID = self.providerNodeID;
     other.endpoint = self.endpoint;
@@ -695,7 +695,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent
+@implementation MTROtaSoftwareUpdateRequestorClusterProviderLocation : MTROTASoftwareUpdateRequestorClusterProviderLocation
+@end
+
+@implementation MTROTASoftwareUpdateRequestorClusterStateTransitionEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -713,7 +716,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent alloc] init];
+    auto other = [[MTROTASoftwareUpdateRequestorClusterStateTransitionEvent alloc] init];
 
     other.previousState = self.previousState;
     other.newState = self.newState;
@@ -733,7 +736,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent
+@implementation MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent : MTROTASoftwareUpdateRequestorClusterStateTransitionEvent
+@end
+
+@implementation MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -747,7 +753,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent alloc] init];
+    auto other = [[MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent alloc] init];
 
     other.softwareVersion = self.softwareVersion;
     other.productID = self.productID;
@@ -764,7 +770,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent
+@implementation MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent : MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent
+@end
+
+@implementation MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -782,7 +791,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent alloc] init];
+    auto other = [[MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent alloc] init];
 
     other.softwareVersion = self.softwareVersion;
     other.bytesDownloaded = self.bytesDownloaded;
@@ -800,6 +809,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent : MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent
 @end
 
 @implementation MTRPowerSourceClusterBatChargeFaultChangeType
@@ -3564,6 +3576,40 @@ NS_ASSUME_NONNULL_BEGIN
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: catalogVendorId:%@; applicationId:%@; >",
                                              NSStringFromClass([self class]), _catalogVendorId, _applicationId];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRClientMonitoringClusterMonitoringRegistration
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clientNodeId = @(0);
+
+        _iCid = @(0);
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRClientMonitoringClusterMonitoringRegistration alloc] init];
+
+    other.clientNodeId = self.clientNodeId;
+    other.iCid = self.iCid;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientNodeId:%@; iCid:%@; fabricIndex:%@; >",
+                                             NSStringFromClass([self class]), _clientNodeId, _iCid, _fabricIndex];
     return descriptionString;
 }
 

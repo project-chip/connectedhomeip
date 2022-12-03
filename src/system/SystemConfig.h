@@ -175,18 +175,6 @@
 /* Configuration option variables defined below */
 
 /**
- *  @def CHIP_SYSTEM_CONFIG_NO_LOCKING
- *
- *  @brief
- *      Disable the use of locking within the system layer.
- *
- *      Unless you are simulating an LwIP-based system on a Unix-style host, this value should be left at its default.
- */
-#ifndef CHIP_SYSTEM_CONFIG_NO_LOCKING
-#define CHIP_SYSTEM_CONFIG_NO_LOCKING 0
-#endif /* CHIP_SYSTEM_CONFIG_NO_LOCKING */
-
-/**
  *  @def CHIP_SYSTEM_CONFIG_POSIX_LOCKING
  *
  *  @brief
@@ -504,6 +492,18 @@ struct LwIPEvent;
 #define CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE (CHIP_SYSTEM_HEADER_RESERVE_SIZE)
 #endif /* !CHIP_SYSTEM_CONFIG_USE_LWIP */
 #endif /* CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE */
+
+/**
+ *  @def CHIP_SYSTEM_CONFIG_PLATFORM_LOG
+ *
+ *  @brief
+ *      Defines whether (1) or not (0) the system uses a platform-specific logging implementation.
+ *
+ *  See CHIPLogging.h for details.
+ */
+#ifndef CHIP_SYSTEM_CONFIG_PLATFORM_LOG
+#define CHIP_SYSTEM_CONFIG_PLATFORM_LOG 0
+#endif // CHIP_SYSTEM_CONFIG_PLATFORM_LOG
 
 /**
  *  @def CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME

@@ -19,7 +19,7 @@
 #import <os/lock.h>
 
 #import "MTRAsyncCallbackWorkQueue.h"
-#import "MTRLogging.h"
+#import "MTRLogging_Internal.h"
 
 #pragma mark - Class extensions
 

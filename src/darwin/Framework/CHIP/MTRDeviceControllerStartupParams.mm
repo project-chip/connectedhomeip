@@ -17,7 +17,7 @@
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRCertificates.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
-#import "MTRLogging.h"
+#import "MTRLogging_Internal.h"
 #import "MTRP256KeypairBridge.h"
 #import "NSDataSpanConversion.h"
 

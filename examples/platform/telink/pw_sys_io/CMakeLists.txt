@@ -8,7 +8,7 @@ target_compile_options(suppress_zephyr_warnings INTERFACE
     -Wno-undef
 )
 
-pw_add_module_library(pw_sys_io.telink
+pw_add_library(pw_sys_io.telink STATIC
     SOURCES
       sys_io_telink.cc
     PRIVATE_DEPS

@@ -20,12 +20,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "em_bus.h"
-#include "em_cmu.h"
-#include "em_gpio.h"
-#include "em_ldma.h"
-#include "em_usart.h"
-
 #include "wfx_host_events.h"
 #include "wifi_config.h"
 
