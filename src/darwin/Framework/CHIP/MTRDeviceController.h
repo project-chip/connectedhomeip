@@ -17,7 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import <Matter/MTRNOCChainIssuer.h>
+#import <Matter/MTROperationalCertificateIssuer.h>
 
 @class MTRBaseDevice;
 
@@ -118,18 +118,33 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue MTR_NEWLY_AVAILABLE;
 
 /**
- * Sets this MTRDeviceController to use the given issuer for issuing operational certs. By default, the MTRDeviceController uses an
- * internal issuer.
+ * Sets this MTRDeviceController to use the given issuer for issuing operational
+ * certificates. By default, the MTRDeviceController uses an internal issuer
+ * using the signing provided when it was created.
  *
- * When a nocChainIssuer is set, the device commissioner will delegate verification to the chip::Credentials::PartialDACVerifier so
- * that DAC chain and CD validation can be performed by custom code triggered by MTRNOCChainIssuer.onNOCChainGenerationNeeded().
- * Otherwise, the device commissioner uses the chip::Credentials::DefaultDACVerifier
+ * Both arguments must be nil (to stop using an external operational certificate
+ * issuer) or both must be non-nil.
  *
- * @param[in] nocChainIssuer the NOC Chain issuer to use for issuer operational certs
+ * When using an external operational certificate issuer, all device attestation
+ * checks that require some sort of trust anchors are delegated to the external
+ * certificate issuer.  Specifically, the following device attestation checks
+ * are not performed and must be done by the operationalCertificateIssuer:
  *
- * @param[in] queue The queue on which the callbacks will be delivered
+ * (1) Make sure the PAA is valid and approved by CSA.
+ * (2) vid-scoped PAA check: if the PAA is vid scoped, then its vid must match the DAC vid.
+ * (3) cert chain check: verify PAI is signed by PAA, and DAC is signed by PAI.
+ * (4) PAA subject key id extraction: the PAA subject key must match the PAA key referenced in the PAI.
+ * (5) CD signature check: make sure a valid CSA CD key is used to sign the CD.
+ *
+ * @param[in] operationalCertificateIssuer the operationalCertificateIssuer to
+ *            use for issuing operational certs
+ *
+ * @param[in] queue The queue on which the calls into the
+ *                  operationalCertificateIssuer will happen.
  */
-- (void)setNocChainIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer queue:(dispatch_queue_t)queue;
+- (BOOL)setOperationalCertificateIssuer:(nullable id<MTROperationalCertificateIssuer>)operationalCertificateIssuer
+                                  queue:(nullable dispatch_queue_t)queue
+                                  error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 /**
  * Return the attestation challenge for the secure session of the device being commissioned.
@@ -221,6 +236,8 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 - (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate
                      queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use setDeviceControllerDelegate:");
 
+- (void)setNocChainIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer
+                    queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use setOperationalCertificateIssuer");
 @end
 
 NS_ASSUME_NONNULL_END

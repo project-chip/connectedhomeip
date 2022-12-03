@@ -23,6 +23,36 @@ NS_ASSUME_NONNULL_BEGIN
  * Represents information relating to product attestation.
  *
  */
+@interface MTRAttestationInfo : NSObject
+
+@property (nonatomic, copy, readonly) NSData * challenge;
+
+@property (nonatomic, copy, readonly) NSData * nonce;
+
+@property (nonatomic, copy, readonly) NSData * elements;
+
+@property (nonatomic, copy, readonly) NSData * elementsSignature;
+
+@property (nonatomic, copy, readonly) NSData * dac;
+
+@property (nonatomic, copy, readonly) NSData * pai;
+
+@property (nonatomic, copy, readonly) NSData * certificationDeclaration;
+
+@property (nonatomic, copy, readonly) NSData * firmwareInfo;
+
+- (instancetype)initWithChallenge:(NSData *)challenge
+                            nonce:(NSData *)nonce
+                         elements:(NSData *)elements
+                elementsSignature:(NSData *)elementsSignature
+                              dac:(NSData *)dac
+                              pai:(NSData *)pai
+         certificationDeclaration:(NSData *)certificationDeclaration
+                     firmwareInfo:(NSData *)firmwareInfo;
+
+@end
+
+MTR_NEWLY_DEPRECATED("Please use MTRAttestationInfo")
 @interface AttestationInfo : NSObject
 
 @property (nonatomic, copy) NSData * challenge;

@@ -20,9 +20,31 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Represents information relating to NOC CSR.
+ * Represents information relating to a certificate signing request for a Matter
+ * operational certificate.  The entire TLV nocsr-elements structure, including
+ * any vendor-specific data, is included, as well as the parsed-out CSR and
+ * CSRNonce fields from that structure.
  *
+ * The AttestationSignature from the CSRResponse command is also included.  This
+ * signs a concatenation of csrElements and the attestationChallenge found in
+ * MTRAttestationInfo.
  */
+MTR_NEWLY_AVAILABLE
+@interface MTROperationalCSRInfo : NSObject
+
+@property (nonatomic, copy, readonly) NSData * csr;
+@property (nonatomic, copy, readonly) NSData * csrNonce;
+@property (nonatomic, copy, readonly) NSData * csrElements;
+@property (nonatomic, copy, readonly) NSData * attestationSignature;
+
+- (instancetype)initWithCSR:(NSData *)csr
+                   csrNonce:(NSData *)csrNonce
+                csrElements:(NSData *)csrElements
+       attestationSignature:(NSData *)attestationSignature;
+
+@end
+
+MTR_NEWLY_DEPRECATED("Please use MTROperationalCSRInfo")
 @interface CSRInfo : NSObject
 
 @property (nonatomic, copy) NSData * nonce;
