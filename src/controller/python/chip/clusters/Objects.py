@@ -11142,11 +11142,11 @@ class Switch(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="newPosition", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="previousPosition", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="totalNumberOfPressesCounted", Tag=1, Type=uint),
                     ])
 
-            newPosition: 'uint' = 0
+            previousPosition: 'uint' = 0
             totalNumberOfPressesCounted: 'uint' = 0
 
 

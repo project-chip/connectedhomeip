@@ -49,7 +49,17 @@ MTR_NEWLY_AVAILABLE
 {{/unless}}
 @interface MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event : NSObject <NSCopying>
 {{#zcl_event_fields}}
-@property (nonatomic, copy{{#unless (isStrEqual (asGetterName name) (asStructPropertyName name))}}, getter={{asGetterName name}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName name}};
+@property (nonatomic, copy{{#unless (isStrEqual (asGetterName name) (asStructPropertyName name))}}, getter={{asGetterName name}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName name}}
+{{#if (isStrEqual (asUpperCamelCase ../parent.name preserveAcronyms=true) "Switch")}}
+{{#if (isStrEqual (asUpperCamelCase ../name preserveAcronyms=true) "MultiPressComplete")}}
+{{#if (isStrEqual (asStructPropertyName name) "previousPosition")}}
+{{! Workaround for the name being mis-spelled in XML previously }}
+MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull newPosition MTR_NEWLY_DEPRECATED("Please use previousPosition")
+{{/if}}
+{{/if}}
+{{/if}}
+;
 {{/zcl_event_fields}}
 @end
 {{#unless (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name))}}

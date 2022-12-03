@@ -10880,7 +10880,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields
 {
-    kNewPosition                 = 0,
+    kPreviousPosition            = 0,
     kTotalNumberOfPressesCounted = 1,
 };
 
@@ -10892,7 +10892,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    uint8_t newPosition                 = static_cast<uint8_t>(0);
+    uint8_t previousPosition            = static_cast<uint8_t>(0);
     uint8_t totalNumberOfPressesCounted = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -10905,7 +10905,7 @@ public:
     static constexpr EventId GetEventId() { return Events::MultiPressComplete::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
 
-    uint8_t newPosition                 = static_cast<uint8_t>(0);
+    uint8_t previousPosition            = static_cast<uint8_t>(0);
     uint8_t totalNumberOfPressesCounted = static_cast<uint8_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

@@ -390,7 +390,8 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @end
 
 @interface MTRSwitchClusterMultiPressCompleteEvent : NSObject <NSCopying>
-@property (nonatomic, copy, getter=getNewPosition) NSNumber * _Nonnull newPosition;
+@property (nonatomic, copy) NSNumber * _Nonnull previousPosition MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull newPosition MTR_NEWLY_DEPRECATED("Please use previousPosition");
 @property (nonatomic, copy) NSNumber * _Nonnull totalNumberOfPressesCounted;
 @end
 
