@@ -115,7 +115,7 @@ jobs:
                     linux debug all-clusters-app \
                     out/linux-x64-all-clusters/chip-all-clusters-app \
                     /tmp/bloat_reports/
-            - name: Build example Standalone All Clusters Mininal Server
+            - name: Build example Standalone All Clusters Minimal Server
               timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -124,7 +124,7 @@ jobs:
                         build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug all-clusters-minimal-app \
-                    out/linux-x64-all-clusters-minimal/chip-all-clusters-app \
+                    out/linux-x64-all-clusters-minimal/chip-all-clusters-minimal-app \
                     /tmp/bloat_reports/
             - name: Build example TV app
               timeout-minutes: 10
