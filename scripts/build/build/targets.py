@@ -125,6 +125,7 @@ def BuildHostTarget():
     target.AppendModifier('nodeps', enable_ble=False, enable_wifi=False, enable_thread=False,
                           crypto_library=HostCryptoLibrary.MBEDTLS, use_clang=True).ExceptIfRe('-(clang|noble|boringssl|mbedtls)')
 
+    target.AppendModifier('platform-mdns', use_platform_mdns=True)
     target.AppendModifier('minmdns-verbose', minmdns_high_verbosity=True)
     target.AppendModifier('libnl', minmdns_address_policy="libnl")
     target.AppendModifier('same-event-loop', separate_event_loop=False).OnlyIfRe('-(chip-tool|darwin-framework-tool)')

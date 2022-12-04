@@ -22,6 +22,9 @@ concurrency:
     group: full-${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     full_android:
         name: Run
@@ -73,35 +76,35 @@ jobs:
             - name: Build Android arm-chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target android-arm-chip-tool build"
+                    "./scripts/build/build_examples.py --target android-arm-chip-tool build"
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build Android arm-tv-casting-app
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target android-arm-tv-casting-app build"
+                    "./scripts/build/build_examples.py --target android-arm-tv-casting-app build"
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build Android arm-tv-server
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target android-arm-tv-server build"
+                    "./scripts/build/build_examples.py --target android-arm-tv-server build"
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build Android arm64-tv-casting-app
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target android-arm64-tv-casting-app build"
+                    "./scripts/build/build_examples.py --target android-arm64-tv-casting-app build"
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build Android arm64-tv-server
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target android-arm64-tv-server build"
+                    "./scripts/build/build_examples.py --target android-arm64-tv-server build"
             - name: Build Android arm64-chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target android-arm64-chip-tool build"
+                    "./scripts/build/build_examples.py --target android-arm64-chip-tool build"
             - name: Run Android build rule tests
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -111,4 +114,4 @@ jobs:
             # - name: Build Android Studio build (arm64 only)
             #   run: |
             #     ./scripts/run_in_build_env.sh \
-            #       "./scripts/build/build_examples.py --no-log-timestamps --target android-androidstudio-arm64-chip-tool  build"
+            #       "./scripts/build/build_examples.py --target android-androidstudio-arm64-chip-tool  build"
