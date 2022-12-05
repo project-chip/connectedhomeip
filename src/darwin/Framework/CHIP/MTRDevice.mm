@@ -331,6 +331,7 @@ private:
                    readParams.mpEventPathParamsList = eventPath.get();
                    readParams.mEventPathParamsListSize = 1;
                    readParams.mKeepSubscriptions = true;
+                   readParams.mIsFabricFiltered = false;
                    attributePath.release();
                    eventPath.release();
 

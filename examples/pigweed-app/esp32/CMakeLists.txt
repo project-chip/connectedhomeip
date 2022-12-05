@@ -47,6 +47,10 @@ set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
 include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
+include($ENV{PW_ROOT}/pw_assert/backend.cmake)
+include($ENV{PW_ROOT}/pw_log/backend.cmake)
+include($ENV{PW_ROOT}/pw_sys_io/backend.cmake)
+include($ENV{PW_ROOT}/pw_trace/backend.cmake)
 
 pw_set_module_config(pw_rpc_CONFIG pw_rpc.disable_global_mutex_config)
 pw_set_backend(pw_log pw_log_basic)

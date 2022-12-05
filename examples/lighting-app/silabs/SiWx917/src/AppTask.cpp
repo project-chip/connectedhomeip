@@ -21,11 +21,6 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 
-#ifdef ENABLE_WSTK_LEDS
-#include "LEDWidget.h"
-#include "sl_simple_led_instances.h"
-#endif // ENABLE_WSTK_LEDS
-
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/clusters/identify-server/identify-server.h>
@@ -43,11 +38,6 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#ifdef ENABLE_WSTK_LEDS
-#define SYSTEM_STATE_LED &sl_led_led0
-#define LIGHT_LED &sl_led_led1
-#endif // ENABLE_WSTK_LEDS
-
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_LIGHT_SWITCH &sl_button_btn1
 
@@ -55,10 +45,6 @@ using namespace chip;
 using namespace ::chip::DeviceLayer;
 
 namespace {
-
-#ifdef ENABLE_WSTK_LEDS
-LEDWidget sLightLED;
-#endif // ENABLE_WSTK_LEDS
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 
@@ -144,19 +130,16 @@ CHIP_ERROR AppTask::Init()
         appError(err);
     }
 
-    err = LightMgr().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        SILABS_LOG("LightMgr::Init() failed");
-        appError(err);
-    }
+    /* TODO
+        err = LightMgr().Init();
+        if (err != CHIP_NO_ERROR)
+        {
+            SILABS_LOG("LightMgr::Init() failed");
+            appError(err);
+        }
 
-    LightMgr().SetCallbacks(ActionInitiated, ActionCompleted);
-
-#ifdef ENABLE_WSTK_LEDS
-    sLightLED.Init(LIGHT_LED);
-    sLightLED.Set(LightMgr().IsLightOn());
-#endif // ENABLE_WSTK_LEDS
+        LightMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+    */
 
     return err;
 }
@@ -246,38 +229,11 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
-{
-    if (buttonHandle == NULL)
-    {
-        return;
-    }
-
-    AppEvent button_event           = {};
-    button_event.Type               = AppEvent::kEventType_Button;
-    button_event.ButtonEvent.Action = btnAction;
-
-    if (buttonHandle == APP_LIGHT_SWITCH && btnAction == SL_SIMPLE_BUTTON_PRESSED)
-    {
-        button_event.Handler = LightActionEventHandler;
-        sAppTask.PostEvent(&button_event);
-    }
-    else if (buttonHandle == APP_FUNCTION_BUTTON)
-    {
-        button_event.Handler = BaseApplication::ButtonHandler;
-        sAppTask.PostEvent(&button_event);
-    }
-}
-
 void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {
     // Action initiated, update the light led
     bool lightOn = aAction == LightingManager::ON_ACTION;
     SILABS_LOG("Turning light %s", (lightOn) ? "On" : "Off")
-
-#ifdef ENABLE_WSTK_LEDS
-    sLightLED.Set(lightOn);
-#endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
     sAppTask.GetLCD().WriteDemoUI(lightOn);

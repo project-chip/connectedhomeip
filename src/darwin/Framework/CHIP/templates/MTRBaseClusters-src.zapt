@@ -181,7 +181,7 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 + (void) read{{>attribute}}WithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint  queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion
 {
     auto * bridge = new MTR{{>attribute_data_callback_name}}CallbackBridge(queue, completion);
-    std::move(*bridge).DispatchLocalAction(^({{>attribute_data_callback_name}}Callback successCb, MTRErrorCallback failureCb) {
+    std::move(*bridge).DispatchLocalAction(clusterStateCacheContainer.baseDevice, ^({{>attribute_data_callback_name}}Callback successCb, MTRErrorCallback failureCb) {
           if (clusterStateCacheContainer.cppClusterStateCache) {
               chip::app::ConcreteAttributePath path;
               using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;

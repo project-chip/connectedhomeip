@@ -107,7 +107,24 @@ static void AddReadClientContainer(uint64_t deviceId, MTRReadClientContainer * c
     [readClientContainersLock unlock];
 }
 
-static void PurgeReadClientContainers(uint64_t deviceId, dispatch_queue_t queue, void (^_Nullable completion)(void))
+static void ReinstateReadClientList(NSMutableArray<MTRReadClientContainer *> * readClientList, NSNumber * key,
+    dispatch_queue_t queue, dispatch_block_t _Nullable completion)
+{
+    [readClientContainersLock lock];
+    auto existingList = readClientContainers[key];
+    if (existingList) {
+        [existingList addObjectsFromArray:readClientList];
+    } else {
+        readClientContainers[key] = readClientList;
+    }
+    [readClientContainersLock unlock];
+    if (completion) {
+        dispatch_async(queue, completion);
+    }
+}
+
+static void PurgeReadClientContainers(
+    MTRDeviceController * controller, uint64_t deviceId, dispatch_queue_t queue, void (^_Nullable completion)(void))
 {
     InitializeReadClientContainers();
 
@@ -119,22 +136,28 @@ static void PurgeReadClientContainers(uint64_t deviceId, dispatch_queue_t queue,
     [readClientContainersLock unlock];
 
     // Destroy read clients in the work queue
-    dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-        for (MTRReadClientContainer * container in listToDelete) {
-            if (container.readClientPtr) {
-                Platform::Delete(container.readClientPtr);
-                container.readClientPtr = nullptr;
+    [controller
+        asyncDispatchToMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
+            for (MTRReadClientContainer * container in listToDelete) {
+                if (container.readClientPtr) {
+                    Platform::Delete(container.readClientPtr);
+                    container.readClientPtr = nullptr;
+                }
+                if (container.pathParams) {
+                    Platform::Delete(container.pathParams);
+                    container.pathParams = nullptr;
+                }
             }
-            if (container.pathParams) {
-                Platform::Delete(container.pathParams);
-                container.pathParams = nullptr;
+            [listToDelete removeAllObjects];
+            if (completion) {
+                dispatch_async(queue, completion);
             }
         }
-        [listToDelete removeAllObjects];
-        if (completion) {
-            dispatch_async(queue, completion);
-        }
-    });
+        errorHandler:^(NSError * error) {
+            // Can't delete things. Just put them back, and hope we
+            // can delete them later.
+            ReinstateReadClientList(listToDelete, key, queue, completion);
+        }];
 }
 
 static void PurgeCompletedReadClientContainers(uint64_t deviceId)
@@ -157,7 +180,8 @@ static void PurgeCompletedReadClientContainers(uint64_t deviceId)
 
 #ifdef DEBUG
 // This function is for unit testing only. This function closes all read clients.
-static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, void (^_Nullable completion)(void))
+static void CauseReadClientFailure(
+    MTRDeviceController * controller, uint64_t deviceId, dispatch_queue_t queue, void (^_Nullable completion)(void))
 {
     InitializeReadClientContainers();
 
@@ -168,18 +192,23 @@ static void CauseReadClientFailure(uint64_t deviceId, dispatch_queue_t queue, vo
     [readClientContainers removeObjectForKey:key];
     [readClientContainersLock unlock];
 
-    dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-        for (MTRReadClientContainer * container in listToFail) {
-            // Send auto resubscribe request again by read clients, which must fail.
-            chip::app::ReadPrepareParams readParams;
-            if (container.readClientPtr) {
-                container.readClientPtr->SendAutoResubscribeRequest(std::move(readParams));
+    [controller
+        asyncDispatchToMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
+            for (MTRReadClientContainer * container in listToFail) {
+                // Send auto resubscribe request again by read clients, which must fail.
+                chip::app::ReadPrepareParams readParams;
+                if (container.readClientPtr) {
+                    container.readClientPtr->SendAutoResubscribeRequest(std::move(readParams));
+                }
+            }
+            if (completion) {
+                dispatch_async(queue, completion);
             }
         }
-        if (completion) {
-            dispatch_async(queue, completion);
-        }
-    });
+        errorHandler:^(NSError * error) {
+            // Can't fail things. Just put them back.
+            ReinstateReadClientList(listToFail, key, queue, completion);
+        }];
 }
 #endif
 
@@ -321,6 +350,7 @@ public:
                                               MTRClusterStateCacheContainer * container = weakPtr;
                                               if (container) {
                                                   container.cppClusterStateCache = nullptr;
+                                                  container.baseDevice = nil;
                                               }
                                           };
                                       }
@@ -393,6 +423,7 @@ public:
                                           clusterStateCacheContainer.cppClusterStateCache = clusterStateCache.get();
                                           // ClusterStateCache will be deleted when OnDone is called.
                                           callback->AdoptClusterStateCache(std::move(clusterStateCache));
+                                          clusterStateCacheContainer.baseDevice = self;
                                       }
                                       // Callback and ReadClient will be deleted when OnDone is called.
                                       callback->AdoptReadClient(std::move(readClient));
@@ -1243,7 +1274,7 @@ exit:
 {
     // This method must only be used for MTRDeviceOverXPC. However, for unit testing purpose, the method purges all read clients.
     MTR_LOG_DEBUG("Unexpected call to deregister report handlers");
-    PurgeReadClientContainers(self.nodeID, queue, completion);
+    PurgeReadClientContainers(self.deviceController, self.nodeID, queue, completion);
 }
 
 namespace {
@@ -1389,7 +1420,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 - (void)failSubscribers:(dispatch_queue_t)queue completion:(void (^)(void))completion
 {
     MTR_LOG_DEBUG("Causing failure in subscribers on purpose");
-    CauseReadClientFailure(self.nodeID, queue, completion);
+    CauseReadClientFailure(self.deviceController, self.nodeID, queue, completion);
 }
 #endif
 

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/telink.gni")
 
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/telink/args.gni")
@@ -48,18 +47,13 @@ static_library("telink") {
     "SystemPlatformConfig.h",
   ]
 
-  deps = []
-
   public = [
     "${chip_root}/src/credentials/CHIPCert.h",
     "${chip_root}/src/credentials/CertificationDeclaration.h",
     "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
   ]
 
-  public_deps = [
-    "${chip_root}/src/platform:platform_base",
-    "${telink_sdk_build_root}",
-  ]
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   if (chip_enable_factory_data) {
     sources += [

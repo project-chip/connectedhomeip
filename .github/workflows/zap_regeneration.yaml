@@ -28,7 +28,7 @@ jobs:
 
         runs-on: ubuntu-20.04
         container:
-            image: connectedhomeip/chip-build:0.6.15
+            image: connectedhomeip/chip-build:0.6.17
         defaults:
             run:
                 shell: sh

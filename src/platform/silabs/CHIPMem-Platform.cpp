@@ -150,7 +150,12 @@ bool MemoryInternalCheckPointer(const void * p, size_t min_size)
 } // namespace Platform
 } // namespace chip
 
+#ifdef BRD4325A
+extern "C" void memMonitoringTrackAlloc(void * ptr, size_t size) {}
+extern "C" void memMonitoringTrackFree(void * ptr, size_t size) {}
+#else
 extern "C" __WEAK void memMonitoringTrackAlloc(void * ptr, size_t size) {}
 extern "C" __WEAK void memMonitoringTrackFree(void * ptr, size_t size) {}
+#endif // BRD4325A
 
 #endif // CHIP_CONFIG_MEMORY_MGMT_PLATFORM

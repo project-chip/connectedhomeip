@@ -18,19 +18,14 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 import("$dir_pw_build/python.gni")
 
+import("${chip_root}/scripts/idl/files.gni")
+
 pw_python_package("idl") {
   setup = [ "setup.py" ]
-  inputs = [
+  inputs = matter_idl_generator_templates
+  inputs += [
     # Dependency grammar
     "matter_grammar.lark",
-
-    # Templates used for generation
-    "generators/bridge/BridgeClustersCpp.jinja",
-    "generators/bridge/BridgeClustersCommon.jinja",
-    "generators/bridge/BridgeClustersGlobalStructs.jinja",
-    "generators/java/ChipClustersCpp.jinja",
-    "generators/java/ChipClustersRead.jinja",
-    "generators/cpp/application/PluginApplicationCallbacksHeader.jinja",
 
     # Unit test data
     "tests/available_tests.yaml",
@@ -70,25 +65,7 @@ pw_python_package("idl") {
     "tests/outputs/simple_attribute/jni/MyClusterClient-InvokeSubscribeImpl.cpp",
   ]
 
-  sources = [
-    "__init__.py",
-    "generators/__init__.py",
-    "generators/bridge/__init__.py",
-    "generators/cpp/__init__.py",
-    "generators/cpp/application/__init__.py",
-    "generators/filters.py",
-    "generators/java/__init__.py",
-    "generators/types.py",
-    "matter_idl_parser.py",
-    "matter_idl_types.py",
-    "xml_parser.py",
-    "zapxml/__init__.py",
-    "zapxml/handlers/__init__.py",
-    "zapxml/handlers/base.py",
-    "zapxml/handlers/context.py",
-    "zapxml/handlers/handlers.py",
-    "zapxml/handlers/parsing.py",
-  ]
+  sources = matter_idl_generator_sources
 
   tests = [
     "test_matter_idl_parser.py",

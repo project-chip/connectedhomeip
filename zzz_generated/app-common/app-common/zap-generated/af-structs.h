@@ -368,6 +368,14 @@ typedef struct _LineupInfo
     uint8_t lineupInfoType;
 } LineupInfo;
 
+// Struct for MonitoringRegistration
+typedef struct _MonitoringRegistration
+{
+    chip::NodeId ClientNodeId;
+    uint64_t ICid;
+    chip::FabricIndex FabricIndex;
+} MonitoringRegistration;
+
 // Struct for NOCStruct
 typedef struct _NOCStruct
 {
