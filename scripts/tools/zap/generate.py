@@ -19,6 +19,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+import tempfile
 import subprocess
 import sys
 import urllib.request
@@ -268,7 +269,18 @@ def main():
         # Parallel-compatible runs will need separate state
         os.environ["ZAP_TEMPSTATE"] = "1"
 
-    runGeneration(cmdLineArgs.zapFile, cmdLineArgs.zclFile, cmdLineArgs.templateFile, cmdLineArgs.outputDir)
+    # `zap-cli` may extract things into a temporary directory. ensure extraction
+    # does not conflict.
+    with tempfile.TemporaryDirectory(prefix='zap') as temp_dir:
+        old_temp = os.environ['TEMP'] if 'TEMP' in os.environ else None
+        os.environ['TEMP'] = temp_dir
+
+        runGeneration(cmdLineArgs.zapFile, cmdLineArgs.zclFile, cmdLineArgs.templateFile, cmdLineArgs.outputDir)
+
+        if old_temp:
+            os.environ['TEMP'] = old_temp
+        else:
+            del os.environ['TEMP']
 
     prettifiers = [
         runClangPrettifier,
