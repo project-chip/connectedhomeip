@@ -17,27 +17,24 @@
 
 #pragma once
 
-#include <lib/support/CodeUtils.h>
-#include <platform/CHIPDeviceConfig.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceConfig.h>
 
 using MonitoringRegistrationStruct = chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::Type;
 
 namespace chip {
-class ClientMonitoringRegistrationTable 
+class ClientMonitoringRegistrationTable
 {
 public:
-
     /**********************************************************
      * Functions Definitions
      *********************************************************/
 
-    ClientMonitoringRegistrationTable()
-    {}
+    ClientMonitoringRegistrationTable() {}
 
     static ClientMonitoringRegistrationTable & Instance();
-
 
 private:
     /**********************************************************
@@ -48,4 +45,4 @@ private:
     MonitoringRegistrationStruct mRegisteredClients[CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC];
 };
 
-} // namespace Chip
+} // namespace chip

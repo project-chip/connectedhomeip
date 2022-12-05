@@ -34,4 +34,4 @@ ClientMonitoringRegistrationTable & ClientMonitoringRegistrationTable::Instance(
     return sInstance;
 }
 
-}
+} // namespace chip
