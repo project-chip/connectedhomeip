@@ -76,45 +76,42 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
-    if (!QPGConfig::ConfigValueExists(QPGConfig::kCounterKey_BootReason))
+    qvRebootReason = qvCHIP_GetResetReason();
+
+    switch (qvRebootReason)
     {
-        qvRebootReason = qvCHIP_GetResetReason();
-
-        switch (qvRebootReason)
+        case qvResetReason_HW_BrownOutDetected:
         {
-            case qvResetReason_HW_BrownOutDetected:
-            {
-                bootReason = BootReasonType::kBrownOutReset;
-                break;
-            }
-
-            case qvResetReason_HW_Watchdog:
-            {
-                bootReason = BootReasonType::kHardwareWatchdogReset;
-                break;
-            }
-
-            case qvResetReason_HW_Por:
-            {
-                bootReason = BootReasonType::kPowerOnReboot;
-                break;
-            }
-
-            case qvResetReason_SW_Por:
-            {
-                bootReason = BootReasonType::kSoftwareReset;
-                break;
-            }
-
-            default:
-            bootReason = BootReasonType::kUnspecified;
+            bootReason = BootReasonType::kBrownOutReset;
             break;
         }
 
-        err = StoreBootReason(to_underlying(bootReason));
-        SuccessOrExit(err);
+        case qvResetReason_HW_Watchdog:
+        {
+            bootReason = BootReasonType::kHardwareWatchdogReset;
+            break;
+        }
+
+        case qvResetReason_HW_Por:
+        {
+            bootReason = BootReasonType::kPowerOnReboot;
+            break;
+        }
+
+        case qvResetReason_SW_Por:
+        {
+            bootReason = BootReasonType::kSoftwareReset;
+            break;
+        }
+
+        default:
+        bootReason = BootReasonType::kUnspecified;
+        break;
     }
 
+    err = StoreBootReason(to_underlying(bootReason));
+    SuccessOrExit(err);
+    
     err = CHIP_NO_ERROR;
 
 exit:
