@@ -283,6 +283,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET=mt793x",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
+    } else if (chip_device_platform == "openiotsdk") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK=1",
+        "CHIP_DEVICE_LAYER_TARGET=openiotsdk",
+      ]
     }
 
     if (chip_device_config_device_software_version_string != "") {
@@ -459,6 +464,8 @@ if (chip_device_platform != "none") {
       _platform_target = "Beken"
     } else if (chip_device_platform == "mt793x") {
       _platform_target = "mt793x"
+    } else if (chip_device_platform == "openiotsdk") {
+      _platform_target = "openiotsdk"
     } else {
       assert(false, "Unknown chip_device_platform: ${chip_device_platform}")
     }
