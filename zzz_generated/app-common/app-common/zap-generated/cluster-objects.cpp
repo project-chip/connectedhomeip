@@ -8542,7 +8542,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNewPosition)), newPosition));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPreviousPosition)), previousPosition));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTotalNumberOfPressesCounted)),
                                            totalNumberOfPressesCounted));
     ReturnErrorOnFailure(writer.EndContainer(outer));
@@ -8563,8 +8563,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kNewPosition):
-            ReturnErrorOnFailure(DataModel::Decode(reader, newPosition));
+        case to_underlying(Fields::kPreviousPosition):
+            ReturnErrorOnFailure(DataModel::Decode(reader, previousPosition));
             break;
         case to_underlying(Fields::kTotalNumberOfPressesCounted):
             ReturnErrorOnFailure(DataModel::Decode(reader, totalNumberOfPressesCounted));

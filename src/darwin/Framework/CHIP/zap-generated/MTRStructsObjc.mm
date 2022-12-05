@@ -2035,7 +2035,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _newPosition = @(0);
+        _previousPosition = @(0);
 
         _totalNumberOfPressesCounted = @(0);
     }
@@ -2046,7 +2046,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRSwitchClusterMultiPressCompleteEvent alloc] init];
 
-    other.newPosition = self.newPosition;
+    other.previousPosition = self.previousPosition;
     other.totalNumberOfPressesCounted = self.totalNumberOfPressesCounted;
 
     return other;
@@ -2054,9 +2054,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newPosition:%@; totalNumberOfPressesCounted:%@; >",
-                                             NSStringFromClass([self class]), _newPosition, _totalNumberOfPressesCounted];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: previousPosition:%@; totalNumberOfPressesCounted:%@; >",
+                                             NSStringFromClass([self class]), _previousPosition, _totalNumberOfPressesCounted];
     return descriptionString;
+}
+
+- (void)setNewPosition:(NSNumber * _Nonnull)newPosition
+{
+    self.previousPosition = newPosition;
+}
+
+- (NSNumber * _Nonnull)newPosition
+{
+    return self.previousPosition;
 }
 
 @end

@@ -763,12 +763,12 @@ public class ChipEventStructs {
   }
 
   public static class SwitchClusterMultiPressCompleteEvent {
-    public Integer newPosition;
+    public Integer previousPosition;
     public Integer totalNumberOfPressesCounted;
 
     public SwitchClusterMultiPressCompleteEvent(
-        Integer newPosition, Integer totalNumberOfPressesCounted) {
-      this.newPosition = newPosition;
+        Integer previousPosition, Integer totalNumberOfPressesCounted) {
+      this.previousPosition = previousPosition;
       this.totalNumberOfPressesCounted = totalNumberOfPressesCounted;
     }
 
@@ -776,8 +776,8 @@ public class ChipEventStructs {
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("SwitchClusterMultiPressCompleteEvent {\n");
-      output.append("\tnewPosition: ");
-      output.append(newPosition);
+      output.append("\tpreviousPosition: ");
+      output.append(previousPosition);
       output.append("\n");
       output.append("\ttotalNumberOfPressesCounted: ");
       output.append(totalNumberOfPressesCounted);
