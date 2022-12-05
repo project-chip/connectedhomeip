@@ -198,7 +198,7 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
     sdCtx->mHostNameRegistrar.Init(hostname, addressType, interfaceId);
 
     DNSServiceRef sdRef;
-    auto err = DNSServiceRegister(&sdRef, kRegisterFlags, interfaceId, name, type, kLocalDot, hostname, ntohs(port), record.size(),
+    auto err = DNSServiceRegister(&sdRef, kRegisterFlags, interfaceId, name, type, kLocalDot, hostname, htons(port), record.size(),
                                   record.data(), OnRegister, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
