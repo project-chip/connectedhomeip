@@ -616,10 +616,10 @@ def TizenTargets():
 def BouffalolabTargets():
     target = Target('bouffalolab', BouffalolabBuilder)
 
-    yield target.Extend('bl602-iot-matter-v1-light', board=BouffalolabBoard.BL602_IoT_Matter_V1, app=BouffalolabApp.LIGHT, enable_rpcs=False)
-    yield target.Extend('bl602-iot-matter-v1-light-115200', board=BouffalolabBoard.BL602_IoT_Matter_V1, app=BouffalolabApp.LIGHT, enable_rpcs=False, baudrate=115200)
-    yield target.Extend('bl602-iot-matter-v1-light-rpc', board=BouffalolabBoard.BL602_IoT_Matter_V1, app=BouffalolabApp.LIGHT, enable_rpcs=True, baudrate=115200)
-    yield target.Extend('bl602-night-light-light', board=BouffalolabBoard.BL602_NIGHT_LIGHT, app=BouffalolabApp.LIGHT, enable_rpcs=False)
+    yield target.Extend('bl602-iot-matter-v1-light', board=BouffalolabBoard.BL602_IoT_Matter_V1, app=BouffalolabApp.LIGHT, enable_rpcs=False, module_type="BL602")
+    yield target.Extend('bl602-iot-matter-v1-light-115200', board=BouffalolabBoard.BL602_IoT_Matter_V1, app=BouffalolabApp.LIGHT, enable_rpcs=False, baudrate=115200, module_type="BL602")
+    yield target.Extend('bl602-iot-matter-v1-light-rpc', board=BouffalolabBoard.BL602_IoT_Matter_V1, app=BouffalolabApp.LIGHT, enable_rpcs=True, baudrate=115200, module_type="BL602")
+    yield target.Extend('bl602-night-light-light', board=BouffalolabBoard.BL602_NIGHT_LIGHT, app=BouffalolabApp.LIGHT, enable_rpcs=False, module_type="BL602")
 
     yield target.Extend('xt-zb6-devkit-light', board=BouffalolabBoard.XT_ZB6_DevKit, app=BouffalolabApp.LIGHT, enable_rpcs=False, module_type="BL706C-22")
     yield target.Extend('xt-zb6-devkit-light-115200', board=BouffalolabBoard.XT_ZB6_DevKit, app=BouffalolabApp.LIGHT, enable_rpcs=False, baudrate=115200, module_type="BL706C-22")
