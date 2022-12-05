@@ -22,24 +22,18 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
 
-using MonitoringRegistrationStruct = chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::Type;
 
 namespace chip {
 class ClientMonitoringRegistrationTable
 {
 public:
-    /**********************************************************
-     * Functions Definitions
-     *********************************************************/
+    using MonitoringRegistrationStruct = chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::Type;
 
     ClientMonitoringRegistrationTable() {}
 
     static ClientMonitoringRegistrationTable & Instance();
 
 private:
-    /**********************************************************
-     * Attributes Declaration
-     *********************************************************/
 
     static ClientMonitoringRegistrationTable sInstance;
     MonitoringRegistrationStruct mRegisteredClients[CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC];

@@ -63,8 +63,6 @@ public:
     {
         return CHIP_ERROR_WRITE_FAILED;
     }
-
-private:
 };
 
 ClientMonitoringAttributeAccess gAttribute;
