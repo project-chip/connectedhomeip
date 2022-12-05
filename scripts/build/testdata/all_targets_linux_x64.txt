@@ -7,7 +7,7 @@ efr32-{brd4161a,brd4187c,brd4163a,brd4164a,brd4166a,brd4170a,brd4186a,brd4187a,b
 esp32-{m5stack,c3devkit,devkitc,qemu}-{all-clusters,all-clusters-minimal,ota-requestor,ota-requestor,shell,light,lock,bridge,temperature-measurement,ota-requestor,tests}[-rpc][-ipv6only]
 genio-lighting-app
 linux-fake-tests[-mbedtls][-boringssl][-asan][-tsan][-libfuzzer][-coverage][-dmalloc][-clang]
-linux-{x64,arm64}-{rpc-console,all-clusters,all-clusters-minimal,chip-tool,thermostat,java-matter-controller,minmdns,light,lock,shell,ota-provider,ota-requestor,python-bindings,tv-app,tv-casting-app,bridge,dynamic-bridge,tests,chip-cert,address-resolve-tool}[-nodeps][-minmdns-verbose][-libnl][-same-event-loop][-no-interactive][-ipv6only][-no-ble][-no-wifi][-no-thread][-mbedtls][-boringssl][-asan][-tsan][-libfuzzer][-coverage][-dmalloc][-clang][-test][-rpc]
+linux-{x64,arm64}-{rpc-console,all-clusters,all-clusters-minimal,chip-tool,thermostat,java-matter-controller,minmdns,light,lock,shell,ota-provider,ota-requestor,python-bindings,tv-app,tv-casting-app,bridge,dynamic-bridge,tests,chip-cert,address-resolve-tool}[-nodeps][-platform-mdns][-minmdns-verbose][-libnl][-same-event-loop][-no-interactive][-ipv6only][-no-ble][-no-wifi][-no-thread][-mbedtls][-boringssl][-asan][-tsan][-libfuzzer][-coverage][-dmalloc][-clang][-test][-rpc]
 linux-x64-efr32-test-runner[-clang]
 imx-{chip-tool,lighting-app,thermostat,all-clusters-app,all-clusters-minimal-app,ota-provider-app}[-release]
 infineon-psoc6-{lock,light,all-clusters,all-clusters-minimal}[-ota][-updateimage]

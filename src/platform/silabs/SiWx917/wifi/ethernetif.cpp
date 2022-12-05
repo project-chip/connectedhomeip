@@ -21,12 +21,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "em_bus.h"
-#include "em_cmu.h"
-#include "em_gpio.h"
-#include "em_ldma.h"
-#include "em_usart.h"
-
 #ifndef WF200_WIFI
 #include "FreeRTOS.h"
 #include "event_groups.h"
@@ -182,141 +176,6 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
     }
 }
 
-/*****************************************************************************
- *  @fn  static err_t low_level_output(struct netif *netif, struct pbuf *p)
- *  @brief
- *    This function should does the actual transmission of the packet(s).
- *    The packet is contained in the pbuf that is passed to the function.
- *    This pbuf might be chained.
- *
- * @param[in] netif: the lwip network interface structure
- *
- * @param[in] p: the packet to send
- *
- * @return
- *    ERR_OK if successful
- ******************************************************************************/
-#ifdef WF200_WIFI
-static err_t low_level_output(struct netif * netif, struct pbuf * p)
-{
-    struct pbuf * q;
-    sl_wfx_send_frame_req_t * tx_buffer;
-    uint8_t * buffer;
-    uint32_t framelength, asize;
-    uint32_t bufferoffset;
-    uint32_t padding;
-    sl_status_t result;
-
-    for (q = p, framelength = 0; q != NULL; q = q->next)
-    {
-        framelength += q->len;
-    }
-    if (framelength < LWIP_FRAME_ALIGNMENT)
-    { /* 60 : Frame alignment for LWIP */
-        padding = LWIP_FRAME_ALIGNMENT - framelength;
-    }
-    else
-    {
-        padding = 0;
-    }
-
-    /* choose padding of 64 */
-    asize = SL_WFX_ROUND_UP(framelength + padding, 64) + sizeof(sl_wfx_send_frame_req_t);
-    // 12 is size of other data in buffer struct, user shouldn't have to care about this?
-    if (sl_wfx_host_allocate_buffer((void **) &tx_buffer, SL_WFX_TX_FRAME_BUFFER, asize) != SL_STATUS_OK)
-    {
-        SILABS_LOG("*ERR*EN-Out: No mem frame len=%d", framelength);
-        gOverrunCount++;
-        SILABS_LOG("overrun count exiting when faied to alloc value %d", gOverrunCount);
-        return ERR_MEM;
-    }
-    buffer = tx_buffer->body.packet_data;
-    /* copy frame from pbufs to driver buffers */
-    for (q = p, bufferoffset = 0; q != NULL; q = q->next)
-    {
-        /* Get bytes in current lwIP buffer */
-        memcpy((uint8_t *) ((uint8_t *) buffer + bufferoffset), (uint8_t *) ((uint8_t *) q->payload), q->len);
-        bufferoffset += q->len;
-    }
-    /* No requirement to do this - but we should for security */
-    if (padding)
-    {
-        memset(buffer + bufferoffset, 0, padding);
-        framelength += padding;
-    }
-    /* transmit */
-    int i  = 0;
-    result = SL_STATUS_FAIL;
-
-#ifdef WIFI_DEBUG_ENABLED
-    SILABS_LOG("WF200: Out %d", (int) framelength);
-#endif
-
-    /* send the generated frame over Wifi network */
-    while ((result != SL_STATUS_OK) && (i++ < 10))
-    {
-        result = sl_wfx_send_ethernet_frame(tx_buffer, framelength, SL_WFX_STA_INTERFACE, PRIORITY_0);
-    }
-    sl_wfx_host_free_buffer(tx_buffer, SL_WFX_TX_FRAME_BUFFER);
-
-    if (result != SL_STATUS_OK)
-    {
-        SILABS_LOG("*ERR*Send enet %d", (int) framelength);
-        return ERR_IF;
-    }
-    return ERR_OK;
-}
-
-/*****************************************************************************
- * @fn   void sl_wfx_host_received_frame_callback(sl_wfx_received_ind_t *rx_buffer)
- * @brief
- *    This function implements the wf200 received frame callback.
- *    Called from the context of the bus_task (not ISR)
- *
- * @param[in] rx_buffer: the ethernet frame received by the wf200
- *
- * @return
- *    None
- ******************************************************************************/
-void sl_wfx_host_received_frame_callback(sl_wfx_received_ind_t * rx_buffer)
-{
-    struct netif * netif;
-
-    /* Check packet interface to send to AP or STA interface */
-    if ((rx_buffer->header.info & SL_WFX_MSG_INFO_INTERFACE_MASK) == (SL_WFX_STA_INTERFACE << SL_WFX_MSG_INFO_INTERFACE_OFFSET))
-    {
-
-        /* Send received frame to station interface */
-        if ((netif = wfx_get_netif(SL_WFX_STA_INTERFACE)) != NULL)
-        {
-            uint8_t * buffer;
-            uint16_t len;
-
-            len    = rx_buffer->body.frame_length;
-            buffer = (uint8_t *) &(rx_buffer->body.frame[rx_buffer->body.frame_padding]);
-
-#ifdef WIFI_DEBUG_ENABLED
-            SILABS_LOG("WF200: In %d", (int) len);
-#endif
-
-            low_level_input(netif, buffer, len);
-        }
-        else
-        {
-#ifdef WIFI_DEBUG_ENABLED
-            SILABS_LOG("WF200: NO-INTF");
-#endif
-        }
-    }
-    else
-    {
-#ifdef WIFI_DEBUG_ENABLED
-        SILABS_LOG("WF200: Invalid frame IN");
-#endif
-    }
-}
-
-#else /* For RS911x - using LWIP */
 static SemaphoreHandle_t ethout_sem;
 /*****************************************************************************
  *  @fn  static err_t low_level_output(struct netif *netif, struct pbuf *p)
@@ -422,8 +281,6 @@ void wfx_host_received_sta_frame_cb(uint8_t * buf, int len)
     }
 }
 
-#endif /* RS911x - with LWIP */
-
 /*****************************************************************************
  *  @fn  err_t sta_ethernetif_init(struct netif *netif)
  *  @brief
@@ -452,10 +309,10 @@ err_t sta_ethernetif_init(struct netif * netif)
 
     /* initialize the hardware */
     low_level_init(netif);
-#ifndef WF200_WIFI
+
     /* Need single output only */
     ethout_sem = xSemaphoreCreateBinaryStatic(&xEthernetIfSemaBuffer);
     xSemaphoreGive(ethout_sem);
-#endif
+
     return ERR_OK;
 }

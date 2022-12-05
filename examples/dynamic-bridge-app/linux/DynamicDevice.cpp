@@ -19,7 +19,7 @@
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 
 #include "DynamicDevice.h"
 
@@ -55,7 +55,7 @@ Device DynamicDevice::CreateDevice()
 
     // Force a default descriptor cluster to be present.
     mClusterDecls.emplace_back(
-        EmberAfCluster DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nullptr));
+        EmberAfCluster DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::Descriptor::Id, descriptorAttrs, nullptr, nullptr));
 
     return Device(chip::Span<chip::DataVersion>(mVersions.data(), mVersions.size()),
                   chip::Span<EmberAfCluster>(mClusterDecls.data(), mClusterDecls.size()),

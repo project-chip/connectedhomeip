@@ -28,13 +28,6 @@ void uartConsoleInit(void);
 int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength);
 int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead);
 
-// Implemented by in openthread code
-#ifndef PW_RPC_ENABLED
-extern void otPlatUartReceived(const uint8_t * aBuf, uint16_t aBufLength);
-extern void otPlatUartSendDone(void);
-extern void otSysEventSignalPending(void);
-#endif
-
 #ifdef __cplusplus
 } // extern "C"
 #endif
