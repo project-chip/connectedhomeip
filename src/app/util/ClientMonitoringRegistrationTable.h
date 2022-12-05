@@ -22,7 +22,6 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
 
-
 namespace chip {
 class ClientMonitoringRegistrationTable
 {
@@ -34,7 +33,6 @@ public:
     static ClientMonitoringRegistrationTable & Instance();
 
 private:
-
     static ClientMonitoringRegistrationTable sInstance;
     MonitoringRegistrationStruct mRegisteredClients[CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC];
 };

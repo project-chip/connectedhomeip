@@ -1316,10 +1316,9 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_NUM_CD_KEY_SLOTS 5
 #endif // CHIP_CONFIG_NUM_CD_KEY_SLOTS
 
-
 /**
  * @def CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC
- * 
+ *
  * @brief Defines the number of clients that can register for monitoring with a server
  * see ClientMonitoring cluster for specification
  */
