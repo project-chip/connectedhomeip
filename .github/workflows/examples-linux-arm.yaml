@@ -22,6 +22,9 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     arm_crosscompile:
         name: Linux ARM Cross compile
@@ -64,11 +67,13 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Build Some samples
               timeout-minutes: 45
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
+                        --target linux-arm64-chip-cert \
                         --target linux-arm64-all-clusters-clang \
                         --target linux-arm64-chip-tool-ipv6only-clang \
                         --target linux-arm64-lock-clang \

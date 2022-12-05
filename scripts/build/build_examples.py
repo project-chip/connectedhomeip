@@ -205,4 +205,4 @@ def cmd_build(context, copy_artifacts_to, create_archives):
 
 
 if __name__ == '__main__':
-    main()
+    main(auto_envvar_prefix='CHIP')

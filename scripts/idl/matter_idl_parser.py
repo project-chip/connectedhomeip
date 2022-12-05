@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-import enum
 import functools
 import logging
+from enum import Enum
 
 from lark import Lark
 from lark.visitors import Transformer, v_args
@@ -61,7 +61,7 @@ class AddDeviceTypeToEndpointTransform:
 
 class MatterIdlTransformer(Transformer):
     """
-    A transformer capable to transform data parsed by Lark according to 
+    A transformer capable to transform data parsed by Lark according to
     matter_grammar.lark.
 
     Generally transforms a ".matter" file into an Abstract Syntax Tree (AST).
@@ -72,7 +72,7 @@ class MatterIdlTransformer(Transformer):
     purpose is to convert LARK tokens (that ar generally inputted by name)
     into underlying python types.
 
-    Some documentation to get started is available at 
+    Some documentation to get started is available at
     https://lark-parser.readthedocs.io/en/latest/visitors.html#transformer
 
     TLDR would be:
@@ -438,9 +438,10 @@ def CreateParser(skip_meta: bool = False):
 if __name__ == '__main__':
     # This Parser is generally not intended to be run as a stand-alone binary.
     # The ability to run is for debug and to print out the parsed AST.
+    import pprint
+
     import click
     import coloredlogs
-    import pprint
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants
@@ -469,4 +470,4 @@ if __name__ == '__main__':
         logging.info("Data:")
         pprint.pp(data)
 
-    main()
+    main(auto_envvar_prefix='CHIP')

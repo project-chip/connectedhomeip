@@ -22,11 +22,12 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     tizen:
         name: Tizen
-        env:
-            BUILD_TYPE: tizen
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -49,6 +50,10 @@ jobs:
                   attempt_delay: 2000
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform tizen
+
+            - name: Bootstrap
+              run: scripts/build/gn_bootstrap.sh
+
             - name: Build Tizen examples
               run: |
                 ./scripts/run_in_build_env.sh \
