@@ -1152,8 +1152,23 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
                 app::DataModel::Nullable<int8_t> averageRssi;
                 app::DataModel::Nullable<int8_t> lastRssi;
 
-                averageRssi.SetNonNull(neighInfo.mAverageRssi);
-                lastRssi.SetNonNull(neighInfo.mLastRssi);
+                if (neighInfo.mAverageRssi == OT_RADIO_RSSI_INVALID)
+                {
+                    averageRssi.SetNull();
+                }
+                else
+                {
+                    averageRssi.SetNonNull(((neighInfo.mAverageRssi > 0) ? 0 : neighInfo.mAverageRssi));
+                }
+
+                if (neighInfo.mAverageRssi == OT_RADIO_RSSI_INVALID)
+                {
+                    lastRssi.SetNull();
+                }
+                else
+                {
+                    lastRssi.SetNonNull(((neighInfo.mLastRssi > 0) ? 0 : neighInfo.mLastRssi));
+                }
 
                 neighborTable.averageRssi      = averageRssi;
                 neighborTable.lastRssi         = lastRssi;
