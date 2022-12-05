@@ -69,7 +69,7 @@ def try_update_yaml_node_id_test_runner_state(tests, config):
     identities = {'alpha': None if 'nodeId' not in config else config['nodeId']}
 
     for test in tests:
-        if not test.isEnabled:
+        if not test.is_enabled:
             continue
 
         identity = test.identity

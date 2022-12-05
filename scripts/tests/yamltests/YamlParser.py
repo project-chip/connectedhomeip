@@ -15,6 +15,7 @@
 
 import yaml
 import string
+from enum import Enum
 
 from . import YamlFixes
 
@@ -74,61 +75,81 @@ _EVENT_COMMANDS = [
 ]
 
 
+class PostProcessCheckStatus(Enum):
+    SUCCESS = 'success',
+    WARNING = 'warning',
+    ERROR = 'error'
+
+
+# TODO these values are just what was there before, these should be updated
+class PostProcessCheckType(Enum):
+    IM_STATUS = 'Error',
+    CLUSTER_STATUS = 'ClusterError',
+    RESPONSE_VALIDATION = 'Response',
+    CONSTRAINT_VALIDATION = 'Constraints',
+    SAVE_AS_VARIABLE = 'SaveAs'
+
+
 # Each 'check' add an entry into the logs db. This entry contains the success of failure state as well as a log
 # message describing the check itself.
 # A check state can be any of the three valid state:
 #  * success: Indicates that the check was successfull
 #  * failure: Indicates that the check was unsuccessfull
 #  * warning: Indicates that the check is probably successful but that something needs to be considered.
-class YamlLog:
-    def __init__(self, state, category, message):
-        if not state == 'success' and not state == 'warning' and not state == 'error':
-            raise ValueError
-
+class PostProcessCheck:
+    def __init__(self, state: PostProcessCheckStatus, category: PostProcessCheckType, message: str):
         self.state = state
         self.category = category
         self.message = message
 
-    def is_success(self):
-        return self.state == 'success'
+    def is_success(self) -> bool:
+        return self.state == PostProcessCheckStatus.SUCCESS
 
-    def is_warning(self):
-        return self.state == 'warning'
+    def is_warning(self) -> bool:
+        return self.state == PostProcessCheckStatus.WARNING
 
-    def is_error(self):
-        return self.state == 'error'
+    def is_error(self) -> bool:
+        return self.state == PostProcessCheckStatus.ERROR
 
 
-class YamlLogger:
+class PostProcessResponseResult:
+    ''' asdf
+
+    There are multiple steps that occur when post processing a response. This is a summary of the
+    results. Note that the number and types of steps performed is dependant on test step itself.
+    '''
+
     def __init__(self):
         self.entries = []
         self.successes = 0
         self.warnings = 0
         self.errors = 0
 
-    def success(self, category, message):
-        self.__insert('success', category, message)
+    def success(self, category: PostProcessCheckType, message: str):
+        ''' Adds a success entry that occured when post processing response to results.'''
+        self.__insert(PostProcessCheckStatus.SUCCESS, category, message)
         self.successes += 1
-        pass
 
-    def warning(self, category, message):
-        self.__insert('warning', category, message)
+    def warning(self, category: PostProcessCheckType, message: str):
+        ''' Adds a warning entry that occured when post processing response to results.'''
+        self.__insert(PostProcessCheckStatus.WARNING, category, message)
         self.warnings += 1
-        pass
 
-    def error(self, category, message):
-        self.__insert('error', category, message)
+    def error(self, category: PostProcessCheckType, message: str):
+        ''' Adds an error entry that occured when post processing response to results.'''
+        self.__insert(PostProcessCheckStatus.ERROR, category, message)
         self.errors += 1
-        pass
 
     def is_success(self):
+        # It is possible that post processing a response doesn't have any success entires added
+        # that is why we explicitly only search for if an error occurred.
         return self.errors == 0
 
     def is_failure(self):
         return self.errors != 0
 
-    def __insert(self, state, category, message):
-        log = YamlLog(state, category, message)
+    def __insert(self, state: PostProcessCheckStatus, category: PostProcessCheckType, message: str):
+        log = PostProcessCheck(state, category, message)
         self.entries.append(log)
 
 
@@ -148,17 +169,17 @@ def _valueOrConfig(data, key, config):
     return data[key] if key in data else config[key]
 
 
-class YamlTest:
-    isEnabled: True
-    isCommand: False
-    isAttribute: False
-    isEvent: False
+class TestStep:
+    is_enabled: True
+    is_command: False
+    is_attribute: False
+    is_event: False
 
-    def __init__(self, test, config, definitions):
-        # disabled tests are not parsed in order to allow the test to be added to the test
+    def __init__(self, test: dict, config: dict, definitions):
+        # Disabled tests are not parsed in order to allow the test to be added to the test
         # suite even if the feature is not implemented yet.
-        self.isEnabled = not ('disabled' in test and test['disabled'])
-        if not self.isEnabled:
+        self.is_enabled = not ('disabled' in test and test['disabled'])
+        if not self.is_enabled:
             return
 
         _check_valid_keys(test, _TEST_SECTION)
@@ -178,8 +199,8 @@ class YamlTest:
         self.timedInteractionTimeoutMs = _valueOrNone(test, 'timedInteractionTimeoutMs')
         self.busyWaitMs = _valueOrNone(test, 'busyWaitMs')
 
-        self.isAttribute = self.command in _ATTRIBUTE_COMMANDS
-        self.isEvent = self.command in _EVENT_COMMANDS
+        self.is_attribute = self.command in _ATTRIBUTE_COMMANDS
+        self.is_event = self.command in _EVENT_COMMANDS
 
         self.arguments = _valueOrNone(test, 'arguments')
         self.response = _valueOrNone(test, 'response')
@@ -187,7 +208,7 @@ class YamlTest:
         _check_valid_keys(self.arguments, _TEST_ARGUMENTS_SECTION)
         _check_valid_keys(self.response, _TEST_RESPONSE_SECTION)
 
-        if self.isAttribute:
+        if self.is_attribute:
             attribute_definition = definitions.get_attribute_definition(self.attribute)
             self.arguments = self.__update_with_definition(self.arguments, attribute_definition, config)
             self.response = self.__update_with_definition(self.response, attribute_definition, config)
@@ -197,71 +218,76 @@ class YamlTest:
             self.arguments = self.__update_with_definition(self.arguments, command_definition, config)
             self.response = self.__update_with_definition(self.response, response_definition, config)
 
-    def check_response(self, response, config):
-        logger = YamlLogger()
+    def post_process_response(self, response, config):
+        result = PostProcessResponseResult()
 
-        if (not self.__maybe_check_optional(response, logger)):
-            return logger
+        if (not self.__maybe_check_optional(response, result)):
+            return result
 
-        self.__maybe_check_error(response, logger)
-        self.__maybe_check_cluster_error(response, logger)
-        self.__maybe_check_values(response, config, logger)
-        self.__maybe_check_constraints(response, config, logger)
-        self.__maybe_save_as(response, config, logger)
+        self.__maybe_check_error(response, result)
+        self.__maybe_check_cluster_error(response, result)
+        self.__maybe_check_values(response, config, result)
+        self.__maybe_check_constraints(response, config, result)
+        self.__maybe_save_as(response, config, result)
 
-        return logger
+        return result
 
-    def __maybe_check_optional(self, response, logger):
+    def __maybe_check_optional(self, response, result):
         if not self.optional or not 'error' in response:
             return True
 
         error = response['error']
         if error == 'UNSUPPORTED_ATTRIBUTE' or error == 'UNSUPPORTED_COMMAND':
-            # logger.warning('Optional', f'The response contains the error: "{error}".')
+            # result.warning('Optional', f'The response contains the error: "{error}".')
             return False
 
         return True
 
-    def __maybe_check_error(self, response, logger):
+    def __maybe_check_error(self, response, result):
         if self.response and 'error' in self.response:
             expectedError = self.response['error']
             if 'error' in response:
                 receivedError = response['error']
                 if expectedError == receivedError:
-                    logger.success('Error', f'The test expects the "{expectedError}" error which occured successfully.')
+                    result.success(PostProcessCheckType.IM_STATUS,
+                                   f'The test expects the "{expectedError}" error which occured successfully.')
                 else:
-                    logger.error('Error', f'The test expects the "{expectedError}" error but the "{receivedError}" error occured.')
+                    result.error(PostProcessCheckType.IM_STATUS,
+                                 f'The test expects the "{expectedError}" error but the "{receivedError}" error occured.')
             else:
-                logger.error('Error', f'The test expects the "{expectedError}" error but no error occured.')
+                result.error(PostProcessCheckType.IM_STATUS, f'The test expects the "{expectedError}" error but no error occured.')
         elif not self.response or not 'error' in self.response:
             if 'error' in response:
                 receivedError = response['error']
-                logger.error('Error', f'The test expects no error but the "{receivedError}" error occured.')
+                result.error(PostProcessCheckType.IM_STATUS, f'The test expects no error but the "{receivedError}" error occured.')
             # Handle generic success/errors
             elif response == 'failure':
                 receivedError = response
-                logger.error('Error', f'The test expects no error but the "{receivedError}" error occured.')
+                result.error(PostProcessCheckType.IM_STATUS, f'The test expects no error but the "{receivedError}" error occured.')
             else:
-                logger.success('Error', f'The test expects no error an no error occured.')
+                result.success(PostProcessCheckType.IM_STATUS, f'The test expects no error an no error occured.')
 
-    def __maybe_check_cluster_error(self, response, logger):
+    def __maybe_check_cluster_error(self, response, result):
         if self.response and 'clusterError' in self.response:
             expectedError = self.response['clusterError']
             if 'clusterError' in response:
                 receivedError = response['clusterError']
                 if expectedError == receivedError:
-                    logger.success('Error', f'The test expects the "{expectedError}" error which occured successfully.')
+                    result.success(PostProcessCheckType.CLUSTER_STATUS,
+                                   f'The test expects the "{expectedError}" error which occured successfully.')
                 else:
-                    logger.error('Error', f'The test expects the "{expectedError}" error but the "{receivedError}" error occured.')
+                    result.error(PostProcessCheckType.CLUSTER_STATUS,
+                                 f'The test expects the "{expectedError}" error but the "{receivedError}" error occured.')
             else:
-                logger.error('Error', f'The test expects the "{expectedError}" error but no error occured.')
+                result.error(PostProcessCheckType.CLUSTER_STATUS,
+                             f'The test expects the "{expectedError}" error but no error occured.')
 
-    def __maybe_check_values(self, response, config, logger):
+    def __maybe_check_values(self, response, config, result):
         if not self.response or not 'values' in self.response:
             return
 
         if not 'value' in response:
-            logger.error('Response', f'The test expects some values but none was received.')
+            result.error(PostProcessCheckType.RESPONSE_VALIDATION, f'The test expects some values but none was received.')
             return
 
         expected_entries = self.response['values']
@@ -276,30 +302,31 @@ class YamlTest:
                 expected_value = expected_entry['value']
                 if not expected_name in received_entry:
                     if expected_value is None:
-                        logger.success('Response', f'The test expectation "{expected_name} == {expected_value}" is true')
+                        result.success(PostProcessCheckType.RESPONSE_VALIDATION,
+                                       f'The test expectation "{expected_name} == {expected_value}" is true')
                     else:
-                        logger.error(
-                            'Response', f'The test expects a value named "{expected_name}" but it does not exists in the response."')
+                        result.error(
+                            PostProcessCheckType.RESPONSE_VALIDATION, f'The test expects a value named "{expected_name}" but it does not exists in the response."')
                     return
 
                 received_value = received_entry[expected_name]
-                self.__check_value(expected_name, expected_value, received_value, logger)
+                self.__check_value(expected_name, expected_value, received_value, result)
             else:
                 if not 'value' in expected_entries[0]:
                     continue
 
                 expected_value = expected_entry['value']
                 received_value = received_entry
-                self.__check_value('value', expected_value, received_value, logger)
+                self.__check_value('value', expected_value, received_value, result)
 
-    def __check_value(self, name, expected_value, received_value, logger):
+    def __check_value(self, name, expected_value, received_value, result):
         # TODO Supports Array/List. See an exemple of failure in TestArmFailSafe.yaml
         if expected_value == received_value:
-            logger.success('Response', f'The test expectation "{name} == {expected_value}" is true')
+            result.success(PostProcessCheckType.RESPONSE_VALIDATION, f'The test expectation "{name} == {expected_value}" is true')
         else:
-            logger.error('Response', f'The test expectation "{name} == {expected_value}" is false')
+            result.error(PostProcessCheckType.RESPONSE_VALIDATION, f'The test expectation "{name} == {expected_value}" is false')
 
-    def __maybe_check_constraints(self, response, config, logger):
+    def __maybe_check_constraints(self, response, config, result):
         if not self.response or not 'constraints' in self.response:
             return
         constraints = self.response['constraints']
@@ -376,7 +403,8 @@ class YamlTest:
             if allowed['types'] == '*' or type(value) in allowed['types']:
                 return True
 
-            logger.error('Constraints', f'The "{constraint}" constraint is used but the value is not of types {allowed["types"]}.')
+            result.error(PostProcessCheckType.CONSTRAINT_VALIDATION,
+                         f'The "{constraint}" constraint is used but the value is not of types {allowed["types"]}.')
             return False
 
         received_value = response['value']
@@ -572,18 +600,18 @@ class YamlTest:
                 message = f'Unknown constraint type: {constraint}'
 
             if success:
-                logger.success('Constraints', f'The test constraint "{message}" succeeds.')
+                result.success(PostProcessCheckType.CONSTRAINT_VALIDATION, f'The test constraint "{message}" succeeds.')
             elif warning:
-                logger.warning('Constraints', f'The test constraints "{message}" is ignored.')
+                result.warning(PostProcessCheckType.CONSTRAINT_VALIDATION, f'The test constraints "{message}" is ignored.')
             else:
-                logger.error('Constraints', f'The test constraint "{message}" failed.')
+                result.error(PostProcessCheckType.CONSTRAINT_VALIDATION, f'The test constraint "{message}" failed.')
 
-    def __maybe_save_as(self, response, config, logger):
-        if not self.response or not 'values' in self.response:
+    def __maybe_save_as(self, response, config, result):
+        if not self.response or 'values' not in self.response:
             return
 
         if not 'value' in response:
-            logger.error('SaveAs', f'SaveAs: The test expects some values but none was received.')
+            result.error(PostProcessCheckType.SAVE_AS_VARIABLE, f'The test expects some values but none was received.')
             return
 
         expected_entries = self.response['values']
@@ -597,17 +625,17 @@ class YamlTest:
             if type(expected_entry) is dict and type(received_entry) is dict:
                 expected_name = expected_entry['name']
                 if not expected_name in received_entry:
-                    logger.error(
-                        'SaveAs', f'The test expects a value named "{expected_name}" but it does not exists in the response."')
+                    result.error(
+                        PostProcessCheckType.SAVE_AS_VARIABLE, f'The test expects a value named "{expected_name}" but it does not exists in the response."')
                     continue
 
                 received_value = received_entry[expected_name]
                 config[saveAs] = received_value
-                logger.success('SaveAs', f'The test save the value "{received_value}" as {saveAs}.')
+                result.success(PostProcessCheckType.SAVE_AS_VARIABLE, f'The test save the value "{received_value}" as {saveAs}.')
             else:
                 received_value = received_entry
                 config[saveAs] = received_value
-                logger.success('SaveAs', f'The test save the value "{received_value}" as {saveAs}.')
+                result.success(PostProcessCheckType.SAVE_AS_VARIABLE, f'The test save the value "{received_value}" as {saveAs}.')
 
     def __update_with_definition(self, container, mapping_type, config):
         if not container or not mapping_type:
@@ -703,7 +731,8 @@ class YamlTests:
 class YamlParser:
     name: None
     PICS: None
-    config: None
+    # TODO config should be internal (_config). Also can it actually be None, or
+    config: dict = {}
     tests: None
 
     def __init__(self, test_file, pics_file, definitions):
@@ -717,15 +746,16 @@ class YamlParser:
 
             self.name = _valueOrNone(data, 'name')
             self.PICS = _valueOrNone(data, 'PICS')
+
             self.config = _valueOrNone(data, 'config')
 
-            tests = list(filter(lambda test: test.isEnabled, [YamlTest(
+            tests = list(filter(lambda test: test.is_enabled, [TestStep(
                 test, self.config, definitions) for test in _valueOrNone(data, 'tests')]))
             YamlFixes.try_update_yaml_node_id_test_runner_state(tests, self.config)
 
-            self.tests = YamlTests(tests, self.__updatePlaceholder)
+            self.tests = YamlTests(tests, self.__update_placeholder)
 
-    def __updatePlaceholder(self, data):
+    def __update_placeholder(self, data):
         data.arguments = self.__encode_values(data.arguments)
         data.response = self.__encode_values(data.response)
         return data
@@ -734,6 +764,7 @@ class YamlParser:
         if not container:
             return None
 
+        # TODO this should likely be moved to end of TestStep.__init__
         if 'value' in container:
             container['values'] = [{'name': 'value', 'value': container['value']}]
             del container['value']
@@ -741,50 +772,55 @@ class YamlParser:
         if 'values' in container:
             for idx, item in enumerate(container['values']):
                 if 'value' in item:
-                    container['values'][idx]['value'] = self.__encode_value_with_config(item['value'], self.config)
+                    container['values'][idx]['value'] = self.__config_variable_substitution(item['value'])
 
+        # TODO this should likely be moved to end of TestStep.__init__. But depends on rationale
         if 'saveAs' in container:
             if not 'values' in container:
+                # TODO Currently very unclear why this corner case is needed. Would be nice to add
+                # information as to why this would happen.
                 container['values'] = [{}]
             container['values'][0]['saveAs'] = container['saveAs']
             del container['saveAs']
 
         return container
 
-    def __encode_value_with_config(self, value, config):
+    def __config_variable_substitution(self, value):
         if type(value) is list:
-            return [self.__encode_value_with_config(entry, config) for entry in value]
+            return [self.__config_variable_substitution(entry) for entry in value]
         elif type(value) is dict:
             mapped_value = {}
             for key in value:
-                mapped_value[key] = self.__encode_value_with_config(value[key], config)
+                mapped_value[key] = self.__config_variable_substitution(value[key])
             return mapped_value
         elif type(value) is str:
             # For most tests, a single config variable is used and it can be replaced as in.
             # But some other tests were relying on the fact that the expression was put 'as if' in
-            # the generated code and was resolved before beeing sent over the wire. For such expressions
+            # the generated code and was resolved before being sent over the wire. For such expressions
             # (e.g 'myVar + 1') we need to compute it before sending it over the wire.
             tokens = value.split()
             if len(tokens) == 0:
                 return value
 
-            has_items_from_config = False
+            substitution_occured = False
             for idx, token in enumerate(tokens):
-                if token in config:
-                    config_item = self.config[token]
-                    if type(config_item) is dict and 'defaultValue' in config_item:
-                        config_item = config_item['defaultValue']
-                    tokens[idx] = config_item
-                    has_items_from_config = True
+                if token in self.config:
+                    variable_info = self.config[token]
+                    if type(variable_info) is dict and 'defaultValue' in variable_info:
+                        variable_info = variable_info['defaultValue']
+                    tokens[idx] = variable_info
+                    substitution_occured = True
 
             if len(tokens) == 1:
                 return tokens[0]
 
             tokens = [str(token) for token in tokens]
             value = ' '.join(tokens)
-            return value if not has_items_from_config else eval(value)
+            # TODO we should move away from eval. That will mean that we will need to do extra parsing,
+            # but it would be safer then just blindly running eval.
+            return value if not substitution_occured else eval(value)
         else:
             return value
 
-    def updateConfig(key, value):
+    def update_config(self, key, value):
         self.config[key] = value
