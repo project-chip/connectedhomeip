@@ -74,34 +74,25 @@ Mac OS.
 The following steps take examples for BL602 develop board `BL602-IoT-Matter-V1`
 and BL706 develop board `XT-ZB6-DevKit`.
 
--   Build lighting app
+-   Build lighting app with UART baudrate 2000000
 
     ```
     ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light build
     ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light build
     ```
 
--   UART baudrate is 2000000 by default; for baudrate 115200, please build
-    target name with `-115200` appended
+-   Build lighting app with UART baudrate 115200
 
-    ```shell
+    ```
     ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light-115200 build
     ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-115200 build
     ```
 
--   Build target name with `-rpc` appended for rpc enabled as following
-    commands.
+-   Build lighting app with RPC enabled and UART baudrate 115200.
 
-    ```shell
+    ```
     ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light-rpc build
     ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-rpc build
-    ```
-
--   For multiple build options ,such as UART baudrate 115200 + rpc, please try
-
-    ```shell
-    ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light-rpc-115200 build
-    ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-rpc-115200 build
     ```
 
 ## Download image
@@ -168,7 +159,7 @@ and BL706 develop board `XT-ZB6-DevKit`.
 ## Run the example
 
 -   You can open the serial console. For example, if the device is at
-    `/dev/ttyACM0`:
+    `/dev/ttyACM0` with UART baudrate 2000000 built:
 
         ```shell
         picocom -b 2000000 /dev/ttyACM0

@@ -19,16 +19,6 @@ from enum import Enum, auto
 
 from .gn import GnBuilder
 
-# Supported log levels, mapping string values required for argument
-# parsing into logging constants
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARN,
-    'fatal': logging.FATAL,
-}
-
-
 class BouffalolabApp(Enum):
     LIGHT = auto()
 
