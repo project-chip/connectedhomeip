@@ -21,7 +21,6 @@
 #include "AppEvent.h"
 #include "LEDWidget.h"
 
-#include <core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #if CONFIG_CHIP_FACTORY_DATA

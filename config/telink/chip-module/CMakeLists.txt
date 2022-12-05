@@ -303,6 +303,8 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     add_custom_target(west_sign ALL
         COMMAND
         west sign -t imgtool -p ${ZEPHYR_BASE}/../bootloader/mcuboot/scripts/imgtool.py -d ${PROJECT_BINARY_DIR}/.. -- --pad-header --key ${ZEPHYR_BASE}/../bootloader/mcuboot/root-rsa-2048.pem
+        BYPRODUCTS
+        ${PROJECT_BINARY_DIR}/zephyr.signed.bin
     )
 
     add_custom_target(merge_mcuboot ALL
