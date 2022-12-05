@@ -19,6 +19,7 @@ from enum import Enum, auto
 
 from .gn import GnBuilder
 
+
 class BouffalolabApp(Enum):
     LIGHT = auto()
 
