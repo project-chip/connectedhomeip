@@ -1827,6 +1827,36 @@ public class ChipStructs {
     }
   }
 
+  public static class ClientMonitoringClusterMonitoringRegistration {
+    public Long clientNodeId;
+    public Long ICid;
+    public Integer fabricIndex;
+
+    public ClientMonitoringClusterMonitoringRegistration(
+        Long clientNodeId, Long ICid, Integer fabricIndex) {
+      this.clientNodeId = clientNodeId;
+      this.ICid = ICid;
+      this.fabricIndex = fabricIndex;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ClientMonitoringClusterMonitoringRegistration {\n");
+      output.append("\tclientNodeId: ");
+      output.append(clientNodeId);
+      output.append("\n");
+      output.append("\tICid: ");
+      output.append(ICid);
+      output.append("\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class UnitTestingClusterSimpleStruct {
     public Integer a;
     public Boolean b;

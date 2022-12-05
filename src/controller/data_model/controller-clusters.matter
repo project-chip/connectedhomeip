@@ -4108,6 +4108,37 @@ client cluster ElectricalMeasurement = 2820 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+client cluster ClientMonitoring = 4166 {
+  fabric_scoped struct MonitoringRegistration {
+    node_id clientNodeId = 1;
+    int64u ICid = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute int32u idleModeInterval = 0;
+  readonly attribute int32u activeModeInterval = 1;
+  readonly attribute int16u activeModeThreshold = 2;
+  readonly attribute MonitoringRegistration expectedClients[] = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct RegisterClientMonitoringRequest {
+    node_id clientNodeId = 0;
+    INT64U ICid = 1;
+  }
+
+  request struct UnregisterClientMonitoringRequest {
+    node_id clientNodeId = 0;
+    INT64U ICid = 1;
+  }
+
+  command access(invoke: manage) RegisterClientMonitoring(RegisterClientMonitoringRequest): DefaultSuccess = 0;
+  command access(invoke: manage) UnregisterClientMonitoring(UnregisterClientMonitoringRequest): DefaultSuccess = 1;
+}
+
 client cluster UnitTesting = 4294048773 {
   enum SimpleEnum : ENUM8 {
     kUnspecified = 0;
@@ -4486,6 +4517,7 @@ endpoint 1 {
   binding cluster ApplicationBasic;
   binding cluster AccountLogin;
   binding cluster ElectricalMeasurement;
+  binding cluster ClientMonitoring;
   binding cluster UnitTesting;
 }
 

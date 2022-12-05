@@ -62,6 +62,10 @@ public:
      */
     CHIP_ERROR LoadFromStorage(FabricIndex fabricIndex);
 
+    CHIP_ERROR DeleteFromStorage(FabricIndex fabric);
+
+    bool HasValueForFabric(FabricIndex);
+
     /**
      * @brief Accessor function that returns the client registration entry that was loaded for a fabric from persistant storage.
      * @see LoadFromStorage

@@ -1774,6 +1774,25 @@ typedef void (*CHIPElectricalMeasurementClusterFeatureMapAttributeCallbackType)(
     void *, chip::app::Clusters::ElectricalMeasurement::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPElectricalMeasurementClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+
+typedef void (*CHIPClientMonitoringClusterIdleModeIntervalAttributeCallbackType)(
+    void *, chip::app::Clusters::ClientMonitoring::Attributes::IdleModeInterval::TypeInfo::DecodableArgType);
+typedef void (*CHIPClientMonitoringClusterActiveModeIntervalAttributeCallbackType)(
+    void *, chip::app::Clusters::ClientMonitoring::Attributes::ActiveModeInterval::TypeInfo::DecodableArgType);
+typedef void (*CHIPClientMonitoringClusterActiveModeThresholdAttributeCallbackType)(
+    void *, chip::app::Clusters::ClientMonitoring::Attributes::ActiveModeThreshold::TypeInfo::DecodableArgType);
+typedef void (*CHIPClientMonitoringClusterExpectedClientsAttributeCallbackType)(
+    void *, const chip::app::Clusters::ClientMonitoring::Attributes::ExpectedClients::TypeInfo::DecodableType &);
+typedef void (*CHIPClientMonitoringClusterGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::ClientMonitoring::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPClientMonitoringClusterAcceptedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::ClientMonitoring::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPClientMonitoringClusterAttributeListAttributeCallbackType)(
+    void *, const chip::app::Clusters::ClientMonitoring::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPClientMonitoringClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::ClientMonitoring::Attributes::FeatureMap::TypeInfo::DecodableArgType);
+typedef void (*CHIPClientMonitoringClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::ClientMonitoring::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPUnitTestingClusterTestSpecificResponseCallbackType)(
     void *, const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType &);
 typedef void (*CHIPUnitTestingClusterTestAddArgumentsResponseCallbackType)(

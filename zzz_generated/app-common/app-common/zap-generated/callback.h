@@ -8810,6 +8810,12 @@ bool emberAfClientMonitoringClusterRegisterClientMonitoringCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ClientMonitoring::Commands::RegisterClientMonitoring::DecodableType & commandData);
 /**
+ * @brief Client Monitoring Cluster UnregisterClientMonitoring Command callback (from client)
+ */
+bool emberAfClientMonitoringClusterUnregisterClientMonitoringCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ClientMonitoring::Commands::UnregisterClientMonitoring::DecodableType & commandData);
+/**
  * @brief Client Monitoring Cluster StayAwakeRequest Command callback (from client)
  */
 bool emberAfClientMonitoringClusterStayAwakeRequestCallback(
