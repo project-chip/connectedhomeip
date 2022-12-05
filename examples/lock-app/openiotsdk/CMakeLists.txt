@@ -19,7 +19,6 @@ cmake_minimum_required(VERSION 3.21)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 get_filename_component(OPEN_IOT_SDK_CONFIG ${CHIP_ROOT}/config/openiotsdk REALPATH)
 get_filename_component(OPEN_IOT_SDK_EXAMPLE_COMMON ${CHIP_ROOT}/examples/platform/openiotsdk REALPATH)
-get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
 list(APPEND CMAKE_MODULE_PATH ${OPEN_IOT_SDK_CONFIG}/cmake)
 
@@ -59,11 +58,11 @@ include(chip)
 
 add_subdirectory(${OPEN_IOT_SDK_EXAMPLE_COMMON}/app ./app_build)
 
+chip_add_data_model(openiotsdk-app lock)
+
 target_include_directories(${APP_TARGET} 
     PRIVATE
         main/include
-        ${GEN_DIR}/app-common
-        ${GEN_DIR}/lock-app
 )
 
 target_sources(${APP_TARGET} 
@@ -72,17 +71,10 @@ target_sources(${APP_TARGET}
         main/ZclCallbacks.cpp
         main/LockManager.cpp
         main/LockEndpoint.cpp
-        ${GEN_DIR}/lock-app/zap-generated/IMClusterCommandHandler.cpp
 )
 
 target_link_libraries(${APP_TARGET}
     openiotsdk-app
-)
-
-include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
-chip_configure_data_model(${APP_TARGET}
-    INCLUDE_SERVER
-    ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lock-common/lock-app.zap
 )
 
 include(linker)

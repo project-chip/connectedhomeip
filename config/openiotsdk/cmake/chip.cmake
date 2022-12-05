@@ -19,6 +19,8 @@
 #     CMake for CHIP library configuration
 #
 
+get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
+
 # Default CHIP build configuration 
 set(CONFIG_CHIP_PROJECT_CONFIG "main/include/CHIPProjectConfig.h" CACHE STRING "")
 set(CONFIG_CHIP_LIB_TESTS NO CACHE BOOL "")
@@ -37,3 +39,27 @@ endif()
 
 # Add CHIP sources
 add_subdirectory(${OPEN_IOT_SDK_CONFIG} ./chip_build)
+
+function(chip_add_data_model target model_name)
+    target_include_directories(${target} 
+        PUBLIC
+            ${GEN_DIR}/app-common
+            ${GEN_DIR}/${model_name}-app
+    )
+
+    target_sources(${target} 
+        PUBLIC
+            ${GEN_DIR}/${model_name}-app/zap-generated/IMClusterCommandHandler.cpp
+    )
+
+    target_compile_definitions(${target}
+        PUBLIC
+            USE_CHIP_DATA_MODEL
+    )
+
+    include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
+    chip_configure_data_model(${target}
+        INCLUDE_SERVER
+        ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../${model_name}-common/${model_name}-app.zap
+    )
+endfunction()

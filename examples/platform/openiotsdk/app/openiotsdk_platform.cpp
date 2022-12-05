@@ -29,11 +29,20 @@
 #include "mbedtls/platform.h"
 
 #include <DeviceInfoProviderImpl.h>
-#include <lib/core/CHIPConfig.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <platform/openiotsdk/OpenIoTSDKArchUtils.h>
+
+#include <lib/core/CHIPConfig.h>
+#include <platform/CHIPDeviceLayer.h>
+
+#ifdef USE_CHIP_DATA_MODEL
+#include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
+#include <app/util/af.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#endif // USE_CHIP_DATA_MODEL
 
 #ifdef TFM_SUPPORT
 #include "psa/update.h"
@@ -43,6 +52,8 @@
 using namespace ::chip;
 using namespace ::chip::Platform;
 using namespace ::chip::DeviceLayer;
+
+constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 #define NETWORK_UP_FLAG 0x00000001U
 #define NETWORK_DOWN_FLAG 0x00000002U
@@ -276,4 +287,51 @@ int openiotsdk_network_init(bool wait)
     }
 
     return EXIT_SUCCESS;
+}
+
+int openiotsdk_chip_run(void)
+{
+    CHIP_ERROR err;
+
+#ifdef USE_CHIP_DATA_MODEL
+    // Init ZCL Data Model and start server
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    err = initParams.InitializeStaticResourcesBeforeServerInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Initialize static resources before server init failed: %s", err.AsString());
+        return EXIT_FAILURE;
+    }
+    initParams.operationalServicePort        = CHIP_PORT;
+    initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
+
+    err = Server::GetInstance().Init(initParams);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Initialize server failed: %s", err.AsString());
+        return EXIT_FAILURE;
+    }
+
+    // Now that the server has started and we are done with our startup logging,
+    // log our discovery/onboarding information again so it's not lost in the
+    // noise.
+    ConfigurationMgr().LogDeviceConfig();
+
+    PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork));
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+
+    // We only have network commissioning on endpoint 0.
+    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
+#endif // USE_CHIP_DATA_MODEL
+
+    return EXIT_SUCCESS;
+}
+
+void openiotsdk_chip_shutdown()
+{
+#ifdef USE_CHIP_DATA_MODEL
+    Server::GetInstance().Shutdown();
+#endif // USE_CHIP_DATA_MODEL
 }

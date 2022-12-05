@@ -18,48 +18,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <lib/core/CHIPConfig.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceLayer.h>
-
-#include <app/server/OnboardingCodesUtil.h>
-#include <app/server/Server.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include "openiotsdk_platform.h"
 
-using namespace ::chip;
-using namespace ::chip::DeviceLayer;
-
 static void app_thread(void * argument)
 {
-    CHIP_ERROR error;
-
     if (openiotsdk_network_init(true))
     {
         ChipLogError(NotSpecified, "Network initialization failed");
         goto exit;
     }
 
-    // Init ZCL Data Model and start server
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.operationalServicePort        = CHIP_PORT;
-    initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
-
-    error = Server::GetInstance().Init(initParams);
-    SuccessOrExit(error);
-
-    // Now that the server has started and we are done with our startup logging,
-    // log our discovery/onboarding information again so it's not lost in the
-    // noise.
-    ConfigurationMgr().LogDeviceConfig();
-
-    PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork));
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+    if (openiotsdk_chip_run())
+    {
+        ChipLogError(NotSpecified, "CHIP stack run failed");
+        goto exit;
+    }
 
     ChipLogProgress(NotSpecified, "Open IoT SDK lock-app example application run");
 
@@ -69,7 +44,7 @@ static void app_thread(void * argument)
         osDelay(osWaitForever);
     }
 
-    Server::GetInstance().Shutdown();
+    openiotsdk_chip_shutdown();
 
 exit:
     osThreadTerminate(osThreadGetId());
