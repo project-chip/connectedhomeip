@@ -57,6 +57,7 @@ _TEST_RESPONSE_SECTION = [
     'value',
     'values',
     'error',
+    'clusterError',
     'constraints',
     'type',
     'hasMasksSet',
@@ -68,6 +69,7 @@ _ATTRIBUTE_COMMANDS = [
     'readAttribute',
     'writeAttribute',
     'subscribeAttribute',
+    'waitForReport',
 ]
 
 _EVENT_COMMANDS = [
@@ -224,17 +226,47 @@ class TestStep:
                 self.arguments = self.__update_with_definition(self.arguments, command_definition, config)
                 self.response = self.__update_with_definition(self.response, response_definition, config)
 
+        # TODO Move this calls before the previous blocks that calls update_with_definition to make the
+        #      underlying update_with_definition logic simpler to read.
+        self._convert_single_value_to_values(self.arguments)
+        self._convert_single_value_to_values(self.response)
+
+    def _convert_single_value_to_values(self, container):
+        if container is None or 'values' in container:
+            return
+
+        # Attribute tests pass a single value argument that does not carry a name but
+        # instead uses a generic 'value' keyword. Convert to keyword to be the single
+        # members of the 'values' array which is what is used for other tests.
+        value = {}
+
+        known_keys_to_copy = ['value', 'constraints', 'saveAs']
+        known_keys_to_allow = ['error', 'clusterError']
+
+        for key, item in list(container.items()):
+            if key in known_keys_to_copy:
+                value[key] = item
+                del container[key]
+            elif key in known_keys_to_allow:
+                # Nothing to do for those keys.
+                pass
+            else:
+                raise KeyError(f'Unknown key: {key}')
+
+        container['values'] = [value]
+
     def post_process_response(self, response, config):
         result = PostProcessResponseResult()
 
-        if (not self.__maybe_check_optional(response, result)):
+        if not self.__maybe_check_optional(response, result):
             return result
 
         self.__maybe_check_error(response, result)
-        self.__maybe_check_cluster_error(response, result)
-        self.__maybe_check_values(response, config, result)
-        self.__maybe_check_constraints(response, config, result)
-        self.__maybe_save_as(response, config, result)
+        if self.response:
+            self.__maybe_check_cluster_error(response, result)
+            self.__maybe_check_values(response, config, result)
+            self.__maybe_check_constraints(response, config, result)
+            self.__maybe_save_as(response, config, result)
 
         return result
 
@@ -242,143 +274,141 @@ class TestStep:
         if not self.optional or not 'error' in response:
             return True
 
-        error = response['error']
-        if error == 'UNSUPPORTED_ATTRIBUTE' or error == 'UNSUPPORTED_COMMAND':
+        received_error = response.get('error')
+        if received_error == 'UNSUPPORTED_ATTRIBUTE' or received_error == 'UNSUPPORTED_COMMAND':
             # result.warning('Optional', f'The response contains the error: "{error}".')
             return False
 
         return True
 
     def __maybe_check_error(self, response, result):
-        if self.response and 'error' in self.response:
-            expectedError = self.response['error']
-            if 'error' in response:
-                receivedError = response['error']
-                if expectedError == receivedError:
-                    result.success(PostProcessCheckType.IM_STATUS,
-                                   f'The test expects the "{expectedError}" error which occured successfully.')
-                else:
-                    result.error(PostProcessCheckType.IM_STATUS,
-                                 f'The test expects the "{expectedError}" error but the "{receivedError}" error occured.')
-            else:
-                result.error(PostProcessCheckType.IM_STATUS, f'The test expects the "{expectedError}" error but no error occured.')
-        elif not self.response or not 'error' in self.response:
-            if 'error' in response:
-                receivedError = response['error']
-                result.error(PostProcessCheckType.IM_STATUS, f'The test expects no error but the "{receivedError}" error occured.')
-            # Handle generic success/errors
-            elif response == 'failure':
-                receivedError = response
-                result.error(PostProcessCheckType.IM_STATUS, f'The test expects no error but the "{receivedError}" error occured.')
-            else:
-                result.success(PostProcessCheckType.IM_STATUS, f'The test expects no error an no error occured.')
+        check_type = PostProcessCheckType.IM_STATUS
+        error_success = 'The test expects the "{error}" error which occured successfully.'
+        error_success_no_error = 'The test expects no error and no error occurred.'
+        error_wrong_error = 'The test expects the "{error}" error but the "{value}" error occured.'
+        error_unexpected_error = 'The test expects no error but the "{value}" error occured.'
+        error_unexpected_success = 'The test expects the "{error}" error but no error occured.'
+
+        expected_error = self.response.get('error') if self.response else None
+
+        # Handle generic success/error
+        if type(response) is str and response == 'failure':
+            received_error = response
+        elif type(response) is str and response == 'success':
+            received_error = None
+        else:
+            received_error = response.get('error')
+
+        if expected_error and received_error and expected_error == received_error:
+            result.success(check_type, error_success.format(error=expected_error))
+        elif expected_error and received_error:
+            result.error(check_type, error_wrong_error.format(error=expected_error, value=received_error))
+        elif expected_error and not received_error:
+            result.error(check_type, error_unexpected_success.format(error=expected_error))
+        elif not expected_error and received_error:
+            result.error(check_type, error_unexpected_error.format(error=received_error))
+        elif not expected_error and not received_error:
+            result.success(check_type, error_success_no_error)
+        else:
+            # This should not happens
+            raise AssertionError('This should not happens.')
 
     def __maybe_check_cluster_error(self, response, result):
-        if self.response and 'clusterError' in self.response:
-            expectedError = self.response['clusterError']
-            if 'clusterError' in response:
-                receivedError = response['clusterError']
-                if expectedError == receivedError:
-                    result.success(PostProcessCheckType.CLUSTER_STATUS,
-                                   f'The test expects the "{expectedError}" error which occured successfully.')
-                else:
-                    result.error(PostProcessCheckType.CLUSTER_STATUS,
-                                 f'The test expects the "{expectedError}" error but the "{receivedError}" error occured.')
+        check_type = PostProcessCheckType.IM_STATUS
+        error_success = 'The test expects the "{error}" error which occured successfully.'
+        error_unexpected_success = 'The test expects the "{error}" error but no error occured.'
+        error_wrong_error = 'The test expects the "{error}" error but the "{value}" error occured.'
+
+        expected_error = self.response.get('clusterError')
+        received_error = response.get('clusterError')
+
+        if expected_error:
+            if received_error and expected_error == received_error:
+                result.success(check_type, error_success.format(error=expected_error))
+            elif received_error:
+                result.error(check_type, error_wrong_error.format(error=expected_error, value=received_error))
             else:
-                result.error(PostProcessCheckType.CLUSTER_STATUS,
-                             f'The test expects the "{expectedError}" error but no error occured.')
+                result.error(check_type, error_unexpected_success.format(error=expected_error))
+        else:
+            # Nothing is logged here to not be redundant with the generic error checking code.
+            pass
 
     def __maybe_check_values(self, response, config, result):
-        if not self.response or not 'values' in self.response:
-            return
+        check_type = PostProcessCheckType.RESPONSE_VALIDATION
+        error_success = 'The test expectation "{name} == {value}" is true'
+        error_failure = 'The test expectation "{name} == {value}" is false'
+        error_name_does_not_exist = 'The test expects a value named "{name}" but it does not exists in the response."'
 
-        if not 'value' in response:
-            result.error(PostProcessCheckType.RESPONSE_VALIDATION, f'The test expects some values but none was received.')
-            return
+        for value in self.response['values']:
+            if not 'value' in value:
+                continue
 
-        expected_entries = self.response['values']
-        received_entry = response['value']
-
-        for expected_entry in expected_entries:
-            if type(expected_entry) is dict and type(received_entry) is dict:
-                if not 'value' in expected_entry:
+            expected_name = 'value'
+            received_value = response.get('value')
+            if not self.is_attribute:
+                expected_name = value.get('name')
+                if not expected_name in received_value:
+                    result.error(check_type, error_name_does_not_exist.format(name=expected_name))
                     continue
 
-                expected_name = expected_entry['name']
-                expected_value = expected_entry['value']
-                if not expected_name in received_entry:
-                    if expected_value is None:
-                        result.success(PostProcessCheckType.RESPONSE_VALIDATION,
-                                       f'The test expectation "{expected_name} == {expected_value}" is true')
-                    else:
-                        result.error(
-                            PostProcessCheckType.RESPONSE_VALIDATION, f'The test expects a value named "{expected_name}" but it does not exists in the response."')
-                    return
+                received_value = received_value.get(expected_name) if received_value else None
 
-                received_value = received_entry[expected_name]
-                self.__check_value(expected_name, expected_value, received_value, result)
+            # TODO Supports Array/List. See an exemple of failure in TestArmFailSafe.yaml
+            expected_value = value.get('value')
+            if expected_value == received_value:
+                result.success(check_type, error_success.format(name=expected_name, value=received_value))
             else:
-                if not 'value' in expected_entries[0]:
-                    continue
-
-                expected_value = expected_entry['value']
-                received_value = received_entry
-                self.__check_value('value', expected_value, received_value, result)
-
-    def __check_value(self, name, expected_value, received_value, result):
-        # TODO Supports Array/List. See an exemple of failure in TestArmFailSafe.yaml
-        if expected_value == received_value:
-            result.success(PostProcessCheckType.RESPONSE_VALIDATION, f'The test expectation "{name} == {expected_value}" is true')
-        else:
-            result.error(PostProcessCheckType.RESPONSE_VALIDATION, f'The test expectation "{name} == {expected_value}" is false')
+                result.error(check_type, error_failure.format(name=expected_name, value=expected_value))
 
     def __maybe_check_constraints(self, response, config, result):
-        if not self.response or not 'constraints' in self.response:
-            return
+        check_type = PostProcessCheckType.CONSTRAINT_VALIDATION
+        error_success = 'Constraints check passed'
+        error_failure = 'Constraints check failed'
+        error_name_does_not_exist = 'The test expects a value named "{name}" but it does not exists in the response."'
 
-        # TODO eventually move getting contraints into __update_placeholder
-        # TODO We need to provide config to get_constraints and perform substitutions.
-        #    if type(constraint_value) is str and constraint_value in config:
-        #        constraint_value = config[constraint_value]
-        constraints = get_constraints(self.response['constraints'])
-
-        received_value = response['value']
-        if all([constraint.is_met(received_value) for constraint in constraints]):
-            result.success(PostProcessCheckType.CONSTRAINT_VALIDATION, f'Constraints check passed')
-        else:
-            # TODO would be helpful to be more verbose here
-            result.error(PostProcessCheckType.CONSTRAINT_VALIDATION, f'Constraints check failed')
-
-    def __maybe_save_as(self, response, config, result):
-        if not self.response or 'values' not in self.response:
-            return
-
-        if not 'value' in response:
-            result.error(PostProcessCheckType.SAVE_AS_VARIABLE, f'The test expects some values but none was received.')
-            return
-
-        expected_entries = self.response['values']
-        received_entry = response['value']
-
-        for expected_entry in expected_entries:
-            if not 'saveAs' in expected_entry:
+        for value in self.response['values']:
+            if not 'constraints' in value:
                 continue
-            saveAs = expected_entry['saveAs']
 
-            if type(expected_entry) is dict and type(received_entry) is dict:
-                expected_name = expected_entry['name']
-                if not expected_name in received_entry:
-                    result.error(
-                        PostProcessCheckType.SAVE_AS_VARIABLE, f'The test expects a value named "{expected_name}" but it does not exists in the response."')
+            expected_name = 'value'
+            received_value = response.get('value')
+            if not self.is_attribute:
+                expected_name = value.get('name')
+                if not expected_name in received_value:
+                    result.error(check_type, error_name_does_not_exist.format(name=expected_name))
                     continue
 
-                received_value = received_entry[expected_name]
-                config[saveAs] = received_value
-                result.success(PostProcessCheckType.SAVE_AS_VARIABLE, f'The test save the value "{received_value}" as {saveAs}.')
+                received_value = received_value.get(expected_name) if received_value else None
+
+            constraints = get_constraints(value['constraints'])
+            if all([constraint.is_met(received_value) for constraint in constraints]):
+                result.success(check_type, error_success)
             else:
-                received_value = received_entry
-                config[saveAs] = received_value
-                result.success(PostProcessCheckType.SAVE_AS_VARIABLE, f'The test save the value "{received_value}" as {saveAs}.')
+                # TODO would be helpful to be more verbose here
+                result.error(check_type, error_failure)
+
+    def __maybe_save_as(self, response, config, result):
+        check_type = PostProcessCheckType.SAVE_AS_VARIABLE
+        error_success = 'The test save the value "{value}" as {name}.'
+        error_name_does_not_exist = 'The test expects a value named "{name}" but it does not exists in the response."'
+
+        for value in self.response['values']:
+            if not 'saveAs' in value:
+                continue
+
+            expected_name = 'value'
+            received_value = response.get('value')
+            if not self.is_attribute:
+                expected_name = value.get('name')
+                if not expected_name in received_value:
+                    result.error(check_type, error_name_does_not_exist.format(name=expected_name))
+                    continue
+
+                received_value = received_value.get(expected_name) if received_value else None
+
+            save_as = value.get('saveAs')
+            config[save_as] = received_value
+            result.success(check_type, error_success.format(value=received_value, name=save_as))
 
     def __as_mapping(self, definitions, cluster_name, target_name):
         element = definitions.get_type_by_name(cluster_name, target_name)
@@ -508,34 +538,25 @@ class YamlParser:
             self.tests = YamlTests(tests, self.__update_placeholder)
 
     def __update_placeholder(self, data):
-        data.arguments = self.__encode_values(data.arguments)
-        data.response = self.__encode_values(data.response)
+        self.__encode_values(data.arguments)
+        self.__encode_values(data.response)
         return data
 
     def __encode_values(self, container):
         if not container:
-            return None
+            return
 
-        # TODO this should likely be moved to end of TestStep.__init__
-        if 'value' in container:
-            container['values'] = [{'name': 'value', 'value': container['value']}]
-            del container['value']
+        values = container['values']
 
-        if 'values' in container:
-            for idx, item in enumerate(container['values']):
-                if 'value' in item:
-                    container['values'][idx]['value'] = self.__config_variable_substitution(item['value'])
+        for idx, item in enumerate(values):
+            if 'value' in item:
+                values[idx]['value'] = self.__config_variable_substitution(item['value'])
 
-        # TODO this should likely be moved to end of TestStep.__init__. But depends on rationale
-        if 'saveAs' in container:
-            if not 'values' in container:
-                # TODO Currently very unclear why this corner case is needed. Would be nice to add
-                # information as to why this would happen.
-                container['values'] = [{}]
-            container['values'][0]['saveAs'] = container['saveAs']
-            del container['saveAs']
+            if 'constraints' in item:
+                for constraint, constraint_value in item['constraints'].items():
+                    values[idx]['constraints'][constraint] = self.__config_variable_substitution(constraint_value)
 
-        return container
+        container['values'] = values
 
     def __config_variable_substitution(self, value):
         if type(value) is list:
