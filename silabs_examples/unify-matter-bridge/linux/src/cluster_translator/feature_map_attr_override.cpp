@@ -24,7 +24,7 @@ using namespace unify::matter_bridge;
 #define LEVEL_ONOFF_DEPENDENCY_FEATURE_MAP_MASK 0x01
 #define LEVEL_LIGHTING_FEATURE_MAP_MASK 0x02
 
-uint32_t ColorControllerAttributeAccessOverride::get_feature_map_settings(const ConcreteReadAttributePath & aPath)
+uint32_t ColorControlAttributeAccessOverride::get_feature_map_settings(const ConcreteReadAttributePath & aPath)
 {
     uint32_t feature_map_value = 0;
     chip::app::Clusters::ColorControl::Attributes::ColorCapabilities::TypeInfo::Type colorControlCapabilities;

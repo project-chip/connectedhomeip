@@ -56,17 +56,16 @@ constexpr const char * LOG_TAG = "unify_matter_bridge";
 static bool matter_running;
 static std::mutex unify_mutex;
 
-
 static void call_unify_event_queue(intptr_t)
 {
     unify_mutex.lock();
     bool shutdown = !uic_main_loop_run();
     unify_mutex.unlock();
-    if( shutdown ) {
+    if (shutdown)
+    {
         matter_running = false;
         Server::GetInstance().DispatchShutDownAndStopEventLoop();
     }
-
 }
 
 std::thread run_unify()
@@ -77,9 +76,9 @@ std::thread run_unify()
             uic_main_wait_for_file_descriptors();
             // It seems that ScheduleWork is not thread safe, which is why its protected
             // by a mutex
-            unify_mutex.lock();            
+            unify_mutex.lock();
             PlatformMgr().ScheduleWork(call_unify_event_queue);
-            unify_mutex.unlock();            
+            unify_mutex.unlock();
         }
     });
     return unify_thread;
@@ -98,7 +97,6 @@ int main(int argc, char * argv[])
                                                           { NULL, "Terminator" } };
 
     uic_init(uic_fixt_setup_steps_list, argc, argv, CMAKE_PROJECT_VERSION);
-
 
     const char * __argv__[] = { "matter_bridge", nullptr };
     int __argc__            = sizeof(__argv__) / sizeof(const char *) - 1;
@@ -150,7 +148,7 @@ int main(int argc, char * argv[])
 
     // Initializing color controller cluster command handler
     ColorControlClusterCommandHandler color_control_commands_handler(node_state_monitor, unify_mqtt_handler, m_group_translator);
-    ColorControllerAttributeAccessOverride color_control_attribute_handler(node_state_monitor, unify_mqtt_handler);
+    ColorControlAttributeAccessOverride color_control_attribute_handler(node_state_monitor, unify_mqtt_handler);
 
     // Initializing OccupancySensing command handler
     OccupancySensingClusterCommandHandler occupancy_sensing_command_handler(node_state_monitor, unify_mqtt_handler,

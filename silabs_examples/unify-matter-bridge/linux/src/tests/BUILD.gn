@@ -52,6 +52,7 @@ chip_test_suite("tests") {
     "TestGroupTranslator.cpp",
     "TestGroupCommandTranslator.cpp",
     "TestCli.cpp",
+    "TestColorControl.cpp",
     "TestNodeStateMonitor.cpp",
     "TestOnOff.cpp",
     "TestOnOffCommandsHandler.cpp",

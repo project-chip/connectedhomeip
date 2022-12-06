@@ -35,6 +35,27 @@
 
 namespace unify::matter_bridge {
 namespace Test {
+
+/** @brief Poor man's Result<T, CHIP_ERROR>. */
+template <class T>
+class Result
+{
+public:
+    Result() : mOk(), mError(CHIP_NO_ERROR) {}
+
+    void set_value(T value) { mOk = value; }
+
+    void set_error(CHIP_ERROR err) { mError = err; }
+
+    T unwrap() { return mOk.value(); }
+
+    CHIP_ERROR unwrap_err() { return mError; }
+
+private:
+    std::optional<T> mOk;
+    CHIP_ERROR mError;
+};
+
 /**
  * @brief
  *   By specializing <AttributeHandler> and <CommandHandler> parameters, this class
@@ -105,6 +126,20 @@ public:
         return SUCCESS;
     }
 
+    template <typename T>
+    inline CHIP_ERROR attribute_test(
+        nlTestSuite * sSuite, const std::string & topic, const std::string & json_payload,
+        typename chip::Controller::TypedReadAttributeCallback<typename T::DecodableType>::OnSuccessCallbackType onSuccessCb)
+    {
+        CHIP_ERROR err   = CHIP_NO_ERROR;
+        auto onFailureCb = [&err](const chip::app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { err = aError; };
+        err = chip::Controller::ReadAttribute<T>(&GetExchangeManager(), GetSessionBobToAlice(), kEndpointId, onSuccessCb,
+                                                 onFailureCb);
+        DrainAndServiceIO();
+
+        return err;
+    }
+
     /**
      * @brief
      *   The type parameter T is generally expected to be a
@@ -123,14 +158,14 @@ public:
     inline CHIP_ERROR attribute_test(nlTestSuite * sSuite, const std::string & topic, const std::string & json_payload,
                                      typename T::Type value)
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
+        // CHIP_ERROR err = CHIP_NO_ERROR;
         mMqttHandler.subscribeCB(topic.c_str(), json_payload.c_str(), json_payload.length(), &mAttributeHandler.value());
 
         auto onSuccessCb = [sSuite, value](const chip::app::ConcreteDataAttributePath & attributePath,
                                            const typename T::Type & dataResponse) {
             if (happy)
             {
-                NL_TEST_ASSERT(sSuite, dataResponse ==  value);
+                NL_TEST_ASSERT(sSuite, dataResponse == value);
             }
             else
             {
@@ -138,14 +173,24 @@ public:
             }
         };
 
-        auto onFailureCb = [&err](const chip::app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { err = aError; };
+        return attribute_test<T>(sSuite, topic, json_payload, onSuccessCb);
+    }
 
-        err = chip::Controller::ReadAttribute<T>(&GetExchangeManager(), GetSessionBobToAlice(), kEndpointId, onSuccessCb,
-                                                 onFailureCb);
-        NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
-        DrainAndServiceIO();
+    /**
+     * @brief
+     *   @return A result containing the attribute value or error code.
+     */
+    template <typename T>
+    inline Result<typename T::Type> attribute_test(nlTestSuite * sSuite, const std::string & topic,
+                                                   const std::string & json_payload)
+    {
+        Result<typename T::Type> result;
+        auto onSuccessCb = [&result](const chip::app::ConcreteAttributePath & attributePath,
+                                     const typename T::Type & dataResponse) { result.set_value(dataResponse); };
+        CHIP_ERROR err   = attribute_test<T>(sSuite, topic, json_payload, onSuccessCb);
+        result.set_error(err);
 
-        return err;
+        return result;
     }
 
     template <typename T>
@@ -193,8 +238,7 @@ public:
     command_test(nlTestSuite * sSuite, const std::string & topic, const std::string & json_payload, T & request,
                  typename chip::Controller::TypedCommandCallback<typename T::ResponseType>::OnSuccessCallbackType onSuccessCb)
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
+        CHIP_ERROR err   = CHIP_NO_ERROR;
         auto onFailureCb = [&err](CHIP_ERROR aError) { err = aError; };
 
         err = chip::Controller::InvokeCommandRequest<T>(&GetExchangeManager(), GetSessionBobToAlice(), kEndpointId, request,
@@ -205,7 +249,7 @@ public:
         if (err == CHIP_NO_ERROR)
         {
             NL_TEST_ASSERT(sSuite, mMqttHandler.publish_topic == topic);
-            NL_TEST_ASSERT_EQUAL_JSON(sSuite, json_payload,mMqttHandler.publish_payload);
+            NL_TEST_ASSERT_EQUAL_JSON(sSuite, json_payload, mMqttHandler.publish_payload);
         }
 
         return err;
@@ -228,9 +272,9 @@ public:
     inline CHIP_ERROR command_test(nlTestSuite * sSuite, const std::string & topic, const std::string & json_payload, T & request,
                                    typename T::ResponseType & response)
     {
-        auto onSuccessCb = [&response](const chip::app::ConcreteCommandPath & commandPath,
-                                               const chip::app::StatusIB & aStatus,
-                                               const typename T::ResponseType & dataResponse) { response = dataResponse; };
+
+        auto onSuccessCb = [&response](const chip::app::ConcreteCommandPath & commandPath, const chip::app::StatusIB & aStatus,
+                                       const typename T::ResponseType & dataResponse) { response = dataResponse; };
 
         return command_test<T>(sSuite, topic, json_payload, request, onSuccessCb);
     }

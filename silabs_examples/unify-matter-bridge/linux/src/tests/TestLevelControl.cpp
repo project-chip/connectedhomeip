@@ -113,7 +113,7 @@ static void TestLevelControlAttributeOptions(nlTestSuite * sSuite, void * apCont
     // Bitmask
     err = ctx.attribute_test<Clusters::LevelControl::Attributes::Options::TypeInfo>(
         sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Attributes/Options/Reported",
-        R"({ "value": {"ExecuteIfOff":false,"CoupleColorTempToLevel":false } })", 0);
+        R"({ "value": {"ExecuteIfOff":false,"CoupleColorTempToLevel":false } })", false);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 
     err = ctx.attribute_test<Clusters::LevelControl::Attributes::Options::TypeInfo>(
@@ -123,7 +123,7 @@ static void TestLevelControlAttributeOptions(nlTestSuite * sSuite, void * apCont
 
     // it is also ok to skip parameters
     err = ctx.attribute_test<Clusters::LevelControl::Attributes::Options::TypeInfo>(
-        sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Attributes/Options/Reported", R"({ "value": { } })", 0);
+        sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Attributes/Options/Reported", R"({ "value": { } })", false);
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }
 

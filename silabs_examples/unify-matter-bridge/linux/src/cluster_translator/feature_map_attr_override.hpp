@@ -23,10 +23,10 @@
 #include "attribute_translator.hpp"
 
 namespace unify::matter_bridge {
-class ColorControllerAttributeAccessOverride : public ColorControlAttributeAccess
+class ColorControlAttributeAccessOverride : public ColorControlAttributeAccess
 {
 public:
-    ColorControllerAttributeAccessOverride(matter_node_state_monitor & node_state_monitor, UnifyMqtt & unify_mqtt) :
+    ColorControlAttributeAccessOverride(matter_node_state_monitor & node_state_monitor, UnifyMqtt & unify_mqtt) :
         ColorControlAttributeAccess(node_state_monitor, unify_mqtt)
     {}
 
