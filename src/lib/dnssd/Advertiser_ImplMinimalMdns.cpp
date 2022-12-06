@@ -488,7 +488,10 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (!operationalAllocator->AddResponder<SrvResponder>(SrvResourceRecord(instanceName, hostName, params.GetPort()))
+    // We are the sole owner of our instanceName, so records keyed on the
+    // instanceName should have the cache-flush bit set.
+    if (!operationalAllocator
+             ->AddResponder<SrvResponder>(SrvResourceRecord(instanceName, hostName, params.GetPort()).SetCacheFlush(true))
              .SetReportAdditional(hostName)
              .IsValid())
     {
@@ -497,7 +500,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     }
 
     if (!operationalAllocator
-             ->AddResponder<TxtResponder>(TxtResourceRecord(instanceName, GetOperationalTxtEntries(operationalAllocator, params)))
+             ->AddResponder<TxtResponder>(
+                 TxtResourceRecord(instanceName, GetOperationalTxtEntries(operationalAllocator, params)).SetCacheFlush(true))
              .SetReportAdditional(hostName)
              .IsValid())
     {
