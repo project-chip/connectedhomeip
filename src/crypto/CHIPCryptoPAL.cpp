@@ -459,6 +459,7 @@ CHIP_ERROR Spake2p::KeyConfirm(const uint8_t * in, size_t in_len)
     if (err == CHIP_ERROR_INTERNAL)
     {
         ChipLogError(SecureChannel, "Failed to verify peer's MAC. This can happen when setup code is incorrect.");
+        err = CHIP_ERROR_PASSCODE_AUTHENTICATION_FAILED;
     }
     ReturnErrorOnFailure(err);
 

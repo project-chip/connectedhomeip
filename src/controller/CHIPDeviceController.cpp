@@ -918,7 +918,14 @@ void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
 {
     if (mPairingDelegate != nullptr)
     {
-        mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingFailed);
+        if(err == CHIP_ERROR_PASSCODE_AUTHENTICATION_FAILED)
+        {
+            mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingInvalidPasscode);
+        }
+        else
+        {
+            mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingFailed);
+        }
     }
 
     RendezvousCleanup(err);
