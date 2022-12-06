@@ -199,7 +199,7 @@ jobs:
             - name: Run Tests
               timeout-minutes: 65
               run: |
-                  test -z ${BUILD_VARIANT##*tsan*} && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH_TSAN
+                  echo ${BUILD_VARIANT} | grep -q tsan && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH_TSAN
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
                      --chip-tool ./out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -349,10 +349,8 @@ jobs:
         strategy:
             matrix:
                 build_variant: [ipv6only-no-ble-no-wifi-tsan-clang-test]
-                chip_tool: [""]
         env:
             BUILD_VARIANT: ${{ matrix.build_variant }}
-            CHIP_TOOL_VARIANT: ${{ matrix.chip_tool }}
             TSAN_OPTIONS: halt_on_error=1
 
         if: github.actor != 'restyled-io[bot]'
@@ -381,7 +379,7 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
               with:
-                  name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name: bootstrap-logs-linux-${{ matrix.build_variant }}
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
@@ -392,14 +390,17 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-all-clusters-${BUILD_VARIANT} \
-                        --target linux-x64-python-bindings \
+                        --target linux-x64-python-bindings-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Run Tests
               timeout-minutes: 10
               run: |
-                  test -z ${BUILD_VARIANT##*tsan*} && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH_TSAN
+                  if echo ${BUILD_VARIANT} | grep -q tsan; then
+                    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH_TSAN
+                    export CHIP_SCRIPT_LD_PRELOAD=libtsan.so.0
+                  fi
                   ./scripts/run_in_build_env.sh \
                      "./scripts/tests/run_python_test.py \
                         --app out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
@@ -493,7 +494,7 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
               with:
-                  name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name: bootstrap-logs-linux-${{ matrix.build_variant }}
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
@@ -591,7 +592,7 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
               with:
-                  name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  name: bootstrap-logs-darwin-${{ matrix.build_variant }}
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
