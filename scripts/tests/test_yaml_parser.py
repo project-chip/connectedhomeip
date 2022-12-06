@@ -19,11 +19,13 @@
 # to a more appropriate spot. For now, having this file to do some quick checks
 # is arguably better then no checks at all.
 
+import glob
 import os
 import unittest
+import functools
 from pathlib import Path
 
-from yamltests.ClustersDefinitions import ClustersDefinitions
+from yamltests.SpecDefinitions import *
 from yamltests.YamlParser import YamlParser
 
 _DEFAULT_MATTER_ROOT = os.path.abspath(
@@ -33,6 +35,19 @@ _YAML_TEST_SUITE_PATH = os.path.abspath(
 
 _CLUSTER_DEFINITION_DIRECTORY = os.path.abspath(
     os.path.join(_DEFAULT_MATTER_ROOT, 'src/app/zap-templates/zcl/data-model'))
+
+
+def sort_with_global_attribute_first(a, b):
+    if a.endswith('global-attributes.xml'):
+        return -1
+    elif b.endswith('global-attributes.xml'):
+        return 1
+    elif a > b:
+        return 1
+    elif a == b:
+        return 0
+    elif a < b:
+        return -1
 
 
 class TestYamlParser(unittest.TestCase):
@@ -60,9 +75,12 @@ class TestYamlParser(unittest.TestCase):
         # TODO Again we should not be reliant on extneral XML files. But some test (even brittal)
         # are better than no tests.
 
-        clusters_definitions = ClustersDefinitions(_CLUSTER_DEFINITION_DIRECTORY)
+        filenames = glob.glob(_CLUSTER_DEFINITION_DIRECTORY + '/*/*.xml', recursive=False)
+        filenames.sort(key=functools.cmp_to_key(sort_with_global_attribute_first))
+        sources = [ParseSource(source=name) for name in filenames]
+        specifications = SpecDefinitions(sources)
 
-        self._yaml_parser = YamlParser(path_to_test, pics_file, clusters_definitions)
+        self._yaml_parser = YamlParser(path_to_test, pics_file, specifications)
 
     def test_able_to_iterate_over_all_tests(self):
         # self._yaml_parser.tests implements `__next__`, which does value substitution. We are

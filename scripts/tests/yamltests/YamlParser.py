@@ -210,14 +210,19 @@ class TestStep:
         _check_valid_keys(self.response, _TEST_RESPONSE_SECTION)
 
         if self.is_attribute:
-            attribute_definition = definitions.get_attribute_definition(self.attribute)
-            self.arguments = self.__update_with_definition(self.arguments, attribute_definition, config)
-            self.response = self.__update_with_definition(self.response, attribute_definition, config)
+            attribute = definitions.get_attribute_by_name(self.cluster, self.attribute)
+            if attribute:
+                attribute_definition = self.__as_mapping(definitions, self.cluster, attribute.definition.data_type.name)
+                self.arguments = self.__update_with_definition(self.arguments, attribute_definition, config)
+                self.response = self.__update_with_definition(self.response, attribute_definition, config)
         else:
-            command_definition = definitions.get_command_args_definition(self.command)
-            response_definition = definitions.get_response_args_definition(self.command)
-            self.arguments = self.__update_with_definition(self.arguments, command_definition, config)
-            self.response = self.__update_with_definition(self.response, response_definition, config)
+            command = definitions.get_command_by_name(self.cluster, self.command)
+            if command:
+                command_definition = self.__as_mapping(definitions, self.cluster, command.input_param)
+                response_definition = self.__as_mapping(definitions, self.cluster, command.output_param)
+
+                self.arguments = self.__update_with_definition(self.arguments, command_definition, config)
+                self.response = self.__update_with_definition(self.response, response_definition, config)
 
     def post_process_response(self, response, config):
         result = PostProcessResponseResult()
@@ -374,6 +379,18 @@ class TestStep:
                 received_value = received_entry
                 config[saveAs] = received_value
                 result.success(PostProcessCheckType.SAVE_AS_VARIABLE, f'The test save the value "{received_value}" as {saveAs}.')
+
+    def __as_mapping(self, definitions, cluster_name, target_name):
+        element = definitions.get_type_by_name(cluster_name, target_name)
+
+        if hasattr(element, 'base_type'):
+            target_name = element.base_type.lower()
+        elif hasattr(element, 'fields'):
+            target_name = {f.name: self.__as_mapping(definitions, cluster_name, f.data_type.name) for f in element.fields}
+        elif target_name:
+            target_name = target_name.lower()
+
+        return target_name
 
     def __update_with_definition(self, container, mapping_type, config):
         if not container or not mapping_type:
