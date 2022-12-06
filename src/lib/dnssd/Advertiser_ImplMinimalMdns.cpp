@@ -490,20 +490,17 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
     // We are the sole owner of our instanceName, so records keyed on the
     // instanceName should have the cache-flush bit set.
-    if (!operationalAllocator
-             ->AddResponder<SrvResponder>(SrvResourceRecord(instanceName, hostName, params.GetPort()).SetCacheFlush(true))
-             .SetReportAdditional(hostName)
-             .IsValid())
+    SrvResourceRecord srvRecord(instanceName, hostName, params.GetPort());
+    srvRecord.SetCacheFlush(true);
+    if (!operationalAllocator->AddResponder<SrvResponder>(srvRecord).SetReportAdditional(hostName).IsValid())
     {
         ChipLogError(Discovery, "Failed to add SRV record mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (!operationalAllocator
-             ->AddResponder<TxtResponder>(
-                 TxtResourceRecord(instanceName, GetOperationalTxtEntries(operationalAllocator, params)).SetCacheFlush(true))
-             .SetReportAdditional(hostName)
-             .IsValid())
+    TxtResourceRecord txtRecord(instanceName, GetOperationalTxtEntries(operationalAllocator, params));
+    txtRecord.SetCacheFlush(true);
+    if (!operationalAllocator->AddResponder<TxtResponder>(txtRecord).SetReportAdditional(hostName).IsValid())
     {
         ChipLogError(Discovery, "Failed to add TXT record mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
