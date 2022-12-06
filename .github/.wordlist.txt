@@ -301,6 +301,7 @@ contrib
 controllee
 conv
 CopperConcentrationMeasurement
+Corstone
 cortexa
 cp
 cpio
@@ -885,6 +886,7 @@ MyPASSWORD
 MySSID
 NAMESERVER
 NAMESPACE
+namespaces
 namespacing
 nano
 natively
@@ -1143,11 +1145,13 @@ rsn
 RSSI
 RST
 rsync
+RTC
 rtd
 RTL
 rtld
 RTOS
 RTT
+RTX
 RUNAS
 RunMain
 runtime
@@ -1253,6 +1257,7 @@ subdirectory
 subfolder
 submodule
 submodules
+subnet
 subprocess
 SubscribeResponse
 SubscriptionId
@@ -1325,6 +1330,7 @@ Tizen
 TKIP
 tlsr
 TLV
+TLS
 tmp
 tngvndl
 TODO

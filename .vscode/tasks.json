@@ -242,6 +242,151 @@
                 "showReuseMessage": true,
                 "clear": true
             }
+        },
+        {
+            "label": "Build Open IoT SDK example",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": [
+                "-Cbuild",
+                "-d${input:openiotsdkDebugMode}",
+                "${input:openiotsdkExample}"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Build Open IoT SDK unit-tests",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": ["-Cbuild", "-d${input:openiotsdkDebugMode}", "unit-tests"],
+            "group": "build",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Run Open IoT SDK example",
+            "type": "shell",
+            "command": "scripts/run_in_ns.sh",
+            "args": [
+                "${input:openiotsdkNetworkNamespace}",
+                "scripts/examples/openiotsdk_example.sh",
+                "-Crun",
+                "-n${input:openiotsdkNetworkInterface}",
+                "${input:openiotsdkExample}"
+            ],
+            "group": "test",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Run Open IoT SDK unit-tests",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": ["-Crun", "unit-tests", "${input:openiotsdkUnitTest}"],
+            "group": "test",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Test Open IoT SDK example",
+            "type": "shell",
+            "command": "scripts/run_in_ns.sh",
+            "args": [
+                "${input:openiotsdkNetworkNamespace}",
+                "scripts/examples/openiotsdk_example.sh",
+                "-Ctest",
+                "-n${input:openiotsdkNetworkInterface}",
+                "${input:openiotsdkExample}"
+            ],
+            "group": "test",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Debug Open IoT SDK example",
+            "type": "shell",
+            "command": "scripts/run_in_ns.sh",
+            "args": [
+                "${input:openiotsdkNetworkNamespace}",
+                "scripts/examples/openiotsdk_example.sh",
+                "-Crun",
+                "-n${input:openiotsdkNetworkInterface}",
+                "-dtrue",
+                "${input:openiotsdkExample}"
+            ],
+            "group": "none",
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^.*Trying*",
+                    "endsPattern": "^.*Connected to localhost*"
+                }
+            }
+        },
+        {
+            "label": "Debug Open IoT SDK unit-tests",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": [
+                "-Crun",
+                "-dtrue",
+                "unit-tests",
+                "${input:openiotsdkUnitTest}"
+            ],
+            "group": "none",
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^.*Trying*",
+                    "endsPattern": "^.*Connected to localhost*"
+                }
+            }
         }
     ],
     "inputs": [
@@ -286,6 +431,66 @@
             "description": "What mbed application type do you want to use?",
             "options": ["simple", "boot", "upgrade"],
             "default": "simple"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkDebugMode",
+            "description": "Do you want to use debug mode?",
+            "options": ["false", "true"],
+            "default": "false"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkExample",
+            "description": "What Open IoT SDK example application do you want to use?",
+            "options": ["shell", "lock-app"],
+            "default": "shell"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkUnitTest",
+            "description": "What unit test do you want to use?",
+            "options": [
+                "all",
+                "accesstest",
+                "AppTests",
+                "ASN1Tests",
+                "BDXTests",
+                "ChipCryptoTests",
+                "ControllerTests",
+                "CoreTests",
+                "CredentialsTest",
+                "DataModelTests",
+                "InetLayerTests",
+                "MdnsTests",
+                "MessagingLayerTests",
+                "MinimalMdnsCoreTests",
+                "MinimalMdnsRecordsTests",
+                "MinimalMdnsRespondersTests",
+                "PlatformTests",
+                "RawTransportTests",
+                "RetransmitTests",
+                "SecureChannelTests",
+                "SetupPayloadTests",
+                "SupportTests",
+                "SystemLayerTests",
+                "TestShell",
+                "TransportLayerTests",
+                "UserDirectedCommissioningTests"
+            ],
+            "default": "all"
+        },
+        {
+            "type": "promptString",
+            "id": "openiotsdkNetworkNamespace",
+            "description": "Type the network namespace that you want to use. \"default\" means host default network namespace",
+            "default": "default"
+        },
+        {
+            "type": "promptString",
+            "id": "openiotsdkNetworkInterface",
+            "description": "Type the network interface name that you want to use. \"user\" means user network mode",
+            "default": "user"
         },
         {
             "type": "promptString",
@@ -428,6 +633,8 @@
                 "nrf-nrf5340-pump",
                 "nrf-nrf5340-pump-controller",
                 "nrf-nrf5340-shell",
+                "openiotsdk-lock",
+                "openiotsdk-shell",
                 "qpg-qpg6100-lock",
                 "telink-tlsr9518adk80d-all-clusters",
                 "telink-tlsr9518adk80d-all-clusters-minimal",
