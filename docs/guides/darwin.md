@@ -4,19 +4,30 @@
 
 Learn more about Matter [here](https://buildwithmatter.com/)
 
-## Supported Environments
+## Source Compatibility
 
-Matter is supported by iOS/tvOS/iPadOS starting with 16.1.
+Each release of an operating systems, or developer preview release brings a new
+SHA from this repository, which can be helpful for to reference which changes
+are present in the release for testing.
 
-Learn more about how to develop with Matter on Apple's platforms
-[here](https://developer.apple.com/apple-home/matter/)
+-   iOS/iPadOS/tvOS 16.1:
+    [`33f6a910cd9a8a0cfdd7088e2f43efd2f7f566a7`](https://github.com/project-chip/connectedhomeip/commits/33f6a910cd9a8a0cfdd7088e2f43efd2f7f566a7)
 
-Additional documentation about the Matter Support API is
-[here](https://developer.apple.com/documentation/mattersupport)
+-   iOS/iPadOS/tvOS 16.2 Developer Preview:
+    [`c279578c5bc37f117335aa96cec6c5552f070cc0`](https://github.com/project-chip/connectedhomeip/commits/c279578c5bc37f117335aa96cec6c5552f070cc0)
 
-## Setup Requirements
+## Supported Platforms for Matter Device Testing
 
-Note: These steps are supported on:
+Matter is supported by iOS/tvOS/iPadOS/watchOS/HomePod/AppleTV starting with
+16.1.
+
+-   To test your Matter device with Apple's platforms, all you need is a device
+    with a supported OS
+-   Pairing via QR Code or Setup Code is supported directly from the Home App
+
+## Supported Platforms for Application Development
+
+For Context: This is a mapping of platform to OS
 
 -   iPhone _(iOS)_
 -   iPad _(iPadOS)_
@@ -24,6 +35,14 @@ Note: These steps are supported on:
 -   AppleTV _(tvOS)_
 -   HomePod _(tvOS)_
 -   Apple Watch _(watchOS)_
+
+### Overview
+
+-   To develop a Matter Application, learn more about how to develop with Matter
+    on Apple's platforms [here](https://developer.apple.com/apple-home/matter/)
+
+    -   Additional documentation about the Matter Support API is
+        [here](https://developer.apple.com/documentation/mattersupport)
 
 ### Setup Requirements
 
@@ -40,17 +59,6 @@ Note: These steps are supported on:
     Mini, Apple TV 4K, or another device that supports Thread
 -   Enable Developer Mode during the development phase of your app by following
     the steps at Enabling Developer Mode on a device.
-
-## Source Compatibility
-
-Each developer preview release is compatible with a certain SHA from this
-repository.
-
--   iOS/iPadOS/tvOS 16.1:
-    [`33f6a910cd9a8a0cfdd7088e2f43efd2f7f566a7`](https://github.com/project-chip/connectedhomeip/commits/33f6a910cd9a8a0cfdd7088e2f43efd2f7f566a7)
-
--   iOS/iPadOS/tvOS 16.2 Developer Preview:
-    [`c279578c5bc37f117335aa96cec6c5552f070cc0`](https://github.com/project-chip/connectedhomeip/commits/c279578c5bc37f117335aa96cec6c5552f070cc0)
 
 ## Profile Installation
 
@@ -108,7 +116,7 @@ To enable developer mode, please follow the instructions
     - Example command for SHA `c279578c5bc37f117335aa96cec6c5552f070cc0`:
       `$ git checkout c279578c5bc37f117335aa96cec6c5552f070cc0`
 
-In order to work with iOS/iPadOS/tvOS 15.6 or greater, device types as defined
+In order to work with iOS/iPadOS/tvOS 16.1 or greater, device types as defined
 in the Matter Device Library spec are used to determine accessory categories.
 Ensure the right device type is set for each endpoint.
 
