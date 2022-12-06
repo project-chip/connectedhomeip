@@ -385,7 +385,6 @@ config("sanitize_address") {
 
 config("sanitize_thread") {
   cflags = [ "-fsanitize=thread" ]
-
   ldflags = cflags
 }
 
@@ -403,11 +402,16 @@ config("sanitize_undefined_behavior") {
     "-fvisibility=hidden",
     "-fsanitize=undefined",
     "-fsanitize=float-divide-by-zero",
-    "-fsanitize=unsigned-integer-overflow",
-    "-fsanitize=implicit-conversion",
-    "-fsanitize=nullability",
-    "-fno-sanitize=vptr,function",
   ]
+  if (is_clang) {
+    cflags += [
+      "-fsanitize=unsigned-integer-overflow",
+      "-fsanitize=implicit-conversion",
+      "-fsanitize=nullability",
+      "-fno-sanitize=vptr,function",
+    ]
+  }
+
   ldflags = cflags
 }
 
