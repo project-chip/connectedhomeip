@@ -37,6 +37,7 @@ from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
 from builders.imx import IMXApp, IMXBuilder
 from builders.genio import GenioApp, GenioBuilder
+from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder
 
 
 def BuildHostTestRunnerTarget():
@@ -97,7 +98,7 @@ def BuildHostTarget():
     app_parts = [
         TargetPart('rpc-console', app=HostApp.RPC_CONSOLE).OnlyIfRe(f'{native_board_name}-'),
         TargetPart('all-clusters', app=HostApp.ALL_CLUSTERS),
-        TargetPart('all-clusters-minimal', app=HostApp.ALL_CLUSTERS),
+        TargetPart('all-clusters-minimal', app=HostApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('chip-tool', app=HostApp.CHIP_TOOL),
         TargetPart('thermostat', app=HostApp.THERMOSTAT),
         TargetPart('java-matter-controller', app=HostApp.JAVA_MATTER_CONTROLLER),
@@ -125,6 +126,7 @@ def BuildHostTarget():
     target.AppendModifier('nodeps', enable_ble=False, enable_wifi=False, enable_thread=False,
                           crypto_library=HostCryptoLibrary.MBEDTLS, use_clang=True).ExceptIfRe('-(clang|noble|boringssl|mbedtls)')
 
+    target.AppendModifier('platform-mdns', use_platform_mdns=True)
     target.AppendModifier('minmdns-verbose', minmdns_high_verbosity=True)
     target.AppendModifier('libnl', minmdns_address_policy="libnl")
     target.AppendModifier('same-event-loop', separate_event_loop=False).OnlyIfRe('-(chip-tool|darwin-framework-tool)')
@@ -528,6 +530,17 @@ def BuildTelinkTarget():
     return target
 
 
+def BuildOpenIotSdkTargets():
+    target = BuildTarget('openiotsdk', OpenIotSdkBuilder)
+
+    target.AppendFixedTargets([
+        TargetPart('shell', app=OpenIotSdkApp.SHELL),
+        TargetPart('lock', app=OpenIotSdkApp.LOCK),
+    ])
+
+    return target
+
+
 BUILD_TARGETS = [
     BuildAmebaTarget(),
     BuildAndroidTarget(),
@@ -550,6 +563,5 @@ BUILD_TARGETS = [
     BuildQorvoTarget(),
     BuildTizenTarget(),
     BuildTelinkTarget(),
-
-
+    BuildOpenIotSdkTargets(),
 ]

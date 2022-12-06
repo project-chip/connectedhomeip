@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/toolchain/arm_gcc/arm_toolchain.gni")
+
 declare_args() {
-  # Root directory for Telink SDK.
-  telink_sdk_build_root = "//third_party/telink_sdk"
+  openiotsdk_ar = ""
+  openiotsdk_cc = ""
+  openiotsdk_cxx = ""
+}
+
+gcc_toolchain("openiotsdk") {
+  ar = openiotsdk_ar
+  cc = openiotsdk_cc
+  cxx = openiotsdk_cxx
+
+  toolchain_args = {
+    current_os = target_os
+    is_clang = false
+  }
 }

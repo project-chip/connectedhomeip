@@ -22,7 +22,8 @@ import("crypto.gni")
 
 if (chip_crypto == "") {
   if (current_os == "android" || current_os == "freertos" ||
-      current_os == "zephyr" || current_os == "mbed" || current_os == "webos") {
+      current_os == "zephyr" || current_os == "mbed" || current_os == "webos" ||
+      current_os == "cmsis-rtos") {
     chip_crypto = "mbedtls"
   } else {
     chip_crypto = "openssl"

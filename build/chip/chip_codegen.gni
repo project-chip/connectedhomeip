@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
 import("$dir_pw_build/python.gni")
+import("${chip_root}/scripts/idl/files.gni")
 
 declare_args() {
   # Location where code has been pre-generated
@@ -37,6 +38,9 @@ template("_chip_build_time_codegen") {
   pw_python_action("${_name}_codegen") {
     script = "${chip_root}/scripts/codegen.py"
 
+    # TODO: this seems to touch internals. Is this ok? speeds up builds!
+    _pw_internal_run_in_venv = false
+
     _idl_file = invoker.input
     _expected_outputs = "${target_gen_dir}/${_name}.expected.outputs"
 
@@ -52,12 +56,14 @@ template("_chip_build_time_codegen") {
       rebase_path(_idl_file, root_build_dir),
     ]
 
-    deps = [ "${chip_root}/scripts/idl" ]
-
     inputs = [
       _idl_file,
       _expected_outputs,
     ]
+
+    # ensure any change in codegen files will result in a rebuild
+    inputs += matter_idl_generator_files
+
     sources = [ _idl_file ]
 
     outputs = []

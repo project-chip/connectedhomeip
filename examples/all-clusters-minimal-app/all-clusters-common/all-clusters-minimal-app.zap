@@ -1,5 +1,5 @@
 {
-  "featureLevel": 81,
+  "featureLevel": 87,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -18,17 +18,17 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
+      "path": "../../../src/app/zap-templates/app-templates.json",
+      "type": "gen-templates-json",
+      "version": "chip-v1"
+    },
+    {
+      "pathRelativity": "relativeToZap",
       "path": "../../../src/app/zap-templates/zcl/zcl.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
       "description": "Matter SDK ZCL data"
-    },
-    {
-      "pathRelativity": "relativeToZap",
-      "path": "../../../src/app/zap-templates/app-templates.json",
-      "type": "gen-templates-json",
-      "version": "chip-v1"
     }
   ],
   "endpointTypes": [
@@ -8058,7 +8058,7 @@
           "name": "Unit Testing",
           "code": 4294048773,
           "mfgCode": null,
-          "define": "TEST_CLUSTER",
+          "define": "UNIT_TESTING_CLUSTER",
           "side": "client",
           "enabled": 0,
           "commands": [
@@ -8110,7 +8110,7 @@
           "name": "Unit Testing",
           "code": 4294048773,
           "mfgCode": null,
-          "define": "TEST_CLUSTER",
+          "define": "UNIT_TESTING_CLUSTER",
           "side": "server",
           "enabled": 0,
           "commands": [
@@ -9559,7 +9559,7 @@
               "code": 15,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "LevelControlOptions",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -18954,7 +18954,7 @@
           "name": "Unit Testing",
           "code": 4294048773,
           "mfgCode": null,
-          "define": "TEST_CLUSTER",
+          "define": "UNIT_TESTING_CLUSTER",
           "side": "client",
           "enabled": 0,
           "commands": [
@@ -19126,7 +19126,7 @@
           "name": "Unit Testing",
           "code": 4294048773,
           "mfgCode": null,
-          "define": "TEST_CLUSTER",
+          "define": "UNIT_TESTING_CLUSTER",
           "side": "server",
           "enabled": 1,
           "commands": [
@@ -24516,5 +24516,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 61442
     }
-  ]
+  ],
+  "log": []
 }

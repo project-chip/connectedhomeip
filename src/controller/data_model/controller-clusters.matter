@@ -1739,7 +1739,7 @@ client cluster Switch = 59 {
   }
 
   info event MultiPressComplete = 6 {
-    INT8U newPosition = 0;
+    INT8U previousPosition = 0;
     INT8U totalNumberOfPressesCounted = 1;
   }
 
