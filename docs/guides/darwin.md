@@ -4,6 +4,16 @@
 
 Learn more about Matter [here](https://buildwithmatter.com/)
 
+## Supported Environments
+
+Matter is supported by iOS/tvOS/iPadOS starting with 16.1.
+
+Learn more about how to develop with Matter on Apple's platforms
+[here](https://developer.apple.com/apple-home/matter/)
+
+Additional documentation about the Matter Support API is
+[here](https://developer.apple.com/documentation/mattersupport)
+
 ## Setup Requirements
 
 Note: These steps are supported on:
@@ -15,48 +25,44 @@ Note: These steps are supported on:
 -   HomePod _(tvOS)_
 -   Apple Watch _(watchOS)_
 
-### Current requires for testing with Apple Devices
-
-##### Note: Matter functionality is currently a Developer Preview
+### Setup Requirements
 
 -   Devices must support BLE pairing, and have it enabled
--   An iPhone or iPad running iOS/iPadOS at least 15.6. You will need to install
-    a [profile](#profile-installation) on it.
--   An Apple TV or HomePod running at least tvOS 15.6. You will need to install
-    a [profile](#profile-installation) on it. If you have multiple Apple TVs
-    and/or HomePods, you will need to install the
-    [profile](#profile-installation) on all of them.
--   The iPhone or iPad with the Matter [profile](#profile-installation) must
-    belong to the same iCloud account as the Apple TV or HomePod with the Matter
-    [profile](#profile-installation).
+-   An iPhone or iPad running iOS/iPadOS at least 16.1.
+-   An Apple TV or HomePod running at least tvOS 16.1.
+-   The iPhone or iPad with the
+    [Matter Developer Profile](#profile-installation) must belong to the same
+    iCloud account as the Apple TV or HomePod with the Matter
+    [Matter Developer Profile](#profile-installation).
 -   A test iCloud account is highly recommended for Matter development to avoid
     interference with existing homes.
 -   To pair and control Matter Thread devices, you'll need to have a HomePod
-    Mini or Apple TV 4K
--   To pair to devices via BLE, you must either use the Matter Pairing API
-    documented
-    [here](https://developer.apple.com/documentation/homekit/hmmatterhome), or
-    enable [Developer mode](#enable-developer-mode-on-your-apple-device).
+    Mini, Apple TV 4K, or another device that supports Thread
+-   Enable Developer Mode during the development phase of your app by following
+    the steps at Enabling Developer Mode on a device.
 
 ## Source Compatibility
 
 Each developer preview release is compatible with a certain SHA from this
 repository.
 
--   iOS/iPadOS/tvOS 16.0 Developer Preview:
-    [`aa9457e6b94b735076dff6297176183bf9780177`](https://github.com/project-chip/connectedhomeip/commits/aa9457e6b94b735076dff6297176183bf9780177)
+-   iOS/iPadOS/tvOS 16.1:
+    [`33f6a910cd9a8a0cfdd7088e2f43efd2f7f566a7`](https://github.com/project-chip/connectedhomeip/commits/33f6a910cd9a8a0cfdd7088e2f43efd2f7f566a7)
+
+-   iOS/iPadOS/tvOS 16.2 Developer Preview:
+    [`c279578c5bc37f117335aa96cec6c5552f070cc0`](https://github.com/project-chip/connectedhomeip/commits/c279578c5bc37f117335aa96cec6c5552f070cc0)
 
 ## Profile Installation
 
-### Install the Matter Profile on your iPhone or iPad
+### Install the Matter Developer Profile on your iPhone or iPad
 
 Note: The profile will expire automatically after some time
 
 1. Download the
-   [profile](https://developer.apple.com/services-account/download?path=/iOS/iOS_Logs/EnableMatter.mobileconfig)
+   [Matter Developer Profile](https://developer.apple.com/services-account/download?path=/iOS/iOS_Logs/EnableBluetoothCentralMatterClientDeveloperMode.mobileconfig)
 2. Email the profile to an account that is configured on your device running
-   iOS/iPadOS 15.6 (or greater)
-3. Selecting the profile in Mail on your iOS/iPadOS 15.6 (or greater) device
+   iOS/iPadOS 16.1 (or greater)
+3. Selecting the profile in Mail on your iOS/iPadOS 16.1 (or greater) device
    will present an option to install the profile
 
     ##### Note: Make sure to head back to system preferences, and you'll see an option to verify and install the profile near the top
@@ -68,10 +74,10 @@ Note: The profile will expire automatically after some time
 Note: The profile will expire automatically after some time
 
 1. Download the
-   [profile](https://developer.apple.com/services-account/download?path=/iOS/iOS_Logs/EnableMatter.mobileconfig)
+   [Matter Developer Profile](https://developer.apple.com/services-account/download?path=/iOS/iOS_Logs/EnableBluetoothCentralMatterClientDeveloperMode.mobileconfig)
 2. Email the profile to an account that is configured on your device running
-   iOS/iPadOS 15.6 (or greater)
-3. Selecting the profile in Mail on your iOS/iPadOS 15.6 (or greater) device
+   iOS/iPadOS 16.1 (or greater)
+3. Selecting the profile in Mail on your iOS/iPadOS 16.1 (or greater) device
    will present an option to install the profile on the HomePod
 4. Restart the device
 
@@ -80,7 +86,7 @@ Note: The profile will expire automatically after some time
 Note: The profile will expire automatically after some time
 
 1. Download the
-   [profile](https://developer.apple.com/services-account/download?path=/iOS/iOS_Logs/EnableMatter.mobileconfig)
+   [profile](https://developer.apple.com/services-account/download?path=/iOS/iOS_Logs/EnableBluetoothCentralMatterClientDeveloperMode.mobileconfig)
 2. Use
    [Apple Configurator](https://apps.apple.com/us/app/apple-configurator/id1037126344?mt=12)
    to transfer the profile to the Apple TV
@@ -99,8 +105,8 @@ To enable developer mode, please follow the instructions
 1. Clone the [Matter repo](https://github.com/project-chip/connectedhomeip.git)
 2. Checkout the specific commit hash (from [above](#source-compatibility)) for
    maximum compatibility with your installed release:
-    - Example command for SHA `aa9457e6b94b735076dff6297176183bf9780177`:
-      `$ git checkout aa9457e6b94b735076dff6297176183bf9780177`
+    - Example command for SHA `c279578c5bc37f117335aa96cec6c5552f070cc0`:
+      `$ git checkout c279578c5bc37f117335aa96cec6c5552f070cc0`
 
 In order to work with iOS/iPadOS/tvOS 15.6 or greater, device types as defined
 in the Matter Device Library spec are used to determine accessory categories.
@@ -226,12 +232,6 @@ requirements
 
 ### Release Notes & Known Issues
 
--   Please refer to the iOS/iPadOS 15.6
-    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-15_6-release-notes)
-    for currently known issues.
--   Please refer to the iOS/iPadOS 16.0
-    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-16-release-notes)
-    for currently known issues.
 -   Please refer to the iOS/iPadOS 16.1
     [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-16_1-release-notes)
     for currently known issues.
