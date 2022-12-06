@@ -185,7 +185,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestIPResourceRecord(void)
+int TestIPResourceRecord()
 {
 
     nlTestSuite theSuite = { "IPResourceRecord", sTests, nullptr, nullptr };

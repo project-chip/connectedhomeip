@@ -22,6 +22,9 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     esp32:
         name: ESP32
@@ -31,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.6.06
+            image: connectedhomeip/chip-build-esp32:0.6.17
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -71,11 +74,29 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --enable-flashbundle \
                         --target esp32-m5stack-all-clusters \
-                        --target esp32-m5stack-all-clusters-minimal \
-                        --target esp32-m5stack-all-clusters-rpc-ipv6only \
                         build \
                         --copy-artifacts-to out/artifacts \
                      "
+            - name: Prepare code pregen and ensure compile time pregen not possible
+              run: |
+                  ./scripts/run_in_build_env.sh "./scripts/codepregen.py ./zzz_pregenerated"
+                  mv scripts/codegen.py scripts/codegen.py.renamed
+            - name: Build some M5Stack variations with pregen
+              timeout-minutes: 60
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --enable-flashbundle \
+                        --target esp32-m5stack-all-clusters-minimal \
+                        --target esp32-m5stack-all-clusters-rpc-ipv6only \
+                        --pregen-dir ./zzz_pregenerated \
+                        build \
+                        --copy-artifacts-to out/artifacts \
+                     "
+            - name: Undo code pregeneration changes
+              run: |
+                  rm -rf ./zzz_pregenerated
+                  mv scripts/codegen.py.renamed scripts/codegen.py
             - name: Prepare bloat report
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
@@ -119,7 +140,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.6.06
+            image: connectedhomeip/chip-build-esp32:0.6.17
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 

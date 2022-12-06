@@ -18,6 +18,15 @@ rsource "../../zephyr/Kconfig"
 
 if CHIP
 
+config CHIP_APP_LOG_LEVEL
+	int "Set logging level in application"
+	default LOG_DEFAULT_LEVEL
+	help
+	  Sets the logging level in Matter application. 
+	  This config should be used only within application.
+	  To set the logging level for Matter stack use MATTER_LOG_LEVEL 
+	  config.
+
 config CHIP_NFC_COMMISSIONING
 	bool "Enable NFC commissioning support"
 	default n

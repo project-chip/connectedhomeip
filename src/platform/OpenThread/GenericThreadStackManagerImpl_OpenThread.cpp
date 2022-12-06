@@ -1833,23 +1833,30 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::SetSEDIntervalMode(Connecti
 #else
     uint32_t curIntervalMS = otLinkGetPollPeriod(mOTInst);
 #endif
-
+    otError otErr = OT_ERROR_NONE;
     if (interval.count() != curIntervalMS)
     {
 #if CHIP_DEVICE_CONFIG_THREAD_SSED
         // Set CSL period in units of 10 symbols, convert it to microseconds and divide by 1000 to get milliseconds.
-        otError otErr = otLinkCslSetPeriod(mOTInst, interval.count() * 1000 / OT_US_PER_TEN_SYMBOLS);
+        otErr         = otLinkCslSetPeriod(mOTInst, interval.count() * 1000 / OT_US_PER_TEN_SYMBOLS);
+        curIntervalMS = otLinkCslGetPeriod(mOTInst) * OT_US_PER_TEN_SYMBOLS / 1000;
 #else
-        otError otErr = otLinkSetPollPeriod(mOTInst, interval.count());
+        otErr         = otLinkSetPollPeriod(mOTInst, interval.count());
+        curIntervalMS = otLinkGetPollPeriod(mOTInst);
 #endif
         err = MapOpenThreadError(otErr);
     }
 
     Impl()->UnlockThreadStack();
 
-    if (interval.count() != curIntervalMS)
+    if (otErr != OT_ERROR_NONE)
     {
-        ChipLogProgress(DeviceLayer, "OpenThread SED interval set to %" PRId32 "ms", interval.count());
+        ChipLogError(DeviceLayer, "Failed to set SED interval to %" PRId32 "ms. Defaulting to %" PRId32 "ms", interval.count(),
+                     curIntervalMS);
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "OpenThread SED interval is %" PRId32 "ms", curIntervalMS);
     }
 
     return err;

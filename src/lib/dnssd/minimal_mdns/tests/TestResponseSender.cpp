@@ -372,7 +372,7 @@ int TestTeardown(void * inContext)
 
 } // namespace
 
-int TestResponseSender(void)
+int TestResponseSender()
 {
     nlTestSuite theSuite = { "RecordData", sTests, &TestSetup, &TestTeardown };
     nlTestRunner(&theSuite, nullptr);

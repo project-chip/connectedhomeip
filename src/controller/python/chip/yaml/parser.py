@@ -18,7 +18,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from chip import ChipDeviceCtrl
-from chip.clusters.Types import NullValue
 from chip.tlv import float32
 import yaml
 import stringcase
@@ -30,6 +29,7 @@ from chip.yaml.errors import ParsingError, UnexpectedParsingError
 from .data_model_lookup import *
 import chip.yaml.format_converter as Converter
 from .variable_storage import VariableStorage
+from .constraints import get_constraints
 
 _SUCCESS_STATUS_CODE = "SUCCESS"
 _NODE_ID_DEFAULT = 0x12345
@@ -48,110 +48,6 @@ class _ExecutionContext:
     variable_storage: VariableStorage = None
     # Top level configuration values for a yaml test.
     config_values: dict = None
-
-
-class _ConstraintValue:
-    '''Constraints that are numeric primitive data types'''
-
-    def __init__(self, value, field_type, context: _ExecutionContext):
-        self._variable_storage = context.variable_storage
-        # When not none _indirect_value_key is binding a name to the constraint value, and the
-        # actual value can only be looked-up dynamically, which is why this is a key name.
-        self._indirect_value_key = None
-        self._value = None
-
-        if value is None:
-            # Default values set above is all we need here.
-            return
-
-        if isinstance(value, str) and self._variable_storage.is_key_saved(value):
-            self._indirect_value_key = value
-        else:
-            self._value = Converter.convert_yaml_type(
-                value, field_type)
-
-    def get_value(self):
-        '''Gets the current value of the constraint.
-
-        This method accounts for getting the runtime saved value from DUT previous responses.
-        '''
-        if self._indirect_value_key:
-            return self._variable_storage.load(self._indirect_value_key)
-        return self._value
-
-
-class _Constraints:
-    def __init__(self, constraints: dict, field_type, context: _ExecutionContext):
-        self._variable_storage = context.variable_storage
-        self._has_value = constraints.get('hasValue')
-        self._type = constraints.get('type')
-        self._starts_with = constraints.get('startsWith')
-        self._ends_with = constraints.get('endsWith')
-        self._is_upper_case = constraints.get('isUpperCase')
-        self._is_lower_case = constraints.get('isLowerCase')
-        self._min_value = _ConstraintValue(constraints.get('minValue'), field_type,
-                                           context)
-        self._max_value = _ConstraintValue(constraints.get('maxValue'), field_type,
-                                           context)
-        self._contains = constraints.get('contains')
-        self._excludes = constraints.get('excludes')
-        self._has_masks_set = constraints.get('hasMasksSet')
-        self._has_masks_clear = constraints.get('hasMasksClear')
-        self._not_value = _ConstraintValue(constraints.get('notValue'), field_type,
-                                           context)
-
-    def are_constrains_met(self, response) -> bool:
-        return_value = True
-
-        if self._has_value:
-            logger.warn(f'HasValue constraint currently not implemented, forcing failure')
-            return_value = False
-
-        if self._type:
-            logger.warn(f'Type constraint currently not implemented, forcing failure')
-            return_value = False
-
-        if self._starts_with and not response.startswith(self._starts_with):
-            return_value = False
-
-        if self._ends_with and not response.endswith(self._ends_with):
-            return_value = False
-
-        if self._is_upper_case and not response.isupper():
-            return_value = False
-
-        if self._is_lower_case and not response.islower():
-            return_value = False
-
-        min_value = self._min_value.get_value()
-        if response is not NullValue and min_value and response < min_value:
-            return_value = False
-
-        max_value = self._max_value.get_value()
-        if response is not NullValue and max_value and response > max_value:
-            return_value = False
-
-        if self._contains and not set(self._contains).issubset(response):
-            return_value = False
-
-        if self._excludes and not set(self._excludes).isdisjoint(response):
-            return_value = False
-
-        if self._has_masks_set:
-            for mask in self._has_masks_set:
-                if (response & mask) != mask:
-                    return_value = False
-
-        if self._has_masks_clear:
-            for mask in self._has_masks_clear:
-                if (response & mask) != 0:
-                    return_value = False
-
-        not_value = self._not_value.get_value()
-        if not_value and response == not_value:
-            return_value = False
-
-        return return_value
 
 
 class _VariableToSave:
@@ -173,8 +69,8 @@ class _ExpectedResponse:
         if isinstance(value, str) and self._variable_storage.is_key_saved(value):
             self._load_expected_response_in_verify = value
         else:
-            self._expected_response = Converter.convert_yaml_type(
-                value, response_type, use_from_dict=True)
+            self._expected_response = Converter.parse_and_convert_yaml_value(
+                value, response_type, context.config_values, inline_cast_dict_to_struct=True)
 
     def verify(self, response):
         if (self._expected_response_type is None):
@@ -249,8 +145,8 @@ class InvokeAction(BaseAction):
             request_data_as_dict = Converter.convert_name_value_pair_to_dict(args)
 
             try:
-                request_data = Converter.convert_yaml_type(
-                    request_data_as_dict, type(command_object))
+                request_data = Converter.parse_and_convert_yaml_value(
+                    request_data_as_dict, type(command_object), context.config_values)
             except ValueError:
                 raise ParsingError('Could not covert yaml type')
 
@@ -270,8 +166,8 @@ class InvokeAction(BaseAction):
             expected_response_args = self._expected_raw_response['values']
             expected_response_data_as_dict = Converter.convert_name_value_pair_to_dict(
                 expected_response_args)
-            expected_response_data = Converter.convert_yaml_type(
-                expected_response_data_as_dict, expected_command)
+            expected_response_data = Converter.parse_and_convert_yaml_value(
+                expected_response_data_as_dict, expected_command, context.config_values)
             self._expected_response_object = expected_command.FromDict(expected_response_data)
 
     def run_action(self, dev_ctrl: ChipDeviceCtrl, endpoint: int, node_id: int):
@@ -311,7 +207,7 @@ class ReadAttributeAction(BaseAction):
         '''
         super().__init__(item['label'])
         self._attribute_name = stringcase.pascalcase(item['attribute'])
-        self._constraints = None
+        self._constraints = []
         self._cluster = cluster
         self._cluster_object = None
         self._request_object = None
@@ -362,9 +258,10 @@ class ReadAttributeAction(BaseAction):
 
         constraints = self._expected_raw_response.get('constraints')
         if constraints:
-            self._constraints = _Constraints(constraints,
-                                             self._request_object.attribute_type.Type,
-                                             context)
+            self._constraints = get_constraints(constraints,
+                                                self._request_object.attribute_type.Type,
+                                                context.variable_storage,
+                                                context.config_values)
 
     def run_action(self, dev_ctrl: ChipDeviceCtrl, endpoint: int, node_id: int):
         try:
@@ -391,7 +288,7 @@ class ReadAttributeAction(BaseAction):
         if self._variable_to_save is not None:
             self._variable_to_save.save_response(parsed_resp)
 
-        if self._constraints and not self._constraints.are_constrains_met(parsed_resp):
+        if not all([constraint.is_met(parsed_resp) for constraint in self._constraints]):
             logger.error(f'Constraints check failed')
             # TODO how should we fail the test here?
 
@@ -430,8 +327,8 @@ class WriteAttributeAction(BaseAction):
         if (item.get('arguments')):
             args = item['arguments']['value']
             try:
-                request_data = Converter.convert_yaml_type(
-                    args, attribute.attribute_type.Type)
+                request_data = Converter.parse_and_convert_yaml_value(
+                    args, attribute.attribute_type.Type, context.config_values)
             except ValueError:
                 raise ParsingError('Could not covert yaml type')
 

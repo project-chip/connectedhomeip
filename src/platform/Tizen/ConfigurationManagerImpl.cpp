@@ -23,16 +23,16 @@
  *          for Tizen platforms.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include "ConfigurationManagerImpl.h"
 
-#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
-#include <platform/Tizen/PosixConfig.h>
-#include <platform/Tizen/WiFiManager.h>
-#include <platform/internal/GenericConfigurationManagerImpl.ipp>
+
+#include "PosixConfig.h"
+#include "WiFiManager.h"
+#include "platform/internal/GenericConfigurationManagerImpl.ipp"
 
 namespace chip {
 namespace DeviceLayer {
@@ -43,7 +43,7 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::Init(void)
+CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR error;
 
@@ -88,12 +88,12 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 #endif
 }
 
-bool ConfigurationManagerImpl::CanFactoryReset(void)
+bool ConfigurationManagerImpl::CanFactoryReset()
 {
     return true;
 }
 
-void ConfigurationManagerImpl::InitiateFactoryReset(void) {}
+void ConfigurationManagerImpl::InitiateFactoryReset() {}
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(Platform::PersistedStorage::Key key, uint32_t & value)
 {
@@ -170,7 +170,7 @@ CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t 
     return Internal::PosixConfig::WriteConfigValueBin(key, data, dataLen);
 }
 
-void ConfigurationManagerImpl::RunConfigUnitTest(void)
+void ConfigurationManagerImpl::RunConfigUnitTest()
 {
     Internal::PosixConfig::RunConfigUnitTest();
 }

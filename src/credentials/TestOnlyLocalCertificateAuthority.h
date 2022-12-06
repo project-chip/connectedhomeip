@@ -74,7 +74,7 @@ public:
         }
         else
         {
-            mRootKeypair->Initialize();
+            mRootKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA);
         }
         mCurrentStatus = GenerateRootCert(*mRootKeypair.get());
         SuccessOrExit(mCurrentStatus);
@@ -155,7 +155,7 @@ protected:
         ReturnErrorOnFailure(ExtractSubjectDNFromChipCert(ByteSpan{ mLastRcac.Get(), mLastRcac.AllocatedSize() }, rcac_dn));
 
         Crypto::P256Keypair icacKeypair;
-        ReturnErrorOnFailure(icacKeypair.Initialize()); // Maybe we won't use it, but it's OK
+        ReturnErrorOnFailure(icacKeypair.Initialize(Crypto::ECPKeyTarget::ECDSA)); // Maybe we won't use it, but it's OK
 
         Crypto::P256Keypair * nocIssuerKeypair = mRootKeypair.get();
         ChipDN * issuer_dn                     = &rcac_dn;

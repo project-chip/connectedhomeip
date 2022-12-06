@@ -536,7 +536,7 @@ tests:
               contains: [55]
 
     - label: "Read the optional attribute (ActiveTimestamp) in AttributeList"
-      PICS: DGTHREAD.S.A0039
+      PICS: DGTHREAD.S.A0038
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -545,7 +545,7 @@ tests:
               contains: [56]
 
     - label: "Read the optional attribute (PendingTimestamp) in AttributeList"
-      PICS: DGTHREAD.S.A003A
+      PICS: DGTHREAD.S.A0039
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -554,7 +554,7 @@ tests:
               contains: [57]
 
     - label: "Read the optional attribute (Delay) in AttributeList"
-      PICS: DGTHREAD.S.A003B
+      PICS: DGTHREAD.S.A003a
       command: "readAttribute"
       attribute: "AttributeList"
       response:

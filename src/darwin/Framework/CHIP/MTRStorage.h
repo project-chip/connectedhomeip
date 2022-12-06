@@ -24,6 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * The Matter framework may call storage methods from arbitrary threads, but
  * will not call storage methods concurrently.
+ *
+ * Implementations of the storage methods must not call into any Matter
+ * framework APIs.
  */
 MTR_NEWLY_AVAILABLE
 @protocol MTRStorage <NSObject>

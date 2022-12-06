@@ -29,8 +29,8 @@ public final class DiscoverCommand extends MatterCommand {
 
   public DiscoverCommand(ChipDeviceController controller, CredentialsIssuer credsIssuer) {
     super(controller, "resolve", credsIssuer);
-    addArgument("nodeid", 0, Long.MAX_VALUE, mNodeId, null);
-    addArgument("fabricid", 0, Long.MAX_VALUE, mFabricId, null);
+    addArgument("nodeid", 0, Long.MAX_VALUE, mNodeId, null, false);
+    addArgument("fabricid", 0, Long.MAX_VALUE, mFabricId, null, false);
   }
 
   @Override

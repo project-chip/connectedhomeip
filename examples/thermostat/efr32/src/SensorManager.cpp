@@ -62,14 +62,14 @@ CHIP_ERROR SensorManager::Init()
 
     if (sSensorTimer == NULL)
     {
-        EFR32_LOG("sSensorTimer timer create failed");
+        SILABS_LOG("sSensorTimer timer create failed");
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
 #ifdef USE_TEMP_SENSOR
     if (SL_STATUS_OK != TemperatureSensor::Init())
     {
-        EFR32_LOG("Failed to Init Sensor");
+        SILABS_LOG("Failed to Init Sensor");
         return CHIP_ERROR_INTERNAL;
     }
 #endif
@@ -96,7 +96,7 @@ void SensorManager::SensorTimerEventHandler(TimerHandle_t xTimer)
     {
         if (SL_STATUS_OK != TemperatureSensor::GetTemp(&humidity, &temperature))
         {
-            EFR32_LOG("Failed to read Temperature !!!");
+            SILABS_LOG("Failed to read Temperature !!!");
         }
         tempSum += temperature;
     }
@@ -118,7 +118,7 @@ void SensorManager::SensorTimerEventHandler(TimerHandle_t xTimer)
     }
 #endif // USE_TEMP_SENSOR
 
-    EFR32_LOG("Sensor Temp is : %d", temperature);
+    SILABS_LOG("Sensor Temp is : %d", temperature);
 
     if ((temperature >= (lastTemperature + kMinTemperatureDelta)) || temperature <= (lastTemperature - kMinTemperatureDelta))
     {

@@ -13,127 +13,128 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.1. [TC-BRBINFO-2.1] Attributes [DUT-Server]
+name: 130.2.1. [TC-BRBINFO-2.1] Attributes [DUT-Server]
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
-    endpoint: 0
+    cluster: "Bridged Device Basic"
+    endpoint: 3
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label: "TH reads VendorName from the DUT."
       PICS: BRBINFO.S.A0001
-      verification: |
-          ./chip-tool bridgeddevicebasic read vendor-name  1 3
+      command: "readAttribute"
+      attribute: "VendorName"
+      response:
+          saveAs: VendorNameValue
+          constraints:
+              type: char_string
+              maxLength: 32
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656495199.434300][2158:2163] CHIP:TOO:   VendorName: TEST_VENDOR
-      disabled: true
-
-    - label: "TH writes VendorName as sample"
+    - label: "TH writes VendorName from the DUT."
       PICS: BRBINFO.S.A0001
-      verification: |
-          ./chip-tool bridgeddevicebasic write vendor-name sample 1 3
+      command: "writeAttribute"
+      attribute: "VendorName"
+      arguments:
+          value: "sample"
+      response:
+          error: UNSUPPORTED_WRITE
 
-          Verify response has unsupported write on TH(chip-tool) Log:
-
-          [1656495259.991989][2164:2169] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-      disabled: true
-
-    - label: "TH reads VendorName"
+    - label: "TH reads VendorName from the DUT."
       PICS: BRBINFO.S.A0001
-      verification: |
-          ./chip-tool bridgeddevicebasic read vendor-name  1 3
-
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656495199.434300][2158:2163] CHIP:TOO:   VendorName: TEST_VENDOR
-      disabled: true
+      command: "readAttribute"
+      attribute: "VendorName"
+      response:
+          value: VendorNameValue
 
     - label: "TH reads VendorID from the DUT."
       PICS: BRBINFO.S.A0002
-      verification: |
-          ./chip-tool bridgeddevicebasic read vendor-id  1 3
+      command: "readAttribute"
+      attribute: "VendorID"
+      response:
+          saveAs: VendorIDValue
+          constraints:
+              type: vendor_id
+              minValue: 1
+              maxValue: 65521
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+    - label:
+          "Verify that VendorID matches the value assigned to this manufacturer"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && BRBINFO.S.A0002
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-          Example Log:
-          [1656495322.252171][2177:2182] CHIP:TOO:   VendorID: 65521
-      disabled: true
-
-    - label: "TH writes VendorID as 0x0011"
+    - label: "TH writes VendorID from the DUT."
       PICS: BRBINFO.S.A0002
-      verification: |
-          ./chip-tool bridgeddevicebasic write vendor-name 0x0011 1 3
+      command: "writeAttribute"
+      attribute: "VendorID"
+      arguments:
+          value: 0x0011
+      response:
+          error: UNSUPPORTED_WRITE
 
-          Verify response has unsupported write on TH(chip-tool) Log:
-
-          [1656495259.991989][2164:2169] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-      disabled: true
-
-    - label: "TH reads VendorID"
+    - label: "TH reads VendorID from the DUT."
       PICS: BRBINFO.S.A0002
-      verification: |
-          ./chip-tool bridgeddevicebasic read vendor-id  1 3
+      command: "readAttribute"
+      attribute: "VendorID"
+      response:
+          value: VendorIDValue
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656495322.252171][2177:2182] CHIP:TOO:   VendorID: 65521
-      disabled: true
-
-    - label: "TH reads ProductName from the DUT."
+    - label: "TH reads ProductName from the DUT"
       PICS: BRBINFO.S.A0003
-      verification: |
-          ./chip-tool bridgeddevicebasic read product-name  1 3
+      command: "readAttribute"
+      attribute: "ProductName"
+      response:
+          saveAs: ProductNameValue
+          constraints:
+              type: char_string
+              maxLength: 32
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656495708.412745][2200:2205] CHIP:TOO:   ProductName: TEST_PRODUCT
-      disabled: true
-
-    - label: "TH writes ProductName as newproduct"
+    - label: "TH writes ProductName from the DUT."
       PICS: BRBINFO.S.A0003
-      verification: |
-          ./chip-tool bridgeddevicebasic write vendor-name ""newproduct"" 1 3
+      command: "writeAttribute"
+      attribute: "ProductName"
+      arguments:
+          value: "newproduct"
+      response:
+          error: UNSUPPORTED_WRITE
 
-          Verify response has unsupported write on TH(chip-tool) Log:
-
-          NOTE the quotes: single-quote/double-quote/string/double-quote/single-quote
-          [1656495259.991989][2164:2169] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-      disabled: true
-
-    - label: "TH reads ProductName"
+    - label: "TH reads ProductName from the DUT"
       PICS: BRBINFO.S.A0003
-      verification: |
-          ./chip-tool bridgeddevicebasic read product-name  1 3
-
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656495708.412745][2200:2205] CHIP:TOO:   ProductName: TEST_PRODUCT
-      disabled: true
+      command: "readAttribute"
+      attribute: "ProductName"
+      response:
+          value: ProductNameValue
 
     - label: "TH reads NodeLabel from the DUT"
       PICS: BRBINFO.S.A0005
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      response:
+          saveAs: NodeLabelValue
+          constraints:
+              type: char_string
+              maxLength: 32
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/23509
+    - label: "TH writes NodeLabel from the DUT."
+      PICS: BRBINFO.S.A0005 && PICS_USER_PROMPT
       verification: |
-          ./chip-tool bridgeddevicebasic read node-label 1 3
-
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1657696463.081741][15476:15481] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0005 DataVersion: 2577979325
-          [1657696463.081791][15476:15481] CHIP:TOO:   NodeLabel: Light 1
-      disabled: true
-
-    - label: "TH writes newnode to NodeLabel"
-      PICS: BRBINFO.S.A0005
-      verification: |
-          ./chip-tool bridgeddevicebasic write node-label ""newnode"" 1 3
+          ./chip-tool bridgeddevicebasic write node-label '"newnode"' 1 3
 
           Verify response has unsupported write on TH(chip-tool) Log:
 
@@ -148,10 +149,17 @@ tests:
           [1660839701.840827][2444:2449] CHIP:DMG:                         },
           [1660839701.840905][2444:2449] CHIP:DMG:
           [1660839701.840973][2444:2449] CHIP:DMG:                 },
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads NodeLabel"
-      PICS: BRBINFO.S.A0005
+    - label: "TH reads NodeLabel from the DUT"
+      PICS: BRBINFO.S.A0005 && PICS_USER_PROMPT
       verification: |
           ./chip-tool bridgeddevicebasic read node-label 1 3
 
@@ -159,370 +167,342 @@ tests:
 
           [1657696463.081741][15476:15481] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0005 DataVersion: 2577979325
           [1657696463.081791][15476:15481] CHIP:TOO:   NodeLabel: newnode
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads HardwareVersion from the DUT."
+    - label: "TH reads HardwareVersion from the DUT"
       PICS: BRBINFO.S.A0007
-      verification: |
-          ./chip-tool bridgeddevicebasic read hardware-version  1 3
+      command: "readAttribute"
+      attribute: "HardwareVersion"
+      response:
+          saveAs: HardwareVersionValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65534
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656496175.564718][2302:2307] CHIP:TOO:   HardwareVersion: 0
-      disabled: true
-
-    - label: "TH writes HardwareVersion as 0x4531"
+    - label: "TH writes HardwareVersion from the DUT."
       PICS: BRBINFO.S.A0007
-      verification: |
-          ./chip-tool bridgeddevicebasic write hardware-version-string 0x4531  1 3
+      command: "writeAttribute"
+      attribute: "HardwareVersion"
+      arguments:
+          value: 0x4531
+      response:
+          error: UNSUPPORTED_WRITE
 
-          Verify response has unsupported write on TH(chip-tool) Log:
-
-          [1656495259.991989][2164:2169] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-      disabled: true
-
-    - label: "TH reads HardwareVersion"
+    - label: "TH reads HardwareVersion from the DUT"
       PICS: BRBINFO.S.A0007
-      verification: |
-          ./chip-tool bridgeddevicebasic write hardware-version-string 0x4531  1 3
-
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656496175.564718][2302:2307] CHIP:TOO:   HardwareVersion: 0
-      disabled: true
+      command: "readAttribute"
+      attribute: "HardwareVersion"
+      response:
+          value: HardwareVersionValue
 
     - label: "TH reads HardwareVersionString from the DUT."
       PICS: BRBINFO.S.A0008
-      verification: |
-          ./chip-tool bridgeddevicebasic read hardware-version-string  1 3
+      command: "readAttribute"
+      attribute: "HardwareVersionString"
+      response:
+          saveAs: HardwareVersionStringValue
+          constraints:
+              type: char_string
+              minLength: 1
+              maxLength: 64
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656496257.298675][2315:2320] CHIP:TOO:   HardwareVersionString: TEST_VERSION
-      disabled: true
-
-    - label: "TH writes HardwareVersionString as newhardwareversion"
+    - label: "TH writes HardwareVersionString from the DUT."
       PICS: BRBINFO.S.A0008
-      verification: |
-          ./chip-tool bridgeddevicebasic write hardware-version-string newhardwareversion  1 3
+      command: "writeAttribute"
+      attribute: "HardwareVersionString"
+      arguments:
+          value: "newhardwareversion"
+      response:
+          error: UNSUPPORTED_WRITE
 
-          Verify response has unsupported write on TH(chip-tool) Log:
-
-          [1656495259.991989][2164:2169] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-      disabled: true
-
-    - label: "TH reads HardwareVersionString"
+    - label: "TH reads HardwareVersionString from the DUT."
       PICS: BRBINFO.S.A0008
-      verification: |
-          ./chip-tool bridgeddevicebasic read hardware-version-string  1 3
+      command: "readAttribute"
+      attribute: "HardwareVersionString"
+      response:
+          value: HardwareVersionStringValue
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656496257.298675][2315:2320] CHIP:TOO:   HardwareVersionString: TEST_VERSION
-      disabled: true
-
-    - label: "TH reads SoftwareVersion from the DUT."
+    - label: "TH reads SoftwareVersion from the DUT"
       PICS: BRBINFO.S.A0009
-      verification: |
-          ./chip-tool bridgeddevicebasic read software-version 1 3
+      command: "readAttribute"
+      attribute: "SoftwareVersion"
+      response:
+          saveAs: SoftwareVersionValue
+          constraints:
+              minValue: 0
+              maxValue: 4294967294
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656496411.609866][2348:2353] CHIP:TOO:   SoftwareVersion: 1
-      disabled: true
-
-    - label: "TH writes SoftwareVersion as 0x8213"
+    - label: "TH writes SoftwareVersion from the DUT."
       PICS: BRBINFO.S.A0009
-      verification: |
-          ./chip-tool bridgeddevicebasic write software-version 0x8213  1 3
+      command: "writeAttribute"
+      attribute: "SoftwareVersion"
+      arguments:
+          value: 0x8213
+      response:
+          error: UNSUPPORTED_WRITE
 
-          Verify response has unsupported write on TH(chip-tool) Log:
-
-          [1656495259.991989][2164:2169] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-      disabled: true
-
-    - label: "TH reads SoftwareVersion"
+    - label: "TH reads SoftwareVersion from the DUT"
       PICS: BRBINFO.S.A0009
-      verification: |
-          ./chip-tool bridgeddevicebasic read software-version 1 3
+      command: "readAttribute"
+      attribute: "SoftwareVersion"
+      response:
+          value: SoftwareVersionValue
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656496411.609866][2348:2353] CHIP:TOO:   SoftwareVersion: 1
-      disabled: true
-
-    - label: "TH reads SoftwareVersionString from the DUT."
+    - label: "TH reads SoftwareVersionString from the DUT"
       PICS: BRBINFO.S.A000a
-      verification: |
-          ./chip-tool bridgeddevicebasic read software-version-string  1 3
+      command: "readAttribute"
+      attribute: "SoftwareVersionString"
+      response:
+          saveAs: SoftwareVersionStringValue
+          constraints:
+              minLength: 1
+              maxLength: 64
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656496498.568951][2362:2367] CHIP:TOO:   SoftwareVersionString: 1.0
-      disabled: true
-
-    - label: "TH writes SoftwareVersionString as 1.0"
+    - label: "TH writes SoftwareVersionString from the DUT."
       PICS: BRBINFO.S.A000a
-      verification: |
-          ./chip-tool bridgeddevicebasic write software-version 1.0  1 3
+      command: "writeAttribute"
+      attribute: "SoftwareVersionString"
+      arguments:
+          value: "1.0"
+      response:
+          error: UNSUPPORTED_WRITE
 
-          Verify response has unsupported write on TH(chip-tool) Log:
-
-
-          [1656495259.991989][2164:2169] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-      disabled: true
-
-    - label: "TH reads SoftwareVersionString"
+    - label: "TH reads SoftwareVersionString from the DUT"
       PICS: BRBINFO.S.A000a
-      verification: |
-          ./chip-tool bridgeddevicebasic read software-version-string  1 3
-
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656496498.568951][2362:2367] CHIP:TOO:   SoftwareVersionString: 1.0
-      disabled: true
+      command: "readAttribute"
+      attribute: "SoftwareVersionString"
+      response:
+          value: SoftwareVersionStringValue
 
     - label: "TH reads ManufacturingDate from the DUT."
       PICS: BRBINFO.S.A000b
-      verification: |
-          ./chip-tool bridgeddevicebasic read manufacturing-date  1 3
+      command: "readAttribute"
+      attribute: "ManufacturingDate"
+      response:
+          saveAs: ManufacturingDateValue
+          constraints:
+              type: char_string
+              minLength: 8
+              maxLength: 16
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+    - label:
+          "Verify if the first 8 characters specify date according to ISO 8601,
+          i.e, YYYYMMDD."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && BRBINFO.S.A000b
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-          Example Log:
-          [1656496661.777852][2388:2393] CHIP:TOO:   ManufacturingDate: 20200101
-      disabled: true
-
-    - label: "TH writes ManufacturingDate as 20210814789452IN"
+    - label: "TH writes ManufacturingDate from the DUT."
       PICS: BRBINFO.S.A000b
-      verification: |
-          ./chip-tool bridgeddevicebasic write manufacturing-date  20210814789452IN 1 3
+      command: "writeAttribute"
+      attribute: "ManufacturingDate"
+      arguments:
+          value: "20210814789452IN"
+      response:
+          error: UNSUPPORTED_WRITE
 
-          Verify response has unsupported write on TH(chip-tool) Log:
-
-          [1656495259.991989][2164:2169] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-      disabled: true
-
-    - label: "TH reads ManufacturingDate"
+    - label: "TH reads ManufacturingDate from the DUT."
       PICS: BRBINFO.S.A000b
-      verification: |
-          ./chip-tool bridgeddevicebasic read manufacturing-date  1 3
+      command: "readAttribute"
+      attribute: "ManufacturingDate"
+      response:
+          value: ManufacturingDateValue
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656496661.777852][2388:2393] CHIP:TOO:   ManufacturingDate: 20200101
-      disabled: true
-
-    - label: "TH reads PartNumber from the DUT."
+    - label: "TH reads PartNumber from the DUT"
       PICS: BRBINFO.S.A000c
-      verification: |
-          ./chip-tool bridgeddevicebasic read part-number  1 3
+      command: "readAttribute"
+      attribute: "PartNumber"
+      response:
+          saveAs: PartNumberValue
+          constraints:
+              type: char_string
+              maxLength: 32
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-
-          [1656496800.941788][2405:2410] CHIP:TOO:   PartNumber: 1234
-      disabled: true
-
-    - label: "TH writes PartNumber as newpart"
+    - label: "TH writes PartNumber from the DUT."
       PICS: BRBINFO.S.A000c
-      verification: |
-          ./chip-tool bridgeddevicebasic write part-number newpart  1 3
+      command: "writeAttribute"
+      attribute: "PartNumber"
+      arguments:
+          value: "newpart"
+      response:
+          error: UNSUPPORTED_WRITE
 
-          Verify response has unsupported write on TH(chip-tool) Log:
-
-          [1656495259.991989][2164:2169] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-      disabled: true
-
-    - label: "TH reads PartNumber"
+    - label: "TH reads PartNumber from the DUT"
       PICS: BRBINFO.S.A000c
-      verification: |
-          ./chip-tool bridgeddevicebasic read part-number  1 3
+      command: "readAttribute"
+      attribute: "PartNumber"
+      response:
+          value: PartNumberValue
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656496800.941788][2405:2410] CHIP:TOO:   PartNumber: 1234
-      disabled: true
-
-    - label: "TH reads ProductURL from the DUT."
+    - label: "TH reads ProductURL from the DUT"
       PICS: BRBINFO.S.A000d
-      verification: |
-          ./chip-tool bridgeddevicebasic read product-url  1 3
+      command: "readAttribute"
+      attribute: "ProductURL"
+      response:
+          saveAs: ProductURLValue
+          constraints:
+              type: long_char_string
+              maxLength: 256
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+    - label:
+          "Verify that it specifies a link to a specific web page, Verify that
+          it follows the syntax rules specified in RFC 3986."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && BRBINFO.S.A000d
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-          Example Log:
-
-          [1656497181.118653][2436:2441] CHIP:TOO:   ProductURL: https://example.com/myproduct
-      disabled: true
-
-    - label: "TH writes ProductURL as https://www.example.com"
+    - label: "TH writes ProductURL from the DUT."
       PICS: BRBINFO.S.A000d
-      verification: |
-          ./chip-tool bridgeddevicebasic write product-url  https://www.example.com 1 3
+      command: "writeAttribute"
+      attribute: "ProductURL"
+      arguments:
+          value: "https://www.example.com"
+      response:
+          error: UNSUPPORTED_WRITE
 
-          Verify response has unsupported write on TH(chip-tool) Log:
-
-          [1656495259.991989][2164:2169] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-      disabled: true
-
-    - label: "TH reads ProductURL"
+    - label: "TH reads ProductURL from the DUT"
       PICS: BRBINFO.S.A000d
-      verification: |
-          ./chip-tool bridgeddevicebasic read product-url  1 3
-
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656497181.118653][2436:2441] CHIP:TOO:   ProductURL: https://example.com/myproduct
-      disabled: true
+      command: "readAttribute"
+      attribute: "ProductURL"
+      response:
+          value: ProductURLValue
 
     - label: "TH reads ProductLabel from the DUT."
       PICS: BRBINFO.S.A000e
-      verification: |
-          ./chip-tool bridgeddevicebasic read product-label  1 3
+      command: "readAttribute"
+      attribute: "ProductLabel"
+      response:
+          saveAs: ProductLabelValue
+          constraints:
+              type: char_string
+              maxLength: 64
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+    - label:
+          "Verify that it does not include the name of the vendor as defined
+          within the VendorName attribute"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && BRBINFO.S.A000e
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-          Example Log:
-
-          [1656501313.811305][2602:2607] CHIP:TOO:   ProductLabel: ABCD
-      disabled: true
-
-    - label: "TH writes ProductLabel as newproductlabel"
+    - label: "TH writes ProductLabel from the DUT."
       PICS: BRBINFO.S.A000e
-      verification: |
-          ./chip-tool bridgeddevicebasic write product-label newproductlabel  1 3
+      command: "writeAttribute"
+      attribute: "ProductLabel"
+      arguments:
+          value: "newproductlabel"
+      response:
+          error: UNSUPPORTED_WRITE
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656495259.991989][2164:2169] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-      disabled: true
-
-    - label: "TH reads ProductLabel"
+    - label: "TH reads ProductLabel from the DUT."
       PICS: BRBINFO.S.A000e
-      verification: |
-          ./chip-tool bridgeddevicebasic read product-label  1 3
-
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656501313.811305][2602:2607] CHIP:TOO:   ProductLabel: ABCD
-      disabled: true
+      command: "readAttribute"
+      attribute: "ProductLabel"
+      response:
+          value: ProductLabelValue
 
     - label: "TH reads SerialNumber from the DUT."
       PICS: BRBINFO.S.A000f
-      verification: |
-          ./chip-tool bridgeddevicebasic read serial-number  1 3
+      command: "readAttribute"
+      attribute: "SerialNumber"
+      response:
+          saveAs: SerialNumberValue
+          constraints:
+              type: char_string
+              maxLength: 32
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-
-          [1656501452.183890][2624:2630] CHIP:TOO:   SerialNumber: 5678
-      disabled: true
-
-    - label: "TH writes SerialNumber_test as newserialnumber"
+    - label: "TH writes SerialNumber from the DUT."
       PICS: BRBINFO.S.A000f
-      verification: |
-          ./chip-tool bridgeddevicebasic write serial-number newserialnumber  1 3
+      command: "writeAttribute"
+      attribute: "SerialNumber"
+      arguments:
+          value: "newserialnumber"
+      response:
+          error: UNSUPPORTED_WRITE
 
-          Verify response has unsupported write on TH(chip-tool) Log:
-
-          [1656495259.991989][2164:2169] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-      disabled: true
-
-    - label: "TH reads SerialNumber"
+    - label: "TH reads SerialNumber from the DUT."
       PICS: BRBINFO.S.A000f
-      verification: |
-          ./chip-tool bridgeddevicebasic read serial-number  1 3
-
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656501452.183890][2624:2630] CHIP:TOO:   SerialNumber: 5678
-      disabled: true
+      command: "readAttribute"
+      attribute: "SerialNumber"
+      response:
+          value: SerialNumberValue
 
     - label: "TH reads Reachable from the DUT."
       PICS: BRBINFO.S.A0011
-      verification: |
-          ./chip-tool bridgeddevicebasic read reachable 1 3
-
-          Verify value of reachable is type of bool and its true in TH Log:
-
-          [1659012746.234251][8169:8174] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0011 DataVersion: 1363291551
-          [1659012746.234309][8169:8174] CHIP:TOO:   Reachable: TRUE
-          [1659012746.234420][8169:8174] CHIP:EM: Sending Standalone Ack for MessageCounter:92645971 on exchange 389i
-      disabled: true
+      command: "readAttribute"
+      attribute: "Reachable"
+      response:
+          value: true
+          constraints:
+              type: boolean
 
     - label:
           "TH sends Write request message to DUT to change value of Reachable to
-          false."
+          false"
       PICS: BRBINFO.S.A0011
-      verification: |
-          ./chip-tool bridgeddevicebasic write-by-id 17   false 1 3
-
-
-
-          On TH verify that, TH receives  UNSUPPORTED_WRITE response as status
-          [1656496372.884955][2340:2345] CHIP:DMG: }
-          [1656496372.885085][2340:2345] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1656496372.885148][2340:2345] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-          [1656496372.885242][2340:2345] CHIP:EM: Sending Standalone Ack for MessageCounter:201795946 on exchange 27637ihe attribute is optional so no example log can be provided.
-      disabled: true
+      command: "writeAttribute"
+      attribute: "Reachable"
+      arguments:
+          value: false
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "TH reads Reachable from the DUT."
       PICS: BRBINFO.S.A0011
-      verification: |
-          ./chip-tool bridgeddevicebasic read reachable 1 3
-          On TH verify that the  value of reachable is type is same as 51
-
-          [1659012746.234251][8169:8174] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0011 DataVersion: 1363291551
-          [1659012746.234309][8169:8174] CHIP:TOO:   Reachable: TRUE
-          [1659012746.234420][8169:8174] CHIP:EM: Sending Standalone Ack for MessageCounter:92645971 on exchange 389i
-      disabled: true
+      command: "readAttribute"
+      attribute: "Reachable"
+      response:
+          value: true
+          constraints:
+              type: boolean
 
     - label: "TH reads UniqueID from the DUT."
       PICS: BRBINFO.S.A0012
-      verification: |
-          ./chip-tool bridgeddevicebasic read unique-id 1 3
+      command: "readAttribute"
+      attribute: "UniqueID"
+      response:
+          saveAs: UniqueIDValue
+          constraints:
+              type: char_string
+              maxLength: 32
 
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-
-          [1656501734.253827][2673:2679] CHIP:TOO:   UniqueID: 30789FE4FCF832C9
-      disabled: true
-
-    - label: "TH writes UniqueID as newid"
+    - label: "TH writes UniqueID from the DUT."
       PICS: BRBINFO.S.A0012
-      verification: |
-          ./chip-tool bridgeddevicebasic write unique-id newid  1 3
+      command: "writeAttribute"
+      attribute: "UniqueID"
+      arguments:
+          value: "newid"
+      response:
+          error: UNSUPPORTED_WRITE
 
-          Verify response has unsupported write on TH(chip-tool) Log:
-
-          [1656495259.991989][2164:2169] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
-      disabled: true
-
-    - label: "TH reads UniqueID"
+    - label: "TH reads UniqueID from the DUT."
       PICS: BRBINFO.S.A0012
-      verification: |
-          ./chip-tool bridgeddevicebasic read unique-id 1 3
-
-          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
-
-          Example Log:
-          [1656501734.253827][2673:2679] CHIP:TOO:   UniqueID: 30789FE4FCF832C9
-      disabled: true
+      command: "readAttribute"
+      attribute: "UniqueID"
+      response:
+          value: UniqueIDValue

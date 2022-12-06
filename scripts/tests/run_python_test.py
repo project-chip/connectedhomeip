@@ -14,13 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
-import coloredlogs
 import datetime
 import logging
 import os
-import pathlib
-import pty
 import queue
 import re
 import shlex
@@ -31,6 +27,8 @@ import threading
 import time
 import typing
 
+import click
+import coloredlogs
 from colorama import Fore, Style
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
@@ -164,4 +162,4 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
 
 
 if __name__ == '__main__':
-    main()
+    main(auto_envvar_prefix='CHIP')

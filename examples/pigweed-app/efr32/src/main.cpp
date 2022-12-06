@@ -60,7 +60,7 @@ void RunRpcService(void *)
 int main(void)
 {
     init_efrPlatform();
-    EFR32_LOG("***** CHIP EFR32 pigweed example *****\r\n");
+    SILABS_LOG("***** CHIP EFR32 pigweed example *****\r\n");
 
     pw_sys_io_Init();
     // Initialize LEDs

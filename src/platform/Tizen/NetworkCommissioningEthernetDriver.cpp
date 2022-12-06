@@ -15,16 +15,21 @@
  *    limitations under the License.
  */
 
-#include <lib/support/SafePointerCast.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <ifaddrs.h>
+
+#include <algorithm>
+#include <cerrno>
+#include <cstring>
+#include <iterator>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include <app-common/zap-generated/cluster-enums.h>
+#include <lib/support/CodeUtils.h>
+#include <platform/NetworkCommissioning.h>
 #include <platform/Tizen/ConnectivityUtils.h>
 #include <platform/Tizen/NetworkCommissioningDriver.h>
-
-#include <cerrno>
-#include <ifaddrs.h>
-#include <limits>
-#include <string>
-#include <vector>
 
 namespace chip {
 namespace DeviceLayer {

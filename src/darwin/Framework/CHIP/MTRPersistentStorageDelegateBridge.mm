@@ -17,6 +17,8 @@
 
 #import "MTRPersistentStorageDelegateBridge.h"
 
+#import "MTRLogging_Internal.h"
+
 #define LOG_DEBUG_PERSISTENT_STORAGE_DELEGATE 0
 
 MTRPersistentStorageDelegateBridge::MTRPersistentStorageDelegateBridge(id<MTRStorage> delegate)
@@ -38,7 +40,7 @@ CHIP_ERROR MTRPersistentStorageDelegateBridge::SyncGetKeyValue(const char * key,
 
     dispatch_sync(mWorkQueue, ^{
 #if LOG_DEBUG_PERSISTENT_STORAGE_DELEGATE
-        NSLog(@"PersistentStorageDelegate Sync Get Value for Key: %@", keyString);
+        MTR_LOG_DEBUG("PersistentStorageDelegate Sync Get Value for Key: %@", keyString);
 #endif
 
         NSData * value = [mDelegate storageDataForKey:keyString];
@@ -81,7 +83,7 @@ CHIP_ERROR MTRPersistentStorageDelegateBridge::SyncSetKeyValue(const char * key,
     __block CHIP_ERROR error = CHIP_NO_ERROR;
     dispatch_sync(mWorkQueue, ^{
 #if LOG_DEBUG_PERSISTENT_STORAGE_DELEGATE
-        NSLog(@"PersistentStorageDelegate Set Key %@", keyString);
+        MTR_LOG_DEBUG("PersistentStorageDelegate Set Key %@", keyString);
 #endif
 
         if ([mDelegate setStorageData:valueData forKey:keyString] == NO) {
@@ -99,7 +101,7 @@ CHIP_ERROR MTRPersistentStorageDelegateBridge::SyncDeleteKeyValue(const char * k
     __block CHIP_ERROR error = CHIP_NO_ERROR;
     dispatch_sync(mWorkQueue, ^{
 #if LOG_DEBUG_PERSISTENT_STORAGE_DELEGATE
-        NSLog(@"PersistentStorageDelegate Delete Key: %@", keyString);
+        MTR_LOG_DEBUG("PersistentStorageDelegate Delete Key: %@", keyString);
 #endif
 
         if ([mDelegate removeStorageDataForKey:keyString] == NO) {

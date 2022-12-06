@@ -19,37 +19,36 @@
 
 #pragma once
 
-#include <platform/ConnectivityManager.h>
-#include <platform/internal/GenericConnectivityManagerImpl.h>
-#include <platform/internal/GenericConnectivityManagerImpl_UDP.h>
+#include <cstdint>
+
+#include <inet/InetBuildConfig.h>
+#include <lib/core/CHIPError.h>
+#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <system/SystemClock.h>
+#include <system/SystemLayer.h>
+
+#include "platform/internal/GenericConnectivityManagerImpl.h"
+#include "platform/internal/GenericConnectivityManagerImpl_UDP.h"
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-#include <platform/internal/GenericConnectivityManagerImpl_TCP.h>
+#include "platform/internal/GenericConnectivityManagerImpl_TCP.h"
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
+#include "platform/internal/GenericConnectivityManagerImpl_BLE.h"
 #else
-#include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
+#include "platform/internal/GenericConnectivityManagerImpl_NoBLE.h"
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <platform/internal/GenericConnectivityManagerImpl_Thread.h>
+#include "platform/internal/GenericConnectivityManagerImpl_Thread.h"
 #else
-#include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
+#include "platform/internal/GenericConnectivityManagerImpl_NoThread.h"
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
+#include "platform/internal/GenericConnectivityManagerImpl_WiFi.h"
 #else
-#include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
+#include "platform/internal/GenericConnectivityManagerImpl_NoWiFi.h"
 #endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include "WiFiManager.h"
-#endif
-
-namespace chip {
-namespace Inet {
-class IPAddress;
-} // namespace Inet
-} // namespace chip
 
 namespace chip {
 namespace DeviceLayer {

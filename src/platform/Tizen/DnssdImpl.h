@@ -17,17 +17,21 @@
 
 #pragma once
 
+#include <cstdint>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <set>
-#include <string>
-#include <sys/param.h>
 #include <vector>
-
-#include <lib/dnssd/platform/Dnssd.h>
 
 #include <dns-sd.h>
 #include <glib.h>
+
+#include <inet/IPAddress.h>
+#include <inet/InetInterface.h>
+#include <lib/core/CHIPError.h>
+#include <lib/dnssd/Constants.h>
+#include <lib/dnssd/platform/Dnssd.h>
 
 namespace chip {
 namespace Dnssd {

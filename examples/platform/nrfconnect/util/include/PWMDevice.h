@@ -49,6 +49,8 @@ public:
     bool InitiateAction(Action_t aAction, int32_t aActor, uint8_t * aValue);
     void SetCallbacks(PWMCallback aActionInitiatedClb, PWMCallback aActionCompletedClb);
     const device * GetDevice() { return mPwmDevice->dev; }
+    void SuppressOutput();
+    void ApplyLevel();
 
 private:
     State_t mState;
@@ -63,5 +65,4 @@ private:
 
     void Set(bool aOn);
     void SetLevel(uint8_t aLevel);
-    void UpdateLight();
 };

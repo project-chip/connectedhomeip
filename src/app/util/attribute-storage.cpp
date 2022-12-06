@@ -110,7 +110,7 @@ static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterI
 //------------------------------------------------------------------------------
 
 // Initial configuration
-void emberAfEndpointConfigure(void)
+void emberAfEndpointConfigure()
 {
     uint16_t ep;
 
@@ -242,7 +242,6 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const Emb
 
     // Now enable the endpoint.
     emberAfEndpointEnableDisable(id, true);
-    emberAfSetDeviceEnabled(id, true);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
@@ -257,7 +256,6 @@ EndpointId emberAfClearDynamicEndpoint(uint16_t index)
         (emberAfEndpointIndexIsEnabled(index)))
     {
         ep = emAfEndpoints[index].endpoint;
-        emberAfSetDeviceEnabled(ep, false);
         emberAfEndpointEnableDisable(ep, false);
         emAfEndpoints[index].endpoint = kInvalidEndpointId;
     }
@@ -265,12 +263,12 @@ EndpointId emberAfClearDynamicEndpoint(uint16_t index)
     return ep;
 }
 
-uint16_t emberAfFixedEndpointCount(void)
+uint16_t emberAfFixedEndpointCount()
 {
     return FIXED_ENDPOINT_COUNT;
 }
 
-uint16_t emberAfEndpointCount(void)
+uint16_t emberAfEndpointCount()
 {
     return emberEndpointCount;
 }
@@ -357,7 +355,7 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
 }
 
 // Calls the init functions.
-void emAfCallInits(void)
+void emAfCallInits()
 {
     uint16_t index;
     for (index = 0; index < emberAfEndpointCount(); index++)

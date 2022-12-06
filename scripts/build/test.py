@@ -107,7 +107,9 @@ class TestBuilder(unittest.TestCase):
             'esp32-m5stack-all-clusters-minimal-rpc-ipv6only',
             'android-arm64-chip-tool',
             'nrf-nrf52840dk-pump',
-            'efr32-brd4161a-light-rpc'
+            'efr32-brd4161a-light-rpc',
+            'openiotsdk-lock',
+            'openiotsdk-shell'
         ]
 
         for target in TARGETS:

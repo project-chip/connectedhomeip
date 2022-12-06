@@ -205,7 +205,7 @@ CHIP_ERROR PersistentStorageOperationalKeystore::NewOpKeypairForFabric(FabricInd
     mPendingKeypair = Platform::New<Crypto::P256Keypair>();
     VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    mPendingKeypair->Initialize();
+    mPendingKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA);
     size_t csrLength = outCertificateSigningRequest.size();
     CHIP_ERROR err   = mPendingKeypair->NewCertificateSigningRequest(outCertificateSigningRequest.data(), csrLength);
     if (err != CHIP_NO_ERROR)

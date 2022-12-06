@@ -82,7 +82,7 @@ private:
     void SetState(State state, OperationSource source);
 
     static void ActuatorTimerEventHandler(k_timer * timer);
-    static void ActuatorAppEventHandler(AppEvent * aEvent);
+    static void ActuatorAppEventHandler(const AppEvent & aEvent);
     friend BoltLockManager & BoltLockMgr();
 
     State mState                             = State::kLockingCompleted;

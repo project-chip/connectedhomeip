@@ -23,6 +23,10 @@
 
 #include <zephyr/kernel.h>
 
+#ifdef CONFIG_CHIP_PW_RPC
+#include "Rpc.h"
+#endif
+
 LOG_MODULE_REGISTER(app);
 
 using namespace ::chip;
@@ -32,6 +36,10 @@ using namespace ::chip::DeviceLayer;
 int main(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+#ifdef CONFIG_CHIP_PW_RPC
+    rpc::Init();
+#endif
 
     err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR)
