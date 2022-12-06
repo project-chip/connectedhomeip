@@ -14,6 +14,7 @@
 #    limitations under the License.
 
 import re
+import binascii
 
 # Some of the YAML files contains some values that has been crafted to avoid some limitations
 # of the original JavaScript parser and the C++ generated bits.
@@ -41,6 +42,27 @@ def try_apply_yaml_float_written_as_strings(value):
     if type(value) is str:
         value = float(value)
     return value
+
+
+def convert_yaml_octet_string_to_bytes(s: str) -> bytes:
+    # This method is a clone of the method in src/controller/python/chip/yaml/format_converter.py
+    # It needs to be only a single copy of this method.
+    """Convert YAML octet string body to bytes, handling any c-style hex escapes (e.g. \x5a) and hex: prefix"""
+    # Step 1: handle explicit "hex:" prefix
+    if s.startswith('hex:'):
+        return binascii.unhexlify(s[4:])
+
+    # Step 2: convert non-hex-prefixed to bytes
+    # TODO(#23669): This does not properly support utf8 octet strings. We mimic
+    # javascript codegen behavior. Behavior of javascript is:
+    #   * Octet string character >= u+0200 errors out.
+    #   * Any character greater than 0xFF has the upper bytes chopped off.
+    as_bytes = [ord(c) for c in s]
+
+    if any([value > 0x200 for value in as_bytes]):
+        raise ValueError('Unsupported char in octet string %r' % as_bytes)
+    accumulated_hex = ''.join([f"{(v & 0xFF):02x}" for v in as_bytes])
+    return binascii.unhexlify(accumulated_hex)
 
 # The PyYAML implementation does not match float according to the JSON and fails on valid numbers.
 

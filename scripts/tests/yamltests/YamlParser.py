@@ -446,10 +446,7 @@ class TestStep:
             elif mapping_type == 'single' or mapping_type == 'double':
                 value = YamlFixes.try_apply_yaml_float_written_as_strings(value)
             elif mapping_type == 'octet_string' or mapping_type == 'long_octet_string':
-                if value.startswith('hex:'):
-                    value = bytes.fromhex(value[4:])
-                else:
-                    value = value.encode()
+                value = YamlFixes.convert_yaml_octet_string_to_bytes(value)
             elif mapping_type == 'boolean':
                 value = bool(value)
 
