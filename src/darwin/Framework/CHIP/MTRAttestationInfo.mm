@@ -22,21 +22,21 @@ NS_ASSUME_NONNULL_BEGIN
 @implementation MTRAttestationInfo : NSObject
 
 - (instancetype)initWithChallenge:(NSData *)challenge
-                            nonce:(NSData *)nonce
-                         elements:(NSData *)elements
-                elementsSignature:(NSData *)elementsSignature
-                              dac:(NSData *)dac
-                              pai:(NSData *)pai
-         certificationDeclaration:(NSData *)certificationDeclaration
-                     firmwareInfo:(NSData *)firmwareInfo
+                                        nonce:(NSData *)nonce
+                                     elements:(NSData *)elements
+                            elementsSignature:(NSData *)elementsSignature
+                 deviceAttestationCertificate:(MTRCertificateDERBytes)deviceAttestationCertificate
+    productAttestationIntermediateCertificate:(MTRCertificateDERBytes)productAttestationIntermediateCertificate
+                     certificationDeclaration:(NSData *)certificationDeclaration
+                                 firmwareInfo:(NSData *)firmwareInfo
 {
     if (self = [super init]) {
         _challenge = challenge;
         _nonce = nonce;
         _elements = elements;
         _elementsSignature = elementsSignature;
-        _dac = dac;
-        _pai = pai;
+        _deviceAttestationCertificate = deviceAttestationCertificate;
+        _productAttestationIntermediateCertificate = productAttestationIntermediateCertificate;
         _certificationDeclaration = certificationDeclaration;
         _firmwareInfo = firmwareInfo;
     }

@@ -17,12 +17,15 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Matter/MTRCertificates.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Represents information relating to product attestation.
  *
  */
+MTR_NEWLY_AVAILABLE
 @interface MTRAttestationInfo : NSObject
 
 @property (nonatomic, copy, readonly) NSData * challenge;
@@ -33,22 +36,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy, readonly) NSData * elementsSignature;
 
-@property (nonatomic, copy, readonly) NSData * dac;
+@property (nonatomic, copy, readonly) MTRCertificateDERBytes deviceAttestationCertificate;
 
-@property (nonatomic, copy, readonly) NSData * pai;
+@property (nonatomic, copy, readonly) MTRCertificateDERBytes productAttestationIntermediateCertificate;
 
 @property (nonatomic, copy, readonly) NSData * certificationDeclaration;
 
 @property (nonatomic, copy, readonly) NSData * firmwareInfo;
 
 - (instancetype)initWithChallenge:(NSData *)challenge
-                            nonce:(NSData *)nonce
-                         elements:(NSData *)elements
-                elementsSignature:(NSData *)elementsSignature
-                              dac:(NSData *)dac
-                              pai:(NSData *)pai
-         certificationDeclaration:(NSData *)certificationDeclaration
-                     firmwareInfo:(NSData *)firmwareInfo;
+                                        nonce:(NSData *)nonce
+                                     elements:(NSData *)elements
+                            elementsSignature:(NSData *)elementsSignature
+                 deviceAttestationCertificate:(MTRCertificateDERBytes)deviceAttestationCertificate
+    productAttestationIntermediateCertificate:(MTRCertificateDERBytes)processAttestationIntermediateCertificate
+                     certificationDeclaration:(NSData *)certificationDeclaration
+                                 firmwareInfo:(NSData *)firmwareInfo;
 
 @end
 

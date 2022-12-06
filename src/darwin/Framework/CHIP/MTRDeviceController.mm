@@ -922,14 +922,15 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
                                                  elements:csrInfo.csrElements
                                         elementsSignature:csrInfo.attestationSignature
                                                       csr:csrInfo.csr];
-    AttestationInfo * oldAttestationInfo = [[AttestationInfo alloc] initWithChallenge:attestationInfo.challenge
-                                                                                nonce:attestationInfo.nonce
-                                                                             elements:attestationInfo.elements
-                                                                    elementsSignature:attestationInfo.elementsSignature
-                                                                                  dac:attestationInfo.dac
-                                                                                  pai:attestationInfo.pai
-                                                             certificationDeclaration:attestationInfo.certificationDeclaration
-                                                                         firmwareInfo:attestationInfo.firmwareInfo];
+    AttestationInfo * oldAttestationInfo =
+        [[AttestationInfo alloc] initWithChallenge:attestationInfo.challenge
+                                             nonce:attestationInfo.nonce
+                                          elements:attestationInfo.elements
+                                 elementsSignature:attestationInfo.elementsSignature
+                                               dac:attestationInfo.deviceAttestationCertificate
+                                               pai:attestationInfo.productAttestationIntermediateCertificate
+                          certificationDeclaration:attestationInfo.certificationDeclaration
+                                      firmwareInfo:attestationInfo.firmwareInfo];
     [self.nocChainIssuer
           onNOCChainGenerationNeeded:oldCSRInfo
                      attestationInfo:oldAttestationInfo

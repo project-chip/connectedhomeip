@@ -188,8 +188,8 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
                                                 nonce:AsData(commissioningParameters.Value().GetAttestationNonce().Value())
                                              elements:AsData(commissioningParameters.Value().GetAttestationElements().Value())
                                     elementsSignature:AsData(commissioningParameters.Value().GetAttestationSignature().Value())
-                                                  dac:AsData(DAC)
-                                                  pai:AsData(PAI)
+                         deviceAttestationCertificate:AsData(DAC)
+            productAttestationIntermediateCertificate:AsData(PAI)
                              certificationDeclaration:AsData(certificationDeclarationSpan)
                                          firmwareInfo:AsData(firmwareInfoSpan)];
 
