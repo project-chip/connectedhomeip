@@ -185,7 +185,7 @@ declare_args() {
   build_tv_casting_common_a = false
 }
 
-assert(chip_disable_platform_kvs == false || chip_device_platform == "darwin",
+assert(!chip_disable_platform_kvs || chip_device_platform == "darwin",
        "Can only disable KVS on some platforms")
 
 if (_chip_device_layer != "none" && chip_device_platform != "external") {
@@ -199,6 +199,11 @@ if (_chip_device_layer != "none" && chip_device_platform != "external") {
       "<platform/" + _chip_device_layer + "/InetPlatformConfig.h>"
   chip_system_platform_config_include =
       "<platform/" + _chip_device_layer + "/SystemPlatformConfig.h>"
+}
+
+declare_args() {
+  # Enable jlink/segger_rtt support.
+  chip_enable_segger_rtt = chip_device_platform != "qpg"
 }
 
 assert(
