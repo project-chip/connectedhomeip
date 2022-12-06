@@ -37,6 +37,7 @@ from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
 from builders.imx import IMXApp, IMXBuilder
 from builders.genio import GenioApp, GenioBuilder
+from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder
 
 
 def BuildHostTestRunnerTarget():
@@ -529,6 +530,17 @@ def BuildTelinkTarget():
     return target
 
 
+def BuildOpenIotSdkTargets():
+    target = BuildTarget('openiotsdk', OpenIotSdkBuilder)
+
+    target.AppendFixedTargets([
+        TargetPart('shell', app=OpenIotSdkApp.SHELL),
+        TargetPart('lock', app=OpenIotSdkApp.LOCK),
+    ])
+
+    return target
+
+
 BUILD_TARGETS = [
     BuildAmebaTarget(),
     BuildAndroidTarget(),
@@ -551,6 +563,5 @@ BUILD_TARGETS = [
     BuildQorvoTarget(),
     BuildTizenTarget(),
     BuildTelinkTarget(),
-
-
+    BuildOpenIotSdkTargets(),
 ]

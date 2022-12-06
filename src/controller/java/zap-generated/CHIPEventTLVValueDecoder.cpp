@@ -1879,12 +1879,12 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
-            jobject value_newPosition;
-            std::string value_newPositionClassName     = "java/lang/Integer";
-            std::string value_newPositionCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(value_newPositionClassName.c_str(),
-                                                                          value_newPositionCtorSignature.c_str(),
-                                                                          cppValue.newPosition, value_newPosition);
+            jobject value_previousPosition;
+            std::string value_previousPositionClassName     = "java/lang/Integer";
+            std::string value_previousPositionCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(value_previousPositionClassName.c_str(),
+                                                                          value_previousPositionCtorSignature.c_str(),
+                                                                          cppValue.previousPosition, value_previousPosition);
 
             jobject value_totalNumberOfPressesCounted;
             std::string value_totalNumberOfPressesCountedClassName     = "java/lang/Integer";
@@ -1909,7 +1909,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
 
-            jobject value = env->NewObject(multiPressCompleteStructClass, multiPressCompleteStructCtor, value_newPosition,
+            jobject value = env->NewObject(multiPressCompleteStructClass, multiPressCompleteStructCtor, value_previousPosition,
                                            value_totalNumberOfPressesCounted);
 
             return value;

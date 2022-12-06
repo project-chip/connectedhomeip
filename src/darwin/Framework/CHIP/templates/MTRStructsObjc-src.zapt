@@ -83,6 +83,21 @@ NS_ASSUME_NONNULL_BEGIN
   return descriptionString;
 }
 
+{{#if (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) "Switch")}}
+{{#if (isStrEqual (asUpperCamelCase name preserveAcronyms=true) "MultiPressComplete")}}
+{{! Workaround for the name being mis-spelled in XML previously }}
+- (void)setNewPosition:(NSNumber * _Nonnull)newPosition
+{
+  self.previousPosition = newPosition;
+}
+
+- (NSNumber * _Nonnull)newPosition
+{
+  return self.previousPosition;
+}
+
+{{/if}}
+{{/if}}
 @end
 {{#unless (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name))}}
 

@@ -439,7 +439,7 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
                 shouldWaitAfterDeviceAttestation = YES;
             }
             _deviceAttestationDelegateBridge = new MTRDeviceAttestationDelegateBridge(
-                self, commissioningParams.deviceAttestationDelegate, _chipWorkQueue, timeoutSecs, shouldWaitAfterDeviceAttestation);
+                self, commissioningParams.deviceAttestationDelegate, timeoutSecs, shouldWaitAfterDeviceAttestation);
             params.SetDeviceAttestationDelegate(_deviceAttestationDelegateBridge);
         }
 

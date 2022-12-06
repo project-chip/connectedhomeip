@@ -3134,10 +3134,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("NewPosition", indent + 1, value.newPosition);
+        CHIP_ERROR err = DataModelLogger::LogValue("PreviousPosition", indent + 1, value.previousPosition);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'NewPosition'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'PreviousPosition'");
             return err;
         }
     }
