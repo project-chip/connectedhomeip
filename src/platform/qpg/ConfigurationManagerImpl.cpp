@@ -111,7 +111,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     err = StoreBootReason(to_underlying(bootReason));
     SuccessOrExit(err);
-    
+
     err = CHIP_NO_ERROR;
 
 exit:
