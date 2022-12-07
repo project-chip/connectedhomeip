@@ -38,12 +38,12 @@ class BaseConstraint(ABC):
         self._is_null_allowed = is_null_allowed
 
     def is_met(self, value):
+        if value is None:
+            return self._is_null_allowed
+
         response_type = type(value)
         if self._types and response_type not in self._types:
             return False
-
-        if value is None:
-            return self._is_null_allowed
 
         return self.check_response(value)
 
