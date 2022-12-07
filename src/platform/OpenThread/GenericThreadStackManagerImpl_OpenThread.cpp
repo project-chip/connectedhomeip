@@ -1158,7 +1158,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
                 }
                 else
                 {
-                    averageRssi.SetNonNull(((neighInfo.mAverageRssi > 0) ? 0 : neighInfo.mAverageRssi));
+                    // Thread average calculation already restrict mAverageRssi to be between -128 and 0
+                    averageRssi.SetNonNull(neighInfo.mAverageRssi);
                 }
 
                 if (neighInfo.mAverageRssi == OT_RADIO_RSSI_INVALID)
