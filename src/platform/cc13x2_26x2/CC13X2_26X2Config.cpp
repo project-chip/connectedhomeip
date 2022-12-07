@@ -48,10 +48,10 @@ const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_SerialNum            
                                                                                        .itemID   = kCC13X2_26X2Matter_ItemID_ChipFactory,
                                                                                        .subID    = 0x0001 } };
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDeviceId           = { { .systemID = kCC13X2_26X2Matter_SysID,
-                                                                                       .itemID   = kCC13X2_26X2Matter_ItemID_ChipFactory, 
+                                                                                       .itemID   = kCC13X2_26X2Matter_ItemID_ChipFactory,
                                                                                        .subID    = 0x0002 } };
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDeviceCert         = { { .systemID = kCC13X2_26X2Matter_SysID,
-                                                                                       .itemID   = kCC13X2_26X2Matter_ItemID_ChipFactory, 
+                                                                                       .itemID   = kCC13X2_26X2Matter_ItemID_ChipFactory,
                                                                                        .subID    = 0x0003 } };
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDeviceICACerts     = { { .systemID = kCC13X2_26X2Matter_SysID,
                                                                                        .itemID   = kCC13X2_26X2Matter_ItemID_ChipFactory,
@@ -416,7 +416,7 @@ CHIP_ERROR CC13X2_26X2Config::FactoryResetConfig(void)
     uint8_t status           = NVINTF_SUCCESS;
 
     //Delete items with the config, kvs_key and kvs_value itemIDs. Items with the factory
-    //and counter itemIDs are not deleted. 
+    //and counter itemIDs are not deleted.
 
     intptr_t key = sNvoctpFps.lockNV();
 

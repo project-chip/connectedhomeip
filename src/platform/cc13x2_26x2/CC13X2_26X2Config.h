@@ -50,8 +50,8 @@ public:
 
     static const uint16_t kCC13X2_26X2Matter_ItemID_ChipConfig      = kNVinf_itemid_chipConfig;
     static const uint16_t kCC13X2_26X2Matter_ItemID_ChipFactory     = kNVinf_itemid_chipFactory;
-    static const uint16_t kCC13X2_26X2Matter_ItemID_ChipCounters    = kNVinf_itemid_chipCounters; 
-    static const uint16_t kCC13X2_26X2Matter_ItemID_ChipKVS_key     = kNVinf_itemid_chipKVS_key; 
+    static const uint16_t kCC13X2_26X2Matter_ItemID_ChipCounters    = kNVinf_itemid_chipCounters;
+    static const uint16_t kCC13X2_26X2Matter_ItemID_ChipKVS_key     = kNVinf_itemid_chipKVS_key;
     static const uint16_t kCC13X2_26X2Matter_ItemID_ChipKVS_value   = kNVinf_itemid_chipKVS_value;
 
     // Key definitions for well-known keys.
