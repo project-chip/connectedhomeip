@@ -30,18 +30,6 @@
 #include <BL602Config.h>
 #include <platform/bouffalolab/BL602/BL602Config.h>
 
-/* ignore GCC Wconversion warnings for pigweed */
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-#endif
-
-#include <pw_log/log.h>
-
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
-
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
