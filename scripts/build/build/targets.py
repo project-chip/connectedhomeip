@@ -613,6 +613,7 @@ def TizenTargets():
     for target in builder.AllVariants():
         yield target
 
+
 def BouffalolabTargets():
     target = Target('bouffalolab', BouffalolabBuilder)
 

@@ -306,7 +306,8 @@ ota-provider-app build and usage.
     ./chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 <node_id_to_lighting_app> 0
     ```
     where `<node_id_to_lighting_app>` is node id of BL602/BL702 lighting app.
--   After OTA software upgrade gets done, BL602/BL702 will get reboot automatically.
+-   After OTA software upgrade gets done, BL602/BL702 will get reboot
+    automatically.
 
 ## Run RPC Console
 
