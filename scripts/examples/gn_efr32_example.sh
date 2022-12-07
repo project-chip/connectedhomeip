@@ -82,6 +82,10 @@ if [ "$#" == "0" ]; then
         enable_sleepy_device
             Enable Sleepy end device. (Default false)
             Must also set chip_openthread_ftd=false
+        sl_matter_version_str
+            Set a Matter sotfware version string for the Silabs examples
+            Used and formatted by default in this script.
+            To skip that formatting or use your own version string use --skip_versioning
         use_rs911x
             Build wifi example with extension board rs911x. (Default false)
         use_wf200
@@ -105,6 +109,9 @@ if [ "$#" == "0" ]; then
             enable Addition data advertissing and rotating device ID
         --use_ot_lib
             use the silabs openthread library
+        --skip_versioning
+            Skip the silabs formating for the Matter software version string
+            Currently : v1.0-<branchName>-<ShortCommitSha>
     "
 elif [ "$#" -lt "2" ]; then
     echo "Invalid number of arguments
@@ -164,7 +171,7 @@ else
                 optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" use_thread_coap_lib=true "
                 shift
                 ;;
-            --skip_silabs_version)
+            --skip_versioning)
                 USE_SILABS_VERSIONING=false
                 shift
                 ;;
@@ -189,7 +196,7 @@ else
             ShortCommitSha=$(git describe --always --dirty)
             branchName=$(git rev-parse --abbrev-ref HEAD)
             optArgs+="sl_matter_version_str=\"v1.0-$branchName-$ShortCommitSha\" "
-        }  &> /dev/null
+        } &>/dev/null
     fi
 
     BUILD_DIR=$OUTDIR/$SILABS_BOARD
