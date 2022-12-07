@@ -48,7 +48,7 @@ constexpr chip::System::Clock::Seconds16 kCommissioningWindowTimeout = chip::Sys
 class CastingServer
 {
 public:
-    CastingServer(CastingServer & other)  = delete;
+    CastingServer(CastingServer & other) = delete;
     void operator=(const CastingServer &) = delete;
     static CastingServer * GetInstance();
 
@@ -67,10 +67,7 @@ public:
     CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Dnssd::DiscoveredNodeData * selectedCommissioner);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-    TargetVideoPlayerInfo * GetActiveTargetVideoPlayer()
-    {
-        return &mActiveTargetVideoPlayerInfo;
-    }
+    TargetVideoPlayerInfo * GetActiveTargetVideoPlayer() { return &mActiveTargetVideoPlayerInfo; }
 
     CHIP_ERROR TargetVideoPlayerInfoInit(chip::NodeId nodeId, chip::FabricIndex fabricIndex,
                                          std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
@@ -87,10 +84,7 @@ public:
 
     chip::NodeId GetVideoPlayerNodeForFabricIndex(chip::FabricIndex fabricIndex);
     chip::FabricIndex GetVideoPlayerFabricIndexForNode(chip::NodeId nodeId);
-    chip::FabricIndex CurrentFabricIndex()
-    {
-        return mActiveTargetVideoPlayerInfo.GetFabricIndex();
-    }
+    chip::FabricIndex CurrentFabricIndex() { return mActiveTargetVideoPlayerInfo.GetFabricIndex(); }
     void SetDefaultFabricIndex(std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                                std::function<void(CHIP_ERROR)> onConnectionFailure,
                                std::function<void(TargetEndpointInfo *)> onNewOrUpdatedEndpoint);
