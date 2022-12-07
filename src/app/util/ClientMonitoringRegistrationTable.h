@@ -28,13 +28,24 @@ class ClientMonitoringRegistrationTable
 public:
     using MonitoringRegistrationStruct = chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::Type;
 
-    ClientMonitoringRegistrationTable() {}
+    ClientMonitoringRegistrationTable(FabricIndex fabricIndex);
+    ~ClientMonitoringRegistrationTable(){};
 
-    static ClientMonitoringRegistrationTable & Instance();
+    void SaveToStorage();
+
+    // Getter
+    NodeId getClientNodeId();
+    uint64_t getICid();
+    FabricIndex getFaricIndex();
+
+    // Setter
+    void setClientNodeId(NodeId clientNodeId);
+    void setICid(uint64_t ICid);
+    void setFabricIndex(FabricIndex fabric);
 
 private:
-    static ClientMonitoringRegistrationTable sInstance;
-    MonitoringRegistrationStruct mRegisteredClients[CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC];
+    void LoadFromStorage(FabricIndex fabricIndex);
+    MonitoringRegistrationStruct mRegisteredClient;
 };
 
 } // namespace chip

@@ -23,15 +23,53 @@ namespace chip {
  * Attributes Definition
  *********************************************************/
 
-ClientMonitoringRegistrationTable ClientMonitoringRegistrationTable::sInstance;
-
 /**********************************************************
  * ClientMonitoringRegistrationTable Implementation
  *********************************************************/
 
-ClientMonitoringRegistrationTable & ClientMonitoringRegistrationTable::Instance()
+ClientMonitoringRegistrationTable::ClientMonitoringRegistrationTable(FabricIndex fabricIndex)
 {
-    return sInstance;
+    this->LoadFromStorage(fabricIndex);
+}
+
+void ClientMonitoringRegistrationTable::LoadFromStorage(FabricIndex fabricIndex)
+{
+    // TODO: Implement load from NVM logic
+}
+
+void ClientMonitoringRegistrationTable::SaveToStorage()
+{
+    // Store to NVM based of class attributes
+}
+
+NodeId ClientMonitoringRegistrationTable::getClientNodeId()
+{
+    return mRegisteredClient.clientNodeId;
+}
+
+uint64_t ClientMonitoringRegistrationTable::getICid()
+{
+    return mRegisteredClient.ICid;
+}
+
+FabricIndex ClientMonitoringRegistrationTable::getFaricIndex()
+{
+    return mRegisteredClient.fabricIndex;
+}
+
+void ClientMonitoringRegistrationTable::setClientNodeId(NodeId clientNodeId)
+{
+    mRegisteredClient.clientNodeId = clientNodeId;
+}
+
+void ClientMonitoringRegistrationTable::setICid(uint64_t ICid)
+{
+    mRegisteredClient.ICid = ICid;
+}
+
+void ClientMonitoringRegistrationTable::setFabricIndex(FabricIndex fabric)
+{
+    mRegisteredClient.fabricIndex = fabric;
 }
 
 } // namespace chip
