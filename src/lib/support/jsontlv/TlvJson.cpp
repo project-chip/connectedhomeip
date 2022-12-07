@@ -67,6 +67,9 @@ struct KeyContext
 //
 static constexpr uint16_t kMaxStringLen = 1280;
 
+constexpr const char kBase64Header[] = "base64:";
+constexpr size_t kBase64HeaderLen    = ArraySize(kBase64Header) - 1;
+
 namespace chip {
 
 /*
@@ -152,10 +155,15 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & 
         VerifyOrReturnError(span.size() < kMaxStringLen, CHIP_ERROR_INVALID_TLV_ELEMENT);
 
         Platform::ScopedMemoryBuffer<char> byteString;
-        byteString.Alloc(BASE64_ENCODED_LEN(span.size()) + 1);
+        byteString.Alloc(kBase64HeaderLen + BASE64_ENCODED_LEN(span.size()) + 1);
         VerifyOrReturnError(byteString.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
 
-        auto encodedLen              = Base64Encode(span.data(), span.size(), byteString.Get());
+        auto encodedLen = Base64Encode(span.data(), span.size(), byteString.Get() + kBase64HeaderLen);
+        if (encodedLen)
+        {
+            memcpy(byteString.Get(), kBase64Header, kBase64HeaderLen);
+            encodedLen += kBase64HeaderLen;
+        }
         byteString.Get()[encodedLen] = '\0';
 
         InsertKeyValue(parent, context, byteString.Get());
