@@ -97,6 +97,7 @@ public final class CommandManager {
       command.initArguments(temp.length, temp);
       command.run();
     } catch (IllegalArgumentException e) {
+      System.out.println("Run command failed with exception: " + e.getMessage());
       showCommand(args[0], command);
     } catch (Exception e) {
       System.out.println("Run command failed with exception: " + e.getMessage());
