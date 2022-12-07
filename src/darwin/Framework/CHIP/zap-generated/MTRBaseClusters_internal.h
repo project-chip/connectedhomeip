@@ -20,7 +20,7 @@
 #import "MTRBaseClusters.h"
 #import "MTRBaseDevice.h"
 
-#include <controller-clusters/zap-generated/CHIPClusters.h>
+#include <zap-generated/CHIPClusters.h>
 
 @interface MTRBaseClusterIdentify ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;

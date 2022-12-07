@@ -5,7 +5,7 @@
 #import "MTRBaseClusters.h"
 #import "MTRBaseDevice.h"
 
-#include <controller-clusters/zap-generated/CHIPClusters.h>
+#include <zap-generated/CHIPClusters.h>
 
 {{#chip_client_clusters includeAll=true}}
 

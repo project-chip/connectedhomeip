@@ -16,13 +16,13 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <controller-clusters/zap-generated/CHIPClusters.h>
 #include <controller/CommissioningWindowOpener.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPMem.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <zap-generated/CHIPClusters.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::System::Clock;

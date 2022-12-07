@@ -251,6 +251,14 @@ jobs:
                        --pregen-dir ./zzz_pregenerated \
                        build \
                     "
+            - name: Check no code generation in output
+              run: |
+                  CNT=$(find -name "CHIPClusters.h" out | wc -l)
+                  if [ "${CNT}" != "0" ]; then
+                     echo "ERROR: found unexpected generated files:"
+                     find -name "CHIPClusters.h" out
+                     exit 1
+                  fi
             - name: Undo code pre-generation changes (make compile time codegen work again)
               run: |
                   rm -rf ./zzz_pregenerated
