@@ -17,14 +17,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * {{description}}
  */
-{{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
-MTR_NEWLY_AVAILABLE
-{{/unless}}
+{{availability (asUpperCamelCase name preserveAcronyms=true)~}}
 @interface MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
-                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER {{availability (asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
 
 {{#chip_cluster_commands}}
 /**
@@ -34,9 +32,9 @@ MTR_NEWLY_AVAILABLE
  */
 {{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline~}}
 {{~#*inline "command"}}{{asUpperCamelCase name preserveAcronyms=true}}{{/inline~}}
-- (void){{asLowerCamelCase name}}WithParams:(MTR{{>cluster}}Cluster{{>command}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completion:({{>command_completion_type command=.}})completion MTR_NEWLY_AVAILABLE;
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{>cluster}}Cluster{{>command}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completion:({{>command_completion_type command=.}})completion {{availability (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
 {{#unless (hasArguments)}}
-- (void){{asLowerCamelCase name}}WithCompletion:({{>command_completion_type command=.}})completion MTR_NEWLY_AVAILABLE;
+- (void){{asLowerCamelCase name}}WithCompletion:({{>command_completion_type command=.}})completion {{availability (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
 {{/unless}}
 {{/chip_cluster_commands}}
 
@@ -48,15 +46,15 @@ MTR_NEWLY_AVAILABLE
 {{~else~}}
   Completion:
 {{~/if_is_fabric_scoped_struct~}}
-(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
 {{#if isWritableAttribute}}
-- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completion:(MTRStatusCompletion)completion {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
 {{/if}}
 {{#if isReportableAttribute}}
 - (void) subscribe{{>attribute}}WithParams:(MTRSubscribeParams *)params
-subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
-+ (void) read{{>attribute}}WithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
++ (void) read{{>attribute}}WithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
 {{/if}}
 {{/chip_server_cluster_attributes}}
 
@@ -69,7 +67,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 
 {{#chip_client_clusters includeAll=true}}
 {{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
-MTR_NEWLY_DEPRECATED("Please use MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}}")
+{{availability (compatClusterNameRemapping name) deprecationMessage=(concat "Please use MTRBaseCluster" (asUpperCamelCase name preserveAcronyms=true))}}
 @interface MTRBaseCluster{{compatClusterNameRemapping name}} : MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}}
 @end
 
@@ -81,98 +79,80 @@ MTR_NEWLY_DEPRECATED("Please use MTRBaseCluster{{asUpperCamelCase name preserveA
 {{#*inline "enumDef"}}
 typedef NS_ENUM({{asUnderlyingZclType name}}, {{objCEnumName clusterName label}}) {
    {{#zcl_enum_items}}
-   {{objCEnumName ../clusterName ../label}}{{objCEnumItemLabel label}} = {{asHex value 2}},
+   {{objCEnumName ../clusterName ../label}}{{objCEnumItemLabel label}} {{availability ../clusterName enum=(asUpperCamelCase ../label preserveAcronyms=true) enumValue=(objCEnumItemLabel label) deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../../name preserveAcronyms=true) ../label) (objCEnumItemLabel label))}} = {{asHex value 2}},
    {{/zcl_enum_items}}
 }
 {{/inline}}
-{{> enumDef name=name clusterName=(asUpperCamelCase ../name preserveAcronyms=true) label=label}}
+{{> enumDef name=name clusterName=(asUpperCamelCase ../name preserveAcronyms=true) label=label}} {{availability (asUpperCamelCase ../name preserveAcronyms=true) enum=(asUpperCamelCase label preserveAcronyms=true)}};
 {{#unless (isStrEqual (asUpperCamelCase ../name preserveAcronyms=true) (compatClusterNameRemapping ../name))}}
-MTR_NEWLY_AVAILABLE;
 
-{{> enumDef name=name clusterName=(compatClusterNameRemapping ../name) label=label}}
-MTR_NEWLY_DEPRECATED("Please use {{objCEnumName (asUpperCamelCase ../name preserveAcronyms=true) label}}")
+{{> enumDef name=name clusterName=(compatClusterNameRemapping ../name) label=label}} {{availability (compatClusterNameRemapping ../name) enum=(asUpperCamelCase label preserveAcronyms=true) deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../name preserveAcronyms=true) label))}};
 {{/unless}}
-;
 
 {{/zcl_enums}}
 {{#zcl_bitmaps}}
 {{#*inline "bitmapDef"}}
 typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName label}}) {
    {{#zcl_bitmap_items}}
-   {{objCEnumName ../clusterName ../label}}{{objCEnumItemLabel label}} = {{asHex mask}},
+   {{objCEnumName ../clusterName ../label}}{{objCEnumItemLabel label}} {{availability ../clusterName bitmap=(asUpperCamelCase ../label preserveAcronyms=true) bitmapValue=(objCEnumItemLabel label) deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../../name preserveAcronyms=true) ../label) (objCEnumItemLabel label))}} = {{asHex mask}},
    {{/zcl_bitmap_items}}
 }
-{{! TODO: We need a better setup for the API_AVALABLE annotations here; this does not scale at all sanely. }}
-{{#if (isStrEqual (asUpperCamelCase clusterName) "Switch")}}
-{{#if (isStrEqual (asUpperCamelCase label) "SwitchFeature")}}
-API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
-{{/if}}
-{{/if}}
-{{#if (isStrEqual (asUpperCamelCase clusterName) "MediaPlayback")}}
-{{#if (isStrEqual (asUpperCamelCase label) "MediaPlaybackFeature")}}
-API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
-{{/if}}
-{{/if}}
 {{/inline}}
-{{> bitmapDef name=name clusterName=(asUpperCamelCase ../name preserveAcronyms=true) label=label}}
+{{> bitmapDef name=name clusterName=(asUpperCamelCase ../name preserveAcronyms=true) label=label}} {{availability (asUpperCamelCase ../name preserveAcronyms=true) bitmap=(asUpperCamelCase label preserveAcronyms=true)}};
 {{#unless (isStrEqual (asUpperCamelCase ../name preserveAcronyms=true) (compatClusterNameRemapping ../name))}}
-MTR_NEWLY_AVAILABLE;
 
-{{> bitmapDef name=name clusterName=(compatClusterNameRemapping ../name) label=label}}
-MTR_NEWLY_DEPRECATED("Please use {{objCEnumName (asUpperCamelCase ../name preserveAcronyms=true) label}}")
+{{> bitmapDef name=name clusterName=(compatClusterNameRemapping ../name) label=label}} {{availability (compatClusterNameRemapping ../name) bitmap=(asUpperCamelCase label preserveAcronyms=true) deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../name preserveAcronyms=true) label))}};
 {{/unless}}
-;
+
 
 {{/zcl_bitmaps}}
 {{/zcl_clusters}}
 
 {{#chip_client_clusters includeAll=true}}
+{{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping name))}}
 @interface MTRBaseCluster{{compatClusterNameRemapping name}} (Deprecated)
 
 - (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
                                endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpointID:queue:");
+                                  queue:(dispatch_queue_t)queue {{availability (compatClusterNameRemapping name) deprecatedRelease="First major API revamp" deprecationMessage="Please use initWithDevice:endpointID:queue:"}};
 
 {{#chip_cluster_commands}}
+{{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) command=(asUpperCamelCase name))}}
 - (void){{asLowerCamelCase name}}WithParams:(MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=. compatRemapClusterName=true}})completionHandler
-  MTR_NEWLY_DEPRECATED("Please use {{asLowerCamelCase name}}WithParams:completion:");
+  {{availability (compatClusterNameRemapping parent.name) command=(asUpperCamelCase name) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithParams:completion:")}};
 {{#unless (hasArguments)}}
 - (void){{asLowerCamelCase name}}WithCompletionHandler:({{>command_completion_type command=. compatRemapClusterName=true}})completionHandler
-  MTR_NEWLY_DEPRECATED("Please use {{asLowerCamelCase name}}WithCompletion:");
+  {{availability (compatClusterNameRemapping parent.name) command=(asUpperCamelCase name) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithCompletion:")}};
 {{/unless}}
+{{/if}}
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-{{!Backwards compat for now: Treat DeviceTypeList as DeviceList. That's OK, since this is a deprecated API. }}
-{{#*inline "attribute"}}Attribute{{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}{{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeList")}}DeviceList{{else}}{{asUpperCamelCase name}}{{/if}}{{else}}{{asUpperCamelCase name}}{{/if}}{{/inline}}
-{{! TODO: We need a better setup for the API_AVALABLE annotations here; this does not scale at all sanely. }}
+{{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))}}
+{{#*inline "attribute"}}Attribute{{compatAttributeNameRemapping parent.name name}}{{/inline}}
 - (void)read{{>attribute}}With
 {{~#if_is_fabric_scoped_struct type~}}
   Params:(MTRReadParams * _Nullable)params completionHandler:
 {{~else~}}
   CompletionHandler:
 {{~/if_is_fabric_scoped_struct~}}
-(void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))completionHandler {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}}
-  MTR_NEWLY_DEPRECATED("Please use readAttribute{{asUpperCamelCase name preserveAcronyms=true}}With{{#if_is_fabric_scoped_struct type}}Params:completion:{{else}}Completion:{{/if_is_fabric_scoped_struct}}");
+(void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))completionHandler {{availability (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name) deprecatedRelease="First major API revamp" fabricScopedDeprecationMessage=(concat "Please use readAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithParams:completion:") nonFabricScopedDeprecationMessage=(concat "Please use readAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithCompletion:") type=type}};
 {{#if isWritableAttribute}}
-- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name compatRemapClusterName=true}})value completionHandler:(MTRStatusCompletion)completionHandler {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}}
-  MTR_NEWLY_DEPRECATED("Please use writeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue:completion:");
-- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name compatRemapClusterName=true}})value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}}
-  MTR_NEWLY_DEPRECATED("Please use writeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue:params:completion:");
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name compatRemapClusterName=true}})value completionHandler:(MTRStatusCompletion)completionHandler {{availability (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use writeAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithValue:completion:")}};
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name compatRemapClusterName=true}})value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler {{availability (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use writeAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithValue:params:completion:")}};
 {{/if}}
 {{#if isReportableAttribute}}
-{{! TODO: We need a better setup for the API_AVALABLE annotations here; this does not scale at all sanely. }}
 - (void) subscribe{{>attribute}}WithMinInterval:(NSNumber * _Nonnull)minInterval  maxInterval:(NSNumber * _Nonnull)maxInterval
        params:(MTRSubscribeParams * _Nullable)params
-subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))reportHandler {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}}
-  MTR_NEWLY_DEPRECATED("Please use subscribeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithParams:subscriptionEstablished:");
-+ (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))completionHandler {{#if (isStrEqual (asUpperCamelCase parent.name) "UnitTesting")}}{{#if (isStrEqual (asUpperCamelCase name) "WriteOnlyInt8u")}}API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)){{/if}}{{/if}}
-  MTR_NEWLY_DEPRECATED("Please use readAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithAttributeCache:endpoint:queue:completion:");
+subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler reportHandler:(void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))reportHandler {{availability (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use subscribeAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithParams:subscriptionEstablished:")}};
++ (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))completionHandler {{availability (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use readAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithAttributeCache:endpoint:queue:completion:")}};
+{{/if}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 
 @end
 
+{{/if}}
 {{/chip_client_clusters}}
 
 NS_ASSUME_NONNULL_END

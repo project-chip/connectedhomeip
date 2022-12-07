@@ -7,11 +7,13 @@
 
 typedef NS_ENUM(uint32_t, MTRClusterIDType) {
 {{#zcl_clusters}}
-MTRCluster{{compatClusterNameRemapping label}}ID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDType{{asUpperCamelCase label}}ID")= {{asMEI manufacturerCode code}},
+{{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping name) isForIds=true)}}
+MTRCluster{{compatClusterNameRemapping label}}ID {{availability (compatClusterNameRemapping name) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use MTRClusterIDType" (asUpperCamelCase label preserveAcronyms=false) "ID") isForIds=true}} = {{asMEI manufacturerCode code}},
+{{/if}}
 {{/zcl_clusters}}
 {{#zcl_clusters}}
 {{~#*inline "cluster"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
-MTRClusterIDType{{>cluster}}ID MTR_NEWLY_AVAILABLE = {{asMEI manufacturerCode code}},
+MTRClusterIDType{{>cluster}}ID {{availability (asUpperCamelCase label preserveAcronyms=true) minimalRelease="First major API revamp" isForIds=true}} = {{asMEI manufacturerCode code}},
 {{/zcl_clusters}}
 };
 
@@ -21,9 +23,11 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 // Deprecated global attribute names
 {{#zcl_attributes_server}}
 {{#unless clusterRef}}
+{{#if (wasIntroducedBeforeRelease "First major API revamp" "" globalAttribute=(asUpperCamelCase label) isForIds=true)}}
 MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID
-MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeGlobalAttribute{{asUpperCamelCase label}}ID")
+{{availability "" api="Deprecated global attribute names" deprecationMessage=(concat "Please use MTRAttributeIDTypeGlobalAttribute" (asUpperCamelCase label) "ID") isForIds=true}}
 = {{asMEI manufacturerCode code}},
+{{/if}}
 {{/unless}}
 {{/zcl_attributes_server}}
 
@@ -31,7 +35,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeGlobalAttribute{{asUpperCamel
 {{#zcl_attributes_server}}
 {{~#*inline "attribute"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
 {{#unless clusterRef}}
-MTRAttributeIDTypeGlobalAttribute{{>attribute}}ID MTR_NEWLY_AVAILABLE = {{asMEI manufacturerCode code}},
+MTRAttributeIDTypeGlobalAttribute{{>attribute}}ID {{availability "" globalAttribute=(asUpperCamelCase label) minimalRelease="First major API revamp" isForIds=true}} = {{asMEI manufacturerCode code}},
 {{/unless}}
 {{/zcl_attributes_server}}
 
@@ -39,26 +43,28 @@ MTRAttributeIDTypeGlobalAttribute{{>attribute}}ID MTR_NEWLY_AVAILABLE = {{asMEI 
 {{#*inline "attributeIDs"}}
 {{#zcl_attributes_server}}
 {{#first}}
+{{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping ../clusterName) isForIds=true)}}
 // Cluster {{compatClusterNameRemapping ../clusterName}} deprecated attribute names
+{{/if}}
 {{/first}}
-{{#if clusterRef}}
-{{! TODO: We need a better setup for the API_AVAILABLE annotations here; this does not scale at all sanely. }}
-MTRCluster{{compatClusterNameRemapping ../clusterName}}Attribute{{asUpperCamelCase label}}ID
-MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeCluster{{asUpperCamelCase ../clusterName}}Attribute{{asUpperCamelCase label}}ID")
+{{! DeviceTypeList is special: we did not call it by that name
+    anywhere else in the API at the point when we shipped an id for it
+    here in the old id format but using the new name alongside the old name. }}
 {{#if (isStrEqual (asUpperCamelCase ../clusterName) "Descriptor")}}
 {{#if (isStrEqual (asUpperCamelCase label) "DeviceTypeList")}}
-API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
-{{/if}}
-{{/if}}
+MTRClusterDescriptorAttributeDeviceTypeListID
+{{availability "Descriptor" attribute="DeviceTypeList" deprecatedRelease="First major API revamp" deprecationMessage="Please use MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID" isForIds=true}}
 = {{asMEI manufacturerCode code}},
-{{!Backwards compat for now: DeviceList as an alias for DeviceTypeList}}
-{{#if (isStrEqual (asUpperCamelCase ../clusterName) "Descriptor")}}
-{{#if (isStrEqual (asUpperCamelCase label) "DeviceTypeList")}}
-MTRClusterDescriptorAttributeDeviceListID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeCluster{{asUpperCamelCase ../clusterName}}Attribute{{asUpperCamelCase label}}ID") = {{asMEI manufacturerCode code}},
 {{/if}}
 {{/if}}
+{{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping ../clusterName) attribute=(compatAttributeNameRemapping ../clusterName label) isForIds=true)}}
+MTRCluster{{compatClusterNameRemapping ../clusterName}}Attribute{{compatAttributeNameRemapping ../clusterName label}}ID
+{{availability (compatClusterNameRemapping ../clusterName) attribute=(compatAttributeNameRemapping ../clusterName label) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use MTRAttributeIDTypeCluster" (asUpperCamelCase ../clusterName preserveAcronyms=false) "Attribute" (asUpperCamelCase label preserveAcronyms=false) "ID") isForIds=true}} =
+{{#if clusterRef}}
+{{asMEI manufacturerCode code}},
 {{else}}
-MTRCluster{{compatClusterNameRemapping ../clusterName}}Attribute{{asUpperCamelCase label}}ID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeCluster{{asUpperCamelCase parent.label}}Attribute{{asUpperCamelCase label}}ID") = MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID,
+MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID,
+{{/if}}
 {{/if}}
 {{#last}}
 
@@ -70,10 +76,11 @@ MTRCluster{{compatClusterNameRemapping ../clusterName}}Attribute{{asUpperCamelCa
 {{#first}}
 // Cluster {{> cluster}} attributes
 {{/first}}
+MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID {{availability (asUpperCamelCase ../clusterName preserveAcronyms=true) attribute=(asUpperCamelCase label preserveAcronyms=true) minimalRelease="First major API revamp" isForIds=true}} =
 {{#if clusterRef}}
-MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID MTR_NEWLY_AVAILABLE = {{asMEI manufacturerCode code}},
+{{asMEI manufacturerCode code}},
 {{else}}
-MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID MTR_NEWLY_AVAILABLE= MTRAttributeIDTypeGlobalAttribute{{asUpperCamelCase label}}ID,
+MTRAttributeIDTypeGlobalAttribute{{asUpperCamelCase label}}ID,
 {{/if}}
 {{#last}}
 
@@ -92,11 +99,15 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
 {{#*inline "commandIDs"}}
 {{#zcl_commands}}
 {{#first}}
+{{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping ../clusterName) isForIds=true)}}
 // Cluster {{compatClusterNameRemapping ../clusterName}} deprecated command id names
+{{/if}}
 {{/first}}
+{{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping ../clusterName) command=(asUpperCamelCase label) isForIds=true)}}
 MTRCluster{{compatClusterNameRemapping ../clusterName}}Command{{asUpperCamelCase label}}ID
-MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeCluster{{asUpperCamelCase ../clusterName}}Command{{asUpperCamelCase label}}ID")
+{{availability (compatClusterNameRemapping ../clusterName) command=(asUpperCamelCase label) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use MTRCommandIDTypeCluster" (asUpperCamelCase ../clusterName preserveAcronyms=false) "Command" (asUpperCamelCase label preserveAcronyms=true) "ID") isForIds=true}}
 = {{asMEI manufacturerCode code}},
+{{/if}}
 {{#last}}
 
 {{/last}}
@@ -107,7 +118,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeCluster{{asUpperCamelCase ../cl
 {{#first}}
 // Cluster {{>cluster}} commands
 {{/first}}
-MTRCommandIDTypeCluster{{>cluster}}Command{{>command}}ID MTR_NEWLY_AVAILABLE = {{asMEI manufacturerCode code}},
+MTRCommandIDTypeCluster{{>cluster}}Command{{>command}}ID {{availability (asUpperCamelCase ../clusterName preserveAcronyms=true) command=(asUpperCamelCase label preserveAcronyms=true) minimalRelease="First major API revamp" isForIds=true}} = {{asMEI manufacturerCode code}},
 {{#last}}
 
 {{/last}}
@@ -125,11 +136,15 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
 {{#*inline "eventIDs"}}
 {{#zcl_events}}
 {{#first}}
+{{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping ../clusterName) isForIds=true)}}
 // Cluster {{compatClusterNameRemapping ../clusterName}} deprecated event names
+{{/if}}
 {{/first}}
+{{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping ../clusterName) event=(asUpperCamelCase name) isForIds=true)}}
 MTRCluster{{compatClusterNameRemapping ../clusterName}}Event{{asUpperCamelCase name}}ID
-MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeCluster{{asUpperCamelCase ../clusterName}}Event{{asUpperCamelCase name}}ID")
+{{availability (compatClusterNameRemapping ../clusterName) event=(asUpperCamelCase name) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use MTREventIDTypeCluster" (asUpperCamelCase ../clusterName preserveAcronyms=false) "Event" (asUpperCamelCase name preserveAcronyms=true) "ID") isForIds=true}}
 = {{asMEI manufacturerCode code}},
+{{/if}}
 {{#last}}
 
 {{/last}}
@@ -140,7 +155,7 @@ MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeCluster{{asUpperCamelCase ../clus
 {{#first}}
 // Cluster {{>cluster}} events
 {{/first}}
-MTREventIDTypeCluster{{>cluster}}Event{{>event}}ID MTR_NEWLY_AVAILABLE = {{asMEI manufacturerCode code}},
+MTREventIDTypeCluster{{>cluster}}Event{{>event}}ID {{availability (asUpperCamelCase ../clusterName preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp" isForIds=true}} = {{asMEI manufacturerCode code}},
 {{#last}}
 
 {{/last}}

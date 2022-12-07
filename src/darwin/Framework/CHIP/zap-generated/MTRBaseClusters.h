@@ -2287,8 +2287,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Provides an interface for providing OTA software updates
  */
-MTR_NEWLY_AVAILABLE
-@interface MTRBaseClusterOTASoftwareUpdateProvider : MTRCluster
+MTR_NEWLY_AVAILABLE @interface MTRBaseClusterOTASoftwareUpdateProvider : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -2388,8 +2387,7 @@ MTR_NEWLY_AVAILABLE
  *
  * Provides an interface for downloading and applying OTA software updates
  */
-MTR_NEWLY_AVAILABLE
-@interface MTRBaseClusterOTASoftwareUpdateRequestor : MTRCluster
+MTR_NEWLY_AVAILABLE @interface MTRBaseClusterOTASoftwareUpdateRequestor : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -11996,8 +11994,7 @@ labels.
  *
  * This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol.
  */
-MTR_NEWLY_AVAILABLE
-@interface MTRBaseClusterWakeOnLAN : MTRCluster
+MTR_NEWLY_AVAILABLE @interface MTRBaseClusterWakeOnLAN : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -15301,8 +15298,7 @@ MTR_NEWLY_AVAILABLE
  *
  * The Test Cluster is meant to validate the generated code
  */
-MTR_NEWLY_AVAILABLE
-@interface MTRBaseClusterUnitTesting : MTRCluster
+MTR_NEWLY_AVAILABLE @interface MTRBaseClusterUnitTesting : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -17054,9 +17050,9 @@ typedef NS_OPTIONS(uint32_t, MTRLevelControlFeature) {
 };
 
 typedef NS_OPTIONS(uint8_t, MTRLevelControlOptions) {
-    MTRLevelControlOptionsExecuteIfOff = 0x1,
-    MTRLevelControlOptionsCoupleColorTempToLevel = 0x2,
-};
+    MTRLevelControlOptionsExecuteIfOff MTR_NEWLY_AVAILABLE = 0x1,
+    MTRLevelControlOptionsCoupleColorTempToLevel MTR_NEWLY_AVAILABLE = 0x2,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRAccessControlAuthMode) {
     MTRAccessControlAuthModePASE = 0x01,
@@ -17122,95 +17118,150 @@ typedef NS_OPTIONS(uint16_t, MTRActionsCommandBits) {
 };
 
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateProviderOTAApplyUpdateAction) {
-    MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed = 0x00,
-    MTROTASoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction = 0x01,
-    MTROTASoftwareUpdateProviderOTAApplyUpdateActionDiscontinue = 0x02,
+    MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed MTR_NEWLY_AVAILABLE = 0x00,
+    MTROTASoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction MTR_NEWLY_AVAILABLE = 0x01,
+    MTROTASoftwareUpdateProviderOTAApplyUpdateActionDiscontinue MTR_NEWLY_AVAILABLE = 0x02,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateProviderOTAApplyUpdateAction) {
-    MTROtaSoftwareUpdateProviderOTAApplyUpdateActionProceed = 0x00,
-    MTROtaSoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction = 0x01,
-    MTROtaSoftwareUpdateProviderOTAApplyUpdateActionDiscontinue = 0x02,
+    MTROtaSoftwareUpdateProviderOTAApplyUpdateActionProceed MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed")
+    = 0x00,
+    MTROtaSoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction")
+    = 0x01,
+    MTROtaSoftwareUpdateProviderOTAApplyUpdateActionDiscontinue MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateProviderOTAApplyUpdateActionDiscontinue")
+    = 0x02,
 } MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderOTAApplyUpdateAction");
 
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateProviderOTADownloadProtocol) {
-    MTROTASoftwareUpdateProviderOTADownloadProtocolBDXSynchronous = 0x00,
-    MTROTASoftwareUpdateProviderOTADownloadProtocolBDXAsynchronous = 0x01,
-    MTROTASoftwareUpdateProviderOTADownloadProtocolHTTPS = 0x02,
-    MTROTASoftwareUpdateProviderOTADownloadProtocolVendorSpecific = 0x03,
+    MTROTASoftwareUpdateProviderOTADownloadProtocolBDXSynchronous MTR_NEWLY_AVAILABLE = 0x00,
+    MTROTASoftwareUpdateProviderOTADownloadProtocolBDXAsynchronous MTR_NEWLY_AVAILABLE = 0x01,
+    MTROTASoftwareUpdateProviderOTADownloadProtocolHTTPS MTR_NEWLY_AVAILABLE = 0x02,
+    MTROTASoftwareUpdateProviderOTADownloadProtocolVendorSpecific MTR_NEWLY_AVAILABLE = 0x03,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateProviderOTADownloadProtocol) {
-    MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous = 0x00,
-    MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXAsynchronous = 0x01,
-    MTROtaSoftwareUpdateProviderOTADownloadProtocolHTTPS = 0x02,
-    MTROtaSoftwareUpdateProviderOTADownloadProtocolVendorSpecific = 0x03,
+    MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateProviderOTADownloadProtocolBDXSynchronous")
+    = 0x00,
+    MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXAsynchronous MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateProviderOTADownloadProtocolBDXAsynchronous")
+    = 0x01,
+    MTROtaSoftwareUpdateProviderOTADownloadProtocolHTTPS MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateProviderOTADownloadProtocolHTTPS")
+    = 0x02,
+    MTROtaSoftwareUpdateProviderOTADownloadProtocolVendorSpecific MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateProviderOTADownloadProtocolVendorSpecific")
+    = 0x03,
 } MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderOTADownloadProtocol");
 
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateProviderOTAQueryStatus) {
-    MTROTASoftwareUpdateProviderOTAQueryStatusUpdateAvailable = 0x00,
-    MTROTASoftwareUpdateProviderOTAQueryStatusBusy = 0x01,
-    MTROTASoftwareUpdateProviderOTAQueryStatusNotAvailable = 0x02,
-    MTROTASoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported = 0x03,
+    MTROTASoftwareUpdateProviderOTAQueryStatusUpdateAvailable MTR_NEWLY_AVAILABLE = 0x00,
+    MTROTASoftwareUpdateProviderOTAQueryStatusBusy MTR_NEWLY_AVAILABLE = 0x01,
+    MTROTASoftwareUpdateProviderOTAQueryStatusNotAvailable MTR_NEWLY_AVAILABLE = 0x02,
+    MTROTASoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported MTR_NEWLY_AVAILABLE = 0x03,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateProviderOTAQueryStatus) {
-    MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable = 0x00,
-    MTROtaSoftwareUpdateProviderOTAQueryStatusBusy = 0x01,
-    MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable = 0x02,
-    MTROtaSoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported = 0x03,
+    MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateProviderOTAQueryStatusUpdateAvailable")
+    = 0x00,
+    MTROtaSoftwareUpdateProviderOTAQueryStatusBusy MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderOTAQueryStatusBusy")
+    = 0x01,
+    MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateProviderOTAQueryStatusNotAvailable")
+    = 0x02,
+    MTROtaSoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported")
+    = 0x03,
 } MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderOTAQueryStatus");
 
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateRequestorOTAAnnouncementReason) {
-    MTROTASoftwareUpdateRequestorOTAAnnouncementReasonSimpleAnnouncement = 0x00,
-    MTROTASoftwareUpdateRequestorOTAAnnouncementReasonUpdateAvailable = 0x01,
-    MTROTASoftwareUpdateRequestorOTAAnnouncementReasonUrgentUpdateAvailable = 0x02,
+    MTROTASoftwareUpdateRequestorOTAAnnouncementReasonSimpleAnnouncement MTR_NEWLY_AVAILABLE = 0x00,
+    MTROTASoftwareUpdateRequestorOTAAnnouncementReasonUpdateAvailable MTR_NEWLY_AVAILABLE = 0x01,
+    MTROTASoftwareUpdateRequestorOTAAnnouncementReasonUrgentUpdateAvailable MTR_NEWLY_AVAILABLE = 0x02,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateRequestorOTAAnnouncementReason) {
-    MTROtaSoftwareUpdateRequestorOTAAnnouncementReasonSimpleAnnouncement = 0x00,
-    MTROtaSoftwareUpdateRequestorOTAAnnouncementReasonUpdateAvailable = 0x01,
-    MTROtaSoftwareUpdateRequestorOTAAnnouncementReasonUrgentUpdateAvailable = 0x02,
+    MTROtaSoftwareUpdateRequestorOTAAnnouncementReasonSimpleAnnouncement MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateRequestorOTAAnnouncementReasonSimpleAnnouncement")
+    = 0x00,
+    MTROtaSoftwareUpdateRequestorOTAAnnouncementReasonUpdateAvailable MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateRequestorOTAAnnouncementReasonUpdateAvailable")
+    = 0x01,
+    MTROtaSoftwareUpdateRequestorOTAAnnouncementReasonUrgentUpdateAvailable MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateRequestorOTAAnnouncementReasonUrgentUpdateAvailable")
+    = 0x02,
 } MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorOTAAnnouncementReason");
 
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateRequestorOTAChangeReason) {
-    MTROTASoftwareUpdateRequestorOTAChangeReasonUnknown = 0x00,
-    MTROTASoftwareUpdateRequestorOTAChangeReasonSuccess = 0x01,
-    MTROTASoftwareUpdateRequestorOTAChangeReasonFailure = 0x02,
-    MTROTASoftwareUpdateRequestorOTAChangeReasonTimeOut = 0x03,
-    MTROTASoftwareUpdateRequestorOTAChangeReasonDelayByProvider = 0x04,
+    MTROTASoftwareUpdateRequestorOTAChangeReasonUnknown MTR_NEWLY_AVAILABLE = 0x00,
+    MTROTASoftwareUpdateRequestorOTAChangeReasonSuccess MTR_NEWLY_AVAILABLE = 0x01,
+    MTROTASoftwareUpdateRequestorOTAChangeReasonFailure MTR_NEWLY_AVAILABLE = 0x02,
+    MTROTASoftwareUpdateRequestorOTAChangeReasonTimeOut MTR_NEWLY_AVAILABLE = 0x03,
+    MTROTASoftwareUpdateRequestorOTAChangeReasonDelayByProvider MTR_NEWLY_AVAILABLE = 0x04,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateRequestorOTAChangeReason) {
-    MTROtaSoftwareUpdateRequestorOTAChangeReasonUnknown = 0x00,
-    MTROtaSoftwareUpdateRequestorOTAChangeReasonSuccess = 0x01,
-    MTROtaSoftwareUpdateRequestorOTAChangeReasonFailure = 0x02,
-    MTROtaSoftwareUpdateRequestorOTAChangeReasonTimeOut = 0x03,
-    MTROtaSoftwareUpdateRequestorOTAChangeReasonDelayByProvider = 0x04,
+    MTROtaSoftwareUpdateRequestorOTAChangeReasonUnknown MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateRequestorOTAChangeReasonUnknown")
+    = 0x00,
+    MTROtaSoftwareUpdateRequestorOTAChangeReasonSuccess MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateRequestorOTAChangeReasonSuccess")
+    = 0x01,
+    MTROtaSoftwareUpdateRequestorOTAChangeReasonFailure MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateRequestorOTAChangeReasonFailure")
+    = 0x02,
+    MTROtaSoftwareUpdateRequestorOTAChangeReasonTimeOut MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateRequestorOTAChangeReasonTimeOut")
+    = 0x03,
+    MTROtaSoftwareUpdateRequestorOTAChangeReasonDelayByProvider MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateRequestorOTAChangeReasonDelayByProvider")
+    = 0x04,
 } MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorOTAChangeReason");
 
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateRequestorOTAUpdateState) {
-    MTROTASoftwareUpdateRequestorOTAUpdateStateUnknown = 0x00,
-    MTROTASoftwareUpdateRequestorOTAUpdateStateIdle = 0x01,
-    MTROTASoftwareUpdateRequestorOTAUpdateStateQuerying = 0x02,
-    MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnQuery = 0x03,
-    MTROTASoftwareUpdateRequestorOTAUpdateStateDownloading = 0x04,
-    MTROTASoftwareUpdateRequestorOTAUpdateStateApplying = 0x05,
-    MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnApply = 0x06,
-    MTROTASoftwareUpdateRequestorOTAUpdateStateRollingBack = 0x07,
-    MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnUserConsent = 0x08,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateUnknown MTR_NEWLY_AVAILABLE = 0x00,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateIdle MTR_NEWLY_AVAILABLE = 0x01,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateQuerying MTR_NEWLY_AVAILABLE = 0x02,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnQuery MTR_NEWLY_AVAILABLE = 0x03,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateDownloading MTR_NEWLY_AVAILABLE = 0x04,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateApplying MTR_NEWLY_AVAILABLE = 0x05,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnApply MTR_NEWLY_AVAILABLE = 0x06,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateRollingBack MTR_NEWLY_AVAILABLE = 0x07,
+    MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnUserConsent MTR_NEWLY_AVAILABLE = 0x08,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateRequestorOTAUpdateState) {
-    MTROtaSoftwareUpdateRequestorOTAUpdateStateUnknown = 0x00,
-    MTROtaSoftwareUpdateRequestorOTAUpdateStateIdle = 0x01,
-    MTROtaSoftwareUpdateRequestorOTAUpdateStateQuerying = 0x02,
-    MTROtaSoftwareUpdateRequestorOTAUpdateStateDelayedOnQuery = 0x03,
-    MTROtaSoftwareUpdateRequestorOTAUpdateStateDownloading = 0x04,
-    MTROtaSoftwareUpdateRequestorOTAUpdateStateApplying = 0x05,
-    MTROtaSoftwareUpdateRequestorOTAUpdateStateDelayedOnApply = 0x06,
-    MTROtaSoftwareUpdateRequestorOTAUpdateStateRollingBack = 0x07,
-    MTROtaSoftwareUpdateRequestorOTAUpdateStateDelayedOnUserConsent = 0x08,
+    MTROtaSoftwareUpdateRequestorOTAUpdateStateUnknown MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateRequestorOTAUpdateStateUnknown")
+    = 0x00,
+    MTROtaSoftwareUpdateRequestorOTAUpdateStateIdle MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateRequestorOTAUpdateStateIdle")
+    = 0x01,
+    MTROtaSoftwareUpdateRequestorOTAUpdateStateQuerying MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateRequestorOTAUpdateStateQuerying")
+    = 0x02,
+    MTROtaSoftwareUpdateRequestorOTAUpdateStateDelayedOnQuery MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnQuery")
+    = 0x03,
+    MTROtaSoftwareUpdateRequestorOTAUpdateStateDownloading MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateRequestorOTAUpdateStateDownloading")
+    = 0x04,
+    MTROtaSoftwareUpdateRequestorOTAUpdateStateApplying MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateRequestorOTAUpdateStateApplying")
+    = 0x05,
+    MTROtaSoftwareUpdateRequestorOTAUpdateStateDelayedOnApply MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnApply")
+    = 0x06,
+    MTROtaSoftwareUpdateRequestorOTAUpdateStateRollingBack MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateRequestorOTAUpdateStateRollingBack")
+    = 0x07,
+    MTROtaSoftwareUpdateRequestorOTAUpdateStateDelayedOnUserConsent MTR_NEWLY_DEPRECATED(
+        "Please use MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnUserConsent")
+    = 0x08,
 } MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorOTAUpdateState");
 
 typedef NS_ENUM(uint8_t, MTRTimeFormatLocalizationCalendarType) {
@@ -17533,11 +17584,11 @@ typedef NS_ENUM(uint8_t, MTRTimeSynchronizationTimeSource) {
 };
 
 typedef NS_OPTIONS(uint32_t, MTRSwitchFeature) {
-    MTRSwitchFeatureLatchingSwitch = 0x1,
-    MTRSwitchFeatureMomentarySwitch = 0x2,
-    MTRSwitchFeatureMomentarySwitchRelease = 0x4,
-    MTRSwitchFeatureMomentarySwitchLongPress = 0x8,
-    MTRSwitchFeatureMomentarySwitchMultiPress = 0x10,
+    MTRSwitchFeatureLatchingSwitch API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)) = 0x1,
+    MTRSwitchFeatureMomentarySwitch API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)) = 0x2,
+    MTRSwitchFeatureMomentarySwitchRelease API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)) = 0x4,
+    MTRSwitchFeatureMomentarySwitchLongPress API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)) = 0x8,
+    MTRSwitchFeatureMomentarySwitchMultiPress API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)) = 0x10,
 } API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 typedef NS_ENUM(uint8_t, MTRAdministratorCommissioningCommissioningWindowStatus) {
@@ -18233,8 +18284,8 @@ typedef NS_ENUM(uint8_t, MTRMediaPlaybackPlaybackState) {
 };
 
 typedef NS_OPTIONS(uint32_t, MTRMediaPlaybackFeature) {
-    MTRMediaPlaybackFeatureAdvancedSeek = 0x1,
-    MTRMediaPlaybackFeatureVariableSpeed = 0x2,
+    MTRMediaPlaybackFeatureAdvancedSeek API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)) = 0x1,
+    MTRMediaPlaybackFeatureVariableSpeed API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2)) = 0x2,
 } API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 typedef NS_ENUM(uint8_t, MTRMediaInputInputType) {
@@ -18425,85 +18476,86 @@ typedef NS_ENUM(uint8_t, MTRApplicationBasicApplicationStatus) {
 };
 
 typedef NS_ENUM(uint8_t, MTRUnitTestingSimple) {
-    MTRUnitTestingSimpleUnspecified = 0x00,
-    MTRUnitTestingSimpleValueA = 0x01,
-    MTRUnitTestingSimpleValueB = 0x02,
-    MTRUnitTestingSimpleValueC = 0x03,
+    MTRUnitTestingSimpleUnspecified MTR_NEWLY_AVAILABLE = 0x00,
+    MTRUnitTestingSimpleValueA MTR_NEWLY_AVAILABLE = 0x01,
+    MTRUnitTestingSimpleValueB MTR_NEWLY_AVAILABLE = 0x02,
+    MTRUnitTestingSimpleValueC MTR_NEWLY_AVAILABLE = 0x03,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRTestClusterSimple) {
-    MTRTestClusterSimpleUnspecified = 0x00,
-    MTRTestClusterSimpleValueA = 0x01,
-    MTRTestClusterSimpleValueB = 0x02,
-    MTRTestClusterSimpleValueC = 0x03,
+    MTRTestClusterSimpleUnspecified MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingSimpleUnspecified") = 0x00,
+    MTRTestClusterSimpleValueA MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingSimpleValueA") = 0x01,
+    MTRTestClusterSimpleValueB MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingSimpleValueB") = 0x02,
+    MTRTestClusterSimpleValueC MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingSimpleValueC") = 0x03,
 } MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingSimple");
 
 typedef NS_OPTIONS(uint16_t, MTRUnitTestingBitmap16MaskMap) {
-    MTRUnitTestingBitmap16MaskMapMaskVal1 = 0x1,
-    MTRUnitTestingBitmap16MaskMapMaskVal2 = 0x2,
-    MTRUnitTestingBitmap16MaskMapMaskVal3 = 0x4,
-    MTRUnitTestingBitmap16MaskMapMaskVal4 = 0x4000,
+    MTRUnitTestingBitmap16MaskMapMaskVal1 MTR_NEWLY_AVAILABLE = 0x1,
+    MTRUnitTestingBitmap16MaskMapMaskVal2 MTR_NEWLY_AVAILABLE = 0x2,
+    MTRUnitTestingBitmap16MaskMapMaskVal3 MTR_NEWLY_AVAILABLE = 0x4,
+    MTRUnitTestingBitmap16MaskMapMaskVal4 MTR_NEWLY_AVAILABLE = 0x4000,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint16_t, MTRTestClusterBitmap16MaskMap) {
-    MTRTestClusterBitmap16MaskMapMaskVal1 = 0x1,
-    MTRTestClusterBitmap16MaskMapMaskVal2 = 0x2,
-    MTRTestClusterBitmap16MaskMapMaskVal3 = 0x4,
-    MTRTestClusterBitmap16MaskMapMaskVal4 = 0x4000,
+    MTRTestClusterBitmap16MaskMapMaskVal1 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap16MaskMapMaskVal1") = 0x1,
+    MTRTestClusterBitmap16MaskMapMaskVal2 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap16MaskMapMaskVal2") = 0x2,
+    MTRTestClusterBitmap16MaskMapMaskVal3 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap16MaskMapMaskVal3") = 0x4,
+    MTRTestClusterBitmap16MaskMapMaskVal4 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap16MaskMapMaskVal4") = 0x4000,
 } MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap16MaskMap");
 
 typedef NS_OPTIONS(uint32_t, MTRUnitTestingBitmap32MaskMap) {
-    MTRUnitTestingBitmap32MaskMapMaskVal1 = 0x1,
-    MTRUnitTestingBitmap32MaskMapMaskVal2 = 0x2,
-    MTRUnitTestingBitmap32MaskMapMaskVal3 = 0x4,
-    MTRUnitTestingBitmap32MaskMapMaskVal4 = 0x40000000,
+    MTRUnitTestingBitmap32MaskMapMaskVal1 MTR_NEWLY_AVAILABLE = 0x1,
+    MTRUnitTestingBitmap32MaskMapMaskVal2 MTR_NEWLY_AVAILABLE = 0x2,
+    MTRUnitTestingBitmap32MaskMapMaskVal3 MTR_NEWLY_AVAILABLE = 0x4,
+    MTRUnitTestingBitmap32MaskMapMaskVal4 MTR_NEWLY_AVAILABLE = 0x40000000,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRTestClusterBitmap32MaskMap) {
-    MTRTestClusterBitmap32MaskMapMaskVal1 = 0x1,
-    MTRTestClusterBitmap32MaskMapMaskVal2 = 0x2,
-    MTRTestClusterBitmap32MaskMapMaskVal3 = 0x4,
-    MTRTestClusterBitmap32MaskMapMaskVal4 = 0x40000000,
+    MTRTestClusterBitmap32MaskMapMaskVal1 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap32MaskMapMaskVal1") = 0x1,
+    MTRTestClusterBitmap32MaskMapMaskVal2 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap32MaskMapMaskVal2") = 0x2,
+    MTRTestClusterBitmap32MaskMapMaskVal3 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap32MaskMapMaskVal3") = 0x4,
+    MTRTestClusterBitmap32MaskMapMaskVal4 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap32MaskMapMaskVal4") = 0x40000000,
 } MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap32MaskMap");
 
 typedef NS_OPTIONS(uint64_t, MTRUnitTestingBitmap64MaskMap) {
-    MTRUnitTestingBitmap64MaskMapMaskVal1 = 0x1,
-    MTRUnitTestingBitmap64MaskMapMaskVal2 = 0x2,
-    MTRUnitTestingBitmap64MaskMapMaskVal3 = 0x4,
-    MTRUnitTestingBitmap64MaskMapMaskVal4 = 0x4000000000000000,
+    MTRUnitTestingBitmap64MaskMapMaskVal1 MTR_NEWLY_AVAILABLE = 0x1,
+    MTRUnitTestingBitmap64MaskMapMaskVal2 MTR_NEWLY_AVAILABLE = 0x2,
+    MTRUnitTestingBitmap64MaskMapMaskVal3 MTR_NEWLY_AVAILABLE = 0x4,
+    MTRUnitTestingBitmap64MaskMapMaskVal4 MTR_NEWLY_AVAILABLE = 0x4000000000000000,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint64_t, MTRTestClusterBitmap64MaskMap) {
-    MTRTestClusterBitmap64MaskMapMaskVal1 = 0x1,
-    MTRTestClusterBitmap64MaskMapMaskVal2 = 0x2,
-    MTRTestClusterBitmap64MaskMapMaskVal3 = 0x4,
-    MTRTestClusterBitmap64MaskMapMaskVal4 = 0x4000000000000000,
+    MTRTestClusterBitmap64MaskMapMaskVal1 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap64MaskMapMaskVal1") = 0x1,
+    MTRTestClusterBitmap64MaskMapMaskVal2 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap64MaskMapMaskVal2") = 0x2,
+    MTRTestClusterBitmap64MaskMapMaskVal3 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap64MaskMapMaskVal3") = 0x4,
+    MTRTestClusterBitmap64MaskMapMaskVal4 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap64MaskMapMaskVal4")
+    = 0x4000000000000000,
 } MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap64MaskMap");
 
 typedef NS_OPTIONS(uint8_t, MTRUnitTestingBitmap8MaskMap) {
-    MTRUnitTestingBitmap8MaskMapMaskVal1 = 0x1,
-    MTRUnitTestingBitmap8MaskMapMaskVal2 = 0x2,
-    MTRUnitTestingBitmap8MaskMapMaskVal3 = 0x4,
-    MTRUnitTestingBitmap8MaskMapMaskVal4 = 0x40,
+    MTRUnitTestingBitmap8MaskMapMaskVal1 MTR_NEWLY_AVAILABLE = 0x1,
+    MTRUnitTestingBitmap8MaskMapMaskVal2 MTR_NEWLY_AVAILABLE = 0x2,
+    MTRUnitTestingBitmap8MaskMapMaskVal3 MTR_NEWLY_AVAILABLE = 0x4,
+    MTRUnitTestingBitmap8MaskMapMaskVal4 MTR_NEWLY_AVAILABLE = 0x40,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint8_t, MTRTestClusterBitmap8MaskMap) {
-    MTRTestClusterBitmap8MaskMapMaskVal1 = 0x1,
-    MTRTestClusterBitmap8MaskMapMaskVal2 = 0x2,
-    MTRTestClusterBitmap8MaskMapMaskVal3 = 0x4,
-    MTRTestClusterBitmap8MaskMapMaskVal4 = 0x40,
+    MTRTestClusterBitmap8MaskMapMaskVal1 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap8MaskMapMaskVal1") = 0x1,
+    MTRTestClusterBitmap8MaskMapMaskVal2 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap8MaskMapMaskVal2") = 0x2,
+    MTRTestClusterBitmap8MaskMapMaskVal3 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap8MaskMapMaskVal3") = 0x4,
+    MTRTestClusterBitmap8MaskMapMaskVal4 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap8MaskMapMaskVal4") = 0x40,
 } MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingBitmap8MaskMap");
 
 typedef NS_OPTIONS(uint8_t, MTRUnitTestingSimpleBitmap) {
-    MTRUnitTestingSimpleBitmapValueA = 0x1,
-    MTRUnitTestingSimpleBitmapValueB = 0x2,
-    MTRUnitTestingSimpleBitmapValueC = 0x4,
+    MTRUnitTestingSimpleBitmapValueA MTR_NEWLY_AVAILABLE = 0x1,
+    MTRUnitTestingSimpleBitmapValueB MTR_NEWLY_AVAILABLE = 0x2,
+    MTRUnitTestingSimpleBitmapValueC MTR_NEWLY_AVAILABLE = 0x4,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint8_t, MTRTestClusterSimpleBitmap) {
-    MTRTestClusterSimpleBitmapValueA = 0x1,
-    MTRTestClusterSimpleBitmapValueB = 0x2,
-    MTRTestClusterSimpleBitmapValueC = 0x4,
+    MTRTestClusterSimpleBitmapValueA MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingSimpleBitmapValueA") = 0x1,
+    MTRTestClusterSimpleBitmapValueB MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingSimpleBitmapValueB") = 0x2,
+    MTRTestClusterSimpleBitmapValueC MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingSimpleBitmapValueC") = 0x4,
 } MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingSimpleBitmap");
 
 typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {

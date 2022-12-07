@@ -31,13 +31,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 @interface MTRDescriptorClusterDeviceTypeStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull type;
-@property (nonatomic, copy) NSNumber * _Nonnull revision;
+@property (nonatomic, copy) NSNumber * _Nonnull type API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+@property (nonatomic, copy) NSNumber * _Nonnull revision API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 @end
 
+MTR_NEWLY_DEPRECATED("Please use MTRDescriptorClusterDeviceTypeStruct")
 @interface MTRDescriptorClusterDeviceType : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull type;
-@property (nonatomic, copy) NSNumber * _Nonnull revision;
+@property (nonatomic, copy) NSNumber * _Nonnull type MTR_NEWLY_DEPRECATED("Please use MTRDescriptorClusterDeviceTypeStruct");
+@property (nonatomic, copy) NSNumber * _Nonnull revision MTR_NEWLY_DEPRECATED("Please use MTRDescriptorClusterDeviceTypeStruct");
 @end
 
 @interface MTRBindingClusterTargetStruct : NSObject <NSCopying>
@@ -134,9 +135,9 @@ API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 
 MTR_NEWLY_AVAILABLE
 @interface MTROTASoftwareUpdateRequestorClusterProviderLocation : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull providerNodeID;
-@property (nonatomic, copy) NSNumber * _Nonnull endpoint;
-@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull providerNodeID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull endpoint MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterProviderLocation")
@@ -145,10 +146,10 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterProviderLoc
 
 MTR_NEWLY_AVAILABLE
 @interface MTROTASoftwareUpdateRequestorClusterStateTransitionEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull previousState;
-@property (nonatomic, copy, getter=getNewState) NSNumber * _Nonnull newState;
-@property (nonatomic, copy) NSNumber * _Nonnull reason;
-@property (nonatomic, copy) NSNumber * _Nullable targetSoftwareVersion;
+@property (nonatomic, copy) NSNumber * _Nonnull previousState MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy, getter=getNewState) NSNumber * _Nonnull newState MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull reason MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable targetSoftwareVersion MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterStateTransitionEvent")
@@ -157,8 +158,8 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterStateTransi
 
 MTR_NEWLY_AVAILABLE
 @interface MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
-@property (nonatomic, copy) NSNumber * _Nonnull productID;
+@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull productID MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent")
@@ -167,10 +168,10 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterVersionAppl
 
 MTR_NEWLY_AVAILABLE
 @interface MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
-@property (nonatomic, copy) NSNumber * _Nonnull bytesDownloaded;
-@property (nonatomic, copy) NSNumber * _Nullable progressPercent;
-@property (nonatomic, copy) NSNumber * _Nullable platformCode;
+@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull bytesDownloaded MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable progressPercent MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable platformCode MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent")
@@ -647,22 +648,23 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @property (nonatomic, copy) NSString * _Nonnull applicationId;
 @end
 
+MTR_NEWLY_AVAILABLE
 @interface MTRClientMonitoringClusterMonitoringRegistration : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull clientNodeId;
-@property (nonatomic, copy) NSNumber * _Nonnull iCid;
-@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull clientNodeId MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull iCid MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterSimpleStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull a;
-@property (nonatomic, copy) NSNumber * _Nonnull b;
-@property (nonatomic, copy) NSNumber * _Nonnull c;
-@property (nonatomic, copy) NSData * _Nonnull d;
-@property (nonatomic, copy) NSString * _Nonnull e;
-@property (nonatomic, copy) NSNumber * _Nonnull f;
-@property (nonatomic, copy) NSNumber * _Nonnull g;
-@property (nonatomic, copy) NSNumber * _Nonnull h;
+@property (nonatomic, copy) NSNumber * _Nonnull a MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull b MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull c MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nonnull d MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull e MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull f MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull g MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull h MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterSimpleStruct")
@@ -670,14 +672,14 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterSimpleStruct")
 @end
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestFabricScoped : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull fabricSensitiveInt8u;
-@property (nonatomic, copy) NSNumber * _Nullable optionalFabricSensitiveInt8u;
-@property (nonatomic, copy) NSNumber * _Nullable nullableFabricSensitiveInt8u;
-@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalFabricSensitiveInt8u;
-@property (nonatomic, copy) NSString * _Nonnull fabricSensitiveCharString;
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull fabricSensitiveStruct;
-@property (nonatomic, copy) NSArray * _Nonnull fabricSensitiveInt8uList;
-@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricSensitiveInt8u MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable optionalFabricSensitiveInt8u MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable nullableFabricSensitiveInt8u MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalFabricSensitiveInt8u MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull fabricSensitiveCharString MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull fabricSensitiveStruct MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull fabricSensitiveInt8uList MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestFabricScoped")
@@ -685,18 +687,18 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestFabricScoped")
 @end
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterNullablesAndOptionalsStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nullable nullableInt;
-@property (nonatomic, copy) NSNumber * _Nullable optionalInt;
-@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalInt;
-@property (nonatomic, copy) NSString * _Nullable nullableString;
-@property (nonatomic, copy) NSString * _Nullable optionalString;
-@property (nonatomic, copy) NSString * _Nullable nullableOptionalString;
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableStruct;
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable optionalStruct;
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableOptionalStruct;
-@property (nonatomic, copy) NSArray * _Nullable nullableList;
-@property (nonatomic, copy) NSArray * _Nullable optionalList;
-@property (nonatomic, copy) NSArray * _Nullable nullableOptionalList;
+@property (nonatomic, copy) NSNumber * _Nullable nullableInt MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable optionalInt MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalInt MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable nullableString MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable optionalString MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable nullableOptionalString MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableStruct MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable optionalStruct MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableOptionalStruct MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nullable nullableList MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nullable optionalList MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nullable nullableOptionalList MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterNullablesAndOptionalsStruct")
@@ -704,9 +706,9 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterNullablesAndOptionalsStruc
 @end
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterNestedStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull a;
-@property (nonatomic, copy) NSNumber * _Nonnull b;
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull c;
+@property (nonatomic, copy) NSNumber * _Nonnull a MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull b MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull c MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterNestedStruct")
@@ -714,13 +716,13 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterNestedStruct")
 @end
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterNestedStructList : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull a;
-@property (nonatomic, copy) NSNumber * _Nonnull b;
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull c;
-@property (nonatomic, copy) NSArray * _Nonnull d;
-@property (nonatomic, copy) NSArray * _Nonnull e;
-@property (nonatomic, copy) NSArray * _Nonnull f;
-@property (nonatomic, copy) NSArray * _Nonnull g;
+@property (nonatomic, copy) NSNumber * _Nonnull a MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull b MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull c MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull d MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull e MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull f MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull g MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterNestedStructList")
@@ -728,7 +730,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterNestedStructList")
 @end
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterDoubleNestedStructList : NSObject <NSCopying>
-@property (nonatomic, copy) NSArray * _Nonnull a;
+@property (nonatomic, copy) NSArray * _Nonnull a MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterDoubleNestedStructList")
@@ -736,8 +738,8 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterDoubleNestedStructList")
 @end
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestListStructOctet : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull member1;
-@property (nonatomic, copy) NSData * _Nonnull member2;
+@property (nonatomic, copy) NSNumber * _Nonnull member1 MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nonnull member2 MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListStructOctet")
@@ -746,12 +748,12 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListStructOctet")
 
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEventEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull arg1;
-@property (nonatomic, copy) NSNumber * _Nonnull arg2;
-@property (nonatomic, copy) NSNumber * _Nonnull arg3;
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg4;
-@property (nonatomic, copy) NSArray * _Nonnull arg5;
-@property (nonatomic, copy) NSArray * _Nonnull arg6;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull arg2 MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull arg3 MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg4 MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull arg5 MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull arg6 MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEventEvent")
@@ -760,7 +762,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEventEvent")
 
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestFabricScopedEventEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestFabricScopedEventEvent")
