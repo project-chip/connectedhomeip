@@ -66,8 +66,12 @@ bool hasNotifiedIPV6 = false;
 bool hasNotifiedIPV4 = false;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 bool hasNotifiedWifiConnectivity = false;
-bool is_disconnection_event      = false;
-static uint32_t retryInterval    = WLAN_MIN_RETRY_TIMER_MS;
+
+/* Declare a flag to differentiate between after boot-up first IP connection or reconnection */
+bool is_disconnection_event = false;
+
+/* Declare a variable to hold connection time intervals */
+static uint32_t retryInterval = WLAN_MIN_RETRY_TIMER_MS;
 
 /*
  * This file implements the interface to the RSI SAPIs
@@ -197,8 +201,11 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
          * We should enable retry.. (Need config variable for this)
          */
         WFX_RSI_LOG("%s: failed. retry: %d", __func__, wfx_rsi.join_retries);
-        if (!is_disconnection_event)
+        if (!is_disconnection_event)  
         {
+            /* After the reboot or a commissioning time device failed to connect with AP.
+             * Device will retry to connect with AP upto WFX_RSI_CONFIG_MAX_JOIN retries.
+             */
             if (wfx_rsi.join_retries < WFX_RSI_CONFIG_MAX_JOIN)
             {
                 WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (WLAN_RETRY_TIMER_MS / WLAN_MIN_RETRY_TIMER_MS));
@@ -212,6 +219,10 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
         }
         else
         {
+            /* After disconnection
+             * In between WLAN_MIN_RETRY_TIMER_MS to WLAN_MAX_RETRY_TIMER_MS at telescopic time interval device try to connect with AP.
+             * If timer interval exceed WLAN_MAX_RETRY_TIMER_MS then it will try to connect at WLAN_MAX_RETRY_TIMER_MS intervals.
+             */
             if (retryInterval < WLAN_MAX_RETRY_TIMER_MS)
             {
                 WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (retryInterval / WLAN_MIN_RETRY_TIMER_MS));
@@ -238,7 +249,6 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
 #else
         xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_CONN);
 #endif
-        is_disconnection_event = true;
         wfx_rsi.join_retries   = 0;
         retryInterval          = WLAN_MIN_RETRY_TIMER_MS;
     }
@@ -259,6 +269,7 @@ static void wfx_rsi_join_fail_cb(uint16_t status, uint8_t * buf, uint32_t len)
     WFX_RSI_LOG("%s: error: failed status: %02x", __func__, status);
     wfx_rsi.join_retries += 1;
     wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
+    is_disconnection_event = true;
     xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
 }
 #ifdef RS911X_SOCKETS
@@ -517,14 +528,21 @@ static void wfx_rsi_do_join(void)
                 wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
                 WFX_RSI_LOG("%s: rsi_wlan_connect_async failed with status: %02x on try %d", __func__, status,
                             wfx_rsi.join_retries);
-
-                if (!is_disconnection_event) // At comissioning time
+            
+                if (!is_disconnection_event) 
                 {
+                    /* After the reboot or a commissioning time device failed to connect with AP.
+                     * Device will retry to connect with AP upto WFX_RSI_CONFIG_MAX_JOIN retries.
+                     */
                     WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (WLAN_RETRY_TIMER_MS / WLAN_MIN_RETRY_TIMER_MS));
                     vTaskDelay(pdMS_TO_TICKS(WLAN_RETRY_TIMER_MS));
                 }
-                else // At reconnection time
+                else 
                 {
+                    /* After disconnection
+                     * In between WLAN_MIN_RETRY_TIMER_MS to WLAN_MAX_RETRY_TIMER_MS at telescopic time interval device try to connect with AP.
+                     * If timer interval exceed WLAN_MAX_RETRY_TIMER_MS then it will try to connect at WLAN_MAX_RETRY_TIMER_MS intervals.
+                     */
                     if (retryInterval < WLAN_MAX_RETRY_TIMER_MS)
                     {
                         WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (retryInterval / WLAN_MIN_RETRY_TIMER_MS));
