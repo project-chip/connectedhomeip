@@ -28,10 +28,10 @@
  * 0x0026_0000 Secure image     secondary slot (384 KB)
  * 0x002C_0000 Non-secure image secondary slot (2 MB)
  * 0x004C_0000 Scratch area (2 MB)
- * 0x006C_0000 Protected Storage Area (20 KB)
- * 0x006C_5000 Internal Trusted Storage Area (16 KB)
- * 0x006C_9000 OTP / NV counters  area (8 KB)
- * 0x006C_B000 Unused
+ * 0x006C_0000 Protected Storage Area (64 KB)
+ * 0x006D_0000 Internal Trusted Storage Area (64 KB)
+ * 0x006E_0000 OTP / NV counters  area (8 KB)
+ * 0x006E_2000 Unused
  *
  * Flash layout on AN552 with BL2 (single image boot):
  *
@@ -44,10 +44,10 @@
  *    0x0026_0000 Secure     image secondary (384 KB)
  *    0x002C_0000 Non-secure image secondary (384 KB)
  * 0x004C_0000 Scratch area (2 MB)
- * 0x006C_0000 Protected Storage Area (20 KB)
- * 0x006C_5000 Internal Trusted Storage Area (16 KB)
- * 0x006C_9000 OTP / NV counters  area (8 KB)
- * 0x006C_B000 Unused
+ * 0x006C_0000 Protected Storage Area (64 KB)
+ * 0x006D_0000 Internal Trusted Storage Area (64 KB)
+ * 0x006E_0000 OTP / NV counters  area (8 KB)
+ * 0x006E_2000 Unused
  */
 
 /* This header file is included from linker scatter file as well, where only a
@@ -143,11 +143,11 @@
 
 /* Protected Storage (PS) Service definitions */
 #define FLASH_PS_AREA_OFFSET (FLASH_AREA_SCRATCH_OFFSET + FLASH_AREA_SCRATCH_SIZE)
-#define FLASH_PS_AREA_SIZE (0x5000) /* 20 KB */
+#define FLASH_PS_AREA_SIZE (0x10000) /* 64 KB */
 
 /* Internal Trusted Storage (ITS) Service definitions */
 #define FLASH_ITS_AREA_OFFSET (FLASH_PS_AREA_OFFSET + FLASH_PS_AREA_SIZE)
-#define FLASH_ITS_AREA_SIZE (0x4000) /* 16 KB */
+#define FLASH_ITS_AREA_SIZE (0x10000) /* 64 KB */
 
 /* OTP_definitions */
 #define FLASH_OTP_NV_COUNTERS_AREA_OFFSET (FLASH_ITS_AREA_OFFSET + FLASH_ITS_AREA_SIZE)

@@ -191,6 +191,7 @@ chip_gn_arg_bool  ("chip_progress_logging"                CONFIG_CHIP_PROGRESS_L
 chip_gn_arg_bool  ("chip_automation_logging"              CONFIG_CHIP_AUTOMATION_LOGGING)
 chip_gn_arg_bool  ("chip_error_logging"                   CONFIG_CHIP_ERROR_LOGGING)
 chip_gn_arg_bool  ("chip_openiotsdk_use_tfm"              TFM_SUPPORT)
+chip_gn_arg_bool  ("chip_openiotsdk_use_psa_ps"           CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS)
 if (TARGET cmsis-rtos-api)
     chip_gn_arg_string("target_os"                        "cmsis-rtos")
 endif()
