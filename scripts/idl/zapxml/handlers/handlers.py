@@ -183,18 +183,19 @@ class StructHandler(BaseHandler, IdlPostProcessor):
             )
 
             if 'fieldId' in attrs:
-                self._field_index = ParseInt(attrs['fieldId'])
+                field_index = ParseInt(attrs['fieldId'])
             else:
                 # NOTE: code does NOT exist, so the number is incremental here
                 #       this seems a defficiency in XML format.
-                self._field_index += 1
+                field_index = self._field_index
+            self._field_index = field_index + 1
 
             if 'length' in attrs:
                 data_type.max_length = ParseInt(attrs['length'])
 
             field = Field(
                 data_type=data_type,
-                code=self._field_index,
+                code=field_index,
                 name=attrs['name'],
                 is_list=(attrs.get('array', 'false').lower() == 'true'),
             )
@@ -384,14 +385,14 @@ class CommandHandler(BaseHandler):
         if 'length' in attrs:
             data_type.max_length = ParseInt(attrs['length'])
 
-        self._field_index += 1
-
         field = Field(
             data_type=data_type,
             code=self._field_index,
             name=attrs['name'],
             is_list=(attrs.get('array', 'false') == 'true')
         )
+
+        self._field_index += 1
 
         if attrs.get('optional', "false").lower() == 'true':
             field.qualities |= FieldQuality.OPTIONAL
