@@ -220,8 +220,9 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
         else
         {
             /* After disconnection
-             * In between WLAN_MIN_RETRY_TIMER_MS to WLAN_MAX_RETRY_TIMER_MS at telescopic time interval device try to connect with AP.
-             * If timer interval exceed WLAN_MAX_RETRY_TIMER_MS then it will try to connect at WLAN_MAX_RETRY_TIMER_MS intervals.
+             * At the telescopic time interval device try to reconnect with AP, upto WLAN_MAX_RETRY_TIMER_MS intervals
+             * are telescopic. If interval exceed WLAN_MAX_RETRY_TIMER_MS then it will try to reconnect at
+             * WLAN_MAX_RETRY_TIMER_MS intervals.
              */
             if (retryInterval < WLAN_MAX_RETRY_TIMER_MS)
             {
@@ -529,7 +530,7 @@ static void wfx_rsi_do_join(void)
                 wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
                 WFX_RSI_LOG("%s: rsi_wlan_connect_async failed with status: %02x on try %d", __func__, status,
                             wfx_rsi.join_retries);
-            
+
                 if (!is_disconnection_event)
                 {
                     /* After the reboot or a commissioning time device failed to connect with AP.
@@ -538,11 +539,12 @@ static void wfx_rsi_do_join(void)
                     WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
                     vTaskDelay(pdMS_TO_TICKS(WLAN_RETRY_TIMER_MS));
                 }
-                else 
+                else
                 {
                     /* After disconnection
-                     * In between WLAN_MIN_RETRY_TIMER_MS to WLAN_MAX_RETRY_TIMER_MS at telescopic time interval device try to connect with AP.
-                     * If timer interval exceed WLAN_MAX_RETRY_TIMER_MS then it will try to connect at WLAN_MAX_RETRY_TIMER_MS intervals.
+                     * At the telescopic time interval device try to reconnect with AP, upto WLAN_MAX_RETRY_TIMER_MS intervals
+                     * are telescopic. If interval exceed WLAN_MAX_RETRY_TIMER_MS then it will try to reconnect at
+                     * WLAN_MAX_RETRY_TIMER_MS intervals.
                      */
                     if (retryInterval < WLAN_MAX_RETRY_TIMER_MS)
                     {
