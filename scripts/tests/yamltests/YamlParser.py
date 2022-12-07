@@ -210,25 +210,26 @@ class TestStep:
         _check_valid_keys(self.arguments, _TEST_ARGUMENTS_SECTION)
         _check_valid_keys(self.response, _TEST_RESPONSE_SECTION)
 
+        self._convert_single_value_to_values(self.arguments)
+        self._convert_single_value_to_values(self.response)
+
+        argument_mapping = None
+        response_mapping = None
+
         if self.is_attribute:
             attribute = definitions.get_attribute_by_name(self.cluster, self.attribute)
             if attribute:
-                attribute_definition = self.__as_mapping(definitions, self.cluster, attribute.definition.data_type.name)
-                self.arguments = self.__update_with_definition(self.arguments, attribute_definition, config)
-                self.response = self.__update_with_definition(self.response, attribute_definition, config)
+                attribute_mapping = self.__as_mapping(definitions, self.cluster, attribute.definition.data_type.name)
+                argument_mapping = attribute_mapping
+                response_mapping = attribute_mapping
         else:
             command = definitions.get_command_by_name(self.cluster, self.command)
             if command:
-                command_definition = self.__as_mapping(definitions, self.cluster, command.input_param)
-                response_definition = self.__as_mapping(definitions, self.cluster, command.output_param)
+                argument_mapping = self.__as_mapping(definitions, self.cluster, command.input_param)
+                response_mapping = self.__as_mapping(definitions, self.cluster, command.output_param)
 
-                self.arguments = self.__update_with_definition(self.arguments, command_definition, config)
-                self.response = self.__update_with_definition(self.response, response_definition, config)
-
-        # TODO Move this calls before the previous blocks that calls update_with_definition to make the
-        #      underlying update_with_definition logic simpler to read.
-        self._convert_single_value_to_values(self.arguments)
-        self._convert_single_value_to_values(self.response)
+        self.__update_with_definition(self.arguments, argument_mapping, config)
+        self.__update_with_definition(self.response, response_mapping, config)
 
     def _convert_single_value_to_values(self, container):
         if container is None or 'values' in container:
@@ -423,33 +424,22 @@ class TestStep:
 
     def __update_with_definition(self, container: dict, mapping_type, config: dict):
         if not container or not mapping_type:
-            return container
+            return
 
-        for key, items in container.items():
-            if type(items) is list and key == 'values':
-                rv = []
-                for item in items:
-                    newItem = {}
-                    for item_key in item:
-                        if item_key == 'value':
-                            newItem[item_key] = self.__update_value_with_definition(
-                                item['value'], mapping_type[item['name']], config)
-                        else:
-                            if item_key == 'saveAs' and not item[item_key] in config:
-                                config[item[item_key]] = None
-                            newItem[item_key] = item[item_key]
-                    rv.append(newItem)
-                container[key] = rv
-            elif key == 'value' or key == 'values':
-                if 'saveAs' in container and not container['saveAs'] in config:
-                    config[container['saveAs']] = None
-                rv = self.__update_value_with_definition(items, mapping_type, config)
-                container[key] = rv
-            elif key == 'constraints':
-                for constraint in container[key]:
-                    container[key][constraint] = self.__update_value_with_definition(
-                        container[key][constraint], mapping_type, config)
-        return container
+        for value in list(container['values']):
+            for key, item_value in list(value.items()):
+                mapping = mapping_type if self.is_attribute else mapping_type[value['name']]
+
+                if key == 'value':
+                    value[key] = self.__update_value_with_definition(item_value, mapping, config)
+                elif key == 'saveAs' and type(item_value) is str and not item_value in config:
+                    config[item_value] = None
+                elif key == 'constraints':
+                    for constraint, constraint_value in item_value.items():
+                        value[key][constraint] = self.__update_value_with_definition(constraint_value, mapping_type, config)
+                else:
+                    # This key, value pair does not rely on cluster specifications.
+                    pass
 
     def __update_value_with_definition(self, value, mapping_type, config):
         if not mapping_type:
