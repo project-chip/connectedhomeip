@@ -184,6 +184,8 @@ class TestStep:
         if not self.is_enabled:
             return
 
+        self._config = config
+
         _check_valid_keys(test, _TEST_SECTION)
 
         self.label = _valueOrNone(test, 'label')
@@ -228,8 +230,8 @@ class TestStep:
                 argument_mapping = self.__as_mapping(definitions, self.cluster, command.input_param)
                 response_mapping = self.__as_mapping(definitions, self.cluster, command.output_param)
 
-        self.__update_with_definition(self.arguments, argument_mapping, config)
-        self.__update_with_definition(self.response, response_mapping, config)
+        self.__update_with_definition(self.arguments, argument_mapping)
+        self.__update_with_definition(self.response, response_mapping)
 
     def _convert_single_value_to_values(self, container):
         if container is None or 'values' in container:
@@ -255,7 +257,7 @@ class TestStep:
 
         container['values'] = [value]
 
-    def post_process_response(self, response, config):
+    def post_process_response(self, response):
         result = PostProcessResponseResult()
 
         if not self.__maybe_check_optional(response, result):
@@ -264,9 +266,9 @@ class TestStep:
         self.__maybe_check_error(response, result)
         if self.response:
             self.__maybe_check_cluster_error(response, result)
-            self.__maybe_check_values(response, config, result)
-            self.__maybe_check_constraints(response, config, result)
-            self.__maybe_save_as(response, config, result)
+            self.__maybe_check_values(response, result)
+            self.__maybe_check_constraints(response, result)
+            self.__maybe_save_as(response, result)
 
         return result
 
@@ -333,7 +335,7 @@ class TestStep:
             # Nothing is logged here to not be redundant with the generic error checking code.
             pass
 
-    def __maybe_check_values(self, response, config, result):
+    def __maybe_check_values(self, response, result):
         check_type = PostProcessCheckType.RESPONSE_VALIDATION
         error_success = 'The test expectation "{name} == {value}" is true'
         error_failure = 'The test expectation "{name} == {value}" is false'
@@ -360,7 +362,7 @@ class TestStep:
             else:
                 result.error(check_type, error_failure.format(name=expected_name, value=expected_value))
 
-    def __maybe_check_constraints(self, response, config, result):
+    def __maybe_check_constraints(self, response, result):
         check_type = PostProcessCheckType.CONSTRAINT_VALIDATION
         error_success = 'Constraints check passed'
         error_failure = 'Constraints check failed'
@@ -387,7 +389,7 @@ class TestStep:
                 # TODO would be helpful to be more verbose here
                 result.error(check_type, error_failure)
 
-    def __maybe_save_as(self, response, config, result):
+    def __maybe_save_as(self, response, result):
         check_type = PostProcessCheckType.SAVE_AS_VARIABLE
         error_success = 'The test save the value "{value}" as {name}.'
         error_name_does_not_exist = 'The test expects a value named "{name}" but it does not exists in the response."'
@@ -407,7 +409,7 @@ class TestStep:
                 received_value = received_value.get(expected_name) if received_value else None
 
             save_as = value.get('saveAs')
-            config[save_as] = received_value
+            self._config[save_as] = received_value
             result.success(check_type, error_success.format(value=received_value, name=save_as))
 
     def __as_mapping(self, definitions, cluster_name, target_name):
@@ -422,7 +424,7 @@ class TestStep:
 
         return target_name
 
-    def __update_with_definition(self, container: dict, mapping_type, config: dict):
+    def __update_with_definition(self, container: dict, mapping_type):
         if not container or not mapping_type:
             return
 
@@ -431,17 +433,17 @@ class TestStep:
                 mapping = mapping_type if self.is_attribute else mapping_type[value['name']]
 
                 if key == 'value':
-                    value[key] = self.__update_value_with_definition(item_value, mapping, config)
-                elif key == 'saveAs' and type(item_value) is str and not item_value in config:
-                    config[item_value] = None
+                    value[key] = self.__update_value_with_definition(item_value, mapping)
+                elif key == 'saveAs' and type(item_value) is str and not item_value in self._config:
+                    self._config[item_value] = None
                 elif key == 'constraints':
                     for constraint, constraint_value in item_value.items():
-                        value[key][constraint] = self.__update_value_with_definition(constraint_value, mapping_type, config)
+                        value[key][constraint] = self.__update_value_with_definition(constraint_value, mapping_type)
                 else:
                     # This key, value pair does not rely on cluster specifications.
                     pass
 
-    def __update_value_with_definition(self, value, mapping_type, config):
+    def __update_value_with_definition(self, value, mapping_type):
         if not mapping_type:
             return value
 
@@ -454,14 +456,14 @@ class TestStep:
                     rv[key] = value[key]  # int64u
                 else:
                     mapping = mapping_type[key]
-                    rv[key] = self.__update_value_with_definition(value[key], mapping, config)
+                    rv[key] = self.__update_value_with_definition(value[key], mapping)
             return rv
         if type(value) is list:
-            return [self.__update_value_with_definition(entry, mapping_type, config) for entry in value]
+            return [self.__update_value_with_definition(entry, mapping_type) for entry in value]
         # TODO currently I am unsure if the check of `value not in config` is sufficant. For
         # example let's say value = 'foo + 1' and map type is 'int64u', we would arguably do
         # the wrong thing below.
-        if value is not None and value not in config:
+        if value is not None and value not in self._config:
             if mapping_type == 'int64u' or mapping_type == 'int64s' or mapping_type == 'bitmap64' or mapping_type == 'epoch_us':
                 value = YamlFixes.try_apply_yaml_cpp_longlong_limitation_fix(value)
                 value = YamlFixes.try_apply_yaml_unrepresentable_integer_for_javascript_fixes(value)
@@ -474,65 +476,16 @@ class TestStep:
 
         return value
 
+    def update_placeholder(self):
+        '''Performs any config/variable substitutions to the TestStep's arguments and response.
 
-class YamlTests:
-    __tests: None
-    __hook: None
-    __index: 0
-
-    count: 0
-
-    def __init__(self, tests, hook):
-        self.__tests = tests
-        self.__hook = hook
-        self.__index = 0
-
-        self.count = len(tests)
-
-    def __iter__(self):
+        Intended to only be called by YamlTests, so that previously processed test steps that give
+        us the variable are substitued to the current TestStep before it is given to a runner to
+        run.
+        '''
+        self.__encode_values(self.arguments)
+        self.__encode_values(self.response)
         return self
-
-    def __next__(self):
-        if self.__index < self.count:
-            data = self.__tests[self.__index]
-            data = self.__hook(data)
-            self.__index += 1
-            return data
-
-        raise StopIteration
-
-
-class YamlParser:
-    name: None
-    PICS: None
-    # TODO config should be internal (_config)
-    config: dict = {}
-    tests: None
-
-    def __init__(self, test_file, pics_file, definitions):
-        # TODO Needs supports for PICS file
-        with open(test_file) as f:
-            loader = yaml.FullLoader
-            loader = YamlFixes.try_add_yaml_support_for_scientific_notation_without_dot(loader)
-
-            data = yaml.load(f, Loader=loader)
-            _check_valid_keys(data, _TESTS_SECTION)
-
-            self.name = _valueOrNone(data, 'name')
-            self.PICS = _valueOrNone(data, 'PICS')
-
-            self.config = _valueOrNone(data, 'config')
-
-            tests = list(filter(lambda test: test.is_enabled, [TestStep(
-                test, self.config, definitions) for test in _valueOrNone(data, 'tests')]))
-            YamlFixes.try_update_yaml_node_id_test_runner_state(tests, self.config)
-
-            self.tests = YamlTests(tests, self.__update_placeholder)
-
-    def __update_placeholder(self, data):
-        self.__encode_values(data.arguments)
-        self.__encode_values(data.response)
-        return data
 
     def __encode_values(self, container):
         if not container:
@@ -569,8 +522,8 @@ class YamlParser:
 
             substitution_occured = False
             for idx, token in enumerate(tokens):
-                if token in self.config:
-                    variable_info = self.config[token]
+                if token in self._config:
+                    variable_info = self._config[token]
                     if type(variable_info) is dict and 'defaultValue' in variable_info:
                         variable_info = variable_info['defaultValue']
                     tokens[idx] = variable_info
@@ -587,5 +540,57 @@ class YamlParser:
         else:
             return value
 
+
+class YamlTests:
+    __tests: list[TestStep]
+    __index: 0
+
+    count: 0
+
+    def __init__(self, tests: list[TestStep]):
+        self.__tests = tests
+        self.__index = 0
+
+        self.count = len(tests)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.__index < self.count:
+            test = self.__tests[self.__index]
+            test.update_placeholder()
+            self.__index += 1
+            return test
+
+        raise StopIteration
+
+
+class YamlParser:
+    name: None
+    PICS: None
+    tests: None
+    _config: dict = {}
+
+    def __init__(self, test_file, pics_file, definitions):
+        # TODO Needs supports for PICS file
+        with open(test_file) as f:
+            loader = yaml.FullLoader
+            loader = YamlFixes.try_add_yaml_support_for_scientific_notation_without_dot(loader)
+
+            data = yaml.load(f, Loader=loader)
+            _check_valid_keys(data, _TESTS_SECTION)
+
+            self.name = _valueOrNone(data, 'name')
+            self.PICS = _valueOrNone(data, 'PICS')
+
+            self._config = _valueOrNone(data, 'config')
+
+            tests = list(filter(lambda test: test.is_enabled, [TestStep(
+                test, self._config, definitions) for test in _valueOrNone(data, 'tests')]))
+            YamlFixes.try_update_yaml_node_id_test_runner_state(tests, self._config)
+
+            self.tests = YamlTests(tests)
+
     def update_config(self, key, value):
-        self.config[key] = value
+        self._config[key] = value
