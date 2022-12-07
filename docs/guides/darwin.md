@@ -20,8 +20,8 @@ Listed are the Current SHAs:
 
 ## Supported Platforms for Matter Device Testing
 
-Matter is supported by iOS/tvOS/iPadOS/watchOS/HomePod/AppleTV starting with
-16.1.
+-   Matter is supported by iOS/tvOS/iPadOS/watchOS/HomePod/AppleTV starting with
+    16.1
 
 -   To test your Matter device with Apple's platforms, all you need is a device
     with a supported OS
