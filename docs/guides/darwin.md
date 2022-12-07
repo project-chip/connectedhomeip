@@ -6,9 +6,11 @@ Learn more about Matter [here](https://buildwithmatter.com/)
 
 ## Source Compatibility
 
-Each release of an operating systems, or developer preview release brings a new
-SHA from this repository, which can be helpful for to reference which changes
-are present in the release for testing.
+Each release of an Apple operating system, or developer preview release may
+bring a new SHA from this repository, which can be helpful for to reference
+which changes are present in the release for testing.
+
+Listed are the Current SHAs:
 
 -   iOS/iPadOS/tvOS 16.1:
     [`33f6a910cd9a8a0cfdd7088e2f43efd2f7f566a7`](https://github.com/project-chip/connectedhomeip/commits/33f6a910cd9a8a0cfdd7088e2f43efd2f7f566a7)
@@ -24,8 +26,14 @@ Matter is supported by iOS/tvOS/iPadOS/watchOS/HomePod/AppleTV starting with
 -   To test your Matter device with Apple's platforms, all you need is a device
     with a supported OS
 -   Pairing via QR Code or Setup Code is supported directly from the Home App
--   The remainder of this guide is for Matter Application development, you can
-    ignore it!
+-   Please proceed to
+    [this section](#testing-your-matter-device-with-apple-home) if you're
+    developing a new device
+    -   If your device has already been certified, or already fully implemented
+        and just awaiting testing, you can just try pairing to Apple Home
+        directly
+-   Please provide [feedback to Apple](#providing-feedback-to-apple) if you
+    encounter any issues
 
 ## Supported Platforms for Application Development
 
@@ -64,9 +72,11 @@ For Context: This is a mapping of platform to OS
 
 ## Profile Installation
 
+#### Reminder: This is only needed for Application Development
+
 ### Install the Matter Developer Profile on your iPhone or iPad
 
-##### Note: For more detailed profile installation instructions, refer to https://developer.apple.com/bug-reporting/profiles-and-logs
+##### Note: For more detailed profile installation instructions, refer to [here](https://developer.apple.com/bug-reporting/profiles-and-logs)
 
 ##### Note: The profile will expire automatically after some time
 
@@ -117,7 +127,7 @@ enables other useful developer tools
 To enable developer mode, please follow the instructions
 [here](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device)
 
-### Using chiptool on macOS, or CHIP Tool on iOS
+## Using chiptool on macOS, or CHIP Tool on iOS
 
 Pairing Matter Accessory using Open Source Matter Darwin chiptool and iOS
 chiptool will require installing the
@@ -135,10 +145,10 @@ on MacOS or iOS/iPadOS.
 
 -   Restart your system
     -   For _iOS/iPadOS_, enable Developer Mode. Refer to
-        https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device4.
+        [this developer page](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device)
 -   Compile chiptool for macOS or CHIP Tool for iOS
 
-### Ensuring Your Matter Accessory Works with iOS/iPadOS/tvOS
+## Testing your Matter Device with Apple Home
 
 1. Clone the [Matter repo](https://github.com/project-chip/connectedhomeip.git)
 2. Checkout the specific commit hash (from [above](#source-compatibility)) for
@@ -225,7 +235,7 @@ Example:
    initialize your development environment, compile the firmware and flash your
    hardware.
 
-#### General Platform Guides
+#### General Matter Platform Development Guide
 
 ##### Getting the SDK Ready
 
@@ -263,23 +273,7 @@ Example:
 -   [TI All Clusters](/examples/all-clusters-app/cc13x2x7_26x2x7/README.md)
 -   [Tizen](/examples/lighting-app/tizen/README.md)
 
-### Release Notes & Known Issues
-
--   Please refer to the iOS/iPadOS 16.1
-    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-16_1-release-notes)
-    for currently known issues.
--   Please refer to the iOS/iPadOS 16.2 beta 3
-    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16-release-notes)
-    for currently known issues
--   Further issues should be reported
-    [here](https://github.com/project-chip/connectedhomeip/issues)
-
-### Filing Issues against the Developer API, or Apple Home
-
-Please use the following to share description and logs of the issue you are
-running into. Once submitted, please share the feedback link here.
-
-## Feedback assistant ticket:
+## Providing Feedback to Apple
 
 ##### Note: For profile installation instructions, refer to [here](#profile-installation)
 
@@ -301,9 +295,24 @@ running into. Once submitted, please share the feedback link here.
 -   Please make sure you download and install the profiles for iOS and tvOS as
     provided here. The instructions are also in these links.
     -   iOS:
-        -   https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=ios&name=homekit
-        -   https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=ios&name=network
-        -   https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=ios&name=mdns
+        -   [Apple Home Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=ios&name=homekit)
+        -   [Network Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=ios&name=network)
+        -   [mDNS Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=ios&name=mdns)
     -   tvOS:
-        -   https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=homekit
-        -   https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=networkhttps://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=mdns
+        -   [Apple Home Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=homekit)
+        -   [Network Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=network)
+        -   [mDNS Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=mdns)
+
+### Release Notes & Known Issues
+
+-   Please refer to the iOS/iPadOS 16.1
+    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-16_1-release-notes)
+    for currently known issues.
+-   Please refer to the iOS/iPadOS 16.2 beta 3
+    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16-release-notes)
+    for currently known issues
+-   An issues related to Apple Home integration should be reported
+    [feedback](#providing-feedback-to-apple) as described in this section
+
+-   Any issues related to the Matter SDK should be reported to the project
+    [here](https://github.com/project-chip/connectedhomeip/issues)
