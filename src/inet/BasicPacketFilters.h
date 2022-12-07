@@ -40,14 +40,15 @@ public:
     /**
      * @brief Initialize the packet filter with a starting limit
      *
-     * @param maxAllowedQueuedPackets - max number of pending-in-queue DNS packets not yet processed that matched predicate
+     * @param maxAllowedQueuedPackets - max number of pending-in-queue not yet processed predicate-matching packets
      */
     DropIfTooManyQueuedPacketsFilter(size_t maxAllowedQueuedPackets) : mMaxAllowedQueuedPackets(maxAllowedQueuedPackets) {}
 
     /**
      * @brief Set the predicate to use for filtering
      *
-     * @warning DO NOT modify at runtime while the filter is being called.
+     * @warning DO NOT modify at runtime while the filter is being called. If you do so, the queue accounting could
+     *          get out of sync, and cause the filtering to fail to properly work.
      *
      * @param predicateFunc - Predicate function to apply. If nullptr, no filtering will take place
      * @param context - Pointer to predicate-specific context that will be provided to predicate at every call. May be nullptr.
@@ -61,9 +62,13 @@ public:
     /**
      * @brief Set the ceiling for max allowed packets queued up that matched the predicate.
      *
+     * @note Changing this at runtime while packets are coming only affects future dropping, and
+     *       does not remove packets from the queue if the limit is lowered below the currently-in-queue
+     *       count.
+     *
      * @param maxAllowedQueuedPackets - number of packets currently pending allowed.
      */
-    void SetMaxQueuedPacketsLimit(int maxAllowedQueuedPackets) { mMaxAllowedQueuedPackets = maxAllowedQueuedPackets; }
+    void SetMaxQueuedPacketsLimit(int maxAllowedQueuedPackets) { mMaxAllowedQueuedPackets.store(maxAllowedQueuedPackets); }
 
     /**
      * @return the total number of packets dropped so far by the filter
@@ -73,10 +78,12 @@ public:
     /**
      * @brief Reset the counter of dropped packets.
      */
-    void ClearNumDroppedPackets() { mNumDroppedPackets.exchange(0); }
+    void ClearNumDroppedPackets() { mNumDroppedPackets.store(0); }
 
     /**
-     * @brief Template method called when a packet is dropped due to high watermark getting reached, based on predicate.
+     * @brief Method called when a packet is dropped due to high watermark getting reached, based on predicate.
+     *
+     * Subclasses may use this to implement additional behavior or diagnostics.
      *
      * This is called once for every dropped packet. If there is no filter predicate, this is not called.
      *
@@ -89,7 +96,9 @@ public:
     {}
 
     /**
-     * @brief Template method called whenever queue of accumulated packets is now empty, based on predicate.
+     * @brief Method called whenever queue of accumulated packets is now empty, based on predicate.
+     *
+     * Subclasses may use this to implement additional behavior or diagnostics.
      *
      * This is possibly called repeatedly in a row, if the queue actually never gets above one.
      *
@@ -100,8 +109,8 @@ public:
      * @param pktInfo - info about source/dest of packet
      * @param pktPayload - payload content of packet
      */
-    virtual void OnQueueEmpty(const void * endpoint, const chip::Inet::IPPacketInfo & pktInfo,
-                              const chip::System::PacketBufferHandle & pktPayload)
+    virtual void OnLastMatchDequeued(const void * endpoint, const chip::Inet::IPPacketInfo & pktInfo,
+                                     const chip::System::PacketBufferHandle & pktPayload)
     {}
 
     /**
@@ -153,7 +162,7 @@ public:
         int numQueuedPackets = mNumQueuedPackets.load();
         if (numQueuedPackets == 0)
         {
-            OnQueueEmpty(endpoint, pktInfo, pktPayload);
+            OnLastMatchDequeued(endpoint, pktInfo, pktPayload);
         }
 
         // If we ever go negative, we have mismatch ingress/egress filter via predicate and

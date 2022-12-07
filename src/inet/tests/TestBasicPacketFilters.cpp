@@ -53,10 +53,10 @@ public:
         }
     }
 
-    void OnQueueEmpty(const void * endpoint, const IPPacketInfo & pktInfo,
-                      const chip::System::PacketBufferHandle & pktPayload) override
+    void OnLastMatchDequeued(const void * endpoint, const IPPacketInfo & pktInfo,
+                             const chip::System::PacketBufferHandle & pktPayload) override
     {
-        ++mNumOnQueueEmptyCalled;
+        ++mNumOnLastMatchDequeuedCalled;
 
         // Log a hysteretic event
         if (mHitCeilingWantFloor)
@@ -67,9 +67,9 @@ public:
     }
 
     // Public bits to make testing easier
-    nlTestSuite * mTestSuite   = nullptr;
-    int mNumOnDroppedCalled    = 0;
-    int mNumOnQueueEmptyCalled = 0;
+    nlTestSuite * mTestSuite          = nullptr;
+    int mNumOnDroppedCalled           = 0;
+    int mNumOnLastMatchDequeuedCalled = 0;
     bool mHitCeilingWantFloor;
 };
 
@@ -178,9 +178,9 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
         }
         NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 0);
 
-        // OnDroped/OnQueueEmpty only ever called for matching packets, never for non-matching
+        // OnDroped/OnLastMatchDequeued only ever called for matching packets, never for non-matching
         NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 0);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnQueueEmptyCalled == 0);
+        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
     }
 
     {
@@ -193,7 +193,7 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
         }
         NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 0);
         NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 0);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnQueueEmptyCalled == 0);
+        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
 
         // Enqueue packets that match filter, beyond watermark: all dropped.
         for (int numPkt = 0; numPkt < 2; ++numPkt)
@@ -203,7 +203,7 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
         }
         NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 2);
         NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 2);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnQueueEmptyCalled == 0);
+        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
 
         // Dequeue 2 packets that were enqueued, matching filter
         for (int numPkt = 0; numPkt < 2; ++numPkt)
@@ -215,7 +215,7 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
         // Number of dropped packets didn't change
         NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 2);
         NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 2);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnQueueEmptyCalled == 0);
+        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
 
         // Enqueue packets that match filter, up to watermark again. None dropped.
         for (int numPkt = 0; numPkt < 2; ++numPkt)
@@ -228,7 +228,7 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
         // No change from prior state
         NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 2);
         NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 2);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnQueueEmptyCalled == 0);
+        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
 
         // Enqueue two more packets, expect drop
         for (int numPkt = 0; numPkt < 2; ++numPkt)
@@ -240,7 +240,7 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
         // Expect two more dropped total
         NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 4);
         NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 4);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnQueueEmptyCalled == 0);
+        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
 
         // Enqueue non-matching packet, expect allowed.
         for (int numPkt = 0; numPkt < kMaxQueuedPacketsLimit; ++numPkt)
@@ -252,7 +252,7 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
         // Expect no more dropepd
         NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 4);
         NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 4);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnQueueEmptyCalled == 0);
+        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
 
         // Dequeue non-matching packet, expect allowed.
         for (int numPkt = 0; numPkt < kMaxQueuedPacketsLimit; ++numPkt)
@@ -264,9 +264,9 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
         // Expect no change
         NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 4);
         NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 4);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnQueueEmptyCalled == 0);
+        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
 
-        // Dequeue all matching packets, expect allowed and one OnQueueEmpty on last one.
+        // Dequeue all matching packets, expect allowed and one OnLastMatchDequeued on last one.
         for (int numPkt = 0; numPkt < (kMaxQueuedPacketsLimit - 1); ++numPkt)
         {
             NL_TEST_ASSERT(inSuite,
@@ -276,14 +276,14 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
 
         NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 4);
         NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 4);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnQueueEmptyCalled == 0);
+        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
 
         NL_TEST_ASSERT(inSuite,
                        kAllowPacket == fakeUdpEndpoint.ProcessDequeue(fakeSrc, kOtherPort, fakeMdnsDest, kMdnsPort, kFakePayload));
 
         NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 4);
         NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 4);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnQueueEmptyCalled == 1);
+        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 1);
     }
 
     // Validate that clearing drop count works
@@ -291,8 +291,8 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
         gFilter.ClearNumDroppedPackets();
         NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 0);
 
-        gFilter.mNumOnDroppedCalled    = 0;
-        gFilter.mNumOnQueueEmptyCalled = 0;
+        gFilter.mNumOnDroppedCalled           = 0;
+        gFilter.mNumOnLastMatchDequeuedCalled = 0;
     }
 
     // Validate that all packets pass when no predicate set
@@ -308,7 +308,7 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
         }
         NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 0);
         NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 0);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnQueueEmptyCalled == 0);
+        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
 
         // Works even if max number of packets allowed is zero
         gFilter.SetMaxQueuedPacketsLimit(0);
@@ -322,7 +322,7 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
         }
         NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 0);
         NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 0);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnQueueEmptyCalled == 0);
+        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
     }
 
     // Validate that setting max packets to zero, with a matching predicate, drops all matching packets, none of the non-matching.
@@ -339,7 +339,7 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
 
         NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 3);
         NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 3);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnQueueEmptyCalled == 0);
+        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
 
         // Enqueue non-filter-matching, none dropped
         for (int numPkt = 0; numPkt < kMaxQueuedPacketsLimit; ++numPkt)
@@ -350,7 +350,7 @@ void TestBasicPacketFilter(nlTestSuite * inSuite, void * inContext)
 
         NL_TEST_ASSERT(inSuite, gFilter.GetNumDroppedPackets() == 3);
         NL_TEST_ASSERT(inSuite, gFilter.mNumOnDroppedCalled == 3);
-        NL_TEST_ASSERT(inSuite, gFilter.mNumOnQueueEmptyCalled == 0);
+        NL_TEST_ASSERT(inSuite, gFilter.mNumOnLastMatchDequeuedCalled == 0);
     }
 }
 

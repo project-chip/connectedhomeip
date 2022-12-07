@@ -31,7 +31,7 @@ namespace Inet {
 class EndpointQueueFilter
 {
 public:
-    enum FilterOutcome : int
+    enum FilterOutcome
     {
         kAllowPacket = 0,
         kDropPacket  = 1,
