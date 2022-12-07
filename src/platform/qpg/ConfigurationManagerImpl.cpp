@@ -80,31 +80,27 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     switch (qvRebootReason)
     {
-        case qvResetReason_HW_BrownOutDetected:
-        {
-            bootReason = BootReasonType::kBrownOutReset;
-            break;
-        }
+    case qvResetReason_HW_BrownOutDetected: {
+        bootReason = BootReasonType::kBrownOutReset;
+        break;
+    }
 
-        case qvResetReason_HW_Watchdog:
-        {
-            bootReason = BootReasonType::kHardwareWatchdogReset;
-            break;
-        }
+    case qvResetReason_HW_Watchdog: {
+        bootReason = BootReasonType::kHardwareWatchdogReset;
+        break;
+    }
 
-        case qvResetReason_HW_Por:
-        {
-            bootReason = BootReasonType::kPowerOnReboot;
-            break;
-        }
+    case qvResetReason_HW_Por: {
+        bootReason = BootReasonType::kPowerOnReboot;
+        break;
+    }
 
-        case qvResetReason_SW_Por:
-        {
-            bootReason = BootReasonType::kSoftwareReset;
-            break;
-        }
+    case qvResetReason_SW_Por: {
+        bootReason = BootReasonType::kSoftwareReset;
+        break;
+    }
 
-        default:
+    default:
         bootReason = BootReasonType::kUnspecified;
         break;
     }
