@@ -64,7 +64,9 @@ For Context: This is a mapping of platform to OS
 
 ### Install the Matter Developer Profile on your iPhone or iPad
 
-Note: The profile will expire automatically after some time
+##### Note: For more detailed profile installation instructions, refer to https://developer.apple.com/bug-reporting/profiles-and-logs
+
+##### Note: The profile will expire automatically after some time
 
 1. Download the
    [Matter Developer Profile](https://developer.apple.com/services-account/download?path=/iOS/iOS_Logs/EnableBluetoothCentralMatterClientDeveloperMode.mobileconfig)
@@ -75,7 +77,11 @@ Note: The profile will expire automatically after some time
 
     ##### Note: Make sure to head back to system preferences, and you'll see an option to verify and install the profile near the top
 
-4. Restart the device
+4. (Optional) You may be prompted if you want to install it on other devices.
+   Follow the prompts to install on the HomePod, Apple TV, etc., where you have
+   the described issue and reproduce it.
+
+5. Restart the device
 
 ### Install the Matter Profile on your HomePod
 
@@ -245,3 +251,37 @@ requirements
     for currently known issues.
 -   Further issues should be reported
     [here](https://github.com/project-chip/connectedhomeip/issues)
+
+### Filing Issues against the Developer API, or Apple Home
+
+Please use the following to share description and logs of the issue you are
+running into. Once submitted, please share the feedback link here.
+
+## Feedback assistant ticket:
+
+##### Note: For profile installation instructions, refer to [here](#profile-installation)
+
+-   File a feedback assistant ticket.
+    https://developer.apple.com/bug-reporting/#feedback-assistant
+-   Click on the link below using your account:
+    https://feedbackassistant.apple.com/new-form-response
+-   Choose iOS/iPadOS to file an issue
+-   Choose the area as Home App and fill in the details of the type of issue and
+    the description
+-   Please provide the following technical information:
+    -   Sysdiagnose logs for iPhone / iPad with the timestamp / timeframe of the
+        issue
+    -   Sysdiagnose logs for all the Home Hubs (HomePod mini / HomePod / Apple
+        TV) with the timestamp / timeframe of the issue
+    -   Accessory logs with the timestamp / timeframe of the issue
+    -   mDNS network logs with timestamp / timeframe of the issue
+    -   Video or screenshot describing the issue (optional but beneficial)
+-   Please make sure you download and install the profiles for iOS and tvOS as
+    provided here. The instructions are also in these links.
+    -   iOS:
+        -   https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=ios&name=homekit
+        -   https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=ios&name=network
+        -   https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=ios&name=mdns
+    -   tvOS:
+        -   https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=homekit
+        -   https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=networkhttps://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=mdns
