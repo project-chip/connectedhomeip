@@ -188,6 +188,18 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                       "   \"value\" : [ 1, 2, 3, 4 ]\n"
                       "}\n");
 
+    int8uList = {};
+    EncodeAndValidate(int8uList,
+                      "{\n"
+                      "   \"value\" : []\n"
+                      "}\n");
+
+    DataModel::Nullable<DataModel::List<uint8_t>> nullValueList;
+    EncodeAndValidate(nullValueList,
+                      "{\n"
+                      "   \"value\" : null\n"
+                      "}\n");
+
     Clusters::UnitTesting::Structs::SimpleStruct::Type structListData[2] = { structVal, structVal };
     DataModel::List<Clusters::UnitTesting::Structs::SimpleStruct::Type> structList;
 
