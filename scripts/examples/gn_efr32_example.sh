@@ -16,7 +16,7 @@
 #    limitations under the License.
 #
 
-# Build script for GN EFT32 examples GitHub workflow.
+# Build script for GN EFR32 examples GitHub workflow.
 
 set -e
 
@@ -33,6 +33,7 @@ source "$CHIP_ROOT/scripts/activate.sh"
 set -x
 env
 USE_WIFI=false
+USE_SILABS_VERSIONING=true
 
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
 USAGE="./scripts/examples/gn_efr32_example.sh <AppRootFolder> <outputFolder> <silabs_board_name> [<Build options>]"
@@ -163,6 +164,10 @@ else
                 optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" use_thread_coap_lib=true "
                 shift
                 ;;
+            --skip_silabs_version)
+                USE_SILABS_VERSIONING=false
+                shift
+                ;;
             *)
                 if [ "$1" =~ *"use_rs911x=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                     USE_WIFI=true
@@ -177,6 +182,14 @@ else
     if [ -z "$SILABS_BOARD" ]; then
         echo "SILABS_BOARD not defined"
         exit 1
+    fi
+
+    if [ "$USE_SILABS_VERSIONING" == true ]; then
+        {
+            ShortCommitSha=$(git describe --always --dirty)
+            branchName=$(git rev-parse --abbrev-ref HEAD)
+            optArgs+="sl_matter_version_str=\"v1.0-$branchName-$ShortCommitSha\" "
+        }  &> /dev/null
     fi
 
     BUILD_DIR=$OUTDIR/$SILABS_BOARD
