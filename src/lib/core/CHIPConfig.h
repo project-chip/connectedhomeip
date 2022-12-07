@@ -1323,7 +1323,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * see ClientMonitoring cluster for specification
  */
 #ifndef CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC
-#define CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC 4
+#define CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC 1
 #endif // CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC
 /**
  * @}
