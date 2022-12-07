@@ -14,7 +14,6 @@
 #    limitations under the License.
 
 import yaml
-import string
 from enum import Enum
 
 from .constraints import get_constraints
@@ -422,7 +421,7 @@ class TestStep:
 
         return target_name
 
-    def __update_with_definition(self, container, mapping_type, config):
+    def __update_with_definition(self, container: dict, mapping_type, config: dict):
         if not container or not mapping_type:
             return container
 
@@ -466,10 +465,13 @@ class TestStep:
                 else:
                     mapping = mapping_type[key]
                     rv[key] = self.__update_value_with_definition(value[key], mapping, config)
-            value = rv
-        elif type(value) is list:
-            value = [self.__update_value_with_definition(entry, mapping_type, config) for entry in value]
-        elif value and not value in config:
+            return rv
+        if type(value) is list:
+            return [self.__update_value_with_definition(entry, mapping_type, config) for entry in value]
+        # TODO currently I am unsure if the check of `value not in config` is sufficant. For
+        # example let's say value = 'foo + 1' and map type is 'int64u', we would arguably do
+        # the wrong thing below.
+        if value is not None and value not in config:
             if mapping_type == 'int64u' or mapping_type == 'int64s' or mapping_type == 'bitmap64' or mapping_type == 'epoch_us':
                 value = YamlFixes.try_apply_yaml_cpp_longlong_limitation_fix(value)
                 value = YamlFixes.try_apply_yaml_unrepresentable_integer_for_javascript_fixes(value)
@@ -513,7 +515,7 @@ class YamlTests:
 class YamlParser:
     name: None
     PICS: None
-    # TODO config should be internal (_config). Also can it actually be None, or
+    # TODO config should be internal (_config)
     config: dict = {}
     tests: None
 
