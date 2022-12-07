@@ -557,8 +557,7 @@ static void wfx_events_task(void * p_arg)
                     /* After the reboot or a commissioning time device failed to connect with AP.
                      * Device will retry to connect with AP upto WFX_RSI_CONFIG_MAX_JOIN retries.
                      */
-                    SILABS_LOG("%s: retry after %d sec", __func__,
-                               (WLAN_RETRY_TIMER_MS / WLAN_MIN_RETRY_TIMER_MS));
+                    SILABS_LOG("%s: retry after %d sec", __func__, CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
                     if (retryJoin < MAX_JOIN_RETRIES_COUNT)
                         vTaskDelay(WLAN_RETRY_TIMER_MS);
                 }
@@ -570,12 +569,11 @@ static void wfx_events_task(void * p_arg)
                      */
                     if (retryInterval < WLAN_MAX_RETRY_TIMER_MS)
                     {
-                        SILABS_LOG("%s: Next attempt after %d Seconds", __func__, (retryInterval / WLAN_MIN_RETRY_TIMER_MS));
+                        SILABS_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(retryInterval));
                     }
                     else
                     {
-                        SILABS_LOG("%s: Next attempt after %d Seconds", __func__,
-                                   (WLAN_MAX_RETRY_TIMER_MS / WLAN_MIN_RETRY_TIMER_MS));
+                        SILABS_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(WLAN_MAX_RETRY_TIMER_MS));
                     }
 
                     vTaskDelay(retryInterval < WLAN_MAX_RETRY_TIMER_MS ? pdMS_TO_TICKS(retryInterval)
@@ -636,8 +634,8 @@ static void wfx_events_task(void * p_arg)
             hasNotifiedWifiConnectivity = false;
             SILABS_LOG("WIFI: Connected to AP");
             wifi_extra |= WE_ST_STA_CONN;
-            retryJoin              = 0;
-            retryInterval          = WLAN_MIN_RETRY_TIMER_MS;
+            retryJoin     = 0;
+            retryInterval = WLAN_MIN_RETRY_TIMER_MS;
             wfx_lwip_set_sta_link_up();
 #ifdef SLEEP_ENABLED
             if (!(wfx_get_wifi_state() & SL_WFX_AP_INTERFACE_UP))

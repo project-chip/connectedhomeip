@@ -201,14 +201,14 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
          * We should enable retry.. (Need config variable for this)
          */
         WFX_RSI_LOG("%s: failed. retry: %d", __func__, wfx_rsi.join_retries);
-        if (!is_disconnection_event)  
+        if (!is_disconnection_event)
         {
             /* After the reboot or a commissioning time device failed to connect with AP.
              * Device will retry to connect with AP upto WFX_RSI_CONFIG_MAX_JOIN retries.
              */
             if (wfx_rsi.join_retries < WFX_RSI_CONFIG_MAX_JOIN)
             {
-                WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (WLAN_RETRY_TIMER_MS / WLAN_MIN_RETRY_TIMER_MS));
+                WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
                 vTaskDelay(pdMS_TO_TICKS(WLAN_RETRY_TIMER_MS));
                 xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
             }
@@ -225,11 +225,11 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
              */
             if (retryInterval < WLAN_MAX_RETRY_TIMER_MS)
             {
-                WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (retryInterval / WLAN_MIN_RETRY_TIMER_MS));
+                WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(retryInterval));
             }
             else
             {
-                WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (WLAN_MAX_RETRY_TIMER_MS / WLAN_MIN_RETRY_TIMER_MS));
+                WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(WLAN_MAX_RETRY_TIMER_MS));
             }
 
             vTaskDelay(retryInterval < WLAN_MAX_RETRY_TIMER_MS ? pdMS_TO_TICKS(retryInterval)
@@ -249,8 +249,8 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
 #else
         xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_CONN);
 #endif
-        wfx_rsi.join_retries   = 0;
-        retryInterval          = WLAN_MIN_RETRY_TIMER_MS;
+        wfx_rsi.join_retries = 0;
+        retryInterval        = WLAN_MIN_RETRY_TIMER_MS;
     }
 }
 
@@ -500,6 +500,7 @@ static void wfx_rsi_do_join(void)
     {
         WFX_RSI_LOG("%s: WLAN: connecting to %s==%s, sec=%d", __func__, &wfx_rsi.sec.ssid[0], &wfx_rsi.sec.passkey[0],
                     wfx_rsi.sec.security);
+
         /*
          * Join the network
          */
@@ -529,12 +530,12 @@ static void wfx_rsi_do_join(void)
                 WFX_RSI_LOG("%s: rsi_wlan_connect_async failed with status: %02x on try %d", __func__, status,
                             wfx_rsi.join_retries);
             
-                if (!is_disconnection_event) 
+                if (!is_disconnection_event)
                 {
                     /* After the reboot or a commissioning time device failed to connect with AP.
                      * Device will retry to connect with AP upto WFX_RSI_CONFIG_MAX_JOIN retries.
                      */
-                    WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (WLAN_RETRY_TIMER_MS / WLAN_MIN_RETRY_TIMER_MS));
+                    WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
                     vTaskDelay(pdMS_TO_TICKS(WLAN_RETRY_TIMER_MS));
                 }
                 else 
@@ -545,12 +546,11 @@ static void wfx_rsi_do_join(void)
                      */
                     if (retryInterval < WLAN_MAX_RETRY_TIMER_MS)
                     {
-                        WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, (retryInterval / WLAN_MIN_RETRY_TIMER_MS));
+                        WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(retryInterval));
                     }
                     else
                     {
-                        WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__,
-                                    (WLAN_MAX_RETRY_TIMER_MS / WLAN_MIN_RETRY_TIMER_MS));
+                        WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(WLAN_MAX_RETRY_TIMER_MS));
                     }
 
                     vTaskDelay(retryInterval < WLAN_MAX_RETRY_TIMER_MS ? pdMS_TO_TICKS(retryInterval)

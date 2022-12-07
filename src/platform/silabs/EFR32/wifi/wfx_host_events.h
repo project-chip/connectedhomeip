@@ -145,6 +145,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #define WLAN_MAX_RETRY_TIMER_MS 30000
 #define WLAN_MIN_RETRY_TIMER_MS 1000
 #define WLAN_RETRY_TIMER_MS 5000
+#define CONVERT_MS_TO_SEC(TimeInMS) (TimeInMS / 1000)
 
 // WLAN related Macros
 #define ETH_FRAME 0
