@@ -286,7 +286,7 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
                  percentOpen != EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_CLOSED &&
                  percentOpen != EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_OPEN))
     {
-        status = EMBER_ZCL_STATUS_INVALID_VALUE;
+        status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
     else
     {
