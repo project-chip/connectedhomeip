@@ -23,7 +23,7 @@ RUN set -x \
     && : # last line
 
 # Setup Zephyr
-ARG ZEPHYR_REVISION=2901439a086f8202e63dc6f66a590021bb8e15d3
+ARG ZEPHYR_REVISION=7e93d9eeb7d2796d678a069558c251cf94dd0c2e
 WORKDIR /opt/telink/zephyrproject
 RUN set -x \
     && python3 -m pip install -U --no-cache-dir \
@@ -35,9 +35,7 @@ RUN set -x \
     && west init -l \
     && cd .. \
     && west update -o=--depth=1 -n -f smart \
-    && cd modules/hal/telink \
-    && git submodule update --init \
-    && cd ../../../ \
+    && west blobs fetch hal_telink \
     && west zephyr-export \
     && : # last line
 
