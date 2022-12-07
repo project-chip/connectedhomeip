@@ -85,7 +85,7 @@ For Context: This is a mapping of platform to OS
 
 ### Install the Matter Profile on your HomePod
 
-Note: The profile will expire automatically after some time
+##### Note: The profile will expire automatically after some time
 
 1. Download the
    [Matter Developer Profile](https://developer.apple.com/services-account/download?path=/iOS/iOS_Logs/EnableBluetoothCentralMatterClientDeveloperMode.mobileconfig)
@@ -97,7 +97,7 @@ Note: The profile will expire automatically after some time
 
 ### Install the Matter Profile on your Apple TV
 
-Note: The profile will expire automatically after some time
+##### Note: The profile will expire automatically after some time
 
 1. Download the
    [profile](https://developer.apple.com/services-account/download?path=/iOS/iOS_Logs/EnableBluetoothCentralMatterClientDeveloperMode.mobileconfig)
@@ -108,7 +108,8 @@ Note: The profile will expire automatically after some time
 
 ### Enable Developer Mode on your Apple Device
 
-Note: Developer mode is a great way to get logs from your device as well as
+##### Note: Developer mode is a great way to get logs from your device as well as
+
 enables other useful developer tools
 
 To enable developer mode, please follow the instructions
@@ -176,9 +177,7 @@ Example:
 
 ##### Case study 1: Configuring a development M5Stack, as a multi-device to work with iOS/iPadOS/tvOS
 
-Note: These instructions are specific to getting started with the
-(Matter-provided) `all-clusters-app` on an ESP32-based M5Stack, however can be
-generalised to work on most platforms ([more listed below](#guides))
+##### Note: These instructions are specific to getting started with the (Matter-provided) `all-clusters-app` on an ESP32-based M5Stack, however can be generalised to work on most platforms ([more listed below](#guides))
 
 1. Checkout and setup
    [Matter repo](https://github.com/project-chip/connectedhomeip.git) as per the
@@ -191,9 +190,7 @@ generalised to work on most platforms ([more listed below](#guides))
 
 ##### Case study 2: a development Nordic board (nRF52840), working as a light to work with iOS/iPadOS/tvOS
 
-Note: These instructions are specific to getting started with the
-(Matter-provided) "lighting-app" on an Nordic-based NRF52840, however can be
-generalised to work on most platforms (more listed below)
+##### Note: These instructions are specific to getting started with the (Matter-provided) "lighting-app" on an Nordic-based NRF52840, however can be generalised to work on most platforms (more listed below)
 
 1. Checkout and setup
    [Matter repo](https://github.com/project-chip/connectedhomeip.git) as per the
@@ -209,8 +206,7 @@ generalised to work on most platforms (more listed below)
 
 ##### Getting the SDK Ready
 
-Note: Most platforms have very similar, if not the same configuration
-requirements
+##### Note: Most platforms have very similar, if not the same configuration requirements
 
 1. Checkout and setup
    [Matter repo](https://github.com/project-chip/connectedhomeip.git) as per the
