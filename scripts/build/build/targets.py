@@ -223,7 +223,7 @@ def BuildEfr32Target():
     target.AppendModifier('additional_data_advertising', enable_additional_data_advertising=True)
     target.AppendModifier('use_ot_lib', enable_ot_lib=True).ExceptIfRe('-(wifi|use_ot_coap_lib)')
     target.AppendModifier('use_ot_coap_lib', enable_ot_coap_lib=True).ExceptIfRe('-(wifi|use_ot_lib)')
-    target.AppendModifier('skip-versioning', skip_version=True)
+    target.AppendModifier('no-version', no_version=True)
 
     return target
 

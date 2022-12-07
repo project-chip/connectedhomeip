@@ -134,7 +134,7 @@ class Efr32Builder(GnBuilder):
                  enable_additional_data_advertising: bool = False,
                  enable_ot_lib: bool = False,
                  enable_ot_coap_lib: bool = False,
-                 skip_version: bool = False
+                 no_version: bool = False
                  ):
         super(Efr32Builder, self).__init__(
             root=app.BuildRoot(root),
@@ -202,7 +202,7 @@ class Efr32Builder(GnBuilder):
             self.extra_gn_options.append(
                 'use_silabs_thread_lib=true chip_openthread_target="../silabs:ot-efr32-cert" use_thread_coap_lib=true openthread_external_platform=""')
 
-        if skip_version == False:
+        if not no_version:
             shortCommitSha = subprocess.check_output(['git', 'describe', '--always', '--dirty']).decode('ascii').strip()
             branchName = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode('ascii').strip()
             self.extra_gn_options.append(

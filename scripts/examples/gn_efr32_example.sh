@@ -33,7 +33,7 @@ source "$CHIP_ROOT/scripts/activate.sh"
 set -x
 env
 USE_WIFI=false
-USE_SILABS_VERSIONING=true
+USE_GIT_SHA_FOR_VERSION=true
 
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
 USAGE="./scripts/examples/gn_efr32_example.sh <AppRootFolder> <outputFolder> <silabs_board_name> [<Build options>]"
@@ -85,7 +85,7 @@ if [ "$#" == "0" ]; then
         sl_matter_version_str
             Set a Matter sotfware version string for the Silabs examples
             Used and formatted by default in this script.
-            To skip that formatting or use your own version string use --skip_versioning
+            To skip that formatting or use your own version string use --no-version
         use_rs911x
             Build wifi example with extension board rs911x. (Default false)
         use_wf200
@@ -109,7 +109,7 @@ if [ "$#" == "0" ]; then
             enable Addition data advertissing and rotating device ID
         --use_ot_lib
             use the silabs openthread library
-        --skip_versioning
+        --no-version
             Skip the silabs formating for the Matter software version string
             Currently : v1.0-<branchName>-<ShortCommitSha>
     "
@@ -136,9 +136,9 @@ else
                     exit 1
                 fi
                 if [ "$2" = "rs911x" ]; then
-                    optArgs+="use_rs911x=true"
+                    optArgs+="use_rs911x=true "
                 elif [ "$2" = "wf200" ]; then
-                    optArgs+="use_wf200=true"
+                    optArgs+="use_wf200=true "
                 else
                     echo "Wifi usage: --wifi rs911x|wf200"
                     exit 1
@@ -171,8 +171,8 @@ else
                 optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" use_thread_coap_lib=true "
                 shift
                 ;;
-            --skip_versioning)
-                USE_SILABS_VERSIONING=false
+            --no-version)
+                USE_GIT_SHA_FOR_VERSION=false
                 shift
                 ;;
             *)
@@ -191,7 +191,7 @@ else
         exit 1
     fi
 
-    if [ "$USE_SILABS_VERSIONING" == true ]; then
+    if [ "$USE_GIT_SHA_FOR_VERSION" == true ]; then
         {
             ShortCommitSha=$(git describe --always --dirty)
             branchName=$(git rev-parse --abbrev-ref HEAD)
