@@ -115,6 +115,27 @@ enables other useful developer tools
 To enable developer mode, please follow the instructions
 [here](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device)
 
+### Using chiptool on macOS, or CHIP Tool on iOS
+
+Pairing Matter Accessory using Open Source Matter Darwin chiptool and iOS
+chiptool will require installing the
+[Bluetooth Central Matter Client Developer mode profile](https://developer.apple.com/services-account/download?path=/iOS/iOS_Logs/EnableBluetoothCentralMatterClientDeveloperMode.mobileconfig)
+on MacOS or iOS/iPadOS.
+
+-   Download the Bluetooth Central Matter Client Developer Mode profile and
+    install it on a iOS/iPadOS 16.1 beta 3 and MacOS 13.1 beta 3 or later
+    system.
+
+    -   For _macOS_, Profile can be installed via Settings->Privacy &
+        Security->Profiles
+    -   For _iOS/iPadOS_, If necessary, email the profile or use AirDrop to
+        transfer the profile to the _iOS/iPadOS 16 beta 3_ device.
+
+-   Restart your system
+    -   For _iOS/iPadOS_, enable Developer Mode. Refer to
+        https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device4.
+-   Compile chiptool for macOS or CHIP Tool for iOS
+
 ### Ensuring Your Matter Accessory Works with iOS/iPadOS/tvOS
 
 1. Clone the [Matter repo](https://github.com/project-chip/connectedhomeip.git)
@@ -245,6 +266,9 @@ Example:
 -   Please refer to the iOS/iPadOS 16.1
     [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-16_1-release-notes)
     for currently known issues.
+-   Please refer to the iOS/iPadOS 16.2 beta 3
+    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16-release-notes)
+    for currently known issues
 -   Further issues should be reported
     [here](https://github.com/project-chip/connectedhomeip/issues)
 
