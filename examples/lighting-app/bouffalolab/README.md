@@ -62,7 +62,7 @@ Mac OS.
     sudo bash scripts/setup.sh
     ```
 
-    Please execute following command export `BOUFFALOLAB_SDK_ROOT` before
+    Please execute following command to export `BOUFFALOLAB_SDK_ROOT` before
     building.
 
     ```
