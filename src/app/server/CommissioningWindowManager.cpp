@@ -98,6 +98,10 @@ void CommissioningWindowManager::ResetState()
     mECMIterations    = 0;
     mECMSaltLength    = 0;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(false);
+#endif
+
     UpdateWindowStatus(CommissioningWindowStatus::kWindowNotOpen);
 
     UpdateOpenerFabricIndex(NullNullable);
@@ -223,10 +227,7 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
     mPairingSession.Clear();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    if (!mIsBLE && !mListeningForPASE)
-    {
-        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(true);
-    }
+    DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(true);
 #endif
 
     ReturnErrorOnFailure(mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
@@ -454,13 +455,6 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
 CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
 {
     RestoreDiscriminator();
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    if (!mIsBLE && mListeningForPASE)
-    {
-        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(false);
-    }
-#endif
 
     mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
     mListeningForPASE = false;
