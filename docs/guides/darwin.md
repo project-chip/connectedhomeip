@@ -24,6 +24,8 @@ Matter is supported by iOS/tvOS/iPadOS/watchOS/HomePod/AppleTV starting with
 -   To test your Matter device with Apple's platforms, all you need is a device
     with a supported OS
 -   Pairing via QR Code or Setup Code is supported directly from the Home App
+-   The remainder of this guide is for Matter Application development, you can
+    ignore it!
 
 ## Supported Platforms for Application Development
 
@@ -44,7 +46,7 @@ For Context: This is a mapping of platform to OS
     -   Additional documentation about the Matter Support API is
         [here](https://developer.apple.com/documentation/mattersupport)
 
-### Setup Requirements
+### Setup Requirements for Application Development
 
 -   Devices must support BLE pairing, and have it enabled
 -   An iPhone or iPad running iOS/iPadOS at least 16.1.
