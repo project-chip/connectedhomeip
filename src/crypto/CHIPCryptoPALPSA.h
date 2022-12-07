@@ -48,6 +48,10 @@ namespace Crypto {
 #define CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE 0x30000
 #endif // CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
 
+static_assert(CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE >= PSA_KEY_ID_USER_MIN &&
+                  CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE <= PSA_KEY_ID_USER_MAX,
+              "PSA key ID base out of allowed range");
+
 enum class KeyIdBase : psa_key_id_t
 {
     Operational = CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE

@@ -66,7 +66,7 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Generate()
     psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
     psa_set_key_bits(&attributes, kP256_PrivateKey_Length * 8);
     psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
-    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_EXPORT | PSA_KEY_USAGE_SIGN_MESSAGE);
+    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_MESSAGE);
     psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_PERSISTENT);
     psa_set_key_id(&attributes, GetKeyId());
 

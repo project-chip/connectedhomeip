@@ -39,11 +39,15 @@ public:
     void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair) override;
 
 private:
-    class PersistentP256Keypair : public P256Keypair
+    class PersistentP256Keypair : private P256Keypair
     {
     public:
         explicit PersistentP256Keypair(FabricIndex fabricIndex);
-        ~PersistentP256Keypair();
+        ~PersistentP256Keypair() override;
+
+        using P256Keypair::ECDSA_sign_msg;
+        using P256Keypair::NewCertificateSigningRequest;
+        using P256Keypair::Pubkey;
 
         psa_key_id_t GetKeyId() const;
         bool Exists() const;
