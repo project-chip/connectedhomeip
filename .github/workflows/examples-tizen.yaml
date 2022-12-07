@@ -61,7 +61,7 @@ jobs:
                         --enable-flashbundle \
                         --target tizen-arm-all-clusters \
                         --target tizen-arm-all-clusters-minimal-no-wifi \
-                        --target chip-tool \
+                        --target chip-tool-ubsan \
                         --target light \
                         --target light-no-ble-no-wifi \
                         build \
