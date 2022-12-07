@@ -52,7 +52,6 @@ executable("chip-all-clusters-app") {
 
   include_dirs = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
-    "${chip_root}/zzz_generated/all-clusters-app",
     "include",
   ]
 
