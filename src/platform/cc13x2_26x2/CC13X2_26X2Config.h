@@ -40,19 +40,19 @@ public:
     // TODO: Define a proper system ID in upstream driver
     static constexpr uint16_t kNvinf_sysid_chip = (13);
 
-    static constexpr uint16_t kNVinf_itemid_chipConfig     = (1);
-    static constexpr uint16_t kNVinf_itemid_chipFactory    = (2);
-    static constexpr uint16_t kNVinf_itemid_chipCounters   = (3);
-    static constexpr uint16_t kNVinf_itemid_chipKVS_key    = (4);
-    static constexpr uint16_t kNVinf_itemid_chipKVS_value  = (5);
+    static constexpr uint16_t kNVinf_itemid_chipConfig    = (1);
+    static constexpr uint16_t kNVinf_itemid_chipFactory   = (2);
+    static constexpr uint16_t kNVinf_itemid_chipCounters  = (3);
+    static constexpr uint16_t kNVinf_itemid_chipKVS_key   = (4);
+    static constexpr uint16_t kNVinf_itemid_chipKVS_value = (5);
 
-    static const uint16_t kCC13X2_26X2Matter_SysID   = kNvinf_sysid_chip;
+    static const uint16_t kCC13X2_26X2Matter_SysID = kNvinf_sysid_chip;
 
-    static const uint16_t kCC13X2_26X2Matter_ItemID_ChipConfig      = kNVinf_itemid_chipConfig;
-    static const uint16_t kCC13X2_26X2Matter_ItemID_ChipFactory     = kNVinf_itemid_chipFactory;
-    static const uint16_t kCC13X2_26X2Matter_ItemID_ChipCounters    = kNVinf_itemid_chipCounters;
-    static const uint16_t kCC13X2_26X2Matter_ItemID_ChipKVS_key     = kNVinf_itemid_chipKVS_key;
-    static const uint16_t kCC13X2_26X2Matter_ItemID_ChipKVS_value   = kNVinf_itemid_chipKVS_value;
+    static const uint16_t kCC13X2_26X2Matter_ItemID_ChipConfig    = kNVinf_itemid_chipConfig;
+    static const uint16_t kCC13X2_26X2Matter_ItemID_ChipFactory   = kNVinf_itemid_chipFactory;
+    static const uint16_t kCC13X2_26X2Matter_ItemID_ChipCounters  = kNVinf_itemid_chipCounters;
+    static const uint16_t kCC13X2_26X2Matter_ItemID_ChipKVS_key   = kNVinf_itemid_chipKVS_key;
+    static const uint16_t kCC13X2_26X2Matter_ItemID_ChipKVS_value = kNVinf_itemid_chipKVS_value;
 
     // Key definitions for well-known keys.
     static const Key kConfigKey_SerialNum;

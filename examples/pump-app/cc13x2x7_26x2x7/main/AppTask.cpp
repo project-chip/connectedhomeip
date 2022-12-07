@@ -222,12 +222,12 @@ int AppTask::Init()
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 
-    // Initialize device attestation config
-    #ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
-        SetDeviceAttestationCredentialsProvider(CC13X2_26X2::GetCC13X2_26X2DacProvider());
-    #else
-        SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    #endif
+// Initialize device attestation config
+#ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
+    SetDeviceAttestationCredentialsProvider(CC13X2_26X2::GetCC13X2_26X2DacProvider());
+#else
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
 
     ConfigurationMgr().LogDeviceConfig();
 
