@@ -29,6 +29,8 @@ static_library("cc13x2_26x2") {
     "BlePlatformConfig.h",
     "CC13X2_26X2Config.cpp",
     "CC13X2_26X2Config.h",
+    "CC13X2_26X2DeviceAttestationCreds.cpp",
+    "CC13X2_26X2DeviceAttestationCreds.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
