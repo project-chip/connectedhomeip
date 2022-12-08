@@ -30,9 +30,16 @@ declare_args() {
   sl_ot_efr32_root = "${chip_root}/third_party/openthread/ot-efr32"
   sl_openthread_root = "${chip_root}/third_party/openthread/ot-efr32/openthread"
   use_thread_coap_lib = false
+  sl_matter_version_str = ""
 }
 
 assert(efr32_sdk_target != "", "efr32_sdk_target must be specified")
+
+config("silabs_config") {
+  if (sl_matter_version_str != "") {
+    defines = [ "SL_MATTER_VERSION_STRING=\"${sl_matter_version_str}\"" ]
+  }
+}
 
 group("efr32_sdk") {
   public_deps = [ efr32_sdk_target ]
