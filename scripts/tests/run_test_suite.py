@@ -269,6 +269,8 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
     success = True
 
+    success = True
+
     for i in range(iterations):
         logging.info("Starting iteration %d" % (i+1))
         for test in context.obj.tests:
