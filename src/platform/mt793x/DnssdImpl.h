@@ -26,7 +26,6 @@
 
 namespace chip {
 namespace Dnssd {
-
 enum class ContextType
 {
     Register,
@@ -91,6 +90,21 @@ private:
     std::vector<GenericContext *> mContexts;
 };
 
+struct RegisterContext : public GenericContext
+{
+    DnssdPublishCallback callback;
+    std::string mType;
+    std::string mInstanceName;
+
+    RegisterContext(const char * sType, const char * instanceName, DnssdPublishCallback cb, void * cbContext);
+    virtual ~RegisterContext() {}
+
+    void DispatchFailure(DNSServiceErrorType err) override;
+    void DispatchSuccess() override;
+
+    bool matches(const char * sType) { return mType.compare(sType) == 0; }
+};
+
 struct BrowseContext : public GenericContext
 {
     DnssdBrowseCallback callback;
@@ -138,6 +152,5 @@ struct ResolveContext : public GenericContext
                         const unsigned char * txtRecord);
     bool HasInterface();
 };
-
 } // namespace Dnssd
 } // namespace chip

@@ -28,12 +28,12 @@ NS_ASSUME_NONNULL_BEGIN
 class MTRDeviceAttestationDelegateBridge : public chip::Credentials::DeviceAttestationDelegate {
 public:
     MTRDeviceAttestationDelegateBridge(MTRDeviceController * deviceController,
-        id<MTRDeviceAttestationDelegate> deviceAttestationDelegate, dispatch_queue_t queue,
-        chip::Optional<uint16_t> expiryTimeoutSecs, bool shouldWaitAfterDeviceAttestation = false)
+        id<MTRDeviceAttestationDelegate> deviceAttestationDelegate, chip::Optional<uint16_t> expiryTimeoutSecs,
+        bool shouldWaitAfterDeviceAttestation = false)
         : mResult(chip::Credentials::AttestationVerificationResult::kSuccess)
         , mDeviceController(deviceController)
         , mDeviceAttestationDelegate(deviceAttestationDelegate)
-        , mQueue(queue)
+        , mQueue(dispatch_queue_create("com.csa.matter.framework.device_attestation.workqueue", DISPATCH_QUEUE_SERIAL))
         , mExpiryTimeoutSecs(expiryTimeoutSecs)
         , mShouldWaitAfterDeviceAttestation(shouldWaitAfterDeviceAttestation)
     {

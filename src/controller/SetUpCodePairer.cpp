@@ -224,7 +224,7 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
         // connection attempt fails and calls right back into us to try the next
         // thing.
         SetUpCodePairerParameters params(mDiscoveredParameters.front());
-        mDiscoveredParameters.pop();
+        mDiscoveredParameters.pop_front();
 
         params.SetSetupPINCode(mSetUpPINCode);
 
@@ -272,7 +272,7 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj)
 
     mWaitingForDiscovery[kBLETransport] = false;
 
-    mDiscoveredParameters.emplace(connObj);
+    mDiscoveredParameters.emplace_front(connObj);
     ConnectToDiscoveredDevice();
 }
 
@@ -341,7 +341,12 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
 
     ChipLogProgress(Controller, "Discovered device to be commissioned over DNS-SD");
 
-    mDiscoveredParameters.emplace(nodeData.resolutionData);
+    auto & resolutionData = nodeData.resolutionData;
+    for (size_t i = 0; i < resolutionData.numIPs; i++)
+    {
+        mDiscoveredParameters.emplace_back(nodeData.resolutionData, i);
+    }
+
     ConnectToDiscoveredDevice();
 }
 
@@ -394,7 +399,7 @@ void SetUpCodePairer::ResetDiscoveryState()
 
     while (!mDiscoveredParameters.empty())
     {
-        mDiscoveredParameters.pop();
+        mDiscoveredParameters.pop_front();
     }
 
     mCurrentPASEParameters.ClearValue();
@@ -542,12 +547,12 @@ void SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(System::Layer * layer, v
     }
 }
 
-SetUpCodePairerParameters::SetUpCodePairerParameters(const Dnssd::CommonResolutionData & data)
+SetUpCodePairerParameters::SetUpCodePairerParameters(const Dnssd::CommonResolutionData & data, size_t index)
 {
     mInterfaceId = data.interfaceId;
     Platform::CopyString(mHostName, data.hostName);
 
-    auto & ip = data.ipAddress[0];
+    auto & ip = data.ipAddress[index];
     SetPeerAddress(Transport::PeerAddress::UDP(ip, data.port, ip.IsIPv6LinkLocal() ? data.interfaceId : Inet::InterfaceId::Null()));
 
     if (data.mrpRetryIntervalIdle.HasValue())

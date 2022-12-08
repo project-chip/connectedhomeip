@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Unit / Interation Tests
+name: Unit / Integration Tests
 
 on:
     push:
@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
     unit_tests:
-        name: Unit / Interation Tests
+        name: Unit / Integration Tests
         timeout-minutes: 60
         if: github.actor != 'restyled-io[bot]'
 

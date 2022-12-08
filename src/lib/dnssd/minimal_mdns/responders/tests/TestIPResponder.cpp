@@ -42,7 +42,7 @@ public:
     {
 
         NL_TEST_ASSERT(mSuite, (record.GetType() == QType::A) || (record.GetType() == QType::AAAA));
-        NL_TEST_ASSERT(mSuite, record.GetClass() == QClass::IN);
+        NL_TEST_ASSERT(mSuite, record.GetClass() == QClass::IN_FLUSH);
         NL_TEST_ASSERT(mSuite, record.GetName() == kNames);
     }
 

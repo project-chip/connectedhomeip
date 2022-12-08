@@ -324,8 +324,9 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
         // Initialize device attestation verifier
         const Credentials::AttestationTrustStore * trustStore;
-        if (startupParams.paaCerts) {
-            _attestationTrustStoreBridge = new MTRAttestationTrustStoreBridge(startupParams.paaCerts);
+        if (startupParams.productAttestationAuthorityCertificates) {
+            _attestationTrustStoreBridge
+                = new MTRAttestationTrustStoreBridge(startupParams.productAttestationAuthorityCertificates);
             if (_attestationTrustStoreBridge == nullptr) {
                 MTR_LOG_ERROR("Error: %@", kErrorAttestationTrustStoreInit);
                 errorCode = CHIP_ERROR_NO_MEMORY;
@@ -343,7 +344,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
             return;
         }
 
-        if (startupParams.cdCerts) {
+        if (startupParams.certificationDeclarationCertificates) {
             auto cdTrustStore = _deviceAttestationVerifier->GetCertificationDeclarationTrustStore();
             if (cdTrustStore == nullptr) {
                 MTR_LOG_ERROR("Error: %@", kErrorCDCertStoreInit);
@@ -351,7 +352,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
                 return;
             }
 
-            for (NSData * cdSigningCert in startupParams.cdCerts) {
+            for (NSData * cdSigningCert in startupParams.certificationDeclarationCertificates) {
                 errorCode = cdTrustStore->AddTrustedKey(AsByteSpan(cdSigningCert));
                 if (errorCode != CHIP_NO_ERROR) {
                     MTR_LOG_ERROR("Error: %@", kErrorCDCertStoreInit);
@@ -771,8 +772,8 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
     _storage = storage;
     _otaProviderDelegate = nil;
-    _paaCerts = nil;
-    _cdCerts = nil;
+    _productAttestationAuthorityCertificates = nil;
+    _certificationDeclarationCertificates = nil;
     _port = nil;
     _shouldStartServer = NO;
 
@@ -843,6 +844,26 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 - (void)setStartServer:(BOOL)startServer
 {
     self.shouldStartServer = startServer;
+}
+
+- (nullable NSArray<NSData *> *)paaCerts
+{
+    return self.productAttestationAuthorityCertificates;
+}
+
+- (void)setPaaCerts:(nullable NSArray<NSData *> *)paaCerts
+{
+    self.productAttestationAuthorityCertificates = paaCerts;
+}
+
+- (nullable NSArray<NSData *> *)cdCerts
+{
+    return self.certificationDeclarationCertificates;
+}
+
+- (void)setCdCerts:(nullable NSArray<NSData *> *)cdCerts
+{
+    self.certificationDeclarationCertificates = cdCerts;
 }
 
 @end

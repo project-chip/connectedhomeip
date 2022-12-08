@@ -24,8 +24,12 @@ import com.matter.controller.commands.common.*;
 import com.matter.controller.commands.discover.*;
 import com.matter.controller.commands.pairing.*;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Main {
+  private static Logger logger = Logger.getLogger(Main.class.getName());
+
   private static void registerCommandsDiscover(
       ChipDeviceController controller,
       CommandManager commandManager,
@@ -109,9 +113,9 @@ public class Main {
     try {
       commandManager.run(args);
     } catch (IllegalArgumentException e) {
-      System.out.println("Arguments init failed with exception: " + e.getMessage());
+      logger.log(Level.INFO, "Arguments init failed with exception: " + e.getMessage());
     } catch (Exception e) {
-      System.out.println("Run command failed with exception: " + e.getMessage());
+      logger.log(Level.INFO, "Run command failed with exception: " + e.getMessage());
     }
     controller.shutdownCommissioning();
   }
