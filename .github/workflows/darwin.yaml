@@ -61,7 +61,7 @@ jobs:
             - name: Install zap
               run: |
                  mkdir $ZAP_INSTALL_PATH
-                 curl -L https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-mac.zip --output $ZAP_INSTALL_PATH/zap-mac.zip \
+                 curl -L https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-mac.zip --output $ZAP_INSTALL_PATH/zap-mac.zip
                  cd $ZAP_INSTALL_PATH
                  unzip zap-mac.zip
                  rm zap-mac.zip
