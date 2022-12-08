@@ -302,7 +302,7 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
 
     add_custom_target(west_sign ALL
         COMMAND
-        west sign -t imgtool -p ${ZEPHYR_BASE}/../bootloader/mcuboot/scripts/imgtool.py -d ${PROJECT_BINARY_DIR}/.. -- --pad-header --key ${ZEPHYR_BASE}/../bootloader/mcuboot/root-rsa-2048.pem
+        west sign -t imgtool -p ${ZEPHYR_BASE}/../bootloader/mcuboot/scripts/imgtool.py -d ${PROJECT_BINARY_DIR}/.. -- --key ${ZEPHYR_BASE}/../bootloader/mcuboot/root-rsa-2048.pem
         BYPRODUCTS
         ${PROJECT_BINARY_DIR}/zephyr.signed.bin
     )
@@ -311,7 +311,7 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
         COMMAND
         dd if=${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin of=${PROJECT_BINARY_DIR}/zephyr.bin
         COMMAND
-        dd if=${PROJECT_BINARY_DIR}/zephyr.signed.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=64
+        dd if=${PROJECT_BINARY_DIR}/zephyr.signed.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=96
     )
 
     chip_ota_image(chip-ota-image
@@ -327,7 +327,7 @@ endif()
 if (CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)
     add_custom_target(merge_factory_data ALL
         COMMAND
-        dd if=${PROJECT_BINARY_DIR}/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=976
+        dd if=${PROJECT_BINARY_DIR}/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=2000
     )
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     add_dependencies(merge_factory_data merge_mcuboot)

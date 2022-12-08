@@ -140,7 +140,7 @@ function(telink_create_factory_data_hex_file factory_data_hex_target factory_dat
 set(cbor_script_args "-i ${output_path}/${factory_data_target}.json\n")
 string(APPEND cbor_script_args "-o ${output_path}/${factory_data_target}\n")
 # get partition address and offset from partition manager during compilation
-string(APPEND cbor_script_args "--offset 0xf4000\n")
+string(APPEND cbor_script_args "--offset 0x1f4000\n")
 string(APPEND cbor_script_args "--size 0x1000\n")
 string(APPEND cbor_script_args "-r\n")
 
