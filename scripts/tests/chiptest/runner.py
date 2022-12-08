@@ -39,7 +39,7 @@ class LogPipe(threading.Thread):
         """
         threading.Thread.__init__(self)
 
-        self.daemon = False
+        self.daemon = True
         self.level = level
         self.fd_read, self.fd_write = pty.openpty()
         self.reader = open(self.fd_read, encoding='utf-8', errors='ignore')

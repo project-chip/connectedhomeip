@@ -22,7 +22,7 @@ IP = '127.0.0.1'
 PORT = 9000
 
 if sys.platform == 'linux':
-    IP = '10.10.10.5'
+    IP = '10.200.1.1'
 
 
 class AppsRegister:

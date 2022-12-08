@@ -16,7 +16,7 @@
 
 import subprocess
 
-from . import linux, runner
+from . import fvp, linux, runner
 from .test_definition import ApplicationPaths, TestDefinition, TestTarget
 
 
@@ -66,6 +66,7 @@ __all__ = [
     "TestDefinition",
     "AllTests",
     "ApplicationPaths",
+    "fvp",
     "linux",
     "runner",
 ]

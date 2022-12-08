@@ -117,7 +117,10 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
         log_fmt = '%(levelname)-7s %(message)s'
-    coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
+    if os.isatty(1):
+        coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
+    else:
+        logging.basicConfig(level=__LOG_LEVELS__[log_level], format=log_fmt)
 
     if chip_tool is None:
         chip_tool = FindBinaryPath('chip-tool')
@@ -175,19 +178,19 @@ def cmd_list(context):
     help='Number of iterations to run')
 @click.option(
     '--all-clusters-app',
-    help='what all clusters app to use')
+    help='what all clusters app to use (separate arguments with comma)')
 @click.option(
     '--lock-app',
-    help='what lock app to use')
+    help='what lock app to use (separate arguments with comma)')
 @click.option(
     '--ota-provider-app',
-    help='what ota provider app to use')
+    help='what ota provider app to use (separate arguments with comma)')
 @click.option(
     '--ota-requestor-app',
-    help='what ota requestor app to use')
+    help='what ota requestor app to use (separate arguments with comma)')
 @click.option(
     '--tv-app',
-    help='what tv app to use')
+    help='what tv app to use (separate arguments with comma)')
 @click.option(
     '--bridge-app',
     help='what bridge app to use')
@@ -201,8 +204,19 @@ def cmd_list(context):
     default=None,
     type=int,
     help='If provided, fail if a test runs for longer than this time')
+@click.option(
+    '--network',
+    default='linux',
+    type=click.Choice(['linux','fvp']),
+    help='Select the network rules to set up'
+)
+@click.option(
+    '--ignore-failure',
+    is_flag=True,
+    help='Continue running tests after a test fails'
+)
 @click.pass_context
-def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, bridge_app, pics_file, test_timeout_seconds):
+def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, bridge_app, pics_file, test_timeout_seconds, network, ignore_failure):
     runner = chiptest.runner.Runner()
 
     if all_clusters_app is None:
@@ -226,23 +240,34 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(
         chip_tool=[context.obj.chip_tool],
-        all_clusters_app=[all_clusters_app],
-        lock_app=[lock_app],
-        ota_provider_app=[ota_provider_app],
-        ota_requestor_app=[ota_requestor_app],
-        tv_app=[tv_app],
-        bridge_app=[bridge_app]
+        all_clusters_app=all_clusters_app.split(','),
+        lock_app=lock_app.split(','),
+        ota_provider_app=ota_provider_app.split(','),
+        ota_requestor_app=ota_requestor_app.split(','),
+        tv_app=tv_app.split(','),
+        bridge_app=bridge_app.split(','),
     )
 
     if sys.platform == 'linux':
-        chiptest.linux.PrepareNamespacesForTestExecution(
+        module = None
+        if network == 'linux':
+            module = chiptest.linux
+        elif network == 'fvp':
+            module = chiptest.fvp
+        else:
+            raise ValueError('invalid argument to --network')
+        assert module is not None
+
+        module.PrepareNamespacesForTestExecution(
             context.obj.in_unshare)
-        paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
+        paths = module.PathsWithNetworkNamespaces(paths)
 
     logging.info("Each test will be executed %d times" % iterations)
 
     apps_register = AppsRegister()
     apps_register.init()
+
+    success = True
 
     for i in range(iterations):
         logging.info("Starting iteration %d" % (i+1))
@@ -260,10 +285,14 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 test_end = time.monotonic()
                 logging.exception('%s - FAILED in %0.2f seconds' %
                                   (test.name, (test_end - test_start)))
-                apps_register.uninit()
-                sys.exit(2)
+                success = False
+                if not ignore_failure:
+                    break
 
     apps_register.uninit()
+
+    if not success:
+        sys.exit(2)
 
 
 # On linux, allow an execution shell to be prepared
