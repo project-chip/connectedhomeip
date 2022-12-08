@@ -280,7 +280,8 @@ def main():
         old_temp = os.environ['TEMP'] if 'TEMP' in os.environ else None
         os.environ['TEMP'] = temp_dir
 
-        runGeneration(cmdLineArgs.zapFile, cmdLineArgs.zclFile, cmdLineArgs.templateFile, cmdLineArgs.outputDir, cmdLineArgs.parallel)
+        runGeneration(cmdLineArgs.zapFile, cmdLineArgs.zclFile, cmdLineArgs.templateFile,
+                      cmdLineArgs.outputDir, cmdLineArgs.parallel)
 
         if old_temp:
             os.environ['TEMP'] = old_temp
