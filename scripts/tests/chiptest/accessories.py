@@ -76,6 +76,10 @@ class AppsRegister:
             return accessory.stop()
         return False
 
+    def stopAll(self):
+        for accessory in self.__accessories.values():
+            accessory.stop()
+
     def reboot(self, name):
         accessory = self.__accessories[name]
         if accessory:

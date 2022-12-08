@@ -63,7 +63,7 @@ if ! kill -s 0 $fvp_pid 2>/dev/null; then
     echo "$NAME: $fvp: Failed to launch" >&2
     exit 1
 fi
-trap "kill -9 $fvp_pid 2>/dev/null" EXIT
+trap "echo \"$NAME: Shutting down FVP\" >&2 && kill -9 $fvp_pid 2>/dev/null" EXIT
 
 # Wait for FVP to echo its telnet port
 echo "$NAME: Waiting for telnet port" >&2

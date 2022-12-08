@@ -15,14 +15,14 @@
 
 import logging
 import os
-import sys
+import subprocess
 import threading
 import time
 import typing
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum, auto
-from random import randrange
+from typing import Optional
 
 TEST_NODE_ID = '0x12344321'
 QR_TIMEOUT_SECONDS = 60
@@ -31,7 +31,7 @@ QR_TIMEOUT_SECONDS = 60
 class App:
 
     def __init__(self, runner, command):
-        self.process = None
+        self.process:Optional[subprocess.Popen] = None
         self.outpipe = None
         self.runner = runner
         self.command = command
@@ -43,7 +43,7 @@ class App:
         self.killed = False
 
     def start(self, options=None):
-        if not self.process or not self.process.is_alive():
+        if not self.process:
             # Cache command line options to be used for reboots
             if options:
                 self.options = options
@@ -65,8 +65,12 @@ class App:
             with self.cv_stopped:
                 self.stopped = True
                 self.cv_stopped.notify()
-            self.process.kill()
-            self.process.wait(10)
+            self.process.terminate()
+            try:
+                self.process.wait(10)
+            except subprocess.TimeoutExpired:
+                self.process.kill()
+                self.process.wait()
             self.process = None
             return True
         return False
@@ -298,6 +302,7 @@ class TestDefinition:
             runner.capture_delegate.LogContents()
             raise
         finally:
+            apps_register.stopAll()
             apps_register.killAll()
             apps_register.factoryResetAll()
             apps_register.removeAll()
