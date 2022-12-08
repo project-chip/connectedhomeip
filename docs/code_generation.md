@@ -258,9 +258,9 @@ detect changes in code gen using golden image tests.
 
 #### `codegen.py` tests
 
-These tests run against golde inputs/outputs from `scripts/idl/tests`.
+These tests run against golden inputs/outputs from `scripts/idl/tests`.
 
-`available_tests.yaml` conains the full list of expected generators and outputs
+`available_tests.yaml` contains the full list of expected generators and outputs
 and the test is run via `test_generators.py`. Use the environment variable
 `IDL_GOLDEN_REGENERATE` to force golden image replacement during running of
 `ninja check`:
@@ -271,9 +271,9 @@ IDL_GOLDEN_REGENERATE=1 ninja check
 
 #### `generate.py` tests
 
-These tests run against golde inputs/outputs from `scripts/tools/zap/tests`.
+These tests run against golden inputs/outputs from `scripts/tools/zap/tests`.
 
-`available_tests.yaml` conains the full list of expected generators and outputs
+`available_tests.yaml` contains the full list of expected generators and outputs
 and the test is run via `scripts/tools/zap/test_generate.py`. Use the
 environment variable `ZAP_GENERATE_GOLDEN_REGENERATE` to force golden image
 replacement during running of `ninja check`.
