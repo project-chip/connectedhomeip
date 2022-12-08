@@ -22,7 +22,7 @@ function cleanup {
     fi
 }
 
-trap cleanup EXIT
+trap cleanup EXIT KILL
 
 function show_usage {
     cat <<EOF
@@ -85,26 +85,31 @@ echo "$NAME: Launching FVP" >&2
 
 # Inject executable args.
 if [[ ${#exe_args[@]} -gt 0 ]]; then
-    # Get the virtual address of the command-line.
+    # Get the virtual address of the command-line from the exe or NS version.
     nsfile=${exe%.elf}_ns.elf
+    [[ -f "$nsfile" ]] || nsfile=$exe
     vaddr=$($OBJDUMP -t "$nsfile" | grep $CMDLINE_SYMBOL | awk '{print $1}')
 
-    # Write arguments to a temporary file, separated by NUL and ending with two NULs.
-    tmpargs=$(mktemp)
-    tmp_files+=($tmpargs)
+    if [[ -z "$vaddr" ]]; then
+        echo "$NAME: Command-line args were provided but $CMDLINE_SYMBOL does not exist in binary" >&2
+    else
+        # Write arguments to a temporary file, separated by NUL and ending with two NULs.
+        tmpargs=$(mktemp)
+        tmp_files+=($tmpargs)
 
-    python3 <<EOF
+        python3 <<EOF
 with open('$tmpargs', 'wb') as fp:
     fp.write(b'$CMDLINE_MAGIC\0')
     fp.write(b'\0'.join(b'${exe_args[@]}'.split(b' ')))
     fp.write(b'\0\0')
 EOF
 
-    # Add a data file loaded at the symbol's virtual address to the FVP args.
-    fvp_args+=("--data")
-    fvp_args+=("$tmpargs@0x$vaddr")
+        # Add a data file loaded at the symbol's virtual address to the FVP args.
+        fvp_args+=("--data")
+        fvp_args+=("$tmpargs@0x$vaddr")
 
-    echo "$NAME: Wrote ${#exe_args[@]} argument(s) ($(wc -c <$tmpargs) byte(s)) at 0x$vaddr" >&2
+        echo "$NAME: Wrote ${#exe_args[@]} argument(s) ($(wc -c <$tmpargs) byte(s)) at 0x$vaddr" >&2
+    fi
 fi
 
 $fvp "${fvp_args[@]}" -a "$exe" >"$tmpout" 2>&1 &
