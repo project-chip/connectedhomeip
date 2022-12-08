@@ -42,6 +42,12 @@ FVP_NETWORK="user"
 
 readarray -t TEST_NAMES <"$CHIP_ROOT"/src/test_driver/openiotsdk/unit-tests/testnames.txt
 
+declare -a APP_NAMES
+APP_NAMES+=("shell")
+APP_NAMES+=("unit-tests")
+APP_NAMES+=("lock-app")
+APP_NAMES+=("all-clusters-app")
+
 function show_usage() {
     cat <<EOF
 Usage: $0 [options] example [test_name]
@@ -58,16 +64,20 @@ Options:
     -n,--network    <network_name>  FVP network interface name <network_name - default is "user" which means user network mode>
 
 Examples:
-    shell
-    lock-app
-    unit-tests
+EOF
+
+    for app in "${APP_NAMES[@]}"; do
+        echo "    $app"
+    done
+
+    cat <<EOF
 
 You can run individual test suites of unit tests by using their names [test_name] with the run command:
 
 EOF
-    cat "$CHIP_ROOT"/src/test_driver/openiotsdk/unit-tests/testnames.txt
-    echo ""
+    cat $CHIP_ROOT/src/test_driver/openiotsdk/unit-tests/testnames.txt
     cat <<EOF
+
 Or you can use all tests suites with <all> parameter as [test_name]
 
 The "test" command can be used for all supported examples expect the unit-tests.
@@ -287,16 +297,18 @@ if [[ $# -lt 1 ]]; then
     exit 1
 fi
 
-case "$1" in
-    shell | unit-tests | lock-app)
+for app in "${APP_NAMES[@]}"; do
+    if [[ "$1" = "$app" ]]; then
         EXAMPLE=$1
-        ;;
-    *)
-        echo "Wrong example name"
-        show_usage
-        exit 2
-        ;;
-esac
+        break
+    fi
+done
+
+if [[ -z "$EXAMPLE" ]]; then
+    echo "Wrong example name"
+    show_usage
+    exit 2
+fi
 
 if [[ "$EXAMPLE" == "unit-tests" ]]; then
     if [ ! -z "$2" ]; then
