@@ -155,6 +155,7 @@ template("_chip_build_time_zapgen") {
     _idl_file = invoker.input
 
     args = [
+      "--no-prettify-output",
       "--templates",
       _template_path,
       "--output-dir",

@@ -34,6 +34,7 @@ class CmdLineArgs:
     outputDir: str
     runBootstrap: bool
     parallel: bool = True
+    prettify_output: bool = True
 
 
 CHIP_ROOT_DIR = os.path.realpath(
@@ -107,7 +108,10 @@ def runArgumentsParser() -> CmdLineArgs:
                         help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
     parser.add_argument('--parallel', action='store_true')
     parser.add_argument('--no-parallel', action='store_false', dest='parallel')
+    parser.add_argument('--prettify-output', action='store_true')
+    parser.add_argument('--no-prettify-output', action='store_false', dest='prettify_output')
     parser.set_defaults(parallel=True)
+    parser.set_defaults(prettify_output=True)
     args = parser.parse_args()
 
     # By default, this script assumes that the global CHIP template is used with
@@ -282,13 +286,14 @@ def main():
         else:
             del os.environ['TEMP']
 
-    prettifiers = [
-        runClangPrettifier,
-        runJavaPrettifier,
-    ]
+    if cmdLineArgs.prettify_output:
+        prettifiers = [
+            runClangPrettifier,
+            runJavaPrettifier,
+        ]
 
-    for prettifier in prettifiers:
-        prettifier(cmdLineArgs.templateFile, cmdLineArgs.outputDir)
+        for prettifier in prettifiers:
+            prettifier(cmdLineArgs.templateFile, cmdLineArgs.outputDir)
 
 
 if __name__ == '__main__':

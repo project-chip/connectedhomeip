@@ -188,6 +188,7 @@ function(chip_zapgen TARGET_NAME)
             OUTPUT ${OUT_NAMES}
             COMMAND "${CHIP_ROOT}/scripts/tools/zap/generate.py"
             ARGS
+                "--no-prettify-output"
                 "--templates" "${TEMPLATE_PATH}"
                 "--output-dir" "${GEN_FOLDER}/${OUTPUT_SUBDIR}"
                 "--parallel"
