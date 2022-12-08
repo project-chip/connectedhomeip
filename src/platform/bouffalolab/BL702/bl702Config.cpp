@@ -35,12 +35,7 @@ namespace Internal {
 // // Prefix used for Easyflash keys that contain Chip group encryption keys.
 CHIP_ERROR BL702Config::Init()
 {
-    // EfErrCode err = easyflash_init();
-
-    // if (EF_NO_ERR == err)
     return CHIP_NO_ERROR;
-
-    // return CHIP_ERROR_NO_MEMORY;
 }
 
 CHIP_ERROR BL702Config::ReadConfigValue(const char * key, uint8_t * val, size_t size, size_t & readsize)
@@ -207,23 +202,10 @@ CHIP_ERROR BL702Config::ReadKVS(const char * key, void * value, size_t value_siz
 
     ef_port_env_lock();
 
-    char * p = (char *) malloc((sizeof(KCONFIG_SECT_KVS) + strlen(key) + sizeof(size_t)));
-    if (!p)
+    if (true == ef_get_env_obj(key, &node))
     {
-        ef_port_env_unlock();
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    memcpy(p, KCONFIG_SECT_KVS, sizeof(KCONFIG_SECT_KVS) - 1);
-    p[sizeof(KCONFIG_SECT_KVS) - 1] = '_';
-    strcpy(p + sizeof(KCONFIG_SECT_KVS), key);
-
-    if (true == ef_get_env_obj(p, &node))
-    {
-
         if (offset_bytes > node.value_len)
         {
-            free(p);
             ef_port_env_unlock();
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
@@ -256,13 +238,11 @@ CHIP_ERROR BL702Config::ReadKVS(const char * key, void * value, size_t value_siz
             }
         }
 
-        free(p);
         ef_port_env_unlock();
 
         return CHIP_NO_ERROR;
     }
 
-    free(p);
     ef_port_env_unlock();
 
     return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -274,23 +254,11 @@ CHIP_ERROR BL702Config::WriteKVS(const char * key, const void * value, size_t va
 
     ef_port_env_lock();
 
-    char * p = (char *) malloc((sizeof(KCONFIG_SECT_KVS) + strlen(key) + sizeof(size_t)));
-    if (!p)
-    {
-        ef_port_env_unlock();
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    memcpy(p, KCONFIG_SECT_KVS, sizeof(KCONFIG_SECT_KVS) - 1);
-    p[sizeof(KCONFIG_SECT_KVS) - 1] = '_';
-    strcpy(p + sizeof(KCONFIG_SECT_KVS), key);
-
     if (value && value_size)
     {
-        ret = ef_set_env_blob(p, value, value_size);
+        ret = ef_set_env_blob(key, value, value_size);
     }
 
-    free(p);
     ef_port_env_unlock();
 
     if (ret == EF_NO_ERR)
@@ -307,20 +275,8 @@ CHIP_ERROR BL702Config::ClearKVS(const char * key)
 {
     ef_port_env_lock();
 
-    char * p = (char *) malloc((sizeof(KCONFIG_SECT_KVS) + strlen(key) + sizeof(size_t)));
-    if (!p)
-    {
-        ef_port_env_unlock();
-        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    }
+    ef_del_env(key);
 
-    memcpy(p, KCONFIG_SECT_KVS, sizeof(KCONFIG_SECT_KVS) - 1);
-    p[sizeof(KCONFIG_SECT_KVS) - 1] = '_';
-    strcpy(p + sizeof(KCONFIG_SECT_KVS), key);
-
-    ef_del_env(p);
-
-    free(p);
     ef_port_env_unlock();
 
     return CHIP_NO_ERROR;
