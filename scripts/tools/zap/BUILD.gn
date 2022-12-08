@@ -15,18 +15,23 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-
 action("tests") {
-    script="test_generate.py"
+  script = "test_generate.py"
 
-    _stamp = "${target_gen_dir}/generate.test.passed"
+  _stamp = "${target_gen_dir}/generate.test.passed"
 
-    # FIXME: inputs and outputs
+  inputs = [
+    "tests/available_tests.yaml",
+    "tests/inputs/all-clusters-app.zap",
+    "tests/inputs/lighting-app.zap",
+  ]
 
-    args = [
-        "--stamp", 
-        rebase_path(_stamp),
-    ]
+  args = [
+    "--stamp",
+    rebase_path(_stamp),
+    "--output",
+    rebase_path("${target_gen_dir}"),
+  ]
 
-    outputs=[ _stamp ]
+  outputs = [ _stamp ]
 }

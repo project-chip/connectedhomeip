@@ -13,19 +13,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import glob
 import logging
 import os
 import subprocess
 import sys
 import unittest
 import yaml
+import shutil
 
 from typing import List, Optional
 from dataclasses import dataclass, field
 
 TESTS_DIR = os.path.join(os.path.dirname(__file__), "tests")
 CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
-REGENERATE_GOLDEN_IMAGES = False
+
+
+@dataclass
+class ProgramArguments:
+    stamp_file: Optional[str] = None
+    regenerate_golden: bool = False
+    output_directory: str = ''
+
+
+PROGRAM_ARGUMENTS = None
 
 
 @dataclass
@@ -48,6 +59,7 @@ class GeneratorTestCase:
 @dataclass
 class GeneratorTest:
     zap: str
+    context: ProgramArguments
     test_cases: List[GeneratorTestCase] = field(default_factory=list)
 
     def add_test_cases(self, yaml_test_case_dict):
@@ -56,26 +68,61 @@ class GeneratorTest:
             test_case.add_outputs(outputs)
             self.test_cases.append(test_case)
 
-
     def run_test_cases(self, checker: unittest.TestCase):
         for test in self.test_cases:
             with checker.subTest(template=test.template):
-                subprocess.check_call(
-                    [
+                output_directory = os.path.join(
+                    self.context.output_directory,
+                    os.path.splitext(os.path.basename(self.zap))[0],
+                    os.path.splitext(os.path.basename(test.template))[0]
+                )
+
+                # ensure a clean start as ALL outputs will be compared
+                if os.path.exists(output_directory):
+                    shutil.rmtree(output_directory)
+                os.makedirs(output_directory, exist_ok=True)
+
+                subprocess.check_call([
                     f"{CHIP_ROOT}/scripts/tools/zap/generate.py",
                     "--parallel",
                     "--output-dir",
-                    ".",
+                    output_directory,
                     "--templates",
                     os.path.join(TESTS_DIR, test.template),
                     os.path.join(TESTS_DIR, self.zap),
-                    ]
-                )
+                ], cwd=output_directory)
 
-                checker.assertEqual(0, 1)
+                # Files generated, ready to check:
+                #   - every output file MUST exist in the golden image list
+                #   - every golden image file MUST exist in the output
+                #   - content must match
+
+                # test.outputs contain:
+                #    - file_name
+                #    - golden_path
+                expected_files = set([o.file_name for o in test.outputs])
+                actual_files = set([
+                    name[len(output_directory)+1:] for name in glob.glob(f"{output_directory}/**/*", recursive=True)
+                ])
+
+                checker.assertEqual(expected_files, actual_files, msg="Expected and actual generated file list MUST be identical.")
+
+                # All files exist, ready to do the compare
+                for entry in test.outputs:
+                    expected = os.path.join(TESTS_DIR, entry.golden_path)
+                    actual = os.path.join(output_directory, entry.file_name)
+
+                    try:
+                        subprocess.check_call(["diff", actual, expected])
+                    except:
+                        if self.context.regenerate_golden:
+                            print(f"Copying updated golden image from {actual} to {expected}")
+                            subprocess.check_call(["cp", actual, expected])
+                        else:
+                            raise
 
 
-def build_tests(yaml_data) -> List[GeneratorTest]:
+def build_tests(yaml_data, context: ProgramArguments) -> List[GeneratorTest]:
     """
     Transforms the YAML dictonary (Dict[str, Dict[str, Dict[str,str]]]) into
     a generator test structure.
@@ -83,7 +130,7 @@ def build_tests(yaml_data) -> List[GeneratorTest]:
     result = []
 
     for input_zap, test_cases in yaml_data.items():
-        generator = GeneratorTest(zap=input_zap)
+        generator = GeneratorTest(zap=input_zap, context=context)
         generator.add_test_cases(test_cases)
         result.append(generator)
 
@@ -93,17 +140,12 @@ def build_tests(yaml_data) -> List[GeneratorTest]:
 class TestGenerators(unittest.TestCase):
     def test_generators(self):
         with open(os.path.join(TESTS_DIR, "available_tests.yaml"), 'rt') as stream:
-             yaml_data = yaml.safe_load(stream)
+            yaml_data = yaml.safe_load(stream)
 
-        for test in build_tests(yaml_data):
-             with self.subTest(zap=test.zap):
-                 test.run_test_cases(self)
-
-
-@dataclass
-class ProgramArguments:
-    stamp_file: Optional[str] = None
-    regenerate_golden: bool = False
+        global PROGRAM_ARGUMENTS
+        for test in build_tests(yaml_data, context=PROGRAM_ARGUMENTS):
+            with self.subTest(zap=test.zap):
+                test.run_test_cases(self)
 
 
 def process_arguments():
@@ -123,18 +165,25 @@ def process_arguments():
         del args[idx+1]
         del args[idx]
 
+    if '--output' in args:
+        idx = args.index('--output')
+        program_args.output_directory = args[idx + 1]
+        del args[idx+1]
+        del args[idx]
+    else:
+        raise Exception("`--output` argument is required")
+
     return program_args, args
 
 
 if __name__ == '__main__':
     process_args, unittest_args = process_arguments()
 
-    if process_args.regenerate_golden:
-        REGENERATE_GOLDEN_IMAGES = True
-
     if process_args.stamp_file:
         if os.path.exists(process_args.stamp_file):
             os.remove(process_args.stamp_file)
+
+    PROGRAM_ARGUMENTS = process_args
 
     unittest.main(argv=unittest_args)
 
