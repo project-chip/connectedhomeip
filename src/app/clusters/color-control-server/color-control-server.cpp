@@ -2207,7 +2207,7 @@ bool ColorControlServer::moveColorTempCommand(const app::ConcreteCommandPath & c
 
     if (rate == 0)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
         return true;
     }
 

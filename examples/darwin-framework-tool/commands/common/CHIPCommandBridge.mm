@@ -124,7 +124,7 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
     NSArray<NSData *> * paaCertResults;
     ReturnLogErrorOnFailure(GetPAACertsFromFolder(&paaCertResults));
     if ([paaCertResults count] > 0) {
-        params.paaCerts = paaCertResults;
+        params.productAttestationAuthorityCertificates = paaCertResults;
     }
 
     NSError * error;

@@ -268,12 +268,12 @@ EmberAfStatus emberAfPluginIasZoneClusterSetEnrollmentMethod(EndpointId endpoint
     if (emberAfIasZoneClusterAmIEnrolled(endpoint))
     {
         emberAfIasZoneClusterPrintln("Error: Already enrolled");
-        status = EMBER_ZCL_STATUS_NOT_AUTHORIZED;
+        status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS;
     }
     else if (!isValidEnrollmentMode(method))
     {
         emberAfIasZoneClusterPrintln("Invalid IAS Zone Server Enrollment Mode: %d", method);
-        status = EMBER_ZCL_STATUS_INVALID_VALUE;
+        status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
     else
     {

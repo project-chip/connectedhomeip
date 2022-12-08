@@ -97,15 +97,15 @@ class TestXmlParser(unittest.TestCase):
                                  structs=[
                                      Struct(name='GetSomeDataRequest',
                                             fields=[
-                                                Field(data_type=DataType(name='INT8U'), code=1, name='firstInput'),
-                                                Field(data_type=DataType(name='INT16U'), code=2, name='secondInput')
+                                                Field(data_type=DataType(name='INT8U'), code=0, name='firstInput'),
+                                                Field(data_type=DataType(name='INT16U'), code=1, name='secondInput')
                                             ],
                                             tag=StructTag.REQUEST),
                                      Struct(name='GetSomeDataResponse',
                                             fields=[
-                                                Field(data_type=DataType(name='INT8U'), code=1,
+                                                Field(data_type=DataType(name='INT8U'), code=0,
                                                       name='dataPoint1'),
-                                                Field(data_type=DataType(name='INT8U'), code=2, name='dataPoint2',
+                                                Field(data_type=DataType(name='INT8U'), code=1, name='dataPoint2',
                                                       qualities=FieldQuality.OPTIONAL)
                                             ],
                                             tag=StructTag.RESPONSE, code=0x44)
@@ -226,8 +226,8 @@ class TestXmlParser(unittest.TestCase):
             name='SomeStruct',
             qualities=StructQuality.FABRIC_SCOPED,
             fields=[
-                Field(data_type=DataType(name='int16u'), code=1, name='FirstMember'),
-                Field(data_type=DataType(name='int32u'), code=2, name='SecondMember')
+                Field(data_type=DataType(name='int16u'), code=0, name='FirstMember'),
+                Field(data_type=DataType(name='int32u'), code=1, name='SecondMember')
             ]
         )
         self.assertEqual(idl,

@@ -31,6 +31,15 @@
 
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
 
+/**
+ * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
+ *
+ * A string identifying the software version running on the device.
+ */
+#ifdef SL_MATTER_VERSION_STRING
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING SL_MATTER_VERSION_STRING
+#endif
+
 #if defined(SL_WIFI)
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 1
 #else
