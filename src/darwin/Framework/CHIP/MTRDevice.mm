@@ -137,8 +137,8 @@ private:
 
 @property (nonatomic) BOOL subscriptionActive;
 
-#define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT (1)
-#define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT (3600)
+#define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS (1)
+#define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS (3600)
 @property (nonatomic) uint32_t lastSubscriptionAttemptWait;
 @property (nonatomic) BOOL reattemptingSubscription;
 
@@ -190,22 +190,21 @@ private:
 
 - (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
 {
+    MTR_LOG_INFO("%@ setDelegate %@", self, delegate);
     os_unfair_lock_lock(&self->_lock);
 
     _weakDelegate = [MTRWeakReference weakReferenceWithObject:delegate];
     _delegateQueue = queue;
     [self _setupSubscription];
 
-    MTR_LOG_INFO("%@ setDelegate %@", self, delegate);
-
     os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)invalidate
 {
+    MTR_LOG_INFO("%@ invalidate", self);
     os_unfair_lock_lock(&self->_lock);
 
-    MTR_LOG_INFO("%@ invalidate", self);
     _weakDelegate = nil;
 
     os_unfair_lock_unlock(&self->_lock);
@@ -272,31 +271,37 @@ private:
     id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
     if (!delegate) {
         MTR_LOG_INFO("%@ no delegate - do not reattempt subscription", self);
+        os_unfair_lock_unlock(&self->_lock);
         return;
     }
 
     // don't schedule multiple retries
     if (self.reattemptingSubscription) {
         MTR_LOG_INFO("%@ already reattempting subscription", self);
+        os_unfair_lock_unlock(&self->_lock);
         return;
     }
 
     self.reattemptingSubscription = YES;
 
-    if (_lastSubscriptionAttemptWait < MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT) {
-        _lastSubscriptionAttemptWait = MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT;
+    if (_lastSubscriptionAttemptWait < MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS) {
+        _lastSubscriptionAttemptWait = MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS;
     } else {
         _lastSubscriptionAttemptWait *= 2;
+        if (_lastSubscriptionAttemptWait > MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS) {
+            _lastSubscriptionAttemptWait = MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS;
+        }
     }
 
     MTR_LOG_INFO("%@ scheduling to reattempt subscription in %u seconds", self, _lastSubscriptionAttemptWait);
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_lastSubscriptionAttemptWait * NSEC_PER_SEC)), self.queue, ^{
-        os_unfair_lock_lock(&self->_lock);
-        MTR_LOG_INFO("%@ reattempting subscription", self);
-        self.reattemptingSubscription = NO;
-        [self _setupSubscription];
-        os_unfair_lock_unlock(&self->_lock);
-    });
+    dispatch_after(
+        dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(_lastSubscriptionAttemptWait * NSEC_PER_SEC)), self.queue, ^{
+            os_unfair_lock_lock(&self->_lock);
+            MTR_LOG_INFO("%@ reattempting subscription", self);
+            self.reattemptingSubscription = NO;
+            [self _setupSubscription];
+            os_unfair_lock_unlock(&self->_lock);
+        });
 
     os_unfair_lock_unlock(&self->_lock);
 }
