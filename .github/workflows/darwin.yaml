@@ -67,6 +67,7 @@ jobs:
                  cd $ZAP_INSTALL_PATH
                  unzip zap-mac.zip zap-cli
                  rm zap-mac.zip
+                 ./zap-cli --version
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
