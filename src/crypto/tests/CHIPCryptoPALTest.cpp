@@ -73,6 +73,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#if CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
+
 using namespace chip;
 using namespace chip::Crypto;
 using namespace chip::TLV;
@@ -200,8 +204,6 @@ const AesCtrTestEntry theAesCtrTestVector[] = {
     }
 };
 
-constexpr size_t kAesCtrTestVectorSize = sizeof(theAesCtrTestVector) / sizeof(theAesCtrTestVector[0]);
-
 constexpr size_t KEY_LENGTH   = Crypto::kAES_CCM128_Key_Length;
 constexpr size_t NONCE_LENGTH = Crypto::kAES_CCM128_Nonce_Length;
 
@@ -245,14 +247,13 @@ static void TestAES_CTR_128CryptTestVectors(nlTestSuite * inSuite, void * inCont
 {
     HeapChecker heapChecker(inSuite);
     int numOfTestsRan = 0;
-    for (size_t vectorIndex = 0; vectorIndex < kAesCtrTestVectorSize; vectorIndex++)
+    for (const auto & vector : theAesCtrTestVector)
     {
-        const AesCtrTestEntry * vector = &theAesCtrTestVector[vectorIndex];
-        if (vector->plaintextLen > 0)
+        if (vector.plaintextLen > 0)
         {
             numOfTestsRan++;
-            TestAES_CTR_128_Encrypt(inSuite, vector);
-            TestAES_CTR_128_Decrypt(inSuite, vector);
+            TestAES_CTR_128_Encrypt(inSuite, &vector);
+            TestAES_CTR_128_Decrypt(inSuite, &vector);
         }
     }
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
@@ -838,7 +839,7 @@ static void TestECDSA_Signing_SHA256_Msg(nlTestSuite * inSuite, void * inContext
 
     Test_P256Keypair keypair;
 
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(reinterpret_cast<const uint8_t *>(msg), msg_length, signature);
@@ -857,7 +858,7 @@ static void TestECDSA_Signing_SHA256_Hash(nlTestSuite * inSuite, void * inContex
     size_t msg_length   = sizeof(msg);
 
     Test_P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     // TODO: Need to make this large number (1k+) to catch some signature serialization corner cases
     //       but this is too slow on QEMU/embedded, so we need to parametrize. Signing with ECDSA
@@ -893,7 +894,7 @@ static void TestECDSA_ValidationFailsDifferentMessage(nlTestSuite * inSuite, voi
     size_t msg_length = strlen(msg);
 
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(reinterpret_cast<const uint8_t *>(msg), msg_length, signature);
@@ -913,7 +914,7 @@ static void TestECDSA_ValidationFailIncorrectMsgSignature(nlTestSuite * inSuite,
     size_t msg_length = strlen(msg);
 
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(reinterpret_cast<const uint8_t *>(msg), msg_length, signature);
@@ -936,7 +937,7 @@ static void TestECDSA_ValidationFailIncorrectHashSignature(nlTestSuite * inSuite
     NL_TEST_ASSERT(inSuite, Hash_SHA256(&msg[0], msg_length, &hash[0]) == CHIP_NO_ERROR);
 
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(msg, msg_length, signature);
@@ -954,7 +955,7 @@ static void TestECDSA_SigningMsgInvalidParams(nlTestSuite * inSuite, void * inCo
     size_t msg_length   = strlen(reinterpret_cast<const char *>(msg));
 
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(nullptr, msg_length, signature);
@@ -973,7 +974,7 @@ static void TestECDSA_ValidationMsgInvalidParam(nlTestSuite * inSuite, void * in
     size_t msg_length = strlen(msg);
 
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(reinterpret_cast<const uint8_t *>(msg), msg_length, signature);
@@ -999,7 +1000,7 @@ static void TestECDSA_ValidationHashInvalidParam(nlTestSuite * inSuite, void * i
     NL_TEST_ASSERT(inSuite, Hash_SHA256(&msg[0], msg_length, &hash[0]) == CHIP_NO_ERROR);
 
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(msg, msg_length, signature);
@@ -1018,14 +1019,14 @@ static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
     Test_P256Keypair keypair1;
-    NL_TEST_ASSERT(inSuite, keypair1.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair1.Initialize(ECPKeyTarget::ECDH) == CHIP_NO_ERROR);
 
 #ifdef ENABLE_HSM_EC_KEY
     Test_P256Keypair keypair2(HSM_ECC_KEYID + 1);
 #else
     Test_P256Keypair keypair2;
 #endif
-    NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair2.Initialize(ECPKeyTarget::ECDH) == CHIP_NO_ERROR);
 
     P256ECDHDerivedSecret out_secret1;
     out_secret1[0] = 0;
@@ -1079,6 +1080,10 @@ static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
 }
 #endif
 
+#if CHIP_CRYPTO_PSA
+static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext) {}
+#endif
+
 #if CHIP_CRYPTO_BORINGSSL
 static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext) {}
 #endif
@@ -1120,7 +1125,7 @@ static void TestP256_Keygen(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     const char * msg         = "Test Message for Keygen";
     const uint8_t * test_msg = Uint8::from_const_char(msg);
@@ -1303,7 +1308,7 @@ void TestCSR_GenDirect(nlTestSuite * inSuite, void * inContext)
 
     Test_P256Keypair keypair;
 
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     // Validate case of buffer too small
     uint8_t csrBufTooSmall[kMAX_CSR_Length - 1];
@@ -1346,7 +1351,7 @@ static void TestCSR_GenByKeypair(nlTestSuite * inSuite, void * inContext)
     size_t length = sizeof(csr);
 
     Test_P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, keypair.NewCertificateSigningRequest(csr, length) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, length > 0);
 
@@ -1375,7 +1380,7 @@ static void TestKeypair_Serialize(nlTestSuite * inSuite, void * inContext)
     HeapChecker heapChecker(inSuite);
     Test_P256Keypair keypair;
 
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     P256SerializedKeypair serialized;
     NL_TEST_ASSERT(inSuite, keypair.Serialize(serialized) == CHIP_NO_ERROR);
@@ -1904,6 +1909,40 @@ static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+static void TestX509_VerifyAttestationCertificateFormat(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+
+    struct ValidationTestCase
+    {
+        ByteSpan cert;
+        AttestationCertType type;
+        CHIP_ERROR expectedError;
+    };
+
+    // clang-format off
+    static ValidationTestCase sValidationTestCases[] = {
+        // cert                                           type                               Expected Error
+        // ===============================================================================================================
+        {  sTestCert_PAA_FFF1_Cert,                       Crypto::AttestationCertType::kPAA, CHIP_NO_ERROR               },
+        {  sTestCert_PAI_FFF1_8000_Cert,                  Crypto::AttestationCertType::kPAI, CHIP_NO_ERROR               },
+        {  sTestCert_DAC_FFF2_8002_0017_Cert,             Crypto::AttestationCertType::kDAC, CHIP_NO_ERROR               },
+        {  ByteSpan(),                                    Crypto::AttestationCertType::kDAC, CHIP_ERROR_INVALID_ARGUMENT },
+        {  sTestCert_PAI_FFF2_NoPID_FB_Cert,              Crypto::AttestationCertType::kDAC, CHIP_ERROR_INTERNAL         },
+        {  sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert, Crypto::AttestationCertType::kPAA, CHIP_ERROR_INTERNAL         },
+    };
+    // clang-format on
+
+    for (auto & testCase : sValidationTestCases)
+    {
+        ByteSpan cert  = testCase.cert;
+        CHIP_ERROR err = VerifyAttestationCertificateFormat(cert, testCase.type);
+        NL_TEST_ASSERT(inSuite, err == testCase.expectedError);
+    }
+}
+
 static void TestX509_CertChainValidation(nlTestSuite * inSuite, void * inContext)
 {
     using namespace TestCerts;
@@ -2416,6 +2455,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Spake2+ object reuse", TestSPAKE2P_Reuse),
     NL_TEST_DEF("Test compressed fabric identifier", TestCompressedFabricIdentifier),
     NL_TEST_DEF("Test Pubkey Extraction from x509 Certificate", TestPubkey_x509Extraction),
+    NL_TEST_DEF("Test x509 Attestation Certificate Format Validation", TestX509_VerifyAttestationCertificateFormat),
     NL_TEST_DEF("Test x509 Certificate Chain Validation", TestX509_CertChainValidation),
     NL_TEST_DEF("Test x509 Certificate Timestamp Validation", TestX509_IssuingTimestampValidation),
     NL_TEST_DEF("Test Subject Key Id Extraction from x509 Certificate", TestSKID_x509Extraction),
@@ -2436,6 +2476,11 @@ int TestCHIPCryptoPAL_Setup(void * inContext)
     CHIP_ERROR error = chip::Platform::MemoryInit();
     if (error != CHIP_NO_ERROR)
         return FAILURE;
+
+#if CHIP_CRYPTO_PSA
+    psa_crypto_init();
+#endif
+
     return SUCCESS;
 }
 

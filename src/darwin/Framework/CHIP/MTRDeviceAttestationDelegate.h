@@ -30,9 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * The protocol definition for the MTRDeviceAttestationDelegate
- *
- * All delegate methods will be called on the callers queue.
+ * The protocol definition for the MTRDeviceAttestationDelegate.
  */
 @protocol MTRDeviceAttestationDelegate <NSObject>
 @optional
@@ -61,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)deviceAttestationCompletedForController:(MTRDeviceController *)controller
                                          device:(void *)device
                           attestationDeviceInfo:(MTRDeviceAttestationDeviceInfo *)attestationDeviceInfo
-                                          error:(NSError * _Nullable)error;
+                                          error:(NSError * _Nullable)error MTR_NEWLY_AVAILABLE;
 
 /**
  * Notify the delegate when device attestation fails
@@ -72,7 +70,18 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)deviceAttestationFailedForController:(MTRDeviceController *)controller
                                       device:(void *)device
-                                       error:(NSError * _Nonnull)error;
+                                       error:(NSError * _Nonnull)error MTR_NEWLY_AVAILABLE;
+
+- (void)deviceAttestation:(MTRDeviceController *)controller
+       completedForDevice:(void *)device
+    attestationDeviceInfo:(MTRDeviceAttestationDeviceInfo *)attestationDeviceInfo
+                    error:(NSError * _Nullable)error
+    MTR_NEWLY_DEPRECATED("Please implement deviceAttestationCompletedForController:device:attestationDeviceInfo:error:");
+
+- (void)deviceAttestation:(MTRDeviceController *)controller
+          failedForDevice:(void *)device
+                    error:(NSError * _Nonnull)error
+    MTR_NEWLY_DEPRECATED("Please implement deviceAttestationFailedForController:device:error:");
 
 @end
 

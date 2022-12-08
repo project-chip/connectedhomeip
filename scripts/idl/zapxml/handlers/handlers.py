@@ -78,6 +78,9 @@ class EventHandler(BaseHandler):
             fields=[],
         )
 
+        if attrs.get('isFabricSensitive', "false").lower() == 'true':
+            self._event.qualities |= EventQuality.FABRIC_SENSITIVE
+
     def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'field':
             data_type = DataType(name=attrs['type'])
@@ -92,10 +95,10 @@ class EventHandler(BaseHandler):
             )
 
             if attrs.get('optional', "false").lower() == 'true':
-                field.attributes.add(FieldAttribute.OPTIONAL)
+                field.qualities |= FieldQuality.OPTIONAL
 
             if attrs.get('isNullable', "false").lower() == 'true':
-                field.attributes.add(FieldAttribute.NULLABLE)
+                field.qualities |= FieldQuality.NULLABLE
 
             self._event.fields.append(field)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
@@ -121,11 +124,12 @@ class AttributeHandler(BaseHandler):
 
     def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'access':
+            # Modifier not currently used: fabric scoped exists on the structure itself.
             if 'modifier' in attrs:
                 if attrs['modifier'] != 'fabric-scoped':
                     raise Exception("UNKNOWN MODIFIER: %s" % attrs['modifier'])
-                self._attribute.tags.add(AttributeTag.FABRIC_SCOPED)
-            else:
+
+            if ('role' in attrs) or ('privilege' in attrs):
                 role = AttrsToAccessPrivilege(attrs)
 
                 if attrs['op'] == 'read':
@@ -134,6 +138,7 @@ class AttributeHandler(BaseHandler):
                     self._attribute.writeacl = role
                 else:
                     logging.error("Unknown access: %r" % attrs['op'])
+
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'description':
             return AttributeDescriptionHandler(self.context, self._attribute)
@@ -168,7 +173,8 @@ class StructHandler(BaseHandler, IdlPostProcessor):
         #    - tag not set because not a request/response
         #    - code not set because not a response
 
-        self._is_fabric_scoped = (attrs.get('isFabricScoped', "false").lower() == 'true')
+        if attrs.get('isFabricScoped', "false").lower() == 'true':
+            self._struct.qualities |= StructQuality.FABRIC_SCOPED
 
     def GetNextProcessor(self, name: str, attrs):
         if name.lower() == 'item':
@@ -176,31 +182,32 @@ class StructHandler(BaseHandler, IdlPostProcessor):
                 name=attrs['type']
             )
 
-            # TODO(#22938): IDL should keep track and use the
-            #               isFabricSensitive attribute here
-
             if 'fieldId' in attrs:
-                self._field_index = ParseInt(attrs['fieldId'])
+                field_index = ParseInt(attrs['fieldId'])
             else:
                 # NOTE: code does NOT exist, so the number is incremental here
                 #       this seems a defficiency in XML format.
-                self._field_index += 1
+                field_index = self._field_index
+            self._field_index = field_index + 1
 
             if 'length' in attrs:
                 data_type.max_length = ParseInt(attrs['length'])
 
             field = Field(
                 data_type=data_type,
-                code=self._field_index,
+                code=field_index,
                 name=attrs['name'],
                 is_list=(attrs.get('array', 'false').lower() == 'true'),
             )
 
             if attrs.get('optional', "false").lower() == 'true':
-                field.attributes.add(FieldAttribute.OPTIONAL)
+                field.qualities |= FieldQuality.OPTIONAL
 
             if attrs.get('isNullable', "false").lower() == 'true':
-                field.attributes.add(FieldAttribute.NULLABLE)
+                field.qualities |= FieldQuality.NULLABLE
+
+            if attrs.get('isFabricSensitive', "false").lower() == 'true':
+                field.qualities |= FieldQuality.FABRIC_SENSITIVE
 
             self._struct.fields.append(field)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
@@ -227,14 +234,6 @@ class StructHandler(BaseHandler, IdlPostProcessor):
                                   (self._struct.name, code, code))
         else:
             idl.structs.append(self._struct)
-
-        # Secondary processing, for fabric scoped:
-        #      while ZAP XML maintains these at a struct level. Update attributes
-        if self._is_fabric_scoped:
-            for cluster in idl.clusters:
-                for attribute in cluster.attributes:
-                    if self._struct.name == attribute.definition.data_type.name:
-                        attribute.tags.add(AttributeTag.FABRIC_SCOPED)
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
@@ -371,10 +370,10 @@ class CommandHandler(BaseHandler):
             )
 
             if attrs.get('isFabricScoped', 'false') == 'true':
-                self._command.attributes.add(CommandAttribute.FABRIC_SCOPED)
+                self._command.qualities |= CommandQuality.FABRIC_SCOPED
 
             if attrs.get('mustUseTimedInvoke', 'false') == 'true':
-                self._command.attributes.add(CommandAttribute.TIMED_INVOKE)
+                self._command.qualities |= CommandQuality.TIMED_INVOKE
 
         else:
             self._struct.tag = StructTag.RESPONSE
@@ -386,8 +385,6 @@ class CommandHandler(BaseHandler):
         if 'length' in attrs:
             data_type.max_length = ParseInt(attrs['length'])
 
-        self._field_index += 1
-
         field = Field(
             data_type=data_type,
             code=self._field_index,
@@ -395,11 +392,13 @@ class CommandHandler(BaseHandler):
             is_list=(attrs.get('array', 'false') == 'true')
         )
 
+        self._field_index += 1
+
         if attrs.get('optional', "false").lower() == 'true':
-            field.attributes.add(FieldAttribute.OPTIONAL)
+            field.qualities |= FieldQuality.OPTIONAL
 
         if attrs.get('isNullable', "false").lower() == 'true':
-            field.attributes.add(FieldAttribute.NULLABLE)
+            field.qualities |= FieldQuality.NULLABLE
 
         return field
 

@@ -80,7 +80,7 @@ static const nlTest sTests[] = {
     NL_TEST_SENTINEL()
 };
 
-int TestStreamerStdio(void)
+int TestStreamerStdio()
 {
     nlTestSuite theSuite = { "Test Shell: Streamer", &sTests[0], nullptr, nullptr };
 

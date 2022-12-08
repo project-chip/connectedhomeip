@@ -38,9 +38,6 @@
                ReferencedContainer = "container:Matter.xcodeproj">
             </BuildableReference>
             <SkippedTests>
-               <Test
-                  Identifier = "MTRXPCListenerSampleTests">
-               </Test>
             </SkippedTests>
          </TestableReference>
       </Testables>

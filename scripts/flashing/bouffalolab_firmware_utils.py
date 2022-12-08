@@ -19,7 +19,8 @@ import os
 import pathlib
 import firmware_utils
 
-from bflb_iot_tool.__main__ import run_main
+import bflb_iot_tool
+import bflb_iot_tool.__main__
 
 
 # Additional options that can be use to configure an `Flasher`
@@ -98,6 +99,28 @@ class Flasher(firmware_utils.Flasher):
         super().__init__(platform=None, module=__name__, **options)
         self.define_options(BOUFFALO_OPTIONS)
 
+    def get_boot_image(self, config_path):
+
+        boot_image_guess = None
+
+        for root, dirs, files in os.walk(config_path, topdown=False):
+            for name in files:
+                if name == "boot2_isp_release.bin":
+                    return os.path.join(root, name)
+                elif not boot_image_guess and name.find("release") >= 0:
+                    boot_image_guess = os.path.join(root, name)
+
+        return boot_image_guess
+
+    def get_dts_file(self, config_path, xtal_value):
+
+        for root, dirs, files in os.walk(config_path, topdown=False):
+            for name in files:
+                if name.find(xtal_value) >= 0:
+                    return os.path.join(config_path, name)
+
+        return None
+
     def verify(self):
         """Not supported"""
         self.log(0, "Verification is done after image flashed.")
@@ -110,6 +133,8 @@ class Flasher(firmware_utils.Flasher):
         """Perform actions on the device according to self.option."""
         self.log(3, 'Options:', self.option)
 
+        tool_path = os.path.dirname(bflb_iot_tool.__file__)
+
         options_keys = BOUFFALO_OPTIONS["configuration"].keys()
         arguments = [__file__]
         work_dir = None
@@ -120,6 +145,12 @@ class Flasher(firmware_utils.Flasher):
             self.reset()
         if self.option.verify_application:
             self.verify()
+
+        chip_name = None
+        chip_config_path = None
+        boot_image = None
+        dts_path = None
+        xtal_value = None
 
         command_args = {}
         for (key, value) in dict(vars(self.option)).items():
@@ -147,20 +178,45 @@ class Flasher(firmware_utils.Flasher):
                 else:
                     arg = ("--{}={}".format(key, value)).strip()
 
+            if key == "chipname":
+                chip_name = value
+            elif key == "xtal":
+                xtal_value = value
+            elif key == "dts":
+                dts_path = value
+
             arguments.append(arg)
+
+            print(key, value)
+
+        print(dts_path, xtal_value)
+        if not dts_path and xtal_value:
+            chip_config_path = os.path.join(tool_path, "chips", chip_name, "device_tree")
+            dts_path = self.get_dts_file(chip_config_path, xtal_value)
+            arguments.append("--dts")
+            arguments.append(dts_path)
 
         if self.option.erase:
             arguments.append("--erase")
+
+            if chip_name == "bl602":
+                chip_config_path = os.path.join(tool_path, "chips", chip_name, "builtin_imgs")
+                boot_image = self.get_boot_image(chip_config_path)
+                arguments.append("--boot2")
+                arguments.append(boot_image)
 
         os.chdir(work_dir)
         arguments[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', arguments[0])
         sys.argv = arguments
 
-        run_main()
+        print("arguments", arguments)
+        bflb_iot_tool.__main__.run_main()
 
         return self
 
 
 if __name__ == '__main__':
+
     sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+
     sys.exit(Flasher().flash_command(sys.argv))

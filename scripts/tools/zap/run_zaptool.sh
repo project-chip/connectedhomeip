@@ -29,23 +29,29 @@ set -e
 
 SCRIPT_PATH="$(_get_fullpath "$0")"
 CHIP_ROOT="${SCRIPT_PATH%/scripts/tools/zap/run_zaptool.sh}"
-[[ -n "$1" ]] && ZAP_ARGS=(-i "$(_get_fullpath "$1")") || ZAP_ARGS=()
+[[ -n "$1" ]] && ZAP_ARGS="-i \"$(_get_fullpath "$1")\"" || ZAP_ARGS=""
+
+if [ ! -z "$ZAP_DEVELOPMENT_PATH" ]; then
+    WORKING_DIR=$ZAP_DEVELOPMENT_PATH
+    ZAP_CMD="node src-script/zap-start.js"
+
+    "$CHIP_ROOT"/scripts/tools/zap/zap_bootstrap.sh
+elif [ ! -z "$ZAP_INSTALL_PATH" ]; then
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        ZAP_CMD="$ZAP_INSTALL_PATH/zap.app/Contents/MacOS/zap"
+    else
+        ZAP_CMD="$ZAP_INSTALL_PATH/zap"
+    fi
+    WORKING_DIR="$CHIP_ROOT"
+else
+    ZAP_CMD="zap"
+    WORKING_DIR="$CHIP_ROOT"
+fi
 
 (
+    cd "$WORKING_DIR"
 
-    cd "$CHIP_ROOT" &&
-        git submodule update --init third_party/zap/repo
-
-    cd "third_party/zap/repo"
-    if ! npm list installed-check &>/dev/null; then
-        npm install installed-check
-    fi
-
-    if ! ./node_modules/.bin/installed-check -c &>/dev/null; then
-        npm install
-    fi
-
-    echo "ARGS: ${ZAP_ARGS[@]}"
+    echo "ARGS: $ZAP_ARGS"
 
     if [[ "${ZAP_ARGS[@]}" == *"/all-clusters-app.zap"* ]]; then
         ZCL_FILE="$CHIP_ROOT/src/app/zap-templates/zcl/zcl-with-test-extensions.json"
@@ -53,8 +59,11 @@ CHIP_ROOT="${SCRIPT_PATH%/scripts/tools/zap/run_zaptool.sh}"
         ZCL_FILE="$CHIP_ROOT/src/app/zap-templates/zcl/zcl.json"
     fi
 
-    node src-script/zap-start.js --logToStdout \
-        --gen "$CHIP_ROOT/src/app/zap-templates/app-templates.json" \
-        --zcl "$ZCL_FILE" \
-        "${ZAP_ARGS[@]}"
+    bash -c " \
+        $ZAP_CMD \
+        --logToStdout \
+        --gen \"$CHIP_ROOT/src/app/zap-templates/app-templates.json\" \
+        --zcl \"$ZCL_FILE\" \
+        $ZAP_ARGS \
+    "
 )

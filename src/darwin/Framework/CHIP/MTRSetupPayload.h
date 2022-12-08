@@ -20,8 +20,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_OPTIONS(NSUInteger, MTRDiscoveryCapabilities) {
-    MTRDiscoveryCapabilitiesUnknown = 0, // Device capabilties are not known
-                                         // (e.g. all we have is a numeric code).
+    MTRDiscoveryCapabilitiesUnknown = 0, // Device capabilities are not known (e.g. all we have is a numeric code).
+    MTRDiscoveryCapabilitiesNone MTR_NEWLY_DEPRECATED("Please use MTRDiscoveryCapabilitiesUnknown") = 0,
     MTRDiscoveryCapabilitiesSoftAP = 1 << 0, // Device supports WiFi softAP
     MTRDiscoveryCapabilitiesBLE = 1 << 1, // Device supports BLE
     MTRDiscoveryCapabilitiesOnNetwork = 1 << 2, // Device supports On Network setup
@@ -37,14 +37,18 @@ typedef NS_ENUM(NSUInteger, MTRCommissioningFlow) {
     MTRCommissioningFlowInvalid = 3,
 };
 
-typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) { MTROptionalQRCodeInfoTypeString, MTROptionalQRCodeInfoTypeInt32 };
+typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
+    MTROptionalQRCodeInfoTypeUnknown MTR_NEWLY_DEPRECATED("The type is never actually unknown"),
+    MTROptionalQRCodeInfoTypeString,
+    MTROptionalQRCodeInfoTypeInt32,
+};
 
 /**
  * An optional information item present in the QR code the setup payload was
  * initialized from.
  */
 @interface MTROptionalQRCodeInfo : NSObject
-@property (nonatomic, assign) MTROptionalQRCodeInfoType infoType;
+@property (nonatomic, assign) MTROptionalQRCodeInfoType type MTR_NEWLY_AVAILABLE;
 // The numeric value of the TLV tag for this information item.
 @property (nonatomic, copy) NSNumber * tag;
 // Exactly one of integerValue and stringValue will be non-nil, depending on the
@@ -66,9 +70,11 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) { MTROptionalQRCodeInfoTy
 @property (nonatomic, copy) NSNumber * productID;
 @property (nonatomic, assign) MTRCommissioningFlow commissioningFlow;
 /**
- * The value of discoveryCapabilities is made up of the various MTRDiscoveryCapabilities flags.
+ * The value of discoveryCapabilities is made up of the various
+ * MTRDiscoveryCapabilities flags.  If the discovery capabilities are not known,
+ * this will be set to MTRDiscoveryCapabilitiesUnknown.
  */
-@property (nonatomic, assign) MTRDiscoveryCapabilities discoveryCapabilities;
+@property (nonatomic, assign) MTRDiscoveryCapabilities discoveryCapabilities MTR_NEWLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * discriminator;
 /**
  * If hasShortDiscriminator is true, the discriminator value contains just the
@@ -77,15 +83,20 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) { MTROptionalQRCodeInfoTy
  * discriminator can be anything in the range 0xA00 t0 0xAFF.
  */
 @property (nonatomic, assign) BOOL hasShortDiscriminator;
-@property (nonatomic, copy) NSNumber * setupPasscode;
+@property (nonatomic, copy) NSNumber * setupPasscode MTR_NEWLY_AVAILABLE;
 
 @property (nonatomic, copy, nullable) NSString * serialNumber;
 - (NSArray<MTROptionalQRCodeInfo *> * _Nullable)getAllOptionalVendorData:(NSError * __autoreleasing *)error;
 
 /**
+ * Generate a random Matter-valid setup PIN.
+ */
++ (NSUInteger)generateRandomPIN;
+
+/**
  * Generate a random Matter-valid setup passcode.
  */
-+ (NSNumber *)generateRandomSetupPasscode;
++ (NSNumber *)generateRandomSetupPasscode API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 /**
  * Create an MTRSetupPayload with the given onboarding payload.
@@ -93,13 +104,15 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) { MTROptionalQRCodeInfoTy
  * Will return nil on errors (e.g. if the onboarding payload cannot be parsed).
  */
 + (MTRSetupPayload * _Nullable)setupPayloadWithOnboardingPayload:(NSString *)onboardingPayload
-                                                           error:(NSError * __autoreleasing *)error;
+                                                           error:(NSError * __autoreleasing *)error
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 /**
  * Initialize an MTRSetupPayload with the given passcode and discriminator.
  * This will pre-set version, product id, and vendor id to 0.
  */
-- (instancetype)initWithSetupPasscode:(NSNumber *)setupPasscode discriminator:(NSNumber *)discriminator;
+- (instancetype)initWithSetupPasscode:(NSNumber *)setupPasscode
+                        discriminator:(NSNumber *)discriminator API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 /** Get 11 digit manual entry code from the setup payload. */
 - (NSString * _Nullable)manualEntryCode;
@@ -110,11 +123,24 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) { MTROptionalQRCodeInfoTy
  * Returns nil on failure (e.g. if the setup payload does not have all the
  * information a QR code needs).
  */
-- (NSString * _Nullable)qrCodeString;
+- (NSString * _Nullable)qrCodeString:(NSError * __autoreleasing *)error
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
-// A setup payload must have a passcode and a discriminator at the very least.
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
+@end
+
+@interface MTROptionalQRCodeInfo (Deprecated)
+
+@property (nonatomic, copy) NSNumber * infoType MTR_NEWLY_DEPRECATED("Please use type");
+
+@end
+
+@interface MTRSetupPayload (Deprecated)
+
+@property (nonatomic, copy, nullable) NSNumber * rendezvousInformation MTR_NEWLY_DEPRECATED("Please use discoveryCapabilities");
+@property (nonatomic, copy) NSNumber * setUpPINCode MTR_NEWLY_DEPRECATED("Please use setupPasscode");
+
+- (instancetype)init MTR_NEWLY_DEPRECATED("Please use initWithSetupPasscode or setupPayloadWithOnboardingPayload");
++ (instancetype)new MTR_NEWLY_DEPRECATED("Please use initWithSetupPasscode or setupPayloadWithOnboardingPayload");
 
 @end
 

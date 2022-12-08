@@ -162,7 +162,7 @@ class IdlType:
         return self.item_type == IdlItemType.STRUCT
 
 
-# Data types, held by ZAP in chip-types.xml
+# Data types, held by ZAP in chip-types.xml and generally by the spec.
 __CHIP_SIZED_TYPES__ = {
     "bitmap16": BasicInteger(idl_name="bitmap16", byte_count=2, is_signed=False),
     "bitmap24": BasicInteger(idl_name="bitmap24", byte_count=3, is_signed=False),
@@ -189,31 +189,31 @@ __CHIP_SIZED_TYPES__ = {
     "int8s": BasicInteger(idl_name="int8s", byte_count=1, is_signed=True),
     "int8u": BasicInteger(idl_name="int8u", byte_count=1, is_signed=False),
     # Derived types
-    "action_id": BasicInteger(idl_name="action_id", byte_count=1, is_signed=True),
-    "attrib_id": BasicInteger(idl_name="attrib_id", byte_count=4, is_signed=True),
-    "cluster_id": BasicInteger(idl_name="cluster_id", byte_count=4, is_signed=True),
-    "command_id": BasicInteger(idl_name="command_id", byte_count=4, is_signed=True),
-    "data_ver": BasicInteger(idl_name="data_ver", byte_count=4, is_signed=True),
-    "date": BasicInteger(idl_name="date", byte_count=4, is_signed=True),
-    "devtype_id": BasicInteger(idl_name="devtype_id", byte_count=4, is_signed=True),
-    "endpoint_no": BasicInteger(idl_name="endpoint_no", byte_count=2, is_signed=True),
+    # Specification describes them in section '7.18.2. Derived Data Types'
+    "action_id": BasicInteger(idl_name="action_id", byte_count=1, is_signed=False),
+    "attrib_id": BasicInteger(idl_name="attrib_id", byte_count=4, is_signed=False),
+    "cluster_id": BasicInteger(idl_name="cluster_id", byte_count=4, is_signed=False),
+    "command_id": BasicInteger(idl_name="command_id", byte_count=4, is_signed=False),
+    "data_ver": BasicInteger(idl_name="data_ver", byte_count=4, is_signed=False),
+    "date": BasicInteger(idl_name="date", byte_count=4, is_signed=False),
+    "devtype_id": BasicInteger(idl_name="devtype_id", byte_count=4, is_signed=False),
+    "endpoint_no": BasicInteger(idl_name="endpoint_no", byte_count=2, is_signed=False),
     "epoch_s": BasicInteger(idl_name="epoch_s", byte_count=4, is_signed=False),
     "epoch_us": BasicInteger(idl_name="epoch_us", byte_count=8, is_signed=False),
-    "event_id": BasicInteger(idl_name="event_id", byte_count=4, is_signed=True),
-    "event_no": BasicInteger(idl_name="event_no", byte_count=8, is_signed=True),
-    "fabric_id": BasicInteger(idl_name="fabric_id", byte_count=8, is_signed=True),
-    "fabric_idx": BasicInteger(idl_name="fabric_idx", byte_count=1, is_signed=True),
-    "field_id": BasicInteger(idl_name="field_id", byte_count=4, is_signed=True),
-    "group_id": BasicInteger(idl_name="group_id", byte_count=2, is_signed=True),
-    "node_id": BasicInteger(idl_name="node_id", byte_count=8, is_signed=True),
-    "percent": BasicInteger(idl_name="percent", byte_count=1, is_signed=True),
-    "percent100ths": BasicInteger(idl_name="percent100ths", byte_count=2, is_signed=True),
-    "status": BasicInteger(idl_name="status", byte_count=2, is_signed=True),
-    "systime_us": BasicInteger(idl_name="systime_us", byte_count=8, is_signed=True),
-    "tod": BasicInteger(idl_name="tod", byte_count=4, is_signed=True),
-    "trans_id": BasicInteger(idl_name="trans_id", byte_count=4, is_signed=True),
-    "utc": BasicInteger(idl_name="utc", byte_count=4, is_signed=True),
-    "vendor_id": BasicInteger(idl_name="vendor_id", byte_count=2, is_signed=True),
+    "event_id": BasicInteger(idl_name="event_id", byte_count=4, is_signed=False),
+    "event_no": BasicInteger(idl_name="event_no", byte_count=8, is_signed=False),
+    "fabric_id": BasicInteger(idl_name="fabric_id", byte_count=8, is_signed=False),
+    "fabric_idx": BasicInteger(idl_name="fabric_idx", byte_count=1, is_signed=False),
+    "field_id": BasicInteger(idl_name="field_id", byte_count=4, is_signed=False),
+    "group_id": BasicInteger(idl_name="group_id", byte_count=2, is_signed=False),
+    "node_id": BasicInteger(idl_name="node_id", byte_count=8, is_signed=False),
+    "percent": BasicInteger(idl_name="percent", byte_count=1, is_signed=False),
+    "percent100ths": BasicInteger(idl_name="percent100ths", byte_count=2, is_signed=False),
+    "status": BasicInteger(idl_name="status", byte_count=2, is_signed=False),
+    "systime_us": BasicInteger(idl_name="systime_us", byte_count=8, is_signed=False),
+    "tod": BasicInteger(idl_name="tod", byte_count=4, is_signed=False),
+    "trans_id": BasicInteger(idl_name="trans_id", byte_count=4, is_signed=False),
+    "vendor_id": BasicInteger(idl_name="vendor_id", byte_count=2, is_signed=False),
 }
 
 

@@ -79,6 +79,19 @@ void ActiveResolveAttempts::CompleteIpResolution(SerializedQNameIterator targetH
     }
 }
 
+CHIP_ERROR ActiveResolveAttempts::CompleteAllBrowses()
+{
+    for (auto & item : mRetryQueue)
+    {
+        if (item.attempt.IsBrowse())
+        {
+            item.attempt.Clear();
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 void ActiveResolveAttempts::MarkPending(const chip::PeerId & peerId)
 {
     MarkPending(ScheduledAttempt(peerId, /* firstSend */ true));

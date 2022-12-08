@@ -241,7 +241,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestDnssdPlatform(void)
+int TestDnssdPlatform()
 {
     nlTestSuite theSuite = { "DnssdPlatform", &sTests[0], &TestSetup, &TestTeardown };
     nlTestRunner(&theSuite, nullptr);

@@ -1,0 +1,66 @@
+#include <app-common/zap-generated/attribute-id.h>
+
+#include <new>
+
+#include "bridge/BridgeGlobalStructs.h"
+
+namespace clusters {
+
+{%- for cluster in clusters %}
+{%-   if cluster | dynamicCluster(idl) %}
+struct {{cluster.name}}Cluster : public CommonCluster
+{
+  {%-   for struct in cluster.structs %}
+  {%-     if struct.tag == None %}
+  struct {{struct.name}}
+  {
+    CHIP_ERROR Decode(chip::TLV::TLVReader & reader);
+    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const;
+
+    {%-      for field in struct.fields %}
+    {{field | getField(cluster, idl)}} {{field.name}};
+    {%-      endfor  %}
+  };
+  {%-     endif %}
+  {%-   endfor %}
+
+  static constexpr chip::ClusterId kClusterId = {{cluster.code}};
+
+  chip::ClusterId GetClusterId() override { return kClusterId; }
+
+  CHIP_ERROR WriteFromBridge(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
+
+  template<typename T>
+  void AddAllAttributes(T *list)
+  {
+  {%-  for attr in cluster.attributes %}
+    list->Add(m{{attr.definition.name | capitalcase}});
+  {%-  endfor  %}
+  }
+
+  chip::Span<const EmberAfAttributeMetadata> GetAllAttributes() override;
+
+{%  for attr in cluster.attributes %}
+  Attribute<{{attr.definition.code}}, {{attr | getMask(cluster, idl)}}, {{attr | getType(cluster, idl)}}> m{{attr.definition.name | capitalcase}}{{attr | getInit(cluster, idl)}};
+{%-  endfor  %}
+};
+
+struct {{cluster.name}}Access : public CommonAttributeAccessInterface
+{
+  {{cluster.name}}Access();
+
+  {{cluster.name}}Cluster* GetCluster(const chip::app::ConcreteClusterPath & aPath)
+  {
+    CommonCluster * cluster = FindCluster(aPath);
+    return cluster ? static_cast<{{cluster.name}}Cluster*>(cluster) : nullptr;
+  }
+
+  CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
+  CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
+  void OnListWriteBegin(const chip::app::ConcreteAttributePath & aPath) override;
+  void OnListWriteEnd(const chip::app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful) override;
+};
+{%-   endif %}
+{%- endfor %}
+
+}

@@ -17,12 +17,14 @@
  */
 
 #include "Command.h"
-#include "platform/PlatformManager.h"
 
+#include <functional>
 #include <netdb.h>
 #include <sstream>
 #include <sys/socket.h>
 #include <sys/types.h>
+
+#include <math.h> // For INFINITY
 
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BytesToHex.h>
@@ -42,9 +44,9 @@ bool Command::InitArguments(int argc, char ** argv)
     size_t argvExtraArgsCount = (size_t) argc;
     size_t mandatoryArgsCount = 0;
     size_t optionalArgsCount  = 0;
-    for (size_t i = 0; i < mArgs.size(); i++)
+    for (auto & arg : mArgs)
     {
-        if (mArgs[i].isOptional())
+        if (arg.isOptional())
         {
             optionalArgsCount++;
         }
@@ -541,6 +543,18 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Float: {
         isValidArgument = HandleNullableOptional<float>(arg, argValue, [&](auto * value) {
+            if (strcmp(argValue, "Infinity") == 0)
+            {
+                *value = INFINITY;
+                return true;
+            }
+
+            if (strcmp(argValue, "-Infinity") == 0)
+            {
+                *value = -INFINITY;
+                return true;
+            }
+
             std::stringstream ss;
             ss << argValue;
             ss >> *value;
@@ -551,6 +565,18 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Double: {
         isValidArgument = HandleNullableOptional<double>(arg, argValue, [&](auto * value) {
+            if (strcmp(argValue, "Infinity") == 0)
+            {
+                *value = INFINITY;
+                return true;
+            }
+
+            if (strcmp(argValue, "-Infinity") == 0)
+            {
+                *value = -INFINITY;
+                return true;
+            }
+
             std::stringstream ss;
             ss << argValue;
             ss >> *value;
@@ -803,7 +829,7 @@ const char * Command::GetArgumentDescription(size_t index) const
     return nullptr;
 }
 
-const char * Command::GetAttribute(void) const
+const char * Command::GetAttribute() const
 {
     size_t argsCount = mArgs.size();
     for (size_t i = 0; i < argsCount; i++)
@@ -818,7 +844,7 @@ const char * Command::GetAttribute(void) const
     return nullptr;
 }
 
-const char * Command::GetEvent(void) const
+const char * Command::GetEvent() const
 {
     size_t argsCount = mArgs.size();
     for (size_t i = 0; i < argsCount; i++)
@@ -877,9 +903,8 @@ void ResetOptionalArg(const Argument & arg)
 
 void Command::ResetArguments()
 {
-    for (size_t i = 0; i < mArgs.size(); i++)
+    for (const auto & arg : mArgs)
     {
-        const Argument arg      = mArgs[i];
         const ArgumentType type = arg.type;
         if (arg.isOptional())
         {

@@ -53,7 +53,7 @@ namespace {
 constexpr int kExtDiscoveryTimeoutSecs = 20;
 }
 
-CHIP_ERROR main()
+int main()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -65,26 +65,27 @@ CHIP_ERROR main()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Platform::MemoryInit() failed");
-        return err;
+        return 1;
     }
 
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "PlatformMgr().InitChipStack() failed");
-        return err;
+        return 1;
     }
 
     // Network connectivity
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     ConnectivityManagerImpl().StartWiFiManagement();
 #endif
-#if CHIP_ENABLE_OPENTHREAD
+
+#if defined(CHIP_ENABLE_OPENTHREAD)
     err = ThreadStackMgr().InitThreadStack();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "ThreadStackMgr().InitThreadStack() failed");
-        return err;
+        return 1;
     }
 
 #ifdef CONFIG_OPENTHREAD_MTD
@@ -95,9 +96,11 @@ CHIP_ERROR main()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "ConnectivityMgr().SetThreadDeviceType() failed");
-        return err;
+        return 1;
     }
-#endif /* CHIP_ENABLE_OPENTHREAD */
+#elif !defined(CONFIG_WIFI_NRF700X)
+    return CHIP_ERROR_INTERNAL;
+#endif
 
     // Device Attestation & Onboarding codes
     chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
@@ -108,7 +111,11 @@ CHIP_ERROR main()
     // Start IM server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+    err = chip::Server::GetInstance().Init(initParams);
+    if (err != CHIP_NO_ERROR)
+    {
+        return 1;
+    }
 
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
 
@@ -136,7 +143,7 @@ CHIP_ERROR main()
     if (rc != 0)
     {
         ChipLogError(AppServer, "Streamer initialization failed: %d", rc);
-        return CHIP_ERROR_INTERNAL;
+        return 1;
     }
 
     cmd_misc_init();
@@ -151,5 +158,5 @@ CHIP_ERROR main()
     Engine::Root().RunMainLoop();
 #endif
 
-    return err;
+    return 0;
 }

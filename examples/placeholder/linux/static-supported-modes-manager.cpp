@@ -39,7 +39,7 @@ const StaticSupportedModesManager::EndpointSpanPair
 
 const StaticSupportedModesManager StaticSupportedModesManager::instance = StaticSupportedModesManager();
 
-const SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeOptionsProvider(EndpointId endpointId) const
+SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeOptionsProvider(EndpointId endpointId) const
 {
     for (auto & endpointSpanPair : supportedOptionsByEndpoints)
     {

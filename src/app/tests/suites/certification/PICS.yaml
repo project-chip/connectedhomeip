@@ -3714,10 +3714,10 @@ PICS:
       id: DGTHREAD.S.A0039
 
     - label: "Does the DUT-server support the Delay attribute?"
-      id: DGTHREAD.S.A003A
+      id: DGTHREAD.S.A003a
 
     - label: "Does the DUT-server support the SecurityPolicy attribute?"
-      id: DGTHREAD.S.A003B
+      id: DGTHREAD.S.A003b
 
     - label: "Does the DUT-server support the ChannelPage0Mask attribute?"
       id: DGTHREAD.S.A003c
@@ -4588,6 +4588,16 @@ PICS:
 
     - label: "Does the DUT(server) support the ReachableChanged event?"
       id: BINFO.S.E03
+
+    #Features
+    - label: "Does the device implement the Wi-Fi related features ?"
+      id: CNET.S.F00
+
+    - label: "Does the device implement the Thread related features"
+      id: CNET.S.F01
+
+    - label: "Does the device implement the Ethernet related features ?"
+      id: CNET.S.F02
 
     #Client Attributes
     - label: "Does the DUT(Client) support the DataModelRevision attribute?"

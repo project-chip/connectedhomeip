@@ -22,6 +22,9 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     ameba:
         name: Ameba
@@ -32,11 +35,11 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-ameba:0.6.02
+            image: connectedhomeip/chip-build-ameba:0.6.18
             options: --user root
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.15
+            - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -47,4 +50,12 @@ jobs:
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform ameba
             - name: Build example Ameba All Clusters App
-              run: scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target-glob 'ameba-*' build"
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target ameba-amebad-all-clusters \
+                        --target ameba-amebad-all-clusters-minimal \
+                        --target ameba-amebad-light \
+                        --target ameba-amebad-pigweed \
+                        build \
+                     "

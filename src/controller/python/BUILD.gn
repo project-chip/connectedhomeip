@@ -30,7 +30,10 @@ config("controller_wno_deprecate") {
   cflags = [ "-Wno-deprecated-declarations" ]
 }
 
-chip_python_version = "0.0"
+declare_args() {
+  chip_python_version = "0.0"
+  chip_python_package_prefix = "chip"
+}
 
 shared_library("ChipDeviceCtrl") {
   if (chip_controller) {
@@ -70,6 +73,7 @@ shared_library("ChipDeviceCtrl") {
       "chip/internal/ChipThreadWork.h",
       "chip/internal/CommissionerImpl.cpp",
       "chip/logging/LoggingRedirect.cpp",
+      "chip/native/PyChipError.cpp",
       "chip/utils/DeviceProxyUtils.cpp",
     ]
   } else {
@@ -225,6 +229,13 @@ chip_python_wheel_action("chip-core") {
         "chip/storage/__init__.py",
         "chip/utils/CommissioningBuildingBlocks.py",
         "chip/utils/__init__.py",
+        "chip/yaml/__init__.py",
+        "chip/yaml/constraints.py",
+        "chip/yaml/data_model_lookup.py",
+        "chip/yaml/errors.py",
+        "chip/yaml/format_converter.py",
+        "chip/yaml/parser.py",
+        "chip/yaml/variable_storage.py",
       ]
 
       if (chip_controller) {
@@ -268,6 +279,7 @@ chip_python_wheel_action("chip-core") {
     "chip.internal",
     "chip.interaction_model",
     "chip.logging",
+    "chip.yaml",
     "chip.native",
     "chip.clusters",
     "chip.setup_payload",
@@ -297,10 +309,7 @@ chip_python_wheel_action("chip-core") {
   if (current_os == "mac") {
     py_package_reqs += [ "pyobjc-framework-corebluetooth" ]
   } else if (current_os == "linux") {
-    py_package_reqs += [
-      "dbus-python==1.2.18",
-      "pygobject",
-    ]
+    py_package_reqs += [ "pygobject" ]
   }
 
   if (current_cpu == "x64") {
@@ -314,8 +323,10 @@ chip_python_wheel_action("chip-core") {
   }
 
   if (current_os == "mac") {
-    py_platform_tag =
-        "macosx_" + string_replace(mac_deployment_target, ".", "_")
+    py_platform_tag = string_replace(
+            string_replace(mac_deployment_target, "macos", "macosx."),
+            ".",
+            "_")
   } else {
     py_platform_tag = current_os
   }
@@ -330,11 +341,12 @@ chip_python_wheel_action("chip-core") {
     lib_name = "_ChipServer.so"
   }
 
-  py_package_name = "chip-core"
+  py_package_name = "${chip_python_package_prefix}-core"
+  py_package_output = string_replace(py_package_name, "-", "_")
 
   public_deps = [ ":ChipDeviceCtrl" ]
 
-  output_name = "chip_core-${chip_python_version}-${tags}.whl"
+  output_name = "${py_package_output}-${chip_python_version}-${tags}.whl"
 }
 
 chip_python_wheel_action("chip-clusters") {
@@ -367,10 +379,11 @@ chip_python_wheel_action("chip-clusters") {
 
   py_package_reqs = [ "dacite" ]
 
-  py_package_name = "chip-clusters"
+  py_package_name = "${chip_python_package_prefix}-clusters"
+  py_package_output = string_replace(py_package_name, "-", "_")
   py_platform_tag = "any"
 
-  output_name = "chip_clusters-${chip_python_version}-py3-none-any.whl"
+  output_name = "${py_package_output}-${chip_python_version}-py3-none-any.whl"
 }
 
 chip_python_wheel_action("chip-repl") {
@@ -411,7 +424,8 @@ chip_python_wheel_action("chip-repl") {
     "mobly",
   ]
 
-  py_package_name = "chip-repl"
+  py_package_name = "${chip_python_package_prefix}-repl"
+  py_package_output = string_replace(py_package_name, "-", "_")
   py_platform_tag = "any"
 
   data_deps = [
@@ -419,5 +433,5 @@ chip_python_wheel_action("chip-repl") {
     ":chip-core",
   ]
 
-  output_name = "chip_repl-${chip_python_version}-py3-none-any.whl"
+  output_name = "${py_package_output}-${chip_python_version}-py3-none-any.whl"
 }

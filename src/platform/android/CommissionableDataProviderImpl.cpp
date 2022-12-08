@@ -151,7 +151,7 @@ CHIP_ERROR CommissionableDataProviderImpl::Update(JNIEnv * env, jstring spake2pV
     mPaseIterationCount = spake2pIterationCount;
     if (havePasscode)
     {
-        mSetupPasscode.SetValue(setupPasscode);
+        mSetupPasscode.SetValue(static_cast<uint32_t>(setupPasscode));
     }
 
     // Set to global CommissionableDataProvider once success first time

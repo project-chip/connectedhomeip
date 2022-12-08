@@ -21,7 +21,7 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/ClusterIds.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
@@ -76,7 +76,7 @@ int AppTask::StartAppTask()
     if (sAppEventQueue == NULL)
     {
         PLAT_LOG("Failed to allocate app event queue");
-        while (1)
+        while (true)
             ;
     }
 
@@ -85,7 +85,7 @@ int AppTask::StartAppTask()
         pdPASS)
     {
         PLAT_LOG("Failed to create app task");
-        while (1)
+        while (true)
             ;
     }
     return ret;
@@ -136,7 +136,7 @@ int AppTask::Init()
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("PlatformMgr().InitChipStack() failed");
-        while (1)
+        while (true)
             ;
     }
     PLAT_LOG("Start Event Loop Task");
@@ -144,7 +144,7 @@ int AppTask::Init()
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("PlatformMgr().StartEventLoopTask() failed");
-        while (1)
+        while (true)
             ;
     }
 
@@ -179,7 +179,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     sAppTask.Init();
 
-    while (1)
+    while (true)
     {
         /* Task pend until we have stuff to do */
         if (xQueueReceive(sAppEventQueue, &event, portMAX_DELAY) == pdTRUE)
@@ -263,7 +263,7 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
         LED_setOff(gLedRedHandle);
         state = 0;
     }
-    emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &state, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    emberAfWriteAttribute(1, app::Clusters::OnOff::Id, ZCL_ON_OFF_ATTRIBUTE_ID, &state, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 void AppTask::DispatchEvent(AppEvent * aEvent)

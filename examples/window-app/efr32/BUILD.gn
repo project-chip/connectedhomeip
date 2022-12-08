@@ -26,17 +26,12 @@ assert(current_os == "freertos")
 
 project_dir = "${chip_root}/examples/window-app"
 efr32_project_dir = "${project_dir}/efr32"
-examples_plat_dir = "${chip_root}/examples/platform/efr32"
+examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
-
-  # PIN code for PASE session establishment.
-  setupPinCode = 20202021
-
-  #default Discriminator value
-  setupDiscriminator = 3840
 
   # Monitor & log memory usage at runtime.
   enable_heap_monitoring = false
@@ -79,6 +74,7 @@ assert(!(use_wf200 && chip_enable_openthread))
 if (chip_enable_wifi) {
   assert(use_rs911x || use_wf200)
   enable_openthread_cli = false
+  import("${chip_root}/src/platform/silabs/EFR32/wifi_args.gni")
 }
 
 # ThunderBoards, Explorer Kit and MGM240L do not support LCD (No LCD)
@@ -95,23 +91,37 @@ if (chip_enable_wifi) {
     show_qr_code = false
     disable_lcd = true
   }
-  wifi_sdk_dir = "${chip_root}/third_party/silabs/matter_support/matter/wifi"
+  wifi_sdk_dir = "${chip_root}/src/platform/silabs/EFR32/wifi"
   efr32_lwip_defs = [ "LWIP_NETIF_API=1" ]
-  efr32_lwip_defs += [
-    "LWIP_IPV4=1",
-    "LWIP_ARP=1",
-    "LWIP_ICMP=1",
-    "LWIP_DHCP=1",
-    "LWIP_IPV6_ND=1",
-    "LWIP_IGMP=1",
-  ]
+  if (lwip_ipv4) {
+    efr32_lwip_defs += [
+      "LWIP_IPV4=1",
+
+      # adds following options to provide
+      # them to .cpp source files
+      # flags ported from lwipopts file
+      # TODO: move lwipopts to one location
+      "LWIP_ARP=1",
+      "LWIP_ICMP=1",
+      "LWIP_IGMP=1",
+      "LWIP_DHCP=1",
+      "LWIP_DNS=0",
+    ]
+  } else {
+    efr32_lwip_defs += [ "LWIP_IPV4=0" ]
+  }
+  if (lwip_ipv6) {
+    efr32_lwip_defs += [ "LWIP_IPV6=1" ]
+  } else {
+    efr32_lwip_defs += [ "LWIP_IPV6=0" ]
+  }
 
   if (use_rs911x) {
     wiseconnect_sdk_root =
         "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
-    import("${wifi_sdk_dir}/rs911x/rs911x.gni")
+    import("${examples_plat_dir}/rs911x/rs911x.gni")
   } else {
-    import("${wifi_sdk_dir}/wf200/wf200.gni")
+    import("${examples_plat_dir}/wf200/wf200.gni")
   }
 }
 
@@ -122,16 +132,15 @@ efr32_sdk("sdk") {
   ]
 
   include_dirs = [
-    "${chip_root}/src/platform/EFR32",
+    "${chip_root}/src/platform/silabs/EFR32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
+    "${examples_common_plat_dir}",
   ]
 
   defines = [
     "BOARD_ID=${silabs_board}",
-    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
-    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
     "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
   ]
 
@@ -164,6 +173,7 @@ efr32_sdk("sdk") {
 
 efr32_executable("window_app") {
   output_name = "chip-efr32-window-example.out"
+  public_configs = [ "${efr32_sdk_build_root}:silabs_config" ]
   output_dir = root_out_dir
   include_dirs = [
     "include",
@@ -172,8 +182,8 @@ efr32_executable("window_app") {
   defines = []
 
   sources = [
+    "${examples_common_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/efr32_utils.cpp",
-    "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/matter_config.cpp",
     "${project_dir}/common/src/WindowApp.cpp",
@@ -268,7 +278,7 @@ efr32_executable("window_app") {
   if (enable_heap_monitoring) {
     defines += [ "HEAP_MONITORING" ]
 
-    sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]
+    sources += [ "${examples_common_plat_dir}/MemMonitoring.cpp" ]
   }
 
   ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
@@ -295,6 +305,11 @@ efr32_executable("window_app") {
   # Attestation Credentials
   if (chip_build_platform_attestation_credentials_provider) {
     deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
+  }
+
+  # Factory Data Provider
+  if (use_efr32_factory_data_provider) {
+    deps += [ "${examples_plat_dir}:efr32-factory-data-provider" ]
   }
 }
 

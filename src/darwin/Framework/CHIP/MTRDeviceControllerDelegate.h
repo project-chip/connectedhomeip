@@ -19,12 +19,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSUInteger, MTRCommissioningStatus) {
+typedef NS_ENUM(NSInteger, MTRCommissioningStatus) {
     MTRCommissioningStatusUnknown = 0,
     MTRCommissioningStatusSuccess = 1,
     MTRCommissioningStatusFailed = 2,
     MTRCommissioningStatusDiscoveringMoreDevices = 3
-};
+} MTR_NEWLY_AVAILABLE;
 
 @class MTRDeviceController;
 
@@ -33,6 +33,7 @@ typedef NS_ENUM(NSUInteger, MTRCommissioningStatus) {
  *
  * All delegate methods will be called on the supplied Delegate Queue.
  */
+MTR_NEWLY_AVAILABLE
 @protocol MTRDeviceControllerDelegate <NSObject>
 @optional
 /**
@@ -50,6 +51,23 @@ typedef NS_ENUM(NSUInteger, MTRCommissioningStatus) {
  * Notify the delegate when commissioning is completed.
  */
 - (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error;
+
+@end
+
+typedef NS_ENUM(NSUInteger, MTRPairingStatus) {
+    MTRPairingStatusUnknown MTR_NEWLY_DEPRECATED("Please use MTRCommissioningStatusUnknown") = 0,
+    MTRPairingStatusSuccess MTR_NEWLY_DEPRECATED("Please use MTRCommissioningStatusSuccess") = 1,
+    MTRPairingStatusFailed MTR_NEWLY_DEPRECATED("Please use MTRCommissioningStatusFailed") = 2,
+    MTRPairingStatusDiscoveringMoreDevices MTR_NEWLY_DEPRECATED("Please use MTRCommissioningStatusDiscoveringMoreDevices") = 3
+} MTR_NEWLY_DEPRECATED("Please use MTRCommissioningStatus");
+
+MTR_NEWLY_DEPRECATED("Please use MTRDeviceControllerDelegate")
+@protocol MTRDevicePairingDelegate <NSObject>
+@optional
+- (void)onStatusUpdate:(MTRPairingStatus)status;
+- (void)onPairingComplete:(NSError * _Nullable)error;
+- (void)onCommissioningComplete:(NSError * _Nullable)error;
+- (void)onPairingDeleted:(NSError * _Nullable)error;
 
 @end
 

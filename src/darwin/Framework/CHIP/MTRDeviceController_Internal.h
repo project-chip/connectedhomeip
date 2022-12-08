@@ -152,7 +152,7 @@ NS_ASSUME_NONNULL_BEGIN
  * synchronously during the callback invocation.
  */
 - (void)asyncDispatchToMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
-                      errorHandler:(void (^)(NSError *))erroHandler;
+                      errorHandler:(void (^)(NSError *))errorHandler;
 
 /**
  * Get an MTRBaseDevice for the given node id.  This exists to allow subclasses

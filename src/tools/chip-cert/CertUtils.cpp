@@ -1272,7 +1272,6 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
     uint16_t vid = certConfig.IsSubjectVIDMismatch() ? static_cast<uint16_t>(subjectVID + 1) : subjectVID;
     uint16_t pid = certConfig.IsSubjectPIDMismatch() ? static_cast<uint16_t>(subjectPID + 1) : subjectPID;
     bool isCA    = (attCertType != kAttCertType_DAC);
-    int pathLen  = kPathLength_NotSpecified;
 
     VerifyOrReturnError(subjectCN != nullptr, false);
     VerifyOrReturnError(caCert != nullptr, false);
@@ -1409,11 +1408,7 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
     }
 
     // Add basic constraints certificate extensions.
-    if (certConfig.IsExtensionBasicPathLenPresent(attCertType) || !certConfig.IsExtensionBasicCAPresent())
-    {
-        pathLen = certConfig.GetExtensionBasicPathLenValue(attCertType);
-    }
-    res = SetBasicConstraintsExtension(newCert, isCA, pathLen, certConfig);
+    res = SetBasicConstraintsExtension(newCert, isCA, certConfig.GetExtensionBasicPathLenValue(attCertType), certConfig);
     VerifyTrueOrExit(res);
 
     // Add key usage certificate extensions.

@@ -25,15 +25,17 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
 {
     mWorkQueue = dispatch_queue_create("com.chip.open_commissioning_window", DISPATCH_QUEUE_SERIAL);
     auto * controller = CurrentCommissioner();
-    auto * device = [MTRBaseDevice deviceWithNodeID:@(mNodeId) controller:controller];
+    auto * device = [MTRDevice deviceWithNodeID:mNodeId deviceController:controller];
 
     auto * self = this;
     if (mCommissioningWindowOption == 0) {
-        auto * cluster = [[MTRBaseClusterAdministratorCommissioning alloc] initWithDevice:device endpoint:@(0) queue:mWorkQueue];
+        auto * cluster = [[MTRClusterAdministratorCommissioning alloc] initWithDevice:device endpointID:@(0) queue:mWorkQueue];
         auto * params = [[MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams alloc] init];
         params.commissioningTimeout = @(mCommissioningWindowTimeoutMs);
         params.timedInvokeTimeoutMs = @(10000);
         [cluster openBasicCommissioningWindowWithParams:params
+                                         expectedValues:nil
+                                  expectedValueInterval:nil
                                              completion:^(NSError * _Nullable error) {
                                                  if (error == nil) {
                                                      self->SetCommandExitStatus(CHIP_NO_ERROR);

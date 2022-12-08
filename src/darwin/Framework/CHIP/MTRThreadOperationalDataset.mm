@@ -17,12 +17,13 @@
 
 #import "MTRThreadOperationalDataset.h"
 
-#include "MTRLogging.h"
+#include "MTRLogging_Internal.h"
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
 size_t const MTRSizeThreadNetworkName = chip::Thread::kSizeNetworkName;
 size_t const MTRSizeThreadExtendedPANID = chip::Thread::kSizeExtendedPanId;
+size_t const MTRSizeThreadExtendedPanId = MTRSizeThreadExtendedPANID;
 size_t const MTRSizeThreadMasterKey = chip::Thread::kSizeMasterKey;
 size_t const MTRSizeThreadPSKc = chip::Thread::kSizePSKc;
 size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
@@ -30,6 +31,7 @@ size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
 @interface MTRThreadOperationalDataset ()
 
 @property (readonly) chip::Thread::OperationalDataset cppThreadOperationalDataset;
+@property (nonatomic, copy) NSNumber * channelNumber;
 
 @end
 
@@ -39,16 +41,16 @@ size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
                                 extendedPANID:(NSData *)extendedPANID
                                     masterKey:(NSData *)masterKey
                                          PSKc:(NSData *)PSKc
-                                      channel:(NSNumber *)channel
+                                channelNumber:(NSNumber *)channelNumber
                                         panID:(NSData *)panID
 {
     if (self = [super init]) {
-        _networkName = networkName;
-        _extendedPANID = extendedPANID;
-        _masterKey = masterKey;
-        _PSKc = PSKc;
-        _channel = channel;
-        _panID = panID;
+        _networkName = [networkName copy];
+        _extendedPANID = [extendedPANID copy];
+        _masterKey = [masterKey copy];
+        _PSKc = [PSKc copy];
+        _channelNumber = [channelNumber copy];
+        _panID = [panID copy];
         _cppThreadOperationalDataset = chip::Thread::OperationalDataset();
         if ([self _populateCppOperationalDataset]) {
             return self;
@@ -86,7 +88,7 @@ size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
     [self.PSKc getBytes:&PSKc length:MTRSizeThreadPSKc];
     _cppThreadOperationalDataset.SetPSKc(PSKc);
 
-    _cppThreadOperationalDataset.SetChannel([self.channel unsignedShortValue]);
+    _cppThreadOperationalDataset.SetChannel([self.channelNumber unsignedShortValue]);
 
     // Thread's PAN ID is 2 bytes
     if (![self _checkDataLength:self.panID expectedLength:MTRSizeThreadPANID]) {
@@ -138,7 +140,7 @@ size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
                        extendedPANID:[NSData dataWithBytes:extendedPANID length:MTRSizeThreadExtendedPANID]
                            masterKey:[NSData dataWithBytes:masterKey length:MTRSizeThreadMasterKey]
                                 PSKc:[NSData dataWithBytes:pskc length:MTRSizeThreadPSKc]
-                             channel:@(channel)
+                       channelNumber:@(channel)
                                panID:[NSData dataWithBytes:&panID length:sizeof(uint16_t)]];
 }
 
@@ -146,6 +148,35 @@ size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
 {
     chip::ByteSpan span = _cppThreadOperationalDataset.AsByteSpan();
     return [NSData dataWithBytes:span.data() length:span.size()];
+}
+
+@end
+
+@implementation MTRThreadOperationalDataset (Deprecated)
+
+- (void)setChannel:(uint16_t)channel
+{
+    self.channelNumber = @(channel);
+}
+
+- (uint16_t)channel
+{
+    return [self.channelNumber unsignedShortValue];
+}
+
+- (nullable instancetype)initWithNetworkName:(NSString *)networkName
+                               extendedPANID:(NSData *)extendedPANID
+                                   masterKey:(NSData *)masterKey
+                                        PSKc:(NSData *)PSKc
+                                     channel:(uint16_t)channel
+                                       panID:(NSData *)panID
+{
+    return [self initWithNetworkName:networkName
+                       extendedPANID:extendedPANID
+                           masterKey:masterKey
+                                PSKc:PSKc
+                       channelNumber:@(channel)
+                               panID:panID];
 }
 
 @end

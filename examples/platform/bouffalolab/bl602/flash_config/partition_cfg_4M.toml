@@ -1,0 +1,94 @@
+[pt_table]
+#partition table is 4K in size
+address0 = 0xE000
+address1 = 0xF000
+
+[[pt_entry]]
+type = 0
+name = "FW"
+device = 0
+address0 = 0x10000
+size0 = 0x1E7000
+address1 = 0x1F7000
+size1 = 0x199000
+# compressed image must set len,normal image can left it to 0
+len = 0
+
+[[pt_entry]]
+type = 2
+name = "mfg"
+device = 0
+address0 = 0x390000
+size0 = 0x32000
+address1 = 0
+size1 = 0
+# compressed image must set len,normal image can left it to 0
+len = 0
+
+[[pt_entry]]
+type = 3
+name = "media"
+device = 0
+address0 = 0x3C2000
+size0 = 0x1000
+address1 = 0
+size1 = 0
+# compressed image must set len,normal image can left it to 0
+len = 0
+
+[[pt_entry]]
+type = 4
+name = "PSM"
+device = 0
+address0 = 0x3C3000
+size0 = 0x33000
+address1 = 0
+size1 = 0
+# compressed image must set len,normal image can left it to 0
+len = 0
+
+[[pt_entry]]
+type = 5
+name = "KEY"
+device = 0
+address0 = 0x3F6000
+size0 = 0x2000
+address1 = 0
+size1 = 0
+# compressed image must set len,normal image can left it to 0
+len = 0
+
+[[pt_entry]]
+type = 6
+name = "DATA"
+device = 0
+address0 = 0x3F8000
+size0 = 0x5000
+address1 = 0
+size1 = 0
+# compressed image must set len,normal image can left it to 0
+len = 0
+
+
+[[pt_entry]]
+type = 7
+name = "factory"
+device = 0
+address0 = 0x3FD000
+size0 = 0x7000
+address1 = 0
+size1 = 0
+# compressed image must set len,normal image can left it to 0
+len = 0
+
+#if user want to put RF calibration data on flash, uncomment following pt entry
+#[[pt_entry]]
+#type = 8
+#name = "rf_para"
+#device = 0
+#address0 = 0x1FF000
+#size0 = 0x1000
+#address1 = 0
+#size1 = 0
+## compressed image must set len,normal image can left it to 0
+#len = 0

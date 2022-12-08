@@ -108,7 +108,7 @@ CHIP_ERROR FixedLabelAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 }
 } // anonymous namespace
 
-void MatterFixedLabelPluginServerInitCallback(void)
+void MatterFixedLabelPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }

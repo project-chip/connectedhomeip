@@ -23,24 +23,25 @@ template("bl602_executable") {
 
   objcopy_image_name = output_base_name + ".bin"
   objcopy_image_format = "binary"
+
   objcopy = "riscv64-unknown-elf-objcopy"
   if ("linux" == host_os) {
-    objcopy =
-        "../../${bouffalolab_toolchain}/Linux/bin/riscv64-unknown-elf-objcopy"
+    objcopy = "${bouffalolab_sdk_root}/toolchain/riscv/Linux/bin/riscv64-unknown-elf-objcopy"
   } else if ("mac" == host_os || "darwin" == host_os) {
-    objcopy =
-        "../../${bouffalolab_toolchain}/Darwin/bin/riscv64-unknown-elf-objcopy"
+    objcopy = "${bouffalolab_sdk_root}/toolchain/riscv/Darwin/bin/riscv64-unknown-elf-objcopy"
   }
 
   # Copy flashing dependencies to the output directory so that the output
   # is collectively self-contained; this allows flashing to work reliably
   # even if the build and flashing steps take place on different machines
   # or in different containers.
-
   flashing_runtime_target = target_name + ".flashing_runtime"
   flashing_script_inputs = [
+    "${chip_root}/scripts/flashing/bouffalolab_firmware_utils.py",
     "${chip_root}/scripts/flashing/firmware_utils.py",
-    "${chip_root}/scripts/flashing/bl602_firmware_utils.py",
+
+    "${chip_root}/examples/platform/bouffalolab/bl602/flash_config/partition_cfg_2M.toml",
+    "${chip_root}/examples/platform/bouffalolab/bl602/flash_config/partition_cfg_4M.toml",
   ]
   copy(flashing_runtime_target) {
     sources = flashing_script_inputs
@@ -50,7 +51,27 @@ template("bl602_executable") {
   flashing_script_generator =
       "${chip_root}/scripts/flashing/gen_flashing_script.py"
   flashing_script_name = output_base_name + ".flash.py"
-  flashing_options = [ "bl602" ]
+  flashing_options = [ "bouffalolab" ]
+  flashing_options += [ "--chipname" ]
+  flashing_options += [ "bl602" ]
+  flashing_options += [ "--xtal" ]
+  flashing_options += [ "40M" ]
+  flashing_options += [ "--pt" ]
+
+  if (invoker.board == "BL602-IOT-DVK-3S") {
+    flashing_options +=
+        [ rebase_path("partition_cfg_2M.toml", root_out_dir, root_out_dir) ]
+  } else {
+    flashing_options +=
+        [ rebase_path("partition_cfg_4M.toml", root_out_dir, root_out_dir) ]
+  }
+
+  flashing_options += [ "--ota" ]
+  flashing_options += [ "ota_images/" ]
+
+  # set 2000000 baudrate for image download by default
+  flashing_options += [ "--baudrate" ]
+  flashing_options += [ "2000000" ]
 
   flashable_executable(target_name) {
     forward_variables_from(invoker, "*")

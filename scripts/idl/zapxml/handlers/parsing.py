@@ -73,16 +73,16 @@ def AttrsToAttribute(attrs) -> Attribute:
     attribute = Attribute(definition=field)
 
     if attrs.get('optional', "false").lower() == 'true':
-        attribute.definition.attributes.add(FieldAttribute.OPTIONAL)
+        attribute.definition.qualities |= FieldQuality.OPTIONAL
 
     if attrs.get('isNullable', "false").lower() == 'true':
-        attribute.definition.attributes.add(FieldAttribute.NULLABLE)
+        attribute.definition.qualities |= FieldQuality.NULLABLE
 
     if attrs.get('readable', "true").lower() == 'true':
-        attribute.tags.add(AttributeTag.READABLE)
+        attribute.qualities |= AttributeQuality.READABLE
 
     if attrs.get('writable', "false").lower() == 'true':
-        attribute.tags.add(AttributeTag.WRITABLE)
+        attribute.qualities |= AttributeQuality.WRITABLE
 
     # TODO(#22937): NOSUBSCRIBE attribute tag is not available - could find no
     #               clear source to get this info.

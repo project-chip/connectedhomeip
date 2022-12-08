@@ -21,38 +21,53 @@ using namespace chip;
 
 CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> gCASEClientPool;
 
-CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIndex)
+CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIndex,
+                                             std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
+                                             std::function<void(CHIP_ERROR)> onConnectionFailure, uint16_t vendorId,
+                                             uint16_t productId, uint16_t deviceType, const char * deviceName, size_t numIPs,
+                                             chip::Inet::IPAddress * ipAddress)
 {
     ChipLogProgress(NotSpecified, "TargetVideoPlayerInfo nodeId=0x" ChipLogFormatX64 " fabricIndex=%d", ChipLogValueX64(nodeId),
                     fabricIndex);
     mNodeId      = nodeId;
     mFabricIndex = fabricIndex;
+    mVendorId    = vendorId;
+    mProductId   = productId;
+    mDeviceType  = deviceType;
+    mNumIPs      = numIPs;
+    for (size_t i = 0; i < numIPs && i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
+    {
+        mIpAddress[i] = ipAddress[i];
+    }
+
+    chip::Platform::CopyString(mDeviceName, chip::Dnssd::kMaxDeviceNameLen + 1, deviceName);
     for (auto & endpointInfo : mEndpoints)
     {
         endpointInfo.Reset();
     }
 
-    Server * server = &(chip::Server::GetInstance());
-    server->GetCASESessionManager()->FindOrEstablishSession(ScopedNodeId(nodeId, fabricIndex), &mOnConnectedCallback,
-                                                            &mOnConnectionFailureCallback);
-
-    if (!mDeviceProxy.ConnectionReady())
+    if (onConnectionSuccess && onConnectionFailure)
     {
-        ChipLogError(AppServer, "Failed to find an existing instance of OperationalDeviceProxy to the peer");
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        ReturnErrorOnFailure(FindOrEstablishCASESession(onConnectionSuccess, onConnectionFailure));
     }
-    ChipLogProgress(AppServer, "Created an instance of DeviceProxy");
 
     mInitialized = true;
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR TargetVideoPlayerInfo::FindOrEstablishCASESession(std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
+                                                             std::function<void(CHIP_ERROR)> onConnectionFailure)
+{
+    mOnConnectionSuccessClientCallback = onConnectionSuccess;
+    mOnConnectionFailureClientCallback = onConnectionFailure;
+    Server * server                    = &(chip::Server::GetInstance());
+    server->GetCASESessionManager()->FindOrEstablishSession(ScopedNodeId(mNodeId, mFabricIndex), &mOnConnectedCallback,
+                                                            &mOnConnectionFailureCallback);
+    return CHIP_NO_ERROR;
+}
+
 TargetEndpointInfo * TargetVideoPlayerInfo::GetOrAddEndpoint(EndpointId endpointId)
 {
-    if (!mInitialized)
-    {
-        return nullptr;
-    }
     TargetEndpointInfo * endpoint = GetEndpoint(endpointId);
     if (endpoint != nullptr)
     {
@@ -71,10 +86,6 @@ TargetEndpointInfo * TargetVideoPlayerInfo::GetOrAddEndpoint(EndpointId endpoint
 
 TargetEndpointInfo * TargetVideoPlayerInfo::GetEndpoint(EndpointId endpointId)
 {
-    if (!mInitialized)
-    {
-        return nullptr;
-    }
     for (auto & endpointInfo : mEndpoints)
     {
         if (endpointInfo.IsInitialized() && endpointInfo.GetEndpointId() == endpointId)
@@ -85,12 +96,13 @@ TargetEndpointInfo * TargetVideoPlayerInfo::GetEndpoint(EndpointId endpointId)
     return nullptr;
 }
 
+TargetEndpointInfo * TargetVideoPlayerInfo::GetEndpoints()
+{
+    return mEndpoints;
+}
+
 bool TargetVideoPlayerInfo::HasEndpoint(EndpointId endpointId)
 {
-    if (!mInitialized)
-    {
-        return false;
-    }
     for (auto & endpointInfo : mEndpoints)
     {
         if (endpointInfo.IsInitialized() && endpointInfo.GetEndpointId() == endpointId)
@@ -112,4 +124,48 @@ void TargetVideoPlayerInfo::PrintInfo()
             endpointInfo.PrintInfo();
         }
     }
+}
+
+bool TargetVideoPlayerInfo::IsSameAs(const chip::Dnssd::DiscoveredNodeData * discoveredNodeData)
+{
+    // return false because 'this' VideoPlayer is not null
+    if (discoveredNodeData == nullptr)
+    {
+        return false;
+    }
+
+    // return false because deviceNames are different
+    if (strcmp(mDeviceName, discoveredNodeData->commissionData.deviceName) != 0)
+    {
+        return false;
+    }
+
+    // return false because not even a single IP Address matches
+    if (mNumIPs > 0)
+    {
+        bool matchFound = false;
+        for (size_t i = 0; i < mNumIPs && i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
+        {
+            for (size_t j = 0;
+                 j < discoveredNodeData->resolutionData.numIPs && j < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; j++)
+            {
+                if (mIpAddress[i] == discoveredNodeData->resolutionData.ipAddress[j])
+                {
+                    matchFound = true;
+                    break;
+                }
+            }
+            if (matchFound)
+            {
+                break;
+            }
+        }
+
+        if (!matchFound)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }

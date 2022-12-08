@@ -185,26 +185,6 @@ CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOp
     return WriteConfigValue(ESP32Config::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetProductURL(char * buf, size_t bufSize)
-{
-    CHIP_ERROR err = ReadConfigValueStr(ESP32Config::kConfigKey_ProductURL, buf, bufSize, bufSize);
-    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    }
-    return err;
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetProductLabel(char * buf, size_t bufSize)
-{
-    CHIP_ERROR err = ReadConfigValueStr(ESP32Config::kConfigKey_ProductLabel, buf, bufSize, bufSize);
-    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    }
-    return err;
-}
-
 CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t bufSize)
 {
     memset(buf, 0, bufSize);
@@ -219,6 +199,25 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint32_t & softwareVer)
 {
     softwareVer = CHIP_CONFIG_SOFTWARE_VERSION_NUMBER;
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
+{
+#if CONFIG_ENABLE_ESP32_LOCATIONCAPABILITY
+    uint32_t value = 0;
+    CHIP_ERROR err = ReadConfigValue(ESP32Config::kConfigKey_LocationCapability, value);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        location = static_cast<uint8_t>(value);
+    }
+
+    return err;
+#else
+    location = static_cast<uint8_t>(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+    return CHIP_NO_ERROR;
+#endif
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)

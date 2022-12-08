@@ -117,6 +117,9 @@ struct BrowseContext : public GenericContext
 
     void DispatchFailure(DNSServiceErrorType err) override;
     void DispatchSuccess() override;
+
+    // Dispatch what we have found so far, but don't stop browsing.
+    void DispatchPartialSuccess();
 };
 
 struct InterfaceInfo

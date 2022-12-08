@@ -23,6 +23,8 @@
 #include <app/ConcreteEventPath.h>
 #include <app/DeviceProxy.h>
 
+@class MTRDeviceController;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRBaseDevice ()
@@ -53,9 +55,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign, readonly) chip::NodeId nodeID;
 
-/**
- * Controllers are created via the MTRDeviceControllerFactory object.
- */
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
@@ -67,6 +66,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
 
+@end
+
+@interface MTRClusterPath ()
+- (instancetype)initWithPath:(const chip::app::ConcreteClusterPath &)path;
 @end
 
 @interface MTRAttributePath ()

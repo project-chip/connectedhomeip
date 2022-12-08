@@ -184,7 +184,7 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 }
 } // anonymous namespace
 
-void MatterDescriptorPluginServerInitCallback(void)
+void MatterDescriptorPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }

@@ -7,3 +7,4 @@ updates:
     allow:
       - dependency-name: "third_party/pigweed/repo"
       - dependency-name: "third_party/mbedtls/repo"
+      - dependency-name: "third_party/openthread/repo"

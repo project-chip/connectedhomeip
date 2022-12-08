@@ -42,7 +42,7 @@ IGNORE: Set[str] = {
     '/platform/Beken/',
     '/platform/Infineon/CYW30739/',
     '/platform/Darwin/',
-    '/platform/EFR32/',
+    '/platform/silabs/',
     '/platform/ESP32/',
     '/platform/fake/',
     '/platform/Linux/',
@@ -51,6 +51,7 @@ IGNORE: Set[str] = {
     '/platform/Infineon/PSOC6/',
     '/platform/bouffalolab/BL602',
     '/platform/webos/',
+    '/platform/mt793x/',
     r'POSIX\.h$',
 }
 
@@ -148,7 +149,9 @@ ALLOW: Dict[str, Set[str]] = {
     # Uses platform-define to switch between list and array
     'src/lib/dnssd/minimal_mdns/ResponseSender.h': {'list'},
 
-    # Not really for embedded consumers; uses std::queue to keep track
+    # Not really for embedded consumers; uses std::deque to keep track
     # of a list of discovered things.
-    'src/controller/SetUpCodePairer.h': {'queue'},
+    'src/controller/SetUpCodePairer.h': {'deque'},
+
+    'src/controller/ExamplePersistentStorage.cpp': {'fstream'}
 }

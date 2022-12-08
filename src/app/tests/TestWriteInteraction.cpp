@@ -382,7 +382,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     const uint8_t byteSpanData[] = { 0xde, 0xad, 0xbe, 0xef };
     const char charSpanData[]    = "a simple test string";
 
-    app::Clusters::TestCluster::Structs::SimpleStruct::Type dataTx;
+    app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataTx;
     dataTx.a = 12;
     dataTx.b = true;
     dataTx.d = chip::ByteSpan(byteSpanData);
@@ -402,7 +402,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     NL_TEST_ASSERT(apSuite, callback.mOnSuccessCalled == 1);
 
     {
-        app::Clusters::TestCluster::Structs::SimpleStruct::Type dataRx;
+        app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataRx;
         TLV::TLVReader reader;
         reader.Init(attributeDataTLV, attributeDataTLVLen);
         reader.Next();
@@ -447,7 +447,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMatch(nlTe
     attributePathParams.mClusterId   = 3;
     attributePathParams.mAttributeId = 4;
 
-    DataModel::Nullable<app::Clusters::TestCluster::Structs::SimpleStruct::Type> dataTx;
+    DataModel::Nullable<app::Clusters::UnitTesting::Structs::SimpleStruct::Type> dataTx;
 
     Optional<DataVersion> version(kAcceptedDataVersion);
 
@@ -496,10 +496,10 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMismatch(n
     attributePathParams.mClusterId   = 3;
     attributePathParams.mAttributeId = 4;
 
-    app::Clusters::TestCluster::Structs::SimpleStruct::Type dataTxValue;
+    app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataTxValue;
     dataTxValue.a = 12;
     dataTxValue.b = true;
-    DataModel::Nullable<app::Clusters::TestCluster::Structs::SimpleStruct::Type> dataTx;
+    DataModel::Nullable<app::Clusters::UnitTesting::Structs::SimpleStruct::Type> dataTx;
     dataTx.SetNonNull(dataTxValue);
     Optional<DataVersion> version(kRejectedDataVersion);
     writeClient.EncodeAttribute(attributePathParams, dataTx, version);
@@ -679,6 +679,40 @@ void TestWriteInteraction::TestWriteHandlerInvalidateFabric(nlTestSuite * apSuit
 
 #endif
 
+/**
+ * Helper macro we can use to pretend we got a reply from the server in cases
+ * when the reply was actually dropped due to us not wanting the client's state
+ * machine to advance.
+ *
+ * When this macro is used, the client has sent a message and is waiting for an
+ * ack+response, and the server has sent a response that got dropped and is
+ * waiting for an ack (and maybe a response).
+ *
+ * What this macro then needs to do is:
+ *
+ * 1. Pretend that the client got an ack (and clear out the corresponding ack
+ *    state).
+ * 2. Pretend that the client got a message from the server, with the id of the
+ *    message that was dropped, which requires an ack, so the client will send
+ *    that ack in its next message.
+ *
+ * This is a macro so we get useful line numbers on assertion failures
+ */
+#define PretendWeGotReplyFromServer(aSuite, aContext, aClientExchange)                                                             \
+    {                                                                                                                              \
+        Messaging::ReliableMessageMgr * localRm    = (aContext).GetExchangeManager().GetReliableMessageMgr();                      \
+        Messaging::ExchangeContext * localExchange = aClientExchange;                                                              \
+        NL_TEST_ASSERT(aSuite, localRm->TestGetCountRetransTable() == 2);                                                          \
+                                                                                                                                   \
+        localRm->ClearRetransTable(localExchange);                                                                                 \
+        NL_TEST_ASSERT(aSuite, localRm->TestGetCountRetransTable() == 1);                                                          \
+                                                                                                                                   \
+        localRm->EnumerateRetransTable([localExchange](auto * entry) {                                                             \
+            localExchange->SetPendingPeerAckMessageCounter(entry->retainedBuf.GetMessageCounter());                                \
+            return Loop::Break;                                                                                                    \
+        });                                                                                                                        \
+    }
+
 // Write Client sends a write request, receives an unexpected message type, sends a status response to that.
 void TestWriteInteraction::TestWriteInvalidMessage1(nlTestSuite * apSuite, void * apContext)
 {
@@ -724,7 +758,11 @@ void TestWriteInteraction::TestWriteInvalidMessage1(nlTestSuite * apSuite, void 
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
 
-    rm->ClearRetransTable(writeClient.mExchangeCtx.Get());
+    // Since we are dropping packets, things are not getting acked.  Set up
+    // our MRP state to look like what it would have looked like if the
+    // packet had not gotten dropped.
+    PretendWeGotReplyFromServer(apSuite, ctx, writeClient.mExchangeCtx.Get());
+
     ctx.GetLoopback().mSentMessageCount                 = 0;
     ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
@@ -791,7 +829,11 @@ void TestWriteInteraction::TestWriteInvalidMessage2(nlTestSuite * apSuite, void 
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::WriteResponse);
 
-    rm->ClearRetransTable(writeClient.mExchangeCtx.Get());
+    // Since we are dropping packets, things are not getting acked.  Set up
+    // our MRP state to look like what it would have looked like if the
+    // packet had not gotten dropped.
+    PretendWeGotReplyFromServer(apSuite, ctx, writeClient.mExchangeCtx.Get());
+
     ctx.GetLoopback().mSentMessageCount                 = 0;
     ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
@@ -857,7 +899,11 @@ void TestWriteInteraction::TestWriteInvalidMessage3(nlTestSuite * apSuite, void 
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
 
-    rm->ClearRetransTable(writeClient.mExchangeCtx.Get());
+    // Since we are dropping packets, things are not getting acked.  Set up
+    // our MRP state to look like what it would have looked like if the
+    // packet had not gotten dropped.
+    PretendWeGotReplyFromServer(apSuite, ctx, writeClient.mExchangeCtx.Get());
+
     ctx.GetLoopback().mSentMessageCount                 = 0;
     ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
@@ -925,7 +971,11 @@ void TestWriteInteraction::TestWriteInvalidMessage4(nlTestSuite * apSuite, void 
     payloadHeader.SetExchangeID(0);
     payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
 
-    rm->ClearRetransTable(writeClient.mExchangeCtx.Get());
+    // Since we are dropping packets, things are not getting acked.  Set up
+    // our MRP state to look like what it would have looked like if the
+    // packet had not gotten dropped.
+    PretendWeGotReplyFromServer(apSuite, ctx, writeClient.mExchangeCtx.Get());
+
     ctx.GetLoopback().mSentMessageCount                 = 0;
     ctx.GetLoopback().mNumMessagesToDrop                = 0;
     ctx.GetLoopback().mNumMessagesToAllowBeforeDropping = 0;

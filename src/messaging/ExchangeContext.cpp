@@ -573,6 +573,18 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         return CHIP_NO_ERROR;
     }
 
+    if (IsMessageNotAcked())
+    {
+        // The only way we can get here is a spec violation on the other side:
+        // we sent a message that needs an ack, and the other side responded
+        // with a message that does not contain an ack for the message we sent.
+        // Just drop this message; if we delivered it to our delegate it might
+        // try to send another message-needing-an-ack in response, which would
+        // violate our internal invariants.
+        ChipLogError(ExchangeManager, "Dropping message without piggyback ack when we are waiting for an ack.");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     // Since we got the response, cancel the response timer.
     CancelResponseTimer();
 

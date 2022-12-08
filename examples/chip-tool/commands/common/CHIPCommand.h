@@ -19,7 +19,7 @@
 #pragma once
 
 #ifdef CONFIG_USE_LOCAL_STORAGE
-#include "../../config/PersistentStorage.h"
+#include <controller/ExamplePersistentStorage.h>
 #endif // CONFIG_USE_LOCAL_STORAGE
 
 #include "Command.h"
@@ -84,7 +84,7 @@ public:
         AddArgument("trace_log", 0, 1, &mTraceLog);
         AddArgument("trace_decode", 0, 1, &mTraceDecode);
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
-        AddArgument("ble-adapter", 0, UINT64_MAX, &mBleAdapterId);
+        AddArgument("ble-adapter", 0, UINT16_MAX, &mBleAdapterId);
     }
 
     /////////// Command Interface /////////

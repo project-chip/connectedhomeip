@@ -17,10 +17,10 @@
  */
 package chip.devicecontroller.model;
 
-import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
+import javax.annotation.Nullable;
 
 /** Class for tracking CHIP cluster state in a hierarchical manner. */
 public final class ClusterState {

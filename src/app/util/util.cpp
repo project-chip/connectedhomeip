@@ -15,42 +15,19 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2020 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-/***************************************************************************/
-/**
- * @file
- * @brief This file contains all of the common ZCL
- *command and attribute handling code for Ember's ZCL
- *implementation
- *******************************************************************************
- ******************************************************************************/
-
 #include "app/util/common.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/print-cluster.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/ember-compatibility-functions.h>
-#include <zap-generated/PluginApplicationCallbacks.h>
+#include <app/util/generic-callbacks.h>
+
+// TODO: figure out a clear path for compile-time codegen
+#include <app/PluginApplicationCallbacks.h>
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>
@@ -64,9 +41,6 @@ using namespace chip;
 //------------------------------------------------------------------------------
 // Globals
 
-// Storage and functions for turning on and off devices
-bool afDeviceEnabled[MAX_ENDPOINT_COUNT];
-
 #ifdef EMBER_AF_ENABLE_STATISTICS
 // a variable containing the number of messages send from the utilities
 // since emberAfInit was called.
@@ -74,8 +48,8 @@ uint32_t afNumPktsSent;
 #endif
 
 const EmberAfClusterName zclClusterNames[] = {
-    CLUSTER_IDS_TO_NAMES              // defined in print-cluster.h
-    { ZCL_NULL_CLUSTER_ID, nullptr }, // terminator
+    CLUSTER_IDS_TO_NAMES            // defined in print-cluster.h
+    { kInvalidClusterId, nullptr }, // terminator
 };
 
 // A pointer to the current command being processed
@@ -106,45 +80,12 @@ EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 
 //------------------------------------------------------------------------------
 
-// Device enabled/disabled functions
-bool emberAfIsDeviceEnabled(EndpointId endpoint)
-{
-    uint16_t index;
-#ifdef ZCL_USING_BASIC_CLUSTER_DEVICE_ENABLED_ATTRIBUTE
-    bool deviceEnabled;
-    if (emberAfReadServerAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_DEVICE_ENABLED_ATTRIBUTE_ID, (uint8_t *) &deviceEnabled,
-                                   sizeof(deviceEnabled)) == EMBER_ZCL_STATUS_SUCCESS)
-    {
-        return deviceEnabled;
-    }
-#endif
-    index = emberAfIndexFromEndpoint(endpoint);
-    if (index != 0xFFFF && index < sizeof(afDeviceEnabled))
-    {
-        return afDeviceEnabled[index];
-    }
-    return false;
-}
-
-void emberAfSetDeviceEnabled(EndpointId endpoint, bool enabled)
-{
-    uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index != 0xFFFF && index < sizeof(afDeviceEnabled))
-    {
-        afDeviceEnabled[index] = enabled;
-    }
-#ifdef ZCL_USING_BASIC_CLUSTER_DEVICE_ENABLED_ATTRIBUTE
-    emberAfWriteServerAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_DEVICE_ENABLED_ATTRIBUTE_ID, (uint8_t *) &enabled,
-                                ZCL_BOOLEAN_ATTRIBUTE_TYPE);
-#endif
-}
-
 // Is the device identifying?
 bool emberAfIsDeviceIdentifying(EndpointId endpoint)
 {
 #ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
     uint16_t identifyTime;
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, app::Clusters::Identify::Id, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
                                                       (uint8_t *) &identifyTime, sizeof(identifyTime));
     return (status == EMBER_ZCL_STATUS_SUCCESS && 0 < identifyTime);
 #else
@@ -208,14 +149,12 @@ void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
         // emberAfPopNetworkIndex();
     }
 
-    memset(afDeviceEnabled, true, emberAfEndpointCount());
-
     MATTER_PLUGINS_INIT
 
     emAfCallInits();
 }
 
-void emberAfTick(void)
+void emberAfTick()
 {
     // Call the AFV2-specific per-endpoint callbacks
     // Anything that defines callbacks as void *TickCallback(void) is called in
@@ -258,7 +197,7 @@ void MatterFanControlPluginServerInitCallback() {}
 // such as after a leave network. This allows zcl utils to clear state
 // that should not be kept when changing networks
 // ****************************************
-void emberAfStackDown(void)
+void emberAfStackDown()
 {
     emberAfRegistrationAbortCallback();
 }
@@ -271,7 +210,7 @@ uint16_t emberAfFindClusterNameIndex(ClusterId cluster)
 {
     static_assert(sizeof(ClusterId) == 4, "May need to adjust our index type or somehow define it in terms of cluster id type");
     uint16_t index = 0;
-    while (zclClusterNames[index].id != ZCL_NULL_CLUSTER_ID)
+    while (zclClusterNames[index].id != kInvalidClusterId)
     {
         if (zclClusterNames[index].id == cluster)
         {
@@ -305,7 +244,7 @@ void emberAfDecodeAndPrintCluster(ClusterId cluster)
 // If it is invalid, we just return the
 // EMBER_AF_NULL_MANUFACTURER_CODE, which we tend to use
 // for references to the standard library.
-uint16_t emberAfGetMfgCodeFromCurrentCommand(void)
+uint16_t emberAfGetMfgCodeFromCurrentCommand()
 {
     if (emberAfCurrentCommand() != nullptr)
     {
@@ -313,16 +252,6 @@ uint16_t emberAfGetMfgCodeFromCurrentCommand(void)
     }
 
     return EMBER_AF_NULL_MANUFACTURER_CODE;
-}
-
-uint8_t emberAfNextSequence(void)
-{
-    return ((++emberAfSequenceNumber) & EMBER_AF_ZCL_SEQUENCE_MASK);
-}
-
-uint8_t emberAfGetLastSequenceNumber(void)
-{
-    return (emberAfSequenceNumber & EMBER_AF_ZCL_SEQUENCE_MASK);
 }
 
 // the caller to the library can set a flag to say do not respond to the
@@ -347,7 +276,7 @@ void emberAfSetRetryOverride(EmberAfRetryOverride value)
     emberAfApsRetryOverride = value;
 }
 
-EmberAfRetryOverride emberAfGetRetryOverride(void)
+EmberAfRetryOverride emberAfGetRetryOverride()
 {
     return (EmberAfRetryOverride) emberAfApsRetryOverride;
 }
@@ -381,7 +310,7 @@ void emberAfSetDisableDefaultResponse(EmberAfDisableDefaultResponse value)
     }
 }
 
-EmberAfDisableDefaultResponse emberAfGetDisableDefaultResponse(void)
+EmberAfDisableDefaultResponse emberAfGetDisableDefaultResponse()
 {
     return (EmberAfDisableDefaultResponse) emAfDisableDefaultResponse;
 }
@@ -593,34 +522,6 @@ int8_t emberAfCompareDates(EmberAfDate* date1, EmberAfDate* date2)
 bool emberAfIsTypeSigned(EmberAfAttributeType dataType)
 {
     return (dataType >= ZCL_INT8S_ATTRIBUTE_TYPE && dataType <= ZCL_INT64S_ATTRIBUTE_TYPE);
-}
-
-EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl * controls, EndpointId endpoint)
-{
-    uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index == 0xFFFF)
-    {
-        return EMBER_INVALID_ENDPOINT;
-    }
-    emberEventControlSetInactive(&controls[index]);
-    return EMBER_SUCCESS;
-}
-
-bool emberAfEndpointEventControlGetActive(EmberEventControl * controls, EndpointId endpoint)
-{
-    uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    return (index != 0xFFFF && emberEventControlGetActive(&controls[index]));
-}
-
-EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl * controls, EndpointId endpoint)
-{
-    uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index == 0xFFFF)
-    {
-        return EMBER_INVALID_ENDPOINT;
-    }
-    emberEventControlSetActive(&controls[index]);
-    return EMBER_SUCCESS;
 }
 
 uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, const uint8_t * appendingChars,

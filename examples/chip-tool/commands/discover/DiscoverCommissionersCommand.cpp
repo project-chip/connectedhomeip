@@ -18,6 +18,7 @@
 
 #include "DiscoverCommissionersCommand.h"
 #include <arpa/inet.h>
+#include <controller/CHIPDeviceController.h>
 
 using namespace ::chip;
 

@@ -30,7 +30,7 @@
 
 //#include <lib/support/RandUtils.h>   //==> rm from TE7.5
 #include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
@@ -288,7 +288,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 {
     PRINTF("====> emberAfExternalAttributeReadCallback\r\n");
 
-    if(clusterId == ZCL_SWITCH_CLUSTER_ID) {
+    if(clusterId == Clusters::Switch::Id) {
         *buffer = g_ButtonPress;
     }
     return EMBER_ZCL_STATUS_SUCCESS;
@@ -1027,7 +1027,7 @@ void task_main(void * param)
         }
     }
 
-    while (1)
+    while (true)
     {
         /* wait for interface up */
         os_thread_sleep(os_msec_to_ticks(5000));
@@ -1131,7 +1131,7 @@ static void rst_args_lt(System::Layer * aSystemLayer, void * aAppState)
 
 void task_test_main(void * param)
 {
-    while (1)
+    while (true)
     {
         /* wait for interface up */
         os_thread_sleep(os_msec_to_ticks(500));
@@ -1144,12 +1144,12 @@ void task_test_main(void * param)
             value             = (uint16_t) is_on;
             // sync-up the switch attribute:
             PRINTF("--> update ZCL_CURRENT_POSITION_ATTRIBUTE_ID [%d] \r\n", value);
-            emAfWriteAttribute(1, ZCL_SWITCH_CLUSTER_ID, ZCL_CURRENT_POSITION_ATTRIBUTE_ID, (uint8_t *) &value, sizeof(value), true,
+            emAfWriteAttribute(1, Clusters::Switch::Id, ZCL_CURRENT_POSITION_ATTRIBUTE_ID, (uint8_t *) &value, sizeof(value), true,
                                false);
 #ifdef SUPPORT_MANUAL_CTRL
             // sync-up the Light attribute (for test event, OO.M.ManuallyControlled)
-            PRINTF("--> update [ZCL_ON_OFF_CLUSTER_ID]: ZCL_ON_OFF_ATTRIBUTE_ID [%d] \r\n", value);
-            emAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &value, sizeof(value), true, false);
+            PRINTF("--> update [Clusters::Switch::Id]: ZCL_ON_OFF_ATTRIBUTE_ID [%d] \r\n", value);
+            emAfWriteAttribute(1, Clusters::Switch::Id, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &value, sizeof(value), true, false);
 #endif // SUPPORT_MANUAL_CTRL
 
             need2sync_sw_attr = false;
@@ -1272,7 +1272,11 @@ void ShellCLIMain(void * pvParameter)
             strcpy(def_psk, "nxp12345");
         }
         PRINTF("Connecting to [%s, %s] \r\n", def_ssid, def_psk);
-        ConnectivityMgrImpl().ProvisionWiFiNetwork(def_ssid, def_psk);
+
+        // TODO: ConnectivityMgrImpl is the platform implementation of ConnectivityMgr layer.
+        // Application should use the APIs defined src/include/platform to talk to the Matter
+        // platfrom layer, instead of calling into the functions defined in the platform implemenation.
+        // ConnectivityMgrImpl().ProvisionWiFiNetwork(def_ssid, def_psk);
     }
 
     // Run CHIP servers
@@ -1525,7 +1529,7 @@ static void OnSwitchAttributeChangeCallback(EndpointId endpointId, AttributeId a
                 }
         }
         if (do_sendrpt == true) {
-                ConcreteEventPath event_path(endpointId, ZCL_SWITCH_CLUSTER_ID, 0);
+                ConcreteEventPath event_path(endpointId, Clusters::Switch::Id, 0);
                 pimEngine->GetReportingEngine().ScheduleEventDelivery(event_path, chip::app::EventOptions::Type::kUrgent,
    sizeof(uint16_t));
         }
@@ -1550,7 +1554,7 @@ void IdentifyTimerHandler(System::Layer * systemLayer, void * appState)
     if (pidt->identifyTimerCount)
     {
         pidt->identifyTimerCount--;
-        emAfWriteAttribute(pidt->ep, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID, (uint8_t *) &pidt->identifyTimerCount,
+        emAfWriteAttribute(pidt->ep, Clusters::Identify::Id, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID, (uint8_t *) &pidt->identifyTimerCount,
                            sizeof(identifyTimerCount), true, false);
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, pidt);
     }
@@ -1583,16 +1587,16 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     // path.mEndpointId, path.mClusterId, path.mAttributeId, mask, type, size, value
     switch (path.mClusterId)
     {
-    case ZCL_ON_OFF_CLUSTER_ID:
+    case Clusters::OnOff::Id:
         OnOnOffPostAttributeChangeCallback(path.mEndpointId, path.mAttributeId, value);
         break;
-    case ZCL_SWITCH_CLUSTER_ID:
+    case Clusters::Switch::Id:
         OnSwitchAttributeChangeCallback(path.mEndpointId, path.mAttributeId, value);
         // SwitchToggleOnOff();
         // Trigger to send on/off/toggle command to the bound devices
         chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
         break;
-    case ZCL_IDENTIFY_CLUSTER_ID:
+    case Clusters::Identify::Id:
         OnIdentifyPostAttributeChangeCallback(path.mEndpointId, path.mAttributeId, value);
         break;
     default:
@@ -1613,7 +1617,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
                                                    uint16_t maxReadLength)
 {
     // Added for the pairing of TE9 to report the commission_info
-    // default function (in zzz_generated/all-clusters-app/zap-generated/callback-stub.cpp)
+    // default function (in callback-stub.cpp)
     //
     PRINTF("-> %s()\n\r", __FUNCTION__);
     return EMBER_ZCL_STATUS_SUCCESS;

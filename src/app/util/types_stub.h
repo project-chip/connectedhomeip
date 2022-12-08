@@ -15,30 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2020 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-/***************************************************************************/
-/**
- * @file
- * @brief This is a stub file for types that are external to the ZCL
- *        application framework. These can be redefined/modified as needed in
- *        the CHIP project
- ******************************************************************************/
-
 #pragma once
 
 #include <string.h> // For mem* functions.
@@ -321,27 +297,6 @@ typedef struct
  * node might play in a network.
  */
 
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberNodeType
-#else
-typedef uint8_t EmberNodeType;
-enum
-#endif
-{
-    /** The device is not joined. */
-    EMBER_UNKNOWN_DEVICE = 0,
-    /** Will relay messages and can act as a parent to other nodes. */
-    EMBER_COORDINATOR = 1,
-    /** Will relay messages and can act as a parent to other nodes. */
-    EMBER_ROUTER = 2,
-    /** Communicates only with its parent and will not relay messages. */
-    EMBER_END_DEVICE = 3,
-    /** An end device whose radio can be turned off to save power.
-     *  The application must call ::emberPollForData() to receive messages.
-     */
-    EMBER_SLEEPY_END_DEVICE = 4,
-};
-
 /**
  * @brief Defines the possible incoming message types.
  */
@@ -496,8 +451,6 @@ enum
  */
 struct EmberBindingTableEntry
 {
-    EmberBindingTableEntry() = default;
-
     static EmberBindingTableEntry ForNode(chip::FabricIndex fabric, chip::NodeId node, chip::EndpointId localEndpoint,
                                           chip::EndpointId remoteEndpoint, chip::Optional<chip::ClusterId> cluster)
     {
@@ -745,19 +698,6 @@ typedef struct
     uint8_t special;
     EmberVersionType type;
 } EmberVersion;
-
-/** @brief This structure contains information about child nodes.
- *
- */
-typedef struct
-{
-    EmberEUI64 eui64;
-    EmberNodeType type;
-    EmberNodeId id;
-    uint8_t phy;
-    uint8_t power;
-    uint8_t timeout;
-} EmberChildData;
 
 /**
  * @brief A distinguished network ID that will never be assigned

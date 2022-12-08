@@ -262,14 +262,10 @@ static constexpr TestCase sTestCases[] = {
       ByteSpan(sTestCMS_CDContent02), ByteSpan(sTestCMS_SignedMessage02) },
 };
 
-static constexpr size_t sNumTestCases = ArraySize(sTestCases);
-
 static void TestCD_EncodeDecode(nlTestSuite * inSuite, void * inContext)
 {
-    for (size_t i = 0; i < sNumTestCases; i++)
+    for (const auto & testCase : sTestCases)
     {
-        const TestCase & testCase = sTestCases[i];
-
         uint8_t encodedCertElemBuf[kCertificationElements_TLVEncodedMaxLength];
         MutableByteSpan encodedCDPayload(encodedCertElemBuf);
 
@@ -359,7 +355,7 @@ static void TestCD_CMSSignAndVerify(nlTestSuite * inSuite, void * inContext)
 
     // Test with random key
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, CMS_Sign(cdContentIn, signerKeyId, keypair, signedMessage) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, CMS_Verify(signedMessage, keypair.Pubkey(), cdContentOut) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, cdContentIn.data_equal(cdContentOut));
@@ -379,10 +375,8 @@ static void TestCD_CMSSignAndVerify(nlTestSuite * inSuite, void * inContext)
 
 static void TestCD_CMSVerifyAndExtract(nlTestSuite * inSuite, void * inContext)
 {
-    for (size_t i = 0; i < sNumTestCases; i++)
+    for (const auto & testCase : sTestCases)
     {
-        const TestCase & testCase = sTestCases[i];
-
         // Verify using signer P256PublicKey
         ByteSpan cdContentOut;
         NL_TEST_ASSERT(inSuite,
@@ -412,10 +406,8 @@ static void TestCD_CMSVerifyAndExtract(nlTestSuite * inSuite, void * inContext)
 
 static void TestCD_CertificationElementsDecoder(nlTestSuite * inSuite, void * inContext)
 {
-    for (size_t i = 0; i < sNumTestCases; i++)
+    for (const auto & testCase : sTestCases)
     {
-        const TestCase & testCase = sTestCases[i];
-
         uint8_t encodedCertElemBuf[kCertificationElements_TLVEncodedMaxLength];
         MutableByteSpan encodedCDPayload(encodedCertElemBuf);
 
@@ -630,7 +622,7 @@ static const nlTest sTests[] = { NL_TEST_DEF_FN(TestCD_EncodeDecode),
                                  NL_TEST_DEF_FN(TestCD_DefaultCdTrustStore),
                                  NL_TEST_SENTINEL() };
 
-int TestCertificationDeclaration(void)
+int TestCertificationDeclaration()
 {
     nlTestSuite theSuite = { "CHIP Certification Declaration tests", &sTests[0], nullptr, nullptr };
 

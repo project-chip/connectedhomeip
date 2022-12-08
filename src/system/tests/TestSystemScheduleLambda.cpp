@@ -83,7 +83,7 @@ static int TestTeardown(void * aContext)
     return (SUCCESS);
 }
 
-int TestSystemScheduleLambda(void)
+int TestSystemScheduleLambda()
 {
     // Run test suit againt one lContext.
     nlTestRunner(&kTheSuite, nullptr);

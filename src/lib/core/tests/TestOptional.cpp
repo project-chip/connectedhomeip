@@ -191,7 +191,7 @@ int TestOptional_Teardown(void * inContext)
     return SUCCESS;
 }
 
-int TestOptional(void)
+int TestOptional()
 {
     // clang-format off
     nlTestSuite theSuite =

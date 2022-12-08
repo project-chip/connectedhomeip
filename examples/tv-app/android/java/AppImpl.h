@@ -91,7 +91,8 @@ public:
         mAccountLoginDelegate(setupPIN), mContentLauncherDelegate(attributeDelegate, { "image/*", "video/*" },
                                                                   to_underlying(SupportedStreamingProtocol::kDash) |
                                                                       to_underlying(SupportedStreamingProtocol::kHls)),
-        mMediaPlaybackDelegate(attributeDelegate), mTargetNavigatorDelegate({ "home", "search", "info", "guide", "menu" }, 0){};
+        mMediaPlaybackDelegate(attributeDelegate),
+        mTargetNavigatorDelegate(attributeDelegate, { "home", "search", "info", "guide", "menu" }, 0){};
     virtual ~ContentAppImpl() {}
 
     AccountLoginDelegate * GetAccountLoginDelegate() override { return &mAccountLoginDelegate; };
@@ -109,7 +110,11 @@ public:
         mMediaPlaybackDelegate.SetEndpointId(GetEndpointId());
         return &mMediaPlaybackDelegate;
     };
-    TargetNavigatorDelegate * GetTargetNavigatorDelegate() override { return &mTargetNavigatorDelegate; };
+    TargetNavigatorDelegate * GetTargetNavigatorDelegate() override
+    {
+        mTargetNavigatorDelegate.SetEndpointId(GetEndpointId());
+        return &mTargetNavigatorDelegate;
+    };
 
 protected:
     ApplicationBasicManager mApplicationBasicDelegate;
@@ -157,6 +162,11 @@ public:
     // and for voice agents, this may be Access::Privilege::kAdminister
     // When a vendor has admin privileges, it will get access to all clusters on ep1
     Access::Privilege GetVendorPrivilege(uint16_t vendorId) override;
+
+    // Get the cluster list this vendorId/productId should have on static endpoints such as ep1 for casting video clients.
+    // When a vendor has admin privileges, it will get access to all clusters on ep1
+    std::list<ClusterId> GetAllowedClusterListForStaticEndpoint(EndpointId endpointId, uint16_t vendorId,
+                                                                uint16_t productId) override;
 
     void AddAdminVendorId(uint16_t vendorId);
 

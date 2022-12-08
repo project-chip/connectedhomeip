@@ -19,6 +19,7 @@ package com.google.chip.chiptool
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -68,38 +69,63 @@ class SelectActionFragment : Fragment() {
     if (savedInstanceState != null) return
     if (hasLocationPermission()) return
 
-    val permissionRequest = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-      if (granted) {
-        provisionWiFiCredentialsBtn.isEnabled = true
-        provisionThreadCredentialsBtn.isEnabled = true
-      } else {
-        provisionWiFiCredentialsBtn.isEnabled = false
-        provisionThreadCredentialsBtn.isEnabled = false
+    val permissionRequest =
+      registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { grantResults
+        ->
+        var granted = true
+        for (value in grantResults.values) {
+          if (!value) {
+            granted = false
+          }
+        }
+        if (granted) {
+          provisionWiFiCredentialsBtn.isEnabled = true
+          provisionThreadCredentialsBtn.isEnabled = true
+        } else {
+          provisionWiFiCredentialsBtn.isEnabled = false
+          provisionThreadCredentialsBtn.isEnabled = false
 
-        AlertDialog.Builder(requireContext())
+          AlertDialog.Builder(requireContext())
             .setTitle(R.string.location_permission_denied_title)
             .setMessage(R.string.location_permission_denied_message)
             .setPositiveButton(R.string.text_ok) { dialog, _ -> dialog.dismiss() }
             .setCancelable(false)
             .create()
             .show()
+        }
       }
-    }
 
-    permissionRequest.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    val permissions: Array<String> =
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        arrayOf(
+          Manifest.permission.BLUETOOTH_SCAN,
+          Manifest.permission.BLUETOOTH_CONNECT,
+          Manifest.permission.ACCESS_FINE_LOCATION,
+        )
+      } else {
+        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+      }
+    permissionRequest.launch(permissions)
   }
 
   private fun hasLocationPermission(): Boolean {
-    val locationPermissionState =
-        ContextCompat.checkSelfPermission(
-            requireContext(),
-            Manifest.permission.ACCESS_FINE_LOCATION
-        )
+    val locationPermissionGranted =
+      ContextCompat.checkSelfPermission(
+        requireContext(),
+        Manifest.permission.ACCESS_FINE_LOCATION
+      ) == PackageManager.PERMISSION_GRANTED
 
-    return PackageManager.PERMISSION_GRANTED == locationPermissionState
+    // Android 12 new permission
+    var bleScanPermissionGranted = true
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      bleScanPermissionGranted =
+        ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_SCAN) ==
+          PackageManager.PERMISSION_GRANTED
+    }
+
+    return locationPermissionGranted && bleScanPermissionGranted
   }
+
 
   private fun getCallback() = FragmentUtil.getHost(this, Callback::class.java)
 

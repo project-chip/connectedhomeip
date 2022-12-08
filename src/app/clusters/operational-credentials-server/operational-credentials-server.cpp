@@ -272,11 +272,6 @@ const FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
 CHIP_ERROR DeleteFabricFromTable(FabricIndex fabricIndex)
 {
     ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().Delete(fabricIndex));
-
-    // We need to withdraw the advertisement for the now-removed fabric, so need
-    // to restart advertising altogether.
-    app::DnssdServer::Instance().StartServer();
-
     return CHIP_NO_ERROR;
 }
 
@@ -362,6 +357,10 @@ public:
     {
         ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
 
+        // We need to withdraw the advertisement for the now-removed fabric, so need
+        // to restart advertising altogether.
+        app::DnssdServer::Instance().StartServer();
+
         EventManagement::GetInstance().FabricRemoved(fabricIndex);
 
         NotifyFabricTableChanged();
@@ -396,7 +395,7 @@ private:
 
 OpCredsFabricTableDelegate gFabricDelegate;
 
-void MatterOperationalCredentialsPluginServerInitCallback(void)
+void MatterOperationalCredentialsPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 
@@ -968,7 +967,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
         Crypto::P256ECDSASignature signature;
         MutableByteSpan signatureSpan{ signature.Bytes(), signature.Capacity() };
 
-        // Getnerate attestation signature
+        // Generate attestation signature
         err = dacProvider->SignWithDeviceAttestationKey(tbsSpan, signatureSpan);
         ClearSecretData(attestationElements.Get() + attestationElementsSpan.size(), attestationChallenge.size());
         VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
@@ -1101,7 +1100,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
             Crypto::P256ECDSASignature signature;
             MutableByteSpan signatureSpan{ signature.Bytes(), signature.Capacity() };
 
-            // Getnerate attestation signature
+            // Generate attestation signature
             err = dacProvider->SignWithDeviceAttestationKey(tbsSpan, signatureSpan);
             ClearSecretData(nocsrElements.Get() + nocsrElementsSpan.size(), attestationChallenge.size());
             VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);

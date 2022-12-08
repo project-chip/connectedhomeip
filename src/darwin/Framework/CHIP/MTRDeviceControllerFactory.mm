@@ -25,8 +25,8 @@
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
-#import "MTRLogging.h"
-#import "MTRMemory.h"
+#import "MTRFramework.h"
+#import "MTRLogging_Internal.h"
 #import "MTROTAProviderDelegateBridge.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
@@ -40,6 +40,7 @@
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#include <lib/support/Pool.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <platform/PlatformManager.h>
 
@@ -49,7 +50,6 @@ using namespace chip::Controller;
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
 static NSString * const kErrorAttestationTrustStoreInit = @"Init failure while creating the attestation trust store";
 static NSString * const kErrorDACVerifierInit = @"Init failure while creating the device attestation verifier";
-static NSString * const kInfoFactoryShutdown = @"Shutting down the Matter controller factory";
 static NSString * const kErrorGroupProviderInit = @"Init failure while initializing group data provider";
 static NSString * const kErrorControllersInit = @"Init controllers array failure";
 static NSString * const kErrorControllerFactoryInit = @"Init failure while initializing controller factory";
@@ -84,6 +84,11 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
 @implementation MTRDeviceControllerFactory
 
++ (void)initialize
+{
+    MTRFrameworkInit();
+}
+
 + (instancetype)sharedInstance
 {
     static MTRDeviceControllerFactory * factory = nil;
@@ -104,7 +109,6 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     _running = NO;
     _chipWorkQueue = DeviceLayer::PlatformMgrImpl().GetWorkQueue();
     _controllerFactory = &DeviceControllerFactory::GetInstance();
-    [MTRMemory ensureInit];
 
     _groupStorageDelegate = new chip::TestPersistentStorageDelegate();
     if ([self checkForInitError:(_groupStorageDelegate != nullptr) logMsg:kErrorGroupProviderInit]) {
@@ -239,6 +243,49 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         }
 
         if (startupParams.otaProviderDelegate) {
+            if (![startupParams.otaProviderDelegate respondsToSelector:@selector(handleQueryImageForNodeID:
+                                                                                                controller:params:completion:)]
+                && ![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleQueryImageForNodeID:controller:params:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleQueryImageForNodeID");
+                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+                return;
+            }
+            if (![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completion:)]
+                && ![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleApplyUpdateRequestForNodeID");
+                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+                return;
+            }
+            if (![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:controller:params:completion:)]
+                && ![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:controller:params:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleNotifyUpdateAppliedForNodeID");
+                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+                return;
+            }
+            if (![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleBDXTransferSessionBeginForNodeID:
+                                                                             controller:fileDesignator:offset:completion:)]
+                && ![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector
+                    (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleBDXTransferSessionBeginForNodeID");
+                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+                return;
+            }
+            if (![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completion:)]
+                && ![startupParams.otaProviderDelegate
+                    respondsToSelector:@selector(handleBDXQueryForNodeID:
+                                                              controller:blockSize:blockIndex:bytesToSkip:completionHandler:)]) {
+                MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleBDXQueryForNodeID");
+                errorCode = CHIP_ERROR_INVALID_ARGUMENT;
+                return;
+            }
             _otaProviderDelegateBridge = new MTROTAProviderDelegateBridge(startupParams.otaProviderDelegate);
             if (_otaProviderDelegateBridge == nil) {
                 MTR_LOG_ERROR("Error: %@", kErrorOtaProviderInit);
@@ -277,8 +324,9 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
         // Initialize device attestation verifier
         const Credentials::AttestationTrustStore * trustStore;
-        if (startupParams.paaCerts) {
-            _attestationTrustStoreBridge = new MTRAttestationTrustStoreBridge(startupParams.paaCerts);
+        if (startupParams.productAttestationAuthorityCertificates) {
+            _attestationTrustStoreBridge
+                = new MTRAttestationTrustStoreBridge(startupParams.productAttestationAuthorityCertificates);
             if (_attestationTrustStoreBridge == nullptr) {
                 MTR_LOG_ERROR("Error: %@", kErrorAttestationTrustStoreInit);
                 errorCode = CHIP_ERROR_NO_MEMORY;
@@ -296,7 +344,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
             return;
         }
 
-        if (startupParams.cdCerts) {
+        if (startupParams.certificationDeclarationCertificates) {
             auto cdTrustStore = _deviceAttestationVerifier->GetCertificationDeclarationTrustStore();
             if (cdTrustStore == nullptr) {
                 MTR_LOG_ERROR("Error: %@", kErrorCDCertStoreInit);
@@ -304,7 +352,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
                 return;
             }
 
-            for (NSData * cdSigningCert in startupParams.cdCerts) {
+            for (NSData * cdSigningCert in startupParams.certificationDeclarationCertificates) {
                 errorCode = cdTrustStore->AddTrustedKey(AsByteSpan(cdSigningCert));
                 if (errorCode != CHIP_NO_ERROR) {
                     MTR_LOG_ERROR("Error: %@", kErrorCDCertStoreInit);
@@ -330,6 +378,19 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
             MTR_LOG_ERROR("Error: %@", kErrorControllerFactoryInit);
             return;
         }
+
+        // This needs to happen after DeviceControllerFactory::Init,
+        // because that creates (lazily, by calling functions with
+        // static variables in them) some static-lifetime objects.
+        chip::HeapObjectPoolExitHandling::IgnoreLeaksOnExit();
+
+        // Make sure we don't leave a system state running while we have no
+        // controllers started.  This is working around the fact that a system
+        // state is brought up live on factory init, and not when it comes time
+        // to actually start a controller, and does not actually clean itself up
+        // until its refcount (which starts as 0) goes to 0.
+        _controllerFactory->RetainSystemState();
+        _controllerFactory->ReleaseSystemState();
 
         self->_running = YES;
     });
@@ -357,7 +418,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         [_controllers[0] shutdown];
     }
 
-    MTR_LOG_DEBUG("%@", kInfoFactoryShutdown);
+    MTR_LOG_DEBUG("Shutting down the Matter controller factory");
     _controllerFactory->Shutdown();
 
     [self cleanupStartupObjects];
@@ -600,7 +661,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         }
     }
 
-    *fabric = fabricTable.FindFabric(pubKey, [params.fabricID unsignedLongLongValue]);
+    *fabric = fabricTable.FindFabric(pubKey, params.fabricID.unsignedLongLongValue);
     return YES;
 }
 
@@ -614,8 +675,11 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     VerifyOrReturnValue(_otaProviderDelegateBridge != nil, controller);
     VerifyOrReturnValue([_controllers count] == 1, controller);
 
-    auto systemState = _controllerFactory->GetSystemState();
-    CHIP_ERROR err = _otaProviderDelegateBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr());
+    __block CHIP_ERROR err;
+    dispatch_sync(_chipWorkQueue, ^{
+        auto systemState = _controllerFactory->GetSystemState();
+        err = _otaProviderDelegateBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr());
+    });
     if (CHIP_NO_ERROR != err) {
         MTR_LOG_ERROR("Failed to init provider delegate bridge: %" CHIP_ERROR_FORMAT, err.Format());
         [controller shutdown];
@@ -651,19 +715,23 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     [_controllers removeObject:controller];
 
     if ([_controllers count] == 0) {
-        if (_otaProviderDelegateBridge) {
-            _otaProviderDelegateBridge->Shutdown();
-        }
-
         // That was our last controller.  Stop the event loop before it
         // shuts down, because shutdown of the last controller will tear
         // down most of the world.
         DeviceLayer::PlatformMgrImpl().StopEventLoopTask();
 
+        if (_otaProviderDelegateBridge) {
+            _otaProviderDelegateBridge->Shutdown();
+        }
+
         [controller shutDownCppController];
     } else {
         // Do the controller shutdown on the Matter work queue.
         dispatch_sync(_chipWorkQueue, ^{
+            if (_otaProviderDelegateBridge) {
+                _otaProviderDelegateBridge->ControllerShuttingDown(controller);
+            }
+
             [controller shutDownCppController];
         });
     }
@@ -704,12 +772,98 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
     _storage = storage;
     _otaProviderDelegate = nil;
-    _paaCerts = nil;
-    _cdCerts = nil;
+    _productAttestationAuthorityCertificates = nil;
+    _certificationDeclarationCertificates = nil;
     _port = nil;
     _shouldStartServer = NO;
 
     return self;
+}
+
+@end
+
+@implementation MTRControllerFactory
+- (BOOL)isRunning
+{
+    return [[MTRDeviceControllerFactory sharedInstance] isRunning];
+}
+
++ (instancetype)sharedInstance
+{
+    // We could try to delegate to MTRDeviceControllerFactory's sharedInstance
+    // here, but then we would have to add the backwards-compar selectors to
+    // MTRDeviceControllerFactory, etc.  Just forward things along instead.
+    // This works because we never accept an MTRControllerFactory as an argument
+    // in any of our public APIs.
+    static MTRControllerFactory * factory = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        // initialize the factory.
+        factory = [[MTRControllerFactory alloc] init];
+    });
+    return factory;
+}
+
+- (BOOL)startup:(MTRControllerFactoryParams *)startupParams
+{
+    return [[MTRDeviceControllerFactory sharedInstance] startControllerFactory:startupParams error:nil];
+}
+
+- (void)shutdown
+{
+    return [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
+}
+
+- (MTRDeviceController * _Nullable)startControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams
+{
+    return [[MTRDeviceControllerFactory sharedInstance] createControllerOnExistingFabric:startupParams error:nil];
+}
+
+- (MTRDeviceController * _Nullable)startControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
+{
+    return [[MTRDeviceControllerFactory sharedInstance] createControllerOnNewFabric:startupParams error:nil];
+}
+
+@end
+
+@implementation MTRControllerFactoryParams
+
+- (id<MTRPersistentStorageDelegate>)storageDelegate
+{
+    // Cast is safe, because MTRPersistentStorageDelegate doesn't add
+    // any selectors to MTRStorage, so anything implementing
+    // MTRStorage also implements MTRPersistentStorageDelegate.
+    return static_cast<id<MTRPersistentStorageDelegate>>(self.storage);
+}
+
+- (BOOL)startServer
+{
+    return self.shouldStartServer;
+}
+
+- (void)setStartServer:(BOOL)startServer
+{
+    self.shouldStartServer = startServer;
+}
+
+- (nullable NSArray<NSData *> *)paaCerts
+{
+    return self.productAttestationAuthorityCertificates;
+}
+
+- (void)setPaaCerts:(nullable NSArray<NSData *> *)paaCerts
+{
+    self.productAttestationAuthorityCertificates = paaCerts;
+}
+
+- (nullable NSArray<NSData *> *)cdCerts
+{
+    return self.certificationDeclarationCertificates;
+}
+
+- (void)setCdCerts:(nullable NSArray<NSData *> *)cdCerts
+{
+    self.certificationDeclarationCertificates = cdCerts;
 }
 
 @end

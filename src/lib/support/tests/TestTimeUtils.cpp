@@ -1021,7 +1021,7 @@ void TestChipEpochTimeConversion()
     }
 }
 
-int TestTimeUtils(void)
+int TestTimeUtils()
 {
     TestOrdinalDateConversion();
     TestDaysSinceEpochConversion();

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,13 +19,14 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include "BluezObjectList.h"
-#include "MainLoop.h"
-#include "Types.h"
-
 #include <errno.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <pthread.h>
+
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
+
+#include "BluezObjectList.h"
+#include "Types.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -121,10 +122,8 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
 {
     ReturnErrorCodeIf(mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(MainLoop::Instance().EnsureStarted());
-
     mIsScanning = true; // optimistic, to allow all callbacks to check this
-    if (!MainLoop::Instance().ScheduleAndWait(MainLoopStartScan, this))
+    if (PlatformMgrImpl().ScheduleOnGLibMainLoopThread(MainLoopStartScan, this, true) != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to schedule BLE scan start.");
         mIsScanning = false;
@@ -173,7 +172,7 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
         mInterfaceChangedSignal = 0;
     }
 
-    if (!MainLoop::Instance().ScheduleAndWait(MainLoopStopScan, this))
+    if (PlatformMgrImpl().ScheduleOnGLibMainLoopThread(MainLoopStopScan, this, true) != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to schedule BLE scan stop.");
         return CHIP_ERROR_INTERNAL;
@@ -260,7 +259,7 @@ void ChipDeviceScanner::RemoveDevice(BluezDevice1 * device)
 
     if (!bluez_adapter1_call_remove_device_sync(mAdapter, devicePath, nullptr, &error))
     {
-        ChipLogDetail(Ble, "Failed to remove device %s: %s", devicePath, error->message);
+        ChipLogDetail(Ble, "Failed to remove device %s: %s", StringOrNullMarker(devicePath), error->message);
         g_error_free(error);
     }
 }

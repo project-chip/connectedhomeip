@@ -263,6 +263,9 @@ private:
     bool IsIdle() const { return mState == HandlerState::Idle; }
     bool IsReportable() const
     {
+        // Important: Anything that changes the state IsReportable depends on in
+        // a way that causes IsReportable to become true must call ScheduleRun
+        // on the reporting engine.
         return mState == HandlerState::GeneratingReports && !mFlags.Has(ReadHandlerFlags::HoldReport) &&
             (IsDirty() || !mFlags.Has(ReadHandlerFlags::HoldSync));
     }
@@ -299,7 +302,7 @@ private:
     {
         return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);
     }
-    void ClearForceDirtyFlag() { mFlags.Clear(ReadHandlerFlags::ForceDirty); }
+    void ClearForceDirtyFlag() { ClearStateFlag(ReadHandlerFlags::ForceDirty); }
     NodeId GetInitiatorNodeId() const
     {
         auto session = GetSession();
@@ -317,7 +320,7 @@ private:
 
     auto GetTransactionStartGeneration() const { return mTransactionStartGeneration; }
 
-    void UnblockUrgentEventDelivery() { mFlags.Set(ReadHandlerFlags::ForceDirty); }
+    void UnblockUrgentEventDelivery();
 
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
     void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
@@ -374,6 +377,10 @@ private:
 
     const char * GetStateStr() const;
 
+    // Helpers for managing our state flags properly.
+    void SetStateFlag(ReadHandlerFlags aFlag, bool aValue = true);
+    void ClearStateFlag(ReadHandlerFlags aFlag);
+
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
 
     // The current generation of the reporting engine dirty set the last time we were notified that a path we're interested in was
@@ -429,6 +436,11 @@ private:
     SessionHolder mSessionHandle;
 
     Messaging::ExchangeHolder mExchangeCtx;
+#if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
+    // TODO: this should be replaced by a pointer to the InteractionModelEngine that created the ReadHandler
+    // once InteractionModelEngine is no longer a singleton (see issue 23625)
+    Messaging::ExchangeManager * mExchangeMgr = nullptr;
+#endif // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
 
     ObjectList<AttributePathParams> * mpAttributePathList   = nullptr;
     ObjectList<EventPathParams> * mpEventPathList           = nullptr;

@@ -35,7 +35,6 @@ endif (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/examples/chef/out/${SAMPLE_NAME}/zap-generated/callback-stub.cpp
     ${chip_dir}/examples/chef/out/${SAMPLE_NAME}/zap-generated/IMClusterCommandHandler.cpp
 
     ${matter_example_path}//main/chipinterface.cpp

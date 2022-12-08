@@ -129,30 +129,45 @@ exit:
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
     struct ifaddrs * addresses = nullptr;
+    struct sockaddr_ll * mac   = nullptr;
     CHIP_ERROR error           = CHIP_NO_ERROR;
-    bool found                 = false;
 
     // TODO: ideally the buffer size should have been passed as a span, however
     //       for now use the size that is validated in GenericConfigurationManagerImpl.ipp
     constexpr size_t kExpectedBufMinSize = ConfigurationManager::kPrimaryMACAddressLength;
     memset(buf, 0, kExpectedBufMinSize);
 
+    // Prioritize address for interface matching the WiFi interface name
+    // specified in the config headers. Otherwise, use the address for the
+    // first non-loopback interface.
     VerifyOrExit(getifaddrs(&addresses) == 0, error = CHIP_ERROR_INTERNAL);
     for (auto addr = addresses; addr != nullptr; addr = addr->ifa_next)
     {
-        if ((addr->ifa_addr) && (addr->ifa_addr->sa_family == AF_PACKET) && strncmp(addr->ifa_name, "lo", IFNAMSIZ) != 0)
+        if ((addr->ifa_addr) && (addr->ifa_addr->sa_family == AF_PACKET))
         {
-            struct sockaddr_ll * mac = (struct sockaddr_ll *) addr->ifa_addr;
-            memcpy(buf, mac->sll_addr, std::min<size_t>(mac->sll_halen, kExpectedBufMinSize));
-            found = true;
-            break;
+            if (strncmp(addr->ifa_name, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, IFNAMSIZ) == 0)
+            {
+                mac = (struct sockaddr_ll *) addr->ifa_addr;
+                break;
+            }
+
+            if (strncmp(addr->ifa_name, "lo", IFNAMSIZ) != 0 && !mac)
+            {
+                mac = (struct sockaddr_ll *) addr->ifa_addr;
+            }
         }
     }
-    freeifaddrs(addresses);
-    if (!found)
+
+    if (mac)
+    {
+        memcpy(buf, mac->sll_addr, std::min<size_t>(mac->sll_halen, kExpectedBufMinSize));
+    }
+    else
     {
         error = CHIP_ERROR_NO_ENDPOINT;
     }
+
+    freeifaddrs(addresses);
 
 exit:
     return error;
@@ -292,7 +307,7 @@ CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t 
     return PosixConfig::WriteConfigValueBin(key, data, dataLen);
 }
 
-void ConfigurationManagerImpl::RunConfigUnitTest(void)
+void ConfigurationManagerImpl::RunConfigUnitTest()
 {
     PosixConfig::RunConfigUnitTest();
 }
@@ -369,17 +384,23 @@ CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
 
 CHIP_ERROR ConfigurationManagerImpl::GetRegulatoryLocation(uint8_t & location)
 {
-    uint32_t value = 0;
+    uint32_t value;
 
-    CHIP_ERROR err = ReadConfigValue(PosixConfig::kConfigKey_RegulatoryLocation, value);
-
-    if (err == CHIP_NO_ERROR)
+    if (CHIP_NO_ERROR != ReadConfigValue(PosixConfig::kConfigKey_RegulatoryLocation, value))
     {
-        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        ReturnErrorOnFailure(GetLocationCapability(location));
+
+        if (CHIP_NO_ERROR != StoreRegulatoryLocation(location))
+        {
+            ChipLogError(DeviceLayer, "Failed to store RegulatoryLocation");
+        }
+    }
+    else
+    {
         location = static_cast<uint8_t>(value);
     }
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)

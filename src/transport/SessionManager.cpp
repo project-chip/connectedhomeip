@@ -881,7 +881,7 @@ Optional<SessionHandle> SessionManager::FindSecureSessionForNode(ScopedNodeId pe
             //
             // Select the active session with the most recent activity to return back to the caller.
             //
-            if ((found && (found->GetLastActivityTime() > session->GetLastActivityTime())) || !found)
+            if ((found == nullptr) || (found->GetLastActivityTime() < session->GetLastActivityTime()))
             {
                 found = session;
             }

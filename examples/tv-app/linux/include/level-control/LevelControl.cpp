@@ -21,11 +21,11 @@
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 
 using namespace chip;
-
+using namespace chip::app::Clusters;
 #define MAX_LEVEL 99
 #define MIN_LEVEL 1
 
@@ -40,12 +40,13 @@ static EmberAfLevelControlState stateTable[EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER
 
 static EmberAfLevelControlState * getState(EndpointId endpoint)
 {
-    uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID);
+    uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, LevelControl::Id);
     return (ep == 0xFF ? NULL : &stateTable[ep]);
 }
 
 static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize, pp::DataModel::Nullable<uint16_t> transitionTimeDs,
-                        uint8_t optionMask, uint8_t optionOverride)
+                        BitMask<LevelControl::LevelControlOptions> optionMask,
+                        BitMask<LevelControl::LevelControlOptions> optionOverride)
 {
 
     EndpointId endpoint              = emberAfCurrentEndpoint();
@@ -88,7 +89,7 @@ static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize,
         }
         break;
     default:
-        status = EMBER_ZCL_STATUS_INVALID_FIELD;
+        status = EMBER_ZCL_STATUS_INVALID_COMMAND;
         goto send_default_response;
     }
 
@@ -117,14 +118,15 @@ static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize,
     }
 
 send_default_response:
-    if (emberAfCurrentCommand()->apsFrame->clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID)
+    if (emberAfCurrentCommand()->apsFrame->clusterId == LevelControl::Id)
     {
         emberAfSendImmediateDefaultResponse(status);
     }
 }
 
 bool emberAfLevelControlClusterStepCallback(uint8_t stepMode, uint8_t stepSize, pp::DataModel::Nullable<uint8_t> transitionTime,
-                                            uint8_t optionMask, uint8_t optionOverride)
+                                            BitMask<LevelControl::LevelControlOptions> optionMask,
+                                            BitMask<LevelControl::LevelControlOptions> optionOverride)
 {
     stepHandler(ZCL_STEP_COMMAND_ID, stepMode, stepSize, transitionTime, optionMask, optionOverride);
     return true;

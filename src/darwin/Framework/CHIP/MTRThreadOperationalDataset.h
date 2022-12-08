@@ -32,10 +32,11 @@ NS_ASSUME_NONNULL_BEGIN
  * The expected lengths of each of the NSData fields in the MTRThreadOperationalDataset
  */
 extern size_t const MTRSizeThreadNetworkName;
-extern size_t const MTRSizeThreadExtendedPANID;
+extern size_t const MTRSizeThreadExtendedPanId MTR_NEWLY_DEPRECATED("Please use MTRSizeThreadExtendedPANID");
+extern size_t const MTRSizeThreadExtendedPANID MTR_NEWLY_AVAILABLE;
 extern size_t const MTRSizeThreadMasterKey;
 extern size_t const MTRSizeThreadPSKc;
-extern size_t const MTRSizeThreadPANID;
+extern size_t const MTRSizeThreadPANID MTR_NEWLY_AVAILABLE;
 
 /**
  * The Thread Network name
@@ -56,7 +57,7 @@ extern size_t const MTRSizeThreadPANID;
 /**
  * The Thread network channel.  Always an unsigned 16-bit integer.
  */
-@property (nonatomic, copy, readonly) NSNumber * channel;
+@property (nonatomic, copy, readonly) NSNumber * channelNumber MTR_NEWLY_AVAILABLE;
 /**
  * A uint16_t stored as 2-bytes in host order representing the Thread PAN ID
  */
@@ -74,7 +75,7 @@ extern size_t const MTRSizeThreadPANID;
  * @param masterKey Must be MTRSizeThreadMasterKey bytes. Otherwise nil will be
  *                  returned.
  * @param PSKc Must be MTRSizeThreadPSKc bytes.  Otherwise nil will be returned.
- * @param channel Must be an unsigned 16-bit value.
+ * @param channelNumber Must be an unsigned 16-bit value.
  * @param panID Must be MTRSizeThreadPANID bytes.  Otherwise nil will be
  *              returned.  In particular, it's expected to be a 16-bit unsigned
  *              integer stored as 2 bytes in host order.
@@ -83,8 +84,8 @@ extern size_t const MTRSizeThreadPANID;
                                 extendedPANID:(NSData *)extendedPANID
                                     masterKey:(NSData *)masterKey
                                          PSKc:(NSData *)PSKc
-                                      channel:(NSNumber *)channel
-                                        panID:(NSData *)panID;
+                                channelNumber:(NSNumber *)channelNumber
+                                        panID:(NSData *)panID MTR_NEWLY_AVAILABLE;
 
 /**
  * Create a Thread Operational Dataset object with a RCP formatted active operational dataset.
@@ -97,6 +98,20 @@ extern size_t const MTRSizeThreadPANID;
  * This can be used for the threadOperationalDataset of MTRCommissioningParameters.
  */
 - (NSData *)data;
+
+@end
+
+@interface MTRThreadOperationalDataset (Deprecated)
+
+@property (nonatomic, readwrite) uint16_t channel MTR_NEWLY_DEPRECATED("Please use channelNumber");
+
+- (nullable instancetype)initWithNetworkName:(NSString *)networkName
+                               extendedPANID:(NSData *)extendedPANID
+                                   masterKey:(NSData *)masterKey
+                                        PSKc:(NSData *)PSKc
+                                     channel:(uint16_t)channel
+                                       panID:(NSData *)panID
+    MTR_NEWLY_DEPRECATED("Please use initWithNetworkName:extendedPANID:masterKey:PSKc:channelNumber:panID");
 
 @end
 

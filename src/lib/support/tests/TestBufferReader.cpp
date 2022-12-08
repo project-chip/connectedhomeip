@@ -141,7 +141,7 @@ static const nlTest sTests[] = { NL_TEST_DEF_FN(TestBufferReader_Basic), NL_TEST
                                  NL_TEST_DEF_FN(TestBufferReader_Saturation), NL_TEST_DEF_FN(TestBufferReader_Skip),
                                  NL_TEST_SENTINEL() };
 
-int TestBufferReader(void)
+int TestBufferReader()
 {
     nlTestSuite theSuite = { "CHIP BufferReader tests", &sTests[0], nullptr, nullptr };
 

@@ -1,7 +1,6 @@
-
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,7 +57,7 @@ CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, vo
 CHIP_ERROR PythonPersistentStorageDelegate::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
 {
     mStorage[key] = std::string(static_cast<const char *>(value), size);
-    ChipLogDetail(Controller, "SyncSetKeyValue on %s", key);
+    ChipLogDetail(Controller, "SyncSetKeyValue on %s", StringOrNullMarker(key));
 
     return CHIP_NO_ERROR;
 }
@@ -79,7 +78,7 @@ namespace Python {
 
 CHIP_ERROR StorageAdapter::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
 {
-    ChipLogDetail(Controller, "StorageAdapter::GetKeyValue: Key = %s, Value = %p (%u)", key, value, size);
+    ChipLogDetail(Controller, "StorageAdapter::GetKeyValue: Key = %s, Value = %p (%u)", StringOrNullMarker(key), value, size);
     if ((value == nullptr) && (size != 0))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -109,7 +108,7 @@ CHIP_ERROR StorageAdapter::SyncGetKeyValue(const char * key, void * value, uint1
 CHIP_ERROR StorageAdapter::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
 {
     ReturnErrorCodeIf(((value == nullptr) && (size != 0)), CHIP_ERROR_INVALID_ARGUMENT);
-    ChipLogDetail(Controller, "StorageAdapter::SetKeyValue: Key = %s, Value = %p (%u)", key, value, size);
+    ChipLogDetail(Controller, "StorageAdapter::SetKeyValue: Key = %s, Value = %p (%u)", StringOrNullMarker(key), value, size);
     mSetKeyCb(mContext, key, value, size);
     return CHIP_NO_ERROR;
 }
@@ -124,7 +123,7 @@ CHIP_ERROR StorageAdapter::SyncDeleteKeyValue(const char * key)
         return err;
     }
 
-    ChipLogDetail(Controller, "StorageAdapter::DeleteKeyValue: Key = %s", key);
+    ChipLogDetail(Controller, "StorageAdapter::DeleteKeyValue: Key = %s", StringOrNullMarker(key));
     mDeleteKeyCb(mContext, key);
     return CHIP_NO_ERROR;
 }

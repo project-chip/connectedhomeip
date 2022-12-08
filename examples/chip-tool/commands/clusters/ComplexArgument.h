@@ -29,7 +29,8 @@
 
 #include "JsonParser.h"
 
-constexpr uint8_t kMaxLabelLength = 100;
+constexpr uint8_t kMaxLabelLength  = 100;
+constexpr const char kNullString[] = "null";
 
 class ComplexArgumentParser
 {
@@ -196,7 +197,7 @@ public:
 
         size_t size = strlen(value.asCString());
         auto buffer = static_cast<char *>(chip::Platform::MemoryCalloc(size, sizeof(char)));
-        chip::Platform::CopyString(buffer, size, value.asCString());
+        memcpy(buffer, value.asCString(), size);
 
         request = chip::CharSpan(buffer, size);
         return CHIP_NO_ERROR;
@@ -326,7 +327,11 @@ public:
     CHIP_ERROR Parse(const char * label, const char * json)
     {
         Json::Value value;
-        if (!JsonParser::ParseComplexArgument(label, json, value))
+        if (strcmp(kNullString, json) == 0)
+        {
+            value = Json::nullValue;
+        }
+        else if (!JsonParser::ParseComplexArgument(label, json, value))
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }

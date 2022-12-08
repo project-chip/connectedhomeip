@@ -59,6 +59,12 @@ static_assert(LWIP_VERSION_MAJOR > 1, "CHIP requires LwIP 2.0 or later");
 #undef HAVE_IPV6_MULTICAST
 #endif
 
+#if (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
+#define PBUF_STRUCT_DATA_CONTIGUOUS(pbuf) (pbuf)->type == PBUF_RAM || (pbuf)->type == PBUF_POOL
+#else // (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
+#define PBUF_STRUCT_DATA_CONTIGUOUS(pbuf) (pbuf)->type_internal & PBUF_TYPE_FLAG_STRUCT_DATA_CONTIGUOUS
+#endif // (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
+
 namespace chip {
 namespace Platform {
 template <>
@@ -71,6 +77,8 @@ struct Deleter<struct pbuf>
 
 namespace chip {
 namespace Inet {
+
+EndpointQueueFilter * UDPEndPointImplLwIP::sQueueFilter = nullptr;
 
 CHIP_ERROR UDPEndPointImplLwIP::BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port,
                                          InterfaceId interfaceId)
@@ -281,7 +289,16 @@ void UDPEndPointImplLwIP::Free()
 
 void UDPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && msg, IPPacketInfo * pktInfo)
 {
-    if ((mState == State::kListening) && (OnMessageReceived != nullptr))
+    // Process packet filter if needed. May cause packet to get dropped before processing.
+    bool dropPacket = false;
+    if ((pktInfo != nullptr) && (sQueueFilter != nullptr))
+    {
+        auto outcome = sQueueFilter->FilterAfterDequeue(this, *pktInfo, msg);
+        dropPacket   = (outcome == EndpointQueueFilter::FilterOutcome::kDropPacket);
+    }
+
+    // Process actual packet if allowed
+    if ((mState == State::kListening) && (OnMessageReceived != nullptr) && !dropPacket)
     {
         if (pktInfo != nullptr)
         {
@@ -366,6 +383,7 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
 {
     Platform::UniquePtr<struct pbuf> pbufFreeGuard(p);
     UDPEndPointImplLwIP * ep = static_cast<UDPEndPointImplLwIP *>(arg);
+    System::PacketBufferHandle buf;
     if (ep->mState == State::kClosed)
     {
         return;
@@ -378,20 +396,56 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
         return;
     }
 
-    // TODO: Skip copying the buffer if the pbuf already meets the PacketBuffer memory model
-    System::PacketBufferHandle buf = System::PacketBufferHandle::New(p->tot_len, 0);
-    if (buf.IsNull() || pbuf_copy_partial(p, buf->Start(), p->tot_len, 0) != p->tot_len)
+    if (PBUF_STRUCT_DATA_CONTIGUOUS(p))
     {
-        ChipLogError(Inet, "Cannot copy received pbuf of size %u", p->tot_len);
-        return;
+        buf = System::PacketBufferHandle::Adopt(p);
+        // Release pbufFreeGuard since the buf has the ownership of the pbuf.
+        pbufFreeGuard.release();
+        if (buf->HasChainedBuffer())
+        {
+            buf->CompactHead();
+        }
+        if (buf->HasChainedBuffer())
+        {
+            // Have to allocate a new big-enough buffer and copy.
+            uint16_t messageSize            = buf->TotalLength();
+            System::PacketBufferHandle copy = System::PacketBufferHandle::New(messageSize, 0);
+            if (copy.IsNull() || buf->Read(copy->Start(), messageSize) != CHIP_NO_ERROR)
+            {
+                ChipLogError(Inet, "No memory to flatten incoming packet buffer chain of size %u", buf->TotalLength());
+                return;
+            }
+            buf = std::move(copy);
+        }
     }
-    buf->SetDataLength(p->tot_len);
+    else
+    {
+        buf = System::PacketBufferHandle::New(p->tot_len, 0);
+        if (buf.IsNull() || pbuf_copy_partial(p, buf->Start(), p->tot_len, 0) != p->tot_len)
+        {
+            ChipLogError(Inet, "Cannot copy received pbuf of size %u", p->tot_len);
+            return;
+        }
+        buf->SetDataLength(p->tot_len);
+    }
 
     pktInfo->SrcAddress  = IPAddress(*addr);
     pktInfo->DestAddress = IPAddress(*ip_current_dest_addr());
     pktInfo->Interface   = InterfaceId(ip_current_netif());
     pktInfo->SrcPort     = port;
     pktInfo->DestPort    = pcb->local_port;
+
+    auto filterOutcome = EndpointQueueFilter::FilterOutcome::kAllowPacket;
+    if (sQueueFilter != nullptr)
+    {
+        filterOutcome = sQueueFilter->FilterBeforeEnqueue(ep, *(pktInfo.get()), buf);
+    }
+
+    if (filterOutcome != EndpointQueueFilter::FilterOutcome::kAllowPacket)
+    {
+        // Logging, if any, should be at the choice of the filter impl at time of filtering.
+        return;
+    }
 
     // Increase mDelayReleaseCount to delay release of this UDP EndPoint while the HandleDataReceived call is
     // pending on it.
@@ -400,7 +454,9 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
     CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda(
         [ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf), pktInfo = pktInfo.get()] {
             ep->mDelayReleaseCount--;
-            ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p), pktInfo);
+
+            auto handle = System::PacketBufferHandle::Adopt(p);
+            ep->HandleDataReceived(std::move(handle), pktInfo);
         });
 
     if (err == CHIP_NO_ERROR)
@@ -412,6 +468,14 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
     }
     else
     {
+        // On failure to enqueue the processing, we have to tell the filter that
+        // the packet is basically dequeued, if it tries to keep track of the lifecycle.
+        if (sQueueFilter != nullptr)
+        {
+            (void) sQueueFilter->FilterAfterDequeue(ep, *(pktInfo.get()), buf);
+            ChipLogError(Inet, "Dequeue ERROR err = %" CHIP_ERROR_FORMAT, err.Format());
+        }
+
         ep->mDelayReleaseCount--;
     }
 }

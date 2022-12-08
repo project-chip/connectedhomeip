@@ -19,13 +19,13 @@ package chip.devicecontroller;
 
 import android.bluetooth.BluetoothGatt;
 import android.util.Log;
-import androidx.annotation.Nullable;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {

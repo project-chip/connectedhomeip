@@ -35,34 +35,31 @@ namespace {
 
 using CertChainElement = OperationalCertificateStore::CertChainElement;
 
-const char * GetStorageKeyForCert(DefaultStorageKeyAllocator & keyAllocator, FabricIndex fabricIndex, CertChainElement element)
+StorageKeyName GetStorageKeyForCert(FabricIndex fabricIndex, CertChainElement element)
 {
-    const char * storageKey = nullptr;
-
     switch (element)
     {
     case CertChainElement::kNoc:
-        storageKey = keyAllocator.FabricNOC(fabricIndex);
+        return DefaultStorageKeyAllocator::FabricNOC(fabricIndex);
         break;
     case CertChainElement::kIcac:
-        storageKey = keyAllocator.FabricICAC(fabricIndex);
+        return DefaultStorageKeyAllocator::FabricICAC(fabricIndex);
         break;
     case CertChainElement::kRcac:
-        storageKey = keyAllocator.FabricRCAC(fabricIndex);
+        return DefaultStorageKeyAllocator::FabricRCAC(fabricIndex);
         break;
     default:
         break;
     }
 
-    return storageKey;
+    return StorageKeyName::Uninitialized();
 }
 
 bool StorageHasCertificate(PersistentStorageDelegate * storage, FabricIndex fabricIndex, CertChainElement element)
 {
-    DefaultStorageKeyAllocator keyAllocator;
-    const char * storageKey = GetStorageKeyForCert(keyAllocator, fabricIndex, element);
+    StorageKeyName storageKey = GetStorageKeyForCert(fabricIndex, element);
 
-    if (storageKey == nullptr)
+    if (!storageKey)
     {
         return false;
     }
@@ -73,7 +70,7 @@ bool StorageHasCertificate(PersistentStorageDelegate * storage, FabricIndex fabr
     uint8_t placeHolderCertBuffer[kMaxCHIPCertLength];
 
     uint16_t keySize = sizeof(placeHolderCertBuffer);
-    CHIP_ERROR err   = storage->SyncGetKeyValue(storageKey, &placeHolderCertBuffer[0], keySize);
+    CHIP_ERROR err   = storage->SyncGetKeyValue(storageKey.KeyName(), &placeHolderCertBuffer[0], keySize);
 
     return (err == CHIP_NO_ERROR);
 }
@@ -81,11 +78,14 @@ bool StorageHasCertificate(PersistentStorageDelegate * storage, FabricIndex fabr
 CHIP_ERROR LoadCertFromStorage(PersistentStorageDelegate * storage, FabricIndex fabricIndex, CertChainElement element,
                                MutableByteSpan & outCert)
 {
-    DefaultStorageKeyAllocator keyAllocator;
-    const char * storageKey = GetStorageKeyForCert(keyAllocator, fabricIndex, element);
+    StorageKeyName storageKey = GetStorageKeyForCert(fabricIndex, element);
+    if (!storageKey)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
 
     uint16_t keySize = static_cast<uint16_t>(outCert.size());
-    CHIP_ERROR err   = storage->SyncGetKeyValue(storageKey, outCert.data(), keySize);
+    CHIP_ERROR err   = storage->SyncGetKeyValue(storageKey.KeyName(), outCert.data(), keySize);
 
     // Not finding an ICAC means we don't have one, so adjust to meet the API contract, where
     // outCert.empty() will be true;
@@ -112,13 +112,16 @@ CHIP_ERROR LoadCertFromStorage(PersistentStorageDelegate * storage, FabricIndex 
 CHIP_ERROR SaveCertToStorage(PersistentStorageDelegate * storage, FabricIndex fabricIndex, CertChainElement element,
                              const ByteSpan & cert)
 {
-    DefaultStorageKeyAllocator keyAllocator;
-    const char * storageKey = GetStorageKeyForCert(keyAllocator, fabricIndex, element);
+    StorageKeyName storageKey = GetStorageKeyForCert(fabricIndex, element);
+    if (!storageKey)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
 
     // If provided an empty ICAC, we delete the ICAC key previously used. If not there, it's OK
     if ((element == CertChainElement::kIcac) && (cert.empty()))
     {
-        CHIP_ERROR err = storage->SyncDeleteKeyValue(storageKey);
+        CHIP_ERROR err = storage->SyncDeleteKeyValue(storageKey.KeyName());
         if ((err == CHIP_NO_ERROR) || (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND))
         {
             return CHIP_NO_ERROR;
@@ -126,14 +129,17 @@ CHIP_ERROR SaveCertToStorage(PersistentStorageDelegate * storage, FabricIndex fa
         return err;
     }
 
-    return storage->SyncSetKeyValue(storageKey, cert.data(), static_cast<uint16_t>(cert.size()));
+    return storage->SyncSetKeyValue(storageKey.KeyName(), cert.data(), static_cast<uint16_t>(cert.size()));
 }
 
 CHIP_ERROR DeleteCertFromStorage(PersistentStorageDelegate * storage, FabricIndex fabricIndex, CertChainElement element)
 {
-    DefaultStorageKeyAllocator keyAllocator;
-    const char * storageKey = GetStorageKeyForCert(keyAllocator, fabricIndex, element);
-    return storage->SyncDeleteKeyValue(storageKey);
+    StorageKeyName storageKey = GetStorageKeyForCert(fabricIndex, element);
+    if (!storageKey)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+    return storage->SyncDeleteKeyValue(storageKey.KeyName());
 }
 
 } // namespace

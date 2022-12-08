@@ -53,7 +53,7 @@ class TestXmlParser(unittest.TestCase):
             <!-- Comments should be supported -->
             <configurator>
               <cluster>
-                <name>Test Cluster</name>
+                <name>Test</name>
                 <code>0x1234</code>
 
                 <attribute side="server" code="11" type="INT32U" min="0" max="2" isNullable="true" reportable="true" writable="false">SomeIntAttribute</attribute>
@@ -83,30 +83,30 @@ class TestXmlParser(unittest.TestCase):
                          Idl(clusters=[
                              Cluster(
                                  side=ClusterSide.CLIENT,
-                                 name='TestCluster',
+                                 name='Test',
                                  code=0x1234,
                                  attributes=[
                                      Attribute(definition=Field(data_type=DataType(name='INT32U'), code=11, name='SomeIntAttribute',
-                                                                attributes={FieldAttribute.NULLABLE}), tags={AttributeTag.READABLE},
+                                                                qualities=FieldQuality.NULLABLE), qualities=AttributeQuality.READABLE,
                                                readacl=AccessPrivilege.VIEW, writeacl=AccessPrivilege.OPERATE),
                                      Attribute(definition=Field(data_type=DataType(name='INT8U'), code=22, name='AttributeWithAccess',
-                                                                attributes={FieldAttribute.OPTIONAL}),
-                                               tags={AttributeTag.READABLE, AttributeTag.WRITABLE}, readacl=AccessPrivilege.OPERATE,
+                                                                qualities=FieldQuality.OPTIONAL),
+                                               qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, readacl=AccessPrivilege.OPERATE,
                                                writeacl=AccessPrivilege.MANAGE)
                                  ],
                                  structs=[
                                      Struct(name='GetSomeDataRequest',
                                             fields=[
-                                                Field(data_type=DataType(name='INT8U'), code=1, name='firstInput'),
-                                                Field(data_type=DataType(name='INT16U'), code=2, name='secondInput')
+                                                Field(data_type=DataType(name='INT8U'), code=0, name='firstInput'),
+                                                Field(data_type=DataType(name='INT16U'), code=1, name='secondInput')
                                             ],
                                             tag=StructTag.REQUEST),
                                      Struct(name='GetSomeDataResponse',
                                             fields=[
-                                                Field(data_type=DataType(name='INT8U'), code=1,
+                                                Field(data_type=DataType(name='INT8U'), code=0,
                                                       name='dataPoint1'),
-                                                Field(data_type=DataType(name='INT8U'), code=2, name='dataPoint2',
-                                                      attributes={FieldAttribute.OPTIONAL})
+                                                Field(data_type=DataType(name='INT8U'), code=1, name='dataPoint2',
+                                                      qualities=FieldQuality.OPTIONAL)
                                             ],
                                             tag=StructTag.RESPONSE, code=0x44)
                                  ],
@@ -146,6 +146,60 @@ class TestXmlParser(unittest.TestCase):
                              Cluster(side=ClusterSide.CLIENT, name='Test2', code=2, bitmaps=[bitmap]),
                          ]))
 
+    def testFabricScopedAndSensitive(self):
+        idl = XmlToIdl('''<?xml version="1.0"?>
+            <configurator>
+              <cluster>
+                <name>Test</name>
+                <code>0x0001</code>
+
+                <event side="server" code="0x1234" name="FabricEvent" priority="info" isFabricSensitive="true" optional="false">
+                  <description>This is a test event</description>
+                  <field id="1" name="AdminNodeID" type="node_id" isNullable="true"/>
+                  <access op="read" privilege="administer"/>
+                </event>
+
+              </cluster>
+
+              <struct name="FabricStruct" isFabricScoped="true">
+                <cluster code="1"/>
+                <item fieldId="1" name="Field1" type="int32u" isFabricSensitive="true"/>
+                <item fieldId="3" name="Field3" type="int32u" isFabricSensitive="true"/>
+                <item fieldId="10" name="Field10" type="int32u" />
+              </struct>
+
+
+            </configurator>
+        ''')
+        self.assertEqual(idl,
+                         Idl(clusters=[Cluster(side=ClusterSide.CLIENT,
+                                               name='Test',
+                                               code=1,
+                                               events=[Event(priority=EventPriority.INFO,
+                                                             name='FabricEvent',
+                                                             code=0x1234,
+                                                             fields=[Field(data_type=DataType(name='node_id'),
+                                                                           code=1,
+                                                                           name='AdminNodeID',
+                                                                           qualities=FieldQuality.NULLABLE)],
+                                                             readacl=AccessPrivilege.ADMINISTER,
+                                                             qualities=EventQuality.FABRIC_SENSITIVE)],
+                             structs=[Struct(name='FabricStruct',
+                                      fields=[Field(data_type=DataType(name='int32u'),
+                                                    code=1,
+                                                    name='Field1',
+                                                    qualities=FieldQuality.FABRIC_SENSITIVE),
+                                              Field(data_type=DataType(name='int32u'),
+                                                    code=3,
+                                                    name='Field3',
+                                                    qualities=FieldQuality.FABRIC_SENSITIVE),
+                                              Field(data_type=DataType(name='int32u',
+                                                                       max_length=None),
+                                                    code=10,
+                                                    name='Field10')],
+                                      qualities=StructQuality.FABRIC_SCOPED)],
+                         )]))
+
     def testStruct(self):
         idl = XmlToIdl('''<?xml version="1.0"?>
             <configurator>
@@ -170,9 +224,10 @@ class TestXmlParser(unittest.TestCase):
         ''')
         struct = Struct(
             name='SomeStruct',
+            qualities=StructQuality.FABRIC_SCOPED,
             fields=[
-                Field(data_type=DataType(name='int16u'), code=1, name='FirstMember'),
-                Field(data_type=DataType(name='int32u'), code=2, name='SecondMember')
+                Field(data_type=DataType(name='int16u'), code=0, name='FirstMember'),
+                Field(data_type=DataType(name='int32u'), code=1, name='SecondMember')
             ]
         )
         self.assertEqual(idl,
@@ -186,9 +241,9 @@ class TestXmlParser(unittest.TestCase):
                                                  data_type=DataType(name='SomeStruct'),
                                                  code=123,
                                                  name='FabricAttribute',
-                                                 attributes={FieldAttribute.NULLABLE}
+                                                 qualities=FieldQuality.NULLABLE
                                              ),
-                                             tags={AttributeTag.READABLE, AttributeTag.FABRIC_SCOPED},
+                                             qualities=AttributeQuality.READABLE,
                                              readacl=AccessPrivilege.VIEW,
                                              writeacl=AccessPrivilege.OPERATE)]), ]))
 
@@ -236,7 +291,7 @@ Some copyright here... testing that we skip over comments
                                                  code=0,
                                                  name='Type',
                                              ),
-                                             tags={AttributeTag.READABLE},
+                                             qualities=AttributeQuality.READABLE,
                                              readacl=AccessPrivilege.VIEW,
                                              writeacl=AccessPrivilege.OPERATE)]), ]))
 

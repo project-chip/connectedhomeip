@@ -15,29 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2020 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-/***************************************************************************/
-/**
- * @file
- * @brief Routines for the On-Off plugin, which
- *implements the On-Off server cluster.
- *******************************************************************************
- ******************************************************************************/
 #include "on-off-server.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -50,6 +27,10 @@
 #ifdef EMBER_AF_PLUGIN_SCENES
 #include <app/clusters/scenes/scenes.h>
 #endif // EMBER_AF_PLUGIN_SCENES
+
+#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
+#include <app/clusters/level-control/level-control.h>
+#endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -100,6 +81,18 @@ EmberAfStatus OnOffServer::getOnOffValue(chip::EndpointId endpoint, bool * curre
     return status;
 }
 
+#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
+static bool LevelControlWithOnOffFeaturePresent(EndpointId endpoint)
+{
+    if (!emberAfContainsServer(endpoint, LevelControl::Id))
+    {
+        return false;
+    }
+
+    return LevelControlHasFeature(endpoint, LevelControl::LevelControlFeature::kOnOff);
+}
+#endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
+
 /** @brief On/off Cluster Set Value
  *
  * This function is called when the on/off value needs to be set, either through
@@ -109,12 +102,12 @@ EmberAfStatus OnOffServer::getOnOffValue(chip::EndpointId endpoint, bool * curre
  * @param command   Ver.: always
  * @param initiatedByLevelChange   Ver.: always
  */
-EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t command, bool initiatedByLevelChange)
+EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId command, bool initiatedByLevelChange)
 {
     EmberAfStatus status;
     bool currentValue, newValue;
 
-    emberAfOnOffClusterPrintln("On/Off set value: %x %x", endpoint, command);
+    emberAfOnOffClusterPrintln("On/Off set value: %x %x", endpoint, static_cast<uint8_t>(command));
 
     // read current on/off value
     status = Attributes::OnOff::Get(endpoint, &currentValue);
@@ -176,7 +169,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t comm
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         // If initiatedByLevelChange is false, then we assume that the level change
         // ZCL stuff has not happened and we do it here
-        if (!initiatedByLevelChange && emberAfContainsServer(endpoint, LevelControl::Id))
+        if (!initiatedByLevelChange && LevelControlWithOnOffFeaturePresent(endpoint))
         {
             emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
         }
@@ -206,19 +199,23 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t comm
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         // If initiatedByLevelChange is false, then we assume that the level change
         // ZCL stuff has not happened and we do it here
-        if (!initiatedByLevelChange && emberAfContainsServer(endpoint, LevelControl::Id))
+        if (!initiatedByLevelChange && LevelControlWithOnOffFeaturePresent(endpoint))
         {
             emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
         }
-#endif
-
-        // write the new on/off value
-        status = Attributes::OnOff::Set(endpoint, newValue);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        else
         {
-            emberAfOnOffClusterPrintln("ERR: writing on/off %x", status);
-            return status;
+#endif
+            // write the new on/off value
+            status = Attributes::OnOff::Set(endpoint, newValue);
+            if (status != EMBER_ZCL_STATUS_SUCCESS)
+            {
+                emberAfOnOffClusterPrintln("ERR: writing on/off %x", status);
+                return status;
+            }
+#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         }
+#endif
     }
 
 #ifdef EMBER_AF_PLUGIN_SCENES
@@ -260,11 +257,11 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
         // 0xff      This value cannot happen.
         // null       Set the OnOff attribute to its previous value.
 
-        bool onOffValueForStartUp = 0;
+        bool onOffValueForStartUp = false;
         EmberAfStatus status      = getOnOffValueForStartUp(endpoint, onOffValueForStartUp);
         if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
-            status = setOnOffValue(endpoint, onOffValueForStartUp, false);
+            status = setOnOffValue(endpoint, onOffValueForStartUp, true);
         }
 
 #ifdef EMBER_AF_PLUGIN_MODE_SELECT
@@ -299,7 +296,7 @@ EmberAfStatus OnOffServer::getOnOffValueForStartUp(chip::EndpointId endpoint, bo
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
         // Initialise updated value to 0
-        bool updatedOnOff = 0;
+        bool updatedOnOff = false;
         status            = Attributes::OnOff::Get(endpoint, &updatedOnOff);
         if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
@@ -308,10 +305,10 @@ EmberAfStatus OnOffServer::getOnOffValueForStartUp(chip::EndpointId endpoint, bo
                 switch (startUpOnOff.Value())
                 {
                 case OnOff::OnOffStartUpOnOff::kOff:
-                    updatedOnOff = 0; // Off
+                    updatedOnOff = false; // Off
                     break;
                 case OnOff::OnOffStartUpOnOff::kOn:
-                    updatedOnOff = 1; // On
+                    updatedOnOff = true; // On
                     break;
                 case OnOff::OnOffStartUpOnOff::kTogglePreviousOnOff:
                     updatedOnOff = !updatedOnOff;
@@ -452,7 +449,7 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
     return true;
 }
 
-uint32_t OnOffServer::calculateNextWaitTimeMS(void)
+uint32_t OnOffServer::calculateNextWaitTimeMS()
 {
     const chip::System::Clock::Timestamp currentTime = chip::System::SystemClock().GetMonotonicTimestamp();
     chip::System::Clock::Timestamp waitTime          = UPDATE_TIME_MS;

@@ -147,7 +147,7 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
     ByteSpan byteSpan(byteBuf);
     EncodeAndValidate(byteSpan,
                       "{\n"
-                      "   \"value\" : \"AQIDBP/+mYjdzQ==\"\n"
+                      "   \"value\" : \"base64:AQIDBP/+mYjdzQ==\"\n"
                       "}\n");
 
     DataModel::Nullable<uint8_t> nullValue;
@@ -156,7 +156,7 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                       "   \"value\" : null\n"
                       "}\n");
 
-    Clusters::TestCluster::Structs::SimpleStruct::Type structVal;
+    Clusters::UnitTesting::Structs::SimpleStruct::Type structVal;
     structVal.a = 20;
     structVal.b = true;
     structVal.d = byteBuf;
@@ -170,7 +170,7 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                       "      \"0\" : 20,\n"
                       "      \"1\" : true,\n"
                       "      \"2\" : 0,\n"
-                      "      \"3\" : \"AQIDBP/+mYjdzQ==\",\n"
+                      "      \"3\" : \"base64:AQIDBP/+mYjdzQ==\",\n"
                       "      \"4\" : \"hello\",\n"
                       "      \"5\" : 0,\n"
                       "      \"6\" : 1.0,\n"
@@ -188,8 +188,20 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                       "   \"value\" : [ 1, 2, 3, 4 ]\n"
                       "}\n");
 
-    Clusters::TestCluster::Structs::SimpleStruct::Type structListData[2] = { structVal, structVal };
-    DataModel::List<Clusters::TestCluster::Structs::SimpleStruct::Type> structList;
+    int8uList = {};
+    EncodeAndValidate(int8uList,
+                      "{\n"
+                      "   \"value\" : []\n"
+                      "}\n");
+
+    DataModel::Nullable<DataModel::List<uint8_t>> nullValueList;
+    EncodeAndValidate(nullValueList,
+                      "{\n"
+                      "   \"value\" : null\n"
+                      "}\n");
+
+    Clusters::UnitTesting::Structs::SimpleStruct::Type structListData[2] = { structVal, structVal };
+    DataModel::List<Clusters::UnitTesting::Structs::SimpleStruct::Type> structList;
 
     structList = structListData;
 
@@ -200,7 +212,7 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                       "         \"0\" : 20,\n"
                       "         \"1\" : true,\n"
                       "         \"2\" : 0,\n"
-                      "         \"3\" : \"AQIDBP/+mYjdzQ==\",\n"
+                      "         \"3\" : \"base64:AQIDBP/+mYjdzQ==\",\n"
                       "         \"4\" : \"hello\",\n"
                       "         \"5\" : 0,\n"
                       "         \"6\" : 1.0,\n"
@@ -210,7 +222,7 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                       "         \"0\" : 20,\n"
                       "         \"1\" : true,\n"
                       "         \"2\" : 0,\n"
-                      "         \"3\" : \"AQIDBP/+mYjdzQ==\",\n"
+                      "         \"3\" : \"base64:AQIDBP/+mYjdzQ==\",\n"
                       "         \"4\" : \"hello\",\n"
                       "         \"5\" : 0,\n"
                       "         \"6\" : 1.0,\n"
@@ -237,7 +249,7 @@ const nlTest sTests[] = { NL_TEST_DEF("TestConverter", TestConverter), NL_TEST_S
 
 } // namespace
 
-int TestTlvJson(void)
+int TestTlvJson()
 {
     nlTestSuite theSuite = { "TlvJson", sTests, Initialize, Finalize };
     nlTestRunner(&theSuite, nullptr);

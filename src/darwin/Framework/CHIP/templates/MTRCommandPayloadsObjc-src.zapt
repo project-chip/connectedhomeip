@@ -38,6 +38,18 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+{{#*inline "deprecatedImpl"}}
+
+@implementation MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase name}}Params
+@end
+{{/inline}}
+{{#unless (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name))}}
+{{> deprecatedImpl}}
+{{else}}
+{{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (asUpperCamelCase name))}}
+{{> deprecatedImpl}}
+{{/unless}}
+{{/unless}}
 {{/zcl_commands}}
 {{/zcl_clusters}}
 

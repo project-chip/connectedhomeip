@@ -39,6 +39,7 @@
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <system/SystemTimer.h>
 
+#include "esp_bt.h"
 #include "esp_log.h"
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "esp_nimble_hci.h"
@@ -145,15 +146,14 @@ CHIP_ERROR BLEManagerImpl::_Init()
     if (ConnectivityMgr().IsThreadProvisioned())
     {
         ESP_LOGI(TAG, "Thread credentials already provisioned, not initializing BLE");
-        return CHIP_NO_ERROR;
-    }
 #else
     if (ConnectivityMgr().IsWiFiStationProvisioned())
     {
         ESP_LOGI(TAG, "WiFi station already provisioned, not initializing BLE");
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
+        esp_bt_mem_release(ESP_BT_MODE_BTDM);
         return CHIP_NO_ERROR;
     }
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 #endif /* CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING */
 
     CHIP_ERROR err;

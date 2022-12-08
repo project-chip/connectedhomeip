@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2021 Project CHIP Authors
+#    Copyright (c) 2022 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ cmake_minimum_required(VERSION 3.13.1)
 set(BOARD tlsr9518adk80d)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
-get_filename_component(NLIO_ROOT ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
 get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
@@ -31,6 +30,7 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 project(chip-telink-lighting-example)
 
 include(${CHIP_ROOT}/config/telink/app/enable-gnu-std.cmake)
+include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
 target_compile_options(app PRIVATE -fpermissive)
 
@@ -38,7 +38,6 @@ target_include_directories(app PRIVATE
                            include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/lighting-app
-                           ${NLIO_ROOT}
                            ${TELINK_COMMON}/util/include
                            ${TELINK_COMMON}/app/include)
 
@@ -46,71 +45,181 @@ add_definitions(
     "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
 )
 
-# TODO - re-use chip_data_model.cmake to add cluster implementations.
 target_sources(app PRIVATE
                src/AppTask.cpp
                src/LightingManager.cpp
                src/main.cpp
                src/ZclCallbacks.cpp
-               ${GEN_DIR}/lighting-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
-               ${TELINK_COMMON}/util/src/ThreadUtil.cpp
-               ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
-               ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
-               ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
-               ${CHIP_ROOT}/src/app/util/af-event.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-size-util.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-storage.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-table.cpp
-               ${CHIP_ROOT}/src/app/util/binding-table.cpp
-               ${CHIP_ROOT}/src/app/util/ember-compatibility-functions.cpp
-               ${CHIP_ROOT}/src/app/util/ember-print.cpp
-               ${CHIP_ROOT}/src/app/util/error-mapping.cpp
-               ${CHIP_ROOT}/src/app/util/message.cpp
-               ${CHIP_ROOT}/src/app/util/privilege-storage.cpp
-               ${CHIP_ROOT}/src/app/util/util.cpp
-               ${CHIP_ROOT}/src/app/server/EchoHandler.cpp
-               ${CHIP_ROOT}/src/app/server/Dnssd.cpp
-               ${CHIP_ROOT}/src/app/server/OnboardingCodesUtil.cpp
-               ${CHIP_ROOT}/src/app/server/Server.cpp
-               ${CHIP_ROOT}/src/app/server/CommissioningWindowManager.cpp
-               ${CHIP_ROOT}/src/app/clusters/access-control-server/access-control-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/administrator-commissioning-server/administrator-commissioning-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
-               ${CHIP_ROOT}/src/app/clusters/bindings/BindingManager.cpp
-               ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
-               ${CHIP_ROOT}/src/app/clusters/bindings/PendingNotificationMap.cpp
-               ${CHIP_ROOT}/src/app/clusters/descriptor/descriptor.cpp
-               ${CHIP_ROOT}/src/app/clusters/identify-server/identify-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/ethernet-network-diagnostics-server/ethernet-network-diagnostics-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/localization-configuration-server/localization-configuration-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/time-format-localization-server/time-format-localization-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/fixed-label-server/fixed-label-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/user-label-server/user-label-server.cpp               
-               ${CHIP_ROOT}/src/app/clusters/thread-network-diagnostics-server/thread-network-diagnostics-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/software-diagnostics-server/software-diagnostics-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/switch-server/switch-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/general-diagnostics-server/general-diagnostics-server.cpp               	       
-               ${CHIP_ROOT}/src/app/clusters/group-key-mgmt-server/group-key-mgmt-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/level-control/level-control.cpp
-               ${CHIP_ROOT}/src/app/clusters/color-control-server/color-control-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/occupancy-sensor-server/occupancy-sensor-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
-               ${CHIP_ROOT}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
-               ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
-               ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
-               ${CHIP_ROOT}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
-               ${CHIP_ROOT}/src/app/clusters/groups-server/groups-server.cpp
-               )
+               ${TELINK_COMMON}/util/src/ThreadUtil.cpp)
+
+chip_configure_data_model(app
+    INCLUDE_SERVER
+    ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lighting-common/lighting-app.zap
+    GEN_DIR ${GEN_DIR}/lighting-app/zap-generated
+)
 
 if(CONFIG_CHIP_OTA_REQUESTOR)
     target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
 endif()
+
+# Fix for unused swap parameter in: zephyr/include/zephyr/arch/riscv/irq.h:70
+add_compile_options(-Wno-error=unused-parameter)
+
+if (CONFIG_CHIP_PW_RPC)
+
+# Make all targets created below depend on zephyr_interface to inherit MCU-related compilation flags
+link_libraries($<BUILD_INTERFACE:zephyr_interface>)
+
+set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
+include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
+include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
+
+pw_set_module_config(pw_rpc_CONFIG pw_rpc.disable_global_mutex_config)
+pw_set_backend(pw_log pw_log_basic)
+pw_set_backend(pw_assert.check pw_assert_log.check_backend)
+pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
+pw_set_backend(pw_sys_io pw_sys_io.telink)
+pw_set_backend(pw_trace pw_trace_tokenized)
+set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRING "" FORCE)
+
+add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
+add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
+add_subdirectory(third_party/connectedhomeip/examples/platform/telink/pw_sys_io)
+
+pw_proto_library(attributes_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/attributes_service.proto
+  INPUTS
+    ${CHIP_ROOT}/examples/common/pigweed/protos/attributes_service.options
+  PREFIX
+    attributes_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_proto
+)
+
+pw_proto_library(button_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/button_service.proto
+  PREFIX
+    button_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_proto
+)
+
+pw_proto_library(descriptor_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/descriptor_service.proto
+  PREFIX
+    descriptor_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_proto
+)
+
+pw_proto_library(device_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/device_service.proto
+  INPUTS
+    ${CHIP_ROOT}/examples/common/pigweed/protos/device_service.options
+  PREFIX
+    device_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_proto
+)
+
+pw_proto_library(lighting_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/lighting_service.proto
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  PREFIX
+    lighting_service
+  DEPS
+    pw_protobuf.common_proto
+)
+
+pw_proto_library(ot_cli_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/ot_cli_service.proto
+  INPUTS
+    ${CHIP_ROOT}/examples/common/pigweed/protos/ot_cli_service.options
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  PREFIX
+    ot_cli_service
+  DEPS
+    pw_protobuf.common_proto
+)
+
+pw_proto_library(thread_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/thread_service.proto
+  INPUTS
+    ${CHIP_ROOT}/examples/common/pigweed/protos/thread_service.options
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  PREFIX
+    thread_service
+  DEPS
+    pw_protobuf.common_proto
+)
+
+target_sources(app PRIVATE
+  ../../common/pigweed/RpcService.cpp
+  ../../common/pigweed/telink/PigweedLoggerMutex.cpp
+  ${TELINK_COMMON}/Rpc.cpp
+  ${TELINK_COMMON}/util/src/PigweedLogger.cpp
+)
+
+target_include_directories(app PRIVATE
+  ${PIGWEED_ROOT}/pw_sys_io/public
+  ${CHIP_ROOT}/src/lib/support
+  ${CHIP_ROOT}/src/system
+  ${TELINK_COMMON}
+  ../../common
+  ../../common/pigweed
+  ../../common/pigweed/telink)
+
+target_compile_options(app PRIVATE
+                       "-DPW_RPC_ATTRIBUTE_SERVICE=1"
+                       "-DPW_RPC_BUTTON_SERVICE=1"
+                       "-DPW_RPC_DESCRIPTOR_SERVICE=1"
+                       "-DPW_RPC_DEVICE_SERVICE=1"
+                       "-DPW_RPC_LIGHTING_SERVICE=1"
+                       "-DPW_RPC_THREAD_SERVICE=1"
+                       "-DPW_RPC_TRACING_SERVICE=1"
+                       "-DPW_TRACE_BACKEND_SET=1")
+
+target_link_libraries(app PRIVATE
+  attributes_service.nanopb_rpc
+  button_service.nanopb_rpc
+  descriptor_service.nanopb_rpc
+  device_service.nanopb_rpc
+  lighting_service.nanopb_rpc
+  thread_service.nanopb_rpc
+  pw_checksum
+  pw_hdlc
+  pw_log
+  pw_rpc.server
+  pw_trace_tokenized
+  pw_trace_tokenized.trace_buffer
+  pw_trace_tokenized.rpc_service
+  pw_trace_tokenized.protos.nanopb_rpc
+)
+
+target_link_options(app
+  PUBLIC
+    "-T${PIGWEED_ROOT}/pw_tokenizer/pw_tokenizer_linker_sections.ld"
+)
+
+endif(CONFIG_CHIP_PW_RPC)

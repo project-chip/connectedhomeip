@@ -26,6 +26,10 @@
 #include <platform/CHIPDeviceLayer.h>
 #ifdef QR_CODE_ENABLED
 #include <qrcodegen.h>
+#else
+#include "EFR32DeviceDataProvider.h"
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <setup_payload/SetupPayload.h>
 #endif // QR_CODE_ENABLED
 #include <sl_simple_button_instances.h>
 
@@ -38,7 +42,7 @@
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <platform/EFR32/NetworkCommissioningWiFiDriver.h>
+#include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #endif
 
 #ifdef DISPLAY_ENABLED
@@ -54,6 +58,8 @@ SilabsLCD slLCD;
 #define LCD_ICON_TIMEOUT 1000
 
 using namespace chip::app::Clusters::WindowCovering;
+using namespace chip;
+using namespace ::chip::DeviceLayer;
 #define APP_STATE_LED &sl_led_led0
 #define APP_ACTION_LED &sl_led_led1
 
@@ -76,7 +82,7 @@ WindowAppImpl::Timer::Timer(const char * name, uint32_t timeoutInMs, Callback ca
     );
     if (mHandler == NULL)
     {
-        EFR32_LOG("Timer create failed");
+        SILABS_LOG("Timer create failed");
         appError(CHIP_ERROR_INTERNAL);
     }
 }
@@ -91,7 +97,7 @@ void WindowAppImpl::Timer::Start()
     // Timer is not active
     if (xTimerStart(mHandler, 100) != pdPASS)
     {
-        EFR32_LOG("Timer start() failed");
+        SILABS_LOG("Timer start() failed");
         appError(CHIP_ERROR_INTERNAL);
     }
 
@@ -116,7 +122,7 @@ void WindowAppImpl::Timer::Stop()
     mIsActive = false;
     if (xTimerStop(mHandler, 0) == pdFAIL)
     {
-        EFR32_LOG("Timer stop() failed");
+        SILABS_LOG("Timer stop() failed");
         appError(CHIP_ERROR_INTERNAL);
     }
 }
@@ -159,12 +165,12 @@ void WindowAppImpl::OnTaskCallback(void * parameter)
     /*
      * Wait for the WiFi to be initialized
      */
-    EFR32_LOG("APP: Wait WiFi Init");
+    SILABS_LOG("APP: Wait WiFi Init");
     while (!wfx_hw_ready())
     {
         vTaskDelay(10);
     }
-    EFR32_LOG("APP: Done WiFi Init");
+    SILABS_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */
     sWiFiNetworkCommissioningInstance.Init();
     /* added for commisioning with wifi */
@@ -189,7 +195,7 @@ CHIP_ERROR WindowAppImpl::Init()
     mHandle = xTaskCreateStatic(OnTaskCallback, APP_TASK_NAME, ArraySize(sAppStack), NULL, 1, sAppStack, &sAppTaskStruct);
     if (NULL == mHandle)
     {
-        EFR32_LOG("Failed to allocate app task");
+        SILABS_LOG("Failed to allocate app task");
         return CHIP_ERROR_NO_MEMORY;
     }
 
@@ -197,7 +203,7 @@ CHIP_ERROR WindowAppImpl::Init()
     mQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(WindowApp::Event), sAppEventQueueBuffer, &sAppEventQueueStruct);
     if (NULL == mQueue)
     {
-        EFR32_LOG("Failed to allocate app event queue");
+        SILABS_LOG("Failed to allocate app event queue");
         return CHIP_ERROR_NO_MEMORY;
     }
 
@@ -212,12 +218,27 @@ CHIP_ERROR WindowAppImpl::Init()
     slLCD.Init();
 #endif
 
+#ifndef QR_CODE_ENABLED
+    // Create buffer for QR code that can fit max size and null terminator.
+    char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
+    chip::MutableCharSpan QRCode(qrCodeBuffer);
+
+    if (EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(QRCode) == CHIP_NO_ERROR)
+    {
+        PrintQrCodeURL(QRCode);
+    }
+    else
+    {
+        SILABS_LOG("Getting QR code failed!");
+    }
+#endif // QR_CODE_ENABLED
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WindowAppImpl::Start()
 {
-    EFR32_LOG("Starting FreeRTOS scheduler");
+    SILABS_LOG("Starting FreeRTOS scheduler");
     sl_system_kernel_start();
 
     return CHIP_NO_ERROR;
@@ -228,7 +249,7 @@ void WindowAppImpl::Finish()
     WindowApp::Finish();
     chip::Platform::MemoryShutdown();
     // Should never get here.
-    EFR32_LOG("vTaskStartScheduler() failed");
+    SILABS_LOG("vTaskStartScheduler() failed");
     appError(CHIP_ERROR_INTERNAL);
 }
 
@@ -257,7 +278,7 @@ void WindowAppImpl::PostEvent(const WindowApp::Event & event)
 
         if (!status)
         {
-            EFR32_LOG("Failed to post event to app task event queue");
+            SILABS_LOG("Failed to post event to app task event queue");
         }
     }
 }
@@ -328,13 +349,13 @@ void WindowAppImpl::DispatchEvent(const WindowApp::Event & event)
         DispatchEventAttributeChange(event.mEndpoint, event.mAttributeId);
         break;
     case EventId::ResetWarning:
-        EFR32_LOG("Factory Reset Triggered. Release button within %ums to cancel.", LONG_PRESS_TIMEOUT);
+        SILABS_LOG("Factory Reset Triggered. Release button within %ums to cancel.", LONG_PRESS_TIMEOUT);
         // Turn off all LEDs before starting blink to make sure blink is
         // co-ordinated.
         UpdateLEDs();
         break;
     case EventId::ResetCanceled:
-        EFR32_LOG("Factory Reset has been Canceled");
+        SILABS_LOG("Factory Reset has been Canceled");
         UpdateLEDs();
         break;
     case EventId::ProvisionedStateChanged:

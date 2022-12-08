@@ -60,14 +60,11 @@ static_library("Linux") {
     "ConnectivityUtils.h",
     "DeviceInstanceInfoProviderImpl.cpp",
     "DeviceInstanceInfoProviderImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
-    "Logging.cpp",
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningEthernetDriver.cpp",
     "PlatformManagerImpl.cpp",
@@ -77,6 +74,10 @@ static_library("Linux") {
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
   ]
+
+  if (!chip_use_external_logging) {
+    sources += [ "Logging.cpp" ]
+  }
 
   if (chip_enable_openthread) {
     sources += [ "NetworkCommissioningThreadDriver.cpp" ]
@@ -90,8 +91,6 @@ static_library("Linux") {
       "bluez/ChipDeviceScanner.h",
       "bluez/Helper.cpp",
       "bluez/Helper.h",
-      "bluez/MainLoop.cpp",
-      "bluez/MainLoop.h",
       "bluez/Types.h",
     ]
   }

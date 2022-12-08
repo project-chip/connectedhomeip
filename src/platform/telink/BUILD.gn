@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/telink.gni")
 
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/telink/args.gni")
 
 assert(chip_device_platform == "telink")
 
@@ -25,6 +25,7 @@ static_library("telink") {
     "../Zephyr/ConfigurationManagerImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.h",
+    "../Zephyr/DiagnosticDataProviderImplGetter.cpp",
     "../Zephyr/KeyValueStoreManagerImpl.cpp",
     "../Zephyr/Logging.cpp",
     "../Zephyr/PlatformManagerImpl.cpp",
@@ -40,20 +41,28 @@ static_library("telink") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.h",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
   ]
 
-  deps = []
-
-  public_deps = [
-    "${chip_root}/src/platform:platform_base",
-    "${telink_sdk_build_root}",
+  public = [
+    "${chip_root}/src/credentials/CHIPCert.h",
+    "${chip_root}/src/credentials/CertificationDeclaration.h",
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
   ]
+
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  if (chip_enable_factory_data) {
+    sources += [
+      "FactoryDataParser.c",
+      "FactoryDataParser.h",
+      "FactoryDataProvider.cpp",
+      "FactoryDataProvider.h",
+    ]
+  }
 
   if (chip_enable_openthread) {
     sources += [

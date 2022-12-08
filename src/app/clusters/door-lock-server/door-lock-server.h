@@ -410,6 +410,8 @@ private:
      */
     void ScheduleAutoRelock(chip::EndpointId endpointId, uint32_t timeoutSec);
 
+    static void DoorLockOnAutoRelockCallback(chip::EndpointId endpointId);
+
     /**
      * @brief Send generic event
      *
@@ -462,8 +464,6 @@ private:
     friend bool emberAfDoorLockClusterUnlockWithTimeoutCallback(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::DecodableType & commandData);
-
-    friend void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId);
 
     friend bool emberAfDoorLockClusterSetHolidayScheduleCallback(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -571,12 +571,12 @@ struct EmberAfPluginDoorLockCredentialInfo
  */
 struct EmberAfPluginDoorLockUserInfo
 {
-    chip::CharSpan userName;                    /**< Name of the user. */
-    chip::Span<const DlCredential> credentials; /**< Credentials that are associated with user (without data).*/
-    uint32_t userUniqueId;                      /**< Unique user identifier. */
-    DlUserStatus userStatus;                    /**< Status of the user slot (available/occupied). */
-    DlUserType userType;                        /**< Type of the user. */
-    DlCredentialRule credentialRule;            /**< Number of supported credentials. */
+    chip::CharSpan userName;                            /**< Name of the user. */
+    chip::Span<const DlCredential> credentials;         /**< Credentials that are associated with user (without data).*/
+    uint32_t userUniqueId;                              /**< Unique user identifier. */
+    DlUserStatus userStatus = DlUserStatus::kAvailable; /**< Status of the user slot (available/occupied). */
+    DlUserType userType;                                /**< Type of the user. */
+    DlCredentialRule credentialRule;                    /**< Number of supported credentials. */
 
     DlAssetSource creationSource;
     chip::FabricIndex createdBy; /**< ID of the fabric that created the user. */
@@ -886,6 +886,13 @@ bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const O
  */
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
                                               DlOperationError & err);
+
+/**
+ * @brief This callback is called when the AutoRelock timer is expired.
+ *
+ * @param endpointId ID of the endpoint that contains the door lock to be relocked.
+ */
+void emberAfPluginDoorLockOnAutoRelock(chip::EndpointId endpointId);
 
 /**
  * @brief This callback is called when Door Lock cluster needs to access the users database.

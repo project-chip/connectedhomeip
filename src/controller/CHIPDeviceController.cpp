@@ -142,6 +142,15 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
     mSystemState = params.systemState->Retain();
     mState       = State::Initialized;
+
+    if (GetFabricIndex() != kUndefinedFabricIndex)
+    {
+        ChipLogProgress(Controller,
+                        "Joined the fabric at index %d. Fabric ID is 0x" ChipLogFormatX64
+                        " (Compressed Fabric ID: " ChipLogFormatX64 ")",
+                        GetFabricIndex(), ChipLogValueX64(GetFabricId()), ChipLogValueX64(GetCompressedFabricId()));
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -310,9 +319,6 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     VerifyOrReturnError(fabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INTERNAL);
 
     mFabricIndex = fabricIndex;
-
-    ChipLogProgress(Controller, "Joined the fabric at index %d. Compressed fabric ID is: 0x" ChipLogFormatX64, GetFabricIndex(),
-                    ChipLogValueX64(GetCompressedFabricId()));
 
     return CHIP_NO_ERROR;
 }
@@ -686,6 +692,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
     mDeviceInPASEEstablishment = device;
     device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress);
+    device->UpdateDeviceData(params.GetPeerAddress(), params.GetMRPConfig());
 
 #if CONFIG_NETWORK_LAYER_BLE
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
@@ -696,9 +703,15 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         }
         else if (params.HasDiscriminator())
         {
+            // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
+            // for later.
+            mRendezvousParametersForDeviceDiscoveredOverBle = params;
+
             SetupDiscriminator discriminator;
             discriminator.SetLongValue(params.GetDiscriminator());
-            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(discriminator));
+            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(
+                              discriminator, this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError));
+            ExitNow(CHIP_NO_ERROR);
         }
         else
         {
@@ -706,8 +719,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         }
     }
 #endif
-    // TODO: In some cases like PASE over IP, SAI and SII values from commissionable node service should be used
-    session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress(), device->GetRemoteMRPConfig());
+    session = mSystemState->SessionMgr()->CreateUnauthenticatedSession(params.GetPeerAddress(), params.GetMRPConfig());
     VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NO_MEMORY);
 
     // Allocate the exchange immediately before calling PASESession::Pair.
@@ -733,6 +745,38 @@ exit:
 
     return err;
 }
+
+#if CONFIG_NETWORK_LAYER_BLE
+void DeviceCommissioner::OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_CONNECTION_OBJECT connObj)
+{
+    auto self   = static_cast<DeviceCommissioner *>(appState);
+    auto device = self->mDeviceInPASEEstablishment;
+
+    if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kBle)
+    {
+        auto remoteId = device->GetDeviceId();
+
+        auto params = self->mRendezvousParametersForDeviceDiscoveredOverBle;
+        params.SetConnectionObject(connObj);
+        self->mRendezvousParametersForDeviceDiscoveredOverBle = RendezvousParameters();
+
+        self->ReleaseCommissioneeDevice(device);
+        LogErrorOnFailure(self->EstablishPASEConnection(remoteId, params));
+    }
+}
+
+void DeviceCommissioner::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err)
+{
+    auto self   = static_cast<DeviceCommissioner *>(appState);
+    auto device = self->mDeviceInPASEEstablishment;
+
+    if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kBle)
+    {
+        self->ReleaseCommissioneeDevice(device);
+        self->mRendezvousParametersForDeviceDiscoveredOverBle = RendezvousParameters();
+    }
+}
+#endif // CONFIG_NETWORK_LAYER_BLE
 
 CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningParameters & params)
 {
@@ -1084,6 +1128,18 @@ void DeviceCommissioner::OnFailedToExtendedArmFailSafeDeviceAttestation(void * c
     commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
 }
 
+void DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
+                                           Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
+                                           OnExtendFailsafeFailure onFailure)
+{
+    uint64_t breadcrumb = static_cast<uint64_t>(step);
+    GeneralCommissioning::Commands::ArmFailSafe::Type request;
+    request.expiryLengthSeconds = armFailSafeTimeout;
+    request.breadcrumb          = breadcrumb;
+    ChipLogProgress(Controller, "Arming failsafe (%u seconds)", request.expiryLengthSeconds);
+    SendCommand<GeneralCommissioningCluster>(proxy, request, onSuccess, onFailure, kRootEndpointId, commandTimeout);
+}
+
 void DeviceCommissioner::ExtendArmFailSafeForDeviceAttestation(const Credentials::DeviceAttestationVerifier::AttestationInfo & info,
                                                                Credentials::AttestationVerificationResult result)
 {
@@ -1429,6 +1485,11 @@ CHIP_ERROR DeviceCommissioner::DiscoverCommissionableNodes(Dnssd::DiscoveryFilte
 {
     ReturnErrorOnFailure(SetUpNodeDiscovery());
     return mDNSResolver.DiscoverCommissionableNodes(filter);
+}
+
+CHIP_ERROR DeviceCommissioner::StopCommissionableDiscovery()
+{
+    return mDNSResolver.StopDiscovery();
 }
 
 const Dnssd::DiscoveredNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)
@@ -2049,11 +2110,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     switch (step)
     {
     case CommissioningStage::kArmFailsafe: {
-        GeneralCommissioning::Commands::ArmFailSafe::Type request;
-        request.expiryLengthSeconds = params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeTimeout);
-        request.breadcrumb          = breadcrumb;
-        ChipLogProgress(Controller, "Arming failsafe (%u seconds)", request.expiryLengthSeconds);
-        SendCommand<GeneralCommissioningCluster>(proxy, request, OnArmFailSafe, OnBasicFailure, endpoint, timeout);
+        VerifyOrDie(endpoint == kRootEndpointId);
+        ExtendArmFailSafe(proxy, step, params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeTimeout), timeout, OnArmFailSafe,
+                          OnBasicFailure);
     }
     break;
     case CommissioningStage::kReadCommissioningInfo: {

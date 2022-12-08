@@ -15,70 +15,8 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2020 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-/****************************************************************************
- * @file
- * @brief  *
- * Client Operation:
- *   1. Look for ZDO device announce notification.
- *   2. Perform ZDO match descriptor on device.
- *   3. If supports IAS Zone Server, Add that server
- *to our known list. Write CIE Address.
- *   4. Read CIE address, verify it is ours.  This is
- *done mostly because the test case requires it.
- *   5. Read the IAS Zone Server attributes.
- *     Record in table.
- *   6. When we get an enroll request, give them our
- *(only) zone ID.
- *   7. When we get a notification, read their
- *attributes.
- *
- * Improvements that could be made:
- *   Add support for multiple endpoints on server.
- *Most often this is a legacy security system
- *retrofitted with a single ZigBee radio.  Therefore
- *   each sensor is on a different endpoint.  Right
- *now our client only handles a single endpoint per
- *node.
- *
- *   Integration with Poll Control.  When the device
- *boots we should configure its polling to make it
- *possible to read/write its attributes.
- *
- *   Update the emberAfIasZoneClientKnownServers list
- *when we know a server un-enrolls. Right now, we
- *don't have any way to tell when we don't need to
- *keep track of a server anymore, i.e., when it
- *un-enrolls. Therefore, we could potentially keep
- *adding servers to our known list, and run out of
- *room to add more. Fortunately, we have two things
- *working for us:
- *     1. Servers will most likely stay around in a
- *network. It is unlikely that an IAS Zone Client in
- *production will have to handle 254 different
- *servers.
- *     2. If a server un-enrolls and then enrolls
- *again, it will get the same Zone ID and have a spot
- *in the list, since we store servers by long address.
- *******************************************************************************
- ******************************************************************************/
-
 #include "ias-zone-client.h"
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
 
@@ -343,7 +281,7 @@ bool emberAfIasZoneClusterZoneEnrollRequestCallback(app::CommandHandler * comman
         zoneId       = serverIndex;
         setServerZoneId(serverIndex, zoneId);
     }
-    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), ZCL_IAS_ZONE_CLUSTER_ID,
+    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), app::Clusters::IasZone::Id,
                               ZCL_ZONE_ENROLL_RESPONSE_COMMAND_ID, "uu", responseCode, zoneId);
     // Need to send this command with our source EUI because the server will
     // check our EUI64 against his CIE Address to see if we're his CIE.
@@ -418,7 +356,7 @@ static void setCieAddress(EmberNodeId destAddress)
         0, // ieee (filled in later)
     };
     emberAfGetEui64(&writeAttributes[3]);
-    emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), ZCL_IAS_ZONE_CLUSTER_ID,
+    emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), app::Clusters::IasZone::Id,
                               ZCL_WRITE_ATTRIBUTES_COMMAND_ID, "b", writeAttributes, sizeof(writeAttributes));
     emberAfIasZoneClusterPrintln("Writing CIE Address to IAS Zone Server");
     if (EMBER_SUCCESS == sendCommand(destAddress))
@@ -467,7 +405,7 @@ static void checkForIasZoneServer(EmberNodeId emberNodeId, uint8_t * ieeeAddress
         return;
     }
 
-    EmberStatus status = emberAfFindDevicesByCluster(emberNodeId, ZCL_IAS_ZONE_CLUSTER_ID,
+    EmberStatus status = emberAfFindDevicesByCluster(emberNodeId, app::Clusters::IasZone::Id,
                                                      true, // server cluster?
                                                      iasZoneClientServiceDiscoveryCallback);
 
@@ -497,7 +435,7 @@ void readIasZoneServerAttributes(EmberNodeId nodeId)
 
         EMBER_LOW_BYTE(ZCL_ZONE_STATUS_ATTRIBUTE_ID), EMBER_HIGH_BYTE(ZCL_ZONE_STATUS_ATTRIBUTE_ID),
     };
-    emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), ZCL_IAS_ZONE_CLUSTER_ID,
+    emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), app::Clusters::IasZone::Id,
                               ZCL_READ_ATTRIBUTES_COMMAND_ID, "b", iasZoneAttributeIds, sizeof(iasZoneAttributeIds));
     if (EMBER_SUCCESS == sendCommand(nodeId))
     {
@@ -511,7 +449,7 @@ void readIasZoneServerCieAddress(EmberNodeId nodeId)
         EMBER_LOW_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
         EMBER_HIGH_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
     };
-    emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), ZCL_IAS_ZONE_CLUSTER_ID,
+    emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), app::Clusters::IasZone::Id,
                               ZCL_READ_ATTRIBUTES_COMMAND_ID, "b", iasZoneAttributeIds, sizeof(iasZoneAttributeIds));
     if (EMBER_SUCCESS == sendCommand(nodeId))
     {
@@ -521,7 +459,7 @@ void readIasZoneServerCieAddress(EmberNodeId nodeId)
 
 void emberAfPluginIasZoneClientWriteAttributesResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
-    if (clusterId == ZCL_IAS_ZONE_CLUSTER_ID && iasZoneClientState == IAS_ZONE_CLIENT_STATE_SET_CIE_ADDRESS &&
+    if (clusterId == app::Clusters::IasZone::Id && iasZoneClientState == IAS_ZONE_CLIENT_STATE_SET_CIE_ADDRESS &&
         buffer[0] == EMBER_ZCL_STATUS_SUCCESS)
     {
         readIasZoneServerCieAddress(emberAfCurrentCommand()->source);
@@ -533,7 +471,7 @@ void emberAfPluginIasZoneClientWriteAttributesResponseCallback(ClusterId cluster
 void emberAfPluginIasZoneClientReadAttributesResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
     uint8_t zoneStatus, zoneType, zoneState;
-    if (clusterId == ZCL_IAS_ZONE_CLUSTER_ID &&
+    if (clusterId == app::Clusters::IasZone::Id &&
         (iasZoneClientState == IAS_ZONE_CLIENT_STATE_READ_ATTRIBUTES ||
          iasZoneClientState == IAS_ZONE_CLIENT_STATE_READ_CIE_ADDRESS))
     {

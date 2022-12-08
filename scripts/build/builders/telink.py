@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,27 +21,42 @@ from .builder import Builder
 
 
 class TelinkApp(Enum):
+    ALL_CLUSTERS = auto()
+    ALL_CLUSTERS_MINIMAL = auto()
     LIGHT = auto()
     SWITCH = auto()
     OTA_REQUESTOR = auto()
+    THERMOSTAT = auto()
 
     def ExampleName(self):
-        if self == TelinkApp.LIGHT:
+        if self == TelinkApp.ALL_CLUSTERS:
+            return 'all-clusters-app'
+        elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
+            return 'all-clusters-minimal-app'
+        elif self == TelinkApp.LIGHT:
             return 'lighting-app'
         elif self == TelinkApp.SWITCH:
             return 'light-switch-app'
         elif self == TelinkApp.OTA_REQUESTOR:
             return 'ota-requestor-app'
+        elif self == TelinkApp.THERMOSTAT:
+            return 'thermostat'
         else:
             raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
-        if self == TelinkApp.LIGHT:
+        if self == TelinkApp.ALL_CLUSTERS:
+            return 'chip-telink-all-clusters-example'
+        elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
+            return 'chip-telink-all-clusters-minimal-example'
+        elif self == TelinkApp.LIGHT:
             return 'chip-telink-lighting-example'
         elif self == TelinkApp.SWITCH:
             return 'chip-telink-light-switch-example'
         elif self == TelinkApp.OTA_REQUESTOR:
             return 'chip-telink-ota-requestor-example'
+        elif self == TelinkApp.THERMOSTAT:
+            return 'chip-telink-thermostat-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -85,15 +100,21 @@ class TelinkBuilder(Builder):
         if os.path.exists(self.output_dir):
             return
 
+        flags = []
+        if self.options.pregen_dir:
+            flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
+
+        build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
+
         cmd = self.get_cmd_prefixes()
         cmd += '''
 source "$ZEPHYR_BASE/zephyr-env.sh";
-west build --cmake-only -d {outdir} -b {board} {sourcedir}
+west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}
         '''.format(
-            outdir=shlex.quote(
-                self.output_dir), board=self.board.GnArgName(), sourcedir=shlex.quote(
-                os.path.join(
-                    self.root, 'examples', self.app.ExampleName(), 'telink'))).strip()
+            outdir=shlex.quote(self.output_dir),
+            board=self.board.GnArgName(),
+            sourcedir=shlex.quote(os.path.join(self.root, 'examples', self.app.ExampleName(), 'telink')),
+            build_flags=build_flags).strip()
 
         self._Execute(['bash', '-c', cmd],
                       title='Generating ' + self.identifier)

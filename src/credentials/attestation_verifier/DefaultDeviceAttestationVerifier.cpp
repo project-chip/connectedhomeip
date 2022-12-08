@@ -128,32 +128,147 @@ constexpr uint8_t gCdRootCert[517] = {
 // Official CD "Signing Key 001"
 //
 // -----BEGIN CERTIFICATE-----
-// MIICCDCCAa2gAwIBAgIHY3NhY2RzMTAKBggqhkjOPQQDAjBSMQwwCgYDVQQKDAND
+// MIICBzCCAa2gAwIBAgIHY3NhY2RrMTAKBggqhkjOPQQDAjBSMQwwCgYDVQQKDAND
 // U0ExLDAqBgNVBAMMI01hdHRlciBDZXJ0aWZpY2F0aW9uIGFuZCBUZXN0aW5nIENB
-// MRQwEgYKKwYBBAGConwCAQwEQzVBMDAgFw0yMjA4MTExOTMxMTVaGA8yMDcyMDcy
-// OTE5MzExNVowWDEMMAoGA1UECgwDQ1NBMTIwMAYDVQQDDClDZXJ0aWZpY2F0aW9u
+// MRQwEgYKKwYBBAGConwCAQwEQzVBMDAgFw0yMjEwMDMxOTI4NTVaGA8yMDcyMDky
+// MDE5Mjg1NVowWDEMMAoGA1UECgwDQ1NBMTIwMAYDVQQDDClDZXJ0aWZpY2F0aW9u
 // IERlY2xhcmF0aW9uIFNpZ25pbmcgS2V5IDAwMTEUMBIGCisGAQQBgqJ8AgEMBEM1
-// QTAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARbW8Ou1rqjg/3Pm51ac/rqfmXr
-// WSfBxcArHPpLi9trm36yUlE/I/IqWDOdyK24gEYKySHTdte5cMUMO+bm0jbwo2Yw
+// QTAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAATN7uk+RPi3K+PRqcB+IZaLmv/z
+// tAPwXhZp17Hlyu5vx3FLQufiNpXpLNdjVHOigK5ojze7lInhFim5uU/3sJkpo2Yw
 // ZDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBhjAdBgNVHQ4EFgQU
-// g/rXgegtAYtPFPChx/aEAYzF0Z8wHwYDVR0jBBgwFoAUl+Rp0MUEFMJvxwH3fpR3
-// OQmN9qUwCgYIKoZIzj0EAwIDSQAwRgIhAIbSu8KoWTj5792UxtJ/uSgQXVTLRRsm
-// 09ys2m37JxDvAiEA8WMKDbRbwOtkabIyqwDgmiR3KwkyYwaqN4GPsRKfxwQ=
+// /jQ/lZlHdjth7kU5ExM4SU/mfY4wHwYDVR0jBBgwFoAUl+Rp0MUEFMJvxwH3fpR3
+// OQmN9qUwCgYIKoZIzj0EAwIDSAAwRQIgEDWOcdKsVGtUh3evHbBd1lq4aS7yQtOp
+// 6GrOQ3/zXBsCIQDxorh2RXSaI8m2RCcoWaiWa0nLzQepNm3C2jrQVJmC2Q==
 // -----END CERTIFICATE-----
 //
 constexpr uint8_t gCdSigningKey001PubkeyBytes[65] = {
-    0x04, 0x5b, 0x5b, 0xc3, 0xae, 0xd6, 0xba, 0xa3, 0x83, 0xfd, 0xcf, 0x9b, 0x9d, 0x5a, 0x73, 0xfa, 0xea,
-    0x7e, 0x65, 0xeb, 0x59, 0x27, 0xc1, 0xc5, 0xc0, 0x2b, 0x1c, 0xfa, 0x4b, 0x8b, 0xdb, 0x6b, 0x9b, 0x7e,
-    0xb2, 0x52, 0x51, 0x3f, 0x23, 0xf2, 0x2a, 0x58, 0x33, 0x9d, 0xc8, 0xad, 0xb8, 0x80, 0x46, 0x0a, 0xc9,
-    0x21, 0xd3, 0x76, 0xd7, 0xb9, 0x70, 0xc5, 0x0c, 0x3b, 0xe6, 0xe6, 0xd2, 0x36, 0xf0
+    0x04, 0xcd, 0xee, 0xe9, 0x3e, 0x44, 0xf8, 0xb7, 0x2b, 0xe3, 0xd1, 0xa9, 0xc0, 0x7e, 0x21, 0x96, 0x8b,
+    0x9a, 0xff, 0xf3, 0xb4, 0x03, 0xf0, 0x5e, 0x16, 0x69, 0xd7, 0xb1, 0xe5, 0xca, 0xee, 0x6f, 0xc7, 0x71,
+    0x4b, 0x42, 0xe7, 0xe2, 0x36, 0x95, 0xe9, 0x2c, 0xd7, 0x63, 0x54, 0x73, 0xa2, 0x80, 0xae, 0x68, 0x8f,
+    0x37, 0xbb, 0x94, 0x89, 0xe1, 0x16, 0x29, 0xb9, 0xb9, 0x4f, 0xf7, 0xb0, 0x99, 0x29
 };
 
-constexpr uint8_t gCdSigningKey001Kid[20] = { 0x83, 0xfa, 0xd7, 0x81, 0xe8, 0x2d, 0x01, 0x8b, 0x4f, 0x14,
-                                              0xf0, 0xa1, 0xc7, 0xf6, 0x84, 0x01, 0x8c, 0xc5, 0xd1, 0x9f };
+constexpr uint8_t gCdSigningKey001Kid[20] = { 0xFE, 0x34, 0x3F, 0x95, 0x99, 0x47, 0x76, 0x3B, 0x61, 0xEE,
+                                              0x45, 0x39, 0x13, 0x13, 0x38, 0x49, 0x4F, 0xE6, 0x7D, 0x8E };
 
-std::array<ByteSpan, 2> gCdKids                 = { ByteSpan{ gTestCdPubkeyKid }, ByteSpan{ gCdSigningKey001Kid } };
-std::array<Crypto::P256PublicKey, 2> gCdPubkeys = { Crypto::P256PublicKey{ gTestCdPubkeyBytes },
-                                                    Crypto::P256PublicKey{ gCdSigningKey001PubkeyBytes } };
+// Official CD "Signing Key 002"
+//
+// -----BEGIN CERTIFICATE-----
+// MIICCDCCAa2gAwIBAgIHY3NhY2RrMjAKBggqhkjOPQQDAjBSMQwwCgYDVQQKDAND
+// U0ExLDAqBgNVBAMMI01hdHRlciBDZXJ0aWZpY2F0aW9uIGFuZCBUZXN0aW5nIENB
+// MRQwEgYKKwYBBAGConwCAQwEQzVBMDAgFw0yMjEwMDMxOTM2NDZaGA8yMDcyMDky
+// MDE5MzY0NlowWDEMMAoGA1UECgwDQ1NBMTIwMAYDVQQDDClDZXJ0aWZpY2F0aW9u
+// IERlY2xhcmF0aW9uIFNpZ25pbmcgS2V5IDAwMjEUMBIGCisGAQQBgqJ8AgEMBEM1
+// QTAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQDGTfo+UJRBF3ydFe7RiU+43VO
+// jBKuKFV9gCe51MNW2RtAjP8yJ1AXsl+Mi6IFFtXIOvK3JBKAE9/Mj5XSAKkLo2Yw
+// ZDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBhjAdBgNVHQ4EFgQU
+// 3QTbWFshTBxYFYfmVo30h7bdxwEwHwYDVR0jBBgwFoAUl+Rp0MUEFMJvxwH3fpR3
+// OQmN9qUwCgYIKoZIzj0EAwIDSQAwRgIhAJruzxZ806cP/LoQ07PN9xAbjLdwUalV
+// h0Qfx304Tb92AiEAk+jnf2qtyfKyTEHpT3Xf3bfekqUOA+8ikB1yjL5oTsI=
+// -----END CERTIFICATE-----
+//
+constexpr uint8_t gCdSigningKey002PubkeyBytes[65] = {
+    0x04, 0x03, 0x19, 0x37, 0xe8, 0xf9, 0x42, 0x51, 0x04, 0x5d, 0xf2, 0x74, 0x57, 0xbb, 0x46, 0x25, 0x3e,
+    0xe3, 0x75, 0x4e, 0x8c, 0x12, 0xae, 0x28, 0x55, 0x7d, 0x80, 0x27, 0xb9, 0xd4, 0xc3, 0x56, 0xd9, 0x1b,
+    0x40, 0x8c, 0xff, 0x32, 0x27, 0x50, 0x17, 0xb2, 0x5f, 0x8c, 0x8b, 0xa2, 0x05, 0x16, 0xd5, 0xc8, 0x3a,
+    0xf2, 0xb7, 0x24, 0x12, 0x80, 0x13, 0xdf, 0xcc, 0x8f, 0x95, 0xd2, 0x00, 0xa9, 0x0b
+};
+
+constexpr uint8_t gCdSigningKey002Kid[20] = { 0xDD, 0x04, 0xDB, 0x58, 0x5B, 0x21, 0x4C, 0x1C, 0x58, 0x15,
+                                              0x87, 0xE6, 0x56, 0x8D, 0xF4, 0x87, 0xB6, 0xDD, 0xC7, 0x01 };
+
+// Official CD "Signing Key 003"
+//
+// -----BEGIN CERTIFICATE-----
+// MIICBjCCAa2gAwIBAgIHY3NhY2RrMzAKBggqhkjOPQQDAjBSMQwwCgYDVQQKDAND
+// U0ExLDAqBgNVBAMMI01hdHRlciBDZXJ0aWZpY2F0aW9uIGFuZCBUZXN0aW5nIENB
+// MRQwEgYKKwYBBAGConwCAQwEQzVBMDAgFw0yMjEwMDMxOTQxMDFaGA8yMDcyMDky
+// MDE5NDEwMVowWDEMMAoGA1UECgwDQ1NBMTIwMAYDVQQDDClDZXJ0aWZpY2F0aW9u
+// IERlY2xhcmF0aW9uIFNpZ25pbmcgS2V5IDAwMzEUMBIGCisGAQQBgqJ8AgEMBEM1
+// QTAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASfV1zV/bdSHxCk3zHwc5ErYUco
+// 8tN/W2uWvCy/fAsRlpBXfVVdIaCWYKiwgqM56lMPeoEthpO1b9dkGF+rzTL1o2Yw
+// ZDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBhjAdBgNVHQ4EFgQU
+// RxA158BOqqi+fE1ME+PkwgmVqEswHwYDVR0jBBgwFoAUl+Rp0MUEFMJvxwH3fpR3
+// OQmN9qUwCgYIKoZIzj0EAwIDRwAwRAIgIFecbY+1mVVNqxH9+8IMB8+safdyIJU2
+// AqqtZ/w7AkQCIHiVlYTaCnJsnW5/cvj9GfIv7Eb0cjdmcAkrYGbnPQzX
+// -----END CERTIFICATE-----
+//
+constexpr uint8_t gCdSigningKey003PubkeyBytes[65] = {
+    0x04, 0x9f, 0x57, 0x5c, 0xd5, 0xfd, 0xb7, 0x52, 0x1f, 0x10, 0xa4, 0xdf, 0x31, 0xf0, 0x73, 0x91, 0x2b,
+    0x61, 0x47, 0x28, 0xf2, 0xd3, 0x7f, 0x5b, 0x6b, 0x96, 0xbc, 0x2c, 0xbf, 0x7c, 0x0b, 0x11, 0x96, 0x90,
+    0x57, 0x7d, 0x55, 0x5d, 0x21, 0xa0, 0x96, 0x60, 0xa8, 0xb0, 0x82, 0xa3, 0x39, 0xea, 0x53, 0x0f, 0x7a,
+    0x81, 0x2d, 0x86, 0x93, 0xb5, 0x6f, 0xd7, 0x64, 0x18, 0x5f, 0xab, 0xcd, 0x32, 0xf5
+};
+
+constexpr uint8_t gCdSigningKey003Kid[20] = { 0x47, 0x10, 0x35, 0xE7, 0xC0, 0x4E, 0xAA, 0xA8, 0xBE, 0x7C,
+                                              0x4D, 0x4C, 0x13, 0xE3, 0xE4, 0xC2, 0x09, 0x95, 0xA8, 0x4B };
+
+// Official CD "Signing Key 004"
+//
+// -----BEGIN CERTIFICATE-----
+// MIICBjCCAa2gAwIBAgIHY3NhY2RrNDAKBggqhkjOPQQDAjBSMQwwCgYDVQQKDAND
+// U0ExLDAqBgNVBAMMI01hdHRlciBDZXJ0aWZpY2F0aW9uIGFuZCBUZXN0aW5nIENB
+// MRQwEgYKKwYBBAGConwCAQwEQzVBMDAgFw0yMjEwMDMxOTQzMjFaGA8yMDcyMDky
+// MDE5NDMyMVowWDEMMAoGA1UECgwDQ1NBMTIwMAYDVQQDDClDZXJ0aWZpY2F0aW9u
+// IERlY2xhcmF0aW9uIFNpZ25pbmcgS2V5IDAwNDEUMBIGCisGAQQBgqJ8AgEMBEM1
+// QTAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAR8/I2IEKic9PoZF3jyr+x4+FF6
+// l6Plf8ITutiI42EedP+2hL3rqKaLJSNKXDWPNzurm20wThMG3XYgpSjRFhwLo2Yw
+// ZDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBhjAdBgNVHQ4EFgQU
+// 9oYDo2kumBByQZ6h4as4VL13ldMwHwYDVR0jBBgwFoAUl+Rp0MUEFMJvxwH3fpR3
+// OQmN9qUwCgYIKoZIzj0EAwIDRwAwRAIgLqAfkbtLYYdmQsnbn0CWv3G1/lbE36nz
+// HbLbW5t6PY4CIE8oyIHsVhNSTPcb3mwRp+Vxhs8tKhbAdwv5BGgDaAHj
+// -----END CERTIFICATE-----
+//
+constexpr uint8_t gCdSigningKey004PubkeyBytes[65] = {
+    0x04, 0x7c, 0xfc, 0x8d, 0x88, 0x10, 0xa8, 0x9c, 0xf4, 0xfa, 0x19, 0x17, 0x78, 0xf2, 0xaf, 0xec, 0x78,
+    0xf8, 0x51, 0x7a, 0x97, 0xa3, 0xe5, 0x7f, 0xc2, 0x13, 0xba, 0xd8, 0x88, 0xe3, 0x61, 0x1e, 0x74, 0xff,
+    0xb6, 0x84, 0xbd, 0xeb, 0xa8, 0xa6, 0x8b, 0x25, 0x23, 0x4a, 0x5c, 0x35, 0x8f, 0x37, 0x3b, 0xab, 0x9b,
+    0x6d, 0x30, 0x4e, 0x13, 0x06, 0xdd, 0x76, 0x20, 0xa5, 0x28, 0xd1, 0x16, 0x1c, 0x0b
+};
+
+constexpr uint8_t gCdSigningKey004Kid[20] = { 0xF6, 0x86, 0x03, 0xA3, 0x69, 0x2E, 0x98, 0x10, 0x72, 0x41,
+                                              0x9E, 0xA1, 0xE1, 0xAB, 0x38, 0x54, 0xBD, 0x77, 0x95, 0xD3 };
+
+// Official CD "Signing Key 005"
+//
+// -----BEGIN CERTIFICATE-----
+// MIICBzCCAa2gAwIBAgIHY3NhY2RrNTAKBggqhkjOPQQDAjBSMQwwCgYDVQQKDAND
+// U0ExLDAqBgNVBAMMI01hdHRlciBDZXJ0aWZpY2F0aW9uIGFuZCBUZXN0aW5nIENB
+// MRQwEgYKKwYBBAGConwCAQwEQzVBMDAgFw0yMjEwMDMxOTQ3MTVaGA8yMDcyMDky
+// MDE5NDcxNVowWDEMMAoGA1UECgwDQ1NBMTIwMAYDVQQDDClDZXJ0aWZpY2F0aW9u
+// IERlY2xhcmF0aW9uIFNpZ25pbmcgS2V5IDAwNTEUMBIGCisGAQQBgqJ8AgEMBEM1
+// QTAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARDilLGYqKm1yZH+V63UxNu5K4P
+// 2zqpwWkxQms9CGf5EDrn16G4h+n4E6byb3a7zak1k3h8EneMqPKXXcRaIEL5o2Yw
+// ZDASBgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBhjAdBgNVHQ4EFgQU
+// Y38mNK1i6v5q9mLvuW9v0vy//C8wHwYDVR0jBBgwFoAUl+Rp0MUEFMJvxwH3fpR3
+// OQmN9qUwCgYIKoZIzj0EAwIDSAAwRQIhAM1HQpvkHKxLJByWaSYAPRZgh3Bis18W
+// AViq7c/mtzEAAiBZO0lVe6Qo9iQPIBWZaVx/S/YSNO9uKNa/pvFu3V+nIg==
+// -----END CERTIFICATE-----
+//
+constexpr uint8_t gCdSigningKey005PubkeyBytes[65] = {
+    0x04, 0x43, 0x8a, 0x52, 0xc6, 0x62, 0xa2, 0xa6, 0xd7, 0x26, 0x47, 0xf9, 0x5e, 0xb7, 0x53, 0x13, 0x6e,
+    0xe4, 0xae, 0x0f, 0xdb, 0x3a, 0xa9, 0xc1, 0x69, 0x31, 0x42, 0x6b, 0x3d, 0x08, 0x67, 0xf9, 0x10, 0x3a,
+    0xe7, 0xd7, 0xa1, 0xb8, 0x87, 0xe9, 0xf8, 0x13, 0xa6, 0xf2, 0x6f, 0x76, 0xbb, 0xcd, 0xa9, 0x35, 0x93,
+    0x78, 0x7c, 0x12, 0x77, 0x8c, 0xa8, 0xf2, 0x97, 0x5d, 0xc4, 0x5a, 0x20, 0x42, 0xf9
+};
+
+constexpr uint8_t gCdSigningKey005Kid[20] = { 0x63, 0x7F, 0x26, 0x34, 0xAD, 0x62, 0xEA, 0xFE, 0x6A, 0xF6,
+                                              0x62, 0xEF, 0xB9, 0x6F, 0x6F, 0xD2, 0xFC, 0xBF, 0xFC, 0x2F };
+
+struct MatterCDSigningKey
+{
+    const CertificateKeyId mKid;
+    const P256PublicKeySpan mPubkey;
+};
+
+std::array<MatterCDSigningKey, 6> gCdSigningKeys = { {
+    { FixedByteSpan<20>{ gTestCdPubkeyKid }, FixedByteSpan<65>{ gTestCdPubkeyBytes } },
+    { FixedByteSpan<20>{ gCdSigningKey001Kid }, FixedByteSpan<65>{ gCdSigningKey001PubkeyBytes } },
+    { FixedByteSpan<20>{ gCdSigningKey002Kid }, FixedByteSpan<65>{ gCdSigningKey002PubkeyBytes } },
+    { FixedByteSpan<20>{ gCdSigningKey003Kid }, FixedByteSpan<65>{ gCdSigningKey003PubkeyBytes } },
+    { FixedByteSpan<20>{ gCdSigningKey004Kid }, FixedByteSpan<65>{ gCdSigningKey004PubkeyBytes } },
+    { FixedByteSpan<20>{ gCdSigningKey005Kid }, FixedByteSpan<65>{ gCdSigningKey005PubkeyBytes } },
+} };
 
 const ArrayAttestationTrustStore kTestAttestationTrustStore{ &kTestPaaRoots[0], ArraySize(kTestPaaRoots) };
 
@@ -206,7 +321,7 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
     AttestationCertVidPid paaVidPid;
 
     VerifyOrExit(!info.attestationElementsBuffer.empty() && !info.attestationChallengeBuffer.empty() &&
-                     !info.attestationSignatureBuffer.empty() && !info.paiDerBuffer.empty() && !info.dacDerBuffer.empty() &&
+                     !info.attestationSignatureBuffer.empty() && !info.dacDerBuffer.empty() &&
                      !info.attestationNonceBuffer.empty() && onCompletion != nullptr,
                  attestationError = AttestationVerificationResult::kInvalidArgument);
 
@@ -215,6 +330,14 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
 
     // Ensure PAI is present
     VerifyOrExit(!info.paiDerBuffer.empty(), attestationError = AttestationVerificationResult::kPaiMissing);
+
+    // Validate Proper Certificate Format
+    {
+        VerifyOrExit(VerifyAttestationCertificateFormat(info.paiDerBuffer, AttestationCertType::kPAI) == CHIP_NO_ERROR,
+                     attestationError = AttestationVerificationResult::kPaiFormatInvalid);
+        VerifyOrExit(VerifyAttestationCertificateFormat(info.dacDerBuffer, AttestationCertType::kDAC) == CHIP_NO_ERROR,
+                     attestationError = AttestationVerificationResult::kDacFormatInvalid);
+    }
 
     // match DAC and PAI VIDs
     {
@@ -522,11 +645,11 @@ CHIP_ERROR CsaCdKeysTrustStore::AddTrustedKey(const ByteSpan & derCertBytes)
 CHIP_ERROR CsaCdKeysTrustStore::LookupVerifyingKey(const ByteSpan & kid, Crypto::P256PublicKey & outPubKey) const
 {
     // First, search for the well known keys
-    for (size_t keyIdx = 0; keyIdx < gCdKids.size(); keyIdx++)
+    for (auto & cdSigningKey : gCdSigningKeys)
     {
-        if (kid.data_equal(gCdKids[keyIdx]))
+        if (kid.data_equal(cdSigningKey.mKid))
         {
-            outPubKey = gCdPubkeys[keyIdx];
+            outPubKey = cdSigningKey.mPubkey;
             return CHIP_NO_ERROR;
         }
     }
