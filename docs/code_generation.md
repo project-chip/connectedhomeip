@@ -177,8 +177,8 @@ Additionally, individual code regeneration can be done using
 
 ### Compile-time code generation / pre-enerated code
 
-A subset of code generation (both `codegen.py` and `zap-cli`) is done at
-compile time or can use pre-generated output (based on gn/cmake arguments)
+A subset of code generation (both `codegen.py` and `zap-cli`) is done at compile
+time or can use pre-generated output (based on gn/cmake arguments)
 
 Rules for how `generate.py`/`codegen.py` is invoked at compile time are defined
 at:
@@ -200,9 +200,54 @@ Code pre-generation can be used:
 -   To check changes in generated code across versions, beyond the comparisons
     of golden image tests in `scripts/idl/tests`
 
-The script to trigger code pre-generation is `scripts/code_pregenerate.py` and
+The script to trigger code pre-generation is `scripts/codepregen.py` and
 requires the pre-generation output directory as an argument
 
 ```bash
 scripts/code_pregenerate.py ${OUTPUT_DIRECTORY:-./zzz_pregenerated/}
 ```
+
+### Using pre-generated code
+
+Instead of generating code at compile time, the chip build system accepts
+usage of a pre-generated folder. It assumes the structure that `codepregen.py`
+creates. To invoke use:
+
+
+- `build_examples.py` builds accept `--pregen-dir` as an argument, such as:
+
+  ```shell
+  ./scripts/build/build_examples.py --target $TARGET --pregen-dir $PREGEN_DIR build
+  ```
+
+- `gn` builds allow setting `chip_code_pre_generated_directory` as an argument,
+  such as:
+
+  ```shell
+  gn gen --check --fail-on-unused-args --args='chip_code_pre_generated_directory="/some/pregen/dir"'
+  ```
+
+- `cmake` builds allow setting `CHIP_CODEGEN_PREGEN_DIR` variable (which will
+  get propagated to the underlying `gn` builds as needed), such as:
+
+  ```shell
+
+  west build --cmake-only \
+      -d /workspace/out/nrf-nrf5340dk-light \
+      -b nrf5340dk_nrf5340_cpuapp \
+      /workspace/examples/lighting-app/nrfconnect 
+      -- -DCHIP_CODEGEN_PREGEN_DIR=/some/pregen/dir
+
+  idf.py -C examples/all-clusters-app/esp32 \
+      -B /workspace/out/esp32-m5stack-all-clusters \
+      -DCHIP_CODEGEN_PREGEN_DIR=/some/pregen/dir \
+      reconfigure
+
+  cmake -S /workspace/examples/lighting-app/mbed \
+        -B /workspace/out/mbed-cy8cproto_062_4343w-light \
+        -GNinja \
+        -DMBED_OS_PATH=/workspace/third_party/mbed-os/repo \
+        -DMBED_OS_PATH=/workspace/third_party/mbed-os/repo \
+        -DMBED_OS_POSIX_SOCKET_PATH=/workspace/third_party/mbed-os-posix-socket/repo \
+        -DCHIP_CODEGEN_PREGEN_DIR=/some/pregen/dir
+  ```
