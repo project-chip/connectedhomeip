@@ -86,6 +86,7 @@ ti_simplelink_executable("pump_app") {
     ":sdk",
     ":sysconfig",
     "${chip_root}/examples/pump-app/pump-common",
+    "${chip_root}/examples/platform/cc13x2_26x2:cc13x2_26x2-attestation-credentials",
     "${chip_root}/src/lib",
   ]
 
@@ -95,6 +96,7 @@ ti_simplelink_executable("pump_app") {
     deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
   }
 
+  
   include_dirs = [
     "${project_dir}",
     "${project_dir}/main",
