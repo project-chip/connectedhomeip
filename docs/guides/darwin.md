@@ -7,8 +7,8 @@ Learn more about Matter [here](https://buildwithmatter.com/)
 ## Source Compatibility
 
 Each release of an Apple operating system, or developer preview release may
-bring a new SHA from this repository, which can be helpful for to reference
-which changes are present in the release for testing.
+bring a new SHA from this repository, which can be helpful for determining which
+changes are present in the release for testing.for determining
 
 Listed are the Current SHAs:
 
@@ -68,7 +68,9 @@ For Context: This is a mapping of platform to OS
 -   To pair and control Matter Thread devices, you'll need to have a HomePod
     Mini, Apple TV 4K, or another device that supports Thread
 -   Enable Developer Mode during the development phase of your app by following
-    the steps at Enabling Developer Mode on a device.
+    the steps at
+    [Enabling Developer Mode](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device)
+    on a device.
 
 ## Profile Installation
 
@@ -127,10 +129,10 @@ enables other useful developer tools
 To enable developer mode, please follow the instructions
 [here](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device)
 
-## Using chiptool on macOS, or CHIP Tool on iOS
+## Using chip-tool on macOS, or CHIP Tool on iOS
 
-Pairing Matter Accessory using Open Source Matter Darwin chiptool and iOS
-chiptool will require installing the
+Pairing Matter Accessory using Open Source Matter Darwin chip-tool and iOS
+chip-tool will require installing the
 [Bluetooth Central Matter Client Developer mode profile](https://developer.apple.com/services-account/download?path=/iOS/iOS_Logs/EnableBluetoothCentralMatterClientDeveloperMode.mobileconfig)
 on MacOS or iOS/iPadOS.
 
@@ -146,7 +148,7 @@ on MacOS or iOS/iPadOS.
 -   Restart your system
     -   For _iOS/iPadOS_, enable Developer Mode. Refer to
         [this developer page](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device)
--   Compile chiptool for macOS or CHIP Tool for iOS
+-   Compile chip-tool for macOS or CHIP Tool for iOS
 
 ## Testing your Matter Device with Apple Home
 
