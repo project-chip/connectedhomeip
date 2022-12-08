@@ -75,7 +75,7 @@ tests:
                       # Write in a bogus value for the fabric index. This should never actually make it across the wire,
                       # nor be meaningfully ingested by a correct receiver.
                       #
-                      fabricIndex: 100,
+                      FabricIndex: 100,
                       fabricSensitiveInt8u: 33,
                       optionalFabricSensitiveInt8u: 34,
                       nullableFabricSensitiveInt8u: null,
@@ -95,7 +95,7 @@ tests:
                       fabricSensitiveInt8uList: [1, 2, 3, 4],
                   },
                   {
-                      fabricIndex: 100,
+                      FabricIndex: 100,
                       fabricSensitiveInt8u: 43,
                       optionalFabricSensitiveInt8u: 44,
                       nullableFabricSensitiveInt8u: null,
@@ -125,7 +125,7 @@ tests:
           value:
               [
                   {
-                      fabricIndex: 100,
+                      FabricIndex: 100,
                       fabricSensitiveInt8u: 133,
                       optionalFabricSensitiveInt8u: 134,
                       nullableFabricSensitiveInt8u: null,
@@ -145,7 +145,7 @@ tests:
                       fabricSensitiveInt8uList: [11, 12, 13, 14],
                   },
                   {
-                      fabricIndex: 100,
+                      FabricIndex: 100,
                       fabricSensitiveInt8u: 143,
                       optionalFabricSensitiveInt8u: 144,
                       nullableFabricSensitiveInt8u: null,
@@ -175,7 +175,7 @@ tests:
           value:
               [
                   {
-                      fabricIndex: 1,
+                      FabricIndex: 1,
                       fabricSensitiveInt8u: 33,
                       optionalFabricSensitiveInt8u: 34,
                       nullableFabricSensitiveInt8u: null,
@@ -195,7 +195,7 @@ tests:
                       fabricSensitiveInt8uList: [1, 2, 3, 4],
                   },
                   {
-                      fabricIndex: 1,
+                      FabricIndex: 1,
                       fabricSensitiveInt8u: 43,
                       optionalFabricSensitiveInt8u: 44,
                       nullableFabricSensitiveInt8u: null,
@@ -225,7 +225,7 @@ tests:
           value:
               [
                   {
-                      fabricIndex: 2,
+                      FabricIndex: 2,
                       fabricSensitiveInt8u: 133,
                       optionalFabricSensitiveInt8u: 134,
                       nullableFabricSensitiveInt8u: null,
@@ -245,7 +245,7 @@ tests:
                       fabricSensitiveInt8uList: [11, 12, 13, 14],
                   },
                   {
-                      fabricIndex: 2,
+                      FabricIndex: 2,
                       fabricSensitiveInt8u: 143,
                       optionalFabricSensitiveInt8u: 144,
                       nullableFabricSensitiveInt8u: null,
@@ -287,7 +287,7 @@ tests:
           value:
               [
                   {
-                      fabricIndex: 1,
+                      FabricIndex: 1,
                       fabricSensitiveInt8u: 33,
                       optionalFabricSensitiveInt8u: 34,
                       nullableFabricSensitiveInt8u: null,
@@ -307,7 +307,7 @@ tests:
                       fabricSensitiveInt8uList: [1, 2, 3, 4],
                   },
                   {
-                      fabricIndex: 1,
+                      FabricIndex: 1,
                       fabricSensitiveInt8u: 43,
                       optionalFabricSensitiveInt8u: 44,
                       nullableFabricSensitiveInt8u: null,
@@ -327,7 +327,7 @@ tests:
                       fabricSensitiveInt8uList: [2, 3, 4, 5],
                   },
                   {
-                      fabricIndex: 2,
+                      FabricIndex: 2,
                       fabricSensitiveInt8u: 0,
                       nullableFabricSensitiveInt8u: null,
                       fabricSensitiveCharString: "",
@@ -345,7 +345,7 @@ tests:
                       fabricSensitiveInt8uList: [],
                   },
                   {
-                      fabricIndex: 2,
+                      FabricIndex: 2,
                       fabricSensitiveInt8u: 0,
                       nullableFabricSensitiveInt8u: null,
                       fabricSensitiveCharString: "",
@@ -374,7 +374,7 @@ tests:
           value:
               [
                   {
-                      fabricIndex: 1,
+                      FabricIndex: 1,
                       fabricSensitiveInt8u: 0,
                       nullableFabricSensitiveInt8u: null,
                       fabricSensitiveCharString: "",
@@ -392,7 +392,7 @@ tests:
                       fabricSensitiveInt8uList: [],
                   },
                   {
-                      fabricIndex: 1,
+                      FabricIndex: 1,
                       fabricSensitiveInt8u: 0,
                       nullableFabricSensitiveInt8u: null,
                       fabricSensitiveCharString: "",
@@ -410,7 +410,7 @@ tests:
                       fabricSensitiveInt8uList: [],
                   },
                   {
-                      fabricIndex: 2,
+                      FabricIndex: 2,
                       fabricSensitiveInt8u: 133,
                       optionalFabricSensitiveInt8u: 134,
                       nullableFabricSensitiveInt8u: null,
@@ -430,7 +430,7 @@ tests:
                       fabricSensitiveInt8uList: [11, 12, 13, 14],
                   },
                   {
-                      fabricIndex: 2,
+                      FabricIndex: 2,
                       fabricSensitiveInt8u: 143,
                       optionalFabricSensitiveInt8u: 144,
                       nullableFabricSensitiveInt8u: null,
@@ -460,7 +460,7 @@ tests:
           value:
               [
                   {
-                      fabricIndex: 100,
+                      FabricIndex: 100,
                       fabricSensitiveInt8u: 53,
                       optionalFabricSensitiveInt8u: 54,
                       nullableFabricSensitiveInt8u: null,
@@ -490,7 +490,7 @@ tests:
           value:
               [
                   {
-                      fabricIndex: 2,
+                      FabricIndex: 2,
                       fabricSensitiveInt8u: 133,
                       optionalFabricSensitiveInt8u: 134,
                       nullableFabricSensitiveInt8u: null,
@@ -510,7 +510,7 @@ tests:
                       fabricSensitiveInt8uList: [11, 12, 13, 14],
                   },
                   {
-                      fabricIndex: 2,
+                      FabricIndex: 2,
                       fabricSensitiveInt8u: 143,
                       optionalFabricSensitiveInt8u: 144,
                       nullableFabricSensitiveInt8u: null,
@@ -540,7 +540,7 @@ tests:
           value:
               [
                   {
-                      fabricIndex: 1,
+                      FabricIndex: 1,
                       fabricSensitiveInt8u: 53,
                       optionalFabricSensitiveInt8u: 54,
                       nullableFabricSensitiveInt8u: null,

@@ -164,7 +164,7 @@ def BuildEsp32Target():
     target.AppendFixedTargets([
         TargetPart('all-clusters', app=Esp32App.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=Esp32App.ALL_CLUSTERS_MINIMAL),
-        TargetPart('ota-requestor', app=Esp32App.OTA_REQUESTOR),
+        TargetPart('ota-provider', app=Esp32App.OTA_PROVIDER),
         TargetPart('ota-requestor', app=Esp32App.OTA_REQUESTOR),
         TargetPart('shell', app=Esp32App.SHELL),
         TargetPart('light', app=Esp32App.LIGHT),
@@ -223,6 +223,7 @@ def BuildEfr32Target():
     target.AppendModifier('additional_data_advertising', enable_additional_data_advertising=True)
     target.AppendModifier('use_ot_lib', enable_ot_lib=True).ExceptIfRe('-(wifi|use_ot_coap_lib)')
     target.AppendModifier('use_ot_coap_lib', enable_ot_coap_lib=True).ExceptIfRe('-(wifi|use_ot_lib)')
+    target.AppendModifier('no-version', no_version=True)
 
     return target
 
@@ -257,6 +258,7 @@ def BuildNrfTarget():
         TargetPart('shell', app=NrfApp.SHELL),
         TargetPart('pump', app=NrfApp.PUMP),
         TargetPart('pump-controller', app=NrfApp.PUMP_CONTROLLER),
+        TargetPart('window-covering', app=NrfApp.WINDOW_COVERING),
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
@@ -353,6 +355,7 @@ def BuildAmebaTarget():
         TargetPart('all-clusters', app=AmebaApp.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=AmebaApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('light', app=AmebaApp.LIGHT),
+        TargetPart('light-switch', app=AmebaApp.LIGHT_SWITCH),
         TargetPart('pigweed', app=AmebaApp.PIGWEED),
     ])
 

@@ -40,7 +40,7 @@ class NrfApp(Enum):
         elif self == NrfApp.LIGHT:
             return 'examples/lighting-app'
         elif self == NrfApp.SWITCH:
-            return 'light-switch-app'
+            return 'examples/light-switch-app'
         elif self == NrfApp.LOCK:
             return 'examples/lock-app'
         elif self == NrfApp.SHELL:

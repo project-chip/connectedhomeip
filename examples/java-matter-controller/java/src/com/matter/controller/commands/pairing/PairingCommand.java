@@ -27,6 +27,8 @@ import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public abstract class PairingCommand extends MatterCommand
     implements ChipDeviceController.CompletionListener {
@@ -48,6 +50,8 @@ public abstract class PairingCommand extends MatterCommand
   private final StringBuffer mOnboardingPayload = new StringBuffer();
   private final StringBuffer mDiscoveryFilterInstanceName = new StringBuffer();
 
+  private static Logger logger = Logger.getLogger(PairingCommand.class.getName());
+
   public long getNodeId() {
     return mNodeId.get();
   }
@@ -66,17 +70,17 @@ public abstract class PairingCommand extends MatterCommand
 
   @Override
   public void onConnectDeviceComplete() {
-    System.out.println("onConnectDeviceComplete");
+    logger.log(Level.INFO, "onConnectDeviceComplete");
   }
 
   @Override
   public void onStatusUpdate(int status) {
-    System.out.println("onStatusUpdate with status: " + status);
+    logger.log(Level.INFO, "onStatusUpdate with status: " + status);
   }
 
   @Override
   public void onPairingComplete(int errorCode) {
-    System.out.println("onPairingComplete with error code: " + errorCode);
+    logger.log(Level.INFO, "onPairingComplete with error code: " + errorCode);
     if (errorCode != 0) {
       setTestResult("Failure");
     }
@@ -84,12 +88,12 @@ public abstract class PairingCommand extends MatterCommand
 
   @Override
   public void onPairingDeleted(int errorCode) {
-    System.out.println("onPairingDeleted with error code: " + errorCode);
+    logger.log(Level.INFO, "onPairingDeleted with error code: " + errorCode);
   }
 
   @Override
   public void onCommissioningComplete(long nodeId, int errorCode) {
-    System.out.println("onCommissioningComplete with error code: " + errorCode);
+    logger.log(Level.INFO, "onCommissioningComplete with error code: " + errorCode);
     if (errorCode == 0) {
       setTestResult("Success");
     } else {
@@ -100,33 +104,33 @@ public abstract class PairingCommand extends MatterCommand
   @Override
   public void onReadCommissioningInfo(
       int vendorId, int productId, int wifiEndpointId, int threadEndpointId) {
-    System.out.println("onReadCommissioningInfo");
+    logger.log(Level.INFO, "onReadCommissioningInfo");
   }
 
   @Override
   public void onCommissioningStatusUpdate(long nodeId, String stage, int errorCode) {
-    System.out.println("onCommissioningStatusUpdate");
+    logger.log(Level.INFO, "onCommissioningStatusUpdate");
   }
 
   @Override
   public void onNotifyChipConnectionClosed() {
-    System.out.println("onNotifyChipConnectionClosed");
+    logger.log(Level.INFO, "onNotifyChipConnectionClosed");
   }
 
   @Override
   public void onCloseBleComplete() {
-    System.out.println("onCloseBleComplete");
+    logger.log(Level.INFO, "onCloseBleComplete");
   }
 
   @Override
   public void onError(Throwable error) {
     setTestResult(error.toString());
-    System.out.println("onError with error: " + error.toString());
+    logger.log(Level.INFO, "onError with error: " + error.toString());
   }
 
   @Override
   public void onOpCSRGenerationComplete(byte[] csr) {
-    System.out.println("onOpCSRGenerationComplete");
+    logger.log(Level.INFO, "onOpCSRGenerationComplete");
     for (int i = 0; i < csr.length; i++) {
       System.out.print(csr[i] + " ");
     }

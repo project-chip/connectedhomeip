@@ -130,7 +130,6 @@ private:
 #pragma mark - MTRDevice
 @interface MTRDevice ()
 @property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
-@property (nonatomic) dispatch_queue_t queue;
 @property (nonatomic) MTRWeakReference<id<MTRDeviceDelegate>> * weakDelegate;
 @property (nonatomic) dispatch_queue_t delegateQueue;
 @property (nonatomic) NSArray<NSDictionary<NSString *, id> *> * unreportedEvents;
@@ -156,8 +155,7 @@ private:
         _lock = OS_UNFAIR_LOCK_INIT;
         _nodeID = [nodeID copy];
         _deviceController = controller;
-        _queue = dispatch_queue_create("com.apple.matter.framework.xpc.workqueue", DISPATCH_QUEUE_SERIAL);
-        ;
+        _queue = dispatch_queue_create("com.apple.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL);
         _readCache = [NSMutableDictionary dictionary];
         _expectedValueCache = [NSMutableDictionary dictionary];
         _asyncCallbackWorkQueue = [[MTRAsyncCallbackWorkQueue alloc] initWithContext:self queue:_queue];
@@ -413,7 +411,7 @@ private:
     NSString * logPrefix = [NSString
         stringWithFormat:@"MTRDevice read %u %@ %@ %@", _deviceController.fabricIndex, endpointID, clusterID, attributeID];
     // Create work item, set ready handler to perform task, then enqueue the work
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:_queue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTR_LOG_INFO("%@ dequeueWorkItem %@", logPrefix, self->_asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [self newBaseDevice];
@@ -468,7 +466,7 @@ private:
         timeout = MTRClampedNumber(timeout, @(1), @(UINT16_MAX));
     }
     expectedValueInterval = MTRClampedNumber(expectedValueInterval, @(1), @(UINT32_MAX));
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:_queue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTR_LOG_INFO("%@ dequeueWorkItem %@", logPrefix, self->_asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [self newBaseDevice];
@@ -517,7 +515,7 @@ private:
     } else {
         expectedValueInterval = MTRClampedNumber(expectedValueInterval, @(1), @(UINT32_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:_queue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTR_LOG_INFO("%@ dequeueWorkItem %@", logPrefix, self->_asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [self newBaseDevice];
@@ -611,7 +609,7 @@ private:
             waitTime = MTR_DEVICE_EXPIRATION_CHECK_TIMER_MINIMUM_WAIT_TIME;
         }
         MTRWeakReference<MTRDevice *> * weakSelf = [MTRWeakReference weakReferenceWithObject:self];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(waitTime * NSEC_PER_SEC)), _queue, ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(waitTime * NSEC_PER_SEC)), self.queue, ^{
             MTRDevice * strongSelf = weakSelf.strongObject;
             [strongSelf _performScheduledExpirationCheck];
         });

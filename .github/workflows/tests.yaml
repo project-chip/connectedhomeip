@@ -462,6 +462,18 @@ jobs:
                       --target linux-x64-java-matter-controller \
                       build \
                    "
+            - name: Run Tests
+              timeout-minutes: 65
+              run: |
+                  scripts/run_in_build_env.sh \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "pairing" \
+                     --tool-args "--nodeid 1 --setup-payload 20202021 --discriminator 3840 -t 1000" \
+                     --factoryreset \
+                  '
             - name: Uploading core files
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
