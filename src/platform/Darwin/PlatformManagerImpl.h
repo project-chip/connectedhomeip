@@ -54,6 +54,8 @@ public:
         return mWorkQueue;
     }
 
+    CHIP_ERROR PrepareCommissioning();
+
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
 private:
