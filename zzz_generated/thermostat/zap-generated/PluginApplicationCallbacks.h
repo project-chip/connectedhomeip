@@ -48,4 +48,5 @@
     MatterGroupKeyManagementPluginServerInitCallback();                                                                            \
     MatterFixedLabelPluginServerInitCallback();                                                                                    \
     MatterUserLabelPluginServerInitCallback();                                                                                     \
-    MatterThermostatPluginServerInitCallback();
+    MatterThermostatPluginServerInitCallback();                                                                                    \
+    MatterThermostatUserInterfaceConfigurationPluginServerInitCallback();
