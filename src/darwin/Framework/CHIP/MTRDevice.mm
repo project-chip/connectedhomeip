@@ -251,9 +251,6 @@ private:
 
     _state = MTRDeviceStateUnknown;
 
-    // reset unreported events to avoid sending noncontiguous set of events
-    _unreportedEvents = nil;
-
     id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
     if (delegate) {
         dispatch_async(_delegateQueue, ^{
