@@ -158,6 +158,11 @@ def process_arguments():
         idx = args.index('--regenerate')
         program_args.regenerate_golden = True
         del args[idx]
+    elif 'ZAP_GENERATE_GOLDEN_REGENERATE' in os.environ:
+        # Allow `ZAP_GENERATE_GOLDEN_REGENERATE=1 ninja check` to also
+        # update golden images
+        program_args.regenerate_golden = True
+
 
     if '--stamp' in args:
         idx = args.index('--stamp')
