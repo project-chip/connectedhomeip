@@ -363,6 +363,12 @@ jobs:
         timeout-minutes: 200
         runs-on: macos-latest
         if: github.actor != 'restyled-io[bot]'
+        
+        env:
+            # NOTE: zap version should be kept in sync with the image used by 
+            # Docker, currently connectedhomeip/chip-build:0.6.17 
+            ZAP_VERSION: v2022.11.29-nightly
+            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2022.11.29-nightly
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.36
@@ -393,6 +399,15 @@ jobs:
                   ls -la /usr/local/Cellar/openssl@1.1
                   OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
                   ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
+            - name: Install zap
+              run: |
+                 sudo mkdir -p $ZAP_INSTALL_PATH
+                 sudo chown `whoami` $ZAP_INSTALL_PATH
+                 curl -L https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-mac.zip \
+                      --output $ZAP_INSTALL_PATH/zap-mac.zip
+                 cd $ZAP_INSTALL_PATH
+                 unzip zap-mac.zip zap-cli
+                 rm zap-mac.zip
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
