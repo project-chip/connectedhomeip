@@ -475,7 +475,7 @@ PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::De
     RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
     addr.SetTransportType(chip::Transport::Type::kBle);
     params.SetPeerAddress(addr).SetDiscriminator(discriminator);
-    return ToPyChipError(devCtrl->EstablishPASEConnection(nodeid, params).AsInteger());
+    return ToPyChipError(devCtrl->EstablishPASEConnection(nodeid, params));
 }
 
 PyChipError pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
