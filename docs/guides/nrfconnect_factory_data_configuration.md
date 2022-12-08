@@ -386,9 +386,27 @@ window indicates the validation status.
 #### Option 3: Using the nRF Connect Python script
 
 You can have the JSON file checked automatically by the Python script during the
-file generation. For this to happen, provide the path to the JSON schema file as
-an additional argument, which should replace the _<path_to_schema>_ variable in
-the following command:
+file generation. For this to happen, you must install the `jsonschema` Python
+module in your Python environment and provide the path to the JSON schema file
+as an additional argument. To do this, complete the following steps:
+
+1. Install the `jsonschema` Python module by invoking one of the following
+   commands from the Matter root directory:
+
+    - Install only the `jsonschema` module:
+
+        ```
+        $ python -m pip install jsonschema
+        ```
+
+    - Install the `jsonschema` module together with all dependencies for Matter:
+
+        ```
+        $ python -m pip install -r ./scripts/requirements.nrfconnect.txt
+        ```
+
+2. Run the following command (remember to replace the _<path_to_schema>_
+   variable):
 
 ```
 $ python generate_nrfconnect_chip_factory_data.py --schema <path_to_schema>

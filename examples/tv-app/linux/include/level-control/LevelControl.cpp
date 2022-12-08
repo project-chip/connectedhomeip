@@ -89,7 +89,7 @@ static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize,
         }
         break;
     default:
-        status = EMBER_ZCL_STATUS_INVALID_FIELD;
+        status = EMBER_ZCL_STATUS_INVALID_COMMAND;
         goto send_default_response;
     }
 
