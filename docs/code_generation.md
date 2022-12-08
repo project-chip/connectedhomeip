@@ -204,7 +204,7 @@ The script to trigger code pre-generation is `scripts/codepregen.py` and
 requires the pre-generation output directory as an argument
 
 ```bash
-scripts/code_pregenerate.py ${OUTPUT_DIRECTORY:-./zzz_pregenerated/}
+scripts/codepregen.py ${OUTPUT_DIRECTORY:-./zzz_pregenerated/}
 ```
 
 ### Using pre-generated code
