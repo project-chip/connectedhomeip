@@ -246,7 +246,14 @@ class TestDefinition:
                 raise Exception("Unknown test target - "
                                 "don't know which application to run")
 
+            if not target_app:
+                logging.warning('Skipped')
+                return
+
             for path in paths.items():
+                if not path:
+                    continue
+
                 # Do not add chip-tool to the register
                 if path == paths.chip_tool:
                     continue

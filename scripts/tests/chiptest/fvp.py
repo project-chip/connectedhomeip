@@ -24,6 +24,7 @@ import os
 import subprocess
 import sys
 import time
+from typing import Optional
 
 from .test_definition import ApplicationPaths
 
@@ -139,6 +140,10 @@ def PrepareNamespacesForTestExecution(in_unshare: bool):
     CreateNamespacesForAppTest()
 
 
+def _Prefixify(prefix:str, path:Optional[str]) -> str:
+    '''Return path with prefix if path is not None, else return None.'''
+    return prefix + path if path else None
+
 def PathsWithNetworkNamespaces(paths: ApplicationPaths) -> ApplicationPaths:
     """
     Returns a copy of paths with updated command arrays to invoke the
@@ -146,11 +151,11 @@ def PathsWithNetworkNamespaces(paths: ApplicationPaths) -> ApplicationPaths:
     """
     prefix = 'ip netns exec chipns'.split()
     return ApplicationPaths(
-        chip_tool=prefix + paths.chip_tool,
-        all_clusters_app=prefix + paths.all_clusters_app,
-        lock_app=prefix + paths.lock_app,
-        ota_provider_app=prefix + paths.ota_provider_app,
-        ota_requestor_app=prefix + paths.ota_requestor_app,
-        tv_app=prefix + paths.tv_app,
-        bridge_app=prefix + paths.bridge_app,
+        chip_tool=_Prefixify(prefix, paths.chip_tool),
+        all_clusters_app=_Prefixify(prefix, paths.all_clusters_app),
+        lock_app=_Prefixify(prefix, paths.lock_app),
+        ota_provider_app=_Prefixify(prefix, paths.ota_provider_app),
+        ota_requestor_app=_Prefixify(prefix, paths.ota_requestor_app),
+        tv_app=_Prefixify(prefix, paths.tv_app),
+        bridge_app=_Prefixify(prefix, paths.bridge_app)
     )

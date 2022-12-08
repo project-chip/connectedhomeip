@@ -170,6 +170,12 @@ def cmd_list(context):
         print(test.name)
 
 
+def _EnsureBinaryPath(name:str, path:typing.Optional[str]):
+    return path if path is not None else FindBinaryPath(name)
+
+def _SplitPathIfNotNone(path:typing.Optional[str]):
+    return path.split(',') if path is not None else None
+
 @main.command(
     'run', help='Execute the tests')
 @click.option(
@@ -215,37 +221,32 @@ def cmd_list(context):
     is_flag=True,
     help='Continue running tests after a test fails'
 )
+@click.option(
+    '--ignore-missing',
+    is_flag=True,
+    help='Ignore apps that aren\'t passed on the command-line'
+)
 @click.pass_context
-def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, bridge_app, pics_file, test_timeout_seconds, network, ignore_failure):
+def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, bridge_app, pics_file, test_timeout_seconds, network, ignore_failure, ignore_missing):
     runner = chiptest.runner.Runner()
 
-    if all_clusters_app is None:
-        all_clusters_app = FindBinaryPath('chip-all-clusters-app')
-
-    if lock_app is None:
-        lock_app = FindBinaryPath('chip-lock-app')
-
-    if ota_provider_app is None:
-        ota_provider_app = FindBinaryPath('chip-ota-provider-app')
-
-    if ota_requestor_app is None:
-        ota_requestor_app = FindBinaryPath('chip-ota-requestor-app')
-
-    if tv_app is None:
-        tv_app = FindBinaryPath('chip-tv-app')
-
-    if bridge_app is None:
-        bridge_app = FindBinaryPath('chip-bridge-app')
+    if not ignore_missing:
+        all_clusters_app  = _EnsureBinaryPath(all_clusters_app, 'chip-all-clusters-app')
+        lock_app          = _EnsureBinaryPath(lock_app, 'chip-lock-app')
+        ota_provider_app  = _EnsureBinaryPath(ota_provider_app, 'chip-ota-provider-app')
+        ota_requestor_app = _EnsureBinaryPath(ota_requestor_app, 'chip-ota-requestor-app')
+        tv_app            = _EnsureBinaryPath(tv_app, 'chip-tv-app')
+        bridge_app        = _EnsureBinaryPath(tv_app, 'chip-bridge-app')
 
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(
         chip_tool=[context.obj.chip_tool],
-        all_clusters_app=all_clusters_app.split(','),
-        lock_app=lock_app.split(','),
-        ota_provider_app=ota_provider_app.split(','),
-        ota_requestor_app=ota_requestor_app.split(','),
-        tv_app=tv_app.split(','),
-        bridge_app=bridge_app.split(','),
+        all_clusters_app=_SplitPathIfNotNone(all_clusters_app),
+        lock_app=_SplitPathIfNotNone(lock_app),
+        ota_provider_app=_SplitPathIfNotNone(ota_provider_app),
+        ota_requestor_app=_SplitPathIfNotNone(ota_requestor_app),
+        tv_app=_SplitPathIfNotNone(tv_app),
+        bridge_app=_SplitPathIfNotNone(bridge_app),
     )
 
     if sys.platform == 'linux':
