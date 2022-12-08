@@ -100,6 +100,7 @@ void CommissioningWindowManager::ResetState()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(false);
+    mSEDActiveModeEnabled = false;
 #endif
 
     UpdateWindowStatus(CommissioningWindowStatus::kWindowNotOpen);
@@ -227,7 +228,11 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
     mPairingSession.Clear();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(true);
+    if (!mSEDActiveModeEnabled)
+    {
+        mSEDActiveModeEnabled = true;
+        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(true);
+    }
 #endif
 
     ReturnErrorOnFailure(mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
