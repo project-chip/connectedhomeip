@@ -565,7 +565,7 @@ static void wfx_events_task(void * p_arg)
                 {
                     /* After disconnection
                      * At the telescopic time interval device try to reconnect with AP, upto WLAN_MAX_RETRY_TIMER_MS
-                     * intervals are telescopic. If interval exceed WLAN_MAX_RETRY_TIMER_MS then it will try to 
+                     * intervals are telescopic. If interval exceed WLAN_MAX_RETRY_TIMER_MS then it will try to
                      * reconnect at WLAN_MAX_RETRY_TIMER_MS intervals.
                      */
                     if (retryInterval < WLAN_MAX_RETRY_TIMER_MS)
