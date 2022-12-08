@@ -209,45 +209,44 @@ scripts/code_pregenerate.py ${OUTPUT_DIRECTORY:-./zzz_pregenerated/}
 
 ### Using pre-generated code
 
-Instead of generating code at compile time, the chip build system accepts
-usage of a pre-generated folder. It assumes the structure that `codepregen.py`
+Instead of generating code at compile time, the chip build system accepts usage
+of a pre-generated folder. It assumes the structure that `codepregen.py`
 creates. To invoke use:
 
+-   `build_examples.py` builds accept `--pregen-dir` as an argument, such as:
 
-- `build_examples.py` builds accept `--pregen-dir` as an argument, such as:
+    ```shell
+    ./scripts/build/build_examples.py --target $TARGET --pregen-dir $PREGEN_DIR build
+    ```
 
-  ```shell
-  ./scripts/build/build_examples.py --target $TARGET --pregen-dir $PREGEN_DIR build
-  ```
+-   `gn` builds allow setting `chip_code_pre_generated_directory` as an
+    argument, such as:
 
-- `gn` builds allow setting `chip_code_pre_generated_directory` as an argument,
-  such as:
+    ```shell
+    gn gen --check --fail-on-unused-args --args='chip_code_pre_generated_directory="/some/pregen/dir"'
+    ```
 
-  ```shell
-  gn gen --check --fail-on-unused-args --args='chip_code_pre_generated_directory="/some/pregen/dir"'
-  ```
+-   `cmake` builds allow setting `CHIP_CODEGEN_PREGEN_DIR` variable (which will
+    get propagated to the underlying `gn` builds as needed), such as:
 
-- `cmake` builds allow setting `CHIP_CODEGEN_PREGEN_DIR` variable (which will
-  get propagated to the underlying `gn` builds as needed), such as:
+    ```shell
 
-  ```shell
+    west build --cmake-only \
+        -d /workspace/out/nrf-nrf5340dk-light \
+        -b nrf5340dk_nrf5340_cpuapp \
+        /workspace/examples/lighting-app/nrfconnect
+        -- -DCHIP_CODEGEN_PREGEN_DIR=/some/pregen/dir
 
-  west build --cmake-only \
-      -d /workspace/out/nrf-nrf5340dk-light \
-      -b nrf5340dk_nrf5340_cpuapp \
-      /workspace/examples/lighting-app/nrfconnect 
-      -- -DCHIP_CODEGEN_PREGEN_DIR=/some/pregen/dir
+    idf.py -C examples/all-clusters-app/esp32 \
+        -B /workspace/out/esp32-m5stack-all-clusters \
+        -DCHIP_CODEGEN_PREGEN_DIR=/some/pregen/dir \
+        reconfigure
 
-  idf.py -C examples/all-clusters-app/esp32 \
-      -B /workspace/out/esp32-m5stack-all-clusters \
-      -DCHIP_CODEGEN_PREGEN_DIR=/some/pregen/dir \
-      reconfigure
-
-  cmake -S /workspace/examples/lighting-app/mbed \
-        -B /workspace/out/mbed-cy8cproto_062_4343w-light \
-        -GNinja \
-        -DMBED_OS_PATH=/workspace/third_party/mbed-os/repo \
-        -DMBED_OS_PATH=/workspace/third_party/mbed-os/repo \
-        -DMBED_OS_POSIX_SOCKET_PATH=/workspace/third_party/mbed-os-posix-socket/repo \
-        -DCHIP_CODEGEN_PREGEN_DIR=/some/pregen/dir
-  ```
+    cmake -S /workspace/examples/lighting-app/mbed \
+          -B /workspace/out/mbed-cy8cproto_062_4343w-light \
+          -GNinja \
+          -DMBED_OS_PATH=/workspace/third_party/mbed-os/repo \
+          -DMBED_OS_PATH=/workspace/third_party/mbed-os/repo \
+          -DMBED_OS_POSIX_SOCKET_PATH=/workspace/third_party/mbed-os-posix-socket/repo \
+          -DCHIP_CODEGEN_PREGEN_DIR=/some/pregen/dir
+    ```
