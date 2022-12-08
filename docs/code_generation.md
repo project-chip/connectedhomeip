@@ -175,13 +175,13 @@ Additionally, individual code regeneration can be done using
     -o zzz_generated/bridge-app/zap-generated
 ```
 
-### `*.matter` code generation
+### Compile-time code generation / pre-enerated code
 
-`*.matter` code generation can be done either at compile time or it can use
-pre-generated output.
+A subset of code generation (both `codegen.py` and `zap-cli`) is done at
+compile time or can use pre-generated output (based on gn/cmake arguments)
 
-Rules for how `codegen.py` is invoked and how includes/sources are set are
-defined at:
+Rules for how `generate.py`/`codegen.py` is invoked at compile time are defined
+at:
 
 -   `src/app/chip_data_model.cmake`
 -   `src/app/chip_data_model.gni`
