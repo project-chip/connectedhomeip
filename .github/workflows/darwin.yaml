@@ -65,7 +65,7 @@ jobs:
                  curl -L https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-mac.zip \
                       --output $ZAP_INSTALL_PATH/zap-mac.zip
                  cd $ZAP_INSTALL_PATH
-                 unzip zap-mac.zip
+                 unzip zap-mac.zip zap-cli
                  rm zap-mac.zip
             - name: Bootstrap
               timeout-minutes: 25
