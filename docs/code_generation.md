@@ -175,7 +175,7 @@ Additionally, individual code regeneration can be done using
     -o zzz_generated/bridge-app/zap-generated
 ```
 
-### Compile-time code generation / pre-enerated code
+### Compile-time code generation / pre-generated code
 
 A subset of code generation (both `codegen.py` and `zap-cli`) is done at compile
 time or can use pre-generated output (based on gn/cmake arguments)
