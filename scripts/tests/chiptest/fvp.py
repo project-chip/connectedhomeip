@@ -152,4 +152,5 @@ def PathsWithNetworkNamespaces(paths: ApplicationPaths) -> ApplicationPaths:
         ota_provider_app=prefix + paths.ota_provider_app,
         ota_requestor_app=prefix + paths.ota_requestor_app,
         tv_app=prefix + paths.tv_app,
+        bridge_app=prefix + paths.bridge_app,
     )
