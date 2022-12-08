@@ -697,6 +697,8 @@ ALL.append(Target('telink-tlsr9518adk80d-light-switch', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.SWITCH))
 ALL.append(Target('telink-tlsr9518adk80d-ota-requestor', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.OTA_REQUESTOR))
+ALL.append(Target('telink-tlsr9518adk80d-thermostat', TelinkBuilder,
+                  board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.THERMOSTAT))
 
 # have a consistent order overall
 ALL.sort(key=lambda t: t.name)
