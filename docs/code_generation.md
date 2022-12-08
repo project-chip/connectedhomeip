@@ -250,3 +250,34 @@ creates. To invoke use:
           -DMBED_OS_POSIX_SOCKET_PATH=/workspace/third_party/mbed-os-posix-socket/repo \
           -DCHIP_CODEGEN_PREGEN_DIR=/some/pregen/dir
     ```
+
+### Code generation unit testing
+
+Code generation is assumed stable between builds and the build system aims to
+detect changes in code gen using golden image tests.
+
+#### `codegen.py` tests
+
+These tests run against golde inputs/outputs from `scripts/idl/tests`.
+
+`available_tests.yaml` conains the full list of expected generators and outputs
+and the test is run via `test_generators.py`. Use the environment variable
+`IDL_GOLDEN_REGENERATE` to force golden image replacement during running of
+`ninja check`:
+
+```shell
+IDL_GOLDEN_REGENERATE=1 ninja check
+```
+
+#### `generate.py` tests
+
+These tests run against golde inputs/outputs from `scripts/tools/zap/tests`.
+
+`available_tests.yaml` conains the full list of expected generators and outputs
+and the test is run via `scripts/tools/zap/test_generate.py`. Use the
+environment variable `ZAP_GENERATE_GOLDEN_REGENERATE` to force golden image
+replacement during running of `ninja check`.
+
+```shell
+ZAP_GENERATE_GOLDEN_REGENERATE=1 ninja check
+```

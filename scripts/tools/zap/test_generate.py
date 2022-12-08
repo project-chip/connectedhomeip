@@ -163,7 +163,6 @@ def process_arguments():
         # update golden images
         program_args.regenerate_golden = True
 
-
     if '--stamp' in args:
         idx = args.index('--stamp')
         program_args.stamp_file = args[idx + 1]
