@@ -280,15 +280,15 @@ Example:
 ##### Note: For profile installation instructions, refer to [here](#profile-installation)
 
 -   File a feedback assistant ticket.
-    https://developer.apple.com/bug-reporting/#feedback-assistant
--   Click on the link below using your account:
-    https://feedbackassistant.apple.com/new-form-response
+    [About Feedback Assistant](https://developer.apple.com/bug-reporting/#feedback-assistant)
+-   Click this link, and log in using your account:
+    [File Feedback](https://feedbackassistant.apple.com/new-form-response)
 -   Choose iOS/iPadOS to file an issue
 -   Choose the area as Home App and fill in the details of the type of issue and
     the description
 -   Please provide the following technical information:
-    -   Sysdiagnose logs for iPhone / iPad with the timestamp / timeframe of the
-        issue
+    -   Sysdiagnose logs for iPhone / iPad with the timestamp / time frame of
+        the issue
     -   Sysdiagnose logs for all the Home Hubs (HomePod mini / HomePod / Apple
         TV) with the timestamp / timeframe of the issue
     -   Accessory logs with the timestamp / timeframe of the issue
