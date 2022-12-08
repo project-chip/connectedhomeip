@@ -8,7 +8,7 @@ Learn more about Matter [here](https://buildwithmatter.com/)
 
 Each release of an Apple operating system, or developer preview release may
 bring a new SHA from this repository, which can be helpful for determining which
-changes are present in the release for testing.for determining
+changes are present in the release for testing.
 
 Listed are the Current SHAs:
 
