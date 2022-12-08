@@ -134,9 +134,8 @@ PyChipError pychip_DeviceController_SetWiFiCredentials(const char * ssid, const 
 PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                                            uint32_t setupPINCode, chip::NodeId nodeid);
-PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::DeviceCommissioner * devCtrl,
-                                                            uint32_t setupPINCode, uint16_t discriminator,
-                                                            chip::NodeId nodeid);
+PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::DeviceCommissioner * devCtrl, uint32_t setupPINCode,
+                                                            uint16_t discriminator, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 
 PyChipError pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
@@ -469,9 +468,8 @@ PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::Dev
     return ToPyChipError(devCtrl->EstablishPASEConnection(nodeid, params));
 }
 
-PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                       uint32_t setupPINCode, uint16_t discriminator,
-                                                                       chip::NodeId nodeid)
+PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::DeviceCommissioner * devCtrl, uint32_t setupPINCode,
+                                                            uint16_t discriminator, chip::NodeId nodeid)
 {
     chip::Transport::PeerAddress addr;
     RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
