@@ -60,7 +60,7 @@ jobs:
                   ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
             - name: Install zap
               run: |
-                 mkdir $ZAP_INSTALL_PATH
+                 mkdir -p $ZAP_INSTALL_PATH
                  curl -L https://github.com/project-chip/zap/releases/download/${ZAP_VERSION}/zap-mac.zip \
                       --output $ZAP_INSTALL_PATH/zap-mac.zip
                  cd $ZAP_INSTALL_PATH
