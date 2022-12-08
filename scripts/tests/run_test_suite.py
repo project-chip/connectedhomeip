@@ -231,12 +231,12 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     runner = chiptest.runner.Runner()
 
     if not ignore_missing:
-        all_clusters_app  = _EnsureBinaryPath(all_clusters_app, 'chip-all-clusters-app')
-        lock_app          = _EnsureBinaryPath(lock_app, 'chip-lock-app')
-        ota_provider_app  = _EnsureBinaryPath(ota_provider_app, 'chip-ota-provider-app')
-        ota_requestor_app = _EnsureBinaryPath(ota_requestor_app, 'chip-ota-requestor-app')
-        tv_app            = _EnsureBinaryPath(tv_app, 'chip-tv-app')
-        bridge_app        = _EnsureBinaryPath(tv_app, 'chip-bridge-app')
+        all_clusters_app  = _EnsureBinaryPath('chip-all-clusters-app', all_clusters_app)
+        lock_app          = _EnsureBinaryPath('chip-lock-app', lock_app)
+        ota_provider_app  = _EnsureBinaryPath('chip-ota-provider-app', ota_provider_app)
+        ota_requestor_app = _EnsureBinaryPath('chip-ota-requestor-app', ota_requestor_app)
+        tv_app            = _EnsureBinaryPath('chip-tv-app', tv_app)
+        bridge_app        = _EnsureBinaryPath('chip-bridge-app', bridge_app)
 
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(

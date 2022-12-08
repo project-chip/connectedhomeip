@@ -66,4 +66,9 @@ int openiotsdk_platform_run(void);
  */
 int openiotsdk_network_init(bool wait);
 
+/**
+ * @brief Retrieve command-line arguments embedded in the binary.
+ */
+extern "C" void openiotsdk_get_cmdline(int * argc, char *** argv);
+
 #endif /* ! OPENIOTSDK_PLATFORM_H */
