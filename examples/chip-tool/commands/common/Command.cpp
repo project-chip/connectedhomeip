@@ -24,6 +24,8 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
+#include <math.h> // For INFINITY
+
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
@@ -541,6 +543,18 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Float: {
         isValidArgument = HandleNullableOptional<float>(arg, argValue, [&](auto * value) {
+            if (strcmp(argValue, "Infinity") == 0)
+            {
+                *value = INFINITY;
+                return true;
+            }
+
+            if (strcmp(argValue, "-Infinity") == 0)
+            {
+                *value = -INFINITY;
+                return true;
+            }
+
             std::stringstream ss;
             ss << argValue;
             ss >> *value;
@@ -551,6 +565,18 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
 
     case ArgumentType::Double: {
         isValidArgument = HandleNullableOptional<double>(arg, argValue, [&](auto * value) {
+            if (strcmp(argValue, "Infinity") == 0)
+            {
+                *value = INFINITY;
+                return true;
+            }
+
+            if (strcmp(argValue, "-Infinity") == 0)
+            {
+                *value = -INFINITY;
+                return true;
+            }
+
             std::stringstream ss;
             ss << argValue;
             ss >> *value;

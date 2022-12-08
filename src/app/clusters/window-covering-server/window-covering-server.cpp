@@ -841,7 +841,7 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
         }
         else
         {
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_VALUE);
+            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
         }
     }
     else
@@ -933,7 +933,7 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
         }
         else
         {
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_VALUE);
+            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
         }
     }
     else
