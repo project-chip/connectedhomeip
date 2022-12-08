@@ -14,15 +14,13 @@
 
 import("//build_overrides/chip.gni")
 
-config("attestation-credentials-config"){
-  include_dirs = ["${chip_root}"]
+config("attestation-credentials-config") {
+  include_dirs = [ "${chip_root}" ]
 
-  defines = [
-    "CC13X2_26X2_ATTESTATION_CREDENTIALS",
-  ]
+  defines = [ "CC13X2_26X2_ATTESTATION_CREDENTIALS" ]
 }
 
-source_set("cc13x2_26x2-attestation-credentials"){
+source_set("cc13x2_26x2-attestation-credentials") {
   sources = [
     "CC13X2_26X2DeviceAttestationCreds.cpp",
     "CC13X2_26X2DeviceAttestationCreds.h",
@@ -33,6 +31,5 @@ source_set("cc13x2_26x2-attestation-credentials"){
     "${chip_root}/src/platform:platform_base",
   ]
 
-  public_configs = [":attestation-credentials-config"]
+  public_configs = [ ":attestation-credentials-config" ]
 }
-
