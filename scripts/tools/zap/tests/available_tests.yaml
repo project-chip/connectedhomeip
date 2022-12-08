@@ -1,0 +1,22 @@
+# These are the available tests codegen.py
+#
+# General format is:
+# <input-zap>
+#   <template>:
+#      <output_file> : <golden_path>
+#
+# Where
+#   - input-zap is the input zap file
+#   - template is the code generation template
+#   - output_file/golden_path are the expected output file names
+#     and the expected content for those output files.
+inputs/all-clusters-app.zap:
+  ../../../../src/app/zap-templates/app-templates.json:
+    jni/MyClusterClient-ReadImpl.cpp: outputs/optional_argument/jni/MyClusterClient-ReadImpl.cpp
+    jni/MyClusterClient-InvokeSubscribeImpl.cpp: outputs/optional_argument/jni/MyClusterClient-InvokeSubscribeImpl.cpp
+
+inputs/lighting-app.zap:
+  ../../../../src/app/zap-templates/app-templates.json:
+    jni/MyClusterClient-ReadImpl.cpp: outputs/optional_argument/jni/MyClusterClient-ReadImpl.cpp
+    jni/MyClusterClient-InvokeSubscribeImpl.cpp: outputs/optional_argument/jni/MyClusterClient-InvokeSubscribeImpl.cpp
+
