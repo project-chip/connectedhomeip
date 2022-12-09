@@ -1,1 +1,1 @@
-0.6.18 Version bump reason: [Telink] Update Telink Docker with fixes: mcu_boot, OTA, zephyr blob.
+0.6.19 Version bump reason: [Ameba] Support reading and decoding factory data from flash
