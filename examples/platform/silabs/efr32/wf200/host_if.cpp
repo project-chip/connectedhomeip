@@ -568,7 +568,6 @@ static void wfx_events_task(void * p_arg)
                     {
                         SILABS_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(retryInterval));
                     }
-
                     vTaskDelay(pdMS_TO_TICKS(retryInterval));
                     retryInterval += retryInterval;
                 }

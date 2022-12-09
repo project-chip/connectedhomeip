@@ -554,7 +554,6 @@ static void wfx_rsi_do_join(void)
                     {
                         WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(retryInterval));
                     }
-
                     vTaskDelay(pdMS_TO_TICKS(retryInterval));
                     retryInterval += retryInterval;
                 }
