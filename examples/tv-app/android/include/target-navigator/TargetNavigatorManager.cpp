@@ -39,10 +39,10 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
     {
         chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::TargetNavigator::Id,
                                                    chip::app::Clusters::TargetNavigator::Attributes::TargetList::Id);
-        const char * resStr = mAttributeDelegate->Read(aPath);
-        ChipLogProgress(Zcl, "TargetNavigatorManager::HandleNavigateTarget response %s", resStr);
+        std::string resStr = mAttributeDelegate->Read(aPath);
+        ChipLogProgress(Zcl, "TargetNavigatorManager::HandleNavigateTarget response %s", resStr.c_str());
 
-        if (resStr != nullptr && *resStr != 0)
+        if (resStr.length() != 0)
         {
             Json::Reader reader;
             Json::Value value;
@@ -104,10 +104,10 @@ uint8_t TargetNavigatorManager::HandleGetCurrentTarget()
     {
         chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::TargetNavigator::Id,
                                                    chip::app::Clusters::TargetNavigator::Attributes::TargetList::Id);
-        const char * resStr = mAttributeDelegate->Read(aPath);
-        ChipLogProgress(Zcl, "TargetNavigatorManager::HandleGetCurrentTarget response %s", resStr);
+        std::string resStr = mAttributeDelegate->Read(aPath);
+        ChipLogProgress(Zcl, "TargetNavigatorManager::HandleGetCurrentTarget response %s", resStr.c_str());
 
-        if (resStr != nullptr && *resStr != 0)
+        if (resStr.length() != 0)
         {
             Json::Reader reader;
             Json::Value value;
