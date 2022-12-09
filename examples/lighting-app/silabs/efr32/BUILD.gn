@@ -190,6 +190,7 @@ efr32_sdk("sdk") {
 
 efr32_executable("lighting_app") {
   output_name = "chip-efr32-lighting-example.out"
+  public_configs = [ "${efr32_sdk_build_root}:silabs_config" ]
   include_dirs = [ "include" ]
   defines = []
 

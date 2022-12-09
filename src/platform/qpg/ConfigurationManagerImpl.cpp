@@ -48,6 +48,8 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     uint32_t rebootCount;
+    qvResetReason_t qvRebootReason;
+    BootReasonType bootReason;
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<QPGConfig>::Init();
@@ -74,11 +76,37 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
-    if (!QPGConfig::ConfigValueExists(QPGConfig::kCounterKey_BootReason))
+    qvRebootReason = qvCHIP_GetResetReason();
+
+    switch (qvRebootReason)
     {
-        err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
-        SuccessOrExit(err);
+    case qvResetReason_HW_BrownOutDetected: {
+        bootReason = BootReasonType::kBrownOutReset;
+        break;
     }
+
+    case qvResetReason_HW_Watchdog: {
+        bootReason = BootReasonType::kHardwareWatchdogReset;
+        break;
+    }
+
+    case qvResetReason_HW_Por: {
+        bootReason = BootReasonType::kPowerOnReboot;
+        break;
+    }
+
+    case qvResetReason_SW_Por: {
+        bootReason = BootReasonType::kSoftwareReset;
+        break;
+    }
+
+    default:
+        bootReason = BootReasonType::kUnspecified;
+        break;
+    }
+
+    err = StoreBootReason(to_underlying(bootReason));
+    SuccessOrExit(err);
 
     err = CHIP_NO_ERROR;
 

@@ -1,5 +1,5 @@
 #include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/Constants.h>
 
@@ -11,7 +11,7 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     switch (clusterId)
     {
   {%- for name in clusters | sort(attribute='name') | map(attribute='name') | unique %}
-    case ZCL_{{name | normalize_acronyms | constcase}}_CLUSTER_ID:
+    case app::Clusters::{{name}}::Id:
         emberAf{{name}}ClusterInitCallback(endpoint);
         break;
   {%- endfor %}

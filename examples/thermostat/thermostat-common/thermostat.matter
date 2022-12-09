@@ -1447,7 +1447,7 @@ server cluster ThermostatUserInterfaceConfiguration = 516 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22;
+  device type rootdevice = 22, version 1;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Identify {
@@ -1727,7 +1727,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type thermostat = 769;
+  device type thermostat = 769, version 1;
   binding cluster Identify;
 
   server cluster Identify {

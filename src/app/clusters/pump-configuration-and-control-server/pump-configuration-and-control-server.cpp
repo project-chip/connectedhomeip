@@ -60,7 +60,7 @@ enum class RemoteSensorType : uint8_t
     kTemperatureSensor = 0x03,
 };
 
-static RemoteSensorType detectRemoteSensorConnected(void)
+static RemoteSensorType detectRemoteSensorConnected()
 {
     // TODO: Detect the sensor types attached to the pump control cluster
     // this could be pressure, flow or temperature sensors.
@@ -462,7 +462,7 @@ void MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback(cons
     }
 }
 
-void MatterPumpConfigurationAndControlPluginServerInitCallback(void)
+void MatterPumpConfigurationAndControlPluginServerInitCallback()
 {
     emberAfDebugPrintln("Initialize PCC Plugin Server Cluster.");
 

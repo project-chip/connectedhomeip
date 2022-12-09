@@ -24,7 +24,7 @@
 #include "door-lock-server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/EventLogging.h>
 #include <app/server/Server.h>
 #include <app/util/af-event.h>

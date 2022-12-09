@@ -23,8 +23,44 @@ from chip.yaml.errors import ValidationError
 import binascii
 
 
+def substitute_in_config_variables(field_value, config_values: dict):
+    ''' Substitutes values that are config variables.
+
+    YAML values can contain a string of a configuration variable name. In these instances we
+    substitute the configuration variable name with the actual value.
+
+    For examples see unittest src/controller/python/test/unit_tests/test_yaml_format_converter.py
+
+    # TODO This should also substitue any saveAs values as well as perform any required
+    # evaluations.
+
+    Args:
+        'field_value': Value as extracted from YAML.
+        'config_values': Dictionary of global configuration variables.
+    Returns:
+        Value with all global configuration variables substituted with the real value.
+    '''
+    if isinstance(field_value, dict):
+        return {key: substitute_in_config_variables(
+            field_value[key], config_values) for key in field_value}
+    if isinstance(field_value, list):
+        return [substitute_in_config_variables(item, config_values) for item in field_value]
+    if isinstance(field_value, str) and field_value in config_values:
+        config_value = config_values[field_value]
+        if isinstance(config_value, dict) and 'defaultValue' in config_value:
+            # TODO currently we don't validate that if config_value['type'] is provided
+            # that the type does in fact match our expectation.
+            return config_value['defaultValue']
+        return config_values[field_value]
+
+    return field_value
+
+
 def convert_yaml_octet_string_to_bytes(s: str) -> bytes:
-    """Convert YAML octet string body to bytes, handling any c-style hex escapes (e.g. \x5a) and hex: prefix"""
+    '''Convert YAML octet string body to bytes.
+
+    Included handling any c-style hex escapes (e.g. \x5a) and 'hex:' prefix.
+    '''
     # Step 1: handle explicit "hex:" prefix
     if s.startswith('hex:'):
         return binascii.unhexlify(s[4:])
@@ -60,14 +96,21 @@ def convert_name_value_pair_to_dict(arg_values):
     return ret_value
 
 
-def convert_yaml_type(field_value, field_type, use_from_dict=False):
-    ''' Converts yaml value to expected type.
+def convert_yaml_type(field_value, field_type, inline_cast_dict_to_struct):
+    ''' Converts yaml value to provided pythonic type.
 
-    The YAML representation when converted to a Python dictionary does not
-    quite line up in terms of type (see each of the specific if branches
-    below for the rationale for the necessary fix-ups). This function does
-    a fix-up given a field value (as present in the YAML) and its matching
-    cluster object type and returns it.
+    The YAML representation when converted to a dictionary does not line up to
+    the python type data model for the various command/attribute/event object
+    types. This function converts 'field_value' to the appropriate provided
+    'field_type'.
+
+    Args:
+        'field_value': Value as extracted from yaml
+        'field_type': Pythonic command/attribute/event object type that we
+            are converting value to.
+        'inline_cast_dict_to_struct': If true, for any dictionary 'field_value'
+            types provided we will do a convertion to the corresponding data
+            model class in `field_type` by doing field_type.FromDict(...).
     '''
     origin = typing.get_origin(field_type)
 
@@ -110,8 +153,8 @@ def convert_yaml_type(field_value, field_type, use_from_dict=False):
                     f'Did not find field "{item}" in {str(field_type)}') from None
 
             return_field_value[field_descriptor.Label] = convert_yaml_type(
-                field_value[item], field_descriptor.Type, use_from_dict)
-        if use_from_dict:
+                field_value[item], field_descriptor.Type, inline_cast_dict_to_struct)
+        if inline_cast_dict_to_struct:
             return field_type.FromDict(return_field_value)
         return return_field_value
     elif(type(field_value) is float):
@@ -122,7 +165,8 @@ def convert_yaml_type(field_value, field_type, use_from_dict=False):
 
         # The field type passed in is the type of the list element and not list[T].
         for idx, item in enumerate(field_value):
-            field_value[idx] = convert_yaml_type(item, list_element_type, use_from_dict)
+            field_value[idx] = convert_yaml_type(item, list_element_type,
+                                                 inline_cast_dict_to_struct)
         return field_value
     # YAML conversion treats all numbers as ints. Convert to a uint type if the schema
     # type indicates so.
@@ -139,3 +183,25 @@ def convert_yaml_type(field_value, field_type, use_from_dict=False):
     # By default, just return the field_value casted to field_type.
     else:
         return field_type(field_value)
+
+
+def parse_and_convert_yaml_value(field_value, field_type, config_values: dict,
+                                 inline_cast_dict_to_struct: bool = False):
+    ''' Parse and converts YAML type
+
+    Parsing the YAML value means performing required substitutions and evaluations. Parsing is
+    then followed by converting from the YAML type done using yaml.safe_load() to the type used in
+    the various command/attribute/event object data model types.
+
+    Args:
+        'field_value': Value as extracted from yaml to be parsed
+        'field_type': Pythonic command/attribute/event object type that we
+            are converting value to.
+        'config_values': Dictionary of global configuration variables.
+        'inline_cast_dict_to_struct': If true, for any dictionary 'field_value'
+            types provided we will do an inline convertion to the corresponding
+            struct in `field_type` by doing field_type.FromDict(...).
+    '''
+    field_value_with_config_variables = substitute_in_config_variables(field_value, config_values)
+    return convert_yaml_type(field_value_with_config_variables, field_type,
+                             inline_cast_dict_to_struct)

@@ -1985,7 +1985,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTROtaSoftwareUpdateProviderClusterQueryImageParams
+@implementation MTROTASoftwareUpdateProviderClusterQueryImageParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2012,7 +2012,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROtaSoftwareUpdateProviderClusterQueryImageParams alloc] init];
+    auto other = [[MTROTASoftwareUpdateProviderClusterQueryImageParams alloc] init];
 
     other.vendorId = self.vendorId;
     other.productId = self.productId;
@@ -2038,7 +2038,10 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams
+
+@implementation MTROtaSoftwareUpdateProviderClusterQueryImageParams
+@end
+@implementation MTROTASoftwareUpdateProviderClusterQueryImageResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2065,7 +2068,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams alloc] init];
+    auto other = [[MTROTASoftwareUpdateProviderClusterQueryImageResponseParams alloc] init];
 
     other.status = self.status;
     other.delayedActionTime = self.delayedActionTime;
@@ -2092,7 +2095,10 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams
+
+@implementation MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams
+@end
+@implementation MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2107,7 +2113,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams alloc] init];
+    auto other = [[MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams alloc] init];
 
     other.updateToken = self.updateToken;
     other.newVersion = self.newVersion;
@@ -2125,7 +2131,10 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams
+
+@implementation MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams
+@end
+@implementation MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2140,7 +2149,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
+    auto other = [[MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
 
     other.action = self.action;
     other.delayedActionTime = self.delayedActionTime;
@@ -2157,7 +2166,10 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
+
+@implementation MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams
+@end
+@implementation MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2172,7 +2184,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams alloc] init];
+    auto other = [[MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams alloc] init];
 
     other.updateToken = self.updateToken;
     other.softwareVersion = self.softwareVersion;
@@ -2190,7 +2202,10 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams
+
+@implementation MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
+@end
+@implementation MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2211,7 +2226,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams alloc] init];
+    auto other = [[MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams alloc] init];
 
     other.providerNodeId = self.providerNodeId;
     other.vendorId = self.vendorId;
@@ -2232,6 +2247,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams
 @end
 @implementation MTRGeneralCommissioningClusterArmFailSafeParams
 - (instancetype)init
@@ -6974,6 +6992,63 @@ NS_ASSUME_NONNULL_BEGIN
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeId:%@; startTime:%@; numberOfIntervals:%@; >",
                                              NSStringFromClass([self class]), _attributeId, _startTime, _numberOfIntervals];
+    return descriptionString;
+}
+
+@end
+@implementation MTRClientMonitoringClusterRegisterClientMonitoringParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clientNodeId = @(0);
+
+        _iCid = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRClientMonitoringClusterRegisterClientMonitoringParams alloc] init];
+
+    other.clientNodeId = self.clientNodeId;
+    other.iCid = self.iCid;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: clientNodeId:%@; iCid:%@; >", NSStringFromClass([self class]), _clientNodeId, _iCid];
+    return descriptionString;
+}
+
+@end
+@implementation MTRClientMonitoringClusterStayAwakeRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRClientMonitoringClusterStayAwakeRequestParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
     return descriptionString;
 }
 

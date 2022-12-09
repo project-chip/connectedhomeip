@@ -65,6 +65,15 @@ def build_darwin_framework(args):
             # Build Matter.framework as a static library
             "SUPPORTS_TEXT_BASED_API=NO",
             "MACH_O_TYPE=staticlib",
+            # Change visibility flags such that both darwin-framework-tool and Matter.framework
+            # are built with the same flags.
+            "GCC_INLINES_ARE_PRIVATE_EXTERN=NO",
+            "GCC_SYMBOLS_PRIVATE_EXTERN=NO",
+        ]
+
+    if not args.ipv4:
+        command += [
+            "CHIP_INET_CONFIG_ENABLE_IPV4=NO",
         ]
     command_result = run_command(command)
 
@@ -104,6 +113,7 @@ if __name__ == "__main__":
     parser.add_argument("--log_path",
                         help="Output log file destination",
                         required=True)
+    parser.add_argument('--ipv4', action=argparse.BooleanOptionalAction)
 
     args = parser.parse_args()
     build_darwin_framework(args)

@@ -322,7 +322,7 @@ bool ChipDeviceScanner::cancelDiscoveryCb(LSHandle * sh, LSMessage * message, vo
     return true;
 }
 
-CHIP_ERROR ChipDeviceScanner::StopChipScan(void)
+CHIP_ERROR ChipDeviceScanner::StopChipScan()
 {
     int ret = 0;
     ReturnErrorCodeIf(!mIsScanning, CHIP_ERROR_INCORRECT_STATE);

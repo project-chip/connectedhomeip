@@ -117,7 +117,7 @@
 {{#user_endpoints}}
 endpoint {{endpointId}} {
   {{#if deviceIdentifier}}
-  device type {{chip_friendly_endpoint_type_name}} = {{deviceIdentifier}};
+  device type {{chip_friendly_endpoint_type_name}} = {{deviceIdentifier}}, version {{endpointVersion}};
   {{/if~}}
 
   {{#user_clusters}}

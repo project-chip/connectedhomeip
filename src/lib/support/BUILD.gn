@@ -66,8 +66,11 @@ source_set("logging_constants") {
   sources = [ "logging/Constants.h" ]
 }
 
-source_set("enforce_format") {
-  sources = [ "EnforceFormat.h" ]
+source_set("attributes") {
+  sources = [
+    "DLLUtil.h",
+    "EnforceFormat.h",
+  ]
 }
 
 source_set("chip_version_header") {
@@ -165,8 +168,8 @@ static_library("support") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":attributes",
     ":chip_version_header",
-    ":enforce_format",
     ":logging_constants",
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/platform:platform_buildconfig",
@@ -186,6 +189,10 @@ static_library("support") {
   # Android has no 'platform' that provides logging
   if (current_os == "android") {
     public_deps += [ "${chip_root}/src/platform/logging:android" ]
+  }
+
+  if (current_os == "mac" || current_os == "ios") {
+    public_deps += [ "${chip_root}/src/platform/Darwin:logging" ]
   }
 
   public_configs = [

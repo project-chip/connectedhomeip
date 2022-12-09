@@ -2273,6 +2273,9 @@ namespace AccountLogin {
 namespace ElectricalMeasurement {
 } // namespace ElectricalMeasurement
 
+namespace ClientMonitoring {
+} // namespace ClientMonitoring
+
 namespace UnitTesting {
 
 // Enum for SimpleEnum

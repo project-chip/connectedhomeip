@@ -10,7 +10,8 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
 MTRCluster{{compatClusterNameRemapping label}}ID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDType{{asUpperCamelCase label}}ID")= {{asMEI manufacturerCode code}},
 {{/zcl_clusters}}
 {{#zcl_clusters}}
-MTRClusterIDType{{asUpperCamelCase label}}ID MTR_NEWLY_AVAILABLE = {{asMEI manufacturerCode code}},
+{{~#*inline "cluster"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
+MTRClusterIDType{{>cluster}}ID MTR_NEWLY_AVAILABLE = {{asMEI manufacturerCode code}},
 {{/zcl_clusters}}
 };
 
@@ -28,8 +29,9 @@ MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeGlobalAttribute{{asUpperCamel
 
 // Global attributes
 {{#zcl_attributes_server}}
+{{~#*inline "attribute"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
 {{#unless clusterRef}}
-MTRAttributeIDTypeGlobalAttribute{{asUpperCamelCase label}}ID MTR_NEWLY_AVAILABLE = {{asMEI manufacturerCode code}},
+MTRAttributeIDTypeGlobalAttribute{{>attribute}}ID MTR_NEWLY_AVAILABLE = {{asMEI manufacturerCode code}},
 {{/unless}}
 {{/zcl_attributes_server}}
 
@@ -63,13 +65,15 @@ MTRCluster{{compatClusterNameRemapping ../clusterName}}Attribute{{asUpperCamelCa
 {{/last}}
 {{/zcl_attributes_server}}
 {{#zcl_attributes_server}}
+{{~#*inline "cluster"}}{{asUpperCamelCase ../clusterName preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "attribute"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
 {{#first}}
-// Cluster {{asUpperCamelCase ../clusterName}} attributes
+// Cluster {{> cluster}} attributes
 {{/first}}
 {{#if clusterRef}}
-MTRAttributeIDTypeCluster{{asUpperCamelCase parent.label}}Attribute{{asUpperCamelCase label}}ID MTR_NEWLY_AVAILABLE = {{asMEI manufacturerCode code}},
+MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID MTR_NEWLY_AVAILABLE = {{asMEI manufacturerCode code}},
 {{else}}
-MTRAttributeIDTypeCluster{{asUpperCamelCase ../clusterName}}Attribute{{asUpperCamelCase label}}ID MTR_NEWLY_AVAILABLE= MTRAttributeIDTypeGlobalAttribute{{asUpperCamelCase label}}ID,
+MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID MTR_NEWLY_AVAILABLE= MTRAttributeIDTypeGlobalAttribute{{asUpperCamelCase label}}ID,
 {{/if}}
 {{#last}}
 
@@ -98,10 +102,12 @@ MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeCluster{{asUpperCamelCase ../cl
 {{/last}}
 {{/zcl_commands}}
 {{#zcl_commands}}
+{{~#*inline "cluster"}}{{asUpperCamelCase ../clusterName preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "command"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
 {{#first}}
-// Cluster {{asUpperCamelCase ../clusterName}} commands
+// Cluster {{>cluster}} commands
 {{/first}}
-MTRCommandIDTypeCluster{{asUpperCamelCase ../clusterName}}Command{{asUpperCamelCase label}}ID MTR_NEWLY_AVAILABLE = {{asMEI manufacturerCode code}},
+MTRCommandIDTypeCluster{{>cluster}}Command{{>command}}ID MTR_NEWLY_AVAILABLE = {{asMEI manufacturerCode code}},
 {{#last}}
 
 {{/last}}
@@ -129,10 +135,12 @@ MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeCluster{{asUpperCamelCase ../clus
 {{/last}}
 {{/zcl_events}}
 {{#zcl_events}}
+{{~#*inline "cluster"}}{{asUpperCamelCase ../clusterName preserveAcronyms=true}}{{/inline~}}
+{{~#*inline "event"}}{{asUpperCamelCase name preserveAcronyms=true}}{{/inline~}}
 {{#first}}
-// Cluster {{asUpperCamelCase ../clusterName}} events
+// Cluster {{>cluster}} events
 {{/first}}
-MTREventIDTypeCluster{{asUpperCamelCase ../clusterName}}Event{{asUpperCamelCase name}}ID MTR_NEWLY_AVAILABLE = {{asMEI manufacturerCode code}},
+MTREventIDTypeCluster{{>cluster}}Event{{>event}}ID MTR_NEWLY_AVAILABLE = {{asMEI manufacturerCode code}},
 {{#last}}
 
 {{/last}}

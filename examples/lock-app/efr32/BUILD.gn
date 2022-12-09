@@ -180,6 +180,7 @@ efr32_sdk("sdk") {
 
 efr32_executable("lock_app") {
   output_name = "chip-efr32-lock-example.out"
+  public_configs = [ "${efr32_sdk_build_root}:silabs_config" ]
   include_dirs = [ "include" ]
   defines = []
 

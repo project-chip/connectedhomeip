@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-from chip.yaml.format_converter import convert_yaml_octet_string_to_bytes
+from chip.yaml.format_converter import convert_yaml_octet_string_to_bytes, substitute_in_config_variables
 from binascii import unhexlify
 import unittest
 
@@ -42,6 +42,75 @@ class TestOctetStringYamlDecode(unittest.TestCase):
         # Partial hex nibble
         with self.assertRaises(ValueError):
             convert_yaml_octet_string_to_bytes("hex:aa5")
+
+
+class TestSubstitueInConfigVariables(unittest.TestCase):
+
+    def setUp(self):
+        self.common_config = {
+            'arg1': {
+                'defaultValue': 1
+            },
+            'arg2': {
+                'defaultValue': 2
+            },
+            'no_explicit_default': 3
+        }
+
+    def test_basic_substitution(self):
+        self.assertEqual(substitute_in_config_variables('arg1', self.common_config), 1)
+        self.assertEqual(substitute_in_config_variables('arg2', self.common_config), 2)
+        self.assertEqual(substitute_in_config_variables('arg3', self.common_config), 'arg3')
+        self.assertEqual(substitute_in_config_variables('no_explicit_default', self.common_config), 3)
+
+    def test_basis_dict_substitution(self):
+        basic_dict = {
+            'arg1': 'arg1',
+            'arg2': 'arg2',
+            'arg3': 'arg3',
+            'no_explicit_default': 'no_explicit_default',
+        }
+        expected_dict = {
+            'arg1': 1,
+            'arg2': 2,
+            'arg3': 'arg3',
+            'no_explicit_default': 3,
+        }
+        self.assertEqual(substitute_in_config_variables(basic_dict, self.common_config), expected_dict)
+
+    def test_basis_list_substitution(self):
+        basic_list = ['arg1', 'arg2', 'arg3', 'no_explicit_default']
+        expected_list = [1, 2, 'arg3', 3]
+        self.assertEqual(substitute_in_config_variables(basic_list, self.common_config), expected_list)
+
+    def test_complex_nested_type(self):
+        complex_nested_type = {
+            'arg1': ['arg1', 'arg2', 'arg3', 'no_explicit_default'],
+            'arg2': 'arg22',
+            'arg3': {
+                'no_explicit_default': 'no_explicit_default',
+                'arg2': 'arg2',
+                'another_dict': {
+                    'arg1': ['arg1', 'arg1', 'arg1', 'no_explicit_default'],
+                },
+                'another_list': ['arg1', 'arg2', 'arg3', 'no_explicit_default']
+            },
+            'no_explicit_default': 'no_explicit_default',
+        }
+        expected_result = {
+            'arg1': [1, 2, 'arg3', 3],
+            'arg2': 'arg22',
+            'arg3': {
+                'no_explicit_default': 3,
+                'arg2': 2,
+                'another_dict': {
+                    'arg1': [1, 1, 1, 3],
+                },
+                'another_list': [1, 2, 'arg3', 3]
+            },
+            'no_explicit_default': 3,
+        }
+        self.assertEqual(substitute_in_config_variables(complex_nested_type, self.common_config), expected_result)
 
 
 def main():

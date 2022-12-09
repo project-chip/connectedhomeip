@@ -33,59 +33,78 @@ public final class Argument {
   private final long mMax;
   private final Object mValue;
   private final Optional<String> mDesc;
+  private final boolean mOptional;
 
-  public Argument(String name, IPAddress value) {
+  boolean isOptional() {
+    return mOptional;
+  }
+
+  public Argument(String name, IPAddress value, boolean optional) {
     this.mName = name;
     this.mType = ArgumentType.ADDRESS;
     this.mMin = 0;
     this.mMax = 0;
     this.mValue = value;
     this.mDesc = Optional.empty();
+    this.mOptional = optional;
   }
 
-  public Argument(String name, StringBuffer value, @Nullable String desc) {
+  public Argument(String name, StringBuffer value, @Nullable String desc, boolean optional) {
     this.mName = name;
     this.mType = ArgumentType.STRING;
     this.mMin = 0;
     this.mMax = 0;
     this.mValue = value;
     this.mDesc = Optional.ofNullable(desc);
+    this.mOptional = optional;
   }
 
-  public Argument(String name, AtomicBoolean value, @Nullable String desc) {
+  public Argument(String name, AtomicBoolean value, @Nullable String desc, boolean optional) {
     this.mName = name;
     this.mType = ArgumentType.BOOL;
     this.mMin = 0;
     this.mMax = 0;
     this.mValue = value;
     this.mDesc = Optional.ofNullable(desc);
+    this.mOptional = optional;
   }
 
-  public Argument(String name, short min, short max, AtomicInteger value, @Nullable String desc) {
+  public Argument(
+      String name,
+      short min,
+      short max,
+      AtomicInteger value,
+      @Nullable String desc,
+      boolean optional) {
     this.mName = name;
     this.mType = ArgumentType.NUMBER_INT16;
     this.mMin = min;
     this.mMax = max;
     this.mValue = value;
     this.mDesc = Optional.ofNullable(desc);
+    this.mOptional = optional;
   }
 
-  public Argument(String name, int min, int max, AtomicInteger value, @Nullable String desc) {
+  public Argument(
+      String name, int min, int max, AtomicInteger value, @Nullable String desc, boolean optional) {
     this.mName = name;
     this.mType = ArgumentType.NUMBER_INT32;
     this.mMin = min;
     this.mMax = max;
     this.mValue = value;
     this.mDesc = Optional.ofNullable(desc);
+    this.mOptional = optional;
   }
 
-  public Argument(String name, long min, long max, AtomicLong value, @Nullable String desc) {
+  public Argument(
+      String name, long min, long max, AtomicLong value, @Nullable String desc, boolean optional) {
     this.mName = name;
     this.mType = ArgumentType.NUMBER_INT64;
     this.mMin = min;
     this.mMax = max;
     this.mValue = value;
     this.mDesc = Optional.ofNullable(desc);
+    this.mOptional = optional;
   }
 
   public String getName() {

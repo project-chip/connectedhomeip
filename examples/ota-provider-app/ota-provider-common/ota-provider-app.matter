@@ -799,7 +799,7 @@ server cluster UserLabel = 65 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22;
+  device type rootdevice = 22, version 1;
   binding cluster AccessControl;
 
   server cluster AccessControl {
