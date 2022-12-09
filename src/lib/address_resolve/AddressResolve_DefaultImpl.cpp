@@ -117,7 +117,7 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
     VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     handle.ResetForLookup(mTimeSource.GetMonotonicTimestamp(), request);
-    ReturnErrorOnFailure(Dnssd::Resolver::Instance().ResolveNodeId(request.GetPeerId(), Inet::IPAddressType::kAny));
+    ReturnErrorOnFailure(Dnssd::Resolver::Instance().ResolveNodeId(request.GetPeerId()));
     mActiveLookups.PushBack(&handle);
     ReArmTimer();
     return CHIP_NO_ERROR;
