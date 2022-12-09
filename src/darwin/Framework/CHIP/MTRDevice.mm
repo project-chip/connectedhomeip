@@ -291,14 +291,13 @@ private:
     }
 
     MTR_LOG_INFO("%@ scheduling to reattempt subscription in %u seconds", self, _lastSubscriptionAttemptWait);
-    dispatch_after(
-        dispatch_time(DISPATCH_TIME_NOW, static_cast<int64_t>(_lastSubscriptionAttemptWait) * NSEC_PER_SEC), self.queue, ^{
-            os_unfair_lock_lock(&self->_lock);
-            MTR_LOG_INFO("%@ reattempting subscription", self);
-            self.reattemptingSubscription = NO;
-            [self _setupSubscription];
-            os_unfair_lock_unlock(&self->_lock);
-        });
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_lastSubscriptionAttemptWait * NSEC_PER_SEC)), self.queue, ^{
+        os_unfair_lock_lock(&self->_lock);
+        MTR_LOG_INFO("%@ reattempting subscription", self);
+        self.reattemptingSubscription = NO;
+        [self _setupSubscription];
+        os_unfair_lock_unlock(&self->_lock);
+    });
 
     os_unfair_lock_unlock(&self->_lock);
 }

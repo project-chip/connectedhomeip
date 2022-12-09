@@ -189,7 +189,7 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
         _deviceControllerDelegateBridge = nullptr;
     }
 
-    for (MTRDevice * device in self.nodeIDToDeviceMap) {
+    for (MTRDevice * device in [self.nodeIDToDeviceMap allValues]) {
         [device invalidate];
     }
     [self.nodeIDToDeviceMap removeAllObjects];
