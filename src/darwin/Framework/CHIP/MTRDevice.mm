@@ -401,10 +401,7 @@ private:
                                   attributePath.release();
                                   eventPath.release();
 
-                                  std::unique_ptr<SubscriptionCallback> callback;
-                                  std::unique_ptr<ReadClient> readClient;
-                                  std::unique_ptr<ClusterStateCache> clusterStateCache;
-                                  callback = std::make_unique<SubscriptionCallback>(
+                                  auto callback = std::make_unique<SubscriptionCallback>(
                                       ^(NSArray * value) {
                                           MTR_LOG_INFO("%@ got attribute report %@", self, value);
                                           dispatch_async(self.queue, ^{
@@ -447,8 +444,18 @@ private:
                                               [self _handleSubscriptionReset];
                                           });
                                       });
-                                  readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
-                                      callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+
+                                  // Set up a cluster state cache.  We really just want this for the
+                                  // logic it has for tracking data versions and event numbers so we
+                                  // minimize the amount of data we request on resubscribes; we
+                                  // don't care about the data it stores.  Ideally we could use the
+                                  // dataversion-management logic without needing to store the data
+                                  // separately from the data store we already have, or we would
+                                  // stop storing our data separately.
+                                  auto clusterStateCache = std::make_unique<ClusterStateCache>(*callback.get());
+                                  auto readClient
+                                      = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
+                                          clusterStateCache->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
 
                                   // SendAutoResubscribeRequest cleans up the params, even on failure.
                                   CHIP_ERROR err = readClient->SendAutoResubscribeRequest(std::move(readParams));
@@ -463,9 +470,10 @@ private:
                                       return;
                                   }
 
-                                  // Callback and ReadClient will be deleted when OnDone is called or an error is
-                                  // encountered.
+                                  // Callback and ClusterStateCache and ReadClient will be deleted
+                                  // when OnDone is called or an error is encountered.
                                   callback->AdoptReadClient(std::move(readClient));
+                                  callback->AdoptClusterStateCache(std::move(clusterStateCache));
                                   callback.release();
                               }];
 }
