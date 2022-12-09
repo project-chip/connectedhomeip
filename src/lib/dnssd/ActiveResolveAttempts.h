@@ -58,6 +58,7 @@ public:
         struct Resolve
         {
             chip::PeerId peerId;
+            uint32_t consumerCount = 0;
 
             Resolve(chip::PeerId id) : peerId(id) {}
         };
@@ -68,7 +69,11 @@ public:
             IpResolve(HeapQName && host) : hostName(std::move(host)) {}
         };
 
-        ScheduledAttempt() {}
+        ScheduledAttempt()
+        {
+            static_assert(sizeof(Resolve) <= sizeof(Browse) || sizeof(Resolve) <= sizeof(HeapQName),
+                          "Figure out where to put the Resolve counter.");
+        }
         ScheduledAttempt(const chip::PeerId & peer, bool first) :
             resolveData(chip::InPlaceTemplateType<Resolve>(), peer), firstSend(first)
         {}
@@ -181,6 +186,28 @@ public:
         bool IsIpResolve() const { return resolveData.Is<IpResolve>(); }
         void Clear() { resolveData = DataType(); }
 
+        void WillCoalesceWith(const ScheduledAttempt & existing)
+        {
+            if (IsResolve() && existing.Matches(*this))
+            {
+                resolveData.Get<Resolve>().consumerCount = existing.resolveData.Get<Resolve>().consumerCount + 1;
+            }
+        }
+
+        void ConsumerRemoved()
+        {
+            if (!IsResolve())
+            {
+                return;
+            }
+
+            auto & count = resolveData.Get<Resolve>().consumerCount;
+            if (count > 0)
+            {
+                --count;
+            }
+        }
+
         const Browse & BrowseData() const { return resolveData.Get<Browse>(); }
         const Resolve & ResolveData() const { return resolveData.Get<Resolve>(); }
         const IpResolve & IpResolveData() const { return resolveData.Get<IpResolve>(); }
@@ -207,6 +234,10 @@ public:
     /// Mark all browse-type scheduled attemptes as a success, removing them
     /// from the internal list.
     CHIP_ERROR CompleteAllBrowses();
+
+    /// Note that resolve attempts for the given peer id now have one fewer
+    /// consumer.
+    void NodeIdResolutionNoLongerNeeded(const chip::PeerId & peerId);
 
     /// Mark that a resolution is pending, adding it to the internal list
     ///

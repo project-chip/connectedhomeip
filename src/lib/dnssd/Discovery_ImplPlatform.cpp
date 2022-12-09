@@ -625,6 +625,15 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId)
     return mResolverProxy.ResolveNodeId(peerId);
 }
 
+void DiscoveryImplPlatform::NodeIdResolutionNoLongerNeeded(const PeerId & peerId)
+{
+    char name[Common::kInstanceNameMaxLength + 1];
+    if (MakeInstanceName(name, sizeof(name), peerId) == CHIP_NO_ERROR)
+    {
+        ChipDnssdResolveNoLongerNeeded(name);
+    }
+}
+
 CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissionableNodes(DiscoveryFilter filter)
 {
     ReturnErrorOnFailure(InitImpl());
@@ -671,15 +680,30 @@ CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId)
     ChipLogProgress(Discovery, "Resolving " ChipLogFormatX64 ":" ChipLogFormatX64 " ...",
                     ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
 
-    mDelegate->Retain();
-
     DnssdService service;
 
     ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), peerId));
     Platform::CopyString(service.mType, kOperationalServiceName);
     service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolTcp;
     service.mAddressType = Inet::IPAddressType::kAny;
-    return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeIdResolve, mDelegate);
+
+    mDelegate->Retain();
+
+    CHIP_ERROR err = ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeIdResolve, mDelegate);
+    if (err != CHIP_NO_ERROR)
+    {
+        mDelegate->Release();
+    }
+    return err;
+}
+
+void ResolverProxy::NodeIdResolutionNoLongerNeeded(const PeerId & peerId)
+{
+    char name[Common::kInstanceNameMaxLength + 1];
+    if (MakeInstanceName(name, sizeof(name), peerId) == CHIP_NO_ERROR)
+    {
+        ChipDnssdResolveNoLongerNeeded(name);
+    }
 }
 
 ResolverProxy::~ResolverProxy()
