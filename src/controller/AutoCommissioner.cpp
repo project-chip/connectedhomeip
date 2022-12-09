@@ -389,9 +389,14 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
         ChipLogError(Controller, "Device proxy secure session error");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    mStopCommissioning           = false;
-    mCommissioner                = commissioner;
-    mCommissioneeDeviceProxy     = proxy;
+    mStopCommissioning       = false;
+    mCommissioner            = commissioner;
+    mCommissioneeDeviceProxy = proxy;
+    if (mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType() ==
+        Transport::Type::kBle)
+    {
+        mParams.SetNeedsNetworkSetup(true);
+    }
     CHIP_ERROR err               = CHIP_NO_ERROR;
     CommissioningStage nextStage = GetNextCommissioningStage(CommissioningStage::kSecurePairing, err);
     mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, nextStage, mParams, this, GetEndpoint(nextStage),
