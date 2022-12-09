@@ -34,7 +34,7 @@ public:
         , mDeviceController(deviceController)
         , mDeviceAttestationDelegate(deviceAttestationDelegate)
         , mQueue(dispatch_queue_create(
-              "com.csa-iot.matter.framework.device_attestation.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL))
+              "org.csa-iot.matter.framework.device_attestation.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL))
         , mExpiryTimeoutSecs(expiryTimeoutSecs)
         , mShouldWaitAfterDeviceAttestation(shouldWaitAfterDeviceAttestation)
     {

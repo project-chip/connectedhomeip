@@ -26,7 +26,7 @@
 #include <dispatch/dispatch.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
-static constexpr const char * const CHIP_CONTROLLER_QUEUE = "com.csa-iot.matter.framework.controller.workqueue";
+static constexpr const char * const CHIP_CONTROLLER_QUEUE = "org.csa-iot.matter.framework.controller.workqueue";
 
 namespace chip {
 namespace DeviceLayer {

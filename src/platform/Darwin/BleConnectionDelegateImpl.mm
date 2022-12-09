@@ -140,7 +140,7 @@ namespace DeviceLayer {
     if (self) {
         self.shortServiceUUID = [UUIDHelper GetShortestServiceUUID:&chip::Ble::CHIP_BLE_SVC_ID];
         _workQueue
-            = dispatch_queue_create("com.csa-iot.matter.framework.ble.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+            = dispatch_queue_create("org.csa-iot.matter.framework.ble.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
         _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _workQueue);
         _centralManager = [CBCentralManager alloc];

@@ -420,7 +420,7 @@ static NSInteger const kOtaProviderEndpoint = 0;
 MTROTAProviderDelegateBridge::MTROTAProviderDelegateBridge(id<MTROTAProviderDelegate> delegate)
     : mDelegate(delegate)
     , mDelegateNotificationQueue(
-          dispatch_queue_create("com.csa-iot.matter.framework.otaprovider.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL))
+          dispatch_queue_create("org.csa-iot.matter.framework.otaprovider.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL))
 {
     gOtaSender.SetDelegate(delegate, mDelegateNotificationQueue);
     Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, this);

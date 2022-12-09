@@ -32,7 +32,7 @@ static void SetupXPCQueue(void)
 {
     dispatch_once(&workQueueInitOnceToken, ^{
         globalWorkQueue
-            = dispatch_queue_create("com.csa-iot.matter.framework.xpc.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+            = dispatch_queue_create("org.csa-iot.matter.framework.xpc.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     });
 }
 
