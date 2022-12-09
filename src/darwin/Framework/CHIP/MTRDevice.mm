@@ -855,6 +855,9 @@ private:
     // since NSTimeInterval is in seconds, convert ms into seconds in double
     NSDate * expirationTime = [NSDate dateWithTimeIntervalSinceNow:expectedValueInterval.doubleValue / 1000];
 
+    MTR_LOG_INFO(
+        "Setting expected values %@ with expiration time %f seconds from now", values, [expirationTime timeIntervalSinceNow]);
+
     os_unfair_lock_lock(&self->_lock);
 
     // _getAttributesToReportWithNewExpectedValues will log attribute paths reported
