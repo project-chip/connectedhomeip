@@ -4406,7 +4406,7 @@ client cluster UnitTesting = 4294048773 {
 }
 
 endpoint 1 {
-  device type rootdevice = 22;
+  device type rootdevice = 22, version 1;
   binding cluster Identify;
   binding cluster Groups;
   binding cluster Scenes;
