@@ -1277,7 +1277,6 @@ sysconfdir
 SysConfig
 sysctl
 sysdeps
-Sysdiagnose
 SYSROOT
 systemctl
 systemd

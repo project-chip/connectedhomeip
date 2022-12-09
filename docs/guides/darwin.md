@@ -287,9 +287,9 @@ Example:
 -   Choose the area as Home App and fill in the details of the type of issue and
     the description
 -   Please provide the following technical information:
-    -   Sysdiagnose logs for iPhone / iPad with the timestamp / time frame of
+    -   `sysdiagnose` logs for iPhone / iPad with the timestamp / time frame of
         the issue
-    -   Sysdiagnose logs for all the Home Hubs (HomePod mini / HomePod / Apple
+    -   `sysdiagnose` logs for all the Home Hubs (HomePod mini / HomePod / Apple
         TV) with the timestamp / timeframe of the issue
     -   Accessory logs with the timestamp / timeframe of the issue
     -   mDNS network logs with timestamp / timeframe of the issue
