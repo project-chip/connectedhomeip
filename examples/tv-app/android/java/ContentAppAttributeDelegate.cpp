@@ -34,14 +34,15 @@ namespace AppPlatform {
 
 using LaunchResponseType = chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type;
 
-const char * ContentAppAttributeDelegate::Read(const chip::app::ConcreteReadAttributePath & aPath)
+std::string ContentAppAttributeDelegate::Read(const chip::app::ConcreteReadAttributePath & aPath)
 {
     if (aPath.mEndpointId < FIXED_ENDPOINT_COUNT)
     {
+        // returning blank string causes the caller to default to output required by the tests
         return "";
     }
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     ChipLogProgress(Zcl, "ContentAppAttributeDelegate::Read being called for endpoint %d cluster %d attribute %d",
                     aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 
@@ -53,11 +54,15 @@ const char * ContentAppAttributeDelegate::Read(const chip::app::ConcreteReadAttr
         ChipLogError(Zcl, "Java exception in ContentAppAttributeDelegate::Read");
         env->ExceptionDescribe();
         env->ExceptionClear();
+        // returning blank string causes the caller to default to output required by the tests
         return "";
     }
     const char * respStr = env->GetStringUTFChars(resp, 0);
+    std::string retStr(respStr);
+    env->ReleaseStringUTFChars(resp, respStr);
+    env->DeleteLocalRef(resp);
     ChipLogProgress(Zcl, "ContentAppAttributeDelegate::Read got response %s", respStr);
-    return respStr;
+    return retStr;
 }
 
 } // namespace AppPlatform
