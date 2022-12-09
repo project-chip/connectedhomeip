@@ -2618,7 +2618,7 @@ server cluster ApplicationBasic = 1293 {
 }
 
 endpoint 0 {
-  device type anonymousEndpointType = 65280;
+  device type anonymousEndpointType = 65280, version 1;
   binding cluster OnOff;
   binding cluster GeneralCommissioning;
   binding cluster Switch;
@@ -3036,7 +3036,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 258;
+  device type anonymousEndpointType = 258, version 1;
   binding cluster OnOff;
 
   server cluster Identify {

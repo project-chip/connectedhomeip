@@ -1057,7 +1057,7 @@ server cluster PressureMeasurement = 1027 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22;
+  device type rootdevice = 22, version 1;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Groups {
@@ -1226,7 +1226,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 773;
+  device type anonymousEndpointType = 773, version 1;
   binding cluster Groups;
   binding cluster Binding;
 

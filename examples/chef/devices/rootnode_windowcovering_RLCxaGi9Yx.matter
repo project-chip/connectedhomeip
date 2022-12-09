@@ -1165,7 +1165,7 @@ server cluster WindowCovering = 258 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22;
+  device type rootdevice = 22, version 1;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Groups {
@@ -1328,7 +1328,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 514;
+  device type anonymousEndpointType = 514, version 1;
   binding cluster Binding;
 
   server cluster Identify {
