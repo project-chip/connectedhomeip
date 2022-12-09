@@ -1325,6 +1325,7 @@ ths
 Thunderboard
 timedInteractionTimeoutMs
 TimeFormatLocalization
+timeframe
 timeoutMs
 TimeSynchronization
 tinycrypt
