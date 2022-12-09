@@ -179,22 +179,50 @@ protected:
         AddArgument("attribute-name", attributeName, "The attribute name to write.");
     }
 
+    template <typename U = T, std::enable_if_t<std::is_same<U, std::vector<CustomArgument *>>::value, int> = 0>
+    static const char * GetAttributeValuesDescription()
+    {
+        return "Comma-separated list of attribute values to write. Each value is represented as follows, depending on the type:\n"
+               "  * struct: a JSON-encoded object, with field ids as keys.\n"
+               "  * list: a JSON-encoded array of values.\n"
+               "  * null: A literal null.\n"
+               "  * boolean: A literal true or false.\n"
+               "  * unsigned integer: One of:\n"
+               "      a) The number directly, as decimal.\n"
+               "      b) The number directly, as 0x followed by hex digits. (Only for the toplevel value, not inside structs or "
+               "lists.)\n"
+               "      c) A string starting with \"u:\" followed by decimal digits\n"
+               "  * signed integer: One of:\n"
+               "      a) The number directly, if it's negative.\n"
+               "      c) A string starting with \"s:\" followed by decimal digits\n"
+               "  * single-precision float: A string starting with \"f:\" followed by the number.\n"
+               "  * double-precision float: One of:\n"
+               "      a) The number directly, if it's not an integer.\n"
+               "      b) A string starting with \"d:\" followed by the number.\n"
+               "  * octet string: A string starting with \"hex:\" followed by the hex encoding of the bytes.\n"
+               "  * string: A string with the characters.";
+    }
+
+    static const char * GetTypedAttributeValuesDescription() { return "Comma-separated list of attribute values to write."; }
+
+    template <typename U = T, std::enable_if_t<!std::is_same<U, std::vector<CustomArgument *>>::value, int> = 0>
+    static const char * GetAttributeValuesDescription()
+    {
+        return GetTypedAttributeValuesDescription();
+    }
+
     template <typename minType, typename maxType>
     void AddArgumentAttributeValues(minType minValue, maxType maxValue)
     {
-        AddArgument("attribute-values", minValue, maxValue, &mAttributeValues,
-                    "Comma-separated list of attribute values to write.");
+        AddArgument("attribute-values", minValue, maxValue, &mAttributeValues, GetTypedAttributeValuesDescription());
     }
 
-    void AddArgumentAttributeValues()
-    {
-        AddArgument("attribute-values", &mAttributeValues, "Comma-separated list of attribute values to write.");
-    }
+    void AddArgumentAttributeValues() { AddArgument("attribute-values", &mAttributeValues, GetAttributeValuesDescription()); }
 
     void AddArgumentAttributeValues(TypedComplexArgument<T> & attributeParser)
     {
         attributeParser.SetArgument(&mAttributeValues);
-        AddArgument("attribute-values", &attributeParser, "Comma-separated list of attribute values to write.");
+        AddArgument("attribute-values", &attributeParser, GetTypedAttributeValuesDescription());
     }
 
     void AddArguments()

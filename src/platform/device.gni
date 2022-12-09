@@ -16,7 +16,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/ble/ble.gni")
 
 declare_args() {
-  # Device platform layer: cc13x2_26x2, cc32xx, darwin, efr32, esp32, external, freertos, linux, nrfconnect, k32w0, qpg, tizen, cyw30739, bl602, mw320, zephyr, beken, none.
+  # Device platform layer: cc13x2_26x2, cc32xx, darwin, efr32, esp32, external, freertos, linux, nrfconnect, k32w0, qpg, tizen, cyw30739, bl602, mw320, zephyr, beken, openiotsdk, none.
 
   chip_device_platform = "auto"
   chip_platform_target = ""
@@ -86,7 +86,8 @@ declare_args() {
       chip_device_platform == "ameba" || chip_device_platform == "webos" ||
       chip_device_platform == "cc32xx" || chip_device_platform == "bl602" ||
       chip_device_platform == "mw320" || chip_device_platform == "beken" ||
-      chip_device_platform == "mt793x") {
+      chip_device_platform == "mt793x" ||
+      chip_device_platform == "openiotsdk") {
     chip_mdns = "minimal"
   } else if (chip_device_platform == "darwin" ||
              chip_device_platform == "cc13x2_26x2" || current_os == "android" ||
@@ -112,6 +113,8 @@ if (chip_device_platform == "cc13x2_26x2") {
 } else if (chip_device_platform == "darwin") {
   _chip_device_layer = "Darwin"
 } else if (chip_device_platform == "efr32") {
+  _chip_device_layer = "silabs"
+} else if (chip_device_platform == "SiWx917") {
   _chip_device_layer = "silabs"
 } else if (chip_device_platform == "esp32") {
   _chip_device_layer = "ESP32"
@@ -151,6 +154,8 @@ if (chip_device_platform == "cc13x2_26x2") {
   _chip_device_layer = "Beken"
 } else if (chip_device_platform == "mt793x") {
   _chip_device_layer = "mt793x"
+} else if (chip_device_platform == "openiotsdk") {
+  _chip_device_layer = "openiotsdk"
 }
 
 if (chip_device_platform != "external") {
@@ -180,7 +185,7 @@ declare_args() {
   build_tv_casting_common_a = false
 }
 
-assert(chip_disable_platform_kvs == false || chip_device_platform == "darwin",
+assert(!chip_disable_platform_kvs || chip_device_platform == "darwin",
        "Can only disable KVS on some platforms")
 
 if (_chip_device_layer != "none" && chip_device_platform != "external") {
@@ -194,6 +199,11 @@ if (_chip_device_layer != "none" && chip_device_platform != "external") {
       "<platform/" + _chip_device_layer + "/InetPlatformConfig.h>"
   chip_system_platform_config_include =
       "<platform/" + _chip_device_layer + "/SystemPlatformConfig.h>"
+}
+
+declare_args() {
+  # Enable jlink/segger_rtt support.
+  chip_enable_segger_rtt = chip_device_platform != "qpg"
 }
 
 assert(
@@ -212,5 +222,6 @@ assert(
         chip_device_platform == "webos" || chip_device_platform == "bl602" ||
         chip_device_platform == "mw320" || chip_device_platform == "zephyr" ||
         chip_device_platform == "beken" || chip_device_platform == "bl702" ||
-        chip_device_platform == "mt793x",
+        chip_device_platform == "mt793x" || chip_device_platform == "SiWx917" ||
+        chip_device_platform == "openiotsdk",
     "Please select a valid value for chip_device_platform")

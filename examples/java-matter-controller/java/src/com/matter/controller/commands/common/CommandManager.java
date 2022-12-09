@@ -22,11 +22,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public final class CommandManager {
   private final ArrayList<Command> mCommandMgr = new ArrayList<Command>();
   private final Map<String, ArrayList<Command>> mClusters =
       new HashMap<String, ArrayList<Command>>();
+  private static Logger logger = Logger.getLogger(CommandManager.class.getName());
 
   public final void register(String clusterName, ArrayList<Command> commandsList) {
     mClusters.put(clusterName, commandsList);
@@ -36,20 +40,20 @@ public final class CommandManager {
     Command command;
 
     if (args.length < 1) {
-      System.out.println("Missing cluster name");
+      logger.log(Level.INFO, "Missing cluster name");
       showClusters();
       return;
     }
 
     ArrayList<Command> commands = mClusters.get(args[0]);
     if (commands == null) {
-      System.out.println("Unknown cluster: " + args[0]);
+      logger.log(Level.INFO, "Unknown cluster: " + args[0]);
       showClusters();
       return;
     }
 
     if (args.length < 2) {
-      System.out.println("Missing command name");
+      logger.log(Level.INFO, "Missing command name");
       showCluster(args[0], commands);
       return;
     }
@@ -63,27 +67,27 @@ public final class CommandManager {
       }
     } else if (isEventCommand(args[1])) {
       if (args.length < 3) {
-        System.out.println("Missing event name");
+        logger.log(Level.INFO, "Missing event name");
         showClusterEvents(args[0], args[1], commands);
         throw new IllegalArgumentException();
       }
 
       command = getGlobalCommand(commands, args[1], args[2]);
       if (command == null) {
-        System.out.println("Unknown event: " + args[2]);
+        logger.log(Level.INFO, "Unknown event: " + args[2]);
         showClusterEvents(args[0], args[1], commands);
         throw new IllegalArgumentException();
       }
     } else {
       if (args.length < 3) {
-        System.out.println("Missing attribute name");
+        logger.log(Level.INFO, "Missing attribute name");
         showClusterAttributes(args[0], args[1], commands);
         throw new IllegalArgumentException();
       }
 
       command = getGlobalCommand(commands, args[1], args[2]);
       if (command == null) {
-        System.out.println("Unknown attribute: " + args[2]);
+        logger.log(Level.INFO, "Unknown attribute: " + args[2]);
         showClusterAttributes(args[0], args[1], commands);
         throw new IllegalArgumentException();
       }
@@ -96,9 +100,10 @@ public final class CommandManager {
       command.initArguments(temp.length, temp);
       command.run();
     } catch (IllegalArgumentException e) {
-      System.out.println("Arguments init failed with exception: " + e.getMessage());
-    } catch (Exception e) {
       System.out.println("Run command failed with exception: " + e.getMessage());
+      showCommand(args[0], command);
+    } catch (Exception e) {
+      logger.log(Level.INFO, "Run command failed with exception: " + e.getMessage());
     }
   }
 
@@ -138,34 +143,43 @@ public final class CommandManager {
   }
 
   private void showClusters() {
-    System.out.println("Usage:");
-    System.out.println("  java-matter-controller cluster_name command_name [param1 param2 ...]");
-    System.out.println("\n");
-    System.out.println(
+    logger.log(Level.INFO, "Usage:");
+    logger.log(
+        Level.INFO, "  java-matter-controller cluster_name command_name [param1 param2 ...]");
+    logger.log(Level.INFO, "\n");
+    logger.log(
+        Level.INFO,
         "  +-------------------------------------------------------------------------------------+");
-    System.out.println(
+    logger.log(
+        Level.INFO,
         "  | Clusters:                                                                           |");
-    System.out.println(
+    logger.log(
+        Level.INFO,
         "  +-------------------------------------------------------------------------------------+");
 
     for (String key : mClusters.keySet()) {
       System.out.printf("  | * %-82s|\n", key.toLowerCase());
     }
 
-    System.out.println(
+    logger.log(
+        Level.INFO,
         "  +-------------------------------------------------------------------------------------+");
   }
 
   private void showCluster(String clusterName, ArrayList<Command> commands) {
-    System.out.println("Usage:");
-    System.out.println(
+    logger.log(Level.INFO, "Usage:");
+    logger.log(
+        Level.INFO,
         "  java-matter-controller " + clusterName + " command_name [param1 param2 ...]");
-    System.out.println("\n");
-    System.out.println(
+    logger.log(Level.INFO, "\n");
+    logger.log(
+        Level.INFO,
         "  +-------------------------------------------------------------------------------------+");
-    System.out.println(
+    logger.log(
+        Level.INFO,
         "  | Commands:                                                                           |");
-    System.out.println(
+    logger.log(
+        Level.INFO,
         "  +-------------------------------------------------------------------------------------+");
     boolean readCommand = false;
     boolean writeCommand = false;
@@ -196,44 +210,52 @@ public final class CommandManager {
         System.out.printf("  | * %-82s|\n", cmdName);
       }
     }
-    System.out.println(
+    logger.log(
+        Level.INFO,
         "  +-------------------------------------------------------------------------------------+\n");
   }
 
   private void showClusterAttributes(
       String clusterName, String commandName, ArrayList<Command> commands) {
-    System.out.println("Usage:");
+    logger.log(Level.INFO, "Usage:");
     System.out.printf(
         "  java-matter-controller %s %s attribute-name [param1 param2 ...]\n",
         clusterName, commandName);
-    System.out.println("\n");
-    System.out.println(
+    logger.log(Level.INFO, "\n");
+    logger.log(
+        Level.INFO,
         "  +-------------------------------------------------------------------------------------+");
-    System.out.println(
+    logger.log(
+        Level.INFO,
         "  | Attributes:                                                                         |");
-    System.out.println(
+    logger.log(
+        Level.INFO,
         "  +-------------------------------------------------------------------------------------+");
     for (Command command : commands) {
       if (commandName.equals(command.getName())) {
         System.out.printf("  | * %-82s|\n", command.getAttribute().get());
       }
     }
-    System.out.println(
+    logger.log(
+        Level.INFO,
         "  +-------------------------------------------------------------------------------------+");
   }
 
   private void showClusterEvents(
       String clusterName, String commandName, ArrayList<Command> commands) {
-    System.out.println("Usage:");
+    logger.log(Level.INFO, "Usage:");
     System.out.printf(
         "  java-matter-controller %s %s event-name [param1 param2 ...]\n",
         clusterName, commandName);
-    System.out.println("\n");
-    System.out.println(
+    logger.log(Level.INFO, "\n");
+    logger.log(
+        Level.INFO,
         "  +-------------------------------------------------------------------------------------+");
-    System.out.println(
+    logger.log(
+        Level.INFO,
         "  | Events:                                                                             |");
-    System.out.println(
+    logger.log(
+        Level.INFO,
         "  +-------------------------------------------------------------------------------------+");
 
     for (Command command : commands) {
@@ -241,7 +263,49 @@ public final class CommandManager {
         System.out.printf("  | * %-82s|\n", command.getAttribute().get());
       }
     }
-    System.out.println(
+    logger.log(
+        Level.INFO,
         "  +-------------------------------------------------------------------------------------+");
+  }
+
+  private void showCommand(String clusterName, Command command) {
+    logger.log(Level.INFO, "Usage:");
+
+    String arguments = command.getName();
+    String description = "";
+
+    int argumentsCount = command.getArgumentsCount();
+    for (int i = 0; i < argumentsCount; i++) {
+      String arg = "";
+      boolean isOptional = command.getArgumentIsOptional(i);
+      if (isOptional) {
+        arg += "[--";
+      }
+      arg += command.getArgumentName(i);
+      if (isOptional) {
+        arg += "]";
+      }
+      arguments += " ";
+      arguments += arg;
+
+      Optional<String> argDescription = command.getArgumentDescription(i);
+      if (argDescription.isPresent()) {
+        description += "\n";
+        description += arg;
+        description += ":\n  ";
+        description += argDescription.get();
+        description += "\n";
+      }
+    }
+    System.out.format("  java-matter-controller %s %s\n", clusterName, arguments);
+
+    Optional<String> helpText = command.getHelpText();
+    if (helpText.isPresent()) {
+      System.out.format("\n%s\n", helpText.get());
+    }
+
+    if (!description.isEmpty()) {
+      logger.log(Level.INFO, description);
+    }
   }
 }

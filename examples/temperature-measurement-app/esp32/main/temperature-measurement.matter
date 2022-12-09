@@ -837,7 +837,7 @@ server cluster TemperatureMeasurement = 1026 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22;
+  device type rootdevice = 22, version 1;
 
   server cluster Descriptor {
     callback attribute deviceTypeList;
@@ -1026,7 +1026,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type tempsensor = 770;
+  device type tempsensor = 770, version 1;
 
   server cluster Descriptor {
     callback attribute deviceTypeList;

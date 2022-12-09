@@ -40,7 +40,7 @@ class NrfApp(Enum):
         elif self == NrfApp.LIGHT:
             return 'examples/lighting-app'
         elif self == NrfApp.SWITCH:
-            return 'light-switch-app'
+            return 'examples/light-switch-app'
         elif self == NrfApp.LOCK:
             return 'examples/lock-app'
         elif self == NrfApp.SHELL:
@@ -178,6 +178,9 @@ class NrfConnectBuilder(Builder):
 
             if self.board == NrfBoard.NRF52840DONGLE and self.app != NrfApp.ALL_CLUSTERS and self.app != NrfApp.ALL_CLUSTERS_MINIMAL:
                 flags.append("-DCONF_FILE=prj_no_dfu.conf")
+
+            if self.options.pregen_dir:
+                flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
 
             build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 

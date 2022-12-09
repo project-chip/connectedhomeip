@@ -142,6 +142,9 @@ static constexpr chip::ClusterId ZCL_PROXY_VALID_CLUSTER_ID = 0x0044;
 // Definitions for cluster: Boolean State
 static constexpr chip::ClusterId ZCL_BOOLEAN_STATE_CLUSTER_ID = 0x0045;
 
+// Definitions for cluster: Client Monitoring
+static constexpr chip::ClusterId ZCL_CLIENT_MONITORING_CLUSTER_ID = 0x0046;
+
 // Definitions for cluster: Mode Select
 static constexpr chip::ClusterId ZCL_MODE_SELECT_CLUSTER_ID = 0x0050;
 

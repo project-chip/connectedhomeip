@@ -145,7 +145,7 @@ bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, cons
 
     if (!delegate->HandleLogin(tempAccountIdentifier, setupPin))
     {
-        status = EMBER_ZCL_STATUS_NOT_AUTHORIZED;
+        status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS;
     }
 
 exit:

@@ -28,9 +28,15 @@
 #include <zap-generated/cluster/Commands.h>
 #include <zap-generated/test/Commands.h>
 
+#include <cstdio>
+
 int main(int argc, const char * argv[])
 {
     @autoreleasepool {
+        MTRSetLogCallback(MTRLogTypeDetail, ^(MTRLogType type, NSString * component, NSString * message) {
+            fprintf(stdout, "CHIP:%s: %s\n", component.UTF8String, message.UTF8String);
+        });
+
         Commands commands;
         registerCommandsPairing(commands);
         registerCommandsInteractive(commands);

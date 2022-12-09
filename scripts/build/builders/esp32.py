@@ -37,6 +37,7 @@ class Esp32App(Enum):
     TEMPERATURE_MEASUREMENT = auto()
     TESTS = auto()
     OTA_REQUESTOR = auto()
+    OTA_PROVIDER = auto()
 
     @property
     def ExamplePath(self):
@@ -56,6 +57,8 @@ class Esp32App(Enum):
             return 'examples/temperature-measurement-app'
         elif self == Esp32App.OTA_REQUESTOR:
             return 'examples/ota-requestor-app'
+        elif self == Esp32App.OTA_PROVIDER:
+            return 'examples/ota-provider-app'
         elif self == Esp32App.TESTS:
             return 'src/test_driver'
         else:
@@ -79,6 +82,8 @@ class Esp32App(Enum):
             return 'chip-temperature-measurement-app'
         elif self == Esp32App.OTA_REQUESTOR:
             return 'chip-ota-requestor-app'
+        elif self == Esp32App.OTA_PROVIDER:
+            return 'chip-ota-provider-app'
         elif self == Esp32App.TESTS:
             return None
         else:
@@ -95,7 +100,7 @@ class Esp32App(Enum):
         if board == Esp32Board.QEMU:
             return self == Esp32App.TESTS
         elif board == Esp32Board.M5Stack:
-            return self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL or self == Esp32App.OTA_REQUESTOR
+            return self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL or self == Esp32App.OTA_REQUESTOR or self == Esp32App.OTA_PROVIDER
         elif board == Esp32Board.C3DevKit:
             return self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL
         else:
@@ -107,6 +112,7 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
                         Esp32App.ALL_CLUSTERS_MINIMAL,
                         Esp32App.LIGHT,
                         Esp32App.OTA_REQUESTOR,
+                        Esp32App.OTA_PROVIDER,
                         Esp32App.TEMPERATURE_MEASUREMENT]
     if app == Esp32App.TESTS:
         return 'sdkconfig_qemu.defaults'
@@ -176,11 +182,19 @@ class Esp32Builder(Builder):
             self._Execute(
                 ['bash', '-c', 'echo -e "\\nCONFIG_DISABLE_IPV4=y\\n" >>%s' % shlex.quote(defaults_out)])
 
-        cmd = "\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py -C {example_path} -B {out} reconfigure".format(
-            defaults=shlex.quote(defaults_out),
-            example_path=self.ExamplePath,
-            out=shlex.quote(self.output_dir)
-        )
+        cmake_flags = []
+
+        if self.options.pregen_dir:
+            cmake_flags.append(
+                f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
+
+        cmake_args = ['-C', self.ExamplePath, '-B',
+                      shlex.quote(self.output_dir)] + cmake_flags
+
+        cmake_args = " ".join(cmake_args)
+        defaults = shlex.quote(defaults_out)
+
+        cmd = f"\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py {cmake_args} reconfigure"
 
         # This will do a 'cmake reconfigure' which will create ninja files without rebuilding
         self._IdfEnvExecute(cmd)

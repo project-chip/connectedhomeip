@@ -735,7 +735,7 @@ BleTransportProtocolVersion BleLayer::GetHighestSupportedProtocolVersion(const B
         shift_width ^= 4;
 
         uint8_t version = reqMsg.mSupportedProtocolVersions[(i / 2)];
-        version         = (version >> shift_width) & 0x0F; // Grab just the nibble we want.
+        version         = static_cast<uint8_t>((version >> shift_width) & 0x0F); // Grab just the nibble we want.
 
         if ((version >= CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION) &&
             (version <= CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION) && (version > retVersion))

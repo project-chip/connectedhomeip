@@ -19,7 +19,6 @@ from os.path import exists
 import os
 import sys
 import json
-import jsonschema
 import secrets
 import argparse
 import subprocess
@@ -28,6 +27,13 @@ import base64
 from collections import namedtuple
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import load_der_private_key
+
+try:
+    import jsonschema
+except ImportError:
+    no_jsonschema_module = True
+else:
+    no_jsonschema_module = False
 
 # A user can not change the factory data version and must be coherent with
 # the factory data version set in the nRF Connect platform Kconfig file (CHIP_FACTORY_DATA_VERSION).
@@ -483,6 +489,12 @@ def main():
     # check if json file already exist
     if(exists(args.output) and not args.overwrite):
         log.error("Output file: {} already exist, to create a new one add argument '--overwrite'. By default overwriting is disabled".format(args.output))
+        return
+
+    if args.schema and no_jsonschema_module:
+        log.error("Requested verification of the JSON file using jsonschema, but the module is not installed. \n \
+        Install only the module by invoking: pip3 install jsonschema \n \
+        Alternatively, install it with all dependencies for Matter by invoking: pip3 install -r ./scripts/requirements.nrfconnect.txt from the Matter root directory.")
         return
 
     generator = FactoryDataGenerator(args)

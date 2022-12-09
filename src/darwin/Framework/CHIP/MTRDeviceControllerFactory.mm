@@ -25,8 +25,8 @@
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
-#import "MTRLogging.h"
-#import "MTRMemory.h"
+#import "MTRFramework.h"
+#import "MTRLogging_Internal.h"
 #import "MTROTAProviderDelegateBridge.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
@@ -50,7 +50,6 @@ using namespace chip::Controller;
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
 static NSString * const kErrorAttestationTrustStoreInit = @"Init failure while creating the attestation trust store";
 static NSString * const kErrorDACVerifierInit = @"Init failure while creating the device attestation verifier";
-static NSString * const kInfoFactoryShutdown = @"Shutting down the Matter controller factory";
 static NSString * const kErrorGroupProviderInit = @"Init failure while initializing group data provider";
 static NSString * const kErrorControllersInit = @"Init controllers array failure";
 static NSString * const kErrorControllerFactoryInit = @"Init failure while initializing controller factory";
@@ -85,6 +84,11 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
 @implementation MTRDeviceControllerFactory
 
++ (void)initialize
+{
+    MTRFrameworkInit();
+}
+
 + (instancetype)sharedInstance
 {
     static MTRDeviceControllerFactory * factory = nil;
@@ -105,7 +109,6 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     _running = NO;
     _chipWorkQueue = DeviceLayer::PlatformMgrImpl().GetWorkQueue();
     _controllerFactory = &DeviceControllerFactory::GetInstance();
-    [MTRMemory ensureInit];
 
     _groupStorageDelegate = new chip::TestPersistentStorageDelegate();
     if ([self checkForInitError:(_groupStorageDelegate != nullptr) logMsg:kErrorGroupProviderInit]) {
@@ -321,8 +324,9 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
         // Initialize device attestation verifier
         const Credentials::AttestationTrustStore * trustStore;
-        if (startupParams.paaCerts) {
-            _attestationTrustStoreBridge = new MTRAttestationTrustStoreBridge(startupParams.paaCerts);
+        if (startupParams.productAttestationAuthorityCertificates) {
+            _attestationTrustStoreBridge
+                = new MTRAttestationTrustStoreBridge(startupParams.productAttestationAuthorityCertificates);
             if (_attestationTrustStoreBridge == nullptr) {
                 MTR_LOG_ERROR("Error: %@", kErrorAttestationTrustStoreInit);
                 errorCode = CHIP_ERROR_NO_MEMORY;
@@ -340,7 +344,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
             return;
         }
 
-        if (startupParams.cdCerts) {
+        if (startupParams.certificationDeclarationCertificates) {
             auto cdTrustStore = _deviceAttestationVerifier->GetCertificationDeclarationTrustStore();
             if (cdTrustStore == nullptr) {
                 MTR_LOG_ERROR("Error: %@", kErrorCDCertStoreInit);
@@ -348,7 +352,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
                 return;
             }
 
-            for (NSData * cdSigningCert in startupParams.cdCerts) {
+            for (NSData * cdSigningCert in startupParams.certificationDeclarationCertificates) {
                 errorCode = cdTrustStore->AddTrustedKey(AsByteSpan(cdSigningCert));
                 if (errorCode != CHIP_NO_ERROR) {
                     MTR_LOG_ERROR("Error: %@", kErrorCDCertStoreInit);
@@ -414,7 +418,7 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
         [_controllers[0] shutdown];
     }
 
-    MTR_LOG_DEBUG("%@", kInfoFactoryShutdown);
+    MTR_LOG_DEBUG("Shutting down the Matter controller factory");
     _controllerFactory->Shutdown();
 
     [self cleanupStartupObjects];
@@ -671,8 +675,11 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     VerifyOrReturnValue(_otaProviderDelegateBridge != nil, controller);
     VerifyOrReturnValue([_controllers count] == 1, controller);
 
-    auto systemState = _controllerFactory->GetSystemState();
-    CHIP_ERROR err = _otaProviderDelegateBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr());
+    __block CHIP_ERROR err;
+    dispatch_sync(_chipWorkQueue, ^{
+        auto systemState = _controllerFactory->GetSystemState();
+        err = _otaProviderDelegateBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr());
+    });
     if (CHIP_NO_ERROR != err) {
         MTR_LOG_ERROR("Failed to init provider delegate bridge: %" CHIP_ERROR_FORMAT, err.Format());
         [controller shutdown];
@@ -708,19 +715,23 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
     [_controllers removeObject:controller];
 
     if ([_controllers count] == 0) {
-        if (_otaProviderDelegateBridge) {
-            _otaProviderDelegateBridge->Shutdown();
-        }
-
         // That was our last controller.  Stop the event loop before it
         // shuts down, because shutdown of the last controller will tear
         // down most of the world.
         DeviceLayer::PlatformMgrImpl().StopEventLoopTask();
 
+        if (_otaProviderDelegateBridge) {
+            _otaProviderDelegateBridge->Shutdown();
+        }
+
         [controller shutDownCppController];
     } else {
         // Do the controller shutdown on the Matter work queue.
         dispatch_sync(_chipWorkQueue, ^{
+            if (_otaProviderDelegateBridge) {
+                _otaProviderDelegateBridge->ControllerShuttingDown(controller);
+            }
+
             [controller shutDownCppController];
         });
     }
@@ -761,8 +772,8 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 
     _storage = storage;
     _otaProviderDelegate = nil;
-    _paaCerts = nil;
-    _cdCerts = nil;
+    _productAttestationAuthorityCertificates = nil;
+    _certificationDeclarationCertificates = nil;
     _port = nil;
     _shouldStartServer = NO;
 
@@ -833,6 +844,26 @@ static NSString * const kErrorOtaProviderInit = @"Init failure while creating an
 - (void)setStartServer:(BOOL)startServer
 {
     self.shouldStartServer = startServer;
+}
+
+- (nullable NSArray<NSData *> *)paaCerts
+{
+    return self.productAttestationAuthorityCertificates;
+}
+
+- (void)setPaaCerts:(nullable NSArray<NSData *> *)paaCerts
+{
+    self.productAttestationAuthorityCertificates = paaCerts;
+}
+
+- (nullable NSArray<NSData *> *)cdCerts
+{
+    return self.certificationDeclarationCertificates;
+}
+
+- (void)setCdCerts:(nullable NSArray<NSData *> *)cdCerts
+{
+    self.certificationDeclarationCertificates = cdCerts;
 }
 
 @end

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-import enum
 import functools
 import logging
+from enum import Enum
 
 from lark import Lark
 from lark.visitors import Transformer, v_args
@@ -61,7 +61,7 @@ class AddDeviceTypeToEndpointTransform:
 
 class MatterIdlTransformer(Transformer):
     """
-    A transformer capable to transform data parsed by Lark according to 
+    A transformer capable to transform data parsed by Lark according to
     matter_grammar.lark.
 
     Generally transforms a ".matter" file into an Abstract Syntax Tree (AST).
@@ -72,7 +72,7 @@ class MatterIdlTransformer(Transformer):
     purpose is to convert LARK tokens (that ar generally inputted by name)
     into underlying python types.
 
-    Some documentation to get started is available at 
+    Some documentation to get started is available at
     https://lark-parser.readthedocs.io/en/latest/visitors.html#transformer
 
     TLDR would be:
@@ -299,7 +299,8 @@ class MatterIdlTransformer(Transformer):
                 elif operation == AttributeOperation.WRITE:
                     acl['writeacl'] = access
                 else:
-                    raise Exception("Unknown attribute operation: %r" % operation)
+                    raise Exception(
+                        "Unknown attribute operation: %r" % operation)
 
         return (args[-1], acl)
 
@@ -357,8 +358,8 @@ class MatterIdlTransformer(Transformer):
         return endpoint
 
     @v_args(inline=True)
-    def endpoint_device_type(self, name, code):
-        return AddDeviceTypeToEndpointTransform(DeviceType(name=name, code=code))
+    def endpoint_device_type(self, name, code, version):
+        return AddDeviceTypeToEndpointTransform(DeviceType(name=name, code=code, version=version))
 
     @v_args(inline=True)
     def endpoint_cluster_binding(self, id):
@@ -417,7 +418,8 @@ class ParserWithLines:
         self.skip_meta = skip_meta
 
     def parse(self, file, file_name: str = None):
-        idl = MatterIdlTransformer(self.skip_meta).transform(self.parser.parse(file))
+        idl = MatterIdlTransformer(self.skip_meta).transform(
+            self.parser.parse(file))
         idl.parse_file_name = file_name
         return idl
 
@@ -438,9 +440,10 @@ def CreateParser(skip_meta: bool = False):
 if __name__ == '__main__':
     # This Parser is generally not intended to be run as a stand-alone binary.
     # The ability to run is for debug and to print out the parsed AST.
+    import pprint
+
     import click
     import coloredlogs
-    import pprint
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants
@@ -469,4 +472,4 @@ if __name__ == '__main__':
         logging.info("Data:")
         pprint.pp(data)
 
-    main()
+    main(auto_envvar_prefix='CHIP')

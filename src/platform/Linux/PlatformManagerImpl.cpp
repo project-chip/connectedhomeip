@@ -285,8 +285,8 @@ CHIP_ERROR PlatformManagerImpl::RunOnGLibMainLoopThread(GSourceFunc callback, vo
 {
 
     GMainContext * context = g_main_loop_get_context(mGLibMainLoop);
-    VerifyOrReturnError(context != nullptr,
-                        (ChipLogDetail(DeviceLayer, "Failed to get GLib main loop context"), CHIP_ERROR_INTERNAL));
+    VerifyOrReturnError(context != nullptr, CHIP_ERROR_INTERNAL,
+                        ChipLogDetail(DeviceLayer, "Failed to get GLib main loop context"));
 
     // If we've been called from the GLib main loop thread itself, there is no reason to wait
     // for the callback, as it will be executed immediately by the g_main_context_invoke() call

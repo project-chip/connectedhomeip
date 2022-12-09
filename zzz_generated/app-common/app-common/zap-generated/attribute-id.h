@@ -1133,6 +1133,16 @@
 #define ZCL_RMS_VOLTAGE_SAG_PERIOD_PHASE_C_ATTRIBUTE_ID (0x0A16)
 #define ZCL_RMS_VOLTAGE_SWELL_PERIOD_PHASE_C_ATTRIBUTE_ID (0x0A17)
 
+// Attribute ids for cluster: Client Monitoring
+
+// Client attributes
+
+// Server attributes
+#define ZCL_IDLE_MODE_INTERVAL_ATTRIBUTE_ID (0x0000)
+#define ZCL_ACTIVE_MODE_INTERVAL_ATTRIBUTE_ID (0x0001)
+#define ZCL_ACTIVE_MODE_THRESHOLD_ATTRIBUTE_ID (0x0002)
+#define ZCL_EXPECTED_CLIENTS_ATTRIBUTE_ID (0x0003)
+
 // Attribute ids for cluster: Unit Testing
 
 // Client attributes

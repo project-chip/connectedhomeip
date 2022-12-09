@@ -26,7 +26,7 @@
 #import "MTRCommandPayloadsObjc.h"
 #import "MTRDevice.h"
 #import "MTRDevice_Internal.h"
-#import "MTRLogging.h"
+#import "MTRLogging_Internal.h"
 #import "MTRStructsObjc.h"
 
 #include <lib/support/CHIPListUtils.h>
@@ -38,6 +38,21 @@ using chip::Callback::Cancelable;
 using namespace chip::app::Clusters;
 using chip::Messaging::ExchangeManager;
 using chip::SessionHandle;
+
+static void MTRClustersLogEnqueue(NSString * logPrefix, MTRAsyncCallbackWorkQueue * workQueue)
+{
+    MTR_LOG_INFO("%@ enqueueWorkItem %@", logPrefix, workQueue);
+}
+
+static void MTRClustersLogDequeue(NSString * logPrefix, MTRAsyncCallbackWorkQueue * workQueue)
+{
+    MTR_LOG_INFO("%@ dequeueWorkItem %@", logPrefix, workQueue);
+}
+
+static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * error)
+{
+    MTR_LOG_INFO("%@ completion value %@ error %@ endWork", logPrefix, value, error);
+}
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
 @implementation MTRClusterIdentify
@@ -60,22 +75,27 @@ using chip::SessionHandle;
      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                 completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeIdentifyID, (unsigned int) MTRCommandIDTypeClusterIdentifyCommandIdentifyID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Identify Identify dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Identify Identify completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -94,7 +114,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Identify Identify enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -112,22 +132,27 @@ using chip::SessionHandle;
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeIdentifyID, (unsigned int) MTRCommandIDTypeClusterIdentifyCommandTriggerEffectID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Identify TriggerEffect dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Identify TriggerEffect completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -149,7 +174,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Identify TriggerEffect enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -288,22 +313,27 @@ using chip::SessionHandle;
      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                 completion:(void (^)(MTRGroupsClusterAddGroupResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandAddGroupID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Groups AddGroup dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRGroupsClusterAddGroupResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("Groups AddGroup completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, GroupsClusterAddGroupResponseCallbackType successCb,
@@ -323,7 +353,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Groups AddGroup enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -342,22 +372,27 @@ using chip::SessionHandle;
                  completion:
                      (void (^)(MTRGroupsClusterViewGroupResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandViewGroupID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Groups ViewGroup dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRGroupsClusterViewGroupResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("Groups ViewGroup completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -376,7 +411,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Groups ViewGroup enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -395,22 +430,27 @@ using chip::SessionHandle;
                           completion:(void (^)(MTRGroupsClusterGetGroupMembershipResponseParams * _Nullable data,
                                          NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandGetGroupMembershipID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Groups GetGroupMembership dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRGroupsClusterGetGroupMembershipResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("Groups GetGroupMembership completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -451,7 +491,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Groups GetGroupMembership enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -470,22 +510,27 @@ using chip::SessionHandle;
                    completion:
                        (void (^)(MTRGroupsClusterRemoveGroupResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandRemoveGroupID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Groups RemoveGroup dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRGroupsClusterRemoveGroupResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("Groups RemoveGroup completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -505,7 +550,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Groups RemoveGroup enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -532,22 +577,27 @@ using chip::SessionHandle;
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandRemoveAllGroupsID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Groups RemoveAllGroups dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Groups RemoveAllGroups completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -565,7 +615,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Groups RemoveAllGroups enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -583,22 +633,27 @@ using chip::SessionHandle;
                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                              completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeGroupsID,
+                                     (unsigned int) MTRCommandIDTypeClusterGroupsCommandAddGroupIfIdentifyingID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Groups AddGroupIfIdentifying dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Groups AddGroupIfIdentifying completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -618,7 +673,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Groups AddGroupIfIdentifying enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -796,22 +851,27 @@ using chip::SessionHandle;
      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                 completion:(void (^)(MTRScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandAddSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Scenes AddScene dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRScenesClusterAddSceneResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("Scenes AddScene completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, ScenesClusterAddSceneResponseCallbackType successCb,
@@ -907,7 +967,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Scenes AddScene enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -926,22 +986,27 @@ using chip::SessionHandle;
                  completion:
                      (void (^)(MTRScenesClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandViewSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Scenes ViewScene dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRScenesClusterViewSceneResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("Scenes ViewScene completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -961,7 +1026,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Scenes ViewScene enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -980,22 +1045,27 @@ using chip::SessionHandle;
                    completion:
                        (void (^)(MTRScenesClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandRemoveSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Scenes RemoveScene dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRScenesClusterRemoveSceneResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("Scenes RemoveScene completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -1016,7 +1086,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Scenes RemoveScene enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1035,22 +1105,27 @@ using chip::SessionHandle;
                        completion:(void (^)(MTRScenesClusterRemoveAllScenesResponseParams * _Nullable data,
                                       NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandRemoveAllScenesID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Scenes RemoveAllScenes dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRScenesClusterRemoveAllScenesResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("Scenes RemoveAllScenes completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -1070,7 +1145,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Scenes RemoveAllScenes enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1089,22 +1164,27 @@ using chip::SessionHandle;
                   completion:
                       (void (^)(MTRScenesClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandStoreSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Scenes StoreScene dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRScenesClusterStoreSceneResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("Scenes StoreScene completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -1124,7 +1204,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Scenes StoreScene enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1142,22 +1222,27 @@ using chip::SessionHandle;
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandRecallSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Scenes RecallScene dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Scenes RecallScene completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -1186,7 +1271,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Scenes RecallScene enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1205,22 +1290,27 @@ using chip::SessionHandle;
                           completion:(void (^)(MTRScenesClusterGetSceneMembershipResponseParams * _Nullable data,
                                          NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandGetSceneMembershipID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Scenes GetSceneMembership dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRScenesClusterGetSceneMembershipResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("Scenes GetSceneMembership completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -1240,7 +1330,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Scenes GetSceneMembership enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1259,22 +1349,27 @@ using chip::SessionHandle;
                         completion:(void (^)(MTRScenesClusterEnhancedAddSceneResponseParams * _Nullable data,
                                        NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandEnhancedAddSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Scenes EnhancedAddScene dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRScenesClusterEnhancedAddSceneResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("Scenes EnhancedAddScene completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -1371,7 +1466,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Scenes EnhancedAddScene enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1390,22 +1485,27 @@ using chip::SessionHandle;
                          completion:(void (^)(MTRScenesClusterEnhancedViewSceneResponseParams * _Nullable data,
                                         NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandEnhancedViewSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Scenes EnhancedViewScene dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRScenesClusterEnhancedViewSceneResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("Scenes EnhancedViewScene completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -1426,7 +1526,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Scenes EnhancedViewScene enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1445,22 +1545,27 @@ using chip::SessionHandle;
                  completion:
                      (void (^)(MTRScenesClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandCopySceneID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Scenes CopyScene dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRScenesClusterCopySceneResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("Scenes CopyScene completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -1483,7 +1588,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Scenes CopyScene enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1759,22 +1864,27 @@ using chip::SessionHandle;
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandOffID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("OnOff Off dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("OnOff Off completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -1792,7 +1902,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("OnOff Off enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1816,22 +1926,27 @@ using chip::SessionHandle;
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandOnID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("OnOff On dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("OnOff On completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -1849,7 +1964,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("OnOff On enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1873,22 +1988,27 @@ using chip::SessionHandle;
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandToggleID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("OnOff Toggle dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("OnOff Toggle completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -1906,7 +2026,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("OnOff Toggle enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1924,22 +2044,27 @@ using chip::SessionHandle;
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandOffWithEffectID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("OnOff OffWithEffect dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("OnOff OffWithEffect completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -1961,7 +2086,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("OnOff OffWithEffect enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -1988,22 +2113,27 @@ using chip::SessionHandle;
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeOnOffID,
+                                     (unsigned int) MTRCommandIDTypeClusterOnOffCommandOnWithRecallGlobalSceneID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("OnOff OnWithRecallGlobalScene dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("OnOff OnWithRecallGlobalScene completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2021,7 +2151,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("OnOff OnWithRecallGlobalScene enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2039,22 +2169,27 @@ using chip::SessionHandle;
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                       completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandOnWithTimedOffID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("OnOff OnWithTimedOff dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("OnOff OnWithTimedOff completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2076,7 +2211,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("OnOff OnWithTimedOff enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2456,22 +2591,27 @@ using chip::SessionHandle;
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeLevelControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveToLevelID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("LevelControl MoveToLevel dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("LevelControl MoveToLevel completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2500,7 +2640,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("LevelControl MoveToLevel enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2518,22 +2658,27 @@ using chip::SessionHandle;
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("LevelControl Move dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("LevelControl Move completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2563,7 +2708,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("LevelControl Move enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2581,22 +2726,27 @@ using chip::SessionHandle;
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStepID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("LevelControl Step dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("LevelControl Step completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2627,7 +2777,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("LevelControl Step enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2645,22 +2795,27 @@ using chip::SessionHandle;
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStopID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("LevelControl Stop dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("LevelControl Stop completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2682,7 +2837,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("LevelControl Stop enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2700,22 +2855,27 @@ using chip::SessionHandle;
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeLevelControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveToLevelWithOnOffID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("LevelControl MoveToLevelWithOnOff dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("LevelControl MoveToLevelWithOnOff completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2744,7 +2904,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("LevelControl MoveToLevelWithOnOff enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2762,22 +2922,27 @@ using chip::SessionHandle;
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeLevelControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveWithOnOffID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("LevelControl MoveWithOnOff dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("LevelControl MoveWithOnOff completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2807,7 +2972,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("LevelControl MoveWithOnOff enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2825,22 +2990,27 @@ using chip::SessionHandle;
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeLevelControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStepWithOnOffID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("LevelControl StepWithOnOff dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("LevelControl StepWithOnOff completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2871,7 +3041,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("LevelControl StepWithOnOff enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2889,22 +3059,27 @@ using chip::SessionHandle;
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeLevelControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStopWithOnOffID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("LevelControl StopWithOnOff dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("LevelControl StopWithOnOff completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2926,7 +3101,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("LevelControl StopWithOnOff enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -2944,22 +3119,27 @@ using chip::SessionHandle;
                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                               completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeLevelControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveToClosestFrequencyID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("LevelControl MoveToClosestFrequency dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("LevelControl MoveToClosestFrequency completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -2978,7 +3158,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("LevelControl MoveToClosestFrequency enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -3644,7 +3824,7 @@ using chip::SessionHandle;
     return self;
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeDeviceListWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeDeviceTypeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeDescriptorID)
@@ -3725,6 +3905,10 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (NSDictionary<NSString *, id> *)readAttributeDeviceListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributeDeviceTypeListWithParams:params];
+}
 @end
 
 @implementation MTRClusterBinding
@@ -3835,20 +4019,20 @@ using chip::SessionHandle;
     return self;
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeAclWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeACLWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeAccessControlID)
-                                        attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeAclID)
+                                        attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeACLID)
                                              params:params];
 }
 
-- (void)writeAttributeAclWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributeACLWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
-    [self writeAttributeAclWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+    [self writeAttributeACLWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
 }
-- (void)writeAttributeAclWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributeACLWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             params:(MTRWriteParams * _Nullable)params
 {
@@ -3856,7 +4040,7 @@ using chip::SessionHandle;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
                                     clusterID:@(MTRClusterIDTypeAccessControlID)
-                                  attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeAclID)
+                                  attributeID:@(MTRAttributeIDTypeClusterAccessControlAttributeACLID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -3964,6 +4148,21 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (NSDictionary<NSString *, id> *)readAttributeAclWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributeACLWithParams:params];
+}
+- (void)writeAttributeAclWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeACLWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs];
+}
+- (void)writeAttributeAclWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                            params:(MTRWriteParams * _Nullable)params
+{
+    [self writeAttributeACLWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:params];
+}
 @end
 
 @implementation MTRClusterActions
@@ -3986,22 +4185,27 @@ using chip::SessionHandle;
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandInstantActionID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Actions InstantAction dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Actions InstantAction completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4024,7 +4228,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Actions InstantAction enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4042,22 +4246,27 @@ using chip::SessionHandle;
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                    completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
+                                     (unsigned int) MTRCommandIDTypeClusterActionsCommandInstantActionWithTransitionID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Actions InstantActionWithTransition dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Actions InstantActionWithTransition completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4081,7 +4290,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Actions InstantActionWithTransition enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4099,22 +4308,27 @@ using chip::SessionHandle;
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandStartActionID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Actions StartAction dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Actions StartAction completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4137,7 +4351,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Actions StartAction enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4155,22 +4369,27 @@ using chip::SessionHandle;
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
+                                     (unsigned int) MTRCommandIDTypeClusterActionsCommandStartActionWithDurationID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Actions StartActionWithDuration dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Actions StartActionWithDuration completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4194,7 +4413,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Actions StartActionWithDuration enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4212,22 +4431,27 @@ using chip::SessionHandle;
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                   completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandStopActionID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Actions StopAction dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Actions StopAction completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4250,7 +4474,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Actions StopAction enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4268,22 +4492,27 @@ using chip::SessionHandle;
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandPauseActionID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Actions PauseAction dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Actions PauseAction completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4306,7 +4535,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Actions PauseAction enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4324,22 +4553,27 @@ using chip::SessionHandle;
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
+                                     (unsigned int) MTRCommandIDTypeClusterActionsCommandPauseActionWithDurationID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Actions PauseActionWithDuration dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Actions PauseActionWithDuration completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4363,7 +4597,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Actions PauseActionWithDuration enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4381,22 +4615,27 @@ using chip::SessionHandle;
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandResumeActionID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Actions ResumeAction dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Actions ResumeAction completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4419,7 +4658,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Actions ResumeAction enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4437,22 +4676,27 @@ using chip::SessionHandle;
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandEnableActionID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Actions EnableAction dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Actions EnableAction completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4475,7 +4719,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Actions EnableAction enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4493,22 +4737,27 @@ using chip::SessionHandle;
                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                 completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
+                                     (unsigned int) MTRCommandIDTypeClusterActionsCommandEnableActionWithDurationID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Actions EnableActionWithDuration dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Actions EnableActionWithDuration completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4532,7 +4781,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Actions EnableActionWithDuration enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4550,22 +4799,27 @@ using chip::SessionHandle;
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandDisableActionID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Actions DisableAction dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Actions DisableAction completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4588,7 +4842,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Actions DisableAction enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4606,22 +4860,27 @@ using chip::SessionHandle;
                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                  completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeActionsID,
+                                     (unsigned int) MTRCommandIDTypeClusterActionsCommandDisableActionWithDurationID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Actions DisableActionWithDuration dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Actions DisableActionWithDuration completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4645,7 +4904,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Actions DisableActionWithDuration enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -4882,22 +5141,27 @@ using chip::SessionHandle;
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeBasicID, (unsigned int) MTRCommandIDTypeClusterBasicCommandMfgSpecificPingID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Basic MfgSpecificPing dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Basic MfgSpecificPing completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -4915,7 +5179,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Basic MfgSpecificPing enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -5215,7 +5479,7 @@ using chip::SessionHandle;
 }
 @end
 
-@implementation MTRClusterOtaSoftwareUpdateProvider
+@implementation MTRClusterOTASoftwareUpdateProvider
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
 {
@@ -5230,32 +5494,37 @@ using chip::SessionHandle;
     return self;
 }
 
-- (void)queryImageWithParams:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
+- (void)queryImageWithParams:(MTROTASoftwareUpdateProviderClusterQueryImageParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                  completion:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                  completion:(void (^)(MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
                                  NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeOTASoftwareUpdateProviderID,
+                                     (unsigned int) MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandQueryImageID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("OtaSoftwareUpdateProvider QueryImage dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(
-            self.callbackQueue,
+        auto * bridge = new MTROTASoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("OtaSoftwareUpdateProvider QueryImage completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
-                OtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType successCb, MTRErrorCallback failureCb,
+                OTASoftwareUpdateProviderClusterQueryImageResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -5313,7 +5582,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("OtaSoftwareUpdateProvider QueryImage enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -5326,32 +5595,37 @@ using chip::SessionHandle;
     }
 }
 
-- (void)applyUpdateRequestWithParams:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
+- (void)applyUpdateRequestWithParams:(MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                          completion:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                          completion:(void (^)(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
                                          NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeOTASoftwareUpdateProviderID,
+                                     (unsigned int) MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandApplyUpdateRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("OtaSoftwareUpdateProvider ApplyUpdateRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
-        auto * bridge = new MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(
-            self.callbackQueue,
+        auto * bridge = new MTROTASoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("OtaSoftwareUpdateProvider ApplyUpdateRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
-                OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType successCb, MTRErrorCallback failureCb,
+                OTASoftwareUpdateProviderClusterApplyUpdateResponseCallbackType successCb, MTRErrorCallback failureCb,
                 MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
@@ -5368,7 +5642,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("OtaSoftwareUpdateProvider ApplyUpdateRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -5381,27 +5655,32 @@ using chip::SessionHandle;
     }
 }
 
-- (void)notifyUpdateAppliedWithParams:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
+- (void)notifyUpdateAppliedWithParams:(MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeOTASoftwareUpdateProviderID,
+                                     (unsigned int) MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandNotifyUpdateAppliedID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("OtaSoftwareUpdateProvider NotifyUpdateApplied dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("OtaSoftwareUpdateProvider NotifyUpdateApplied completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -5421,7 +5700,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("OtaSoftwareUpdateProvider NotifyUpdateApplied enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -5438,8 +5717,8 @@ using chip::SessionHandle;
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateProviderID)
-                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeGeneratedCommandListID)
+                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateProviderID)
+                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeGeneratedCommandListID)
                              params:params];
 }
 
@@ -5447,35 +5726,38 @@ using chip::SessionHandle;
 {
     return
         [self.device readAttributeWithEndpointID:@(_endpoint)
-                                       clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateProviderID)
-                                     attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeAcceptedCommandListID)
+                                       clusterID:@(MTRClusterIDTypeOTASoftwareUpdateProviderID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeAcceptedCommandListID)
                                           params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateProviderID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateProviderID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateProviderID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateProviderID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateProviderID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateProviderID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeClusterRevisionID)
                                              params:params];
 }
 
+@end
+
+@implementation MTRClusterOtaSoftwareUpdateProvider
 @end
 
 @implementation MTRClusterOtaSoftwareUpdateProvider (Deprecated)
@@ -5495,7 +5777,7 @@ using chip::SessionHandle;
                 expectedValues:expectedDataValueDictionaries
          expectedValueInterval:expectedValueIntervalMs
                     completion:^(
-                        MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error) {
+                        MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error) {
                         // Cast is safe because subclass does not add any selectors.
                         completionHandler(static_cast<MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams *>(data), error);
                     }];
@@ -5509,7 +5791,7 @@ using chip::SessionHandle;
     [self applyUpdateRequestWithParams:params
                         expectedValues:expectedDataValueDictionaries
                  expectedValueInterval:expectedValueIntervalMs
-                            completion:^(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                            completion:^(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
                                 NSError * _Nullable error) {
                                 // Cast is safe because subclass does not add any selectors.
                                 completionHandler(
@@ -5528,7 +5810,7 @@ using chip::SessionHandle;
 }
 @end
 
-@implementation MTRClusterOtaSoftwareUpdateRequestor
+@implementation MTRClusterOTASoftwareUpdateRequestor
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
 {
@@ -5543,27 +5825,32 @@ using chip::SessionHandle;
     return self;
 }
 
-- (void)announceOtaProviderWithParams:(MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
+- (void)announceOtaProviderWithParams:(MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeOTASoftwareUpdateRequestorID,
+                                     (unsigned int) MTRCommandIDTypeClusterOTASoftwareUpdateRequestorCommandAnnounceOtaProviderID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("OtaSoftwareUpdateRequestor AnnounceOtaProvider dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("OtaSoftwareUpdateRequestor AnnounceOtaProvider completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -5591,7 +5878,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("OtaSoftwareUpdateRequestor AnnounceOtaProvider enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -5608,8 +5895,8 @@ using chip::SessionHandle;
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeDefaultOtaProvidersID)
+                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOtaProvidersID)
                              params:params];
 }
 
@@ -5625,8 +5912,8 @@ using chip::SessionHandle;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
-                                    clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                                  attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeDefaultOtaProvidersID)
+                                    clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                                  attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOtaProvidersID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -5635,16 +5922,16 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeUpdatePossibleWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdatePossibleID)
+                                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdatePossibleID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeUpdateStateWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdateStateID)
+                                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdateStateID)
                                              params:params];
 }
 
@@ -5652,8 +5939,8 @@ using chip::SessionHandle;
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdateStateProgressID)
+                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdateStateProgressID)
                              params:params];
 }
 
@@ -5661,8 +5948,8 @@ using chip::SessionHandle;
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeGeneratedCommandListID)
+                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeGeneratedCommandListID)
                              params:params];
 }
 
@@ -5670,35 +5957,38 @@ using chip::SessionHandle;
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
-                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeAcceptedCommandListID)
+                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeAcceptedCommandListID)
                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeOtaSoftwareUpdateRequestorID)
-                                        attributeID:@(MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
+                                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeClusterRevisionID)
                                              params:params];
 }
 
+@end
+
+@implementation MTRClusterOtaSoftwareUpdateRequestor
 @end
 
 @implementation MTRClusterOtaSoftwareUpdateRequestor (Deprecated)
@@ -6457,22 +6747,27 @@ using chip::SessionHandle;
                    completion:(void (^)(MTRGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable data,
                                   NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeGeneralCommissioningID,
+                                     (unsigned int) MTRCommandIDTypeClusterGeneralCommissioningCommandArmFailSafeID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("GeneralCommissioning ArmFailSafe dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("GeneralCommissioning ArmFailSafe completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -6493,7 +6788,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("GeneralCommissioning ArmFailSafe enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -6512,22 +6807,27 @@ using chip::SessionHandle;
                            completion:(void (^)(MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams * _Nullable data,
                                           NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeGeneralCommissioningID,
+                                     (unsigned int) MTRCommandIDTypeClusterGeneralCommissioningCommandSetRegulatoryConfigID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("GeneralCommissioning SetRegulatoryConfig dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("GeneralCommissioning SetRegulatoryConfig completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -6550,7 +6850,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("GeneralCommissioning SetRegulatoryConfig enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -6582,22 +6882,27 @@ using chip::SessionHandle;
                                  (void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data,
                                      NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeGeneralCommissioningID,
+                                     (unsigned int) MTRCommandIDTypeClusterGeneralCommissioningCommandCommissioningCompleteID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("GeneralCommissioning CommissioningComplete dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("GeneralCommissioning CommissioningComplete completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -6616,7 +6921,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("GeneralCommissioning CommissioningComplete enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -6822,22 +7127,27 @@ using chip::SessionHandle;
                     completion:(void (^)(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data,
                                    NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeNetworkCommissioningID,
+                                     (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandScanNetworksID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("NetworkCommissioning ScanNetworks dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("NetworkCommissioning ScanNetworks completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -6871,7 +7181,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("NetworkCommissioning ScanNetworks enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -6890,22 +7200,27 @@ using chip::SessionHandle;
                               completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                              NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeNetworkCommissioningID,
+                                     (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandAddOrUpdateWiFiNetworkID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("NetworkCommissioning AddOrUpdateWiFiNetwork dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("NetworkCommissioning AddOrUpdateWiFiNetwork completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -6930,7 +7245,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("NetworkCommissioning AddOrUpdateWiFiNetwork enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -6949,22 +7264,27 @@ using chip::SessionHandle;
                                 completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                                NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeNetworkCommissioningID,
+                                     (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandAddOrUpdateThreadNetworkID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("NetworkCommissioning AddOrUpdateThreadNetwork dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("NetworkCommissioning AddOrUpdateThreadNetwork completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -6988,7 +7308,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("NetworkCommissioning AddOrUpdateThreadNetwork enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -7007,22 +7327,27 @@ using chip::SessionHandle;
                      completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                     NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeNetworkCommissioningID,
+                                     (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandRemoveNetworkID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("NetworkCommissioning RemoveNetwork dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("NetworkCommissioning RemoveNetwork completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -7046,7 +7371,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("NetworkCommissioning RemoveNetwork enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -7065,22 +7390,27 @@ using chip::SessionHandle;
                       completion:(void (^)(MTRNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable data,
                                      NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeNetworkCommissioningID,
+                                     (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandConnectNetworkID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("NetworkCommissioning ConnectNetwork dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("NetworkCommissioning ConnectNetwork completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -7104,7 +7434,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("NetworkCommissioning ConnectNetwork enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -7123,22 +7453,27 @@ using chip::SessionHandle;
                       completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                      NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeNetworkCommissioningID,
+                                     (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandReorderNetworkID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("NetworkCommissioning ReorderNetwork dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("NetworkCommissioning ReorderNetwork completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -7163,7 +7498,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("NetworkCommissioning ReorderNetwork enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -7425,22 +7760,27 @@ using chip::SessionHandle;
                            completion:(void (^)(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data,
                                           NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeDiagnosticLogsID,
+                                     (unsigned int) MTRCommandIDTypeClusterDiagnosticLogsCommandRetrieveLogsRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DiagnosticLogs RetrieveLogsRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("DiagnosticLogs RetrieveLogsRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -7463,7 +7803,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DiagnosticLogs RetrieveLogsRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -7562,22 +7902,27 @@ using chip::SessionHandle;
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeGeneralDiagnosticsID,
+                                     (unsigned int) MTRCommandIDTypeClusterGeneralDiagnosticsCommandTestEventTriggerID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("GeneralDiagnostics TestEventTrigger dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("GeneralDiagnostics TestEventTrigger completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -7597,7 +7942,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("GeneralDiagnostics TestEventTrigger enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -7773,22 +8118,27 @@ using chip::SessionHandle;
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeSoftwareDiagnosticsID,
+                                     (unsigned int) MTRCommandIDTypeClusterSoftwareDiagnosticsCommandResetWatermarksID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("SoftwareDiagnostics ResetWatermarks dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("SoftwareDiagnostics ResetWatermarks completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -7806,7 +8156,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("SoftwareDiagnostics ResetWatermarks enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -7951,22 +8301,27 @@ using chip::SessionHandle;
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeThreadNetworkDiagnosticsID,
+                                     (unsigned int) MTRCommandIDTypeClusterThreadNetworkDiagnosticsCommandResetCountsID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ThreadNetworkDiagnostics ResetCounts dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ThreadNetworkDiagnostics ResetCounts completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -7984,7 +8339,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ThreadNetworkDiagnostics ResetCounts enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -8618,22 +8973,27 @@ using chip::SessionHandle;
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeWiFiNetworkDiagnosticsID,
+                                     (unsigned int) MTRCommandIDTypeClusterWiFiNetworkDiagnosticsCommandResetCountsID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("WiFiNetworkDiagnostics ResetCounts dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("WiFiNetworkDiagnostics ResetCounts completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -8651,7 +9011,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("WiFiNetworkDiagnostics ResetCounts enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -8872,22 +9232,27 @@ using chip::SessionHandle;
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeEthernetNetworkDiagnosticsID,
+                                     (unsigned int) MTRCommandIDTypeClusterEthernetNetworkDiagnosticsCommandResetCountsID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("EthernetNetworkDiagnostics ResetCounts dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("EthernetNetworkDiagnostics ResetCounts completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -8905,7 +9270,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("EthernetNetworkDiagnostics ResetCounts enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9377,23 +9742,28 @@ using chip::SessionHandle;
                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeAdministratorCommissioningID,
+                  (unsigned int) MTRCommandIDTypeClusterAdministratorCommissioningCommandOpenCommissioningWindowID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("AdministratorCommissioning OpenCommissioningWindow dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO(
-                    "AdministratorCommissioning OpenCommissioningWindow completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -9419,7 +9789,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("AdministratorCommissioning OpenCommissioningWindow enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9437,24 +9807,28 @@ using chip::SessionHandle;
                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                     completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeAdministratorCommissioningID,
+                  (unsigned int) MTRCommandIDTypeClusterAdministratorCommissioningCommandOpenBasicCommissioningWindowID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO(
-            "AdministratorCommissioning OpenBasicCommissioningWindow dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO(
-                    "AdministratorCommissioning OpenBasicCommissioningWindow completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -9476,7 +9850,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("AdministratorCommissioning OpenBasicCommissioningWindow enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9503,22 +9877,27 @@ using chip::SessionHandle;
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeAdministratorCommissioningID,
+                                     (unsigned int) MTRCommandIDTypeClusterAdministratorCommissioningCommandRevokeCommissioningID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("AdministratorCommissioning RevokeCommissioning dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("AdministratorCommissioning RevokeCommissioning completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -9539,7 +9918,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("AdministratorCommissioning RevokeCommissioning enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9690,22 +10069,27 @@ using chip::SessionHandle;
                           completion:(void (^)(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data,
                                          NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
+                                     (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("OperationalCredentials AttestationRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTROperationalCredentialsClusterAttestationResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("OperationalCredentials AttestationRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -9725,7 +10109,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("OperationalCredentials AttestationRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9744,22 +10128,27 @@ using chip::SessionHandle;
                                completion:(void (^)(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data,
                                               NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
+                                     (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandCertificateChainRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("OperationalCredentials CertificateChainRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("OperationalCredentials CertificateChainRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -9779,7 +10168,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("OperationalCredentials CertificateChainRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9798,22 +10187,27 @@ using chip::SessionHandle;
                   completion:(void (^)(MTROperationalCredentialsClusterCSRResponseParams * _Nullable data,
                                  NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
+                                     (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandCSRRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("OperationalCredentials CSRRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTROperationalCredentialsClusterCSRResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("OperationalCredentials CSRRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -9837,7 +10231,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("OperationalCredentials CSRRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9856,22 +10250,27 @@ using chip::SessionHandle;
                completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                               NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
+                                     (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandAddNOCID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("OperationalCredentials AddNOC dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("OperationalCredentials AddNOC completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -9899,7 +10298,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("OperationalCredentials AddNOC enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9918,22 +10317,27 @@ using chip::SessionHandle;
                  completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                 NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
+                                     (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateNOCID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("OperationalCredentials UpdateNOC dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("OperationalCredentials UpdateNOC completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -9957,7 +10361,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("OperationalCredentials UpdateNOC enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -9976,22 +10380,27 @@ using chip::SessionHandle;
                          completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                         NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
+                                     (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateFabricLabelID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("OperationalCredentials UpdateFabricLabel dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("OperationalCredentials UpdateFabricLabel completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -10011,7 +10420,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("OperationalCredentials UpdateFabricLabel enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -10030,22 +10439,27 @@ using chip::SessionHandle;
                     completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
                                    NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
+                                     (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandRemoveFabricID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("OperationalCredentials RemoveFabric dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTROperationalCredentialsClusterNOCResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("OperationalCredentials RemoveFabric completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -10065,7 +10479,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("OperationalCredentials RemoveFabric enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -10083,22 +10497,28 @@ using chip::SessionHandle;
                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                  completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeOperationalCredentialsID,
+                  (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandAddTrustedRootCertificateID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("OperationalCredentials AddTrustedRootCertificate dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("OperationalCredentials AddTrustedRootCertificate completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -10117,7 +10537,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("OperationalCredentials AddTrustedRootCertificate enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -10365,22 +10785,27 @@ using chip::SessionHandle;
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeGroupKeyManagementID,
+                                     (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetWriteID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("GroupKeyManagement KeySetWrite dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("GroupKeyManagement KeySetWrite completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -10438,7 +10863,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("GroupKeyManagement KeySetWrite enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -10457,22 +10882,27 @@ using chip::SessionHandle;
                   completion:(void (^)(MTRGroupKeyManagementClusterKeySetReadResponseParams * _Nullable data,
                                  NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeGroupKeyManagementID,
+                                     (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("GroupKeyManagement KeySetRead dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("GroupKeyManagement KeySetRead completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -10492,7 +10922,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("GroupKeyManagement KeySetRead enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -10510,22 +10940,27 @@ using chip::SessionHandle;
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeGroupKeyManagementID,
+                                     (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetRemoveID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("GroupKeyManagement KeySetRemove dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("GroupKeyManagement KeySetRemove completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -10544,7 +10979,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("GroupKeyManagement KeySetRemove enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -10563,22 +10998,27 @@ using chip::SessionHandle;
                             completion:(void (^)(MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data,
                                            NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeGroupKeyManagementID,
+                                     (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadAllIndicesID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("GroupKeyManagement KeySetReadAllIndices dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("GroupKeyManagement KeySetReadAllIndices completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -10619,7 +11059,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("GroupKeyManagement KeySetReadAllIndices enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11045,22 +11485,27 @@ using chip::SessionHandle;
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeModeSelectID,
+                                     (unsigned int) MTRCommandIDTypeClusterModeSelectCommandChangeToModeID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ModeSelect ChangeToMode dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ModeSelect ChangeToMode completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11079,7 +11524,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ModeSelect ChangeToMode enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11259,22 +11704,27 @@ using chip::SessionHandle;
      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                 completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandLockDoorID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DoorLock LockDoor dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("DoorLock LockDoor completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11301,7 +11751,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DoorLock LockDoor enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11319,22 +11769,27 @@ using chip::SessionHandle;
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                   completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandUnlockDoorID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DoorLock UnlockDoor dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("DoorLock UnlockDoor completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11361,7 +11816,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DoorLock UnlockDoor enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11379,22 +11834,27 @@ using chip::SessionHandle;
               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                          completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+                                     (unsigned int) MTRCommandIDTypeClusterDoorLockCommandUnlockWithTimeoutID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DoorLock UnlockWithTimeout dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("DoorLock UnlockWithTimeout completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11420,7 +11880,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DoorLock UnlockWithTimeout enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11438,22 +11898,27 @@ using chip::SessionHandle;
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+                                     (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetWeekDayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DoorLock SetWeekDaySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("DoorLock SetWeekDaySchedule completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11479,7 +11944,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DoorLock SetWeekDaySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11498,22 +11963,27 @@ using chip::SessionHandle;
                           completion:(void (^)(MTRDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable data,
                                          NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+                                     (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetWeekDayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DoorLock GetWeekDaySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("DoorLock GetWeekDaySchedule completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -11534,7 +12004,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DoorLock GetWeekDaySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11552,22 +12022,27 @@ using chip::SessionHandle;
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+                                     (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearWeekDayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DoorLock ClearWeekDaySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("DoorLock ClearWeekDaySchedule completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11587,7 +12062,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DoorLock ClearWeekDaySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11605,22 +12080,27 @@ using chip::SessionHandle;
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+                                     (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetYearDayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DoorLock SetYearDaySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("DoorLock SetYearDaySchedule completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11642,7 +12122,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DoorLock SetYearDaySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11661,22 +12141,27 @@ using chip::SessionHandle;
                           completion:(void (^)(MTRDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data,
                                          NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+                                     (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetYearDayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DoorLock GetYearDaySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("DoorLock GetYearDaySchedule completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -11697,7 +12182,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DoorLock GetYearDaySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11715,22 +12200,27 @@ using chip::SessionHandle;
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+                                     (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearYearDayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DoorLock ClearYearDaySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("DoorLock ClearYearDaySchedule completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11750,7 +12240,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DoorLock ClearYearDaySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11768,22 +12258,27 @@ using chip::SessionHandle;
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+                                     (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetHolidayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DoorLock SetHolidaySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("DoorLock SetHolidaySchedule completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11806,7 +12301,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DoorLock SetHolidaySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11825,22 +12320,27 @@ using chip::SessionHandle;
                           completion:(void (^)(MTRDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data,
                                          NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+                                     (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetHolidayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DoorLock GetHolidaySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("DoorLock GetHolidaySchedule completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -11860,7 +12360,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DoorLock GetHolidaySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11878,22 +12378,27 @@ using chip::SessionHandle;
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+                                     (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearHolidayScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DoorLock ClearHolidaySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("DoorLock ClearHolidaySchedule completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -11912,7 +12417,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DoorLock ClearHolidaySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -11930,22 +12435,27 @@ using chip::SessionHandle;
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetUserID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DoorLock SetUser dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("DoorLock SetUser completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -12002,7 +12512,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DoorLock SetUser enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -12020,22 +12530,27 @@ using chip::SessionHandle;
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(void (^)(MTRDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetUserID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DoorLock GetUser dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRDoorLockClusterGetUserResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("DoorLock GetUser completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -12054,7 +12569,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DoorLock GetUser enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -12072,22 +12587,27 @@ using chip::SessionHandle;
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                  completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearUserID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DoorLock ClearUser dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("DoorLock ClearUser completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -12109,7 +12629,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DoorLock ClearUser enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -12128,22 +12648,27 @@ using chip::SessionHandle;
                      completion:(void (^)(MTRDoorLockClusterSetCredentialResponseParams * _Nullable data,
                                     NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetCredentialID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DoorLock SetCredential dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRDoorLockClusterSetCredentialResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("DoorLock SetCredential completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -12192,7 +12717,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DoorLock SetCredential enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -12211,22 +12736,27 @@ using chip::SessionHandle;
                            completion:(void (^)(MTRDoorLockClusterGetCredentialStatusResponseParams * _Nullable data,
                                           NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+                                     (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetCredentialStatusID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DoorLock GetCredentialStatus dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("DoorLock GetCredentialStatus completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -12249,7 +12779,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DoorLock GetCredentialStatus enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -12267,22 +12797,27 @@ using chip::SessionHandle;
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeDoorLockID,
+                                     (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearCredentialID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("DoorLock ClearCredential dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("DoorLock ClearCredential completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -12311,7 +12846,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("DoorLock ClearCredential enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -13256,22 +13791,27 @@ using chip::SessionHandle;
      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                 completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID,
+                                     (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandUpOrOpenID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("WindowCovering UpOrOpen dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("WindowCovering UpOrOpen completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -13289,7 +13829,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("WindowCovering UpOrOpen enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -13316,22 +13856,27 @@ using chip::SessionHandle;
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID,
+                                     (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandDownOrCloseID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("WindowCovering DownOrClose dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("WindowCovering DownOrClose completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -13349,7 +13894,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("WindowCovering DownOrClose enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -13376,22 +13921,27 @@ using chip::SessionHandle;
        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                   completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID,
+                                     (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandStopMotionID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("WindowCovering StopMotion dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("WindowCovering StopMotion completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -13409,7 +13959,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("WindowCovering StopMotion enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -13427,22 +13977,27 @@ using chip::SessionHandle;
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID,
+                                     (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToLiftValueID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("WindowCovering GoToLiftValue dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("WindowCovering GoToLiftValue completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -13461,7 +14016,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("WindowCovering GoToLiftValue enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -13479,22 +14034,27 @@ using chip::SessionHandle;
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID,
+                                     (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToLiftPercentageID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("WindowCovering GoToLiftPercentage dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("WindowCovering GoToLiftPercentage completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -13513,7 +14073,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("WindowCovering GoToLiftPercentage enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -13531,22 +14091,27 @@ using chip::SessionHandle;
           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                      completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID,
+                                     (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltValueID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("WindowCovering GoToTiltValue dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("WindowCovering GoToTiltValue completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -13565,7 +14130,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("WindowCovering GoToTiltValue enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -13583,22 +14148,27 @@ using chip::SessionHandle;
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID,
+                                     (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltPercentageID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("WindowCovering GoToTiltPercentage dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("WindowCovering GoToTiltPercentage completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -13617,7 +14187,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("WindowCovering GoToTiltPercentage enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -13999,22 +14569,27 @@ using chip::SessionHandle;
                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                  completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeBarrierControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterBarrierControlCommandBarrierControlGoToPercentID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("BarrierControl BarrierControlGoToPercent dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("BarrierControl BarrierControlGoToPercent completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -14033,7 +14608,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("BarrierControl BarrierControlGoToPercent enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -14060,22 +14635,27 @@ using chip::SessionHandle;
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeBarrierControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterBarrierControlCommandBarrierControlStopID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("BarrierControl BarrierControlStop dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("BarrierControl BarrierControlStop completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -14093,7 +14673,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("BarrierControl BarrierControlStop enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -14744,22 +15324,27 @@ using chip::SessionHandle;
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeThermostatID,
+                                     (unsigned int) MTRCommandIDTypeClusterThermostatCommandSetpointRaiseLowerID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Thermostat SetpointRaiseLower dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Thermostat SetpointRaiseLower completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -14779,7 +15364,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Thermostat SetpointRaiseLower enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -14797,22 +15382,27 @@ using chip::SessionHandle;
               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                          completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeThermostatID,
+                                     (unsigned int) MTRCommandIDTypeClusterThermostatCommandSetWeeklyScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Thermostat SetWeeklySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Thermostat SetWeeklySchedule completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -14869,7 +15459,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Thermostat SetWeeklySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -14888,22 +15478,27 @@ using chip::SessionHandle;
                          completion:(void (^)(MTRThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data,
                                         NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeThermostatID,
+                                     (unsigned int) MTRCommandIDTypeClusterThermostatCommandGetWeeklyScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Thermostat GetWeeklySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("Thermostat GetWeeklySchedule completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -14926,7 +15521,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Thermostat GetWeeklySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -14953,22 +15548,27 @@ using chip::SessionHandle;
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeThermostatID,
+                                     (unsigned int) MTRCommandIDTypeClusterThermostatCommandClearWeeklyScheduleID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Thermostat ClearWeeklySchedule dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Thermostat ClearWeeklySchedule completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -14986,7 +15586,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Thermostat ClearWeeklySchedule enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16484,22 +17084,27 @@ using chip::SessionHandle;
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                  completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToHueID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl MoveToHue dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl MoveToHue completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16523,7 +17128,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl MoveToHue enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16541,22 +17146,27 @@ using chip::SessionHandle;
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveHueID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl MoveHue dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl MoveHue completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16579,7 +17189,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl MoveHue enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16597,22 +17207,27 @@ using chip::SessionHandle;
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepHueID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl StepHue dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl StepHue completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16636,7 +17251,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl StepHue enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16654,22 +17269,27 @@ using chip::SessionHandle;
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                         completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToSaturationID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl MoveToSaturation dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl MoveToSaturation completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16691,7 +17311,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl MoveToSaturation enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16709,22 +17329,27 @@ using chip::SessionHandle;
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                       completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveSaturationID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl MoveSaturation dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl MoveSaturation completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16747,7 +17372,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl MoveSaturation enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16765,22 +17390,27 @@ using chip::SessionHandle;
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                       completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepSaturationID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl StepSaturation dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl StepSaturation completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16804,7 +17434,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl StepSaturation enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16822,22 +17452,27 @@ using chip::SessionHandle;
                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                               completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToHueAndSaturationID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl MoveToHueAndSaturation dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl MoveToHueAndSaturation completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16860,7 +17495,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl MoveToHueAndSaturation enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16878,22 +17513,27 @@ using chip::SessionHandle;
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToColorID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl MoveToColor dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl MoveToColor completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16916,7 +17556,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl MoveToColor enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16934,22 +17574,27 @@ using chip::SessionHandle;
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                  completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveColorID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl MoveColor dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl MoveColor completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -16971,7 +17616,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl MoveColor enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -16989,22 +17634,27 @@ using chip::SessionHandle;
       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                  completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepColorID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl StepColor dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl StepColor completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -17027,7 +17677,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl StepColor enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -17045,22 +17695,27 @@ using chip::SessionHandle;
                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                               completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToColorTemperatureID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl MoveToColorTemperature dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl MoveToColorTemperature completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -17082,7 +17737,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl MoveToColorTemperature enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -17100,22 +17755,27 @@ using chip::SessionHandle;
               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                          completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedMoveToHueID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl EnhancedMoveToHue dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl EnhancedMoveToHue completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -17139,7 +17799,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl EnhancedMoveToHue enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -17157,22 +17817,27 @@ using chip::SessionHandle;
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedMoveHueID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl EnhancedMoveHue dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl EnhancedMoveHue completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -17195,7 +17860,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl EnhancedMoveHue enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -17213,22 +17878,27 @@ using chip::SessionHandle;
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedStepHueID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl EnhancedStepHue dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl EnhancedStepHue completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -17252,7 +17922,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl EnhancedStepHue enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -17270,22 +17940,27 @@ using chip::SessionHandle;
                            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                       completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedMoveToHueAndSaturationID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl EnhancedMoveToHueAndSaturation dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl EnhancedMoveToHueAndSaturation completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -17308,7 +17983,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl EnhancedMoveToHueAndSaturation enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -17326,22 +18001,27 @@ using chip::SessionHandle;
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandColorLoopSetID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl ColorLoopSet dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl ColorLoopSet completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -17368,7 +18048,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl ColorLoopSet enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -17386,22 +18066,27 @@ using chip::SessionHandle;
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandStopMoveStepID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl StopMoveStep dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl StopMoveStep completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -17421,7 +18106,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl StopMoveStep enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -17439,22 +18124,27 @@ using chip::SessionHandle;
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveColorTemperatureID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl MoveColorTemperature dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl MoveColorTemperature completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -17479,7 +18169,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl MoveColorTemperature enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -17497,22 +18187,27 @@ using chip::SessionHandle;
                  expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                             completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeColorControlID,
+                                     (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepColorTemperatureID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ColorControl StepColorTemperature dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ColorControl StepColorTemperature completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -17538,7 +18233,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ColorControl StepColorTemperature enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -19419,23 +20114,23 @@ using chip::SessionHandle;
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributePirOccupiedToUnoccupiedDelayWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributePIROccupiedToUnoccupiedDelayWithParams:(MTRReadParams * _Nullable)params
 {
     return
         [self.device readAttributeWithEndpointID:@(_endpoint)
                                        clusterID:@(MTRClusterIDTypeOccupancySensingID)
-                                     attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePirOccupiedToUnoccupiedDelayID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePIROccupiedToUnoccupiedDelayID)
                                           params:params];
 }
 
-- (void)writeAttributePirOccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributePIROccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
-    [self writeAttributePirOccupiedToUnoccupiedDelayWithValue:dataValueDictionary
+    [self writeAttributePIROccupiedToUnoccupiedDelayWithValue:dataValueDictionary
                                         expectedValueInterval:expectedValueIntervalMs
                                                        params:nil];
 }
-- (void)writeAttributePirOccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributePIROccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                                      params:(MTRWriteParams * _Nullable)params
 {
@@ -19443,29 +20138,29 @@ using chip::SessionHandle;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
                                     clusterID:@(MTRClusterIDTypeOccupancySensingID)
-                                  attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePirOccupiedToUnoccupiedDelayID)
+                                  attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePIROccupiedToUnoccupiedDelayID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributePirUnoccupiedToOccupiedDelayWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributePIRUnoccupiedToOccupiedDelayWithParams:(MTRReadParams * _Nullable)params
 {
     return
         [self.device readAttributeWithEndpointID:@(_endpoint)
                                        clusterID:@(MTRClusterIDTypeOccupancySensingID)
-                                     attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedDelayID)
+                                     attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePIRUnoccupiedToOccupiedDelayID)
                                           params:params];
 }
 
-- (void)writeAttributePirUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributePIRUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
-    [self writeAttributePirUnoccupiedToOccupiedDelayWithValue:dataValueDictionary
+    [self writeAttributePIRUnoccupiedToOccupiedDelayWithValue:dataValueDictionary
                                         expectedValueInterval:expectedValueIntervalMs
                                                        params:nil];
 }
-- (void)writeAttributePirUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributePIRUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                                      params:(MTRWriteParams * _Nullable)params
 {
@@ -19473,29 +20168,29 @@ using chip::SessionHandle;
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
                                     clusterID:@(MTRClusterIDTypeOccupancySensingID)
-                                  attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedDelayID)
+                                  attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePIRUnoccupiedToOccupiedDelayID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributePirUnoccupiedToOccupiedThresholdWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributePIRUnoccupiedToOccupiedThresholdWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
                           clusterID:@(MTRClusterIDTypeOccupancySensingID)
-                        attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedThresholdID)
+                        attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePIRUnoccupiedToOccupiedThresholdID)
                              params:params];
 }
 
-- (void)writeAttributePirUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
-    [self writeAttributePirUnoccupiedToOccupiedThresholdWithValue:dataValueDictionary
+    [self writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:dataValueDictionary
                                             expectedValueInterval:expectedValueIntervalMs
                                                            params:nil];
 }
-- (void)writeAttributePirUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                                          params:(MTRWriteParams * _Nullable)params
 {
@@ -19504,7 +20199,7 @@ using chip::SessionHandle;
     [self.device
         writeAttributeWithEndpointID:@(_endpoint)
                            clusterID:@(MTRClusterIDTypeOccupancySensingID)
-                         attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedThresholdID)
+                         attributeID:@(MTRAttributeIDTypeClusterOccupancySensingAttributePIRUnoccupiedToOccupiedThresholdID)
                                value:dataValueDictionary
                expectedValueInterval:expectedValueIntervalMs
                    timedWriteTimeout:timedWriteTimeout];
@@ -19748,9 +20443,61 @@ using chip::SessionHandle;
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
+- (NSDictionary<NSString *, id> *)readAttributePirOccupiedToUnoccupiedDelayWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributePIROccupiedToUnoccupiedDelayWithParams:params];
+}
+- (void)writeAttributePirOccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributePIROccupiedToUnoccupiedDelayWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs];
+}
+- (void)writeAttributePirOccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                                     params:(MTRWriteParams * _Nullable)params
+{
+    [self writeAttributePIROccupiedToUnoccupiedDelayWithValue:dataValueDictionary
+                                        expectedValueInterval:expectedValueIntervalMs
+                                                       params:params];
+}
+- (NSDictionary<NSString *, id> *)readAttributePirUnoccupiedToOccupiedDelayWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributePIRUnoccupiedToOccupiedDelayWithParams:params];
+}
+- (void)writeAttributePirUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributePIRUnoccupiedToOccupiedDelayWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs];
+}
+- (void)writeAttributePirUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                                     params:(MTRWriteParams * _Nullable)params
+{
+    [self writeAttributePIRUnoccupiedToOccupiedDelayWithValue:dataValueDictionary
+                                        expectedValueInterval:expectedValueIntervalMs
+                                                       params:params];
+}
+- (NSDictionary<NSString *, id> *)readAttributePirUnoccupiedToOccupiedThresholdWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributePIRUnoccupiedToOccupiedThresholdWithParams:params];
+}
+- (void)writeAttributePirUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:dataValueDictionary
+                                            expectedValueInterval:expectedValueIntervalMs];
+}
+- (void)writeAttributePirUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                                         params:(MTRWriteParams * _Nullable)params
+{
+    [self writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:dataValueDictionary
+                                            expectedValueInterval:expectedValueIntervalMs
+                                                           params:params];
+}
 @end
 
-@implementation MTRClusterWakeOnLan
+@implementation MTRClusterWakeOnLAN
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
 {
@@ -19768,51 +20515,54 @@ using chip::SessionHandle;
 - (NSDictionary<NSString *, id> *)readAttributeMACAddressWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWakeOnLanID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLanAttributeMACAddressID)
+                                          clusterID:@(MTRClusterIDTypeWakeOnLANID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLANAttributeMACAddressID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWakeOnLanID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLanAttributeGeneratedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeWakeOnLANID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLANAttributeGeneratedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWakeOnLanID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLanAttributeAcceptedCommandListID)
+                                          clusterID:@(MTRClusterIDTypeWakeOnLANID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLANAttributeAcceptedCommandListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWakeOnLanID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLanAttributeAttributeListID)
+                                          clusterID:@(MTRClusterIDTypeWakeOnLANID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLANAttributeAttributeListID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWakeOnLanID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLanAttributeFeatureMapID)
+                                          clusterID:@(MTRClusterIDTypeWakeOnLANID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLANAttributeFeatureMapID)
                                              params:params];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
-                                          clusterID:@(MTRClusterIDTypeWakeOnLanID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLanAttributeClusterRevisionID)
+                                          clusterID:@(MTRClusterIDTypeWakeOnLANID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWakeOnLANAttributeClusterRevisionID)
                                              params:params];
 }
 
+@end
+
+@implementation MTRClusterWakeOnLan
 @end
 
 @implementation MTRClusterWakeOnLan (Deprecated)
@@ -19845,22 +20595,27 @@ using chip::SessionHandle;
                      completion:(void (^)(MTRChannelClusterChangeChannelResponseParams * _Nullable data,
                                     NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeChannelID, (unsigned int) MTRCommandIDTypeClusterChannelCommandChangeChannelID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Channel ChangeChannel dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRChannelClusterChangeChannelResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("Channel ChangeChannel completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -19880,7 +20635,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Channel ChangeChannel enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -19898,22 +20653,27 @@ using chip::SessionHandle;
                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                              completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeChannelID,
+                                     (unsigned int) MTRCommandIDTypeClusterChannelCommandChangeChannelByNumberID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Channel ChangeChannelByNumber dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Channel ChangeChannelByNumber completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -19933,7 +20693,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Channel ChangeChannelByNumber enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -19951,22 +20711,27 @@ using chip::SessionHandle;
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeChannelID, (unsigned int) MTRCommandIDTypeClusterChannelCommandSkipChannelID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("Channel SkipChannel dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("Channel SkipChannel completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -19985,7 +20750,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("Channel SkipChannel enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20128,22 +20893,27 @@ using chip::SessionHandle;
                       completion:(void (^)(MTRTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
                                      NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeTargetNavigatorID,
+                                     (unsigned int) MTRCommandIDTypeClusterTargetNavigatorCommandNavigateTargetID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("TargetNavigator NavigateTarget dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("TargetNavigator NavigateTarget completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20167,7 +20937,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("TargetNavigator NavigateTarget enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20290,22 +21060,27 @@ using chip::SessionHandle;
                completion:
                    (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandPlayID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("MediaPlayback Play dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("MediaPlayback Play completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20324,7 +21099,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("MediaPlayback Play enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20350,22 +21125,27 @@ using chip::SessionHandle;
                completion:
                    (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
+                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandPauseID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("MediaPlayback Pause dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("MediaPlayback Pause completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20384,7 +21164,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("MediaPlayback Pause enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20413,22 +21193,27 @@ using chip::SessionHandle;
                     completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                    NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
+                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandStopPlaybackID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("MediaPlayback StopPlayback dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("MediaPlayback StopPlayback completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20447,7 +21232,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("MediaPlayback StopPlayback enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20476,22 +21261,27 @@ using chip::SessionHandle;
                  completion:
                      (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
+                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandStartOverID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("MediaPlayback StartOver dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("MediaPlayback StartOver completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20510,7 +21300,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("MediaPlayback StartOver enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20536,22 +21326,27 @@ using chip::SessionHandle;
                 completion:
                     (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
+                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandPreviousID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("MediaPlayback Previous dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("MediaPlayback Previous completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20570,7 +21365,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("MediaPlayback Previous enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20596,22 +21391,27 @@ using chip::SessionHandle;
                completion:
                    (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandNextID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("MediaPlayback Next dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("MediaPlayback Next completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20630,7 +21430,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("MediaPlayback Next enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20656,22 +21456,27 @@ using chip::SessionHandle;
                completion:
                    (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
+                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandRewindID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("MediaPlayback Rewind dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("MediaPlayback Rewind completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20690,7 +21495,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("MediaPlayback Rewind enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20719,22 +21524,27 @@ using chip::SessionHandle;
                    completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                   NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
+                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandFastForwardID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("MediaPlayback FastForward dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("MediaPlayback FastForward completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20753,7 +21563,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("MediaPlayback FastForward enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20772,22 +21582,27 @@ using chip::SessionHandle;
                    completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                   NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
+                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandSkipForwardID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("MediaPlayback SkipForward dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("MediaPlayback SkipForward completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20807,7 +21622,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("MediaPlayback SkipForward enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20826,22 +21641,27 @@ using chip::SessionHandle;
                     completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                    NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID,
+                                     (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandSkipBackwardID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("MediaPlayback SkipBackward dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("MediaPlayback SkipBackward completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20861,7 +21681,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("MediaPlayback SkipBackward enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -20880,22 +21700,27 @@ using chip::SessionHandle;
                completion:
                    (void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandSeekID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("MediaPlayback Seek dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("MediaPlayback Seek completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -20915,7 +21740,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("MediaPlayback Seek enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -21289,22 +22114,27 @@ using chip::SessionHandle;
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeMediaInputID,
+                                     (unsigned int) MTRCommandIDTypeClusterMediaInputCommandSelectInputID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("MediaInput SelectInput dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("MediaInput SelectInput completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -21323,7 +22153,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("MediaInput SelectInput enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -21350,22 +22180,27 @@ using chip::SessionHandle;
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeMediaInputID,
+                                     (unsigned int) MTRCommandIDTypeClusterMediaInputCommandShowInputStatusID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("MediaInput ShowInputStatus dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("MediaInput ShowInputStatus completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -21383,7 +22218,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("MediaInput ShowInputStatus enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -21410,22 +22245,27 @@ using chip::SessionHandle;
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeMediaInputID,
+                                     (unsigned int) MTRCommandIDTypeClusterMediaInputCommandHideInputStatusID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("MediaInput HideInputStatus dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("MediaInput HideInputStatus completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -21443,7 +22283,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("MediaInput HideInputStatus enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -21461,22 +22301,27 @@ using chip::SessionHandle;
         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                    completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeMediaInputID,
+                                     (unsigned int) MTRCommandIDTypeClusterMediaInputCommandRenameInputID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("MediaInput RenameInput dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("MediaInput RenameInput completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -21496,7 +22341,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("MediaInput RenameInput enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -21660,22 +22505,27 @@ using chip::SessionHandle;
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeLowPowerID, (unsigned int) MTRCommandIDTypeClusterLowPowerCommandSleepID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("LowPower Sleep dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("LowPower Sleep completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -21693,7 +22543,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("LowPower Sleep enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -21797,22 +22647,27 @@ using chip::SessionHandle;
                completion:
                    (void (^)(MTRKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeKeypadInputID, (unsigned int) MTRCommandIDTypeClusterKeypadInputCommandSendKeyID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("KeypadInput SendKey dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRKeypadInputClusterSendKeyResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("KeypadInput SendKey completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -21832,7 +22687,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("KeypadInput SendKey enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -21931,22 +22786,27 @@ using chip::SessionHandle;
                      completion:(void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data,
                                     NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeContentLauncherID,
+                                     (unsigned int) MTRCommandIDTypeClusterContentLauncherCommandLaunchContentID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ContentLauncher LaunchContent dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRContentLauncherClusterLaunchResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("ContentLauncher LaunchContent completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -22023,7 +22883,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ContentLauncher LaunchContent enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -22042,22 +22902,27 @@ using chip::SessionHandle;
                  completion:
                      (void (^)(MTRContentLauncherClusterLaunchResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeContentLauncherID,
+                                     (unsigned int) MTRCommandIDTypeClusterContentLauncherCommandLaunchURLID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ContentLauncher LaunchURL dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRContentLauncherClusterLaunchResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("ContentLauncher LaunchURL completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -22175,7 +23040,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ContentLauncher LaunchURL enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -22325,22 +23190,27 @@ using chip::SessionHandle;
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeAudioOutputID,
+                                     (unsigned int) MTRCommandIDTypeClusterAudioOutputCommandSelectOutputID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("AudioOutput SelectOutput dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("AudioOutput SelectOutput completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -22359,7 +23229,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("AudioOutput SelectOutput enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -22377,22 +23247,27 @@ using chip::SessionHandle;
          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                     completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeAudioOutputID,
+                                     (unsigned int) MTRCommandIDTypeClusterAudioOutputCommandRenameOutputID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("AudioOutput RenameOutput dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("AudioOutput RenameOutput completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -22412,7 +23287,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("AudioOutput RenameOutput enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -22533,22 +23408,27 @@ using chip::SessionHandle;
                  completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                                 NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeApplicationLauncherID,
+                                     (unsigned int) MTRCommandIDTypeClusterApplicationLauncherCommandLaunchAppID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ApplicationLauncher LaunchApp dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("ApplicationLauncher LaunchApp completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -22573,7 +23453,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ApplicationLauncher LaunchApp enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -22592,22 +23472,27 @@ using chip::SessionHandle;
                completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                               NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeApplicationLauncherID,
+                                     (unsigned int) MTRCommandIDTypeClusterApplicationLauncherCommandStopAppID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ApplicationLauncher StopApp dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("ApplicationLauncher StopApp completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -22628,7 +23513,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ApplicationLauncher StopApp enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -22647,22 +23532,27 @@ using chip::SessionHandle;
                completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data,
                               NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeApplicationLauncherID,
+                                     (unsigned int) MTRCommandIDTypeClusterApplicationLauncherCommandHideAppID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ApplicationLauncher HideApp dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRApplicationLauncherClusterLauncherResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("ApplicationLauncher HideApp completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -22683,7 +23573,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ApplicationLauncher HideApp enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -22975,22 +23865,27 @@ using chip::SessionHandle;
                    completion:(void (^)(MTRAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
                                   NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeAccountLoginID,
+                                     (unsigned int) MTRCommandIDTypeClusterAccountLoginCommandGetSetupPINID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("AccountLogin GetSetupPIN dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRAccountLoginClusterGetSetupPINResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("AccountLogin GetSetupPIN completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -23013,7 +23908,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("AccountLogin GetSetupPIN enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -23031,22 +23926,27 @@ using chip::SessionHandle;
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeAccountLoginID, (unsigned int) MTRCommandIDTypeClusterAccountLoginCommandLoginID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("AccountLogin Login dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("AccountLogin Login completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -23069,7 +23969,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("AccountLogin Login enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -23093,22 +23993,27 @@ using chip::SessionHandle;
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeAccountLoginID, (unsigned int) MTRCommandIDTypeClusterAccountLoginCommandLogoutID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("AccountLogin Logout dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("AccountLogin Logout completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -23129,7 +24034,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("AccountLogin Logout enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -23265,22 +24170,27 @@ using chip::SessionHandle;
                   expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                              completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeElectricalMeasurementID,
+                                     (unsigned int) MTRCommandIDTypeClusterElectricalMeasurementCommandGetProfileInfoCommandID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ElectricalMeasurement GetProfileInfoCommand dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("ElectricalMeasurement GetProfileInfoCommand completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -23298,7 +24208,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ElectricalMeasurement GetProfileInfoCommand enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -23316,23 +24226,28 @@ using chip::SessionHandle;
                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                     completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeElectricalMeasurementID,
+                  (unsigned int) MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileCommandID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("ElectricalMeasurement GetMeasurementProfileCommand dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO(
-                    "ElectricalMeasurement GetMeasurementProfileCommand completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -23353,7 +24268,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("ElectricalMeasurement GetMeasurementProfileCommand enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -24709,22 +25624,27 @@ using chip::SessionHandle;
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting Test dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("UnitTesting Test completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -24742,7 +25662,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting Test enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -24769,22 +25689,27 @@ using chip::SessionHandle;
            expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                       completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNotHandledID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestNotHandled dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("UnitTesting TestNotHandled completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -24802,7 +25727,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestNotHandled enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -24831,22 +25756,27 @@ using chip::SessionHandle;
                     completion:(void (^)(MTRUnitTestingClusterTestSpecificResponseParams * _Nullable data,
                                    NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestSpecificID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestSpecific dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestSpecificResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("UnitTesting TestSpecific completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -24865,7 +25795,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestSpecific enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -24892,22 +25822,27 @@ using chip::SessionHandle;
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestUnknownCommandID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestUnknownCommand dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("UnitTesting TestUnknownCommand completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -24925,7 +25860,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestUnknownCommand enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -24944,22 +25879,27 @@ using chip::SessionHandle;
                         completion:(void (^)(MTRUnitTestingClusterTestAddArgumentsResponseParams * _Nullable data,
                                        NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestAddArgumentsID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestAddArguments dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("UnitTesting TestAddArguments completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -24980,7 +25920,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestAddArguments enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -24999,22 +25939,27 @@ using chip::SessionHandle;
                                  completion:(void (^)(MTRUnitTestingClusterTestSimpleArgumentResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestSimpleArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestSimpleArgumentRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("UnitTesting TestSimpleArgumentRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -25034,7 +25979,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestSimpleArgumentRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -25054,22 +25999,27 @@ using chip::SessionHandle;
                                           (void (^)(MTRUnitTestingClusterTestStructArrayArgumentResponseParams * _Nullable data,
                                               NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestStructArrayArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestStructArrayArgumentRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("UnitTesting TestStructArrayArgumentRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -25300,7 +26250,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestStructArrayArgumentRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -25319,22 +26269,27 @@ using chip::SessionHandle;
                                  completion:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestStructArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestStructArgumentRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("UnitTesting TestStructArgumentRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -25361,7 +26316,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestStructArgumentRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -25380,22 +26335,27 @@ using chip::SessionHandle;
                                        completion:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
                                                       NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNestedStructArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestNestedStructArgumentRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("UnitTesting TestNestedStructArgumentRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -25426,7 +26386,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestNestedStructArgumentRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -25445,22 +26405,27 @@ using chip::SessionHandle;
                                      completion:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
                                                     NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListStructArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestListStructArgumentRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("UnitTesting TestListStructArgumentRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -25510,7 +26475,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestListStructArgumentRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -25529,22 +26494,27 @@ using chip::SessionHandle;
                                     completion:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
                                                    NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListInt8UArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestListInt8UArgumentRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("UnitTesting TestListInt8UArgumentRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -25585,7 +26555,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestListInt8UArgumentRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -25604,22 +26574,27 @@ using chip::SessionHandle;
                                            completion:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
                                                           NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNestedStructListArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestNestedStructListArgumentRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("UnitTesting TestNestedStructListArgumentRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -25747,7 +26722,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestNestedStructListArgumentRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -25767,23 +26742,28 @@ using chip::SessionHandle;
                                                completion:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data,
                                                               NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID,
+                  (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListNestedStructListArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestListNestedStructListArgumentRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterBooleanResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO(
-                    "UnitTesting TestListNestedStructListArgumentRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -25936,7 +26916,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestListNestedStructListArgumentRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -25955,22 +26935,27 @@ using chip::SessionHandle;
                                    completion:(void (^)(MTRUnitTestingClusterTestListInt8UReverseResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListInt8UReverseRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestListInt8UReverseRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("UnitTesting TestListInt8UReverseRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -26011,7 +26996,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestListInt8UReverseRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -26030,22 +27015,27 @@ using chip::SessionHandle;
                         completion:(void (^)(MTRUnitTestingClusterTestEnumsResponseParams * _Nullable data,
                                        NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestEnumsRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestEnumsRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestEnumsResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("UnitTesting TestEnumsRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -26066,7 +27056,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestEnumsRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -26085,22 +27075,27 @@ using chip::SessionHandle;
                                    completion:(void (^)(MTRUnitTestingClusterTestNullableOptionalResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNullableOptionalRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestNullableOptionalRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("UnitTesting TestNullableOptionalRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -26130,7 +27125,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestNullableOptionalRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -26151,22 +27146,27 @@ using chip::SessionHandle;
                                                   MTRUnitTestingClusterTestComplexNullableOptionalResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestComplexNullableOptionalRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestComplexNullableOptionalRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("UnitTesting TestComplexNullableOptionalRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -26355,7 +27355,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestComplexNullableOptionalRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -26374,22 +27374,27 @@ using chip::SessionHandle;
                                completion:(void (^)(MTRUnitTestingClusterSimpleStructResponseParams * _Nullable data,
                                               NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandSimpleStructEchoRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting SimpleStructEchoRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterSimpleStructResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("UnitTesting SimpleStructEchoRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -26416,7 +27421,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting SimpleStructEchoRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -26443,22 +27448,27 @@ using chip::SessionHandle;
                expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                           completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTimedInvokeRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TimedInvokeRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("UnitTesting TimedInvokeRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -26479,7 +27489,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TimedInvokeRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -26497,22 +27507,27 @@ using chip::SessionHandle;
                               expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                          completion:(MTRStatusCompletion)completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestSimpleOptionalArgumentRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestSimpleOptionalArgumentRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRCommandSuccessCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(error);
-                MTR_LOG_INFO("UnitTesting TestSimpleOptionalArgumentRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
@@ -26536,7 +27551,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestSimpleOptionalArgumentRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -26555,22 +27570,27 @@ using chip::SessionHandle;
                                 completion:(void (^)(MTRUnitTestingClusterTestEmitTestEventResponseParams * _Nullable data,
                                                NSError * _Nullable error))completion
 {
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID,
+                                     (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestEventRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestEmitTestEventRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("UnitTesting TestEmitTestEventRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -26592,7 +27612,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestEmitTestEventRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
@@ -26614,22 +27634,28 @@ using chip::SessionHandle;
                                                 MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completion
 {
+    NSString * logPrefix =
+        [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint,
+                  (unsigned int) MTRClusterIDTypeUnitTestingID,
+                  (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestFabricScopedEventRequestID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMsParam) {
         timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("UnitTesting TestEmitTestFabricScopedEventRequest dequeueWorkItem %@", self.device.asyncCallbackWorkQueue);
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
                                                                 controller:self.device.deviceController];
         auto * bridge = new MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge(
-            self.callbackQueue,
+            self.device.queue,
             ^(id _Nullable value, NSError * _Nullable error) {
-                completion(value, error);
-                MTR_LOG_INFO("UnitTesting TestEmitTestFabricScopedEventRequest completion value %@ error %@ endWork", value, error);
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(value, error);
+                });
                 [workItem endWork];
             },
             ^(ExchangeManager & exchangeManager, const SessionHandle & session,
@@ -26649,7 +27675,7 @@ using chip::SessionHandle;
         std::move(*bridge).DispatchAction(baseDevice);
     };
     workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("UnitTesting TestEmitTestFabricScopedEventRequest enqueueWorkItem %@", self.device.asyncCallbackWorkQueue);
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
     [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {

@@ -543,7 +543,7 @@ NS_ASSUME_NONNULL_BEGIN
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeDeviceListWithParams:(MTRReadParams * _Nullable)params;
+- (NSDictionary<NSString *, id> *)readAttributeDeviceTypeListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeServerListWithParams:(MTRReadParams * _Nullable)params;
 
@@ -611,12 +611,12 @@ NS_ASSUME_NONNULL_BEGIN
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeAclWithParams:(MTRReadParams * _Nullable)params;
-- (void)writeAttributeAclWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
-             expectedValueInterval:(NSNumber *)expectedValueIntervalMs;
-- (void)writeAttributeAclWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (NSDictionary<NSString *, id> *)readAttributeACLWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeACLWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+             expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeACLWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                            params:(MTRWriteParams * _Nullable)params;
+                            params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeExtensionWithParams:(MTRReadParams * _Nullable)params;
 - (void)writeAttributeExtensionWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -820,23 +820,24 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster OTA Software Update Provider
  *    Provides an interface for providing OTA software updates
  */
-@interface MTRClusterOtaSoftwareUpdateProvider : MTRCluster
+MTR_NEWLY_AVAILABLE
+@interface MTRClusterOTASoftwareUpdateProvider : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
-- (void)queryImageWithParams:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
+- (void)queryImageWithParams:(MTROTASoftwareUpdateProviderClusterQueryImageParams *)params
               expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
        expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                  completion:(void (^)(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                  completion:(void (^)(MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)applyUpdateRequestWithParams:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
+- (void)applyUpdateRequestWithParams:(MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
                       expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                          completion:(void (^)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                          completion:(void (^)(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
                                          NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
-- (void)notifyUpdateAppliedWithParams:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
+- (void)notifyUpdateAppliedWithParams:(MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
@@ -860,13 +861,14 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster OTA Software Update Requestor
  *    Provides an interface for downloading and applying OTA software updates
  */
-@interface MTRClusterOtaSoftwareUpdateRequestor : MTRCluster
+MTR_NEWLY_AVAILABLE
+@interface MTRClusterOTASoftwareUpdateRequestor : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
-- (void)announceOtaProviderWithParams:(MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
+- (void)announceOtaProviderWithParams:(MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
@@ -3609,26 +3611,29 @@ labels.
 
 - (NSDictionary<NSString *, id> *)readAttributeOccupancySensorTypeBitmapWithParams:(MTRReadParams * _Nullable)params;
 
-- (NSDictionary<NSString *, id> *)readAttributePirOccupiedToUnoccupiedDelayWithParams:(MTRReadParams * _Nullable)params;
-- (void)writeAttributePirOccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
-                                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs;
-- (void)writeAttributePirOccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (NSDictionary<NSString *, id> *)readAttributePIROccupiedToUnoccupiedDelayWithParams:(MTRReadParams * _Nullable)params
+    MTR_NEWLY_AVAILABLE;
+- (void)writeAttributePIROccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributePIROccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                                     params:(MTRWriteParams * _Nullable)params;
+                                                     params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributePirUnoccupiedToOccupiedDelayWithParams:(MTRReadParams * _Nullable)params;
-- (void)writeAttributePirUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
-                                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs;
-- (void)writeAttributePirUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (NSDictionary<NSString *, id> *)readAttributePIRUnoccupiedToOccupiedDelayWithParams:(MTRReadParams * _Nullable)params
+    MTR_NEWLY_AVAILABLE;
+- (void)writeAttributePIRUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributePIRUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                                     params:(MTRWriteParams * _Nullable)params;
+                                                     params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributePirUnoccupiedToOccupiedThresholdWithParams:(MTRReadParams * _Nullable)params;
-- (void)writeAttributePirUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
-                                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs;
-- (void)writeAttributePirUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (NSDictionary<NSString *, id> *)readAttributePIRUnoccupiedToOccupiedThresholdWithParams:(MTRReadParams * _Nullable)params
+    MTR_NEWLY_AVAILABLE;
+- (void)writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                                           expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                                         params:(MTRWriteParams * _Nullable)params;
+                                                         params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeUltrasonicOccupiedToUnoccupiedDelayWithParams:(MTRReadParams * _Nullable)params;
 - (void)writeAttributeUltrasonicOccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
@@ -3692,7 +3697,8 @@ labels.
  * Cluster Wake on LAN
  *    This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol.
  */
-@interface MTRClusterWakeOnLan : MTRCluster
+MTR_NEWLY_AVAILABLE
+@interface MTRClusterWakeOnLAN : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -5303,15 +5309,12 @@ MTR_NEWLY_AVAILABLE
                                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                                       params:(MTRWriteParams * _Nullable)params;
 
-- (NSDictionary<NSString *, id> *)readAttributeWriteOnlyInt8uWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+- (NSDictionary<NSString *, id> *)readAttributeWriteOnlyInt8uWithParams:(MTRReadParams * _Nullable)params;
+- (void)writeAttributeWriteOnlyInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs;
 - (void)writeAttributeWriteOnlyInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                         expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
-- (void)writeAttributeWriteOnlyInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
-                        expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                                       params:(MTRWriteParams * _Nullable)params
-    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+                                       params:(MTRWriteParams * _Nullable)params;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params;
 
@@ -5326,6 +5329,18 @@ MTR_NEWLY_AVAILABLE
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
+@end
+
+MTR_NEWLY_DEPRECATED("Please use MTRClusterOTASoftwareUpdateProvider")
+@interface MTRClusterOtaSoftwareUpdateProvider : MTRClusterOTASoftwareUpdateProvider
+@end
+
+MTR_NEWLY_DEPRECATED("Please use MTRClusterOTASoftwareUpdateRequestor")
+@interface MTRClusterOtaSoftwareUpdateRequestor : MTRClusterOTASoftwareUpdateRequestor
+@end
+
+MTR_NEWLY_DEPRECATED("Please use MTRClusterWakeOnLAN")
+@interface MTRClusterWakeOnLan : MTRClusterWakeOnLAN
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
@@ -5592,6 +5607,8 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                                endpoint:(uint16_t)endpoint
                                   queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
 
+- (NSDictionary<NSString *, id> *)readAttributeDeviceListWithParams:(MTRReadParams * _Nullable)params
+    MTR_NEWLY_DEPRECATED("Please use readAttributeDeviceTypeListWithParams on MTRClusterDescriptor");
 @end
 
 @interface MTRClusterBinding (Deprecated)
@@ -5608,6 +5625,15 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                                endpoint:(uint16_t)endpoint
                                   queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
 
+- (NSDictionary<NSString *, id> *)readAttributeAclWithParams:(MTRReadParams * _Nullable)params
+    MTR_NEWLY_DEPRECATED("Please use readAttributeACLWithParams on MTRClusterAccessControl");
+- (void)writeAttributeAclWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+    MTR_NEWLY_DEPRECATED("Please use writeAtributeACLWithValue on MTRClusterAccessControl");
+- (void)writeAttributeAclWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                            params:(MTRWriteParams * _Nullable)params
+    MTR_NEWLY_DEPRECATED("Please use writeAttributeACLWithValue on MTRClusterAccessControl");
 @end
 
 @interface MTRClusterActions (Deprecated)
@@ -6505,6 +6531,33 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                                endpoint:(uint16_t)endpoint
                                   queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use initWithDevice:endpoindID:queue:");
 
+- (NSDictionary<NSString *, id> *)readAttributePirOccupiedToUnoccupiedDelayWithParams:(MTRReadParams * _Nullable)params
+    MTR_NEWLY_DEPRECATED("Please use readAttributePIROccupiedToUnoccupiedDelayWithParams on MTRClusterOccupancySensing");
+- (void)writeAttributePirOccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+    MTR_NEWLY_DEPRECATED("Please use writeAtributePIROccupiedToUnoccupiedDelayWithValue on MTRClusterOccupancySensing");
+- (void)writeAttributePirOccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                                     params:(MTRWriteParams * _Nullable)params
+    MTR_NEWLY_DEPRECATED("Please use writeAttributePIROccupiedToUnoccupiedDelayWithValue on MTRClusterOccupancySensing");
+- (NSDictionary<NSString *, id> *)readAttributePirUnoccupiedToOccupiedDelayWithParams:(MTRReadParams * _Nullable)params
+    MTR_NEWLY_DEPRECATED("Please use readAttributePIRUnoccupiedToOccupiedDelayWithParams on MTRClusterOccupancySensing");
+- (void)writeAttributePirUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+    MTR_NEWLY_DEPRECATED("Please use writeAtributePIRUnoccupiedToOccupiedDelayWithValue on MTRClusterOccupancySensing");
+- (void)writeAttributePirUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                      expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                                     params:(MTRWriteParams * _Nullable)params
+    MTR_NEWLY_DEPRECATED("Please use writeAttributePIRUnoccupiedToOccupiedDelayWithValue on MTRClusterOccupancySensing");
+- (NSDictionary<NSString *, id> *)readAttributePirUnoccupiedToOccupiedThresholdWithParams:(MTRReadParams * _Nullable)params
+    MTR_NEWLY_DEPRECATED("Please use readAttributePIRUnoccupiedToOccupiedThresholdWithParams on MTRClusterOccupancySensing");
+- (void)writeAttributePirUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+    MTR_NEWLY_DEPRECATED("Please use writeAtributePIRUnoccupiedToOccupiedThresholdWithValue on MTRClusterOccupancySensing");
+- (void)writeAttributePirUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                          expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                                         params:(MTRWriteParams * _Nullable)params
+    MTR_NEWLY_DEPRECATED("Please use writeAttributePIRUnoccupiedToOccupiedThresholdWithValue on MTRClusterOccupancySensing");
 @end
 
 @interface MTRClusterWakeOnLan (Deprecated)
