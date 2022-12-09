@@ -81,7 +81,7 @@ const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Spake2pVerifier = {
     { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipFactory, .subID = 0x000c }
 };
 
-//Keys stored in the Chip-counters namespace
+// Keys stored in the Chip-counters namespace
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_BootCount = {
     { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipCounters, .subID = 0x000d }
 };
