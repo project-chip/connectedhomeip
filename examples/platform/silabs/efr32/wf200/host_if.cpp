@@ -543,7 +543,6 @@ static void wfx_events_task(void * p_arg)
             if (!retryInProgress)
             {
                 retryInProgress = true;
-                
                 if (!is_disconnection_event)
                 {
                     /* After the reboot or a commissioning time device failed to connect with AP.
