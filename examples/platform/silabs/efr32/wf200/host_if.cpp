@@ -543,21 +543,13 @@ static void wfx_events_task(void * p_arg)
             if (!retryInProgress)
             {
                 retryInProgress = true;
-                if (wfx_is_sta_provisioned())
-                {
-                    SILABS_LOG("%s: Station is provisioned", __func__);
-                }
-                else
-                {
-                    SILABS_LOG("%s: Station not provisioned", __func__);
-                }
-
+                
                 if (!is_disconnection_event)
                 {
                     /* After the reboot or a commissioning time device failed to connect with AP.
                      * Device will retry to connect with AP upto WFX_RSI_CONFIG_MAX_JOIN retries.
                      */
-                    SILABS_LOG("%s: retry after %d sec", __func__, CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
+                    SILABS_LOG("%s: Next attempt after %d sec", __func__, CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
                     if (retryJoin < MAX_JOIN_RETRIES_COUNT)
                         vTaskDelay(WLAN_RETRY_TIMER_MS);
                 }
@@ -568,17 +560,17 @@ static void wfx_events_task(void * p_arg)
                      * intervals are telescopic. If interval exceed WLAN_MAX_RETRY_TIMER_MS then it will try to
                      * reconnect at WLAN_MAX_RETRY_TIMER_MS intervals.
                      */
-                    if (retryInterval < WLAN_MAX_RETRY_TIMER_MS)
+                    if (retryInterval > WLAN_MAX_RETRY_TIMER_MS)
                     {
-                        SILABS_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(retryInterval));
+                        retryInterval = WLAN_MAX_RETRY_TIMER_MS;
+                        SILABS_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(WLAN_MAX_RETRY_TIMER_MS));
                     }
                     else
                     {
-                        SILABS_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(WLAN_MAX_RETRY_TIMER_MS));
+                        SILABS_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(retryInterval));
                     }
 
-                    vTaskDelay(retryInterval < WLAN_MAX_RETRY_TIMER_MS ? pdMS_TO_TICKS(retryInterval)
-                                                                       : pdMS_TO_TICKS(retryInterval = WLAN_MAX_RETRY_TIMER_MS));
+                    vTaskDelay(pdMS_TO_TICKS(retryInterval));
                     retryInterval += retryInterval;
                 }
                 SILABS_LOG("WFX sending the connect command");
