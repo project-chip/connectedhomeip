@@ -77,7 +77,7 @@ void app_button_event_handler(const button_manager_button_t * button_mgr, button
     ChipLogProgress(Zcl, "app_button_event_handler. button=%d, event=%d, state=%d\n",
                     button_mgr[ON_OFF_BUTTON].configuration->button, event, state);
 
-    /* This app is intersted in PLATFORM_BUTTON_1 only */
+    /* This app is interested in PLATFORM_BUTTON_1 only */
     if (button_mgr[0].configuration->button != PLATFORM_BUTTON_1)
         return;
 
