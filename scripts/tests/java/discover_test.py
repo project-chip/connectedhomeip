@@ -17,7 +17,6 @@
 #    limitations under the License.
 #
 
-# Discovery test.
 import logging
 import os
 import sys
@@ -26,7 +25,7 @@ import queue
 import subprocess
 import threading
 import typing
-from optparse import OptionParser
+import argparse
 from colorama import Fore, Style
 from java.base import DumpProgramOutputToQueue
 
@@ -37,46 +36,24 @@ class DiscoverTest:
         self.queue = queue
         self.command = cmd
 
-        optParser = OptionParser()
-        optParser.add_option(
-            "--nodeid",
-            action="store",
-            dest="nodeid",
-            default='1',
-            type='str',
-            help="DNS-SD name corresponding with the given node ID",
-            metavar="<nodeid>"
-        )
-        optParser.add_option(
-            "--fabricid",
-            action="store",
-            dest="fabricid",
-            default='1',
-            type='str',
-            help="DNS-SD name corresponding with the given fabric ID",
-            metavar="<nodeid>"
-        )
-        optParser.add_option(
-            "-p",
-            "--paa-trust-store-path",
-            action="store",
-            dest="paaTrustStorePath",
-            default='',
-            type='str',
-            help="Path that contains valid and trusted PAA Root Certificates.",
-            metavar="<paa-trust-store-path>"
-        )
+        parser = argparse.ArgumentParser(description='Process discover arguments.')
 
-        (options, remainingArgs) = optParser.parse_args(args.split())
+        parser.add_argument('command', help="Command name")
+        parser.add_argument('-n', '--nodeid', help="DNS-SD name corresponding with the given node ID", default='1')
+        parser.add_argument('-f', '--fabricid', help="DNS-SD name corresponding with the given fabric ID", default='1')
+        parser.add_argument('-p', '--paa-trust-store-path', dest='paa_trust_store_path',
+                            help="Path that contains valid and trusted PAA Root Certificates")
 
-        self.nodeid = options.nodeid
-        self.fabricid = options.fabricid
+        args = parser.parse_args(args.split())
+
+        self.command_name = args.command
+        self.nodeid = args.nodeid
+        self.fabricid = args.fabricid
 
         logging.basicConfig(level=logging.INFO)
 
     def TestCmdCommissionables(self):
         java_command = self.command + ['discover', 'commissionables']
-        print(java_command)
         logging.info(f"Execute: {java_command}")
         java_process = subprocess.Popen(
             java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -85,10 +62,12 @@ class DiscoverTest:
 
     def RunTest(self):
         logging.info("Testing discovering commissionables devices")
-        java_exit_code = self.TestCmdCommissionables()
-        if java_exit_code != 0:
-            logging.error("Testing command commissionables failed with error %r" % java_exit_code)
-            return java_exit_code
+
+        if self.command_name == 'commissionables':
+            java_exit_code = self.TestCmdCommissionables()
+            if java_exit_code != 0:
+                logging.error("Testing command commissionables failed with error %r" % java_exit_code)
+                return java_exit_code
 
         # Testing complete without errors
         return 0

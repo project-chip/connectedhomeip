@@ -17,7 +17,6 @@
 #    limitations under the License.
 #
 
-# Commissioning test.
 import logging
 import os
 import sys
