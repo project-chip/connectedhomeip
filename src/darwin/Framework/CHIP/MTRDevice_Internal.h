@@ -33,6 +33,9 @@ typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 - (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs;
 
+// called by controller to clean up and shutdown
+- (void)invalidate;
+
 @property (nonatomic, readonly) MTRDeviceController * deviceController;
 @property (nonatomic, readonly, copy) NSNumber * nodeID;
 // Queue used for various internal bookkeeping work.  In general endWork calls

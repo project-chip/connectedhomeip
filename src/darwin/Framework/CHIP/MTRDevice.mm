@@ -130,11 +130,17 @@ private:
 #pragma mark - MTRDevice
 @interface MTRDevice ()
 @property (nonatomic, readonly) os_unfair_lock lock; // protects the caches and device state
+@property (nonatomic) chip::FabricIndex fabricIndex;
 @property (nonatomic) MTRWeakReference<id<MTRDeviceDelegate>> * weakDelegate;
 @property (nonatomic) dispatch_queue_t delegateQueue;
 @property (nonatomic) NSArray<NSDictionary<NSString *, id> *> * unreportedEvents;
 
 @property (nonatomic) BOOL subscriptionActive;
+
+#define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS (1)
+#define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS (3600)
+@property (nonatomic) uint32_t lastSubscriptionAttemptWait;
+@property (nonatomic) BOOL reattemptingSubscription;
 
 // Read cache is attributePath => NSDictionary of value.
 // See MTRDeviceResponseHandler definition for value dictionary details.
@@ -154,14 +160,21 @@ private:
     if (self = [super init]) {
         _lock = OS_UNFAIR_LOCK_INIT;
         _nodeID = [nodeID copy];
+        _fabricIndex = controller.fabricIndex;
         _deviceController = controller;
         _queue = dispatch_queue_create("com.apple.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL);
         _readCache = [NSMutableDictionary dictionary];
         _expectedValueCache = [NSMutableDictionary dictionary];
         _asyncCallbackWorkQueue = [[MTRAsyncCallbackWorkQueue alloc] initWithContext:self queue:_queue];
         _state = MTRDeviceStateUnknown;
+        MTR_LOG_INFO("%@ init with hex nodeID 0x%016llX", self, _nodeID.unsignedLongLongValue);
     }
     return self;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<MTRDevice: %p>[fabric: %u, nodeID: %@]", self, _fabricIndex, _nodeID];
 }
 
 + (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
@@ -177,11 +190,22 @@ private:
 
 - (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
 {
+    MTR_LOG_INFO("%@ setDelegate %@", self, delegate);
     os_unfair_lock_lock(&self->_lock);
 
     _weakDelegate = [MTRWeakReference weakReferenceWithObject:delegate];
     _delegateQueue = queue;
-    [self setupSubscription];
+    [self _setupSubscription];
+
+    os_unfair_lock_unlock(&self->_lock);
+}
+
+- (void)invalidate
+{
+    MTR_LOG_INFO("%@ invalidate", self);
+    os_unfair_lock_lock(&self->_lock);
+
+    _weakDelegate = nil;
 
     os_unfair_lock_unlock(&self->_lock);
 }
@@ -189,6 +213,9 @@ private:
 - (void)_handleSubscriptionEstablished
 {
     os_unfair_lock_lock(&self->_lock);
+
+    // reset subscription attempt wait time when subscription succeeds
+    _lastSubscriptionAttemptWait = 0;
 
     _state = MTRDeviceStateReachable;
     id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
@@ -206,6 +233,7 @@ private:
     os_unfair_lock_lock(&self->_lock);
 
     _subscriptionActive = NO;
+    _unreportedEvents = nil;
 
     id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
     if (delegate) {
@@ -235,7 +263,43 @@ private:
 
 - (void)_handleSubscriptionReset
 {
-    // TODO: logic to reattempt subscription with exponential back off
+    os_unfair_lock_lock(&self->_lock);
+    // if there is no delegate then also do not retry
+    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
+    if (!delegate) {
+        MTR_LOG_INFO("%@ no delegate - do not reattempt subscription", self);
+        os_unfair_lock_unlock(&self->_lock);
+        return;
+    }
+
+    // don't schedule multiple retries
+    if (self.reattemptingSubscription) {
+        MTR_LOG_INFO("%@ already reattempting subscription", self);
+        os_unfair_lock_unlock(&self->_lock);
+        return;
+    }
+
+    self.reattemptingSubscription = YES;
+
+    if (_lastSubscriptionAttemptWait < MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS) {
+        _lastSubscriptionAttemptWait = MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS;
+    } else {
+        _lastSubscriptionAttemptWait *= 2;
+        if (_lastSubscriptionAttemptWait > MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS) {
+            _lastSubscriptionAttemptWait = MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS;
+        }
+    }
+
+    MTR_LOG_INFO("%@ scheduling to reattempt subscription in %u seconds", self, _lastSubscriptionAttemptWait);
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_lastSubscriptionAttemptWait * NSEC_PER_SEC)), self.queue, ^{
+        os_unfair_lock_lock(&self->_lock);
+        MTR_LOG_INFO("%@ reattempting subscription", self);
+        self.reattemptingSubscription = NO;
+        [self _setupSubscription];
+        os_unfair_lock_unlock(&self->_lock);
+    });
+
+    os_unfair_lock_unlock(&self->_lock);
 }
 
 // assume lock is held
@@ -256,6 +320,7 @@ private:
 {
     os_unfair_lock_lock(&self->_lock);
 
+    // _getAttributesToReportWithReportedValues will log attribute paths reported
     [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport]];
 
     os_unfair_lock_unlock(&self->_lock);
@@ -284,8 +349,11 @@ private:
     os_unfair_lock_unlock(&self->_lock);
 }
 
-- (void)setupSubscription
+// assume lock is held
+- (void)_setupSubscription
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+
     // for now just subscribe once
     if (_subscriptionActive) {
         return;
@@ -293,113 +361,113 @@ private:
 
     _subscriptionActive = YES;
 
-    [_deviceController
-        getSessionForNode:_nodeID.unsignedLongLongValue
-               completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
-                   const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
-                   if (error != nil) {
-                       MTR_LOG_INFO("MTRDevice getSessionForNode error %@", error);
-                       dispatch_async(self.queue, ^{
-                           [self _handleSubscriptionError:error];
-                       });
-                       return;
-                   }
+    [_deviceController getSessionForNode:_nodeID.unsignedLongLongValue
+                              completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
+                                  const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
+                                  if (error != nil) {
+                                      MTR_LOG_INFO("%@ getSessionForNode error %@", self, error);
+                                      dispatch_async(self.queue, ^{
+                                          [self _handleSubscriptionError:error];
+                                          [self _handleSubscriptionReset];
+                                      });
+                                      return;
+                                  }
 
-                   // Wildcard endpoint, cluster, attribute, event.
-                   auto attributePath = std::make_unique<AttributePathParams>();
-                   auto eventPath = std::make_unique<EventPathParams>();
-                   // We want to get event reports at the minInterval, not the maxInterval.
-                   eventPath->mIsUrgentEvent = true;
-                   ReadPrepareParams readParams(session.Value());
+                                  // Wildcard endpoint, cluster, attribute, event.
+                                  auto attributePath = std::make_unique<AttributePathParams>();
+                                  auto eventPath = std::make_unique<EventPathParams>();
+                                  // We want to get event reports at the minInterval, not the maxInterval.
+                                  eventPath->mIsUrgentEvent = true;
+                                  ReadPrepareParams readParams(session.Value());
 
-                   readParams.mMinIntervalFloorSeconds = 0;
-                   // Select a max interval based on the device's claimed idle sleep interval.
-                   auto idleSleepInterval = std::chrono::duration_cast<System::Clock::Seconds32>(
-                       session.Value()->GetRemoteMRPConfig().mIdleRetransTimeout);
-                   if (idleSleepInterval.count() < MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN) {
-                       idleSleepInterval = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN);
-                   }
-                   if (idleSleepInterval.count() > MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX) {
-                       idleSleepInterval = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX);
-                   }
-                   readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>(idleSleepInterval.count());
+                                  readParams.mMinIntervalFloorSeconds = 0;
+                                  // Select a max interval based on the device's claimed idle sleep interval.
+                                  auto idleSleepInterval = std::chrono::duration_cast<System::Clock::Seconds32>(
+                                      session.Value()->GetRemoteMRPConfig().mIdleRetransTimeout);
+                                  if (idleSleepInterval.count() < MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN) {
+                                      idleSleepInterval = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN);
+                                  }
+                                  if (idleSleepInterval.count() > MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX) {
+                                      idleSleepInterval = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX);
+                                  }
+                                  readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>(idleSleepInterval.count());
 
-                   readParams.mpAttributePathParamsList = attributePath.get();
-                   readParams.mAttributePathParamsListSize = 1;
-                   readParams.mpEventPathParamsList = eventPath.get();
-                   readParams.mEventPathParamsListSize = 1;
-                   readParams.mKeepSubscriptions = true;
-                   readParams.mIsFabricFiltered = false;
-                   attributePath.release();
-                   eventPath.release();
+                                  readParams.mpAttributePathParamsList = attributePath.get();
+                                  readParams.mAttributePathParamsListSize = 1;
+                                  readParams.mpEventPathParamsList = eventPath.get();
+                                  readParams.mEventPathParamsListSize = 1;
+                                  readParams.mKeepSubscriptions = true;
+                                  readParams.mIsFabricFiltered = false;
+                                  attributePath.release();
+                                  eventPath.release();
 
-                   std::unique_ptr<SubscriptionCallback> callback;
-                   std::unique_ptr<ReadClient> readClient;
-                   std::unique_ptr<ClusterStateCache> clusterStateCache;
-                   callback = std::make_unique<SubscriptionCallback>(
-                       ^(NSArray * value) {
-                           MTR_LOG_INFO("MTRDevice got attribute report %@", value);
-                           dispatch_async(self.queue, ^{
-                               // OnAttributeData (after OnReportEnd)
-                               [self _handleAttributeReport:value];
-                           });
-                       },
-                       ^(NSArray * value) {
-                           MTR_LOG_INFO("MTRDevice got event report %@", value);
-                           dispatch_async(self.queue, ^{
-                               // OnEventReport (after OnReportEnd)
-                               [self _handleEventReport:value];
-                           });
-                       },
-                       ^(NSError * error) {
-                           MTR_LOG_INFO("MTRDevice got subscription error %@", error);
-                           dispatch_async(self.queue, ^{
-                               // OnError
-                               [self _handleSubscriptionError:error];
-                           });
-                       },
-                       ^(NSError * error, NSNumber * resubscriptionDelay) {
-                           MTR_LOG_INFO("MTRDevice got resubscription error %@ delay %@", error, resubscriptionDelay);
-                           dispatch_async(self.queue, ^{
-                               // OnResubscriptionNeeded
-                               [self _handleResubscriptionNeeded];
-                           });
-                       },
-                       ^(void) {
-                           MTR_LOG_INFO("MTRDevice got subscription established");
-                           dispatch_async(self.queue, ^{
-                               // OnSubscriptionEstablished
-                               [self _handleSubscriptionEstablished];
-                           });
-                       },
-                       ^(void) {
-                           MTR_LOG_INFO("MTRDevice got subscription done");
-                           dispatch_async(self.queue, ^{
-                               // OnDone
-                               [self _handleSubscriptionReset];
-                           });
-                       });
-                   readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
-                       callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+                                  std::unique_ptr<SubscriptionCallback> callback;
+                                  std::unique_ptr<ReadClient> readClient;
+                                  std::unique_ptr<ClusterStateCache> clusterStateCache;
+                                  callback = std::make_unique<SubscriptionCallback>(
+                                      ^(NSArray * value) {
+                                          MTR_LOG_INFO("%@ got attribute report %@", self, value);
+                                          dispatch_async(self.queue, ^{
+                                              // OnAttributeData (after OnReportEnd)
+                                              [self _handleAttributeReport:value];
+                                          });
+                                      },
+                                      ^(NSArray * value) {
+                                          MTR_LOG_INFO("%@ got event report %@", self, value);
+                                          dispatch_async(self.queue, ^{
+                                              // OnEventReport (after OnReportEnd)
+                                              [self _handleEventReport:value];
+                                          });
+                                      },
+                                      ^(NSError * error) {
+                                          MTR_LOG_INFO("%@ got subscription error %@", self, error);
+                                          dispatch_async(self.queue, ^{
+                                              // OnError
+                                              [self _handleSubscriptionError:error];
+                                          });
+                                      },
+                                      ^(NSError * error, NSNumber * resubscriptionDelay) {
+                                          MTR_LOG_INFO("%@ got resubscription error %@ delay %@", self, error, resubscriptionDelay);
+                                          dispatch_async(self.queue, ^{
+                                              // OnResubscriptionNeeded
+                                              [self _handleResubscriptionNeeded];
+                                          });
+                                      },
+                                      ^(void) {
+                                          MTR_LOG_INFO("%@ got subscription established", self);
+                                          dispatch_async(self.queue, ^{
+                                              // OnSubscriptionEstablished
+                                              [self _handleSubscriptionEstablished];
+                                          });
+                                      },
+                                      ^(void) {
+                                          MTR_LOG_INFO("%@ got subscription done", self);
+                                          dispatch_async(self.queue, ^{
+                                              // OnDone
+                                              [self _handleSubscriptionReset];
+                                          });
+                                      });
+                                  readClient = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), exchangeManager,
+                                      callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
 
-                   // SendAutoResubscribeRequest cleans up the params, even on failure.
-                   CHIP_ERROR err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+                                  // SendAutoResubscribeRequest cleans up the params, even on failure.
+                                  CHIP_ERROR err = readClient->SendAutoResubscribeRequest(std::move(readParams));
 
-                   if (err != CHIP_NO_ERROR) {
-                       NSError * error = [MTRError errorForCHIPErrorCode:err];
-                       MTR_LOG_INFO("MTRDevice SendAutoResubscribeRequest error %@", error);
-                       dispatch_async(self.queue, ^{
-                           [self _handleSubscriptionError:error];
-                       });
+                                  if (err != CHIP_NO_ERROR) {
+                                      NSError * error = [MTRError errorForCHIPErrorCode:err];
+                                      MTR_LOG_INFO("%@ SendAutoResubscribeRequest error %@", self, error);
+                                      dispatch_async(self.queue, ^{
+                                          [self _handleSubscriptionError:error];
+                                      });
 
-                       return;
-                   }
+                                      return;
+                                  }
 
-                   // Callback and ReadClient will be deleted when OnDone is called or an error is
-                   // encountered.
-                   callback->AdoptReadClient(std::move(readClient));
-                   callback.release();
-               }];
+                                  // Callback and ReadClient will be deleted when OnDone is called or an error is
+                                  // encountered.
+                                  callback->AdoptReadClient(std::move(readClient));
+                                  callback.release();
+                              }];
 }
 
 #pragma mark Device Interactions
@@ -408,8 +476,7 @@ private:
                                                   attributeID:(NSNumber *)attributeID
                                                        params:(MTRReadParams *)params
 {
-    NSString * logPrefix = [NSString
-        stringWithFormat:@"MTRDevice read %u %@ %@ %@", _deviceController.fabricIndex, endpointID, clusterID, attributeID];
+    NSString * logPrefix = [NSString stringWithFormat:@"%@ read %@ %@ %@", self, endpointID, clusterID, attributeID];
     // Create work item, set ready handler to perform task, then enqueue the work
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
@@ -460,8 +527,7 @@ private:
                expectedValueInterval:(NSNumber *)expectedValueInterval
                    timedWriteTimeout:(NSNumber * _Nullable)timeout
 {
-    NSString * logPrefix = [NSString
-        stringWithFormat:@"MTRDevice write %u %@ %@ %@", _deviceController.fabricIndex, endpointID, clusterID, attributeID];
+    NSString * logPrefix = [NSString stringWithFormat:@"%@ write %@ %@ %@", self, endpointID, clusterID, attributeID];
     if (timeout) {
         timeout = MTRClampedNumber(timeout, @(1), @(UINT16_MAX));
     }
@@ -505,8 +571,7 @@ private:
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
 {
-    NSString * logPrefix = [NSString
-        stringWithFormat:@"MTRDevice command %u %@ %@ %@", _deviceController.fabricIndex, endpointID, clusterID, commandID];
+    NSString * logPrefix = [NSString stringWithFormat:@"%@ command %@ %@ %@", self, endpointID, clusterID, commandID];
     if (timeout) {
         timeout = MTRClampedNumber(timeout, @(1), @(UINT16_MAX));
     }
@@ -586,6 +651,7 @@ private:
 
     // remove from expected value cache and report attributes as needed
     NSMutableArray * attributesToReport = [NSMutableArray array];
+    NSMutableArray * attributePathsToReport = [NSMutableArray array];
     for (MTRPair<MTRAttributePath *, NSDictionary *> * attributeInfo in attributeInfoToRemove) {
         // compare with known value and mark for report if different
         MTRAttributePath * attributePath = attributeInfo.first;
@@ -594,10 +660,14 @@ private:
         if (cachedAttributeDataValue
             && ![self _attributeDataValue:attributeDataValue isEqualToDataValue:cachedAttributeDataValue]) {
             [attributesToReport addObject:@{ MTRAttributePathKey : attributePath, MTRDataKey : cachedAttributeDataValue }];
+            [attributePathsToReport addObject:attributePath];
         }
 
         _expectedValueCache[attributePath] = nil;
     }
+
+    // log attribute paths
+    MTR_LOG_INFO("%@ report from expired expected values %@", self, attributePathsToReport);
     [self _reportAttributes:attributesToReport];
 
 // Have a reasonable minimum wait time for expiration timers
@@ -654,8 +724,8 @@ private:
         return cachedAttributeValue;
     } else {
         // TODO: when not found in cache, generated default values should be used
-        MTR_LOG_INFO(
-            "_attributeValueDictionaryForAttributePath: could not find cached attribute values for attribute %@", attributePath);
+        MTR_LOG_INFO("%@ _attributeValueDictionaryForAttributePath: could not find cached attribute values for attribute %@", self,
+            attributePath);
     }
 
     os_unfair_lock_unlock(&self->_lock);
@@ -676,6 +746,7 @@ private:
     os_unfair_lock_assert_owner(&self->_lock);
 
     NSMutableArray * attributesToReport = [NSMutableArray array];
+    NSMutableArray * attributePathsToReport = [NSMutableArray array];
     for (NSDictionary<NSString *, id> * attributeReponseValue in reportedAttributeValues) {
         MTRAttributePath * attributePath = attributeReponseValue[MTRAttributePathKey];
         NSDictionary * attributeDataValue = attributeReponseValue[MTRDataKey];
@@ -692,7 +763,7 @@ private:
         // if this is an error, report and purge cache
         if (attributeError) {
             shouldReportAttribute = YES;
-            MTR_LOG_INFO("MTRDevice report %@ error %@ purge expected value %@ read cache %@", attributePath, attributeError,
+            MTR_LOG_INFO("%@ report %@ error %@ purge expected value %@ read cache %@", self, attributePath, attributeError,
                 _expectedValueCache[attributePath], _readCache[attributePath]);
             _expectedValueCache[attributePath] = nil;
             _readCache[attributePath] = nil;
@@ -713,17 +784,20 @@ private:
 
             if (!shouldReportAttribute) {
                 if (expectedValue) {
-                    MTR_LOG_INFO("MTRDevice report %@ value filtered - same as expected values", attributePath);
+                    MTR_LOG_INFO("%@ report %@ value filtered - same as expected values", self, attributePath);
                 } else {
-                    MTR_LOG_INFO("MTRDevice report %@ value filtered - same values as cache", attributePath);
+                    MTR_LOG_INFO("%@ report %@ value filtered - same values as cache", self, attributePath);
                 }
             }
         }
 
         if (shouldReportAttribute) {
             [attributesToReport addObject:attributeReponseValue];
+            [attributePathsToReport addObject:attributePath];
         }
     }
+
+    MTR_LOG_INFO("%@ report from reported values %@", self, attributePathsToReport);
 
     return attributesToReport;
 }
@@ -735,6 +809,7 @@ private:
     os_unfair_lock_assert_owner(&self->_lock);
 
     NSMutableArray * attributesToReport = [NSMutableArray array];
+    NSMutableArray * attributePathsToReport = [NSMutableArray array];
     for (NSDictionary<NSString *, id> * attributeReponseValue in expectedAttributeValues) {
         MTRAttributePath * attributePath = attributeReponseValue[MTRAttributePathKey];
         NSDictionary * attributeDataValue = attributeReponseValue[MTRDataKey];
@@ -758,8 +833,11 @@ private:
 
         if (shouldReportAttribute) {
             [attributesToReport addObject:attributeReponseValue];
+            [attributePathsToReport addObject:attributePath];
         }
     }
+
+    MTR_LOG_INFO("%@ report from new expected values %@", self, attributePathsToReport);
 
     return attributesToReport;
 }
@@ -770,8 +848,9 @@ private:
     NSDate * expirationTime = [NSDate dateWithTimeIntervalSinceNow:expectedValueInterval.doubleValue / 1000];
 
     os_unfair_lock_lock(&self->_lock);
-    NSArray * attributesToReport = [self _getAttributesToReportWithNewExpectedValues:values expirationTime:expirationTime];
 
+    // _getAttributesToReportWithNewExpectedValues will log attribute paths reported
+    NSArray * attributesToReport = [self _getAttributesToReportWithNewExpectedValues:values expirationTime:expirationTime];
     [self _reportAttributes:attributesToReport];
 
     [self _checkExpiredExpectedValues];
