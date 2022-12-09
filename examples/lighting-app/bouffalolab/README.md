@@ -106,7 +106,7 @@ and BL706 develop board `XT-ZB6-DevKit`.
 
     > Note, different build options will generate different output folder.
 
-    > Note, make sure terminal is under Matter build environment.
+    > Note, make sure terminal is under Matter build environment. If not, python tool `bflb-iot-tool` should be install as `pip3 install bflb-iot-tool`.
 
     Download operation steps as below, please check `help` option of script for
     more detail.
@@ -145,7 +145,7 @@ and BL706 develop board `XT-ZB6-DevKit`.
             > Note, better to append --erase option to download image for BL602
             > develop board at first time.
 
--   Using `Bouffalo Lab` GUI flash tool`BLDevCube`
+-   Using `Bouffalo Lab` GUI flash tool `BLDevCube`, please download on [this page](https://dev.bouffalolab.com/download).
     -   Hold BOOT pin and reset chip, put the board in download mode.
     -   Select `DTS` file;
     -   Select Partition Table under
