@@ -224,17 +224,16 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
              * are telescopic. If interval exceed WLAN_MAX_RETRY_TIMER_MS then it will try to reconnect at
              * WLAN_MAX_RETRY_TIMER_MS intervals.
              */
-            if (retryInterval < WLAN_MAX_RETRY_TIMER_MS)
+            if (retryInterval > WLAN_MAX_RETRY_TIMER_MS)
             {
-                WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(retryInterval));
+                retryInterval = WLAN_MAX_RETRY_TIMER_MS;
+                WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(WLAN_MAX_RETRY_TIMER_MS));
             }
             else
             {
-                WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(WLAN_MAX_RETRY_TIMER_MS));
+                WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(retryInterval));
             }
-
-            vTaskDelay(retryInterval < WLAN_MAX_RETRY_TIMER_MS ? pdMS_TO_TICKS(retryInterval)
-                                                               : pdMS_TO_TICKS(retryInterval = WLAN_MAX_RETRY_TIMER_MS));
+            vTaskDelay(pdMS_TO_TICKS(retryInterval));
             retryInterval += retryInterval;
             xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
         }
@@ -542,21 +541,21 @@ static void wfx_rsi_do_join(void)
                 else
                 {
                     /* After disconnection
-                     * At the telescopic time interval device try to reconnect with AP, upto WLAN_MAX_RETRY_TIMER_MS intervals
-                     * are telescopic. If interval exceed WLAN_MAX_RETRY_TIMER_MS then it will try to reconnect at
-                     * WLAN_MAX_RETRY_TIMER_MS intervals.
+                     * At the telescopic time interval device try to reconnect with AP, upto WLAN_MAX_RETRY_TIMER_MS
+                     * intervals are telescopic. If interval exceed WLAN_MAX_RETRY_TIMER_MS then it will try to
+                     * reconnect at WLAN_MAX_RETRY_TIMER_MS intervals.
                      */
-                    if (retryInterval < WLAN_MAX_RETRY_TIMER_MS)
+                    if (retryInterval > WLAN_MAX_RETRY_TIMER_MS)
                     {
-                        WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(retryInterval));
+                        retryInterval = WLAN_MAX_RETRY_TIMER_MS;
+                        WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(WLAN_MAX_RETRY_TIMER_MS));
                     }
                     else
                     {
-                        WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(WLAN_MAX_RETRY_TIMER_MS));
+                        WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(retryInterval));
                     }
 
-                    vTaskDelay(retryInterval < WLAN_MAX_RETRY_TIMER_MS ? pdMS_TO_TICKS(retryInterval)
-                                                                       : pdMS_TO_TICKS(retryInterval = WLAN_MAX_RETRY_TIMER_MS));
+                    vTaskDelay(pdMS_TO_TICKS(retryInterval));
                     retryInterval += retryInterval;
                 }
                 wfx_rsi.join_retries++;
