@@ -222,7 +222,7 @@ class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
                  enable_ipv4=True, enable_ble=True, enable_wifi=True,
-                 enable_thread=True, use_tsan=False, use_asan=False,
+                 enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
                  separate_event_loop=True, use_libfuzzer=False, use_clang=False,
                  interactive_mode=True, extra_tests=False,
                  use_platform_mdns=False, enable_rpcs=False,
@@ -259,6 +259,9 @@ class HostBuilder(GnBuilder):
 
         if use_asan:
             self.extra_gn_options.append('is_asan=true')
+
+        if use_ubsan:
+            self.extra_gn_options.append('is_ubsan=true')
 
         if use_dmalloc:
             self.extra_gn_options.append('chip_config_memory_debug_checks=true')
