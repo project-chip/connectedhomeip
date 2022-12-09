@@ -28,6 +28,7 @@ import subprocess
 import sys
 from java.base import DumpProgramOutputToQueue
 from java.commissioning_test import CommissioningTest
+from java.discover_test import DiscoverTest
 from colorama import Fore, Style
 
 
@@ -87,6 +88,14 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
         logging.info("Testing pairing cluster")
 
         test = CommissioningTest(log_cooking_threads, log_queue, command, tool_args)
+        controller_exit_code = test.RunTest()
+
+        if controller_exit_code != 0:
+            logging.error("Test script exited with error %r" % test_script_exit_code)
+    elif tool_cluster == 'discover':
+        logging.info("Testing discover cluster")
+
+        test = DiscoverTest(log_cooking_threads, log_queue, command, tool_args)
         controller_exit_code = test.RunTest()
 
         if controller_exit_code != 0:
