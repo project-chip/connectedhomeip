@@ -216,19 +216,37 @@ void GenericPlatformManagerImpl<ImplClass>::_HandleServerShuttingDown()
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl<ImplClass>::_ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg)
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg)
 {
-    ChipDeviceEvent event;
-    event.Type                    = DeviceEventType::kCallWorkFunct;
-    event.CallWorkFunct.WorkFunct = workFunct;
-    event.CallWorkFunct.Arg       = arg;
+    ChipDeviceEvent event{
+        .Type = DeviceEventType::kCallWorkFunct,
+        .CallWorkFunct {.Arg = arg, .WorkFunct = workFunct}
+    };
 
-    CHIP_ERROR status = Impl()->PostEvent(&event);
-    if (status != CHIP_NO_ERROR)
+    CHIP_ERROR err = Impl()->PostEvent(&event);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Failed to schedule work: %" CHIP_ERROR_FORMAT, status.Format());
+        ChipLogError(DeviceLayer, "Failed to schedule work: %" CHIP_ERROR_FORMAT, err.Format());
     }
+    return err;
 }
+
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_ScheduleBackgroundWork(AsyncWorkFunct workFunct, intptr_t arg)
+{
+    ChipDeviceEvent event{
+        .Type = DeviceEventType::kCallWorkFunct,
+        .CallWorkFunct {.Arg = arg, .WorkFunct = workFunct}
+    };
+    auto err = Impl()->PostEvent(&event);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to schedule background work: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    return err;
+}
+#endif
 
 template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent * event)

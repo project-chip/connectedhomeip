@@ -919,6 +919,12 @@ public:
                                  FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
                                  Crypto::P256PublicKey * outRootPublicKey = nullptr) const;
 
+    // Verifies credentials, using the provided root certificate.
+    // This call is done whenever a fabric is "directly" added
+    static CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
+                                        Credentials::ValidationContext & context, CompressedFabricId & outCompressedFabricId,
+                                        FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
+                                        Crypto::P256PublicKey * outRootPublicKey = nullptr);
     /**
      * @brief Enables FabricInfo instances to collide and reference the same logical fabric (i.e Root Public Key + FabricId).
      *
@@ -1092,13 +1098,6 @@ private:
         return mPendingFabric.IsInitialized() &&
             mStateFlags.HasAll(StateFlags::kIsPendingFabricDataPresent, StateFlags::kIsUpdatePending);
     }
-
-    // Verifies credentials, using the provided root certificate.
-    // This call is done whenever a fabric is "directly" added
-    static CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
-                                        Credentials::ValidationContext & context, CompressedFabricId & outCompressedFabricId,
-                                        FabricId & outFabricId, NodeId & outNodeId, Crypto::P256PublicKey & outNocPubkey,
-                                        Crypto::P256PublicKey * outRootPublicKey);
 
     // Validate an NOC chain at time of adding/updating a fabric (uses VerifyCredentials with additional checks).
     // The `existingFabricId` is passed for UpdateNOC, and must match the Fabric, to make sure that we are

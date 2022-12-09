@@ -60,27 +60,43 @@ class GenericPlatformManagerImpl_FreeRTOS : public GenericPlatformManagerImpl<Im
 protected:
     TimeOut_t mNextTimerBaseTime;
     TickType_t mNextTimerDurationTicks;
-    SemaphoreHandle_t mChipStackLock = NULL;
-    QueueHandle_t mChipEventQueue    = NULL;
-    TaskHandle_t mEventLoopTask      = NULL;
     bool mChipTimerActive;
+
+    SemaphoreHandle_t mChipStackLock = NULL;
+
+    QueueHandle_t mChipEventQueue = NULL;
+    TaskHandle_t mEventLoopTask   = NULL;
+
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
+    QueueHandle_t mBackgroundEventQueue   = NULL;
+    TaskHandle_t mBackgroundEventLoopTask = NULL;
+#endif
 
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack();
+    void _Shutdown(void);
+
     void _LockChipStack(void);
     bool _TryLockChipStack(void);
     void _UnlockChipStack(void);
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
+    bool _IsChipStackLockedByCurrentThread() const;
+#endif
+
+    CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
+
     CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
     void _RunEventLoop(void);
     CHIP_ERROR _StartEventLoopTask(void);
     CHIP_ERROR _StopEventLoopTask();
-    CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
-    void _Shutdown(void);
 
-#if CHIP_STACK_LOCK_TRACKING_ENABLED
-    bool _IsChipStackLockedByCurrentThread() const;
-#endif // CHIP_STACK_LOCK_TRACKING_ENABLED
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
+    CHIP_ERROR _PostBackgroundEvent(const ChipDeviceEvent * event);
+    void _RunBackgroundEventLoop(void);
+    CHIP_ERROR _StartBackgroundEventLoopTask(void);
+    CHIP_ERROR _StopBackgroundEventLoopTask();
+#endif
 
     // ===== Methods available to the implementation subclass.
 
@@ -92,16 +108,27 @@ private:
     inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 
     static void EventLoopTaskMain(void * arg);
-
+    std::atomic<bool> mShouldRunEventLoop;
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE) && CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE
     uint8_t mEventQueueBuffer[CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE * sizeof(ChipDeviceEvent)];
     StaticQueue_t mEventQueueStruct;
 #endif
-
-    std::atomic<bool> mShouldRunEventLoop;
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_TASK) && CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
     StackType_t mEventLoopStack[CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE / sizeof(StackType_t)];
-    StaticTask_t mventLoopTaskStruct;
+    StaticTask_t mEventLoopTaskStruct;
+#endif
+
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING) && CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
+    static void BackgroundEventLoopTaskMain(void * arg);
+    std::atomic<bool> mShouldRunBackgroundEventLoop;
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE) && CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE
+    uint8_t mBackgroundQueueBuffer[CHIP_DEVICE_CONFIG_BG_MAX_EVENT_QUEUE_SIZE * sizeof(ChipDeviceEvent)];
+    StaticQueue_t mBackgroundQueueStruct;
+#endif
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_TASK) && CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
+    StackType_t mBackgroundEventLoopStack[CHIP_DEVICE_CONFIG_BG_TASK_STACK_SIZE / sizeof(StackType_t)];
+    StaticTask_t mBackgroundEventLoopTaskStruct;
+#endif
 #endif
 
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE) && CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE

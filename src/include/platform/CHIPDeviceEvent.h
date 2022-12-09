@@ -317,6 +317,22 @@ enum OtaState
     kOtaApplyFailed,
 };
 
+enum class CleanupStatus
+{
+    kCompleted,
+    kCancelled
+};
+
+/**
+ * A pointer to a function that performs work asynchronously.
+ */
+typedef void (*AsyncWorkFunct)(intptr_t arg);
+
+/**
+ * A pointer to a function that performs cleanup asynchronously.
+ */
+typedef void (*AsyncCleanupFunct)(intptr_t arg, CleanupStatus status);
+
 inline ConnectivityChange GetConnectivityChange(bool prevState, bool newState)
 {
     if (prevState == newState)
@@ -325,11 +341,6 @@ inline ConnectivityChange GetConnectivityChange(bool prevState, bool newState)
         return kConnectivity_Established;
     return kConnectivity_Lost;
 }
-
-/**
- * A pointer to a function that performs work asynchronously.
- */
-typedef void (*AsyncWorkFunct)(intptr_t arg);
 
 } // namespace DeviceLayer
 } // namespace chip
@@ -366,8 +377,9 @@ struct ChipDeviceEvent final
         LambdaBridge LambdaEvent;
         struct
         {
-            AsyncWorkFunct WorkFunct;
             intptr_t Arg;
+            AsyncWorkFunct WorkFunct;
+            AsyncCleanupFunct CleanupFunct;
         } CallWorkFunct;
         struct
         {

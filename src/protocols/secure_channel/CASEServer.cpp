@@ -152,7 +152,7 @@ void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyE
 
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 {
-    ChipLogError(Inet, "CASE Session establishment failed: %" CHIP_ERROR_FORMAT, err.Format());
+    ChipLogError(Inet, "CASE Session establishment failed: asdf qwerty %" CHIP_ERROR_FORMAT, err.Format());
 
     PrepareForSessionEstablishment();
 }

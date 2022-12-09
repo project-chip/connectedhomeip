@@ -192,6 +192,7 @@ private:
         kSentSigma2Resume  = 5,
         kFinished          = 6,
         kFinishedViaResume = 7,
+        kBackgroundPending = 8,
     };
 
     /*
@@ -221,8 +222,12 @@ private:
     CHIP_ERROR HandleSigma2_and_SendSigma3(System::PacketBufferHandle && msg);
     CHIP_ERROR HandleSigma2(System::PacketBufferHandle && msg);
     CHIP_ERROR HandleSigma2Resume(System::PacketBufferHandle && msg);
+
     CHIP_ERROR SendSigma3();
-    CHIP_ERROR HandleSigma3(System::PacketBufferHandle && msg);
+    struct Sigma3Work;
+    CHIP_ERROR HandleSigma3a(System::PacketBufferHandle && msg);
+    static void HandleSigma3b(Sigma3Work & work);
+    CHIP_ERROR HandleSigma3c(Sigma3Work & work);
 
     CHIP_ERROR SendSigma2Resume();
 
@@ -282,6 +287,8 @@ private:
     SessionResumptionStorage::ResumptionIdStorage mNewResumptionId;    // ResumptionId which is stored to resume future session
     // Sigma1 initiator random, maintained to be reused post-Sigma1, such as when generating Sigma2 S2RK key
     uint8_t mInitiatorRandom[kSigmaParamRandomNumberSize];
+
+    int mSequence = 0;
 
     State mState;
 
