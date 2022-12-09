@@ -148,7 +148,7 @@ the EFR32 see
 
 Navigate to
 `matter` and open the file in the path
-`examples/platform/efr32/FreeRTOSConfig.h`. Find the macro:
+`examples/platform/silabs/efr32/FreeRTOSConfig.h`. Find the macro:
 \``configMINIMAL_STACK_SIZE`\`, and change the macro value from `140` to
  **`320`**.
 

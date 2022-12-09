@@ -56,7 +56,7 @@ The default values for the these defines are located in `src/include/platform/CH
 #define CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL 200_ms32
 #endif
 ```
-To change these default values, add `#define CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL <value>_ms32` to `src/platform/EFR32/CHIPDevicePlatformConfig.h`.
+To change these default values, add `#define CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL <value>_ms32` to `src/platform/silabs/EFR32/CHIPDevicePlatformConfig.h`.
 
 ## Building 
 

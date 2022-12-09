@@ -33,11 +33,11 @@ procedure may be used:
 In Matter, device attestation credentials are obtained through the
 [DeviceAttestationCredsProvider](https://github.com/project-chip/connectedhomeip/blob/master/src/credentials/DeviceAttestationCredsProvider.h)
 interface. The
-[EFR32DeviceAttestationCreds](https://github.com/project-chip/connectedhomeip/blob/master/examples/platform/efr32/EFR32DeviceAttestationCreds.h)
+[SilabsDeviceAttestationCreds](https://github.com/project-chip/connectedhomeip/blob/master/examples/platform/silabs/SilabsDeviceAttestationCreds.h)
 is an example implementation for the EFR32 platform. In this implementation,
 PAI, DAC, and CD are all stored in the last page of main flash, which has been
 reserved for this purpose. The exact offsets, and file sizes are defined in the
-[efr32_creds.h](https://github.com/project-chip/connectedhomeip/blob/master/examples/platform/efr32/efr32_creds.h)
+[efr32_creds.h](https://github.com/project-chip/connectedhomeip/blob/master/examples/platform/silabs/efr32_creds.h)
 header.
 
 > WARNING: Applications are expected to overwrite the sizes and offsets defined
@@ -49,7 +49,7 @@ header.
 
 The following examples illustrate the process of creating the CSR, generating
 the DAC, and storing the files in flash, so they may be used by the example
-[EFR32DeviceAttestationCreds](https://github.com/project-chip/connectedhomeip/blob/master/examples/platform/efr32/EFR32DeviceAttestationCreds.h)
+[SilabsDeviceAttestationCreds](https://github.com/project-chip/connectedhomeip/blob/master/examples/platform/silabs/SilabsDeviceAttestationCreds.h)
 provider. The source code for these examples can be found in this repository
 under `./silabs_examples/credentials`.
 
@@ -136,13 +136,13 @@ The parameters are as follows:
 4. Copy the generated header into the Matter code:
 
     ```shell
-    cp ./temp/efr32_creds.h ${MATTER_HOME}/examples/platform/efr32/
+    cp ./temp/efr32_creds.h ${MATTER_HOME}/examples/platform/silabs/
     ```
 
 5. Rebuild the example app with the new credentials enabled, for instance:
 
     ```shell
-    ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32/ ./out/lighting-app BRD4186C chip_build_platform_attestation_credentials_provider=true
+    ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/efr32/ ./out/lighting-app BRD4186C chip_build_platform_attestation_credentials_provider=true
     ```
 
 ## Validation

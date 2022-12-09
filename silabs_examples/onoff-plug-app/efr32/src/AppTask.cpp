@@ -132,14 +132,14 @@ CHIP_ERROR AppTask::Init()
     err = BaseApplication::Init(&gIdentify);
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("BaseApplication::Init() failed");
+        SILABS_LOG("BaseApplication::Init() failed");
         appError(err);
     }
 
     err = PlugMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("PlugMgr().Init() failed");
+        SILABS_LOG("PlugMgr().Init() failed");
         appError(err);
     }
 
@@ -164,7 +164,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("AppTask.Init() failed");
+        SILABS_LOG("AppTask.Init() failed");
         appError(err);
     }
 
@@ -172,7 +172,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     sAppTask.StartStatusLEDTimer();
 #endif
 
-    EFR32_LOG("App Task started");
+    SILABS_LOG("App Task started");
 
     while (true)
     {
@@ -225,7 +225,7 @@ void AppTask::OnOffActionEventHandler(AppEvent * aEvent)
 
         if (!initiated)
         {
-            EFR32_LOG("Action is already in progress or active.");
+            SILABS_LOG("Action is already in progress or active.");
         }
     }
 }
@@ -257,7 +257,7 @@ void AppTask::ActionInitiated(OnOffPlugManager::Action_t aAction, int32_t aActor
 {
     // Action initiated, update the light led
     bool lightOn = aAction == OnOffPlugManager::ON_ACTION;
-    EFR32_LOG("Turning light %s", (lightOn) ? "On" : "Off")
+    SILABS_LOG("Turning light %s", (lightOn) ? "On" : "Off")
     sOnOffLED.Set(lightOn);
 
 #ifdef DISPLAY_ENABLED
@@ -275,11 +275,11 @@ void AppTask::ActionCompleted(OnOffPlugManager::Action_t aAction)
     // action has been completed on the outlet
     if (aAction == OnOffPlugManager::ON_ACTION)
     {
-        EFR32_LOG("Outlet ON")
+        SILABS_LOG("Outlet ON")
     }
     else if (aAction == OnOffPlugManager::OFF_ACTION)
     {
-        EFR32_LOG("Outlet OFF")
+        SILABS_LOG("Outlet OFF")
     }
 
     if (sAppTask.mSyncClusterToButtonAction)
@@ -298,6 +298,6 @@ void AppTask::UpdateClusterState(intptr_t context)
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        EFR32_LOG("ERR: updating on/off %x", status);
+        SILABS_LOG("ERR: updating on/off %x", status);
     }
 }

@@ -57,7 +57,7 @@ CHIP_ERROR OnOffPlugManager::Init()
 
     if (sPlugTimer == NULL)
     {
-        EFR32_LOG("sPlugTimer timer create failed");
+        SILABS_LOG("sPlugTimer timer create failed");
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
@@ -137,7 +137,7 @@ bool OnOffPlugManager::InitiateAction(int32_t aActor, Action_t aAction)
 
             mAutoTurnOffTimerArmed = true;
 
-            EFR32_LOG("Auto Turn off enabled. Will be triggered in %u seconds", mAutoTurnOffDuration);
+            SILABS_LOG("Auto Turn off enabled. Will be triggered in %u seconds", mAutoTurnOffDuration);
         }
 
         if (mActionInitiated_CB)
@@ -153,7 +153,7 @@ void OnOffPlugManager::StartTimer(uint32_t aTimeoutMs)
 {
     if (xTimerIsTimerActive(sPlugTimer))
     {
-        EFR32_LOG("app timer already started!");
+        SILABS_LOG("app timer already started!");
         CancelTimer();
     }
 
@@ -162,7 +162,7 @@ void OnOffPlugManager::StartTimer(uint32_t aTimeoutMs)
     // cannot immediately be sent to the timer command queue.
     if (xTimerChangePeriod(sPlugTimer, (aTimeoutMs / portTICK_PERIOD_MS), 100) != pdPASS)
     {
-        EFR32_LOG("sPlugTimer timer start() failed");
+        SILABS_LOG("sPlugTimer timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
@@ -171,7 +171,7 @@ void OnOffPlugManager::CancelTimer(void)
 {
     if (xTimerStop(sPlugTimer, 0) == pdFAIL)
     {
-        EFR32_LOG("sPlugTimer stop() failed");
+        SILABS_LOG("sPlugTimer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 }
@@ -211,7 +211,7 @@ void OnOffPlugManager::AutoTurnOffTimerEventHandler(AppEvent * aEvent)
 
     plug->mAutoTurnOffTimerArmed = false;
 
-    EFR32_LOG("Auto Turn Off has been triggered!");
+    SILABS_LOG("Auto Turn Off has been triggered!");
 
     plug->InitiateAction(actor, OFF_ACTION);
 }
@@ -229,7 +229,7 @@ void OnOffPlugManager::OffEffectTimerEventHandler(AppEvent * aEvent)
 
     plug->mOffEffectArmed = false;
 
-    EFR32_LOG("OffEffect completed");
+    SILABS_LOG("OffEffect completed");
 
     plug->InitiateAction(actor, OFF_ACTION);
 }

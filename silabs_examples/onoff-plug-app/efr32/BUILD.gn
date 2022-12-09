@@ -32,7 +32,8 @@ if (chip_enable_pw_rpc) {
 assert(current_os == "freertos")
 
 efr32_project_dir = "${chip_root}/silabs_examples/onoff-plug-app/efr32"
-examples_plat_dir = "${chip_root}/examples/platform/efr32"
+examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
 declare_args() {
   # Dump memory usage at link time.
@@ -79,7 +80,7 @@ assert(!(use_wf200 && chip_enable_openthread))
 if (chip_enable_wifi) {
   assert(use_rs911x || use_wf200)
   enable_openthread_cli = false
-  import("${chip_root}/src/platform/EFR32/wifi_args.gni")
+  import("${chip_root}/src/platform/silabs/EFR32/wifi_args.gni")
 }
 
 # ThunderBoards, Explorer Kit and MGM240L do not support LCD (No LCD)
@@ -96,7 +97,7 @@ if (chip_enable_wifi) {
     show_qr_code = false
     disable_lcd = true
   }
-  wifi_sdk_dir = "${chip_root}/src/platform/EFR32/wifi"
+  wifi_sdk_dir = "${chip_root}/src/platform/silabs/EFR32/wifi"
   efr32_lwip_defs = [ "LWIP_NETIF_API=1" ]
 
   if (lwip_ipv4) {
@@ -137,10 +138,11 @@ efr32_sdk("sdk") {
   ]
 
   include_dirs = [
-    "${chip_root}/src/platform/EFR32",
+    "${chip_root}/src/platform/silabs/EFR32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
+    "${examples_common_plat_dir}",
   ]
 
   defines = [
@@ -184,13 +186,14 @@ efr32_sdk("sdk") {
 
 efr32_executable("onoff_plug_app") {
   output_name = "chip-efr32-onoff-plug-example.out"
+  public_configs = [ "${efr32_sdk_build_root}:silabs_config" ]
   include_dirs = [ "include" ]
   defines = []
 
   sources = [
+    "${examples_common_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/BaseApplication.cpp",
     "${examples_plat_dir}/efr32_utils.cpp",
-    "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/matter_config.cpp",
     "src/AppTask.cpp",
@@ -302,8 +305,8 @@ efr32_executable("onoff_plug_app") {
     sources += [
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
       "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-      "${examples_plat_dir}/PigweedLogger.cpp",
-      "${examples_plat_dir}/Rpc.cpp",
+      "${examples_common_plat_dir}/PigweedLogger.cpp",
+      "${examples_common_plat_dir}/Rpc.cpp",
     ]
 
     deps += [

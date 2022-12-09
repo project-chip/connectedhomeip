@@ -103,7 +103,7 @@ Where `mySSID` is **your AP's SSID** and `mypassword` is **your AP's password**.
 The required channel becomes available for connection when the WLAN connection region is configured during compilation to one that supports the channel, such as for Japan for channel 13. 
 
 In order to use the desired channel, before building, make sure the WLAN connection region is configured correctly by reviewing/modifying the following lines in 
-**/examples/platform/efr32/rs911x/rsi_wlan_config.h**:
+**/examples/platform/silabs/efr32/rs911x/rsi_wlan_config.h**:
 ```c
 //Make sure this is set to RSI_ENABLE
 #define RSI_SET_REGION_SUPPORT RSI_ENABLE

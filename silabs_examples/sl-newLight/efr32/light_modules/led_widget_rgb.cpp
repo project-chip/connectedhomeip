@@ -174,7 +174,7 @@ void LEDWidgetRGB::SetLevel(uint8_t level)
     /* 1. Check if the input value is correct. */
     if (level > ATTRIBUTE_LEVEL_MAX)
     {
-        EFR32_LOG(" Error in led_widget_rgb.cpp. The level received is too great.");
+        SILABS_LOG(" Error in led_widget_rgb.cpp. The level received is too great.");
         this->current_level_ = PWM_MAX_VALUE;
     }
     else
@@ -203,7 +203,7 @@ void LEDWidgetRGB::GetLevel(ColorElements* rgb)
     /* 1. Check if the argument struct is not null. */
     if (rgb == nullptr)
     {
-        EFR32_LOG(" Error in led_widget_rgb.cpp. Argument struct is null.");
+        SILABS_LOG(" Error in led_widget_rgb.cpp. Argument struct is null.");
         return;
     }
 
@@ -216,17 +216,17 @@ void LEDWidgetRGB::GetLevel(ColorElements* rgb)
     /* 3. Verify that the colors are in-bound. */
     if (red > PWM_MAX_VALUE)
     {
-        EFR32_LOG(" In led_widget_rgb.cpp. get_rgb_color() returned red value of %d.", red);
+        SILABS_LOG(" In led_widget_rgb.cpp. get_rgb_color() returned red value of %d.", red);
         red = PWM_MAX_VALUE;
     }
     if(green > PWM_MAX_VALUE)
     {
-        EFR32_LOG(" In led_widget_rgb.cpp. get_rgb_color() returned green value of %d.", green);
+        SILABS_LOG(" In led_widget_rgb.cpp. get_rgb_color() returned green value of %d.", green);
         green = PWM_MAX_VALUE;
     }
     if(blue > PWM_MAX_VALUE)
     {
-        EFR32_LOG(" In led_widget_rgb.cpp. get_rgb_color() returned blue value of %d.", blue);
+        SILABS_LOG(" In led_widget_rgb.cpp. get_rgb_color() returned blue value of %d.", blue);
         blue = PWM_MAX_VALUE;
     }
 
@@ -303,7 +303,7 @@ void LEDWidgetRGB::SetColorRGB(ColorElements* rgb)
     /* 1. Verify that the struct argument is not null. */
     if (rgb == nullptr)
     {
-        EFR32_LOG(" Error in led_widget_rgb.cpp. Argument struct is null.");
+        SILABS_LOG(" Error in led_widget_rgb.cpp. Argument struct is null.");
         return;
     }
 
@@ -329,7 +329,7 @@ void LEDWidgetRGB::HueToRGB(uint16_t hue, float saturation, uint8_t value, Color
     /* 1. Verify that the struct argument is not null. */
     if (rgb == nullptr)
     {
-        EFR32_LOG(" Error in led_widget_rgb.cpp. Struct argument is null.");
+        SILABS_LOG(" Error in led_widget_rgb.cpp. Struct argument is null.");
         return;
     }
 
