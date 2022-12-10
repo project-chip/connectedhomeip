@@ -46,8 +46,3 @@ chip_build_tests = false
 chip_config_memory_management = "platform"
 chip_mdns = "minimal"
 chip_enable_pw_rpc = false
-
-pw_build_LINK_DEPS = [
-  "$dir_pw_assert:impl",
-  "$dir_pw_log:impl",
-]

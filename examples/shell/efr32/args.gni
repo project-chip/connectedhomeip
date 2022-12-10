@@ -13,14 +13,11 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
 import("${chip_root}/config/standalone/args.gni")
 import("${chip_root}/src/platform/EFR32/args.gni")
 
 efr32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
-pw_log_BACKEND = "${chip_root}/src/lib/support/pw_log_chip"
-pw_assert_BACKEND = "$dir_pw_assert_log:check_backend"
 chip_enable_openthread = true
 chip_openthread_ftd = true
 chip_build_libshell = true

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
@@ -84,19 +83,10 @@ static_library("EFR32") {
     ]
   }
 
-  # Add pigweed KVS
-  deps = [
-    "$dir_pw_kvs:crc16",
-    "$dir_pw_log",
-  ]
-  public_deps += [
-    "$dir_pw_checksum",
-    "$dir_pw_kvs",
-  ]
   if (chip_enable_openthread) {
     public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
 
-    deps += [ "${chip_root}/third_party/openthread:openthread_cli" ]
+    deps = [ "${chip_root}/third_party/openthread:openthread_cli" ]
 
     sources += [
       "${silabs_platform_dir}/ThreadStackManagerImpl.h",
