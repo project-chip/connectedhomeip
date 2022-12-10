@@ -128,7 +128,7 @@ CHIP_ERROR ResolveHandler(int argc, char ** argv)
     peerId.SetCompressedFabricId(strtoull(argv[0], nullptr, 10));
     peerId.SetNodeId(strtoull(argv[1], nullptr, 10));
 
-    return sResolverProxy.ResolveNodeId(peerId, Inet::IPAddressType::kAny);
+    return sResolverProxy.ResolveNodeId(peerId);
 }
 
 bool ParseSubType(int argc, char ** argv, Dnssd::DiscoveryFilter & filter)
