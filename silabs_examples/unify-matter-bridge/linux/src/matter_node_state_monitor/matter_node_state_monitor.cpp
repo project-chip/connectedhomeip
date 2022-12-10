@@ -221,7 +221,7 @@ void matter_node_state_monitor::register_dynamic_endpoint(const struct bridged_e
         "The unify node [%s] is not added on matter bridge as a dynamic endpoint",
       bridge.unify_unid.c_str());
   }
-  if (status == EMBER_ZCL_STATUS_INSUFFICIENT_SPACE) {
+  if (status == EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED) {
     sl_log_error(LOG_TAG,
                 "There are not sufficient space to add the unify node [%s] on "
                 "matter fabric domain",
