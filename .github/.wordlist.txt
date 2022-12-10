@@ -292,8 +292,8 @@ connstring
 conntype
 const
 ContentApp
-ContentAppPlatform
 ContentApp's
+ContentAppPlatform
 ContentLaunch
 ContentLauncher
 continuousHinting
@@ -1120,8 +1120,8 @@ REPL
 repo
 req
 Requestor
-RequestorCanConsent
 Requestor's
+RequestorCanConsent
 Requestors
 responder
 RestrictedEvent
@@ -1170,8 +1170,8 @@ SDB
 SDC
 SDHC
 SDK
-sdkconfig
 SDK's
+sdkconfig
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1199,6 +1199,7 @@ sexualized
 sfv
 SHA
 ShadeConfiguration
+SHAs
 showDocumentation
 shubhamdp
 SIGINT
@@ -1323,14 +1324,15 @@ ths
 Thunderboard
 timedInteractionTimeoutMs
 TimeFormatLocalization
+timeframe
 timeoutMs
 TimeSynchronization
 tinycrypt
 Tizen
 TKIP
+TLS
 tlsr
 TLV
-TLS
 tmp
 tngvndl
 TODO
