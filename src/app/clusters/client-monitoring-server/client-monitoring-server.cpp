@@ -40,7 +40,7 @@ namespace {
 class ClientMonitoringAttributeAccess : public app::AttributeAccessInterface
 {
 public:
-    ClientMonitoringAttributeAccess() : AttributeAccessInterface(Optional<EndpointId>(0), ClientMonitoring::Id) {}
+    ClientMonitoringAttributeAccess() : AttributeAccessInterface(MakeOptional(kRootEndpointId), ClientMonitoring::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override
     {
@@ -49,7 +49,7 @@ public:
         switch (aPath.mAttributeId)
         {
         case ClientMonitoring::Attributes::ExpectedClients::Id:
-            // TODO : Implement Client monitoring resgitration table
+            // TODO : Implement Client monitoring registration table
             return CHIP_ERROR_NOT_IMPLEMENTED;
 
         default:
