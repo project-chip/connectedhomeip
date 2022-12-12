@@ -99,8 +99,11 @@ void CommissioningWindowManager::ResetState()
     mECMSaltLength    = 0;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(false);
-    mSEDActiveModeEnabled = false;
+    if (mSEDActiveModeEnabled)
+    {
+        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(false);
+        mSEDActiveModeEnabled = false;
+    }
 #endif
 
     UpdateWindowStatus(CommissioningWindowStatus::kWindowNotOpen);
