@@ -346,6 +346,8 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     if (accessInterface == nullptr)
         return EMBER_ZCL_STATUS_FAILURE;
 
+    // adding 64 bytes as padding to include the staging buffer used by
+    // TLVWriter, which is 17 bytes
     std::vector<uint8_t> data(attributeMetadata->size + 64);
 
     // read the attribute and write it to `data`
@@ -377,6 +379,8 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
     if (accessInterface == nullptr)
         return EMBER_ZCL_STATUS_FAILURE;
 
+    // adding 64 bytes as padding to include the staging buffer used by
+    // TLVWriter, which is 17 bytes
     std::vector<uint8_t> data(attributeMetadata->size + 64);
 
     // read from `buffer` and write to `data`
