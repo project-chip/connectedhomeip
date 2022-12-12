@@ -34,7 +34,6 @@ platform, so only one protocol can be supported for a specific device.
 -   [Building](#building)
     -   [Removing build artifacts](#removing-build-artifacts)
     -   [Building with release configuration](#building-with-release-configuration)
-    -   [Building with low-power configuration](#building-with-low-power-configuration)
     -   [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
 -   [Configuring the example](#configuring-the-example)
     -   [Example build types](#example-build-types)
