@@ -38,7 +38,7 @@
 
 @property OnboardingPayload * _Nonnull onboardingPayload;
 
-@property chip::DeviceLayer::CommissionableDataProviderImpl * commissionableDataProvider;
+@property CommissionableDataProviderImpl * commissionableDataProvider;
 
 @property chip::Credentials::DeviceAttestationCredentialsProvider * deviceAttestationCredentialsProvider;
 
@@ -111,10 +111,15 @@
     ChipLogProgress(AppServer, "CastingServerBridge().initApp() called");
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    _commissionableDataProvider = new chip::DeviceLayer::CommissionableDataProviderImpl();
+    _commissionableDataProvider = new CommissionableDataProviderImpl();
     _deviceAttestationCredentialsProvider = chip::Credentials::Examples::GetExampleDACProvider();
+
     _appParameters = appParameters;
     AppParams cppAppParams;
+    uint32_t setupPasscode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
+    uint16_t setupDiscriminator = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
+    uint32_t spake2pIterationCount;
+    chip::ByteSpan spake2pSaltSpan, spake2pVerifierSpan;
     if (_appParameters != nil) {
         err = [ConversionUtils convertToCppAppParamsInfoFrom:_appParameters outAppParams:cppAppParams];
         if (err != CHIP_NO_ERROR) {
@@ -123,22 +128,31 @@
         }
 
         // set fields in commissionableDataProvider
-        _commissionableDataProvider->SetSpake2pIterationCount(_appParameters.spake2pIterationCount);
-        if (_appParameters.spake2pSalt != nil) {
-            chip::ByteSpan spake2pSaltSpan
-                = chip::ByteSpan(static_cast<const uint8_t *>(_appParameters.spake2pSalt.bytes), _appParameters.spake2pSalt.length);
-            _commissionableDataProvider->SetSpake2pSalt(spake2pSaltSpan);
-        }
-
-        if (_appParameters.spake2pVerifier != nil) {
-            chip::ByteSpan spake2pVerifierSpan = chip::ByteSpan(
-                static_cast<const uint8_t *>(_appParameters.spake2pVerifier.bytes), _appParameters.spake2pVerifier.length);
-            _commissionableDataProvider->SetSpake2pSalt(spake2pVerifierSpan);
-        }
-
         if (_appParameters.onboardingPayload != nil) {
-            _commissionableDataProvider->SetSetupPasscode(_appParameters.onboardingPayload.setupPasscode);
-            _commissionableDataProvider->SetSetupDiscriminator(_appParameters.onboardingPayload.setupDiscriminator);
+            setupPasscode = _appParameters.onboardingPayload.setupPasscode > 0 ? _appParameters.onboardingPayload.setupPasscode
+                                                                               : CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
+            setupDiscriminator = _appParameters.onboardingPayload.setupDiscriminator > 0
+                ? _appParameters.onboardingPayload.setupDiscriminator
+                : CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
+        }
+        spake2pIterationCount = _appParameters.spake2pIterationCount;
+        if (_appParameters.spake2pSaltBase64 != nil) {
+            spake2pSaltSpan = chip::ByteSpan(
+                static_cast<const uint8_t *>(_appParameters.spake2pSaltBase64.bytes), _appParameters.spake2pSaltBase64.length);
+        }
+
+        if (_appParameters.spake2pVerifierBase64 != nil) {
+            chip::ByteSpan spake2pVerifierSpan
+                = chip::ByteSpan(static_cast<const uint8_t *>(_appParameters.spake2pVerifierBase64.bytes),
+                    _appParameters.spake2pVerifierBase64.length);
+        }
+
+        err = _commissionableDataProvider->Initialize(_appParameters.spake2pVerifierBase64 != nil ? &spake2pVerifierSpan : nil,
+            _appParameters.spake2pSaltBase64 != nil ? &spake2pSaltSpan : nil, spake2pIterationCount, setupPasscode,
+            setupDiscriminator);
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(AppServer, "Failed to initialize CommissionableDataProvider: %s", ErrorStr(err));
+            return;
         }
 
         if (_appParameters.deviceAttestationCredentials != nil) {
@@ -182,8 +196,6 @@
     }
     chip::DeviceLayer::SetCommissionableDataProvider(_commissionableDataProvider);
 
-    uint32_t setupPasscode = 0;
-    uint16_t setupDiscriminator = 0;
     _commissionableDataProvider->GetSetupPasscode(setupPasscode);
     _commissionableDataProvider->GetSetupDiscriminator(setupDiscriminator);
     _onboardingPayload = [[OnboardingPayload alloc] initWithSetupPasscode:setupPasscode setupDiscriminator:setupDiscriminator];
