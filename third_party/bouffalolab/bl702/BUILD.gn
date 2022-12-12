@@ -14,7 +14,7 @@
 
 import("//build_overrides/bouffalolab_iot_sdk.gni")
 import("//build_overrides/openthread.gni")
-import("${bl702_sdk_build_root}/bl702_sdk.gni")
+import("${bl702_sdk_build_root}/../bl_iot_sdk.gni")
 
 declare_args() {
   # Build target to use for bl702 SDK. Use this to set global SDK defines.
@@ -32,6 +32,6 @@ mbedtls_target("mbedtls") {
   include_dirs = [ "${chip_root}/src/platform/bouffalolab/BL702" ]
 }
 
-group("bl702_sdk") {
+group("bl_iot_sdk") {
   public_deps = [ bl702_sdk_target ]
 }
