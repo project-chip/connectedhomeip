@@ -118,35 +118,6 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue MTR_NEWLY_AVAILABLE;
 
 /**
- * Sets this MTRDeviceController to use the given issuer for issuing operational
- * certificates. By default, the MTRDeviceController uses an internal issuer
- * using the signing provided when it was created.
- *
- * Both arguments must be nil (to stop using an external operational certificate
- * issuer) or both must be non-nil.
- *
- * When using an external operational certificate issuer, all device attestation
- * checks that require some sort of trust anchors are delegated to the external
- * certificate issuer.  Specifically, the following device attestation checks
- * are not performed and must be done by the operationalCertificateIssuer:
- *
- * (1) Make sure the PAA is valid and approved by CSA.
- * (2) vid-scoped PAA check: if the PAA is vid scoped, then its vid must match the DAC vid.
- * (3) cert chain check: verify PAI is signed by PAA, and DAC is signed by PAI.
- * (4) PAA subject key id extraction: the PAA subject key must match the PAA key referenced in the PAI.
- * (5) CD signature check: make sure a valid CSA CD key is used to sign the CD.
- *
- * @param[in] operationalCertificateIssuer the operationalCertificateIssuer to
- *            use for issuing operational certs
- *
- * @param[in] queue The queue on which the calls into the
- *                  operationalCertificateIssuer will happen.
- */
-- (BOOL)setOperationalCertificateIssuer:(nullable id<MTROperationalCertificateIssuer>)operationalCertificateIssuer
-                                  queue:(nullable dispatch_queue_t)queue
-                                  error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
-
-/**
  * Return the attestation challenge for the secure session of the device being commissioned.
  *
  * Attempts to retrieve the attestation challenge for a commissionee with the given Device ID.
@@ -237,7 +208,8 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
                      queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use setDeviceControllerDelegate:");
 
 - (void)setNocChainIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer
-                    queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use setOperationalCertificateIssuer");
+                    queue:(dispatch_queue_t)queue
+    MTR_NEWLY_DEPRECATED("Please set the operationalCertificateIssuer in the MTRDeviceControllerStartupParams instead.");
 @end
 
 NS_ASSUME_NONNULL_END

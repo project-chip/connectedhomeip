@@ -120,6 +120,9 @@ private:
         chip::FabricId fabricId, const chip::CATValues & cats, const chip::Crypto::P256PublicKey & pubkey,
         chip::MutableByteSpan & noc);
 
+    // Called asynchronously in response to the MTROperationalCertificateIssuer
+    // calling the completion we passed it when asking it to generate a NOC
+    // chain.
     void ExternalNOCChainGenerated(MTROperationalCertificateInfo * _Nullable info, NSError * _Nullable error);
 
     CHIP_ERROR ExternalGenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,

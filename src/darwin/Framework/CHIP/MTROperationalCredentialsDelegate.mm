@@ -164,7 +164,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
 
     auto * csrInfo = [[MTROperationalCSRInfo alloc] initWithCSR:AsData(csr)
                                                        csrNonce:AsData(csrNonce)
-                                                    csrElements:AsData(csrElements)
+                                                 csrElementsTLV:AsData(csrElements)
                                            attestationSignature:AsData(csrElementsSignature)];
 
     chip::ByteSpan certificationDeclarationSpan;
@@ -183,15 +183,19 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
         chip::Credentials::DeconstructAttestationElements(commissioningParameters.Value().GetAttestationElements().Value(),
             certificationDeclarationSpan, attestationNonceSpan, timestampDeconstructed, firmwareInfoSpan, vendorReserved));
 
+    NSData * firmwareInfo = nil;
+    if (!firmwareInfoSpan.empty()) {
+        firmwareInfo = AsData(firmwareInfoSpan);
+    }
     MTRAttestationInfo * attestationInfo =
         [[MTRAttestationInfo alloc] initWithChallenge:AsData(attestationChallenge)
                                                 nonce:AsData(commissioningParameters.Value().GetAttestationNonce().Value())
-                                             elements:AsData(commissioningParameters.Value().GetAttestationElements().Value())
+                                          elementsTLV:AsData(commissioningParameters.Value().GetAttestationElements().Value())
                                     elementsSignature:AsData(commissioningParameters.Value().GetAttestationSignature().Value())
                          deviceAttestationCertificate:AsData(DAC)
             productAttestationIntermediateCertificate:AsData(PAI)
                              certificationDeclaration:AsData(certificationDeclarationSpan)
-                                         firmwareInfo:AsData(firmwareInfoSpan)];
+                                         firmwareInfo:firmwareInfo];
 
     MTRDeviceController * __weak weakController = mWeakController;
     dispatch_async(mOperationalCertificateIssuerQueue, ^{

@@ -21,15 +21,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTROperationalCSRInfo : NSObject
 
-- (instancetype)initWithCSR:(NSData *)csr
+- (instancetype)initWithCSR:(MTRCSRDERBytes)csr
                    csrNonce:(NSData *)csrNonce
-                csrElements:(NSData *)csrElements
+             csrElementsTLV:(MTRTLVBytes)csrElementsTLV
        attestationSignature:(NSData *)attestationSignature;
 {
     if (self = [super init]) {
         _csr = csr;
         _csrNonce = csrNonce;
-        _csrElements = csrElements;
+        _csrElementsTLV = csrElementsTLV;
         _attestationSignature = attestationSignature;
     }
     return self;

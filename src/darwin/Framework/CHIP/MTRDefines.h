@@ -24,3 +24,5 @@
 #else
 #define MTR_EXTERN extern MTR_EXPORT
 #endif
+
+typedef NSData * MTRTLVBytes;

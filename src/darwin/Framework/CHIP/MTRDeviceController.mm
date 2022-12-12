@@ -341,9 +341,21 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
 
     if (commissionerInitialized == NO) {
         [self cleanupAfterStartup];
+        return NO;
     }
 
-    return commissionerInitialized;
+    // TODO: Once setNocChainIssuer no longer needs to be supported,
+    // we can just move the internals of
+    // setOperationalCertificateIssuer into the sync-dispatched block
+    // above.
+    if (![self setOperationalCertificateIssuer:startupParams.operationalCertificateIssuer
+                                         queue:startupParams.operationalCertificateIssuerQueue]) {
+        MTR_LOG_ERROR("operationalCertificateIssuer and operationalCertificateIssuerQueue must both be nil or both be non-nil");
+        [self cleanupAfterStartup];
+        return NO;
+    }
+
+    return YES;
 }
 
 - (NSNumber *)controllerNodeID
@@ -550,26 +562,24 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
 
 - (BOOL)setOperationalCertificateIssuer:(nullable id<MTROperationalCertificateIssuer>)operationalCertificateIssuer
                                   queue:(nullable dispatch_queue_t)queue
-                                  error:(NSError * __autoreleasing *)error
 {
     if ((operationalCertificateIssuer != nil && queue == nil) || (operationalCertificateIssuer == nil && queue != nil)) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
-        }
         return NO;
     }
 
-    VerifyOrReturnValue([self checkIsRunning:error], NO);
+    VerifyOrReturnValue([self checkIsRunning], NO);
 
     __block BOOL success = NO;
     dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
+        VerifyOrReturn([self checkIsRunning]);
 
         if (operationalCertificateIssuer != nil) {
             self->_operationalCredentialsDelegate->SetOperationalCertificateIssuer(operationalCertificateIssuer, queue);
             self->_cppCommissioner->SetDeviceAttestationVerifier(_partialDACVerifier);
         } else {
-            self->_cppCommissioner->SetDeviceAttestationVerifier(chip::Credentials::GetDeviceAttestationVerifier());
+            // TODO: Once we are not supporting setNocChainIssuer this
+            // branch can just go away.
+            self->_cppCommissioner->SetDeviceAttestationVerifier(_factory.deviceAttestationVerifier);
         }
         success = YES;
     });
@@ -919,27 +929,31 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
                                    completion:(MTROperationalCertificateIssuedHandler)completion
 {
     CSRInfo * oldCSRInfo = [[CSRInfo alloc] initWithNonce:csrInfo.csrNonce
-                                                 elements:csrInfo.csrElements
+                                                 elements:csrInfo.csrElementsTLV
                                         elementsSignature:csrInfo.attestationSignature
                                                       csr:csrInfo.csr];
+    NSData * _Nullable firmwareInfo = attestationInfo.firmwareInfo;
+    if (firmwareInfo == nil) {
+        firmwareInfo = [NSData data];
+    }
     AttestationInfo * oldAttestationInfo =
         [[AttestationInfo alloc] initWithChallenge:attestationInfo.challenge
                                              nonce:attestationInfo.nonce
-                                          elements:attestationInfo.elements
+                                          elements:attestationInfo.elementsTLV
                                  elementsSignature:attestationInfo.elementsSignature
                                                dac:attestationInfo.deviceAttestationCertificate
                                                pai:attestationInfo.productAttestationIntermediateCertificate
                           certificationDeclaration:attestationInfo.certificationDeclaration
-                                      firmwareInfo:attestationInfo.firmwareInfo];
+                                      firmwareInfo:firmwareInfo];
     [self.nocChainIssuer
           onNOCChainGenerationNeeded:oldCSRInfo
                      attestationInfo:oldAttestationInfo
         onNOCChainGenerationComplete:^(NSData * operationalCertificate, NSData * intermediateCertificate, NSData * rootCertificate,
             NSData * _Nullable ipk, NSNumber * _Nullable adminSubject, NSError * __autoreleasing * error) {
-            auto * info = [MTROperationalCertificateInfo infoWithOperationalCertificate:operationalCertificate
-                                                                intermediateCertificate:intermediateCertificate
-                                                                        rootCertificate:rootCertificate
-                                                                           adminSubject:adminSubject];
+            auto * info = [[MTROperationalCertificateInfo alloc] initWithOperationalCertificate:operationalCertificate
+                                                                        intermediateCertificate:intermediateCertificate
+                                                                                rootCertificate:rootCertificate
+                                                                                   adminSubject:adminSubject];
             completion(info, nil);
             if (error != nil) {
                 *error = nil;
@@ -1175,7 +1189,6 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
 - (void)setNocChainIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer queue:(dispatch_queue_t)queue
 {
     [self setOperationalCertificateIssuer:[[MTROperationalCertificateChainIssuerShim alloc] initWithIssuer:nocChainIssuer]
-                                    queue:queue
-                                    error:nil];
+                                    queue:queue];
 }
 @end

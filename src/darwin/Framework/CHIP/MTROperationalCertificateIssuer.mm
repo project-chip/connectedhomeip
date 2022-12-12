@@ -20,17 +20,18 @@
 
 @implementation MTROperationalCertificateInfo
 
-+ (instancetype)infoWithOperationalCertificate:(MTRCertificateDERBytes)operationalCertificate
+- (instancetype)initWithOperationalCertificate:(MTRCertificateDERBytes)operationalCertificate
                        intermediateCertificate:(nullable MTRCertificateDERBytes)intermediateCertificate
                                rootCertificate:(MTRCertificateDERBytes)rootCertificate
                                   adminSubject:(nullable NSNumber *)adminSubject
 {
-    auto * info = [[MTROperationalCertificateInfo alloc] init];
-    info.operationalCertificate = operationalCertificate;
-    info.intermediateCertificate = intermediateCertificate;
-    info.rootCertificate = rootCertificate;
-    info.adminSubject = adminSubject;
-    return info;
+    if (self = [super init]) {
+        _operationalCertificate = operationalCertificate;
+        _intermediateCertificate = intermediateCertificate;
+        _rootCertificate = rootCertificate;
+        _adminSubject = adminSubject;
+    }
+    return self;
 }
 
 @end

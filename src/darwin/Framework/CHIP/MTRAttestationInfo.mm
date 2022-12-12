@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithChallenge:(NSData *)challenge
                                         nonce:(NSData *)nonce
-                                     elements:(NSData *)elements
+                                  elementsTLV:(MTRTLVBytes)elementsTLV
                             elementsSignature:(NSData *)elementsSignature
                  deviceAttestationCertificate:(MTRCertificateDERBytes)deviceAttestationCertificate
     productAttestationIntermediateCertificate:(MTRCertificateDERBytes)productAttestationIntermediateCertificate
@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
         _challenge = challenge;
         _nonce = nonce;
-        _elements = elements;
+        _elementsTLV = elementsTLV;
         _elementsSignature = elementsSignature;
         _deviceAttestationCertificate = deviceAttestationCertificate;
         _productAttestationIntermediateCertificate = productAttestationIntermediateCertificate;

@@ -41,7 +41,7 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy) MTRCertificateDERBytes rootCertificate;
 @property (nonatomic, copy, nullable) NSNumber * adminSubject;
 
-+ (instancetype)infoWithOperationalCertificate:(MTRCertificateDERBytes)operationalCertificate
+- (instancetype)initWithOperationalCertificate:(MTRCertificateDERBytes)operationalCertificate
                        intermediateCertificate:(nullable MTRCertificateDERBytes)intermediateCertificate
                                rootCertificate:(MTRCertificateDERBytes)rootCertificate
                                   adminSubject:(nullable NSNumber *)adminSubject;

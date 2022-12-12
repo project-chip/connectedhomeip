@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 
 #import <Matter/MTRCertificates.h>
+#import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -28,25 +29,50 @@ NS_ASSUME_NONNULL_BEGIN
 MTR_NEWLY_AVAILABLE
 @interface MTRAttestationInfo : NSObject
 
+/**
+ * The attestation challenge from the secure session.
+ */
 @property (nonatomic, copy, readonly) NSData * challenge;
-
+/**
+ * The attestation nonce from the AttestationRequest command.
+ */
 @property (nonatomic, copy, readonly) NSData * nonce;
-
-@property (nonatomic, copy, readonly) NSData * elements;
-
+/**
+ * The TLV-encoded attestation_elements_message that was used to find the
+ * certificationDeclaration and firmwareInfo.
+ */
+@property (nonatomic, copy, readonly) MTRTLVBytes elementsTLV;
+/**
+ * A signature, using the device attestation private key of the device that sent
+ * the attestation information, over the concatenation of elementsTLV and the
+ * attestation challenge from the secure session.
+ */
 @property (nonatomic, copy, readonly) NSData * elementsSignature;
-
+/**
+ * The device attestation certificate for the device.  This can be used to
+ * verify signatures created with the device attestation private key.
+ */
 @property (nonatomic, copy, readonly) MTRCertificateDERBytes deviceAttestationCertificate;
-
+/**
+ * The product attestation intermediate certificate that can be used to verify
+ * the authenticity of the device attestation certificate.
+ */
 @property (nonatomic, copy, readonly) MTRCertificateDERBytes productAttestationIntermediateCertificate;
-
+/**
+ * The certification declaration of the device.  This is a DER-encoded string
+ * representing a CMS-formatted certification declaration.
+ */
 @property (nonatomic, copy, readonly) NSData * certificationDeclaration;
-
-@property (nonatomic, copy, readonly) NSData * firmwareInfo;
+/*
+ * Firmware information, if any, provided in the elementsTLV.  The encoding of
+ * this is not currently specified, but if present this must match the
+ * Distributed Compliance Ledger entry for the device.
+ */
+@property (nonatomic, copy, readonly, nullable) NSData * firmwareInfo;
 
 - (instancetype)initWithChallenge:(NSData *)challenge
                                         nonce:(NSData *)nonce
-                                     elements:(NSData *)elements
+                                  elementsTLV:(MTRTLVBytes)elementsTLV
                             elementsSignature:(NSData *)elementsSignature
                  deviceAttestationCertificate:(MTRCertificateDERBytes)deviceAttestationCertificate
     productAttestationIntermediateCertificate:(MTRCertificateDERBytes)processAttestationIntermediateCertificate
