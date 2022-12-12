@@ -64,10 +64,7 @@ class DiscoverTest:
         logging.info("Testing discovering commissionables devices")
 
         if self.command_name == 'commissionables':
-            java_exit_code = self.TestCmdCommissionables()
-            if java_exit_code != 0:
-                logging.error("Testing command commissionables failed with error %r" % java_exit_code)
-                return java_exit_code
-
-        # Testing complete without errors
-        return 0
+            code = self.TestCmdCommissionables()
+            if code != 0:
+                logging.error(f"Testing command commissionables failed with error {code}")
+                raise Exception("Failed to discover commissionables devices")

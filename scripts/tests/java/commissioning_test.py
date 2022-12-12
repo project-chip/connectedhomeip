@@ -69,10 +69,7 @@ class CommissioningTest:
     def RunTest(self):
         logging.info("Testing onnetwork-long pairing")
         if self.command_name == 'onnetwork-long':
-            java_exit_code = self.TestCmdOnnetworkLong(self.nodeid, self.setup_payload, self.discriminator, self.timeout)
-            if java_exit_code != 0:
-                logging.error("Testing onnetwork-long pairing failed with error %r" % java_exit_code)
-                return java_exit_code
-
-        # Testing complete without errors
-        return 0
+            code = self.TestCmdOnnetworkLong(self.nodeid, self.setup_payload, self.discriminator, self.timeout)
+            if code != 0:
+                logging.error(f"Testing onnetwork-long pairing failed with error {code}")
+                raise Exception("Failed to pair onnetwork device")

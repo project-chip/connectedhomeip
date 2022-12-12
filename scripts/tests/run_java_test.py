@@ -88,18 +88,18 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
         logging.info("Testing pairing cluster")
 
         test = CommissioningTest(log_cooking_threads, log_queue, command, tool_args)
-        controller_exit_code = test.RunTest()
-
-        if controller_exit_code != 0:
-            logging.error("Test script exited with error %r" % test_script_exit_code)
+        try:
+            test.RunTest()
+        except Exception:
+            sys.exit(1)
     elif tool_cluster == 'discover':
         logging.info("Testing discover cluster")
 
         test = DiscoverTest(log_cooking_threads, log_queue, command, tool_args)
-        controller_exit_code = test.RunTest()
-
-        if controller_exit_code != 0:
-            logging.error("Test script exited with error %r" % test_script_exit_code)
+        try:
+            test.RunTest()
+        except Exception:
+            sys.exit(1)
 
     app_exit_code = 0
     if app_process:
@@ -112,11 +112,8 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
     for thread in log_cooking_threads:
         thread.join()
 
-    if controller_exit_code != 0:
-        sys.exit(controller_exit_code)
-    else:
-        # We expect both app and controller should exit with 0
-        sys.exit(app_exit_code)
+    # We expect app should exit with 0
+    sys.exit(app_exit_code)
 
 
 if __name__ == '__main__':
