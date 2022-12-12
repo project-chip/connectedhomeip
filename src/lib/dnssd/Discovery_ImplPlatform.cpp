@@ -619,10 +619,10 @@ CHIP_ERROR DiscoveryImplPlatform::FinalizeServiceUpdate()
     return ChipDnssdFinalizeServiceUpdate();
 }
 
-CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
+CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId)
 {
     ReturnErrorOnFailure(InitImpl());
-    return mResolverProxy.ResolveNodeId(peerId, type);
+    return mResolverProxy.ResolveNodeId(peerId);
 }
 
 CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissionableNodes(DiscoveryFilter filter)
@@ -664,7 +664,7 @@ Resolver & chip::Dnssd::Resolver::Instance()
     return DiscoveryImplPlatform::GetInstance();
 }
 
-CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
+CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -678,7 +678,7 @@ CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressTy
     ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), peerId));
     Platform::CopyString(service.mType, kOperationalServiceName);
     service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolTcp;
-    service.mAddressType = type;
+    service.mAddressType = Inet::IPAddressType::kAny;
     return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeIdResolve, mDelegate);
 }
 

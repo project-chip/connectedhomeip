@@ -188,6 +188,11 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
         delete _deviceControllerDelegateBridge;
         _deviceControllerDelegateBridge = nullptr;
     }
+
+    for (MTRDevice * device in [self.nodeIDToDeviceMap allValues]) {
+        [device invalidate];
+    }
+    [self.nodeIDToDeviceMap removeAllObjects];
 }
 
 - (BOOL)startup:(MTRDeviceControllerStartupParamsInternal *)startupParams
@@ -530,6 +535,7 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
     os_unfair_lock_lock(&_deviceMapLock);
     MTRDevice * deviceToRemove = self.nodeIDToDeviceMap[device.nodeID];
     if (deviceToRemove == device) {
+        [deviceToRemove invalidate];
         self.nodeIDToDeviceMap[device.nodeID] = nil;
     } else {
         MTR_LOG_ERROR("Error: Cannot remove device %p with nodeID %llu", device, device.nodeID.unsignedLongLongValue);

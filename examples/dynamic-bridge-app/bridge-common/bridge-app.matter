@@ -1453,7 +1453,7 @@ server cluster TemperatureMeasurement = 1026 {
 }
 
 endpoint 0 {
-  device type bridge = 22;
+  device type bridge = 22, version 1;
   binding cluster AccessControl;
 
   server cluster Descriptor {
@@ -1743,7 +1743,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 14;
+  device type anonymousEndpointType = 14, version 1;
   binding cluster Binding;
 
   server cluster Identify {
@@ -1780,7 +1780,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type dimmablelight = 257;
+  device type dimmablelight = 257, version 1;
 
   server cluster OnOff {
     ram      attribute onOff;

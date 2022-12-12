@@ -133,11 +133,11 @@ CHIP_ERROR ASN1Writer::PutOctetString(uint8_t cls, uint8_t tag, chip::TLV::TLVRe
 static uint8_t ReverseBits(uint8_t v)
 {
     // swap adjacent bits
-    v = static_cast<uint8_t>((v >> 1) & 0x55) | static_cast<uint8_t>((v & 0x55) << 1);
+    v = static_cast<uint8_t>(static_cast<uint8_t>((v >> 1) & 0x55) | static_cast<uint8_t>((v & 0x55) << 1));
     // swap adjacent bit pairs
-    v = static_cast<uint8_t>((v >> 2) & 0x33) | static_cast<uint8_t>((v & 0x33) << 2);
+    v = static_cast<uint8_t>(static_cast<uint8_t>((v >> 2) & 0x33) | static_cast<uint8_t>((v & 0x33) << 2));
     // swap nibbles
-    v = static_cast<uint8_t>(v >> 4) | static_cast<uint8_t>(v << 4);
+    v = static_cast<uint8_t>(static_cast<uint8_t>(v >> 4) | static_cast<uint8_t>(v << 4));
     return v;
 }
 

@@ -1290,7 +1290,7 @@ server cluster FanControl = 514 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22;
+  device type rootdevice = 22, version 1;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Groups {
@@ -1453,7 +1453,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 768;
+  device type anonymousEndpointType = 768, version 1;
   binding cluster Binding;
   binding cluster Thermostat;
 

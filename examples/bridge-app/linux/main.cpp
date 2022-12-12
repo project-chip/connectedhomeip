@@ -27,6 +27,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
 #include <app/chip-zcl-zpro-codec.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
@@ -38,6 +39,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ZclString.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/Linux/NetworkCommissioningDriver.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -54,6 +56,7 @@
 #include <vector>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::Credentials;
 using namespace chip::Inet;
 using namespace chip::Transport;
@@ -71,6 +74,10 @@ EndpointId gFirstDynamicEndpointId;
 Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 std::vector<Room *> gRooms;
 std::vector<Action *> gActions;
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && defined(CHIP_DEVICE_LAYER_TARGET_LINUX)
+DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sLinuxWiFiDriver;
+Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0, &sLinuxWiFiDriver);
+#endif
 
 const int16_t minMeasuredValue     = -27315;
 const int16_t maxMeasuredValue     = 32766;
@@ -719,7 +726,12 @@ bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj
     return true;
 }
 
-void ApplicationInit() {}
+void ApplicationInit()
+{
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && defined(CHIP_DEVICE_LAYER_TARGET_LINUX)
+    sWiFiNetworkCommissioningInstance.Init();
+#endif
+}
 
 const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, DEVICE_VERSION_DEFAULT },
                                                        { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
@@ -995,6 +1007,7 @@ int main(int argc, char * argv[])
 
     // Run CHIP
 
+    ApplicationInit();
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
     return 0;

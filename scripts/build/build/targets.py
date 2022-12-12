@@ -71,6 +71,7 @@ def BuildHostFakeTarget():
     target.AppendModifier("boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-boringssl')
     target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
+    target.AppendModifier("ubsan", use_ubsan=True)
     target.AppendModifier("libfuzzer", use_tsan=True).OnlyIfRe("-clang")
     target.AppendModifier('coverage', use_coverage=True).OnlyIfRe('-(chip-tool|all-clusters)')
     target.AppendModifier('dmalloc', use_dmalloc=True)
@@ -139,6 +140,7 @@ def BuildHostTarget():
     target.AppendModifier("boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-boringssl')
     target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
+    target.AppendModifier("ubsan", use_ubsan=True)
     target.AppendModifier("libfuzzer", use_tsan=True).OnlyIfRe("-clang")
     target.AppendModifier('coverage', use_coverage=True).OnlyIfRe('-(chip-tool|all-clusters)')
     target.AppendModifier('dmalloc', use_dmalloc=True)
@@ -459,6 +461,7 @@ def BuildTizenTarget():
     target.AppendModifier(name="no-ble", enable_ble=False)
     target.AppendModifier(name="no-wifi", enable_wifi=False)
     target.AppendModifier(name="asan", use_asan=True)
+    target.AppendModifier(name="ubsan", use_ubsan=True)
 
     return target
 
