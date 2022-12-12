@@ -30,6 +30,7 @@
 #include "matter_data_storage.hpp"
 #include "uic_mqtt.h"
 #include <string>
+#include <ostream>
 
 namespace unify::matter_bridge {
 
@@ -84,11 +85,20 @@ public:
      */
     void register_unify_group(const unify_group_t & group);
 
+    /**
+     * @brief Registers a mqtt subscription callback for
+     *        "ucl/by-group/#" topic
+     */
     void register_unify_group_mqtt_message()
     {
         std::string topic_by_group = "ucl/by-group/#";
         uic_mqtt_subscribe_ex(topic_by_group.c_str(), group_translator::on_mqtt_message_c_cb, this);
     }
+    /**
+     * @brief Display group mapping that depicts which matter groups correspond to which unify groups
+     * @param std::ostream
+     */
+    void display_group_mapping(std::ostream &os);
 
 private:
     unify_group_t last_allocated_group;

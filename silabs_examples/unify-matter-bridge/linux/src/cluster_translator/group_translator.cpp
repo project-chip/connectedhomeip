@@ -11,9 +11,18 @@
  *
  *****************************************************************************/
 #include "group_translator.hpp"
+#include "sl_log.h"
+#include <app/server/Server.h>
+#include <credentials/GroupDataProvider.h>
+#include <iomanip>
 #include <optional>
 #include <regex>
 #include <sstream>
+
+using namespace chip;
+using namespace chip::Credentials;
+
+#define LOG_TAG "group_translator"
 
 namespace unify::matter_bridge {
 
@@ -74,5 +83,35 @@ void group_translator::on_mqtt_message_cb(const char * topic, const char * messa
     const std::string & group_id = match.str(1);
     const unify_group_t group    = std::stoi(group_id);
     group_translator::register_unify_group(group);
+}
+
+void group_translator::display_group_mapping(std::ostream& os)
+{
+    os<<"Display which Matter Groups correspond to which Unify Groups\n";
+    os << std::setw(10) << "Matter Group |" << std::setw(10) << "Matter Fabric index |" << std::setw(10) << "Unify Group\n";
+    GroupDataProvider * provider = GetGroupDataProvider();
+    GroupDataProvider::GroupInfo group;
+    matter_group matter_group_info;
+    chip::FabricIndex fabric_index;
+    for (const auto & fabric_index_iter : Server::GetInstance().GetFabricTable())
+    {
+        fabric_index         = fabric_index_iter.GetFabricIndex();
+        auto group_info_iter = provider->IterateGroupInfo(fabric_index);
+        if (group_info_iter != nullptr)
+        {
+            while (group_info_iter->Next(group))
+            {
+                matter_group_info.group                  = group.group_id;
+                matter_group_info.fabric_index           = fabric_index;
+                std::optional<unify_group_t> unify_group = group_translator::get_unify_group(matter_group_info);
+                if (unify_group.has_value())
+                {
+                    os <<std::setw(10) << matter_group_info.group <<"|"<< std::setw(10) << matter_group_info.fabric_index
+                       <<"|"<< std::setw(10) << unify_group.value()<<"\n";
+                }
+            }
+            group_info_iter->Release();
+        }
+    }
 }
 } // namespace unify::matter_bridge

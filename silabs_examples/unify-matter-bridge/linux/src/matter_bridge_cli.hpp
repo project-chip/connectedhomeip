@@ -11,22 +11,22 @@
  *
  *****************************************************************************/
 
-
-#include "sl_status.h"
-#include "matter_node_state_monitor.hpp"
+#include "group_translator.hpp"
 #include "matter.h"
-
+#include "matter_node_state_monitor.hpp"
+#include "sl_status.h"
 
 using namespace unify::matter_bridge; 
 /**
- * @brief Initailize the CLI 
+ * @brief Initialize the CLI 
  * 
  * @return sl_status_t 
  */
 
 sl_status_t matter_bridge_cli_init();
 /**
- * @brief Set the node_state_monitor for CLI, so that CLI can call node_state_monitor's display functions
- * 
+ * @brief Set endpoint mapping and group mapping display instance;
+ *        --> The node_state_monitor instance is for endpoint mapping display
+ *        --> The group_translator instance is for group mapping display
  */
-void set_matter_node_state_monitor_for_cli(matter_node_state_monitor &);
+void set_mapping_display_instance(matter_node_state_monitor & n, group_translator & m);

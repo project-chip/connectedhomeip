@@ -19,6 +19,7 @@
 #include "unify_node_state_monitor.hpp"
 #include <map>
 #include <optional>
+#include <ostream>
 #include <string>
 
 namespace unify::matter_bridge {
@@ -129,9 +130,10 @@ public:
     std::set<chip::ClusterId> get_supported_cluster(chip::EndpointId endpoint);
 
     /**
-     * @brief Display mapping of Matter endpoints to Unify UNID/endpoints 
+     * @brief Display mapping of Matter endpoints to Unify UNID/endpoints
+     * @param std::ostream
      */
-    void display_map();
+    void display_map(std::ostream & os);
 
 protected:
     /**

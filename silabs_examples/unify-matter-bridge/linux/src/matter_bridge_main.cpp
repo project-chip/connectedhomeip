@@ -124,11 +124,11 @@ int main(int argc, char * argv[])
     device_translator matter_device_translator;
     UnifyEmberInterface ember_interface;
     matter_node_state_monitor node_state_monitor(matter_device_translator, ember_interface);
-    set_matter_node_state_monitor_for_cli(node_state_monitor);
     UnifyMqtt unify_mqtt_handler;
+    group_translator m_group_translator(matter_data_storage::instance());
+    set_mapping_display_instance(node_state_monitor, m_group_translator);
 
     // Initializing Group cluster command handler
-    group_translator m_group_translator(matter_data_storage::instance());
     GroupClusterCommandHandler group_handler(node_state_monitor, unify_mqtt_handler, m_group_translator);
 
     // Initializing Bridged Device Basic Info attributes update handler

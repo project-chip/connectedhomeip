@@ -10,9 +10,10 @@
  * sections of the MSLA applicable to Source Code.
  *
  *****************************************************************************/
+#include <iomanip>
+#include <sstream>
 #include <unordered_map>
 #include <vector>
-#include <sstream>
 
 // Matter includes
 #include "matter.h"
@@ -186,14 +187,12 @@ void matter_node_state_monitor::erase_mapper_endpoint(const std::string unid, ch
   }
 }
 
-void matter_node_state_monitor::display_map()
+void matter_node_state_monitor::display_map(std::ostream & os)
 {
-  sl_log_debug(LOG_TAG, "Unify Unid|\tUnify Endpoint|\tMatter Endpoint\n");
+  os << std::setw(10) << "Unify Unid |" << std::setw(10) <<"Unify Endpoint |"<< std::setw(10) << "Matter Endpoint\n";
   for (auto ep = bridged_endpoints.begin(); ep != bridged_endpoints.end(); ep++) {
-      sl_log_debug(LOG_TAG, "%s | %d | %d",
-                   ep->second.unify_unid.c_str(), 
-                   ep->second.unify_endpoint,
-                   ep->second.matter_endpoint);
+      os << std::setw(10) << ep->second.unify_unid.c_str() << "|" << std::setw(10) << ep->second.unify_endpoint << "|"
+         << std::setw(10) << ep->second.matter_endpoint<<"\n";
   }
 }
 

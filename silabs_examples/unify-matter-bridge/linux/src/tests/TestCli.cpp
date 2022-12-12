@@ -6,11 +6,15 @@
 
 // Third party library
 #include <nlunit-test.h>
-#include "MockNodeStateMonitor.hpp"
 
 #include "attribute_translator.hpp"
 #include "matter_bridge_cli.hpp"
 #include <uic_stdin.hpp>
+
+// mocks
+#include "MockGroupTranslator.hpp"
+#include "MockNodeStateMonitor.hpp"
+
 using namespace unify::matter_bridge;
 
 static UnifyEmberInterface ember_interface = UnifyEmberInterface();
@@ -60,8 +64,11 @@ sl_status_t uic_stdin_handle_command(const char *command)
 static void TestCliSetMatterNodeStateMonitor(nlTestSuite * inSuite, void * aContext)
 {
     Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator, ember_interface);
-    set_matter_node_state_monitor_for_cli(test_matter_node_state_monitor);
+    matter_data_storage m_matter_data_storage;
+    Test::MockGroupTranslator mGroupTranslator(m_matter_data_storage);
+    set_mapping_display_instance(test_matter_node_state_monitor, mGroupTranslator);
     NL_TEST_ASSERT(inSuite, (uic_stdin_handle_command("epmap") == SL_STATUS_OK));
+    NL_TEST_ASSERT(inSuite, (uic_stdin_handle_command("groups_map") == SL_STATUS_OK));
 }
 
 
