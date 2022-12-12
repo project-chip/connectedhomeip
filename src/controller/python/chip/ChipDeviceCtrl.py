@@ -1321,7 +1321,7 @@ class ChipDeviceController():
 
             self._dmLib.pychip_DeviceController_EstablishPASESessionBLE.argtypes = [
                 c_void_p, c_uint32, c_uint16, c_uint64]
-            self._dmLib.pychip_DeviceController_EstablishPASESessionBLE.restype = c_uint32
+            self._dmLib.pychip_DeviceController_EstablishPASESessionBLE.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.argtypes = [
                 c_void_p]
