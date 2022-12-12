@@ -263,11 +263,8 @@ bool PrintCert(const char * fileName, X509 * cert)
     fprintf(file, "Extensions:\n");
 
     indent += 4;
-    if (certData->mCertFlags.Has(CertFlags::kIsCA))
-    {
-        Indent(file, indent);
-        fprintf(file, "Is CA            : true\n");
-    }
+    Indent(file, indent);
+    fprintf(file, "Is CA            : %s\n", certData->mCertFlags.Has(CertFlags::kIsCA) ? "true" : "false");
 
     if (certData->mCertFlags.Has(CertFlags::kPathLenConstraintPresent))
     {
