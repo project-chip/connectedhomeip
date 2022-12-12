@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#include <platform/Tizen/ConnectivityUtils.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include "ConnectivityUtils.h"
 
 // XXX: This is a workaround for a bug in the Tizen SDK header files. It is not
 //      possible to include both <net/if.h> and <linux/if.h> at the same time.
@@ -29,12 +28,16 @@
 #include <linux/ethtool.h>
 #include <linux/sockios.h>
 #include <linux/wireless.h>
-#include <string.h>
+#include <net/if.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
-#include <sys/types.h>
+#include <unistd.h>
 
+#include <cstring>
+
+#include <app-common/zap-generated/cluster-enums.h>
 #include <lib/support/CHIPMemString.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {

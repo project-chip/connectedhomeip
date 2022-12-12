@@ -287,7 +287,7 @@ bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
-void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback(void)
+void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }

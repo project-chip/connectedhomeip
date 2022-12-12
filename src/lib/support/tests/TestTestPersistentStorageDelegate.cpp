@@ -347,7 +347,7 @@ const nlTest sTests[] = { NL_TEST_DEF("Test basic API", TestBasicApi),
 
 } // namespace
 
-int TestTestPersistentStorageDelegate(void)
+int TestTestPersistentStorageDelegate()
 {
     nlTestSuite theSuite = { "TestPersistentStorageDelegate tests", &sTests[0], nullptr, nullptr };
 

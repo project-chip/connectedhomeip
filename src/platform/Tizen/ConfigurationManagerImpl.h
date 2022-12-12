@@ -24,9 +24,15 @@
 
 #pragma once
 
-#include <platform/internal/GenericConfigurationManagerImpl.h>
+#include <cstdint>
+#include <cstdlib>
 
-#include <platform/Tizen/PosixConfig.h>
+#include <lib/core/CHIPError.h>
+#include <platform/DeviceInstanceInfoProvider.h>
+#include <platform/PersistedStorage.h>
+
+#include "PosixConfig.h"
+#include "platform/internal/GenericConfigurationManagerImpl.h"
 
 namespace chip {
 namespace DeviceLayer {

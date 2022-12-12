@@ -3,7 +3,7 @@
 {{~#if compatRemapClusterName~}}
 {{compatClusterNameRemapping command.parent.name}}
 {{~else~}}
-{{asUpperCamelCase command.parent.name}}
+{{asUpperCamelCase command.parent.name preserveAcronyms=true}}
 {{~/if~}}
 {{/inline}}
 void (^)(MTR{{> clusterName}}Cluster{{asUpperCamelCase command.responseName}}Params * _Nullable data, NSError * _Nullable error)

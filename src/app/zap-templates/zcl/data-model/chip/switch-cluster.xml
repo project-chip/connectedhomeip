@@ -60,7 +60,7 @@ Interactions with the switch device are exposed as attributes (for the latching 
     </event>
     <event side="server" code="0x06" priority="info" name="MultiPressComplete" optional="true">
       <description>MultiPress Complete</description>
-      <field id="0" name="NewPosition" type="INT8U" />
+      <field id="0" name="PreviousPosition" type="INT8U" />
       <field id="1" name="TotalNumberOfPressesCounted" type="INT8U" />
     </event>
 

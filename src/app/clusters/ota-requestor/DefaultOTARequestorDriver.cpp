@@ -388,7 +388,7 @@ void DefaultOTARequestorDriver::StopPeriodicQueryTimer()
     CancelDelayedAction(PeriodicQueryTimerHandler, this);
 }
 
-void DefaultOTARequestorDriver::RekickPeriodicQueryTimer(void)
+void DefaultOTARequestorDriver::RekickPeriodicQueryTimer()
 {
     ChipLogProgress(SoftwareUpdate, "Rekicking the Periodic Query timer");
     StopPeriodicQueryTimer();

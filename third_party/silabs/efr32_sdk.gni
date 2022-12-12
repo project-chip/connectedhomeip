@@ -38,6 +38,8 @@ declare_args() {
 
   # Enable Segger System View
   use_system_view = false
+
+  sleep_time_ms = 3300000  # 55 mins sleep
 }
 
 # Explorer Kit and MGM240L do not have external flash
@@ -223,6 +225,7 @@ template("efr32_sdk") {
           "CHIP_DEVICE_CONFIG_ENABLE_SED=1",
           "SL_CATALOG_POWER_MANAGER_PRESENT",
           "SL_CATALOG_SLEEPTIMER_PRESENT",
+          "SL_SLEEP_TIME_MS=${sleep_time_ms}",
         ]
       }
     }

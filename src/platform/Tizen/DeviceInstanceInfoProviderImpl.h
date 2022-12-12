@@ -18,8 +18,13 @@
 
 #pragma once
 
-#include <platform/Tizen/ConfigurationManagerImpl.h>
-#include <platform/internal/GenericDeviceInstanceInfoProvider.h>
+#include <cstdint>
+
+#include <lib/core/CHIPError.h>
+
+#include "ConfigurationManagerImpl.h"
+#include "PosixConfig.h"
+#include "platform/internal/GenericDeviceInstanceInfoProvider.h"
 
 namespace chip {
 namespace DeviceLayer {

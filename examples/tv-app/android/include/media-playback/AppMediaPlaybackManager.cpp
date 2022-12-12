@@ -130,11 +130,11 @@ uint64_t AppMediaPlaybackManager::HandleMediaRequestGetAttribute(chip::Attribute
 {
     ChipLogProgress(Zcl, "Received AppMediaPlaybackManager::HandleMediaRequestGetAttribute:%d", attributeId);
     chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::MediaPlayback::Id, attributeId);
-    const char * resStr = mAttributeDelegate->Read(aPath);
-    ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleMediaRequestGetAttribute response %s", resStr);
+    std::string resStr = mAttributeDelegate->Read(aPath);
+    ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleMediaRequestGetAttribute response %s", resStr.c_str());
 
     uint64_t ret = std::numeric_limits<uint64_t>::max();
-    if (resStr != nullptr && *resStr != 0)
+    if (resStr.length() != 0)
     {
         Json::Reader reader;
         Json::Value value;
@@ -143,7 +143,7 @@ uint64_t AppMediaPlaybackManager::HandleMediaRequestGetAttribute(chip::Attribute
             std::string attrId = to_string(attributeId);
             ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleMediaRequestGetAttribute response parsing done. reading attr %s",
                             attrId.c_str());
-            if (!value[attrId].empty())
+            if (!value[attrId].empty() && value[attrId].isUInt())
             {
                 ret = static_cast<uint64_t>(value[attrId].asUInt());
                 return ret;
@@ -177,9 +177,10 @@ CHIP_ERROR AppMediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncod
     ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleGetSampledPosition");
     chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::MediaPlayback::Id,
                                                chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::Id);
-    const char * resStr = mAttributeDelegate->Read(aPath);
+    std::string resStr = mAttributeDelegate->Read(aPath);
+    ChipLogProgress(Zcl, "AppMediaPlaybackManager::HandleGetSampledPosition response %s", resStr.c_str());
 
-    if (resStr != nullptr && *resStr != 0)
+    if (resStr.length() != 0)
     {
         Json::Reader reader;
         Json::Value value;
@@ -188,13 +189,14 @@ CHIP_ERROR AppMediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncod
             std::string attrId = to_string(chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::Id);
             ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSampledPosition response parsing done. reading attr %s",
                             attrId.c_str());
-            if (!value[attrId].empty())
+            if (!value[attrId].empty() && value[attrId].isObject())
             {
                 std::string updatedAt = to_string(
                     static_cast<uint32_t>(chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Fields::kUpdatedAt));
                 std::string position = to_string(
                     static_cast<uint32_t>(chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Fields::kPosition));
-                if (!value[attrId][updatedAt].empty() && !value[attrId][position].empty())
+                if (!value[attrId][updatedAt].empty() && !value[attrId][position].empty() && value[attrId][updatedAt].isUInt() &&
+                    value[attrId][position].isUInt())
                 {
                     // valid response
                     response.updatedAt = value[attrId][updatedAt].asUInt();

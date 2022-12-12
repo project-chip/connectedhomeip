@@ -19,21 +19,12 @@
 package com.matter.controller.commands.common;
 
 import chip.devicecontroller.ChipDeviceController;
-import com.matter.controller.config.PersistentStorage;
-import com.matter.controller.config.PersistentStorageOpCertStore;
-import com.matter.controller.config.PersistentStorageOperationalKeystore;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class MatterCommand extends Command {
   private final ChipDeviceController mChipDeviceController;
-  private final PersistentStorage mDefaultStorage = new PersistentStorage();
-  private final PersistentStorage mCommissionerStorage = new PersistentStorage();
-  private final PersistentStorageOperationalKeystore mOperationalKeystore =
-      new PersistentStorageOperationalKeystore();
-  private final PersistentStorageOpCertStore mOpCertStore = new PersistentStorageOpCertStore();
-
   private final Optional<CredentialsIssuer> mCredIssuerCmds;
   private final StringBuffer mCommissionerName = new StringBuffer();
   private final StringBuffer mPaaTrustStorePath = new StringBuffer();
@@ -57,40 +48,43 @@ public abstract class MatterCommand extends Command {
     this.mCredIssuerCmds = Optional.ofNullable(credIssuerCmds);
     this.mChipDeviceController = controller;
 
-    // TODO: Add support to enable the below optional arguments
-    /*
     addArgument(
         "paa-trust-store-path",
         mPaaTrustStorePath,
         "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
-            + "directory.");
+            + "directory.",
+        true);
     addArgument(
         "cd-trust-store-path",
         mCDTrustStorePath,
         "Path to directory holding CD certificate information.  Can be absolute or relative to the current working "
-            + "directory.");
+            + "directory.",
+        true);
     addArgument(
         "commissioner-name",
         mCommissionerName,
         "Name of fabric to use. Valid values are \"alpha\", \"beta\", \"gamma\", and integers greater than or equal to "
-            + "4.  The default if not specified is \"alpha\".");
+            + "4.  The default if not specified is \"alpha\".",
+        true);
     addArgument(
         "commissioner-nodeid",
         0,
         Long.MAX_VALUE,
         mCommissionerNodeId,
-        "The node id to use for chip-tool.  If not provided, kTestControllerNodeId (112233, 0x1B669) will be used.");
+        "The node id to use for java-matter-controller.  If not provided, kTestControllerNodeId (112233, 0x1B669) will be used.",
+        true);
     addArgument(
         "use-max-sized-certs",
         mUseMaxSizedCerts,
         "Maximize the size of operational certificates. If not provided or 0 (\"false\"), normally sized operational "
-            + "certificates are generated.");
+            + "certificates are generated.",
+        true);
     addArgument(
         "only-allow-trusted-cd-keys",
         mOnlyAllowTrustedCdKeys,
         "Only allow trusted CD verifying keys (disallow test keys). If not provided or 0 (\"false\"), untrusted CD "
-            + "verifying keys are allowed. If 1 (\"true\"), test keys are disallowed.");
-    */
+            + "verifying keys are allowed. If 1 (\"true\"), test keys are disallowed.",
+        true);
   }
 
   // This method returns the commissioner instance to be used for running the command.
@@ -101,23 +95,10 @@ public abstract class MatterCommand extends Command {
   /////////// Command Interface /////////
   @Override
   public void run() throws Exception {
-    // TODO: setup chip storage from Java, currently it is using example one from chip-tool
-    // maybeSetUpStack();
     runCommand();
-    // maybeTearDownStack();
   }
 
   protected abstract void runCommand();
-
-  private void maybeSetUpStack() throws Exception {
-    mDefaultStorage.init();
-    mOperationalKeystore.init(mDefaultStorage);
-    mOpCertStore.init(mDefaultStorage);
-  }
-
-  private void maybeTearDownStack() {
-    // ToDo:We need to call DeviceController::Shutdown()
-  }
 
   public void setTestResult(String result) {
     mTestResult = Optional.of(result);

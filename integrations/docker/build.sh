@@ -46,11 +46,12 @@ fi
   Build and (optionally tag as latest, push) a docker image from Dockerfile in CWD
 
   Options:
-   --no-cache passed as a docker build argument
-   --latest   update latest to the current built version (\"$VERSION\")
-   --push     push image(s) to docker.io (requires docker login for \"$ORG\")
-   --help     get this message
-   --squash   squash docker layers before push them to docker.io (requires docker-squash python module)
+   --no-cache   passed as a docker build argument
+   --latest     update latest to the current built version (\"$VERSION\")
+   --push       push image(s) to docker.io (requires docker login for \"$ORG\")
+   --skip-build skip the build/prune step
+   --help       get this message
+   --squash     squash docker layers before push them to docker.io (requires docker-squash python module)
 
 "
     exit 0
@@ -65,7 +66,9 @@ set -ex
 
 [[ -n $VERSION ]] || die "version cannot be empty"
 
-mb_space_before=$(df -m "$DOCKER_VOLUME_PATH" | awk 'FNR==2{print $3}')
+if [ -f "$DOCKER_VOLUME_PATH" ]; then
+    mb_space_before=$(df -m "$DOCKER_VOLUME_PATH" | awk 'FNR==2{print $3}')
+fi
 
 # go find and build any CHIP images this image is "FROM"
 awk -F/ '/^FROM connectedhomeip/ {print $2}' Dockerfile | while read -r dep; do
@@ -78,8 +81,10 @@ if [[ ${*/--no-cache//} != "${*}" ]]; then
     BUILD_ARGS+=(--no-cache)
 fi
 
-docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
-docker image prune --force
+[[ ${*/--skip-build//} != "${*}" ]] || {
+    docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
+    docker image prune --force
+}
 
 [[ ${*/--latest//} != "${*}" ]] && {
     docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest
@@ -98,9 +103,10 @@ docker image prune --force
 }
 
 docker images --filter=reference="$ORG/*"
-df -h "$DOCKER_VOLUME_PATH"
-mb_space_after=$(df -m "$DOCKER_VOLUME_PATH" | awk 'FNR==2{print $3}')
-
-printf "%'.f MB total used\n" "$((mb_space_before - mb_space_after))"
+if [ -f "$DOCKER_VOLUME_PATH" ]; then
+    df -h "$DOCKER_VOLUME_PATH"
+    mb_space_after=$(df -m "$DOCKER_VOLUME_PATH" | awk 'FNR==2{print $3}')
+    printf "%'.f MB total used\n" "$((mb_space_before - mb_space_after))"
+fi
 
 exit 0

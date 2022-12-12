@@ -120,7 +120,10 @@ static_library("chip-tool-utils") {
 executable("chip-tool") {
   sources = [ "main.cpp" ]
 
-  deps = [ ":chip-tool-utils" ]
+  deps = [
+    ":chip-tool-utils",
+    "${chip_root}/src/platform/logging:force_stdio",
+  ]
 
   output_dir = root_out_dir
 }

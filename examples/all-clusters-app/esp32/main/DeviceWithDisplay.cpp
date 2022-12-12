@@ -18,6 +18,7 @@
 
 #include "DeviceWithDisplay.h"
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 #if CONFIG_HAVE_DISPLAY
@@ -322,7 +323,7 @@ public:
             {
                 value                  = (value == "On") ? "Off" : "On";
                 uint8_t attributeValue = (value == "On") ? 1 : 0;
-                emberAfWriteServerAttribute(endpointIndex + 1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID,
+                emberAfWriteServerAttribute(endpointIndex + 1, app::Clusters::OnOff::Id, ZCL_ON_OFF_ATTRIBUTE_ID,
                                             (uint8_t *) &attributeValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
             }
 

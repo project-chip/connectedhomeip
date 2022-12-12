@@ -395,7 +395,7 @@ private:
 
 OpCredsFabricTableDelegate gFabricDelegate;
 
-void MatterOperationalCredentialsPluginServerInitCallback(void)
+void MatterOperationalCredentialsPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 

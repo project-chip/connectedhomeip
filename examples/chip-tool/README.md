@@ -156,14 +156,7 @@ The client will send a single command packet and then exit.
 
 1. Commission and pair device with nodeId 1234
 
-2. Add Group to device
-
-```
-chip-tool groups add-group GroupId GroupName node-id endpoint-id
-chip-tool groups add-group 0x4141 Light 1234 1
-```
-
-3. Add group Keyset to device
+2. Add group Keyset to device
 
 ```
 chip-tool groupkeymanagement key-set-write GroupKeySet node-id endpoint-id
@@ -174,11 +167,18 @@ chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 42, \
     "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1234 0
 ```
 
-4. Bind Key to group
+3. Bind Key to group
 
 ```
 chip-tool groupkeymanagement write group-key-map attr-value node-id endpoint-id
 chip-tool groupkeymanagement write group-key-map '[{"groupId": 16705, "groupKeySetID": 42}]' 1234 0
+```
+
+4. Add Group to device
+
+```
+chip-tool groups add-group GroupId GroupName node-id endpoint-id
+chip-tool groups add-group 0x4141 Light 1234 1
 ```
 
 ## Configuring the client for Group Commands
@@ -222,8 +222,10 @@ chip-tool groupsettings bind-keyset 0x4141 0xAAAA
 
 To use the Client to send Matter commands, run the built executable and pass it
 the target cluster name, the target command name, the Group Id in Node Id form
-(`0xffffffffffffXXXX`) and an unused endpoint Id. Take note that Only commands
-and attributes write can be send with Group Id.
+(`0xffffffffffffXXXX`) and an used endpoint Id. Take note that Only commands and
+attributes write can be send with Group Id. Also note that a group ACL needs to
+be installed before a command sent to the group will be accepted. See
+[the access control guide](../../docs/guides/access-control-guide.md#installing-a-group-acl)
 
 E.G. sending to group Id 0x4141
 

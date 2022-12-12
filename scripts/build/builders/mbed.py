@@ -121,14 +121,16 @@ class MbedBuilder(Builder):
                            '--mbed-os-path', self.mbed_os_path,
                            ], title='Generating config ' + self.identifier)
 
-            self._Execute(['cmake', '-S', shlex.quote(self.ExamplePath), '-B', shlex.quote(self.output_dir), '-GNinja',
-                           '-DCMAKE_BUILD_TYPE={}'.format(
-                               self.profile.ProfileName.lower()),
-                           '-DMBED_OS_PATH={}'.format(
-                               shlex.quote(self.mbed_os_path)),
-                           '-DMBED_OS_POSIX_SOCKET_PATH={}'.format(
-                               shlex.quote(self.mbed_os_posix_socket_path)),
-                           ], title='Generating ' + self.identifier)
+            flags = []
+            flags.append(f"-DMBED_OS_PATH={shlex.quote(self.mbed_os_path)}")
+            flags.append(f"-DMBED_OS_PATH={shlex.quote(self.mbed_os_path)}")
+            flags.append(f"-DMBED_OS_POSIX_SOCKET_PATH={shlex.quote(self.mbed_os_posix_socket_path)}")
+
+            if self.options.pregen_dir:
+                flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
+
+            self._Execute(['cmake', '-S', shlex.quote(self.ExamplePath), '-B', shlex.quote(self.output_dir),
+                          '-GNinja'] + flags, title='Generating ' + self.identifier)
 
     def _build(self):
         # Remove old artifacts to force linking

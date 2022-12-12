@@ -16,10 +16,21 @@
  */
 
 #include "AppPreference.h"
-#include <app_preference.h>
-#include <lib/support/Base64.h>
-#include <lib/support/CHIPMem.h>
+
+#include <algorithm>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
 #include <memory>
+#include <utility>
+
+#include <app_preference.h>
+#include <tizen.h>
+
+#include <lib/support/Base64.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -137,7 +137,6 @@
         "Test_TC_MEDIAINPUT_3_15",
         "Test_TC_MEDIAINPUT_3_16",
         "Test_TC_MEDIAINPUT_3_17",
-        "Test_TC_WAKEONLAN_4_1",
         "Test_TC_CHANNEL_5_4",
         "Test_TC_CHANNEL_5_5",
         "Test_TC_CHANNEL_5_6",
@@ -152,7 +151,6 @@
         "Test_TC_CONTENTLAUNCHER_10_7",
         "Test_TC_MC_11_1",
         "Test_TC_MC_11_2",
-        "Test_TC_ALOGIN_12_1",
         "Test_TC_ALOGIN_12_2"
     ],
     "MultipleFabrics": [
@@ -277,7 +275,6 @@
     ],
     "DoorLock": [
         "Test_TC_DRLK_2_1",
-        "Test_TC_DRLK_2_6",
         "Test_TC_DRLK_2_8",
         "Test_TC_DRLK_2_10",
         "Test_TC_DRLK_3_1",
@@ -327,7 +324,6 @@
     ],
     "PumpConfigurationControl": ["Test_TC_PCC_3_1"],
     "AccessControl": [
-        "Test_TC_ACL_2_3",
         "Test_TC_ACL_2_4",
         "Test_TC_ACL_2_5",
         "Test_TC_ACL_2_6",
@@ -338,8 +334,6 @@
     ],
     "UserLabel": ["Test_TC_ULABEL_3_1"],
     "BridgedDeviceBasicInformation": [
-        "Test_TC_BRBINFO_1_1",
-        "Test_TC_BRBINFO_2_1",
         "Test_TC_BRBINFO_2_2",
         "Test_TC_BRBINFO_2_3"
     ],

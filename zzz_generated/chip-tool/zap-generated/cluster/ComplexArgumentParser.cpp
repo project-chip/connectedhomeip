@@ -998,6 +998,38 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ModeSelect::Structs::M
     ComplexArgumentParser::Finalize(request.semanticTags);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MonitoringRegistration.clientNodeId", "clientNodeId",
+                                                                  value.isMember("clientNodeId")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MonitoringRegistration.ICid", "ICid", value.isMember("ICid")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "clientNodeId");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.clientNodeId, value["clientNodeId"]));
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "ICid");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.ICid, value["ICid"]));
+
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.clientNodeId);
+    ComplexArgumentParser::Finalize(request.ICid);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
+}
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::Type & request,
                                         Json::Value & value)
 {

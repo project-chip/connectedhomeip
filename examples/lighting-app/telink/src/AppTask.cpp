@@ -30,7 +30,6 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -454,6 +453,30 @@ void AppTask::UpdateClusterState()
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         LOG_ERR("Updating level cluster failed: %x", status);
+    }
+}
+
+void AppTask::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
+{
+    if (!btnPressed)
+    {
+        return;
+    }
+
+    switch (btnId)
+    {
+    case kButtonId_LightingAction:
+        LightingActionButtonEventHandler();
+        break;
+    case kButtonId_FactoryReset:
+        FactoryResetButtonEventHandler();
+        break;
+    case kButtonId_StartThread:
+        StartThreadButtonEventHandler();
+        break;
+    case kButtonId_StartBleAdv:
+        StartBleAdvButtonEventHandler();
+        break;
     }
 }
 
