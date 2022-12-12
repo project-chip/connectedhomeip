@@ -268,6 +268,11 @@ static void CauseReadClientFailure(
     return [controller baseDeviceForNodeID:nodeID];
 }
 
+- (MTRTransportType)sessionTransportType
+{
+    return [self.deviceController sessionTransportTypeForDevice:self];
+}
+
 - (void)invalidateCASESession
 {
     if (self.isPASEDevice) {

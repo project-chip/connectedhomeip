@@ -14,9 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#import <os/lock.h>
-
-#import "MTRDeviceController.h"
+#import "MTRDeviceController_Internal.h"
 
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommissioningParameters.h"
@@ -53,6 +51,8 @@
 #include <platform/PlatformManager.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <system/SystemClock.h>
+
+#import <os/lock.h>
 
 static NSString * const kErrorCommissionerInit = @"Init failure while initializing a commissioner";
 static NSString * const kErrorIPKInit = @"Init failure while initializing IPK";
@@ -678,17 +678,6 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     return NO;
 }
 
-- (BOOL)_deviceBeingCommissionedOverBLE:(uint64_t)deviceID
-{
-    VerifyOrReturnValue([self checkIsRunning], NO);
-
-    chip::CommissioneeDeviceProxy * deviceProxy;
-    auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(deviceID, &deviceProxy);
-    VerifyOrReturnValue(errorCode == CHIP_NO_ERROR, NO);
-
-    return deviceProxy->GetDeviceTransportType() == chip::Transport::Type::kBle;
-}
-
 - (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
     [self
@@ -726,6 +715,28 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         errorHandler:^(NSError * error) {
             completion(nullptr, chip::NullOptional, error);
         }];
+}
+
+- (MTRTransportType)sessionTransportTypeForDevice:(MTRBaseDevice *)device
+{
+    VerifyOrReturnValue([self checkIsRunning], MTRTransportTypeUndefined);
+
+    __block MTRTransportType result = MTRTransportTypeUndefined;
+    dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning]);
+
+        if (device.isPASEDevice) {
+            chip::CommissioneeDeviceProxy * deviceProxy;
+            VerifyOrReturn(CHIP_NO_ERROR == self->_cppCommissioner->GetDeviceBeingCommissioned(device.nodeID, &deviceProxy));
+            result = MTRMakeTransportType(deviceProxy->GetDeviceTransportType());
+        } else {
+            auto scopedNodeID = self->_cppCommissioner->GetPeerScopedId(device.nodeID);
+            auto sessionHandle = self->_cppCommissioner->SessionMgr()->FindSecureSessionForNode(scopedNodeID);
+            VerifyOrReturn(sessionHandle.HasValue());
+            result = MTRMakeTransportType(sessionHandle.Value()->AsSecureSession()->GetPeerAddress().GetTransportType());
+        }
+    });
+    return result;
 }
 
 - (void)asyncGetCommissionerOnMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
@@ -795,10 +806,6 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     return success;
 }
 
-@end
-
-@implementation MTRDeviceController (InternalMethods)
-
 - (chip::FabricIndex)fabricIndex
 {
     if (!_cppCommissioner) {
@@ -848,6 +855,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
     [self syncRunOnWorkQueue:block error:nil];
 }
+
 @end
 
 /**

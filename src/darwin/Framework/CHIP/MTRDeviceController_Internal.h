@@ -44,7 +44,7 @@ namespace Controller {
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MTRDeviceController (InternalMethods)
+@interface MTRDeviceController ()
 
 #pragma mark - MTRDeviceControllerFactory methods
 
@@ -138,6 +138,12 @@ NS_ASSUME_NONNULL_BEGIN
  * happens, the completion will be invoked with an error on the Matter queue.
  */
 - (void)getSessionForCommissioneeDevice:(chip::NodeId)deviceID completion:(MTRInternalDeviceConnectionCallback)completion;
+
+/**
+ * Returns the transport used by the current session with the given device,
+ * or `MTRTransportTypeUndefined` if no session is currently active.
+ */
+- (MTRTransportType)sessionTransportTypeForDevice:(MTRBaseDevice *)device;
 
 /**
  * Invalidate the CASE session for the given node ID.  This is a temporary thing
