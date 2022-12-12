@@ -76,7 +76,7 @@ bool emberAfClientMonitoringClusterRegisterClientMonitoringCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::RegisterClientMonitoring::DecodableType & commandData)
 {
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
     return false;
 }
 /**
@@ -85,7 +85,7 @@ bool emberAfClientMonitoringClusterRegisterClientMonitoringCallback(
 bool emberAfClientMonitoringClusterStayAwakeRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                             const Commands::StayAwakeRequest::DecodableType & commandData)
 {
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
     return false;
 }
 
