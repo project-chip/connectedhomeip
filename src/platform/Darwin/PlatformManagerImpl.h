@@ -26,7 +26,7 @@
 #include <dispatch/dispatch.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 
-static constexpr const char * const CHIP_CONTROLLER_QUEUE = "com.csa.matter.framework.controller.workqueue";
+static constexpr const char * const CHIP_CONTROLLER_QUEUE = "org.csa-iot.matter.framework.controller.workqueue";
 
 namespace chip {
 namespace DeviceLayer {
@@ -47,7 +47,7 @@ public:
     {
         if (mWorkQueue == nullptr)
         {
-            mWorkQueue = dispatch_queue_create(CHIP_CONTROLLER_QUEUE, DISPATCH_QUEUE_SERIAL);
+            mWorkQueue = dispatch_queue_create(CHIP_CONTROLLER_QUEUE, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
             dispatch_suspend(mWorkQueue);
             mIsWorkQueueSuspended = true;
         }
