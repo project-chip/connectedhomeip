@@ -19,6 +19,23 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@implementation MTROperationalCSRInfo : NSObject
+
+- (instancetype)initWithCSR:(MTRCSRDERBytes)csr
+                   csrNonce:(NSData *)csrNonce
+             csrElementsTLV:(MTRTLVBytes)csrElementsTLV
+       attestationSignature:(NSData *)attestationSignature;
+{
+    if (self = [super init]) {
+        _csr = csr;
+        _csrNonce = csrNonce;
+        _csrElementsTLV = csrElementsTLV;
+        _attestationSignature = attestationSignature;
+    }
+    return self;
+}
+@end
+
 @implementation CSRInfo : NSObject
 
 - (instancetype)initWithNonce:(NSData *)nonce

@@ -17,7 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import <Matter/MTRNOCChainIssuer.h>
+#import <Matter/MTROperationalCertificateIssuer.h>
 
 @class MTRBaseDevice;
 
@@ -128,20 +128,6 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue MTR_NEWLY_AVAILABLE;
 
 /**
- * Sets this MTRDeviceController to use the given issuer for issuing operational certs. By default, the MTRDeviceController uses an
- * internal issuer.
- *
- * When a nocChainIssuer is set, the device commissioner will delegate verification to the chip::Credentials::PartialDACVerifier so
- * that DAC chain and CD validation can be performed by custom code triggered by MTRNOCChainIssuer.onNOCChainGenerationNeeded().
- * Otherwise, the device commissioner uses the chip::Credentials::DefaultDACVerifier
- *
- * @param[in] nocChainIssuer the NOC Chain issuer to use for issuer operational certs
- *
- * @param[in] queue The queue on which the callbacks will be delivered
- */
-- (void)setNocChainIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer queue:(dispatch_queue_t)queue;
-
-/**
  * Return the attestation challenge for the secure session of the device being commissioned.
  *
  * Attempts to retrieve the attestation challenge for a commissionee with the given Device ID.
@@ -231,6 +217,9 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 - (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate
                      queue:(dispatch_queue_t)queue MTR_NEWLY_DEPRECATED("Please use setDeviceControllerDelegate:");
 
+- (void)setNocChainIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer
+                    queue:(dispatch_queue_t)queue
+    MTR_NEWLY_DEPRECATED("Please set the operationalCertificateIssuer in the MTRDeviceControllerStartupParams instead.");
 @end
 
 NS_ASSUME_NONNULL_END
