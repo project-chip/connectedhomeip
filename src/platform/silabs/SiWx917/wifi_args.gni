@@ -25,6 +25,8 @@ arm_platform_config = "${efr32_sdk_build_root}/efr32_arm.gni"
 
 mbedtls_target = "${efr32_sdk_build_root}:efr32_sdk"
 
+chip_crypto = "tinycrypt"
+
 # Transitional CommissionableDataProvider not used anymore
 # examples/platform/efr32/EFR32DeviceDataProvider is now used.
 chip_use_transitional_commissionable_data_provider = false
