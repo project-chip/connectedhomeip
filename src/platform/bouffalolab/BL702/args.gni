@@ -37,7 +37,7 @@ openthread_core_config_platform_check_file =
     "bl702-openthread-core-bl-config-check.h"
 openthread_project_include_dirs =
     [ "${chip_root}/src/platform/bouffalolab/BL702" ]
-openthread_external_platform = "${bl702_sdk_build_root}:bl702_sdk"
+openthread_external_platform = "${bl702_sdk_build_root}:bl_iot_sdk"
 
 pw_build_LINK_DEPS = [
   "$dir_pw_assert:impl",

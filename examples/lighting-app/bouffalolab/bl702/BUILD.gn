@@ -17,7 +17,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${bl702_sdk_build_root}/bl702_executable.gni")
-import("${bl702_sdk_build_root}/bl702_sdk.gni")
+import("${bl702_sdk_build_root}/../bl_iot_sdk.gni")
 import("${build_root}/config/defaults.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -54,13 +54,14 @@ declare_args() {
   baudrate = 2000000
 }
 
-bl702_sdk("sdk") {
+bl_iot_sdk("sdk") {
   include_dirs = [
     "${example_dir}",
     "${example_common_dir}",
   ]
 
   freertos_config = "${examples_plat_dir}/FreeRTOSConfig.h"
+  bl_plat_name = "bl702"
 
   defines = [
     "INCLUDE_xSemaphoreGetMutexHolder=1",
