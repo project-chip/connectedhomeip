@@ -149,9 +149,9 @@ ALLOW: Dict[str, Set[str]] = {
     # Uses platform-define to switch between list and array
     'src/lib/dnssd/minimal_mdns/ResponseSender.h': {'list'},
 
-    # Not really for embedded consumers; uses std::queue to keep track
+    # Not really for embedded consumers; uses std::deque to keep track
     # of a list of discovered things.
-    'src/controller/SetUpCodePairer.h': {'queue'},
+    'src/controller/SetUpCodePairer.h': {'deque'},
 
     'src/controller/ExamplePersistentStorage.cpp': {'fstream'}
 }

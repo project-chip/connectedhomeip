@@ -1739,7 +1739,7 @@ client cluster Switch = 59 {
   }
 
   info event MultiPressComplete = 6 {
-    INT8U newPosition = 0;
+    INT8U previousPosition = 0;
     INT8U totalNumberOfPressesCounted = 1;
   }
 
@@ -4416,7 +4416,7 @@ client cluster UnitTesting = 4294048773 {
 }
 
 endpoint 1 {
-  device type rootdevice = 22;
+  device type rootdevice = 22, version 1;
   binding cluster Identify;
   binding cluster Groups;
   binding cluster Scenes;

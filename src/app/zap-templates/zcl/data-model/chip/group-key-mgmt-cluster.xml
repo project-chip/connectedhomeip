@@ -64,13 +64,13 @@ limitations under the License.
     <attribute side="server" code="0x0003" define="MAX_GROUP_KEYS_PER_FABRIC" type="INT16U" writable="false" optional="false">MaxGroupKeysPerFabric</attribute>
 
     <command source="client" code="0x00" name="KeySetWrite" isFabricScoped="true" optional="false" cli="zcl GroupKeyManagement KeySetWrite">
-      <description>Revoke a Root Key from a Group</description>
+      <description>Write a new set of keys for the given key set id.</description>
       <arg name="GroupKeySet" type="GroupKeySetStruct"/>
       <access op="invoke" privilege="administer"/>
     </command>
 
     <command source="client" code="0x01" name="KeySetRead" isFabricScoped="true" response="KeySetReadResponse" optional="false" cli="zcl GroupKeyManagement KeySetRead">
-      <description>Revoke a Root Key from a Group</description>
+      <description>Read the keys for a given key set id.</description>
       <arg name="GroupKeySetID" type="INT16U"/>
       <access op="invoke" privilege="administer"/>
     </command>

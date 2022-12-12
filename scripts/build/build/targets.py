@@ -37,6 +37,7 @@ from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
 from builders.imx import IMXApp, IMXBuilder
 from builders.genio import GenioApp, GenioBuilder
+from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder
 
 
 def BuildHostTestRunnerTarget():
@@ -70,6 +71,7 @@ def BuildHostFakeTarget():
     target.AppendModifier("boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-boringssl')
     target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
+    target.AppendModifier("ubsan", use_ubsan=True)
     target.AppendModifier("libfuzzer", use_tsan=True).OnlyIfRe("-clang")
     target.AppendModifier('coverage', use_coverage=True).OnlyIfRe('-(chip-tool|all-clusters)')
     target.AppendModifier('dmalloc', use_dmalloc=True)
@@ -138,6 +140,7 @@ def BuildHostTarget():
     target.AppendModifier("boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-boringssl')
     target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
+    target.AppendModifier("ubsan", use_ubsan=True)
     target.AppendModifier("libfuzzer", use_tsan=True).OnlyIfRe("-clang")
     target.AppendModifier('coverage', use_coverage=True).OnlyIfRe('-(chip-tool|all-clusters)')
     target.AppendModifier('dmalloc', use_dmalloc=True)
@@ -163,7 +166,7 @@ def BuildEsp32Target():
     target.AppendFixedTargets([
         TargetPart('all-clusters', app=Esp32App.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=Esp32App.ALL_CLUSTERS_MINIMAL),
-        TargetPart('ota-requestor', app=Esp32App.OTA_REQUESTOR),
+        TargetPart('ota-provider', app=Esp32App.OTA_PROVIDER),
         TargetPart('ota-requestor', app=Esp32App.OTA_REQUESTOR),
         TargetPart('shell', app=Esp32App.SHELL),
         TargetPart('light', app=Esp32App.LIGHT),
@@ -222,6 +225,7 @@ def BuildEfr32Target():
     target.AppendModifier('additional_data_advertising', enable_additional_data_advertising=True)
     target.AppendModifier('use_ot_lib', enable_ot_lib=True).ExceptIfRe('-(wifi|use_ot_coap_lib)')
     target.AppendModifier('use_ot_coap_lib', enable_ot_coap_lib=True).ExceptIfRe('-(wifi|use_ot_lib)')
+    target.AppendModifier('no-version', no_version=True)
 
     return target
 
@@ -256,6 +260,7 @@ def BuildNrfTarget():
         TargetPart('shell', app=NrfApp.SHELL),
         TargetPart('pump', app=NrfApp.PUMP),
         TargetPart('pump-controller', app=NrfApp.PUMP_CONTROLLER),
+        TargetPart('window-covering', app=NrfApp.WINDOW_COVERING),
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
@@ -352,6 +357,7 @@ def BuildAmebaTarget():
         TargetPart('all-clusters', app=AmebaApp.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=AmebaApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('light', app=AmebaApp.LIGHT),
+        TargetPart('light-switch', app=AmebaApp.LIGHT_SWITCH),
         TargetPart('pigweed', app=AmebaApp.PIGWEED),
     ])
 
@@ -455,6 +461,7 @@ def BuildTizenTarget():
     target.AppendModifier(name="no-ble", enable_ble=False)
     target.AppendModifier(name="no-wifi", enable_wifi=False)
     target.AppendModifier(name="asan", use_asan=True)
+    target.AppendModifier(name="ubsan", use_ubsan=True)
 
     return target
 
@@ -529,6 +536,17 @@ def BuildTelinkTarget():
     return target
 
 
+def BuildOpenIotSdkTargets():
+    target = BuildTarget('openiotsdk', OpenIotSdkBuilder)
+
+    target.AppendFixedTargets([
+        TargetPart('shell', app=OpenIotSdkApp.SHELL),
+        TargetPart('lock', app=OpenIotSdkApp.LOCK),
+    ])
+
+    return target
+
+
 BUILD_TARGETS = [
     BuildAmebaTarget(),
     BuildAndroidTarget(),
@@ -551,6 +569,5 @@ BUILD_TARGETS = [
     BuildQorvoTarget(),
     BuildTizenTarget(),
     BuildTelinkTarget(),
-
-
+    BuildOpenIotSdkTargets(),
 ]

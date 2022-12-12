@@ -479,6 +479,18 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCou
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
+{
+    wfx_wifi_scan_ext_t extra_info;
+    int32_t err = wfx_get_ap_ext(&extra_info);
+    if (err == 0)
+    {
+        beaconRxCount = extra_info.beacon_rx_count;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
 {
     int32_t err = wfx_reset_counts();

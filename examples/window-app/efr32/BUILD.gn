@@ -173,6 +173,7 @@ efr32_sdk("sdk") {
 
 efr32_executable("window_app") {
   output_name = "chip-efr32-window-example.out"
+  public_configs = [ "${efr32_sdk_build_root}:silabs_config" ]
   output_dir = root_out_dir
   include_dirs = [
     "include",

@@ -63,6 +63,7 @@ public:
     CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber) override;
     CHIP_ERROR GetWiFiRssi(int8_t & rssi) override;
     CHIP_ERROR GetWiFiBeaconLostCount(uint32_t & beaconLostCount) override;
+    CHIP_ERROR GetWiFiBeaconRxCount(uint32_t & beaconRxCount) override;
     CHIP_ERROR GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount) override;
     CHIP_ERROR GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount) override;
     CHIP_ERROR GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount) override;

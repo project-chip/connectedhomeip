@@ -96,8 +96,7 @@ extern "C" PyChipError pychip_discovery_resolve(uint64_t fabricId, uint64_t node
         ReturnOnFailure(result);
         Resolver::Instance().SetOperationalDelegate(&gPythonResolverDelegate);
 
-        result = Resolver::Instance().ResolveNodeId(chip::PeerId().SetCompressedFabricId(fabricId).SetNodeId(nodeId),
-                                                    chip::Inet::IPAddressType::kAny);
+        result = Resolver::Instance().ResolveNodeId(chip::PeerId().SetCompressedFabricId(fabricId).SetNodeId(nodeId));
     });
 
     return ToPyChipError(result);

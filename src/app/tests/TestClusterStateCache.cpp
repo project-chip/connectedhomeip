@@ -181,7 +181,6 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
     StatusIB status;
     callback->OnReportBegin();
 
-    uint8_t index = 0;
     for (auto & instruction : mInstructionList)
     {
         ConcreteDataAttributePath path(instruction.mEndpointId, Clusters::UnitTesting::Id, 0);
@@ -266,8 +265,6 @@ void DataSeriesGenerator::Generate(ForwardedDataCallbackValidator & dataCallback
             dataCallbackValidator.SetExpectation();
             callback->OnAttributeData(path, nullptr, status);
         }
-
-        index++;
     }
 
     callback->OnReportEnd();
