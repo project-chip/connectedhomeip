@@ -18,7 +18,7 @@ import yaml
 from enum import Enum
 
 from .constraints import get_constraints
-from . import YamlFixes
+from . import fixes
 
 _TESTS_SECTION = [
     'name',
@@ -199,18 +199,18 @@ class _TestStepWithPlaceholders:
 
         self.label = _value_or_none(test, 'label')
         self.optional = _value_or_none(test, 'optional')
-        self.nodeId = _value_or_config(test, 'nodeId', config)
+        self.node_id = _value_or_config(test, 'nodeId', config)
         self.cluster = _value_or_config(test, 'cluster', config)
         self.command = _value_or_config(test, 'command', config)
         self.attribute = _value_or_none(test, 'attribute')
         self.endpoint = _value_or_config(test, 'endpoint', config)
 
         self.identity = _value_or_none(test, 'identity')
-        self.fabricFiltered = _value_or_none(test, 'fabricFiltered')
-        self.minInterval = _value_or_none(test, 'minInterval')
-        self.maxInterval = _value_or_none(test, 'maxInterval')
-        self.timedInteractionTimeoutMs = _value_or_none(test, 'timedInteractionTimeoutMs')
-        self.busyWaitMs = _value_or_none(test, 'busyWaitMs')
+        self.fabric_filtered = _value_or_none(test, 'fabricFiltered')
+        self.min_interval = _value_or_none(test, 'minInterval')
+        self.max_interval = _value_or_none(test, 'maxInterval')
+        self.timed_interaction_timeout_ms = _value_or_none(test, 'timedInteractionTimeoutMs')
+        self.busy_wait_ms = _value_or_none(test, 'busyWaitMs')
 
         self.is_attribute = self.command in _ATTRIBUTE_COMMANDS
         self.is_event = self.command in _EVENT_COMMANDS
@@ -333,12 +333,12 @@ class _TestStepWithPlaceholders:
         # the wrong thing below.
         if value is not None and value not in self._parsing_config_variable_storage:
             if mapping_type == 'int64u' or mapping_type == 'int64s' or mapping_type == 'bitmap64' or mapping_type == 'epoch_us':
-                value = YamlFixes.try_apply_yaml_cpp_longlong_limitation_fix(value)
-                value = YamlFixes.try_apply_yaml_unrepresentable_integer_for_javascript_fixes(value)
+                value = fixes.try_apply_yaml_cpp_longlong_limitation_fix(value)
+                value = fixes.try_apply_yaml_unrepresentable_integer_for_javascript_fixes(value)
             elif mapping_type == 'single' or mapping_type == 'double':
-                value = YamlFixes.try_apply_yaml_float_written_as_strings(value)
+                value = fixes.try_apply_yaml_float_written_as_strings(value)
             elif mapping_type == 'octet_string' or mapping_type == 'long_octet_string':
-                value = YamlFixes.convert_yaml_octet_string_to_bytes(value)
+                value = fixes.convert_yaml_octet_string_to_bytes(value)
             elif mapping_type == 'boolean':
                 value = bool(value)
 
@@ -384,8 +384,8 @@ class TestStep:
         return self._test.optional
 
     @property
-    def nodeId(self):
-        return self._test.nodeId
+    def node_id(self):
+        return self._test.node_id
 
     @property
     def cluster(self):
@@ -408,24 +408,24 @@ class TestStep:
         return self._test.identity
 
     @property
-    def fabricFiltered(self):
-        return self._test.fabricFiltered
+    def fabric_filtered(self):
+        return self._test.fabric_filtered
 
     @property
-    def minInterval(self):
-        return self._test.minInterval
+    def min_interval(self):
+        return self._test.min_interval
 
     @property
-    def maxInterval(self):
-        return self._test.maxInterval
+    def max_interval(self):
+        return self._test.max_interval
 
     @property
-    def timedInteractionTimeoutMs(self):
-        return self._test.timedInteractionTimeoutMs
+    def timed_interaction_timeout_ms(self):
+        return self._test.timed_interaction_timeout_ms
 
     @property
-    def busyWaitMs(self):
-        return self._test.busyWaitMs
+    def busy_wait_ms(self):
+        return self._test.busy_wait_ms
 
     def post_process_response(self, response: dict):
         result = PostProcessResponseResult()
@@ -665,7 +665,7 @@ class YamlTests:
                 test, self._parsing_config_variable_storage, definitions)
             if test_with_placeholders.is_enabled:
                 enabled_tests.append(test_with_placeholders)
-        YamlFixes.try_update_yaml_node_id_test_runner_state(
+        fixes.try_update_yaml_node_id_test_runner_state(
             enabled_tests, self._parsing_config_variable_storage)
 
         self._runtime_config_variable_storage = copy.deepcopy(parsing_config_variable_storage)
@@ -686,7 +686,7 @@ class YamlTests:
         raise StopIteration
 
 
-class YamlParser:
+class TestParser:
     name: None
     PICS: None
     tests: None
@@ -696,7 +696,7 @@ class YamlParser:
         # TODO Needs supports for PICS file
         with open(test_file) as f:
             loader = yaml.FullLoader
-            loader = YamlFixes.try_add_yaml_support_for_scientific_notation_without_dot(loader)
+            loader = fixes.try_add_yaml_support_for_scientific_notation_without_dot(loader)
 
             data = yaml.load(f, Loader=loader)
             _check_valid_keys(data, _TESTS_SECTION)

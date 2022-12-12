@@ -25,8 +25,8 @@ import unittest
 import functools
 from pathlib import Path
 
-from yamltests.SpecDefinitions import *
-from yamltests.YamlParser import YamlParser
+from yamltests.definitions import *
+from yamltests.parser import TestParser
 
 _DEFAULT_MATTER_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -80,7 +80,7 @@ class TestYamlParser(unittest.TestCase):
         sources = [ParseSource(source=name) for name in filenames]
         specifications = SpecDefinitions(sources)
 
-        self._yaml_parser = YamlParser(path_to_test, pics_file, specifications)
+        self._yaml_parser = TestParser(path_to_test, pics_file, specifications)
 
     def test_able_to_iterate_over_all_tests(self):
         # self._yaml_parser.tests implements `__next__`, which does value substitution. We are
