@@ -13,6 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+import copy
 import yaml
 from enum import Enum
 
@@ -93,12 +94,6 @@ class PostProcessCheckType(Enum):
     SAVE_AS_VARIABLE = 'SaveAs'
 
 
-# Each 'check' add an entry into the logs db. This entry contains the success of failure state as well as a log
-# message describing the check itself.
-# A check state can be any of the three valid state:
-#  * success: Indicates that the check was successfull
-#  * failure: Indicates that the check was unsuccessfull
-#  * warning: Indicates that the check is probably successful but that something needs to be considered.
 class PostProcessCheck:
     ''' Information about a single post processing on check step.
 
@@ -166,28 +161,30 @@ class PostProcessResponseResult:
 def _check_valid_keys(section, valid_keys_dict):
     if section:
         for key in section:
-            if not key in valid_keys_dict:
+            if key not in valid_keys_dict:
                 print(f'Unknown key: {key}')
                 raise KeyError
 
 
-def _valueOrNone(data, key):
+def _value_or_none(data, key):
     return data[key] if key in data else None
 
 
-def _valueOrConfig(data, key, config):
+def _value_or_config(data, key, config):
     return data[key] if key in data else config[key]
 
 
-class TestStep:
-    '''A single yaml test action parsed from YAML.
+class _TestStepWithPlaceholders:
+    '''A single YAML test parsed, as is, from YAML.
 
-    There are stages to the lifecycle of this object.
+    Some YAML test steps contain placeholders for variable subsitution. The value of the variable
+    is only known after an earlier test step's has executed and the result successfully post
+    processed.
     '''
-    is_enabled: True
-    is_command: False
-    is_attribute: False
-    is_event: False
+    is_enabled = True
+    is_command = False
+    is_attribute = False
+    is_event = False
 
     def __init__(self, test: dict, config: dict, definitions):
         # Disabled tests are not parsed in order to allow the test to be added to the test
@@ -196,36 +193,36 @@ class TestStep:
         if not self.is_enabled:
             return
 
-        self._config = config
+        self._parsing_config_variable_storage = config
 
         _check_valid_keys(test, _TEST_SECTION)
 
-        self.label = _valueOrNone(test, 'label')
-        self.optional = _valueOrNone(test, 'optional')
-        self.nodeId = _valueOrConfig(test, 'nodeId', config)
-        self.cluster = _valueOrConfig(test, 'cluster', config)
-        self.command = _valueOrConfig(test, 'command', config)
-        self.attribute = _valueOrNone(test, 'attribute')
-        self.endpoint = _valueOrConfig(test, 'endpoint', config)
+        self.label = _value_or_none(test, 'label')
+        self.optional = _value_or_none(test, 'optional')
+        self.nodeId = _value_or_config(test, 'nodeId', config)
+        self.cluster = _value_or_config(test, 'cluster', config)
+        self.command = _value_or_config(test, 'command', config)
+        self.attribute = _value_or_none(test, 'attribute')
+        self.endpoint = _value_or_config(test, 'endpoint', config)
 
-        self.identity = _valueOrNone(test, 'identity')
-        self.fabricFiltered = _valueOrNone(test, 'fabricFiltered')
-        self.minInterval = _valueOrNone(test, 'minInterval')
-        self.maxInterval = _valueOrNone(test, 'maxInterval')
-        self.timedInteractionTimeoutMs = _valueOrNone(test, 'timedInteractionTimeoutMs')
-        self.busyWaitMs = _valueOrNone(test, 'busyWaitMs')
+        self.identity = _value_or_none(test, 'identity')
+        self.fabricFiltered = _value_or_none(test, 'fabricFiltered')
+        self.minInterval = _value_or_none(test, 'minInterval')
+        self.maxInterval = _value_or_none(test, 'maxInterval')
+        self.timedInteractionTimeoutMs = _value_or_none(test, 'timedInteractionTimeoutMs')
+        self.busyWaitMs = _value_or_none(test, 'busyWaitMs')
 
         self.is_attribute = self.command in _ATTRIBUTE_COMMANDS
         self.is_event = self.command in _EVENT_COMMANDS
 
-        self.arguments = _valueOrNone(test, 'arguments')
-        self.response = _valueOrNone(test, 'response')
+        self.arguments_with_placeholders = _value_or_none(test, 'arguments')
+        self.response_with_placeholders = _value_or_none(test, 'response')
 
-        _check_valid_keys(self.arguments, _TEST_ARGUMENTS_SECTION)
-        _check_valid_keys(self.response, _TEST_RESPONSE_SECTION)
+        _check_valid_keys(self.arguments_with_placeholders, _TEST_ARGUMENTS_SECTION)
+        _check_valid_keys(self.response_with_placeholders, _TEST_RESPONSE_SECTION)
 
-        self._convert_single_value_to_values(self.arguments)
-        self._convert_single_value_to_values(self.response)
+        self._convert_single_value_to_values(self.arguments_with_placeholders)
+        self._convert_single_value_to_values(self.response_with_placeholders)
 
         argument_mapping = None
         response_mapping = None
@@ -233,26 +230,27 @@ class TestStep:
         if self.is_attribute:
             attribute = definitions.get_attribute_by_name(self.cluster, self.attribute)
             if attribute:
-                attribute_mapping = self.__as_mapping(definitions, self.cluster, attribute.definition.data_type.name)
+                attribute_mapping = self._as_mapping(definitions, self.cluster,
+                                                     attribute.definition.data_type.name)
                 argument_mapping = attribute_mapping
                 response_mapping = attribute_mapping
         else:
             command = definitions.get_command_by_name(self.cluster, self.command)
             if command:
-                argument_mapping = self.__as_mapping(definitions, self.cluster, command.input_param)
-                response_mapping = self.__as_mapping(definitions, self.cluster, command.output_param)
+                argument_mapping = self._as_mapping(definitions, self.cluster, command.input_param)
+                response_mapping = self._as_mapping(definitions, self.cluster, command.output_param)
 
-        self.__update_with_definition(self.arguments, argument_mapping)
-        self.__update_with_definition(self.response, response_mapping)
+        self._update_with_definition(self.arguments_with_placeholders, argument_mapping)
+        self._update_with_definition(self.response_with_placeholders, response_mapping)
 
         # This performs a very basic sanity parse time check of constrains. This parsing happens
         # again inside post processing response since at that time we will have required variables
-        # to substitute in. This parsing check here has value since some test can take a really long
-        # time to run so knowing earlier on that the test step would have failed at parsing time
-        # before the test step run occurs save developer time that building yaml tests.
-        if self.response:
-            for value in self.response['values']:
-                if not 'constraints' in value:
+        # to substitute in. This parsing check here has value since some test can take a really
+        # long time to run so knowing earlier on that the test step would have failed at parsing
+        # time before the test step run occurs save developer time that building yaml tests.
+        if self.response_with_placeholders:
+            for value in self.response_with_placeholders['values']:
+                if 'constraints' not in value:
                     continue
                 get_constraints(value['constraints'])
 
@@ -280,33 +278,192 @@ class TestStep:
 
         container['values'] = [value]
 
-    def post_process_response(self, response):
+    def _as_mapping(self, definitions, cluster_name, target_name):
+        element = definitions.get_type_by_name(cluster_name, target_name)
+
+        if hasattr(element, 'base_type'):
+            target_name = element.base_type.lower()
+        elif hasattr(element, 'fields'):
+            target_name = {f.name: self._as_mapping(definitions, cluster_name, f.data_type.name) for f in element.fields}
+        elif target_name:
+            target_name = target_name.lower()
+
+        return target_name
+
+    def _update_with_definition(self, container: dict, mapping_type):
+        if not container or not mapping_type:
+            return
+
+        for value in list(container['values']):
+            for key, item_value in list(value.items()):
+                mapping = mapping_type if self.is_attribute else mapping_type[value['name']]
+
+                if key == 'value':
+                    value[key] = self._update_value_with_definition(item_value, mapping)
+                elif key == 'saveAs' and type(item_value) is str and item_value not in self._parsing_config_variable_storage:
+                    self._parsing_config_variable_storage[item_value] = None
+                elif key == 'constraints':
+                    for constraint, constraint_value in item_value.items():
+                        value[key][constraint] = self._update_value_with_definition(
+                            constraint_value, mapping_type)
+                else:
+                    # This key, value pair does not rely on cluster specifications.
+                    pass
+
+    def _update_value_with_definition(self, value, mapping_type):
+        if not mapping_type:
+            return value
+
+        if type(value) is dict:
+            rv = {}
+            for key in value:
+                # FabricIndex is a special case where the framework requires it to be passed even
+                # if it is not part of the requested arguments per spec and not part of the XML
+                # definition.
+                if key == 'FabricIndex' or key == 'fabricIndex':
+                    rv[key] = value[key]  # int64u
+                else:
+                    mapping = mapping_type[key]
+                    rv[key] = self._update_value_with_definition(value[key], mapping)
+            return rv
+        if type(value) is list:
+            return [self._update_value_with_definition(entry, mapping_type) for entry in value]
+        # TODO currently I am unsure if the check of `value not in config` is sufficant. For
+        # example let's say value = 'foo + 1' and map type is 'int64u', we would arguably do
+        # the wrong thing below.
+        if value is not None and value not in self._parsing_config_variable_storage:
+            if mapping_type == 'int64u' or mapping_type == 'int64s' or mapping_type == 'bitmap64' or mapping_type == 'epoch_us':
+                value = YamlFixes.try_apply_yaml_cpp_longlong_limitation_fix(value)
+                value = YamlFixes.try_apply_yaml_unrepresentable_integer_for_javascript_fixes(value)
+            elif mapping_type == 'single' or mapping_type == 'double':
+                value = YamlFixes.try_apply_yaml_float_written_as_strings(value)
+            elif mapping_type == 'octet_string' or mapping_type == 'long_octet_string':
+                value = YamlFixes.convert_yaml_octet_string_to_bytes(value)
+            elif mapping_type == 'boolean':
+                value = bool(value)
+
+        return value
+
+
+class TestStep:
+    '''A single YAML test action parsed from YAML.
+
+    This object for the time being is somewhat stateful. When first created it contains
+    '''
+
+    def __init__(self, test: _TestStepWithPlaceholders, runtime_config_variable_storage: dict):
+        self._test = test
+        self._runtime_config_variable_storage = runtime_config_variable_storage
+        self.arguments = copy.deepcopy(test.arguments_with_placeholders)
+        self.response = copy.deepcopy(test.response_with_placeholders)
+        self._update_placeholder_values(self.arguments)
+        self._update_placeholder_values(self.response)
+
+    @property
+    def is_enabled(self):
+        return self._test.is_enabled
+
+    @property
+    def is_command(self):
+        return self._test.is_command
+
+    @property
+    def is_attribute(self):
+        return self._test.is_attribute
+
+    @property
+    def is_event(self):
+        return self._test.is_event
+
+    @property
+    def label(self):
+        return self._test.label
+
+    @property
+    def optional(self):
+        return self._test.optional
+
+    @property
+    def nodeId(self):
+        return self._test.nodeId
+
+    @property
+    def cluster(self):
+        return self._test.cluster
+
+    @property
+    def command(self):
+        return self._test.command
+
+    @property
+    def attribute(self):
+        return self._test.attribute
+
+    @property
+    def endpoint(self):
+        return self._test.endpoint
+
+    @property
+    def identity(self):
+        return self._test.identity
+
+    @property
+    def fabricFiltered(self):
+        return self._test.fabricFiltered
+
+    @property
+    def minInterval(self):
+        return self._test.minInterval
+
+    @property
+    def maxInterval(self):
+        return self._test.maxInterval
+
+    @property
+    def timedInteractionTimeoutMs(self):
+        return self._test.timedInteractionTimeoutMs
+
+    @property
+    def busyWaitMs(self):
+        return self._test.busyWaitMs
+
+    def post_process_response(self, response: dict):
         result = PostProcessResponseResult()
 
-        if not self.__maybe_check_optional(response, result):
+        if self._skip_post_processing(response, result):
             return result
 
-        self.__maybe_check_error(response, result)
+        self._response_error_validation(response, result)
         if self.response:
-            self.__maybe_check_cluster_error(response, result)
-            self.__maybe_check_values(response, result)
-            self.__maybe_check_constraints(response, result)
-            self.__maybe_save_as(response, result)
+            self._response_cluster_error_validation(response, result)
+            self._response_values_validation(response, result)
+            self._response_constraints_validation(response, result)
+            self._maybe_save_as(response, result)
 
         return result
 
-    def __maybe_check_optional(self, response, result):
-        if not self.optional or not 'error' in response:
-            return True
+    def _skip_post_processing(self, response: dict, result) -> bool:
+        ''' Should we skip perform post processing.
 
-        received_error = response.get('error')
-        if received_error == 'UNSUPPORTED_ATTRIBUTE' or received_error == 'UNSUPPORTED_COMMAND':
-            # result.warning('Optional', f'The response contains the error: "{error}".')
+        Currently we only skip post processing if the test step indicates that sent test step
+        invokation was expected to be optionally supported. We confirm that it is optional
+        supported by either validating we got the expected error only then indicate that all
+        other post processing should be skipped.
+        '''
+        if not self.optional:
             return False
 
-        return True
+        received_error = response.get('error', None)
+        if received_error is None:
+            return False
 
-    def __maybe_check_error(self, response, result):
+        if received_error == 'UNSUPPORTED_ATTRIBUTE' or received_error == 'UNSUPPORTED_COMMAND':
+            # result.warning(PostProcessCheckType.Optional, f'The response contains the error: "{error}".')
+            return True
+
+        return False
+
+    def _response_error_validation(self, response, result):
         check_type = PostProcessCheckType.IM_STATUS
         error_success = 'The test expects the "{error}" error which occured successfully.'
         error_success_no_error = 'The test expects no error and no error occurred.'
@@ -327,7 +484,8 @@ class TestStep:
         if expected_error and received_error and expected_error == received_error:
             result.success(check_type, error_success.format(error=expected_error))
         elif expected_error and received_error:
-            result.error(check_type, error_wrong_error.format(error=expected_error, value=received_error))
+            result.error(check_type, error_wrong_error.format(
+                error=expected_error, value=received_error))
         elif expected_error and not received_error:
             result.error(check_type, error_unexpected_success.format(error=expected_error))
         elif not expected_error and received_error:
@@ -338,7 +496,7 @@ class TestStep:
             # This should not happens
             raise AssertionError('This should not happens.')
 
-    def __maybe_check_cluster_error(self, response, result):
+    def _response_cluster_error_validation(self, response, result):
         check_type = PostProcessCheckType.CLUSTER_STATUS
         error_success = 'The test expects the "{error}" error which occured successfully.'
         error_unexpected_success = 'The test expects the "{error}" error but no error occured.'
@@ -351,28 +509,29 @@ class TestStep:
             if received_error and expected_error == received_error:
                 result.success(check_type, error_success.format(error=expected_error))
             elif received_error:
-                result.error(check_type, error_wrong_error.format(error=expected_error, value=received_error))
+                result.error(check_type, error_wrong_error.format(
+                    error=expected_error, value=received_error))
             else:
                 result.error(check_type, error_unexpected_success.format(error=expected_error))
         else:
             # Nothing is logged here to not be redundant with the generic error checking code.
             pass
 
-    def __maybe_check_values(self, response, result):
+    def _response_values_validation(self, response, result):
         check_type = PostProcessCheckType.RESPONSE_VALIDATION
         error_success = 'The test expectation "{name} == {value}" is true'
         error_failure = 'The test expectation "{name} == {value}" is false'
         error_name_does_not_exist = 'The test expects a value named "{name}" but it does not exists in the response."'
 
         for value in self.response['values']:
-            if not 'value' in value:
+            if 'value' not in value:
                 continue
 
             expected_name = 'value'
             received_value = response.get('value')
             if not self.is_attribute:
                 expected_name = value.get('name')
-                if not expected_name in received_value:
+                if expected_name not in received_value:
                     result.error(check_type, error_name_does_not_exist.format(name=expected_name))
                     continue
 
@@ -381,25 +540,27 @@ class TestStep:
             # TODO Supports Array/List. See an exemple of failure in TestArmFailSafe.yaml
             expected_value = value.get('value')
             if expected_value == received_value:
-                result.success(check_type, error_success.format(name=expected_name, value=received_value))
+                result.success(
+                    check_type, error_success.format(name=expected_name, value=received_value))
             else:
-                result.error(check_type, error_failure.format(name=expected_name, value=expected_value))
+                result.error(
+                    check_type, error_failure.format(name=expected_name, value=expected_value))
 
-    def __maybe_check_constraints(self, response, result):
+    def _response_constraints_validation(self, response, result):
         check_type = PostProcessCheckType.CONSTRAINT_VALIDATION
         error_success = 'Constraints check passed'
         error_failure = 'Constraints check failed'
         error_name_does_not_exist = 'The test expects a value named "{name}" but it does not exists in the response."'
 
         for value in self.response['values']:
-            if not 'constraints' in value:
+            if 'constraints' not in value:
                 continue
 
             expected_name = 'value'
             received_value = response.get('value')
             if not self.is_attribute:
                 expected_name = value.get('name')
-                if not expected_name in received_value:
+                if expected_name not in received_value:
                     result.error(check_type, error_name_does_not_exist.format(name=expected_name))
                     continue
 
@@ -412,105 +573,30 @@ class TestStep:
                 # TODO would be helpful to be more verbose here
                 result.error(check_type, error_failure)
 
-    def __maybe_save_as(self, response, result):
+    def _maybe_save_as(self, response, result):
         check_type = PostProcessCheckType.SAVE_AS_VARIABLE
         error_success = 'The test save the value "{value}" as {name}.'
         error_name_does_not_exist = 'The test expects a value named "{name}" but it does not exists in the response."'
 
         for value in self.response['values']:
-            if not 'saveAs' in value:
+            if 'saveAs' not in value:
                 continue
 
             expected_name = 'value'
             received_value = response.get('value')
             if not self.is_attribute:
                 expected_name = value.get('name')
-                if not expected_name in received_value:
+                if expected_name not in received_value:
                     result.error(check_type, error_name_does_not_exist.format(name=expected_name))
                     continue
 
                 received_value = received_value.get(expected_name) if received_value else None
 
             save_as = value.get('saveAs')
-            self._config[save_as] = received_value
+            self._runtime_config_variable_storage[save_as] = received_value
             result.success(check_type, error_success.format(value=received_value, name=save_as))
 
-    def __as_mapping(self, definitions, cluster_name, target_name):
-        element = definitions.get_type_by_name(cluster_name, target_name)
-
-        if hasattr(element, 'base_type'):
-            target_name = element.base_type.lower()
-        elif hasattr(element, 'fields'):
-            target_name = {f.name: self.__as_mapping(definitions, cluster_name, f.data_type.name) for f in element.fields}
-        elif target_name:
-            target_name = target_name.lower()
-
-        return target_name
-
-    def __update_with_definition(self, container: dict, mapping_type):
-        if not container or not mapping_type:
-            return
-
-        for value in list(container['values']):
-            for key, item_value in list(value.items()):
-                mapping = mapping_type if self.is_attribute else mapping_type[value['name']]
-
-                if key == 'value':
-                    value[key] = self.__update_value_with_definition(item_value, mapping)
-                elif key == 'saveAs' and type(item_value) is str and not item_value in self._config:
-                    self._config[item_value] = None
-                elif key == 'constraints':
-                    for constraint, constraint_value in item_value.items():
-                        value[key][constraint] = self.__update_value_with_definition(constraint_value, mapping_type)
-                else:
-                    # This key, value pair does not rely on cluster specifications.
-                    pass
-
-    def __update_value_with_definition(self, value, mapping_type):
-        if not mapping_type:
-            return value
-
-        if type(value) is dict:
-            rv = {}
-            for key in value:
-                # FabricIndex is a special case where the framework requires it to be passed even if it is not part of the
-                # requested arguments per spec and not part of the XML definition.
-                if key == 'FabricIndex' or key == 'fabricIndex':
-                    rv[key] = value[key]  # int64u
-                else:
-                    mapping = mapping_type[key]
-                    rv[key] = self.__update_value_with_definition(value[key], mapping)
-            return rv
-        if type(value) is list:
-            return [self.__update_value_with_definition(entry, mapping_type) for entry in value]
-        # TODO currently I am unsure if the check of `value not in config` is sufficant. For
-        # example let's say value = 'foo + 1' and map type is 'int64u', we would arguably do
-        # the wrong thing below.
-        if value is not None and value not in self._config:
-            if mapping_type == 'int64u' or mapping_type == 'int64s' or mapping_type == 'bitmap64' or mapping_type == 'epoch_us':
-                value = YamlFixes.try_apply_yaml_cpp_longlong_limitation_fix(value)
-                value = YamlFixes.try_apply_yaml_unrepresentable_integer_for_javascript_fixes(value)
-            elif mapping_type == 'single' or mapping_type == 'double':
-                value = YamlFixes.try_apply_yaml_float_written_as_strings(value)
-            elif mapping_type == 'octet_string' or mapping_type == 'long_octet_string':
-                value = YamlFixes.convert_yaml_octet_string_to_bytes(value)
-            elif mapping_type == 'boolean':
-                value = bool(value)
-
-        return value
-
-    def update_placeholder(self):
-        '''Performs any config/variable substitutions to the TestStep's arguments and response.
-
-        Intended to only be called by YamlTests, so that previously processed test steps that give
-        us the variable are substitued to the current TestStep before it is given to a runner to
-        run.
-        '''
-        self.__encode_values(self.arguments)
-        self.__encode_values(self.response)
-        return self
-
-    def __encode_values(self, container):
+    def _update_placeholder_values(self, container):
         if not container:
             return
 
@@ -518,35 +604,36 @@ class TestStep:
 
         for idx, item in enumerate(values):
             if 'value' in item:
-                values[idx]['value'] = self.__config_variable_substitution(item['value'])
+                values[idx]['value'] = self._config_variable_substitution(item['value'])
 
             if 'constraints' in item:
                 for constraint, constraint_value in item['constraints'].items():
-                    values[idx]['constraints'][constraint] = self.__config_variable_substitution(constraint_value)
+                    values[idx]['constraints'][constraint] = self._config_variable_substitution(
+                        constraint_value)
 
         container['values'] = values
 
-    def __config_variable_substitution(self, value):
+    def _config_variable_substitution(self, value):
         if type(value) is list:
-            return [self.__config_variable_substitution(entry) for entry in value]
+            return [self._config_variable_substitution(entry) for entry in value]
         elif type(value) is dict:
             mapped_value = {}
             for key in value:
-                mapped_value[key] = self.__config_variable_substitution(value[key])
+                mapped_value[key] = self._config_variable_substitution(value[key])
             return mapped_value
         elif type(value) is str:
             # For most tests, a single config variable is used and it can be replaced as in.
             # But some other tests were relying on the fact that the expression was put 'as if' in
-            # the generated code and was resolved before being sent over the wire. For such expressions
-            # (e.g 'myVar + 1') we need to compute it before sending it over the wire.
+            # the generated code and was resolved before being sent over the wire. For such
+            # expressions (e.g 'myVar + 1') we need to compute it before sending it over the wire.
             tokens = value.split()
             if len(tokens) == 0:
                 return value
 
             substitution_occured = False
             for idx, token in enumerate(tokens):
-                if token in self._config:
-                    variable_info = self._config[token]
+                if token in self._runtime_config_variable_storage:
+                    variable_info = self._runtime_config_variable_storage[token]
                     if type(variable_info) is dict and 'defaultValue' in variable_info:
                         variable_info = variable_info['defaultValue']
                     tokens[idx] = variable_info
@@ -557,34 +644,44 @@ class TestStep:
 
             tokens = [str(token) for token in tokens]
             value = ' '.join(tokens)
-            # TODO we should move away from eval. That will mean that we will need to do extra parsing,
-            # but it would be safer then just blindly running eval.
+            # TODO we should move away from eval. That will mean that we will need to do extra
+            # parsing, but it would be safer then just blindly running eval.
             return value if not substitution_occured else eval(value)
         else:
             return value
 
 
 class YamlTests:
-    __tests: list[TestStep]
-    __index: 0
+    _tests: list[_TestStepWithPlaceholders]
+    _index: 0
 
     count: 0
 
-    def __init__(self, tests: list[TestStep]):
-        self.__tests = tests
-        self.__index = 0
+    def __init__(self, parsing_config_variable_storage: dict, definitions, tests: dict):
+        self._parsing_config_variable_storage = parsing_config_variable_storage
+        enabled_tests = []
+        for test in tests:
+            test_with_placeholders = _TestStepWithPlaceholders(
+                test, self._parsing_config_variable_storage, definitions)
+            if test_with_placeholders.is_enabled:
+                enabled_tests.append(test_with_placeholders)
+        YamlFixes.try_update_yaml_node_id_test_runner_state(
+            enabled_tests, self._parsing_config_variable_storage)
 
-        self.count = len(tests)
+        self._runtime_config_variable_storage = copy.deepcopy(parsing_config_variable_storage)
+        self._tests = enabled_tests
+        self._index = 0
+        self.count = len(self._tests)
 
     def __iter__(self):
         return self
 
-    def __next__(self):
-        if self.__index < self.count:
-            test = self.__tests[self.__index]
-            test.update_placeholder()
-            self.__index += 1
-            return test
+    def __next__(self) -> TestStep:
+        if self._index < self.count:
+            test = self._tests[self._index]
+            test_step = TestStep(test, self._runtime_config_variable_storage)
+            self._index += 1
+            return test_step
 
         raise StopIteration
 
@@ -593,7 +690,7 @@ class YamlParser:
     name: None
     PICS: None
     tests: None
-    _config: dict = {}
+    _parsing_config_variable_storage: dict = {}
 
     def __init__(self, test_file, pics_file, definitions):
         # TODO Needs supports for PICS file
@@ -604,16 +701,13 @@ class YamlParser:
             data = yaml.load(f, Loader=loader)
             _check_valid_keys(data, _TESTS_SECTION)
 
-            self.name = _valueOrNone(data, 'name')
-            self.PICS = _valueOrNone(data, 'PICS')
+            self.name = _value_or_none(data, 'name')
+            self.PICS = _value_or_none(data, 'PICS')
 
-            self._config = _valueOrNone(data, 'config')
+            self._parsing_config_variable_storage = _value_or_none(data, 'config')
 
-            tests = list(filter(lambda test: test.is_enabled, [TestStep(
-                test, self._config, definitions) for test in _valueOrNone(data, 'tests')]))
-            YamlFixes.try_update_yaml_node_id_test_runner_state(tests, self._config)
-
-            self.tests = YamlTests(tests)
+            tests = _value_or_none(data, 'tests')
+            self.tests = YamlTests(self._parsing_config_variable_storage, definitions, tests)
 
     def update_config(self, key, value):
-        self._config[key] = value
+        self._parsing_config_variable_storage[key] = value
