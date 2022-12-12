@@ -32,7 +32,7 @@ server cluster Third = 3 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22;
+  device type rootdevice = 22, version 1;
   binding cluster Second;
 
   server cluster Third {

@@ -47,8 +47,7 @@ AttributeStatusIBs::Builder & AttributeStatusIBs::Builder::EndOfAttributeStatuse
 #if CHIP_CONFIG_IM_PRETTY_PRINT
 CHIP_ERROR AttributeStatusIBs::Parser::PrettyPrint() const
 {
-    CHIP_ERROR err            = CHIP_NO_ERROR;
-    size_t NumAttributeStatus = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("AttributeStatusIBs =");
@@ -68,8 +67,6 @@ CHIP_ERROR AttributeStatusIBs::Parser::PrettyPrint() const
             ReturnErrorOnFailure(status.PrettyPrint());
             PRETTY_PRINT_DECDEPTH();
         }
-
-        ++NumAttributeStatus;
     }
 
     PRETTY_PRINT("],");

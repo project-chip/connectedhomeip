@@ -58,9 +58,6 @@ java_binary("java-matter-controller") {
     "java/src/com/matter/controller/commands/pairing/PairingModeType.java",
     "java/src/com/matter/controller/commands/pairing/PairingNetworkType.java",
     "java/src/com/matter/controller/commands/pairing/UnpairCommand.java",
-    "java/src/com/matter/controller/config/PersistentStorage.java",
-    "java/src/com/matter/controller/config/PersistentStorageOpCertStore.java",
-    "java/src/com/matter/controller/config/PersistentStorageOperationalKeystore.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

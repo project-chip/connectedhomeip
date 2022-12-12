@@ -49,7 +49,7 @@ chip_test_suite("tests") {
   ]
 
   if (chip_device_platform == "esp32" || chip_device_platform == "nrfconnect" ||
-      chip_device_platform == "efr32") {
+      chip_device_platform == "efr32" || chip_device_platform == "openiotsdk") {
     defines = [ "CURRENT_TIME_NOT_IMPLEMENTED=1" ]
   }
 

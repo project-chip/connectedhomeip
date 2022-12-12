@@ -234,7 +234,7 @@ bool emberAfScenesClusterRemoveSceneCallback(app::CommandHandler * commandObj, c
 
     if (!isEndpointInGroup(fabricIndex, emberAfCurrentEndpoint(), groupId))
     {
-        status = EMBER_ZCL_STATUS_INVALID_FIELD;
+        status = EMBER_ZCL_STATUS_INVALID_COMMAND;
     }
     else
     {
@@ -284,7 +284,7 @@ bool emberAfScenesClusterRemoveAllScenesCallback(app::CommandHandler * commandOb
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
     auto & groupId   = commandData.groupId;
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_FIELD;
+    EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_COMMAND;
     CHIP_ERROR err       = CHIP_NO_ERROR;
 
     emberAfScenesClusterPrintln("RX: RemoveAllScenes 0x%2x", groupId);
@@ -417,7 +417,7 @@ bool emberAfScenesClusterGetSceneMembershipCallback(app::CommandHandler * comman
 
     if (!isEndpointInGroup(fabricIndex, emberAfCurrentEndpoint(), groupId))
     {
-        status = EMBER_ZCL_STATUS_INVALID_FIELD;
+        status = EMBER_ZCL_STATUS_INVALID_COMMAND;
     }
 
     if (status == EMBER_ZCL_STATUS_SUCCESS)
@@ -471,7 +471,7 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(chip::FabricIndex fa
 
     if (!isEndpointInGroup(fabricIndex, endpoint, groupId))
     {
-        return EMBER_ZCL_STATUS_INVALID_FIELD;
+        return EMBER_ZCL_STATUS_INVALID_COMMAND;
     }
 
     for (i = 0; i < MATTER_SCENES_TABLE_SIZE; i++)
@@ -491,7 +491,7 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(chip::FabricIndex fa
     // If the target index is still zero, the table is full.
     if (index == EMBER_AF_SCENE_TABLE_NULL_INDEX)
     {
-        return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+        return EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
     }
 
     emberAfPluginScenesServerRetrieveSceneEntry(entry, index);
@@ -589,7 +589,7 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::FabricIndex fab
 {
     if (!isEndpointInGroup(fabricIndex, endpoint, groupId))
     {
-        return EMBER_ZCL_STATUS_INVALID_FIELD;
+        return EMBER_ZCL_STATUS_INVALID_COMMAND;
     }
 
     uint8_t i;
@@ -737,7 +737,7 @@ bool emberAfPluginScenesServerParseAddScene(
     // Add Scene commands can only reference groups to which we belong.
     if (!isEndpointInGroup(fabricIndex, endpoint, groupId))
     {
-        status = EMBER_ZCL_STATUS_INVALID_FIELD;
+        status = EMBER_ZCL_STATUS_INVALID_COMMAND;
         goto kickout;
     }
 
@@ -758,7 +758,7 @@ bool emberAfPluginScenesServerParseAddScene(
     // If the target index is still zero, the table is full.
     if (index == EMBER_AF_SCENE_TABLE_NULL_INDEX)
     {
-        status = EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+        status = EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
         goto kickout;
     }
 
@@ -1070,7 +1070,7 @@ bool emberAfPluginScenesServerParseViewScene(app::CommandHandler * commandObj, c
     // View Scene commands can only reference groups which we belong to.
     if (!isEndpointInGroup(fabricIndex, endpoint, groupId))
     {
-        status = EMBER_ZCL_STATUS_INVALID_FIELD;
+        status = EMBER_ZCL_STATUS_INVALID_COMMAND;
     }
     else
     {

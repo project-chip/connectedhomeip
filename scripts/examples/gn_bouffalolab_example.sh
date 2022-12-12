@@ -141,6 +141,17 @@ else
         exit 1
     fi
 
+    if [[ "$BOUFFALOLAB_SDK_ROOT" == "" ]]; then
+
+        echo -e "\e[31mPlease make sure Bouffalo Lab SDK installs as below:\e[0m"
+        echo -e "\e[31m\tcd third_party/bouffalolab/repo\e[0m"
+        echo -e "\e[31m\tsudo bash scripts/setup.sh\e[0m"
+
+        echo -e "\e[31mPlease make sure BOUFFALOLAB_SDK_ROOT exports before building as below:\e[0m"
+        echo -e "\e[31m\texport BOUFFALOLAB_SDK_ROOT=/opt/bouffalolab_sdk\e[0m"
+
+        exit 1
+    fi
     optArgs=$optArgs' bouffalolab_sdk_root="'$BOUFFALOLAB_SDK_ROOT'"'
 
     example_dir=$MATTER_ROOT/examples/$example_name/bouffalolab/$bouffalo_chip

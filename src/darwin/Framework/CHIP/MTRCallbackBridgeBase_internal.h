@@ -121,29 +121,38 @@ public:
     }
 
     /**
-     * Run the given MTRLocalActionBlock on the Matter thread, then handle
+     * Try to run the given MTRLocalActionBlock on the Matter thread, if we have
+     * a device and it's attached to a running controller, then handle
      * converting the value produced by the success callback to the right type
      * so it can be passed to a callback of the type we're templated over.
      *
      * Does not attempt to establish any sessions to devices.  Must not be used
      * with any action blocks that need a session.
      */
-    void DispatchLocalAction(MTRLocalActionBlock _Nonnull action)
+    void DispatchLocalAction(MTRBaseDevice * _Nullable device, MTRLocalActionBlock _Nonnull action)
     {
+        if (!device) {
+            OnFailureFn(this, CHIP_ERROR_INCORRECT_STATE);
+            return;
+        }
+
         LogRequestStart();
 
-        // For now keep sync dispatch here.
-        dispatch_sync(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-            CHIP_ERROR err = action(mSuccess, mFailure);
-            if (err != CHIP_NO_ERROR) {
-                NSLog(@"Failure performing action. C++-mangled success callback type: '%s', error: %s", typeid(T).name(),
-                    chip::ErrorStr(err));
+        [device.deviceController
+            asyncDispatchToMatterQueue:^(chip::Controller::DeviceCommissioner *) {
+                CHIP_ERROR err = action(mSuccess, mFailure);
+                if (err != CHIP_NO_ERROR) {
+                    NSLog(@"Failure performing action. C++-mangled success callback type: '%s', error: %s", typeid(T).name(),
+                        chip::ErrorStr(err));
 
-                // Take the normal async error-reporting codepath.  This will also
-                // handle cleaning us up properly.
-                OnFailureFn(this, err);
+                    // Take the normal async error-reporting codepath.  This will also
+                    // handle cleaning us up properly.
+                    OnFailureFn(this, err);
+                }
             }
-        });
+            errorHandler:^(NSError * error) {
+                DispatchFailure(this, error);
+            }];
     }
 
     void ActionWithPASEDevice(MTRBaseDevice * device)

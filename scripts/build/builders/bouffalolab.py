@@ -14,6 +14,7 @@
 
 import os
 import platform
+import logging
 from enum import Enum, auto
 
 from .gn import GnBuilder
@@ -28,9 +29,9 @@ class BouffalolabApp(Enum):
         else:
             raise Exception('Unknown app type: %r' % self)
 
-    def AppNamePrefix(self):
+    def AppNamePrefix(self, chip_name):
         if self == BouffalolabApp.LIGHT:
-            return 'chip-bl702-lighting-example'
+            return ('chip-%s-lighting-example' % chip_name)
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -87,7 +88,7 @@ class BouffalolabBuilder(GnBuilder):
         )
 
         self.argsOpt = []
-
+        self.chip_name = bouffalo_chip
         toolchain = os.path.join(root, '../../examples/platform/bouffalolab/common/toolchain')
         toolchain = 'custom_toolchain="{}:riscv_gcc"'.format(toolchain)
         if toolchain:
@@ -107,19 +108,29 @@ class BouffalolabBuilder(GnBuilder):
         elif enable_shell:
             self.argsOpt.append('chip_build_libshell=true')
 
-        self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])
+        try:
+            self.argsOpt.append('bouffalolab_sdk_root="%s"' % os.environ['BOUFFALOLAB_SDK_ROOT'])
+        except KeyError as err:
+            logging.fatal('Please make sure Bouffalo Lab SDK installs as below:')
+            logging.fatal('\tcd third_party/bouffalolab/repo')
+            logging.fatal('\tsudo bash scripts/setup.sh')
+
+            logging.fatal('Please make sure BOUFFALOLAB_SDK_ROOT exports before building as below:')
+            logging.fatal('\texport BOUFFALOLAB_SDK_ROOT=/opt/bouffalolab_sdk')
+
+            raise err
 
     def GnBuildArgs(self):
         return self.argsOpt
 
     def build_outputs(self):
         items = {
-            '%s.out' % self.app.AppNamePrefix():
+            '%s.out' % self.app.AppNamePrefix(self.chip_name):
                 os.path.join(self.output_dir, '%s.out' %
-                             self.app.AppNamePrefix()),
-            '%s.out.map' % self.app.AppNamePrefix():
+                             self.app.AppNamePrefix(self.chip_name)),
+            '%s.out.map' % self.app.AppNamePrefix(self.chip_name):
                 os.path.join(self.output_dir,
-                             '%s.out.map' % self.app.AppNamePrefix()),
+                             '%s.out.map' % self.app.AppNamePrefix(self.chip_name)),
         }
 
         return items

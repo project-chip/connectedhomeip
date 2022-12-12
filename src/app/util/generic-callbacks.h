@@ -110,7 +110,7 @@ bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::Cluste
  * value of EMBER_ZCL_STATUS_SUCCESS. Ensure that the size of the externally
  * managed attribute value is smaller than what the buffer can hold. In the case
  * of a buffer overflow throw an appropriate error such as
- * EMBER_ZCL_STATUS_INSUFFICIENT_SPACE. Any other return value indicates the
+ * EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED. Any other return value indicates the
  * application was not able to read the attribute.
  */
 EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,

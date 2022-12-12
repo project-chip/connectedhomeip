@@ -22,7 +22,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 
-class EFR32MatterConfig
+class SI917MatterConfig
 {
 public:
     static CHIP_ERROR InitMatter(const char * appName);

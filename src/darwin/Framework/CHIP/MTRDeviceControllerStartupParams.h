@@ -16,7 +16,7 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NSData * MTRCertificateDERBytes;
+#import <Matter/MTRCertificates.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

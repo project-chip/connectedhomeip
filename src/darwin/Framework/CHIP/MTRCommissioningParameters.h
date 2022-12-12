@@ -60,6 +60,8 @@ NS_ASSUME_NONNULL_BEGIN
  * An optional delegate that can be notified upon completion of device
  * attestation.  See documentation for MTRDeviceAttestationDelegate for
  * details.
+ *
+ * The delegate methods will be invoked on an arbitrary thread.
  */
 @property (nonatomic, strong, nullable) id<MTRDeviceAttestationDelegate> deviceAttestationDelegate;
 /**
@@ -68,7 +70,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * If nil, the fail-safe will not be extended before calling into the
  * deviceAttestationDelegate.
-
  */
 @property (nonatomic, copy, nullable) NSNumber * failSafeExpiryTimeout MTR_NEWLY_AVAILABLE;
 

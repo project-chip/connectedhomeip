@@ -73,12 +73,14 @@ static void MTRClustersLogCompletion(NSString *logPrefix, id value, NSError *err
     if (timedInvokeTimeoutMsParam) {
       timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
     }
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.callbackQueue];
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
         MTRBaseDevice *baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * bridge = new MTR{{>callbackName}}CallbackBridge(self.callbackQueue,
+        auto * bridge = new MTR{{>callbackName}}CallbackBridge(self.device.queue,
           ^(id _Nullable value, NSError * _Nullable error) {
+            MTRClustersLogCompletion(logPrefix, value, error);
+            dispatch_async(self.callbackQueue, ^{
           {{#if hasSpecificResponse}}
             {{! This treats completion as taking an id for the data.  This is
                 not great from a type-safety perspective, of course. }}
@@ -89,7 +91,7 @@ static void MTRClustersLogCompletion(NSString *logPrefix, id value, NSError *err
                 type-safety perspective, of course. }}
             completion(error);
           {{/if}}
-            MTRClustersLogCompletion(logPrefix, value, error);
+            });
             [workItem endWork];
           },
           ^(ExchangeManager & exchangeManager, const SessionHandle & session, {{>callbackName}}CallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {

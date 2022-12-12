@@ -1674,7 +1674,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
                 {
                     bool keyCertSignFlag = keyUsage & X509v3_KU_KEY_CERT_SIGN;
                     bool crlSignFlag     = keyUsage & X509v3_KU_CRL_SIGN;
-                    bool otherFlags      = keyUsage & ~(X509v3_KU_CRL_SIGN | X509v3_KU_KEY_CERT_SIGN | X509v3_KU_DIGITAL_SIGNATURE);
+                    bool otherFlags      = keyUsage &
+                        ~static_cast<uint32_t>(X509v3_KU_CRL_SIGN | X509v3_KU_KEY_CERT_SIGN | X509v3_KU_DIGITAL_SIGNATURE);
                     VerifyOrExit(keyCertSignFlag && crlSignFlag && !otherFlags, err = CHIP_ERROR_INTERNAL);
                 }
             }

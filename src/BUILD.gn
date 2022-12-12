@@ -107,10 +107,13 @@ if (chip_build_tests) {
     if (chip_device_platform != "nrfconnect" &&
         chip_device_platform != "efr32") {
       # TODO(#10447): Controller test has HF on EFR32.
-      deps += [
-        "${chip_root}/src/controller/tests",
-        "${chip_root}/src/controller/tests/data_model",
-      ]
+      deps += [ "${chip_root}/src/controller/tests/data_model" ]
+
+      # Skip controller test for Open IoT SDK
+      # https://github.com/project-chip/connectedhomeip/issues/23747
+      if (chip_device_platform != "openiotsdk") {
+        deps += [ "${chip_root}/src/controller/tests" ]
+      }
     }
 
     if (current_os != "zephyr" && current_os != "mbed" &&
