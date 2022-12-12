@@ -344,11 +344,11 @@ static CHIP_ERROR Resolve(void * context, DnssdResolveCallback callback, uint32_
     ChipLogDetail(Discovery, "Resolve type=%s name=%s interface=%" PRIu32, StringOrNullMarker(type), StringOrNullMarker(name),
                   interfaceId);
 
-    // This is a little silly, in that resolves for the sane name, type, etc get
+    // This is a little silly, in that resolves for the same name, type, etc get
     // coalesced by the underlying mDNSResponder anyway.  But we need to keep
     // track of our context/callback/etc, (even though in practice it's always
     // exactly the same) and the interface id (which might actually be different
-    // for different Resolve calls).  So for now just keep using a
+    // for different Resolve calls). So for now just keep using a
     // ResolveContext to track all that.
     std::shared_ptr<uint32_t> counterHolder;
     if (auto existingCtx = MdnsContexts::GetInstance().GetExistingResolveForInstanceName(name))
@@ -474,15 +474,8 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
 void ChipDnssdResolveNoLongerNeeded(const char * instanceName)
 {
     auto existingCtx = MdnsContexts::GetInstance().GetExistingResolveForInstanceName(instanceName);
-    if (!existingCtx)
-    {
-        return;
-    }
-
-    if (*existingCtx->consumerCounter == 0)
-    {
-        return;
-    }
+    VerifyOrReturn(existingCtx != nullptr);
+    VerifyOrReturn(*existingCtx->consumerCounter != 0);
 
     (*existingCtx->consumerCounter)--;
 

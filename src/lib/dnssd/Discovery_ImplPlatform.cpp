@@ -628,10 +628,9 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId)
 void DiscoveryImplPlatform::NodeIdResolutionNoLongerNeeded(const PeerId & peerId)
 {
     char name[Common::kInstanceNameMaxLength + 1];
-    if (MakeInstanceName(name, sizeof(name), peerId) == CHIP_NO_ERROR)
-    {
-        ChipDnssdResolveNoLongerNeeded(name);
-    }
+    ReturnOnFailure(MakeInstanceName(name, sizeof(name), peerId));
+
+    ChipDnssdResolveNoLongerNeeded(name);
 }
 
 CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissionableNodes(DiscoveryFilter filter)
@@ -700,10 +699,9 @@ CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId)
 void ResolverProxy::NodeIdResolutionNoLongerNeeded(const PeerId & peerId)
 {
     char name[Common::kInstanceNameMaxLength + 1];
-    if (MakeInstanceName(name, sizeof(name), peerId) == CHIP_NO_ERROR)
-    {
-        ChipDnssdResolveNoLongerNeeded(name);
-    }
+    ReturnOnFailure(MakeInstanceName(name, sizeof(name), peerId));
+
+    ChipDnssdResolveNoLongerNeeded(name);
 }
 
 ResolverProxy::~ResolverProxy()
