@@ -287,7 +287,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     while (true)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
+        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
         while (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);

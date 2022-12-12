@@ -372,7 +372,7 @@ public:
      * the result of the operation is passed to the delegate's `OnNodeIdResolved` or
      * `OnNodeIdResolutionFailed` method, respectively.
      */
-    virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) = 0;
+    virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId) = 0;
 
     /**
      * Finds all commissionable nodes matching the given filter.

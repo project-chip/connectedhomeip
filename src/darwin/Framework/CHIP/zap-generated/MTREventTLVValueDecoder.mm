@@ -1240,8 +1240,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
 
             do {
                 NSNumber * _Nonnull memberValue;
-                memberValue = [NSNumber numberWithUnsignedChar:cppValue.newPosition];
-                value.newPosition = memberValue;
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.previousPosition];
+                value.previousPosition = memberValue;
             } while (0);
             do {
                 NSNumber * _Nonnull memberValue;

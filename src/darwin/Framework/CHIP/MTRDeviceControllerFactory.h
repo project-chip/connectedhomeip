@@ -21,6 +21,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRCertificates.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -52,16 +53,21 @@ MTR_NEWLY_AVAILABLE
 
 /*
  * The Product Attestation Authority certificates that are trusted to sign
- * device attestation information.  Defaults to nil.
+ * device attestation information (and in particular to sign Product Attestation
+ * Intermediate certificates, which then sign Device Attestation Certificates).
  *
+ * Defaults to nil.
  */
-@property (nonatomic, copy, nullable) NSArray<NSData *> * paaCerts;
+@property (nonatomic, copy, nullable) NSArray<MTRCertificateDERBytes> * productAttestationAuthorityCertificates;
 /*
- * The Certificate Declaration certificates that are trusted to sign
- * device attestation information.  Defaults to nil.
+ * The Certification Declaration certificates whose public keys correspond to
+ * private keys that are trusted to sign certification declarations.  Defaults
+ * to nil.
  *
+ * These certificates are used in addition to, not replacing, the default set of
+ * well-known certification declaration signing keys.
  */
-@property (nonatomic, copy, nullable) NSArray<NSData *> * cdCerts;
+@property (nonatomic, copy, nullable) NSArray<MTRCertificateDERBytes> * certificationDeclarationCertificates;
 /*
  * The network port to bind to.  If not specified, an ephemeral port will be
  * used.
@@ -145,7 +151,11 @@ MTR_NEWLY_DEPRECATED("Please use MTRDeviceControllerFactoryParams")
 @interface MTRControllerFactoryParams : MTRDeviceControllerFactoryParams
 @property (nonatomic, strong, readonly) id<MTRPersistentStorageDelegate> storageDelegate MTR_NEWLY_DEPRECATED(
     "Please use the storage property");
-@property (nonatomic, assign) BOOL startServer;
+@property (nonatomic, assign) BOOL startServer MTR_NEWLY_DEPRECATED("Please use shouldStartServer");
+@property (nonatomic, copy, nullable)
+    NSArray<NSData *> * paaCerts MTR_NEWLY_DEPRECATED("Please use productAttestationAuthorityCertificates");
+@property (nonatomic, copy, nullable)
+    NSArray<NSData *> * cdCerts MTR_NEWLY_DEPRECATED("Please use certificationDeclarationCertificates");
 @end
 
 MTR_NEWLY_DEPRECATED("Please use MTRDeviceControllerFactory")

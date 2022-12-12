@@ -112,12 +112,10 @@ DNSServiceProtocol GetProtocol(const chip::Inet::IPAddressType & addressType)
     return kDNSServiceProtocol_IPv6;
 #endif
 }
-
 } // namespace
 
 namespace chip {
 namespace Dnssd {
-
 CHIP_ERROR GenericContext::Finalize(DNSServiceErrorType err)
 {
     if (MdnsContexts::GetInstance().Has(this) == CHIP_NO_ERROR)
@@ -137,6 +135,51 @@ CHIP_ERROR GenericContext::Finalize(DNSServiceErrorType err)
     }
 
     return Error::ToChipError(err);
+}
+
+RegisterContext::RegisterContext(const char * sType, const char * instanceName, DnssdPublishCallback cb, void * cbContext)
+{
+    type     = ContextType::Register;
+    context  = cbContext;
+    callback = cb;
+
+    mType         = sType;
+    mInstanceName = instanceName;
+}
+
+void RegisterContext::DispatchFailure(DNSServiceErrorType err)
+{
+    ChipLogError(Discovery, "Mdns: Register failure (%s)", Error::ToString(err));
+    callback(context, nullptr, nullptr, Error::ToChipError(err));
+    MdnsContexts::GetInstance().Remove(this);
+}
+
+void RegisterContext::DispatchSuccess()
+{
+    std::string typeWithoutSubTypes = GetFullTypeWithoutSubTypes(mType);
+    callback(context, typeWithoutSubTypes.c_str(), mInstanceName.c_str(), CHIP_NO_ERROR);
+
+    // Once a service has been properly published it is normally unreachable because the hostname has not yet been
+    // registered against the dns daemon. Register the records mapping the hostname to our IP.
+    // mHostNameRegistrar.Register();
+}
+
+CHIP_ERROR MdnsContexts::GetRegisterContextOfType(const char * type, RegisterContext ** context)
+{
+    bool found = false;
+    std::vector<GenericContext *>::iterator iter;
+
+    for (iter = mContexts.begin(); iter != mContexts.end(); iter++)
+    {
+        if ((*iter)->type == ContextType::Register && (static_cast<RegisterContext *>(*iter))->matches(type))
+        {
+            *context = static_cast<RegisterContext *>(*iter);
+            found    = true;
+            break;
+        }
+    }
+
+    return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
 MdnsContexts::~MdnsContexts()
@@ -500,6 +543,5 @@ InterfaceInfo::~InterfaceInfo()
     }
     Platform::MemoryFree(const_cast<TextEntry *>(service.mTextEntries));
 }
-
 } // namespace Dnssd
 } // namespace chip

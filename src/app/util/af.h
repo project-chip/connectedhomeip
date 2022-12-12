@@ -303,16 +303,6 @@ void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size);
  */
 bool emberAfIsDeviceIdentifying(chip::EndpointId endpoint);
 
-/**
- * @brief Function that enables or disables an endpoint.
- *
- * By calling this function, you turn off all processing of incoming traffic
- * for a given endpoint.
- *
- * @param endpoint Zigbee endpoint number
- */
-void emberAfSetDeviceEnabled(chip::EndpointId endpoint, bool enabled);
-
 /** @} END Device Control */
 
 /** @name Miscellaneous */

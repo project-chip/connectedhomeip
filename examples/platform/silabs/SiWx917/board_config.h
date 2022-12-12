@@ -28,7 +28,7 @@
 
 /**
  * @file
- *   This file includes dev borad compile-time configuration constants for efr32.
+ *   This file includes dev board compile-time configuration constants for SiWx917.
  *
  */
 

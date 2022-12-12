@@ -16,7 +16,6 @@
 
 import logging
 import os
-import shutil
 import sys
 import time
 import typing
@@ -281,4 +280,4 @@ if sys.platform == 'linux':
 
 
 if __name__ == '__main__':
-    main()
+    main(auto_envvar_prefix='CHIP')

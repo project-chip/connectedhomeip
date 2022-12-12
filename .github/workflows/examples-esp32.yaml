@@ -22,6 +22,9 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     esp32:
         name: ESP32
@@ -31,7 +34,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.6.06
+            image: connectedhomeip/chip-build-esp32:0.6.18
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -137,7 +140,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.6.06
+            image: connectedhomeip/chip-build-esp32:0.6.18
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 

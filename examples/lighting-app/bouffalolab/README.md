@@ -59,7 +59,7 @@ Mac OS.
 
     ```
     cd third_party/bouffalolab/repo
-    sudo bash script/setup.sh
+    sudo bash scripts/setup.sh
     ```
 
     Please execute following command export `BOUFFALOLAB_SDK_ROOT` before

@@ -109,7 +109,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
 
     if (params.GetCountryCode().HasValue())
     {
-        auto & code = params.GetCountryCode().Value();
+        auto code = params.GetCountryCode().Value();
         MutableCharSpan copiedCode(mCountryCode);
         if (CopyCharSpanToMutableCharSpan(code, copiedCode) == CHIP_NO_ERROR)
         {

@@ -278,7 +278,7 @@ public:
     void Shutdown() override;
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override { mCommissioningDelegate = delegate; }
-    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
+    CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR StopDiscovery() override;
@@ -652,7 +652,7 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
     return SendAllPendingQueries();
 }
 
-CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
+CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId)
 {
     mActiveResolves.MarkPending(peerId);
 
@@ -700,14 +700,14 @@ ResolverProxy::~ResolverProxy()
 // updating the delegate that ends up being used by the server by calling 'SetOperationalDelegate'.
 // This effectively allow minimal to have multiple controllers issuing requests as long the requests are serialized, but
 // it won't work well if requests are issued in parallel.
-CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
+CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogProgress(Discovery, "Resolving " ChipLogFormatX64 ":" ChipLogFormatX64 " ...",
                     ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
     chip::Dnssd::Resolver::Instance().SetOperationalDelegate(mDelegate);
-    return chip::Dnssd::Resolver::Instance().ResolveNodeId(peerId, type);
+    return chip::Dnssd::Resolver::Instance().ResolveNodeId(peerId);
 }
 
 CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)

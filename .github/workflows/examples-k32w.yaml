@@ -22,6 +22,9 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     k32w:
         name: K32W
@@ -34,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-k32w:0.6.06
+            image: connectedhomeip/chip-build-k32w:0.6.18
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -67,7 +70,7 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Build examples
-              timeout-minutes: 30
+              timeout-minutes: 40
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
