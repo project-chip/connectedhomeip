@@ -78,15 +78,16 @@ _EVENT_COMMANDS = [
 
 
 class PostProcessCheckStatus(Enum):
+    ''' Inidcates the post processing check step status.'''
     SUCCESS = 'success',
     WARNING = 'warning',
     ERROR = 'error'
 
 
-# TODO these values are just what was there before, these should be updated
 class PostProcessCheckType(Enum):
-    IM_STATUS = 'Error',
-    CLUSTER_STATUS = 'ClusterError',
+    ''' Inidcates the post processing check step type.'''
+    IM_STATUS = 'IMStatus',
+    CLUSTER_STATUS = 'ClusterStatus',
     RESPONSE_VALIDATION = 'Response',
     CONSTRAINT_VALIDATION = 'Constraints',
     SAVE_AS_VARIABLE = 'SaveAs'
@@ -99,6 +100,12 @@ class PostProcessCheckType(Enum):
 #  * failure: Indicates that the check was unsuccessfull
 #  * warning: Indicates that the check is probably successful but that something needs to be considered.
 class PostProcessCheck:
+    ''' Information about a single post processing on check step.
+
+    Each check has a helpful message should the consumer want to closer inspect what checks are,
+    as well as details as to why something may have failed.
+    '''
+
     def __init__(self, state: PostProcessCheckStatus, category: PostProcessCheckType, message: str):
         self.state = state
         self.category = category
@@ -115,10 +122,11 @@ class PostProcessCheck:
 
 
 class PostProcessResponseResult:
-    ''' asdf
+    ''' Post processing response result information.
 
-    There are multiple steps that occur when post processing a response. This is a summary of the
-    results. Note that the number and types of steps performed is dependant on test step itself.
+    There are multiple steps that occur when post processing a response. This contains all the
+    results for each step performed. Note that the number and types of steps performed is
+    dependant on test step itself.
     '''
 
     def __init__(self):
@@ -129,17 +137,17 @@ class PostProcessResponseResult:
 
     def success(self, category: PostProcessCheckType, message: str):
         ''' Adds a success entry that occured when post processing response to results.'''
-        self.__insert(PostProcessCheckStatus.SUCCESS, category, message)
+        self._insert(PostProcessCheckStatus.SUCCESS, category, message)
         self.successes += 1
 
     def warning(self, category: PostProcessCheckType, message: str):
         ''' Adds a warning entry that occured when post processing response to results.'''
-        self.__insert(PostProcessCheckStatus.WARNING, category, message)
+        self._insert(PostProcessCheckStatus.WARNING, category, message)
         self.warnings += 1
 
     def error(self, category: PostProcessCheckType, message: str):
         ''' Adds an error entry that occured when post processing response to results.'''
-        self.__insert(PostProcessCheckStatus.ERROR, category, message)
+        self._insert(PostProcessCheckStatus.ERROR, category, message)
         self.errors += 1
 
     def is_success(self):
@@ -150,7 +158,7 @@ class PostProcessResponseResult:
     def is_failure(self):
         return self.errors != 0
 
-    def __insert(self, state: PostProcessCheckStatus, category: PostProcessCheckType, message: str):
+    def _insert(self, state: PostProcessCheckStatus, category: PostProcessCheckType, message: str):
         log = PostProcessCheck(state, category, message)
         self.entries.append(log)
 
@@ -172,6 +180,10 @@ def _valueOrConfig(data, key, config):
 
 
 class TestStep:
+    '''A single yaml test action parsed from YAML.
+
+    There are stages to the lifecycle of this object.
+    '''
     is_enabled: True
     is_command: False
     is_attribute: False
@@ -232,6 +244,17 @@ class TestStep:
 
         self.__update_with_definition(self.arguments, argument_mapping)
         self.__update_with_definition(self.response, response_mapping)
+
+        # This performs a very basic sanity parse time check of constrains. This parsing happens
+        # again inside post processing response since at that time we will have required variables
+        # to substitute in. This parsing check here has value since some test can take a really long
+        # time to run so knowing earlier on that the test step would have failed at parsing time
+        # before the test step run occurs save developer time that building yaml tests.
+        if self.response:
+            for value in self.response['values']:
+                if not 'constraints' in value:
+                    continue
+                get_constraints(value['constraints'])
 
     def _convert_single_value_to_values(self, container):
         if container is None or 'values' in container:
@@ -316,7 +339,7 @@ class TestStep:
             raise AssertionError('This should not happens.')
 
     def __maybe_check_cluster_error(self, response, result):
-        check_type = PostProcessCheckType.IM_STATUS
+        check_type = PostProcessCheckType.CLUSTER_STATUS
         error_success = 'The test expects the "{error}" error which occured successfully.'
         error_unexpected_success = 'The test expects the "{error}" error but no error occured.'
         error_wrong_error = 'The test expects the "{error}" error but the "{value}" error occured.'
