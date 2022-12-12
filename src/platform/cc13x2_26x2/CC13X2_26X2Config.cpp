@@ -80,6 +80,9 @@ const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Spake2pSalt = {
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Spake2pVerifier = {
     { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipFactory, .subID = 0x000c }
 };
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_LifeTimeCounter = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipFactory, .subID = 0x0010 }
+};
 
 // Keys stored in the Chip-counters namespace
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_BootCount = {
@@ -88,9 +91,7 @@ const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_BootCount = {
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_TotalOperationalHours = {
     { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipCounters, .subID = 0x000f }
 };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_LifeTimeCounter = {
-    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipCounters, .subID = 0x0010 }
-};
+
 
 // Keys stored in the Chip-config namespace
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_ServiceConfig = {
@@ -417,8 +418,8 @@ CHIP_ERROR CC13X2_26X2Config::FactoryResetConfig(void)
     NVINTF_nvProxy_t nvProxy = { 0 };
     uint8_t status           = NVINTF_SUCCESS;
 
-    // Delete items with the config, kvs_key and kvs_value itemIDs. Items with the factory
-    // and counter itemIDs are not deleted.
+    // Delete items with the config, counter, kvs_key and kvs_value itemIDs. Items with the factory
+    // itemIDs are not deleted.
 
     intptr_t key = sNvoctpFps.lockNV();
 
@@ -427,7 +428,20 @@ CHIP_ERROR CC13X2_26X2Config::FactoryResetConfig(void)
     nvProxy.itemid = kCC13X2_26X2Matter_ItemID_ChipConfig;
     nvProxy.flag   = NVINTF_DOSTART | NVINTF_DOITMID | NVINTF_DODELETE;
 
-    /* Lock and wipe all items with sysid TIOP */
+    /* Lock and wipe all items with config itemid */
+    do
+    {
+        status = sNvoctpFps.doNext(&nvProxy);
+    } while (NVINTF_SUCCESS == status);
+    /* check we ran out of elements */
+    VerifyOrExit(status == NVINTF_NOTFOUND, err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+
+    /* Setup doNext call */
+    nvProxy.sysid  = kCC13X2_26X2Matter_SysID;
+    nvProxy.itemid = kCC13X2_26X2Matter_ItemID_ChipCounters;
+    nvProxy.flag   = NVINTF_DOSTART | NVINTF_DOITMID | NVINTF_DODELETE;
+
+    /* Lock and wipe all items with counters itemid */
     do
     {
         status = sNvoctpFps.doNext(&nvProxy);
@@ -440,7 +454,7 @@ CHIP_ERROR CC13X2_26X2Config::FactoryResetConfig(void)
     nvProxy.itemid = kCC13X2_26X2Matter_ItemID_ChipKVS_key;
     nvProxy.flag   = NVINTF_DOSTART | NVINTF_DOITMID | NVINTF_DODELETE;
 
-    /* Lock and wipe all items with sysid TIOP */
+    /* Lock and wipe all items with kvs_key itemid */
     do
     {
         status = sNvoctpFps.doNext(&nvProxy);
@@ -453,7 +467,7 @@ CHIP_ERROR CC13X2_26X2Config::FactoryResetConfig(void)
     nvProxy.itemid = kCC13X2_26X2Matter_ItemID_ChipKVS_value;
     nvProxy.flag   = NVINTF_DOSTART | NVINTF_DOITMID | NVINTF_DODELETE;
 
-    /* Lock and wipe all items with sysid TIOP */
+    /* Lock and wipe all items with key_value itemid */
     do
     {
         status = sNvoctpFps.doNext(&nvProxy);
