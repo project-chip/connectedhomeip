@@ -99,10 +99,6 @@ void ActiveResolveAttempts::NodeIdResolutionNoLongerNeeded(const PeerId & peerId
         if (item.attempt.Matches(peerId))
         {
             item.attempt.ConsumerRemoved();
-            if (item.attempt.ResolveData().consumerCount == 0)
-            {
-                item.attempt.Clear();
-            }
             return;
         }
     }

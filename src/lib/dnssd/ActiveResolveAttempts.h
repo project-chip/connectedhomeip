@@ -72,7 +72,8 @@ public:
         ScheduledAttempt()
         {
             static_assert(sizeof(Resolve) <= sizeof(Browse) || sizeof(Resolve) <= sizeof(HeapQName),
-                          "Figure out where to put the Resolve counter.");
+                          "Figure out where to put the Resolve counter so that Resolve is not making ScheduledAttempt bigger than "
+                          "it has to be anyway to handle the other attempt types.");
         }
         ScheduledAttempt(const chip::PeerId & peer, bool first) :
             resolveData(chip::InPlaceTemplateType<Resolve>(), peer), firstSend(first)
@@ -186,12 +187,29 @@ public:
         bool IsIpResolve() const { return resolveData.Is<IpResolve>(); }
         void Clear() { resolveData = DataType(); }
 
+        // Called when this scheduled attempt will replace an existing scheduled
+        // attempt, because either they match or we have run out of attempt
+        // slots.  When this happens, we want to propagate the consumer count
+        // from the existing attempt to the new one, if they're matching resolve
+        // attempts.
         void WillCoalesceWith(const ScheduledAttempt & existing)
         {
-            if (IsResolve() && existing.Matches(*this))
+            if (!IsResolve())
             {
-                resolveData.Get<Resolve>().consumerCount = existing.resolveData.Get<Resolve>().consumerCount + 1;
+                // Consumer count is only tracked for resolve requests
+                return;
             }
+
+            if (!existing.Matches(*this))
+            {
+                // Out of attempt slots, so just dropping the existing attempt.
+                return;
+            }
+
+            // Adding another consumer to the same query. Propagate along the
+            // consumer count to our new attempt, which will replace the
+            // existing one.
+            resolveData.Get<Resolve>().consumerCount = existing.resolveData.Get<Resolve>().consumerCount + 1;
         }
 
         void ConsumerRemoved()
@@ -205,6 +223,11 @@ public:
             if (count > 0)
             {
                 --count;
+            }
+
+            if (count == 0)
+            {
+                Clear();
             }
         }
 

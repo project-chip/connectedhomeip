@@ -388,9 +388,16 @@ public:
     /*
      * Notify the resolver that one of the consumers that called ResolveNodeId
      * successfully no longer needs the resolution result (e.g. because it got
-     * the result, or got an error, or no longer cares about future updates).
+     * the result via OnOperationalNodeResolved, or got an via
+     * OnOperationalNodeResolutionFailed, or no longer cares about future
+     * updates).
+     *
      * There must be a NodeIdResolutionNoLongerNeeded call that matches every
-     * successful ResolveNodeId call.
+     * successful ResolveNodeId call.  In particular, implementations of
+     * OnOperationalNodeResolved and OnOperationalNodeResolutionFailed must call
+     * NodeIdResolutionNoLongerNeeded once for each prior successful call to
+     * ResolveNodeId for the relevant PeerId that has not yet had a matching
+     * NodeIdResolutionNoLongerNeeded call made.
      */
     virtual void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) = 0;
 
