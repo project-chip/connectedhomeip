@@ -38,7 +38,8 @@
 
 using namespace chip::Ble;
 
-constexpr uint64_t kScanningTimeoutInSeconds = 60;
+constexpr uint64_t kScanningWithDiscriminatorTimeoutInSeconds = 60;
+constexpr uint64_t kScanningWithoutDiscriminatorTimeoutInSeconds = 120;
 
 @interface BleConnection : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate>
 
@@ -48,6 +49,8 @@ constexpr uint64_t kScanningTimeoutInSeconds = 60;
 @property (strong, nonatomic) CBPeripheral * peripheral;
 @property (strong, nonatomic) CBUUID * shortServiceUUID;
 @property (nonatomic, readonly, nullable) dispatch_source_t timer;
+@property (strong, nonatomic) NSMutableDictionary * cachedPeripherals;
+@property (unsafe_unretained, nonatomic) bool hasDeviceDiscriminator;
 @property (unsafe_unretained, nonatomic) bool found;
 @property (unsafe_unretained, nonatomic) chip::SetupDiscriminator deviceDiscriminator;
 @property (unsafe_unretained, nonatomic) void * appState;
@@ -59,6 +62,9 @@ constexpr uint64_t kScanningTimeoutInSeconds = 60;
 - (void)setBleLayer:(chip::Ble::BleLayer *)bleLayer;
 - (void)start;
 - (void)stop;
+- (BOOL)hasDiscriminator;
+- (void)updateWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator;
+- (void)update;
 
 @end
 
@@ -71,10 +77,40 @@ namespace DeviceLayer {
             Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & deviceDiscriminator)
         {
             ChipLogProgress(Ble, "%s", __FUNCTION__);
+
+            // If the previous connection delegate was a scan without a discriminator, just reuse it instead of
+            // creating a brand new connection but update the discriminator and the ble layer members.
+            if (ble and ![ble hasDiscriminator]) {
+                [ble setBleLayer:bleLayer];
+                ble.appState = appState;
+                ble.onConnectionComplete = OnConnectionComplete;
+                ble.onConnectionError = OnConnectionError;
+                [ble updateWithDiscriminator:deviceDiscriminator];
+                return;
+            }
+
             CancelConnection();
             ble = [[BleConnection alloc] initWithDiscriminator:deviceDiscriminator];
             [ble setBleLayer:bleLayer];
             ble.appState = appState;
+            ble.onConnectionComplete = OnConnectionComplete;
+            ble.onConnectionError = OnConnectionError;
+            ble.centralManager = [ble.centralManager initWithDelegate:ble queue:ble.workQueue];
+        }
+
+        void BleConnectionDelegateImpl::PrepareConnection()
+        {
+            ChipLogProgress(Ble, "%s", __FUNCTION__);
+
+            // If the previous connection delegate was a scan without a discriminator, just reuse it instead of
+            // creating a brand new connection but clear the cache and reset the timer.
+            if (ble and ![ble hasDiscriminator]) {
+                [ble update];
+                return;
+            }
+
+            CancelConnection();
+            ble = [[BleConnection alloc] init];
             ble.onConnectionComplete = OnConnectionComplete;
             ble.onConnectionError = OnConnectionError;
             ble.centralManager = [ble.centralManager initWithDelegate:ble queue:ble.workQueue];
@@ -98,32 +134,56 @@ namespace DeviceLayer {
 
 @implementation BleConnection
 
-- (id)initWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator
+- (id)init
 {
     self = [super init];
     if (self) {
         self.shortServiceUUID = [UUIDHelper GetShortestServiceUUID:&chip::Ble::CHIP_BLE_SVC_ID];
-        _deviceDiscriminator = deviceDiscriminator;
         _workQueue = dispatch_queue_create("com.chip.ble.work_queue", DISPATCH_QUEUE_SERIAL);
         _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
         _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _workQueue);
         _centralManager = [CBCentralManager alloc];
         _found = false;
+        _cachedPeripherals = [[NSMutableDictionary alloc] init];
+        _hasDeviceDiscriminator = false;
 
         dispatch_source_set_event_handler(_timer, ^{
             [self stop];
             [self dispatchConnectionError:BLE_ERROR_APP_CLOSED_CONNECTION];
         });
-        dispatch_source_set_timer(
-            _timer, dispatch_walltime(nullptr, kScanningTimeoutInSeconds * NSEC_PER_SEC), DISPATCH_TIME_FOREVER, 5 * NSEC_PER_SEC);
+
+        [self resetTimer];
     }
 
     return self;
 }
 
+- (id)initWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator
+{
+    self = [self init];
+    if (self) {
+        _deviceDiscriminator = deviceDiscriminator;
+        _hasDeviceDiscriminator = true;
+        [self resetTimer];
+    }
+
+    return self;
+}
+
+- (void)resetTimer
+{
+    auto timeout =
+        [self hasDiscriminator] ? kScanningWithDiscriminatorTimeoutInSeconds : kScanningWithoutDiscriminatorTimeoutInSeconds;
+    dispatch_source_set_timer(_timer, dispatch_walltime(nullptr, timeout * NSEC_PER_SEC), DISPATCH_TIME_FOREVER, 5 * NSEC_PER_SEC);
+}
+
 // All our callback dispatch must happen on _chipWorkQueue
 - (void)dispatchConnectionError:(CHIP_ERROR)error
 {
+    if (self.onConnectionError == nil) {
+        return;
+    }
+
     dispatch_async(_chipWorkQueue, ^{
         self.onConnectionError(self.appState, error);
     });
@@ -131,6 +191,10 @@ namespace DeviceLayer {
 
 - (void)dispatchConnectionComplete:(CBPeripheral *)peripheral
 {
+    if (self.onConnectionComplete == nil) {
+        return;
+    }
+
     dispatch_async(_chipWorkQueue, ^{
         self.onConnectionComplete(self.appState, (__bridge void *) peripheral);
     });
@@ -183,10 +247,15 @@ namespace DeviceLayer {
                     uint8_t opCode = bytes[0];
                     uint16_t discriminator = (bytes[1] | (bytes[2] << 8)) & 0xfff;
 
-                    if ((opCode == 0 || opCode == 1) && [self checkDiscriminator:discriminator]) {
-                        ChipLogProgress(Ble, "Connecting to device with discriminator: %d", discriminator);
-                        [self connect:peripheral];
-                        [self stopScanning];
+                    if (opCode == 0 || opCode == 1) {
+                        if (![self hasDiscriminator]) {
+                            ChipLogProgress(Ble, "Storing device %p with discriminator: %d", peripheral, discriminator);
+                            _cachedPeripherals[@(discriminator)] = peripheral;
+                        } else if ([self checkDiscriminator:discriminator]) {
+                            ChipLogProgress(Ble, "Connecting to device %p with discriminator: %d", peripheral, discriminator);
+                            [self connect:peripheral];
+                            [self stopScanning];
+                        }
                     }
                 }
 
@@ -194,6 +263,11 @@ namespace DeviceLayer {
             }
         }
     }
+}
+
+- (BOOL)hasDiscriminator
+{
+    return _hasDeviceDiscriminator;
 }
 
 - (BOOL)checkDiscriminator:(uint16_t)discriminator
@@ -343,6 +417,8 @@ namespace DeviceLayer {
 {
     [self stopScanning];
     [self disconnect];
+    [_cachedPeripherals removeAllObjects];
+    _cachedPeripherals = nil;
     _centralManager.delegate = nil;
     _centralManager = nil;
     _peripheral = nil;
@@ -384,6 +460,38 @@ namespace DeviceLayer {
 
     _mBleLayer->CloseAllBleConnections();
     _peripheral = nil;
+}
+
+- (void)update
+{
+    [_cachedPeripherals removeAllObjects];
+    [self resetTimer];
+}
+
+- (void)updateWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator
+{
+    _deviceDiscriminator = deviceDiscriminator;
+    _hasDeviceDiscriminator = true;
+
+    CBPeripheral * peripheral = nil;
+    if (deviceDiscriminator.IsShortDiscriminator()) {
+        for (NSNumber * longDiscriminator in _cachedPeripherals) {
+            if ([self checkDiscriminator:[longDiscriminator unsignedShortValue]]) {
+                peripheral = _cachedPeripherals[longDiscriminator];
+                break;
+            }
+        }
+    } else {
+        peripheral = _cachedPeripherals[@(deviceDiscriminator.GetLongValue())];
+    }
+
+    if (peripheral) {
+        ChipLogProgress(Ble, "Connecting to cached device: %p", peripheral);
+        [self connect:peripheral];
+        [self stopScanning];
+    } else {
+        [self resetTimer];
+    }
 }
 
 /**

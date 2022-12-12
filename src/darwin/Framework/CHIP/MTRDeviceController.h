@@ -103,6 +103,16 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
                                                         error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 /**
+ * Prepare the controller for setting up a commissioning session.
+ *
+ * This method is intended to be used when it is known that a setting up a commissioning session
+ * will happen soon.
+ * For example it may ask different subsystems to look for useful informations onto the network
+ * ahead of commissioning that may then be re-used during commissioning.
+ */
+- (BOOL)prepareCommissioningSession:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
+/**
  * Controllers are created via the MTRDeviceControllerFactory object.
  */
 - (instancetype)init NS_UNAVAILABLE;

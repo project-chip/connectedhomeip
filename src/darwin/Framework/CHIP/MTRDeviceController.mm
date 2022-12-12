@@ -64,6 +64,7 @@ static NSString * const kErrorPartialDacVerifierInit = @"Init failure while crea
 static NSString * const kErrorPairDevice = @"Failure while pairing the device";
 static NSString * const kErrorUnpairDevice = @"Failure while unpairing the device";
 static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
+static NSString * const kErrorPrepareCommissioning = @"Failure while trying to prepare the commissioning process";
 static NSString * const kErrorOpenPairingWindow = @"Open Pairing Window failed";
 static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrieve a paired device";
 static NSString * const kErrorNotRunning = @"Controller is not running. Call startup first.";
@@ -490,6 +491,19 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
         auto errorCode = self.cppCommissioner->StopPairing([nodeID unsignedLongLongValue]);
         success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error];
     });
+    return success;
+}
+
+- (BOOL)prepareCommissioningSession:(NSError * __autoreleasing *)error
+{
+    __block BOOL success = NO;
+    dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning:error]);
+
+        auto errorCode = chip::DeviceLayer::PlatformMgrImpl().PrepareCommissioning();
+        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorPrepareCommissioning error:error];
+    });
+
     return success;
 }
 
