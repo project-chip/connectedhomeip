@@ -79,14 +79,14 @@ _EVENT_COMMANDS = [
 
 
 class PostProcessCheckStatus(Enum):
-    ''' Inidcates the post processing check step status.'''
+    '''Inidcates the post processing check step status.'''
     SUCCESS = 'success',
     WARNING = 'warning',
     ERROR = 'error'
 
 
 class PostProcessCheckType(Enum):
-    ''' Inidcates the post processing check step type.'''
+    '''Inidcates the post processing check step type.'''
     IM_STATUS = 'IMStatus',
     CLUSTER_STATUS = 'ClusterStatus',
     RESPONSE_VALIDATION = 'Response',
@@ -95,10 +95,10 @@ class PostProcessCheckType(Enum):
 
 
 class PostProcessCheck:
-    ''' Information about a single post processing on check step.
+    '''Information about a single post processing operation that was performed.
 
-    Each check has a helpful message should the consumer want to closer inspect what checks are,
-    as well as details as to why something may have failed.
+    Each check has a helpful message, indicating what the post processing operation did and whether
+    it was successful or not.
     '''
 
     def __init__(self, state: PostProcessCheckStatus, category: PostProcessCheckType, message: str):
@@ -117,10 +117,10 @@ class PostProcessCheck:
 
 
 class PostProcessResponseResult:
-    ''' Post processing response result information.
+    '''Post processing response result information.
 
-    There are multiple steps that occur when post processing a response. This contains all the
-    results for each step performed. Note that the number and types of steps performed is
+    There are multiple operations that occur when post processing a response. This contains all the
+    results for each operation performed. Note that the number and types of steps performed is
     dependant on test step itself.
     '''
 
@@ -131,17 +131,17 @@ class PostProcessResponseResult:
         self.errors = 0
 
     def success(self, category: PostProcessCheckType, message: str):
-        ''' Adds a success entry that occured when post processing response to results.'''
+        '''Adds a success entry that occured when post processing response to results.'''
         self._insert(PostProcessCheckStatus.SUCCESS, category, message)
         self.successes += 1
 
     def warning(self, category: PostProcessCheckType, message: str):
-        ''' Adds a warning entry that occured when post processing response to results.'''
+        '''Adds a warning entry that occured when post processing response to results.'''
         self._insert(PostProcessCheckStatus.WARNING, category, message)
         self.warnings += 1
 
     def error(self, category: PostProcessCheckType, message: str):
-        ''' Adds an error entry that occured when post processing response to results.'''
+        '''Adds an error entry that occured when post processing response to results.'''
         self._insert(PostProcessCheckStatus.ERROR, category, message)
         self.errors += 1
 
@@ -328,7 +328,7 @@ class _TestStepWithPlaceholders:
             return rv
         if type(value) is list:
             return [self._update_value_with_definition(entry, mapping_type) for entry in value]
-        # TODO currently I am unsure if the check of `value not in config` is sufficant. For
+        # TODO currently unsure if the check of `value not in config` is sufficant. For
         # example let's say value = 'foo + 1' and map type is 'int64u', we would arguably do
         # the wrong thing below.
         if value is not None and value not in self._parsing_config_variable_storage:
@@ -348,7 +348,10 @@ class _TestStepWithPlaceholders:
 class TestStep:
     '''A single YAML test action parsed from YAML.
 
-    This object for the time being is somewhat stateful. When first created it contains
+    This object contains all the information required for a test runner to execute the test step.
+    It also provide a function that is expected to be called by the test runner to post process
+    the recieved response from the accessory. Post processing both validates recieved response
+    and saves any variables that might be required but test step that have yet to be executed.
     '''
 
     def __init__(self, test: _TestStepWithPlaceholders, runtime_config_variable_storage: dict):
@@ -443,7 +446,7 @@ class TestStep:
         return result
 
     def _skip_post_processing(self, response: dict, result) -> bool:
-        ''' Should we skip perform post processing.
+        '''Should we skip perform post processing.
 
         Currently we only skip post processing if the test step indicates that sent test step
         invokation was expected to be optionally supported. We confirm that it is optional
