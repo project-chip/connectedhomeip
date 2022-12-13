@@ -35,7 +35,7 @@ using namespace chip::app::Clusters::ClientMonitoring;
 namespace {
 
 /**
- * @brief Attribute Override class for ClientMonitoring cluster attribures
+ * @brief Implementation of attribute access for ClientMonitoring cluster
  */
 class ClientMonitoringAttributeAccess : public app::AttributeAccessInterface
 {
