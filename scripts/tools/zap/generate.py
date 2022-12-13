@@ -38,6 +38,7 @@ class CmdLineArgs:
     runBootstrap: bool
     parallel: bool = True
     prettify_output: bool = True
+    version_check: bool = True
 
 
 CHIP_ROOT_DIR = os.path.realpath(
@@ -113,8 +114,11 @@ def runArgumentsParser() -> CmdLineArgs:
     parser.add_argument('--no-parallel', action='store_false', dest='parallel')
     parser.add_argument('--prettify-output', action='store_true')
     parser.add_argument('--no-prettify-output', action='store_false', dest='prettify_output')
+    parser.add_argument('--version-check', action='store_true')
+    parser.add_argument('--no-version-check', action='store_false', dest='version_check')
     parser.set_defaults(parallel=True)
     parser.set_defaults(prettify_output=True)
+    parser.set_defaults(version_check=True)
     args = parser.parse_args()
 
     # By default, this script assumes that the global CHIP template is used with
@@ -160,8 +164,17 @@ def extractGeneratedIdl(output_dir, zap_config_path):
     os.rename(idl_path, target_path)
 
 
-def runGeneration(zap_file, zcl_file, templates_file, output_dir, parallel):
+def runGeneration(cmdLineArgs):
+    zap_file = cmdLineArgs.zapFile
+    zcl_file = cmdLineArgs.zclFile
+    templates_file = cmdLineArgs.templateFile
+    output_dir = cmdLineArgs.outputDir
+    parallel = cmdLineArgs.parallel
+
     tool = ZapTool()
+
+    if cmdLineArgs.version_check:
+        tool.version_check()
 
     args = ['-z', zcl_file, '-g', templates_file, '-i', zap_file, '-o', output_dir]
 
@@ -255,8 +268,7 @@ def main():
         old_temp = os.environ['TEMP'] if 'TEMP' in os.environ else None
         os.environ['TEMP'] = temp_dir
 
-        runGeneration(cmdLineArgs.zapFile, cmdLineArgs.zclFile, cmdLineArgs.templateFile,
-                      cmdLineArgs.outputDir, cmdLineArgs.parallel)
+        runGeneration(cmdLineArgs)
 
         if old_temp:
             os.environ['TEMP'] = old_temp

@@ -163,6 +163,9 @@ RUN set -x \
 
 # Install a known ZAP release
 # Only keep the cli version, since `zap` is 143MB and not usable (UI)
+#
+# If you change this, make sure you also change:
+#   - scripts/tools/zap/zap_execution.py
 ENV ZAP_VERSION=v2022.11.29-nightly
 RUN set -x \
     && mkdir -p /opt/zap-${ZAP_VERSION} \
