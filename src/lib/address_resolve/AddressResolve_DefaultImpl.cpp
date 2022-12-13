@@ -127,6 +127,7 @@ CHIP_ERROR Resolver::CancelLookup(Impl::NodeLookupHandle & handle, FailureCallba
 {
     VerifyOrReturnError(handle.IsActive(), CHIP_ERROR_INVALID_ARGUMENT);
     mActiveLookups.Remove(&handle);
+    Dnssd::Resolver::Instance().NodeIdResolutionNoLongerNeeded(handle.GetRequest().GetPeerId());
 
     // Adjust any timing updates.
     ReArmTimer();
@@ -164,6 +165,7 @@ void Resolver::Shutdown()
 
         mActiveLookups.Erase(current);
 
+        Dnssd::Resolver::Instance().NodeIdResolutionNoLongerNeeded(peerId);
         // Failure callback only called after iterator was cleared:
         // This allows failure handlers to deallocate structures that may
         // contain the active lookup data as a member (intrusive lists members)
@@ -231,6 +233,8 @@ void Resolver::HandleAction(IntrusiveList<NodeLookupHandle>::Iterator & current)
     NodeListener * listener = current->GetListener();
     mActiveLookups.Erase(current);
 
+    Dnssd::Resolver::Instance().NodeIdResolutionNoLongerNeeded(peerId);
+
     // ensure action is taken AFTER the current current lookup is marked complete
     // This allows failure handlers to deallocate structures that may
     // contain the active lookup data as a member (intrusive lists members)
@@ -276,6 +280,8 @@ void Resolver::OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERR
 
         NodeListener * listener = current->GetListener();
         mActiveLookups.Erase(current);
+
+        Dnssd::Resolver::Instance().NodeIdResolutionNoLongerNeeded(peerId);
 
         // Failure callback only called after iterator was cleared:
         // This allows failure handlers to deallocate structures that may
@@ -326,6 +332,7 @@ void Resolver::ReArmTimer()
             mActiveLookups.Erase(it);
             it = mActiveLookups.begin();
 
+            Dnssd::Resolver::Instance().NodeIdResolutionNoLongerNeeded(peerId);
             // Callback only called after active lookup is cleared
             // This allows failure handlers to deallocate structures that may
             // contain the active lookup data as a member (intrusive lists members)
