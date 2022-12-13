@@ -78,6 +78,9 @@ static NSString * const kErrorGetAttestationChallenge = @"Failure getting attest
 static NSString * const kErrorSpake2pVerifierGenerationFailed = @"PASE verifier generation failed";
 static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
 
+typedef void (^SyncWorkQueueBlock)(void);
+typedef BOOL (^SyncWorkQueueBlockWithReturnValue)(void);
+
 @interface MTRDeviceController ()
 
 // queue used to serialize all work performed by the MTRDeviceController
@@ -366,19 +369,18 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
 
 - (NSNumber *)controllerNodeID
 {
-    if (![self isRunning]) {
+    __block NSNumber * nodeID = nil;
+
+    auto block = ^{
+        nodeID = @(self->_cppCommissioner->GetNodeId());
+    };
+
+    [self syncRunOnWorkQueue:block error:nil];
+
+    if (!nodeID) {
         MTR_LOG_ERROR("A controller has no node id if it has not been started");
-        return nil;
     }
-    __block NSNumber * nodeID;
-    dispatch_sync(_chipWorkQueue, ^{
-        if (![self isRunning]) {
-            MTR_LOG_ERROR("A controller has no node id if it has not been started");
-            nodeID = nil;
-        } else {
-            nodeID = @(_cppCommissioner->GetNodeId());
-        }
-    });
+
     return nodeID;
 }
 
@@ -386,12 +388,7 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
                                    newNodeID:(NSNumber *)newNodeID
                                        error:(NSError * __autoreleasing *)error
 {
-    VerifyOrReturnValue([self checkIsRunning:error], NO);
-
-    __block BOOL success = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
+    auto block = ^{
         // Try to get a QR code if possible (because it has a better
         // discriminator, etc), then fall back to manual code if that fails.
         NSString * pairingCode = [payload qrCodeString:nil];
@@ -399,29 +396,23 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
             pairingCode = [payload manualEntryCode];
         }
         if (pairingCode == nil) {
-            success = ![MTRDeviceController checkForError:CHIP_ERROR_INVALID_ARGUMENT logMsg:kErrorSetupCodeGen error:error];
-            return;
+            return ![MTRDeviceController checkForError:CHIP_ERROR_INVALID_ARGUMENT logMsg:kErrorSetupCodeGen error:error];
         }
 
         chip::NodeId nodeId = [newNodeID unsignedLongLongValue];
-        _operationalCredentialsDelegate->SetDeviceID(nodeId);
-        CHIP_ERROR errorCode = self.cppCommissioner->EstablishPASEConnection(nodeId, [pairingCode UTF8String]);
-        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
-    });
+        self->_operationalCredentialsDelegate->SetDeviceID(nodeId);
+        auto errorCode = self.cppCommissioner->EstablishPASEConnection(nodeId, [pairingCode UTF8String]);
+        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
+    };
 
-    return success;
+    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
 }
 
 - (BOOL)commissionNodeWithID:(NSNumber *)nodeID
          commissioningParams:(MTRCommissioningParameters *)commissioningParams
                        error:(NSError * __autoreleasing *)error
 {
-    VerifyOrReturnValue([self checkIsRunning:error], NO);
-
-    __block BOOL success = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
+    auto block = ^{
         chip::Controller::CommissioningParameters params;
         if (commissioningParams.csrNonce) {
             params.SetCSRNonce(AsByteSpan(commissioningParams.csrNonce));
@@ -456,85 +447,73 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
                     respondsToSelector:@selector(deviceAttestation:completedForDevice:attestationDeviceInfo:error:)]) {
                 shouldWaitAfterDeviceAttestation = YES;
             }
-            _deviceAttestationDelegateBridge = new MTRDeviceAttestationDelegateBridge(
+            self->_deviceAttestationDelegateBridge = new MTRDeviceAttestationDelegateBridge(
                 self, commissioningParams.deviceAttestationDelegate, timeoutSecs, shouldWaitAfterDeviceAttestation);
-            params.SetDeviceAttestationDelegate(_deviceAttestationDelegateBridge);
+            params.SetDeviceAttestationDelegate(self->_deviceAttestationDelegateBridge);
         }
 
         chip::NodeId deviceId = [nodeID unsignedLongLongValue];
-        _operationalCredentialsDelegate->SetDeviceID(deviceId);
+        self->_operationalCredentialsDelegate->SetDeviceID(deviceId);
         auto errorCode = self.cppCommissioner->Commission(deviceId, params);
-        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
-    });
-    return success;
+        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
+    };
+
+    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
 }
 
 - (BOOL)continueCommissioningDevice:(void *)device
            ignoreAttestationFailure:(BOOL)ignoreAttestationFailure
                               error:(NSError * __autoreleasing *)error
 {
-    VerifyOrReturnValue([self checkIsRunning:error], NO);
-
-    __block BOOL success = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
-        auto lastAttestationResult = _deviceAttestationDelegateBridge
-            ? _deviceAttestationDelegateBridge->attestationVerificationResult()
+    auto block = ^{
+        auto lastAttestationResult = self->_deviceAttestationDelegateBridge
+            ? self->_deviceAttestationDelegateBridge->attestationVerificationResult()
             : chip::Credentials::AttestationVerificationResult::kSuccess;
 
         auto deviceProxy = static_cast<chip::DeviceProxy *>(device);
         auto errorCode = self.cppCommissioner->ContinueCommissioningAfterDeviceAttestation(deviceProxy,
             ignoreAttestationFailure ? chip::Credentials::AttestationVerificationResult::kSuccess : lastAttestationResult);
-        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
-    });
-    return success;
+        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
+    };
+
+    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
 }
 
 - (BOOL)cancelCommissioningForNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
-    VerifyOrReturnValue([self checkIsRunning:error], NO);
-
-    __block BOOL success = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
-        _operationalCredentialsDelegate->ResetDeviceID();
+    auto block = ^{
+        self->_operationalCredentialsDelegate->ResetDeviceID();
         auto errorCode = self.cppCommissioner->StopPairing([nodeID unsignedLongLongValue]);
-        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error];
-    });
-    return success;
+        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error];
+    };
+
+    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
 }
 
 - (BOOL)prepareCommissioningSession:(NSError * __autoreleasing *)error
 {
-    __block BOOL success = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
+    auto block = ^{
         auto errorCode = chip::DeviceLayer::PlatformMgrImpl().PrepareCommissioning();
-        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorPrepareCommissioning error:error];
-    });
+        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPrepareCommissioning error:error];
+    };
 
-    return success;
+    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
 }
 
 - (MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
-    VerifyOrReturnValue([self checkIsRunning:error], nil);
+    __block MTRBaseDevice * device = nil;
 
-    __block MTRBaseDevice * device;
-    __block BOOL success = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
+    auto block = ^{
         chip::CommissioneeDeviceProxy * deviceProxy;
-        auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(nodeID.unsignedLongLongValue, &deviceProxy);
-        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error];
-        device = [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
-    });
-    VerifyOrReturnValue(success, nil);
 
+        auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(nodeID.unsignedLongLongValue, &deviceProxy);
+        VerifyOrReturn(![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error]);
+
+        device = [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
+    };
+
+    [self syncRunOnWorkQueue:block error:error];
     return device;
 }
 
@@ -587,24 +566,19 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
         return NO;
     }
 
-    VerifyOrReturnValue([self checkIsRunning], NO);
-
-    __block BOOL success = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning]);
-
+    auto block = ^{
         if (operationalCertificateIssuer != nil) {
             self->_operationalCredentialsDelegate->SetOperationalCertificateIssuer(operationalCertificateIssuer, queue);
-            self->_cppCommissioner->SetDeviceAttestationVerifier(_partialDACVerifier);
+            self->_cppCommissioner->SetDeviceAttestationVerifier(self->_partialDACVerifier);
         } else {
             // TODO: Once we are not supporting setNocChainIssuer this
             // branch can just go away.
-            self->_cppCommissioner->SetDeviceAttestationVerifier(_factory.deviceAttestationVerifier);
+            self->_cppCommissioner->SetDeviceAttestationVerifier(self->_factory.deviceAttestationVerifier);
         }
-        success = YES;
-    });
+        return YES;
+    };
 
-    return success;
+    return [self syncRunOnWorkQueueWithReturnValue:block error:nil];
 }
 
 + (nullable NSData *)computePASEVerifierForSetupPasscode:(NSNumber *)setupPasscode
@@ -630,27 +604,23 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
 
 - (NSData * _Nullable)attestationChallengeForDeviceID:(NSNumber *)deviceID
 {
-    VerifyOrReturnValue([self checkIsRunning], nil);
+    __block NSData * attestationChallenge = nil;
 
-    __block NSData * attestationChallenge;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning]);
-
+    auto block = ^{
         chip::CommissioneeDeviceProxy * deviceProxy;
         auto errorCode = self.cppCommissioner->GetDeviceBeingCommissioned([deviceID unsignedLongLongValue], &deviceProxy);
-        auto success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorGetCommissionee error:nil];
-        VerifyOrReturn(success);
+        VerifyOrReturn(![MTRDeviceController checkForError:errorCode logMsg:kErrorGetCommissionee error:nil]);
 
         uint8_t challengeBuffer[chip::Crypto::kAES_CCM128_Key_Length];
         chip::ByteSpan challenge(challengeBuffer);
 
         errorCode = deviceProxy->GetAttestationChallenge(challenge);
-        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorGetAttestationChallenge error:nil];
-        VerifyOrReturn(success);
+        VerifyOrReturn(![MTRDeviceController checkForError:errorCode logMsg:kErrorGetAttestationChallenge error:nil]);
 
         attestationChallenge = AsData(challenge);
-    });
+    };
 
+    [self syncRunOnWorkQueue:block error:nil];
     return attestationChallenge;
 }
 
@@ -807,6 +777,30 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
     });
 }
 
+- (void)syncRunOnWorkQueue:(SyncWorkQueueBlock)block error:(NSError * __autoreleasing *)error
+{
+    VerifyOrReturn([self checkIsRunning:error]);
+
+    dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning:error]);
+        block();
+    });
+}
+
+- (BOOL)syncRunOnWorkQueueWithReturnValue:(SyncWorkQueueBlockWithReturnValue)block error:(NSError * __autoreleasing *)error
+{
+    __block BOOL success = NO;
+
+    VerifyOrReturnValue([self checkIsRunning:error], success);
+
+    dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning:error]);
+        success = block();
+    });
+
+    return success;
+}
+
 @end
 
 @implementation MTRDeviceController (InternalMethods)
@@ -850,21 +844,15 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
 
 - (void)invalidateCASESessionForNode:(chip::NodeId)nodeID;
 {
-    if (![self checkIsRunning]) {
-        return;
-    }
-
-    dispatch_sync(_chipWorkQueue, ^{
-        if (![self checkIsRunning]) {
-            return;
-        }
-
+    auto block = ^{
         auto sessionMgr = self->_cppCommissioner->SessionMgr();
         VerifyOrDie(sessionMgr != nullptr);
 
         sessionMgr->MarkSessionsAsDefunct(
             self->_cppCommissioner->GetPeerScopedId(nodeID), chip::MakeOptional(chip::Transport::SecureSession::Type::kCASE));
-    });
+    };
+
+    [self syncRunOnWorkQueue:block error:nil];
 }
 @end
 
@@ -1030,27 +1018,21 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
 {
-    VerifyOrReturnValue([self checkIsRunning:error], NO);
-
-    __block BOOL success = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
+    auto block = ^{
         std::string manualPairingCode;
         chip::SetupPayload payload;
         payload.discriminator.SetLongValue(discriminator);
         payload.setUpPINCode = setupPINCode;
 
         auto errorCode = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);
-        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorSetupCodeGen error:error];
-        VerifyOrReturn(success);
+        VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorSetupCodeGen error:error], NO);
 
-        _operationalCredentialsDelegate->SetDeviceID(deviceID);
+        self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
         errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, manualPairingCode.c_str());
-        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
-    });
+        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
+    };
 
-    return success;
+    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
 }
 
 - (BOOL)pairDevice:(uint64_t)deviceID
@@ -1059,39 +1041,30 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
 {
-    VerifyOrReturnValue([self checkIsRunning:error], NO);
-
-    __block BOOL success = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
+    auto block = ^{
         chip::Inet::IPAddress addr;
         chip::Inet::IPAddress::FromString([address UTF8String], addr);
         chip::Transport::PeerAddress peerAddress = chip::Transport::PeerAddress::UDP(addr, port);
 
-        _operationalCredentialsDelegate->SetDeviceID(deviceID);
+        self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
 
         auto params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetPeerAddress(peerAddress);
         auto errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, params);
-        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
-    });
+        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
+    };
 
-    return success;
+    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
 }
 
 - (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error
 {
-    VerifyOrReturnValue([self checkIsRunning:error], NO);
-
-    __block BOOL success = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
-        _operationalCredentialsDelegate->SetDeviceID(deviceID);
+    auto block = ^{
+        self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
         auto errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, [onboardingPayload UTF8String]);
-        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
-    });
-    return success;
+        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
+    };
+
+    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
 }
 
 - (BOOL)commissionDevice:(uint64_t)deviceID
@@ -1113,8 +1086,6 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
 
 - (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error
 {
-    VerifyOrReturnValue([self checkIsRunning:error], NO);
-
     if (duration > UINT16_MAX) {
         MTR_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
         if (error) {
@@ -1123,16 +1094,13 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
         return NO;
     }
 
-    __block BOOL success = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
-
+    auto block = ^{
         auto errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(
             self.cppCommissioner, deviceID, chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)));
-        success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorOpenPairingWindow error:error];
-    });
+        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorOpenPairingWindow error:error];
+    };
 
-    return success;
+    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
 }
 
 - (NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
@@ -1141,16 +1109,12 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
                               setupPIN:(NSUInteger)setupPIN
                                  error:(NSError * __autoreleasing *)error
 {
-    __block NSString * rv = nil;
-
-    VerifyOrReturnValue([self checkIsRunning:error], rv);
-
     if (duration > UINT16_MAX) {
         MTR_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
-        return rv;
+        return nil;
     }
 
     if (discriminator > 0xfff) {
@@ -1158,7 +1122,7 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
-        return rv;
+        return nil;
     }
 
     if (!chip::CanCastTo<uint32_t>(setupPIN) || !chip::SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(setupPIN))) {
@@ -1166,20 +1130,19 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
         if (error) {
             *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
-        return rv;
+        return nil;
     }
 
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
+    __block NSString * rv = nil;
 
+    auto block = ^{
         chip::SetupPayload setupPayload;
         auto errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(self.cppCommissioner, deviceID,
             chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)), chip::Crypto::kSpake2p_Min_PBKDF_Iterations,
             static_cast<uint16_t>(discriminator), chip::MakeOptional(static_cast<uint32_t>(setupPIN)), chip::NullOptional,
             setupPayload);
 
-        auto success = ![MTRDeviceController checkForError:errorCode logMsg:kErrorOpenPairingWindow error:error];
-        VerifyOrReturn(success);
+        VerifyOrReturn(![MTRDeviceController checkForError:errorCode logMsg:kErrorOpenPairingWindow error:error]);
 
         chip::ManualSetupPayloadGenerator generator(setupPayload);
         std::string outCode;
@@ -1190,8 +1153,9 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
         } else {
             MTR_LOG_ERROR("Failed to get decimal setup code");
         }
-    });
+    };
 
+    [self syncRunOnWorkQueue:block error:error];
     return rv;
 }
 
