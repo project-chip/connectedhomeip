@@ -209,6 +209,10 @@ CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, c
 {
     return wr.Put(chip::TLV::Tag(), (int64_t) strtoll(buffer, nullptr, 10));
 }
+CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const uint32_t *)
+{
+    return wr.Put(chip::TLV::Tag(), (uint32_t) strtoll(buffer, nullptr, 10));
+}
 CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const uint64_t *)
 {
     return wr.Put(chip::TLV::Tag(), (uint64_t) strtoll(buffer, nullptr, 10));
@@ -320,6 +324,8 @@ CHIP_ERROR ReadOrWriteBufferForType(std::vector<uint8_t> * data, uint8_t * buffe
         return ReadOrWriteBuffer<uint64_t>(data, buffer, maxReadLength, read);
     case ZCL_BOOLEAN_ATTRIBUTE_TYPE:
         return ReadOrWriteBuffer<bool>(data, buffer, maxReadLength, read);
+    case ZCL_BITMAP32_ATTRIBUTE_TYPE:
+        return ReadOrWriteBuffer<uint32_t>(data, buffer, maxReadLength, read);
     default:
         // Assume integer
         return ReadOrWriteBuffer<int64_t>(data, buffer, maxReadLength, read);
