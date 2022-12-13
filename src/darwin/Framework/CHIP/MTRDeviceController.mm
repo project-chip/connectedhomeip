@@ -21,6 +21,7 @@
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommissioningParameters.h"
 #import "MTRDeviceControllerDelegateBridge.h"
+#import "MTRDeviceDiscoveryDelegateBridge.h"
 #import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
@@ -76,6 +77,7 @@ static NSString * const kErrorGetCommissionee = @"Failure obtaining device being
 static NSString * const kErrorGetAttestationChallenge = @"Failure getting attestation challenge";
 static NSString * const kErrorSpake2pVerifierGenerationFailed = @"PASE verifier generation failed";
 static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
+static NSString * const kErrorDeviceDiscoveryInit = @"Init failure while creating device discovery delegate";
 
 @interface MTRDeviceController ()
 
@@ -92,6 +94,9 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
 @property (readonly) MTRDeviceControllerFactory * factory;
 @property (readonly) NSMutableDictionary * nodeIDToDeviceMap;
 @property (readonly) os_unfair_lock deviceMapLock; // protects nodeIDToDeviceMap
+@property (readonly) chip::Dnssd::ResolverProxy mDNSResolver;
+@property (readonly) MTRDeviceDiscoveryDelegateBridge * deviceDiscoveryDelegateBridge;
+@property (readonly) chip::Dnssd::ResolverDelegateProxy resolverDelegagteProxy;
 @end
 
 @implementation MTRDeviceController
@@ -119,7 +124,13 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
             return nil;
         }
         _operationalCredentialsDelegate->setChipWorkQueue(_chipWorkQueue);
+
+        _deviceDiscoveryDelegateBridge = new MTRDeviceDiscoveryDelegateBridge();
+        if ([self checkForInitError:(_deviceDiscoveryDelegateBridge != nullptr) logMsg:kErrorDeviceDiscoveryInit]) {
+            return nil;
+        }
     }
+
     return self;
 }
 
@@ -770,6 +781,14 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
     });
 }
 
+- (void)discoverCommissionableNodes
+{
+    _mDNSResolver.Shutdown(); // reset if already inited
+    _mDNSResolver.Init(chip::DeviceLayer::UDPEndPointManager());
+    _mDNSResolver.SetCommissioningDelegate(_deviceDiscoveryDelegateBridge);
+    chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kNone, (uint64_t) 0);
+    _mDNSResolver.DiscoverCommissionableNodes(filter);
+}
 @end
 
 @implementation MTRDeviceController (InternalMethods)
@@ -828,6 +847,13 @@ static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifi
         sessionMgr->MarkSessionsAsDefunct(
             self->_cppCommissioner->GetPeerScopedId(nodeID), chip::MakeOptional(chip::Transport::SecureSession::Type::kCASE));
     });
+}
+
+- (void)setDeviceDiscoveryDelegate:(id<MTRDeviceDiscoveryDelegate>)delegate queue:(dispatch_queue_t)queue
+{
+    VerifyOrReturn([self checkIsRunning]);
+    dispatch_async(_chipWorkQueue, ^{VerifyOrReturn([self checkIsRunning]);
+        self->_deviceDiscoveryDelegateBridge->setDelegate(self, delegate, queue);});
 }
 @end
 

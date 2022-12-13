@@ -302,6 +302,30 @@ extern NSString * const MTRArrayValueType;
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
     API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
+/**
+ * Reads events from the device.
+ *
+ * Nil values for endpointID, clusterID, eventID indicate wildcards
+ * (e.g. nil eventID means "read all the events from the endpoint(s) and
+ * cluster(s) that match endpointID/clusterID").
+ *
+ * If all of endpointID, clusterID, eventID are non-nil, a single
+ * event will be read.
+ *
+ * If all of endpointID, clusterID, eventID are nil, all events on the
+ * device will be read.
+ *
+ * A non-nil eventID along with a nil clusterID will only succeed if the
+ * event ID is for a global event that applies to all clusters.
+ */
+
+- (void)readEventsWithEndpointID:(NSNumber * _Nullable)endpointID
+                       clusterID:(NSNumber * _Nullable)clusterID
+                         eventID:(NSNumber * _Nullable)eventID
+                          params:(MTRReadParams * _Nullable)params
+                           queue:(dispatch_queue_t)queue
+                      completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
+
 @end
 
 /**

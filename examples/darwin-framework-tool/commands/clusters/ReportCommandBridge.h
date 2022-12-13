@@ -241,3 +241,68 @@ protected:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
 };
+
+class ReadEvent : public ModelCommand {
+public:
+          ReadEvent()
+        : ModelCommand("read-event-by-id")
+    {
+        AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
+        AddArgument("event-id", 0, UINT32_MAX, &mEventId);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        ModelCommand::AddArguments();
+    }
+
+    ReadEvent(chip::ClusterId clusterId)
+        : ModelCommand("read-event-by-id")
+        , mClusterId(clusterId)
+    {
+        AddArgument("event-id", 0, UINT32_MAX, &mEventId);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        ModelCommand::AddArguments();
+    }
+
+    ReadEvent(const char * _Nonnull eventName)
+        : ModelCommand("read-event")
+    {
+        AddArgument("event-name", eventName);
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadEvent() {}
+
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
+    {
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
+        MTRReadParams * params = [[MTRReadParams alloc] init];
+        if (mFabricFiltered.HasValue()) {
+            params.filterByFabric = mFabricFiltered.Value();
+        }
+        [device
+            readEventsWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
+                               clusterID:[NSNumber numberWithUnsignedInteger:mClusterId]
+                             eventID:[NSNumber numberWithUnsignedInteger:mEventId]
+                                  params:params
+                                   queue:callbackQueue
+                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                  if (error != nil) {
+                                      LogNSError("Error reading event", error);
+                                  }
+                                  if (values) {
+                                      for (id item in values) {
+                                          NSLog(@"Response Item: %@", [item description]);
+                                      }
+                                  }
+                                  SetCommandExitStatus(error);
+                              }];
+        return CHIP_NO_ERROR;
+    }
+
+protected:
+    chip::Optional<bool> mFabricFiltered;
+
+private:
+    chip::ClusterId mClusterId;
+    chip::AttributeId mEventId;
+};

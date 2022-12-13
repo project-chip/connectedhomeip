@@ -58,3 +58,4 @@
 #import <Matter/MTRStorage.h>
 #import <Matter/MTRStructsObjc.h>
 #import <Matter/MTRThreadOperationalDataset.h>
+#import <Matter/MTRDeviceDiscoveryDelegate.h>

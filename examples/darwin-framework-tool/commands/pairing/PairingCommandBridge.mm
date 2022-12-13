@@ -66,6 +66,9 @@ CHIP_ERROR PairingCommandBridge::RunCommand()
     case PairingMode::Code:
         PairWithPayload(&error);
         break;
+    case PairingMode::Ethernet:
+        PairWithIPAddress(&error);
+        break;
     case PairingMode::Ble:
         PairWithCode(&error);
         break;
@@ -129,4 +132,15 @@ void PairingCommandBridge::Unpair()
                                         SetCommandExitStatus(removeErr);
                                     }];
     }];
+}
+
+void PairingCommandBridge::PairWithIPAddress(NSError * __autoreleasing * error)
+{
+    SetUpDeviceControllerDelegate();
+    MTRDeviceController * commissioner = CurrentCommissioner();
+    [commissioner pairDevice:mNodeId
+                     address:[NSString stringWithUTF8String:ipAddress]
+                        port:mRemotePort
+                setupPINCode:mSetupPINCode
+                       error:error];
 }

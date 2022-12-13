@@ -277,6 +277,11 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         make_unique<SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{/if}}
         {{/chip_server_cluster_attributes}}
+        {{#zcl_events}}
+        {{#first}}
+        make_unique<ReadEvent>(Id), //
+        {{/first}}
+        {{/zcl_events}}
     };
 
     commands.Register(clusterName, clusterCommands);

@@ -147,6 +147,10 @@ executable("darwin-framework-tool") {
     "commands/provider/OTASoftwareUpdateInteractive.mm",
     "commands/storage/Commands.h",
     "commands/storage/StorageManagementCommand.mm",
+    "commands/discover/Commands.h",
+    "commands/discover/DiscoverCommissionablesCommand.h",
+    "commands/discover/DiscoverCommissionablesCommand.mm",
+    "commands/discover/DeviceDiscoveryDelegateBridge.mm",
     "main.mm",
   ]
 

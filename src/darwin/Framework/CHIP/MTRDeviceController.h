@@ -30,6 +30,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 @class MTRSetupPayload;
 @protocol MTRDevicePairingDelegate;
 @protocol MTRDeviceControllerDelegate;
+@protocol MTRDeviceDiscoveryDelegate;
 
 @interface MTRDeviceController : NSObject
 
@@ -160,6 +161,21 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * MTRDeviceControllerFactory, to avoid leaking the controller.
  */
 - (void)shutdown;
+
+/**
+ * Discover commissionable nodes.
+ */
+- (void)discoverCommissionableNodes;
+
+/**
+ * Set the Delegate for the device discovery
+ *
+ * @param[in] delegate The delegate the discovery process should use
+ *
+ * @param[in] queue The queue on which the callbacks will be delivered
+ */
+- (void)setDeviceDiscoveryDelegate:(id<MTRDeviceDiscoveryDelegate>)delegate
+                             queue:(dispatch_queue_t)queue;
 
 @end
 
