@@ -37,6 +37,7 @@ class PythonResolverDelegate : public OperationalResolveDelegate
 public:
     void OnOperationalNodeResolved(const ResolvedNodeData & nodeData) override
     {
+        Resolver::Instance().NodeIdResolutionNoLongerNeeded(nodeData.operationalData.peerId);
         if (mSuccessCallback != nullptr)
         {
             char ipAddressBuffer[128];
@@ -59,6 +60,7 @@ public:
 
     void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override
     {
+        Resolver::Instance().NodeIdResolutionNoLongerNeeded(peerId);
         if (mFailureCallback != nullptr)
         {
             mFailureCallback(peerId.GetCompressedFabricId(), peerId.GetNodeId(), ToPyChipError(error));
