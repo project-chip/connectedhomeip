@@ -36,10 +36,8 @@ This library must first be compiled for the target system, by changing directory
 
 ```bash
 root@docker:/uic$ cmake -DCMAKE_INSTALL_PREFIX=$PWD/stage -GNinja -DCMAKE_TOOLCHAIN_FILE=../cmake/armhf_debian.cmake  -B build_unify_armhf/ -S components
-
 root@docker:/uic$ cmake --build build_unify_armhf
-
-root@docker:/uic$ cmake --install build_unify_armhf --prefix $PWD/stage
+root@docker:/uic$ cmake --install build_unify_armhf
 ```
 
 After cross-compiling the Unify library, set two paths in the PKG_CONFIG_PATH.
@@ -47,8 +45,13 @@ The first path is for the staged Unify library and the second is for cross compi
 
 ```bash
 root@docker:/uic$ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$PWD/stage/share/pkgconfig
-
 root@docker:/uic$ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/lib/arm-linux-gnueabihf/pkgconfig
+```
+
+If you want to be able to use Zap to generate code from Unify XML files you need to export UCL_XML_PATH as well.
+
+```bash
+root@docker:/uic$ export UCL_XML_PATH=$PWD/stage/share/uic/ucl
 ```
 
 ## Set Up the Matter Build Environment

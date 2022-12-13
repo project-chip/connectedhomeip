@@ -20,7 +20,7 @@ import("${chip_root}/build/config/compiler/compiler.gni")
 assert(chip_build_tools)
 
 pkg_config("unify") {
-  packages = [ "libunify" ]
+  packages = [ "libunify_static" ]
 }
 
 config("unify-config") {
