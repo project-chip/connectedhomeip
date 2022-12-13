@@ -1438,6 +1438,26 @@ server cluster OperationalCredentials = 62 {
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
 }
 
+client cluster FixedLabel = 64 {
+  struct LabelStruct {
+    char_string<16> label = 0;
+    char_string<16> value = 1;
+  }
+
+  readonly attribute LabelStruct labelList[] = 0;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+server cluster FixedLabel = 64 {
+  struct LabelStruct {
+    char_string<16> label = 0;
+    char_string<16> value = 1;
+  }
+
+  readonly attribute LabelStruct labelList[] = 0;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 server cluster BooleanState = 69 {
   info event StateChange = 0 {
     boolean stateValue = 0;
@@ -1988,6 +2008,7 @@ client cluster TemperatureMeasurement = 1026 {
   readonly attribute nullable int16s measuredValue = 0;
   readonly attribute nullable int16s minMeasuredValue = 1;
   readonly attribute nullable int16s maxMeasuredValue = 2;
+  readonly attribute int16u tolerance = 3;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -1996,6 +2017,7 @@ server cluster TemperatureMeasurement = 1026 {
   readonly attribute nullable int16s measuredValue = 0;
   readonly attribute nullable int16s minMeasuredValue = 1;
   readonly attribute nullable int16s maxMeasuredValue = 2;
+  readonly attribute int16u tolerance = 3;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -2952,6 +2974,7 @@ endpoint 0 {
     ram      attribute measuredValue default = 0x8000;
     ram      attribute minMeasuredValue default = 0x8000;
     ram      attribute maxMeasuredValue default = 0x8000;
+    ram      attribute tolerance;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 4;
   }
@@ -3038,6 +3061,7 @@ endpoint 0 {
 endpoint 1 {
   device type anonymousEndpointType = 258, version 1;
   binding cluster OnOff;
+  binding cluster FixedLabel;
 
   server cluster Identify {
     ram      attribute identifyTime;
@@ -3096,6 +3120,11 @@ endpoint 1 {
     callback attribute uniqueID;
     callback attribute capabilityMinima;
     ram      attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster FixedLabel {
+    callback attribute labelList;
     ram      attribute clusterRevision default = 1;
   }
 
