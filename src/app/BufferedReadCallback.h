@@ -107,6 +107,12 @@ private:
     {
         return mCallback.GetHighestReceivedEventNumber(aEventNumber);
     }
+
+    void OnUnsolicitedCommunication(ReadClient * apReadClient) override
+    {
+        return mCallback.OnUnsolicitedCommunication(apReadClient);
+    }
+
     /*
      * Given a reader positioned at a list element, allocate a packet buffer, copy the list item where
      * the reader is positioned into that buffer and add it to our buffered list for tracking.

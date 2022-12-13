@@ -55,12 +55,14 @@ typedef void (^DataReportCallback)(NSArray * value);
 typedef void (^ErrorCallback)(NSError * error);
 typedef void (^SubscriptionEstablishedHandler)(void);
 typedef void (^OnDoneHandler)(void);
+typedef void (^UnsolicitedCommunicationHandler)(void);
 
 class MTRBaseSubscriptionCallback : public chip::app::ClusterStateCache::Callback {
 public:
     MTRBaseSubscriptionCallback(DataReportCallback attributeReportCallback, DataReportCallback eventReportCallback,
         ErrorCallback errorCallback, MTRDeviceResubscriptionScheduledHandler _Nullable resubscriptionCallback,
-        SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler, OnDoneHandler _Nullable onDoneHandler)
+        SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler, OnDoneHandler _Nullable onDoneHandler,
+        UnsolicitedCommunicationHandler _Nullable unsolicitedCommunicationHandler = NULL)
         : mAttributeReportCallback(attributeReportCallback)
         , mEventReportCallback(eventReportCallback)
         , mErrorCallback(errorCallback)
@@ -68,6 +70,7 @@ public:
         , mSubscriptionEstablishedHandler(subscriptionEstablishedHandler)
         , mBufferedReadAdapter(*this)
         , mOnDoneHandler(onDoneHandler)
+        , mUnsolicitedCommunicationHandler(unsolicitedCommunicationHandler)
     {
     }
 
@@ -117,6 +120,8 @@ private:
 
     CHIP_ERROR OnResubscriptionNeeded(chip::app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
 
+    void OnUnsolicitedCommunication(chip::app::ReadClient * apReadClient) override;
+
     void ReportData();
 
 protected:
@@ -131,6 +136,7 @@ private:
     ErrorCallback _Nullable mErrorCallback = nil;
     MTRDeviceResubscriptionScheduledHandler _Nullable mResubscriptionCallback = nil;
     SubscriptionEstablishedHandler _Nullable mSubscriptionEstablishedHandler = nil;
+    UnsolicitedCommunicationHandler _Nullable mUnsolicitedCommunicationHandler = nil;
     chip::app::BufferedReadCallback mBufferedReadAdapter;
 
     // Our lifetime management is a little complicated.  On errors that don't

@@ -234,6 +234,22 @@ public:
             aEventNumber.ClearValue();
             return CHIP_NO_ERROR;
         }
+
+        /**
+         * OnUnsolicitedCommunication will be called for a subscription ReadClient
+         * when any incoming communication happens with a matching node on
+         * the fabric.
+         *
+         * This callback will be called:
+         *   - When receiving any unsolicited communication from the node
+         *   - Even for disconnected subscriptions.
+         *
+         * @param[in] apReadClient the ReadClient for the subscription.
+         */
+        virtual void OnUnsolicitedCommunication(ReadClient * apReadClient)
+        {
+            ChipLogDetail(DataManagement, "%s ReadClient[%p]", __func__, this);
+        }
     };
 
     enum class InteractionType : uint8_t
@@ -287,6 +303,8 @@ public:
     CHIP_ERROR SendRequest(ReadPrepareParams & aReadPrepareParams);
 
     void OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+
+    void OnUnsolicitedCommunication() { mpCallback.OnUnsolicitedCommunication(this); }
 
     auto GetSubscriptionId() const
     {
