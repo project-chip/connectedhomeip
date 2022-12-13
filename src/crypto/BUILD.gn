@@ -116,7 +116,12 @@ if (chip_crypto == "openssl") {
   import("//build_overrides/mbedtls.gni")
 
   source_set("cryptopal_psa") {
-    sources = [ "CHIPCryptoPALPSA.cpp" ]
+    sources = [
+      "CHIPCryptoPALPSA.cpp",
+      "CHIPCryptoPALPSA.h",
+      "PSAOperationalKeystore.cpp",
+      "PSAOperationalKeystore.h",
+    ]
     public_deps = [ ":public_headers" ]
 
     external_mbedtls = current_os == "zephyr"
