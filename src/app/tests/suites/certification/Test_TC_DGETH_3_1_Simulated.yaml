@@ -1,0 +1,73 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 47.3.1. [TC-DGETH-3.1] Attributes [DUT as Client]
+
+PICS:
+    - DGETH.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Ethernet Network Diagnostics"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the device to be commissioned"
+      cluster: "DelayCommands"
+      command: "WaitForCommissioning"
+
+    - label: "Read attribute: PHYRate"
+      PICS: DGETH.C.A0000
+      wait: "readAttribute"
+      attribute: "PHYRate"
+
+    - label: "Read attribute: FullDuplex"
+      PICS: DGETH.C.A0001
+      wait: "readAttribute"
+      attribute: "FullDuplex"
+
+    - label: "Read attribute: PacketRxCount"
+      PICS: DGETH.C.A0002
+      wait: "readAttribute"
+      attribute: "PacketRxCount"
+
+    - label: "Read attribute: PacketTxCount"
+      PICS: DGETH.C.A0003
+      wait: "readAttribute"
+      attribute: "PacketTxCount"
+
+    - label: "Read attribute: TxErrCount"
+      PICS: DGETH.C.A0004
+      wait: "readAttribute"
+      attribute: "TxErrCount"
+
+    - label: "Read attribute: CollisionCount"
+      PICS: DGETH.C.A0005
+      wait: "readAttribute"
+      attribute: "CollisionCount"
+
+    - label: "Read attribute: OverrunCount"
+      PICS: DGETH.C.A0006
+      wait: "readAttribute"
+      attribute: "OverrunCount"
+
+    - label: "Read attribute: CarrierDetect"
+      PICS: DGETH.C.A0007
+      wait: "readAttribute"
+      attribute: "CarrierDetect"
+
+    - label: "Read attribute: TimeSinceReset"
+      PICS: DGETH.C.A0008
+      wait: "readAttribute"
+      attribute: "TimeSinceReset"

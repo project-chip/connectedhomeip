@@ -590,6 +590,7 @@ PICS:
       id: TSUIC.S.A0002
 
     # Software Diagnostics cluster
+    #Server Attributes
     - label: "The metrics for high watermark related to memory consumption."
       id: DGSW.S.F00
 
@@ -611,6 +612,7 @@ PICS:
     - label: "Does the device implement the ResetWaterMarks command?"
       id: DGSW.S.C00.Rsp
 
+    #Client Attributes
     - label: "Does the device implement the ThreadMetrics attribute"
       id: DGSW.C.A0000
 
@@ -3254,9 +3256,7 @@ PICS:
     - label: "Does the device implement the ResetCounts command?"
       id: DGETH.S.C00.Rsp
 
-    - label: "Does the device implement the ResetCounts command?"
-      id: DGETH.C.C00.Tx
-
+    #Server
     - label: "Does the device implement the PHYRate attribute?"
       id: DGETH.S.A0000
 
@@ -3284,6 +3284,55 @@ PICS:
     - label: "Does the device implement the CarrierDetect attribute?"
       id: DGETH.S.A0008
 
+    #Client
+    - label: "Does the device implement the ResetCounts command?"
+      id: DGETH.C.C00.Tx
+
+    - label:
+          "Does the DUT(client) have access privileges for the PHYRate attribute
+          implemented on server"
+      id: DGETH.C.A0000
+
+    - label:
+          "Does the DUT(client) have access privileges for the FullDuplex
+          attribute implemented on server"
+      id: DGETH.C.A0001
+
+    - label:
+          "Does the DUT(client) have access privileges for the PacketRxCount
+          attribute implemented on server"
+      id: DGETH.C.A0002
+
+    - label:
+          "Does the DUT(client) have access privileges for the PacketTxCount
+          attribute implemented on server"
+      id: DGETH.C.A0003
+
+    - label:
+          "Does the DUT(client) have access privileges for the TxErrCount
+          attribute implemented on server"
+      id: DGETH.C.A0004
+
+    - label:
+          "Does the DUT(client) have access privileges for the CollisionCount
+          attribute implemented on server"
+      id: DGETH.C.A0005
+
+    - label:
+          "Does the DUT(client) have access privileges for the OverrunCount
+          attribute implemented on server"
+      id: DGETH.C.A0006
+
+    - label:
+          "Does the DUT(client) have access privileges for the CarrierDetect
+          attribute implemented on server"
+      id: DGETH.C.A0007
+
+    - label:
+          "Does the DUT(client) have access privileges for the CarrierDetect
+          attribute implemented on server"
+      id: DGETH.C.A0008
+
     #Features
     - label:
           "Counts for the number of received and transmitted packets on the
@@ -3306,6 +3355,7 @@ PICS:
           of packets on the ethernet interface."
       id: DGWIFI.S.F01
 
+    #Server
     - label:
           "Indicates the BSSID for which the Wi-Fi network the Node is currently
           connected. If the interface not configured, a NULL value should be
@@ -3371,6 +3421,7 @@ PICS:
           the Node. This value should not be subscribed."
       id: DGWIFI.S.A000c
 
+    #Events
     - label:
           "Indicates Node’s Wi-Fi connection has been disconnected as a result
           of de-authenticated or dis-association and indicates the reason."
@@ -3393,6 +3444,73 @@ PICS:
           PacketMulticastRxCount, PacketMulticastTxCount, PacketUnicastRxCount,
           PacketUnicastTxCount"
       id: DGWIFI.S.C00.Rsp
+
+    #Client
+    - label:
+          "Does the DUT(client) have access privileges for the BSSID attribute
+          implemented on the server?"
+      id: DGWIFI.C.A0000
+
+    - label:
+          "Does the DUT(client) have access privileges for the SecurityType
+          attribute implemented on the server?"
+      id: DGWIFI.C.A0001
+
+    - label:
+          "Does the DUT(client) have access privileges for the WiFiVersion
+          attribute implemented on the server?"
+      id: DGWIFI.C.A0002
+
+    - label:
+          "Does the DUT(client) have access privileges for the ChannelNumber
+          attribute implemented on the server?"
+      id: DGWIFI.C.A0003
+
+    - label:
+          "Does the DUT(client) have access privileges for the RSSI attribute
+          implemented on the server?"
+      id: DGWIFI.C.A0004
+
+    - label:
+          "Does the DUT(client) have access privileges for the BeaconLostCount
+          attribute implemented on the server?"
+      id: DGWIFI.C.A0005
+
+    - label:
+          "Does the DUT(client) have access privileges for the BeaconRxCount
+          attribute implemented on the server?"
+      id: DGWIFI.C.A0006
+
+    - label:
+          "Does the DUT(client) have access privileges for the
+          PacketMulticastRxCount attribute implemented on the server?"
+      id: DGWIFI.C.A0007
+
+    - label:
+          "Does the DUT(client) have access privileges for the
+          PacketMulticastTxCount attribute implemented on the server?"
+      id: DGWIFI.C.A0008
+
+    - label:
+          "Does the DUT(client) have access privileges for the
+          PacketUnicastRxCount attribute implemented on the server?"
+      id: DGWIFI.C.A0009
+
+    - label:
+          "Does the DUT(client) have access privileges for the
+          PacketUnicastTxCount attribute implemented on the server?"
+      id: DGWIFI.C.A000a
+
+    - label:
+          "Does the DUT(client) have access privileges for the CurrentMaxRate
+          attribute implemented on the server?"
+      id: DGWIFI.C.A000b
+
+    - label:
+          "Does the DUT(client) have access privileges for the OverrunCount
+          attribute implemented on the server?"
+      id: DGWIFI.C.A000c
+
     #Actions Cluster
     - label: "Does the device implement the ActionList attribute?"
       id: ACT.S.A0000
