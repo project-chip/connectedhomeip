@@ -38,7 +38,7 @@ public:
     Crypto::P256Keypair * AllocateEphemeralKeypairForCASE() override;
     void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair) override;
 
-private:
+protected:
     class PersistentP256Keypair : private P256Keypair
     {
     public:
