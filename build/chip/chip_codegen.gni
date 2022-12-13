@@ -125,7 +125,7 @@ template("_chip_build_time_zapgen") {
         rebase_path("${chip_root}/src/app/zap-templates/app-templates.json")
 
     _partials_dir = "${chip_root}/src/app/zap-templates/partials"
-    _template_dir = "${chip_root}/src/app/zap-templates/templates"
+    _template_dir = "${chip_root}/src/app/zap-templates/templates/app"
 
     # TODO: unclear how to maintain these: there is no parser that can figure
     #       out links of template files and zap files and such
