@@ -221,12 +221,18 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
 
 CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ReliableMessageProtocolConfig & config)
 {
-    mCASEClient = mInitParams.clientPool->Allocate(CASEClientInitParams{
-        mInitParams.sessionManager, mInitParams.sessionResumptionStorage, mInitParams.certificateValidityPolicy,
-        mInitParams.exchangeMgr, mFabricTable, mInitParams.groupDataProvider, mInitParams.mrpLocalConfig });
+    mCASEClient = mInitParams.clientPool->Allocate();
     ReturnErrorCodeIf(mCASEClient == nullptr, CHIP_ERROR_NO_MEMORY);
 
-    CHIP_ERROR err = mCASEClient->EstablishSession(mPeerId, mDeviceAddress, config, this);
+    CASEClientInitParams initParams = { mInitParams.sessionManager,
+                                        mInitParams.sessionResumptionStorage,
+                                        mInitParams.certificateValidityPolicy,
+                                        mInitParams.exchangeMgr,
+                                        mFabricTable,
+                                        mInitParams.groupDataProvider,
+                                        mInitParams.mrpLocalConfig };
+
+    CHIP_ERROR err = mCASEClient->EstablishSession(initParams, mPeerId, mDeviceAddress, config, this);
     if (err != CHIP_NO_ERROR)
     {
         CleanupCASEClient();

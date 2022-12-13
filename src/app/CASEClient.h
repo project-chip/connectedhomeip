@@ -41,16 +41,13 @@ struct CASEClientInitParams
 class DLL_EXPORT CASEClient
 {
 public:
-    CASEClient(const CASEClientInitParams & params);
-
     void SetRemoteMRPIntervals(const ReliableMessageProtocolConfig & remoteMRPConfig);
 
-    CHIP_ERROR EstablishSession(const ScopedNodeId & peer, const Transport::PeerAddress & peerAddress,
-                                const ReliableMessageProtocolConfig & remoteMRPConfig, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR EstablishSession(const CASEClientInitParams & params, const ScopedNodeId & peer,
+                                const Transport::PeerAddress & peerAddress, const ReliableMessageProtocolConfig & remoteMRPConfig,
+                                SessionEstablishmentDelegate * delegate);
 
 private:
-    CASEClientInitParams mInitParams;
-
     CASESession mCASESession;
 };
 
