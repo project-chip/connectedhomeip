@@ -1868,7 +1868,7 @@ server cluster DoorLock = 257 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22;
+  device type rootdevice = 22, version 1;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
@@ -2147,7 +2147,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type doorlock = 10;
+  device type doorlock = 10, version 1;
 
   server cluster Identify {
     ram      attribute identifyTime;

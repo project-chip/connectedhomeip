@@ -292,9 +292,11 @@ template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::DispatchEventToApplication(const ChipDeviceEvent * event)
 {
     // Dispatch the event to each of the registered application event handlers.
-    for (AppEventHandler * eventHandler = mAppEventHandlerList; eventHandler != nullptr; eventHandler = eventHandler->Next)
+    for (AppEventHandler * eventHandler = mAppEventHandlerList; eventHandler != nullptr;)
     {
+        AppEventHandler * nextEventHandler = eventHandler->Next;
         eventHandler->Handler(event, eventHandler->Arg);
+        eventHandler = nextEventHandler;
     }
 }
 

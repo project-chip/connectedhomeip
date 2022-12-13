@@ -25,7 +25,7 @@ import("${efr32_sdk_build_root}/efr32_sdk.gni")
 assert(current_os == "freertos")
 
 project_dir = "${chip_root}/examples/window-app"
-efr32_project_dir = "${project_dir}/efr32"
+efr32_project_dir = "${project_dir}/silabs/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 

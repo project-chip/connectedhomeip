@@ -6241,14 +6241,14 @@ light or a window shade.
 /**
  * Command KeySetWrite
  *
- * Revoke a Root Key from a Group
+ * Write a new set of keys for the given key set id.
  */
 - (void)keySetWriteWithParams:(MTRGroupKeyManagementClusterKeySetWriteParams *)params
                    completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 /**
  * Command KeySetRead
  *
- * Revoke a Root Key from a Group
+ * Read the keys for a given key set id.
  */
 - (void)keySetReadWithParams:(MTRGroupKeyManagementClusterKeySetReadParams *)params
                   completion:(void (^)(MTRGroupKeyManagementClusterKeySetReadResponseParams * _Nullable data,

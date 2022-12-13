@@ -118,7 +118,9 @@ public:
 protected:
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     chip::LifetimePersistedCounter<uint32_t> mLifetimePersistedCounter;
-    uint8_t mRotatingDeviceIdUniqueId[kRotatingDeviceIDUniqueIDLength] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
+    uint8_t mRotatingDeviceIdUniqueId[CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH] =
+        CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
+    size_t mRotatingDeviceIdUniqueIdLength = kRotatingDeviceIDUniqueIDLength;
 #endif
 
     friend GenericDeviceInstanceInfoProvider<ConfigClass>;

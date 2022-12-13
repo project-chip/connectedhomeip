@@ -6,8 +6,8 @@ cyw30739-cyw930739m2evb_01-{light,lock,ota-requestor}[-no-progress-logging]
 efr32-{brd4161a,brd4187c,brd4163a,brd4164a,brd4166a,brd4170a,brd4186a,brd4187a,brd4304a}-{window-covering,switch,unit-test,light,lock}[-rpc][-with-ota-requestor][-sed][-low-power][-shell][-no_logging][-openthread_mtd][-enable_heap_monitoring][-no_openthread_cli][-show_qr_code][-wifi][-rs911x][-wf200][-wifi_ipv4][-additional_data_advertising][-use_ot_lib][-use_ot_coap_lib][-no-version]
 esp32-{m5stack,c3devkit,devkitc,qemu}-{all-clusters,all-clusters-minimal,ota-provider,ota-requestor,shell,light,lock,bridge,temperature-measurement,ota-requestor,tests}[-rpc][-ipv6only]
 genio-lighting-app
-linux-fake-tests[-mbedtls][-boringssl][-asan][-tsan][-libfuzzer][-coverage][-dmalloc][-clang]
-linux-{x64,arm64}-{rpc-console,all-clusters,all-clusters-minimal,chip-tool,thermostat,java-matter-controller,minmdns,light,lock,shell,ota-provider,ota-requestor,python-bindings,tv-app,tv-casting-app,bridge,dynamic-bridge,tests,chip-cert,address-resolve-tool}[-nodeps][-platform-mdns][-minmdns-verbose][-libnl][-same-event-loop][-no-interactive][-ipv6only][-no-ble][-no-wifi][-no-thread][-mbedtls][-boringssl][-asan][-tsan][-libfuzzer][-coverage][-dmalloc][-clang][-test][-rpc]
+linux-fake-tests[-mbedtls][-boringssl][-asan][-tsan][-ubsan][-libfuzzer][-coverage][-dmalloc][-clang]
+linux-{x64,arm64}-{rpc-console,all-clusters,all-clusters-minimal,chip-tool,thermostat,java-matter-controller,minmdns,light,lock,shell,ota-provider,ota-requestor,python-bindings,tv-app,tv-casting-app,bridge,dynamic-bridge,tests,chip-cert,address-resolve-tool}[-nodeps][-platform-mdns][-minmdns-verbose][-libnl][-same-event-loop][-no-interactive][-ipv6only][-no-ble][-no-wifi][-no-thread][-mbedtls][-boringssl][-asan][-tsan][-ubsan][-libfuzzer][-coverage][-dmalloc][-clang][-test][-rpc]
 linux-x64-efr32-test-runner[-clang]
 imx-{chip-tool,lighting-app,thermostat,all-clusters-app,all-clusters-minimal-app,ota-provider-app}[-release]
 infineon-psoc6-{lock,light,all-clusters,all-clusters-minimal}[-ota][-updateimage]
@@ -17,6 +17,6 @@ mw320-all-clusters-app
 nrf-{nrf5340dk,nrf52840dk,nrf52840dongle}-{all-clusters,all-clusters-minimal,lock,light,light-switch,shell,pump,pump-controller,window-covering}[-rpc]
 nrf-native-posix-64-tests
 qpg-qpg6105-{lock,light,shell,persistent-storage}
-tizen-arm-{all-clusters,all-clusters-minimal,chip-tool,light}[-no-ble][-no-wifi][-asan]
+tizen-arm-{all-clusters,all-clusters-minimal,chip-tool,light}[-no-ble][-no-wifi][-asan][-ubsan]
 telink-tlsr9518adk80d-{all-clusters,all-clusters-minimal,light,light-switch,ota-requestor,thermostat}
 openiotsdk-{shell,lock}

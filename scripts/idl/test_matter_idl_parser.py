@@ -81,7 +81,8 @@ class TestParser(unittest.TestCase):
                             data_type=DataType(name="CHAR_STRING"), code=1, name="astring", ),
                         Field(data_type=DataType(name="CLUSTER_ID"), code=2, name="idlist",
                               is_list=True, qualities=FieldQuality.OPTIONAL),
-                        Field(data_type=DataType(name="int"), code=0x123, name="valueThatIsNullable", qualities=FieldQuality.NULLABLE),
+                        Field(data_type=DataType(name="int"), code=0x123,
+                              name="valueThatIsNullable", qualities=FieldQuality.NULLABLE),
                         Field(data_type=DataType(name="char_string", max_length=123),
                               code=222, name="sized_string"),
                    ])]
@@ -224,7 +225,8 @@ class TestParser(unittest.TestCase):
                         Struct(name="FreeStruct", fields=[]),
                         Struct(name="InParam", fields=[],
                                tag=StructTag.REQUEST),
-                        Struct(name="OutParam", fields=[], tag=StructTag.RESPONSE, code=223),
+                        Struct(name="OutParam", fields=[],
+                               tag=StructTag.RESPONSE, code=223),
                     ],
                     commands=[
                         Command(name="WithoutArg", code=123,
@@ -262,7 +264,8 @@ class TestParser(unittest.TestCase):
                     structs=[
                         Struct(name="InParam", fields=[],
                                tag=StructTag.REQUEST),
-                        Struct(name="OutParam", fields=[], tag=StructTag.RESPONSE, code=4),
+                        Struct(name="OutParam", fields=[],
+                               tag=StructTag.RESPONSE, code=4),
                     ],
                     commands=[
                         Command(name="WithoutArg", code=1,
@@ -403,8 +406,10 @@ server cluster A = 1 { /* Test comment */ }
         """)
 
         expected = Idl(clusters=[
-            Cluster(parse_meta=ParseMetaData(line=2, column=1), side=ClusterSide.SERVER, name="A", code=1),
-            Cluster(parse_meta=ParseMetaData(line=5, column=4), side=ClusterSide.CLIENT, name="B", code=2),
+            Cluster(parse_meta=ParseMetaData(line=2, column=1),
+                    side=ClusterSide.SERVER, name="A", code=1),
+            Cluster(parse_meta=ParseMetaData(line=5, column=4),
+                    side=ClusterSide.CLIENT, name="B", code=2),
         ])
         self.assertEqual(actual, expected)
 
@@ -425,8 +430,8 @@ server cluster A = 1 { /* Test comment */ }
     def test_endpoints(self):
         actual = parseText("""
             endpoint 12 {
-                device type foo = 123;
-                device type bar = 0xFF;
+                device type foo = 123, version 1;
+                device type bar = 0xFF, version 2;
 
                 server cluster Foo { }
                 server cluster Bar { }
@@ -437,12 +442,16 @@ server cluster A = 1 { /* Test comment */ }
 
         expected = Idl(endpoints=[Endpoint(number=12,
                                            device_types=[
-                                               DeviceType(name="foo", code=123),
-                                               DeviceType(name="bar", code=0xFF),
+                                               DeviceType(
+                                                   name="foo", code=123, version=1),
+                                               DeviceType(
+                                                   name="bar", code=0xFF, version=2),
                                            ],
                                            server_clusters=[
-                                               ServerClusterInstantiation(name="Foo"),
-                                               ServerClusterInstantiation(name="Bar"),
+                                               ServerClusterInstantiation(
+                                                   name="Foo"),
+                                               ServerClusterInstantiation(
+                                                   name="Bar"),
                                            ],
                                            client_bindings=["Bar", "Test"],)
                                   ])
@@ -465,10 +474,12 @@ server cluster A = 1 { /* Test comment */ }
         expected = Idl(endpoints=[Endpoint(number=3,
                                            server_clusters=[
                                                ServerClusterInstantiation(name="Example", attributes=[
-                                                   AttributeInstantiation(name='inRamZero', storage=AttributeStorage.RAM),
+                                                   AttributeInstantiation(
+                                                       name='inRamZero', storage=AttributeStorage.RAM),
                                                    AttributeInstantiation(name='inRamWithDefault',
                                                                           storage=AttributeStorage.RAM, default=123),
-                                                   AttributeInstantiation(name='inNVMNoDef', storage=AttributeStorage.PERSIST),
+                                                   AttributeInstantiation(
+                                                       name='inNVMNoDef', storage=AttributeStorage.PERSIST),
                                                    AttributeInstantiation(
                                                        name='inNVMStr', storage=AttributeStorage.PERSIST, default="abc"),
                                                    AttributeInstantiation(name='inNVMWithDefault',

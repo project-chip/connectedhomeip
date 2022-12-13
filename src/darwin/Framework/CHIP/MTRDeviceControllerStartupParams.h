@@ -17,6 +17,7 @@
 #import <Foundation/Foundation.h>
 
 #import <Matter/MTRCertificates.h>
+#import <Matter/MTROperationalCertificateIssuer.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -27,11 +28,11 @@ NS_ASSUME_NONNULL_BEGIN
  * Keypair used to sign operational certificates.  This is the root CA keypair
  * if not using an intermediate CA, the intermediate CA's keypair otherwise.
  *
- * Allowed to be nil if this controller will not be issuing operational
- * certificates.  In that case, the MTRDeviceControllerStartupParams object must
- * be initialized using
+ * Allowed to be nil if this controller will not be issuing internally-generated
+ * operational certificates.  In that case, the MTRDeviceControllerStartupParams
+ * object must be initialized using
  * initWithIPK:operationalKeypair:operationalCertificate:intermediateCertificate:rootCertificate:
- * (to provide the operational credentials for the controller itself).
+ * (to provide the operational credentials for t2he controller itself).
  */
 @property (nonatomic, copy, readonly, nullable) id<MTRKeypair> nocSigner;
 /**
@@ -186,6 +187,31 @@ NS_ASSUME_NONNULL_BEGIN
  * documentation for nodeID.
  */
 @property (nonatomic, strong, nullable) id<MTRKeypair> operationalKeypair;
+
+/**
+ * The certificate issuer delegate to use for issuing operational certificates
+ * when commmissioning devices.  Allowed to be nil if this controller either
+ * does not issue operational certificates at all or internally generates the
+ * certificates to be issued.  In the latter case, nocSigner must not be nil.
+ *
+ * When this property is non-nill, all device attestation checks that require
+ * some sort of trust anchors are delegated to the operationalCertificateIssuer.
+ * Specifically, the following device attestation checks are not performed and
+ * must be done by the operationalCertificateIssuer:
+ *
+ * (1) Make sure the PAA is valid and approved by CSA.
+ * (2) VID-scoped PAA check: if the PAA is VID scoped, then its VID must match the DAC VID.
+ * (3) cert chain check: verify PAI is signed by PAA, and DAC is signed by PAI.
+ * (4) PAA subject key id extraction: the PAA subject key must match the PAA key referenced in the PAI.
+ * (5) CD signature check: make sure a valid CSA CD key is used to sign the CD.
+ */
+@property (nonatomic, strong, nullable) id<MTROperationalCertificateIssuer> operationalCertificateIssuer MTR_NEWLY_AVAILABLE;
+
+/**
+ * The dispatch queue on which operationalCertificateIssuer should be called.
+ * Allowed to be nil if and only if operationalCertificateIssuer is nil.
+ */
+@property (nonatomic, strong, nullable) dispatch_queue_t operationalCertificateIssuerQueue MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 

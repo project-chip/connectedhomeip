@@ -92,6 +92,18 @@ CHIP_ERROR ActiveResolveAttempts::CompleteAllBrowses()
     return CHIP_NO_ERROR;
 }
 
+void ActiveResolveAttempts::NodeIdResolutionNoLongerNeeded(const PeerId & peerId)
+{
+    for (auto & item : mRetryQueue)
+    {
+        if (item.attempt.Matches(peerId))
+        {
+            item.attempt.ConsumerRemoved();
+            return;
+        }
+    }
+}
+
 void ActiveResolveAttempts::MarkPending(const chip::PeerId & peerId)
 {
     MarkPending(ScheduledAttempt(peerId, /* firstSend */ true));
@@ -172,6 +184,7 @@ void ActiveResolveAttempts::MarkPending(ScheduledAttempt && attempt)
         ChipLogError(Discovery, "Re-using pending resolve entry before reply was received.");
     }
 
+    attempt.WillCoalesceWith(entryToUse->attempt);
     entryToUse->attempt        = attempt;
     entryToUse->queryDueTime   = mClock->GetMonotonicTimestamp();
     entryToUse->nextRetryDelay = System::Clock::Seconds16(1);

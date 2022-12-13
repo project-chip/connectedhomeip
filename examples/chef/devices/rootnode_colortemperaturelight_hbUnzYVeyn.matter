@@ -1371,7 +1371,7 @@ server cluster ColorControl = 768 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22;
+  device type rootdevice = 22, version 1;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Groups {
@@ -1514,7 +1514,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 268;
+  device type anonymousEndpointType = 268, version 1;
 
   server cluster Identify {
     ram      attribute identifyTime;

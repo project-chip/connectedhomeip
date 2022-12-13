@@ -26,7 +26,7 @@ import queue
 import subprocess
 import threading
 import typing
-from optparse import OptionParser
+import argparse
 from colorama import Fore, Style
 from java.base import DumpProgramOutputToQueue
 
@@ -37,77 +37,30 @@ class CommissioningTest:
         self.queue = queue
         self.command = cmd
 
-        optParser = OptionParser()
-        optParser.add_option(
-            "-t",
-            "--timeout",
-            action="store",
-            dest="testTimeout",
-            default='200',
-            type='str',
-            help="The program will return with timeout after specified seconds.",
-            metavar="<timeout-second>",
-        )
-        optParser.add_option(
-            "-a",
-            "--address",
-            action="store",
-            dest="deviceAddress",
-            default='',
-            type='str',
-            help="Address of the device",
-            metavar="<device-addr>",
-        )
-        optParser.add_option(
-            "--setup-payload",
-            action="store",
-            dest="setupPayload",
-            default='',
-            type='str',
-            help="Setup Payload (manual pairing code or QR code content)",
-            metavar="<setup-payload>"
-        )
-        optParser.add_option(
-            "--nodeid",
-            action="store",
-            dest="nodeid",
-            default='1',
-            type='str',
-            help="The Node ID issued to the device",
-            metavar="<nodeid>"
-        )
-        optParser.add_option(
-            "--discriminator",
-            action="store",
-            dest="discriminator",
-            default='3840',
-            type='str',
-            help="Discriminator of the device",
-            metavar="<nodeid>"
-        )
-        optParser.add_option(
-            "-p",
-            "--paa-trust-store-path",
-            action="store",
-            dest="paaTrustStorePath",
-            default='',
-            type='str',
-            help="Path that contains valid and trusted PAA Root Certificates.",
-            metavar="<paa-trust-store-path>"
-        )
+        parser = argparse.ArgumentParser(description='Process pairing arguments.')
 
-        (options, remainingArgs) = optParser.parse_args(args.split())
+        parser.add_argument('command', help="Command name")
+        parser.add_argument('-t', '--timeout', help="The program will return with timeout after specified seconds", default='200')
+        parser.add_argument('-a', '--address', help="Address of the device")
+        parser.add_argument('-s', '--setup-payload', dest='setup_payload',
+                            help="Setup Payload (manual pairing code or QR code content)")
+        parser.add_argument('-n', '--nodeid', help="The Node ID issued to the device", default='1')
+        parser.add_argument('-d', '--discriminator', help="Discriminator of the device", default='3840')
+        parser.add_argument('-p', '--paa-trust-store-path', dest='paa_trust_store_path',
+                            help="Path that contains valid and trusted PAA Root Certificates")
 
-        self.nodeid = options.nodeid
-        self.setupPayload = options.setupPayload
-        self.discriminator = options.discriminator
-        self.testTimeout = options.testTimeout
+        args = parser.parse_args(args.split())
+
+        self.command_name = args.command
+        self.nodeid = args.nodeid
+        self.setup_payload = args.setup_payload
+        self.discriminator = args.discriminator
+        self.timeout = args.timeout
 
         logging.basicConfig(level=logging.INFO)
 
     def TestOnnetworkLong(self, nodeid, setuppin, discriminator, timeout):
         java_command = self.command + ['pairing', 'onnetwork-long', nodeid, setuppin, discriminator, timeout]
-        print(java_command)
         logging.info(f"Execute: {java_command}")
         java_process = subprocess.Popen(
             java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -116,10 +69,11 @@ class CommissioningTest:
 
     def RunTest(self):
         logging.info("Testing onnetwork-long pairing")
-        java_exit_code = self.TestOnnetworkLong(self.nodeid, self.setupPayload, self.discriminator, self.testTimeout)
-        if java_exit_code != 0:
-            logging.error("Testing onnetwork-long pairing failed with error %r" % java_exit_code)
-            return java_exit_code
+        if self.command_name == 'onnetwork-long':
+            java_exit_code = self.TestOnnetworkLong(self.nodeid, self.setup_payload, self.discriminator, self.timeout)
+            if java_exit_code != 0:
+                logging.error("Testing onnetwork-long pairing failed with error %r" % java_exit_code)
+                return java_exit_code
 
         # Testing complete without errors
         return 0

@@ -70,6 +70,11 @@ def build_darwin_framework(args):
             "GCC_INLINES_ARE_PRIVATE_EXTERN=NO",
             "GCC_SYMBOLS_PRIVATE_EXTERN=NO",
         ]
+
+    if not args.ipv4:
+        command += [
+            "CHIP_INET_CONFIG_ENABLE_IPV4=NO",
+        ]
     command_result = run_command(command)
 
     print("Build Framework Result: {}".format(command_result))
@@ -108,6 +113,7 @@ if __name__ == "__main__":
     parser.add_argument("--log_path",
                         help="Output log file destination",
                         required=True)
+    parser.add_argument('--ipv4', action=argparse.BooleanOptionalAction)
 
     args = parser.parse_args()
     build_darwin_framework(args)

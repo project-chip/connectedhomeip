@@ -85,25 +85,27 @@ CHIP_ERROR AppContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEn
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetAcceptHeaderList");
     chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::ContentLauncher::Id,
                                                chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::Id);
-    const char * resStr = mAttributeDelegate->Read(aPath);
-    ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response %s", resStr);
+    std::string resStr = mAttributeDelegate->Read(aPath);
+    ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetAcceptHeaderList response %s", resStr.c_str());
 
-    if (resStr != nullptr && *resStr != 0)
+    if (resStr.length() != 0)
     {
         Json::Reader reader;
         Json::Value value;
         if (reader.parse(resStr, value))
         {
             std::string attrId = to_string(chip::app::Clusters::ContentLauncher::Attributes::AcceptHeader::Id);
-            ChipLogProgress(
-                Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response parsing done. reading attr %s",
-                attrId.c_str());
+            ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetAcceptHeaderList response parsing done. reading attr %s",
+                            attrId.c_str());
             if (value[attrId].isArray())
             {
                 mAcceptHeaderList.clear();
                 for (Json::Value & entry : value[attrId])
                 {
-                    mAcceptHeaderList.push_back(entry.asString());
+                    if (entry.isString())
+                    {
+                        mAcceptHeaderList.push_back(entry.asString());
+                    }
                 }
             }
         }
@@ -124,10 +126,10 @@ uint32_t AppContentLauncherManager::HandleGetSupportedStreamingProtocols()
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols");
     chip::app::ConcreteReadAttributePath aPath(mEndpointId, chip::app::Clusters::ContentLauncher::Id,
                                                chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id);
-    const char * resStr = mAttributeDelegate->Read(aPath);
-    ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response %s", resStr);
+    std::string resStr = mAttributeDelegate->Read(aPath);
+    ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response %s", resStr.c_str());
 
-    if (resStr == nullptr || *resStr == 0)
+    if (resStr.length() == 0)
     {
         return mSupportedStreamingProtocols;
     }
@@ -141,7 +143,7 @@ uint32_t AppContentLauncherManager::HandleGetSupportedStreamingProtocols()
     std::string attrId = to_string(chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id);
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleGetSupportedStreamingProtocols response parsing done. reading attr %s",
                     attrId.c_str());
-    if (!value[attrId].empty())
+    if (!value[attrId].empty() && value[attrId].isInt())
     {
         uint32_t supportedStreamingProtocols = static_cast<uint32_t>(value[attrId].asInt());
         mSupportedStreamingProtocols         = supportedStreamingProtocols;

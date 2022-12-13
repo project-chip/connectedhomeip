@@ -31,7 +31,7 @@ if (chip_enable_pw_rpc) {
 
 assert(current_os == "freertos")
 
-efr32_project_dir = "${chip_root}/examples/light-switch-app/efr32"
+efr32_project_dir = "${chip_root}/examples/lock-app/silabs/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
@@ -169,7 +169,6 @@ efr32_sdk("sdk") {
       # Using LWIP instead of the native TCP/IP stack
       defines += efr32_lwip_defs
     }
-
     if (sl_wfx_config_softap) {
       defines += [ "SL_WFX_CONFIG_SOFTAP" ]
     }
@@ -179,8 +178,8 @@ efr32_sdk("sdk") {
   }
 }
 
-efr32_executable("light_switch_app") {
-  output_name = "chip-efr32-light-switch-example.out"
+efr32_executable("lock_app") {
+  output_name = "chip-efr32-lock-example.out"
   public_configs = [ "${efr32_sdk_build_root}:silabs_config" ]
   include_dirs = [ "include" ]
   defines = []
@@ -192,8 +191,8 @@ efr32_executable("light_switch_app") {
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/matter_config.cpp",
     "src/AppTask.cpp",
+    "src/LockManager.cpp",
     "src/ZclCallbacks.cpp",
-    "src/binding-handler.cpp",
     "src/main.cpp",
   ]
 
@@ -206,12 +205,19 @@ efr32_executable("light_switch_app") {
     sources += [ "${examples_plat_dir}/uart.cpp" ]
   }
 
+  if (chip_build_libshell) {
+    sources += [ "src/EventHandlerLibShell.cpp" ]
+  }
+
   deps = [
     ":sdk",
-    "${chip_root}/examples/light-switch-app/light-switch-common",
+    "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
+    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+    "${examples_plat_dir}:efr-matter-shell",
   ]
 
   # OpenThread Settings
@@ -221,16 +227,6 @@ efr32_executable("light_switch_app") {
       "${chip_root}/third_party/openthread:openthread-platform",
       "${examples_plat_dir}:efr-matter-shell",
     ]
-  }
-
-  # Attestation Credentials
-  if (chip_build_platform_attestation_credentials_provider) {
-    deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
-  }
-
-  # Factory Data Provider
-  if (use_efr32_factory_data_provider) {
-    deps += [ "${examples_plat_dir}:efr32-factory-data-provider" ]
   }
 
   if (chip_enable_ota_requestor) {
@@ -284,7 +280,7 @@ efr32_executable("light_switch_app") {
     include_dirs += [ "${examples_plat_dir}/display" ]
     defines += [
       "DISPLAY_ENABLED",
-      "IS_DEMO_SWITCH=1",
+      "IS_DEMO_LOCK=1",
     ]
     if (show_qr_code) {
       defines += [ "QR_CODE_ENABLED" ]
@@ -299,7 +295,9 @@ efr32_executable("light_switch_app") {
       "PW_RPC_BUTTON_SERVICE=1",
       "PW_RPC_DESCRIPTOR_SERVICE=1",
       "PW_RPC_DEVICE_SERVICE=1",
-      "PW_RPC_LIGHTING_SERVICE=1",
+      "PW_RPC_LOCKING_SERVICE=1",
+      "PW_RPC_OTCLI_SERVICE=1",
+      "PW_RPC_THREAD_SERVICE=1",
     ]
 
     sources += [
@@ -317,7 +315,9 @@ efr32_executable("light_switch_app") {
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
-      "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:locking_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
       "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
     ]
 
@@ -355,11 +355,20 @@ efr32_executable("light_switch_app") {
     ]
   }
 
+  # Attestation Credentials
+  if (chip_build_platform_attestation_credentials_provider) {
+    deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
+  }
+
+  # Factory Data Provider
+  if (use_efr32_factory_data_provider) {
+    deps += [ "${examples_plat_dir}:efr32-factory-data-provider" ]
+  }
+
   output_dir = root_out_dir
 }
-
 group("efr32") {
-  deps = [ ":light_switch_app" ]
+  deps = [ ":lock_app" ]
 }
 
 group("default") {

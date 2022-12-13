@@ -241,6 +241,8 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, Inet::InterfaceId interface,
     return CHIP_NO_ERROR;
 }
 
+void ChipDnssdResolveNoLongerNeeded(const char * instanceName) {}
+
 CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
