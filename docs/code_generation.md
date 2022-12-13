@@ -205,6 +205,10 @@ requires the pre-generation output directory as an argument
 
 ```bash
 scripts/codepregen.py ${OUTPUT_DIRECTORY:-./zzz_pregenerated/}
+
+# To generate a single output you can use `--input-glob`:
+
+scripts/codepregen.py --input-glob "*all-clusters*" ${OUTPUT_DIRECTORY:-./zzz_pregenerated/}
 ```
 
 ### Using pre-generated code

@@ -26,7 +26,7 @@ declare_args() {
 
 # Code generation that will happen at build time.
 #
-# uses `scripts/codege.py` for code generation.
+# uses `scripts/codegen.py` for code generation.
 template("_chip_build_time_codegen") {
   _name = target_name
   _generator = invoker.generator
@@ -124,23 +124,22 @@ template("_chip_build_time_zapgen") {
     _template_path =
         rebase_path("${chip_root}/src/app/zap-templates/app-templates.json")
 
+    _partials_dir = "${chip_root}/src/app/zap-templates/partials"
+    _template_dir = "${chip_root}/src/app/zap-templates/templates"
+
     # TODO: unclear how to maintain these: there is no parser that can figure
     #       out links of template files and zap files and such
     _extra_dependencies = [
-      "${chip_root}/src/app/zap-templates/partials/header.zapt",
-      "${chip_root}/src/app/zap-templates/partials/idl/command_request_response.zapt",
-      "${chip_root}/src/app/zap-templates/partials/idl/command_request_struct.zapt",
-      "${chip_root}/src/app/zap-templates/partials/idl/command_response_struct.zapt",
-      "${chip_root}/src/app/zap-templates/partials/idl/structure_definition.zapt",
-      "${chip_root}/src/app/zap-templates/partials/idl/structure_member.zapt",
-      "${chip_root}/src/app/zap-templates/partials/im_command_handler_cluster_commands.zapt",
-      "${chip_root}/src/app/zap-templates/templates/app/access.zapt",
-      "${chip_root}/src/app/zap-templates/templates/app/CHIPClientCallbacks.zapt",
-      "${chip_root}/src/app/zap-templates/templates/app/CHIPClusters.zapt",
-      "${chip_root}/src/app/zap-templates/templates/app/endpoint_config.zapt",
-      "${chip_root}/src/app/zap-templates/templates/app/gen_config.zapt",
-      "${chip_root}/src/app/zap-templates/templates/app/im-cluster-command-handler.zapt",
-      "${chip_root}/src/app/zap-templates/templates/app/MatterIDL.zapt",
+      "${_partials_dir}/header.zapt",
+      "${_partials_dir}/im_command_handler_cluster_commands.zapt",
+
+      # Application templates, actually generating files
+      "${_template_dir}/access.zapt",
+      "${_template_dir}/CHIPClientCallbacks.zapt",
+      "${_template_dir}/CHIPClusters.zapt",
+      "${_template_dir}/endpoint_config.zapt",
+      "${_template_dir}/gen_config.zapt",
+      "${_template_dir}/im-cluster-command-handler.zapt",
     ]
 
     _output_subdir = "zap-generated"
@@ -314,7 +313,7 @@ template("chip_codegen") {
   } else {
     _name = target_name
 
-    # This contstructs a path like:
+    # This constructs a path like:
     #  FROM all-clusters-app.matter (inside examples/all-clusters-app/all-clusters-common/)
     #  USING "cpp-app" for generator:
     #    => ${pregen_dir}/examples/all-clusters-app/all-clusters-common/all-clusters-app/codegen/cpp-app

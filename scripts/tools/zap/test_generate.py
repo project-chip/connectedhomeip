@@ -149,7 +149,7 @@ class TestGenerators(unittest.TestCase):
 
 
 def process_arguments():
-    """Parses sys.argv and extracts arguments that are specifict to the script."""
+    """Parses sys.argv and extracts arguments that are specific to the script."""
     args = sys.argv[:]
 
     program_args = ProgramArguments()
