@@ -50,7 +50,7 @@ public:
         {
         case ClientMonitoring::Attributes::ExpectedClients::Id:
             // TODO : Implement Client monitoring registration table
-            return CHIP_ERROR_NOT_IMPLEMENTED;
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedRead);
 
         default:
             break;
@@ -61,7 +61,7 @@ public:
 
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override
     {
-        return CHIP_ERROR_WRITE_FAILED;
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
     }
 };
 
