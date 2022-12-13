@@ -54,7 +54,7 @@
 
  @param clientQueue Queue to dispatch the call to the discoveredCommissionerHandler on
 
- @param discoveredCommissionerHandler Handler to call after a discovered commissioner has been retrieved
+ @param discoveredCommissionerHandler Handler called synchronously after a discovered commissioner has been retrieved
  */
 - (void)getDiscoveredCommissioner:(int)index
                       clientQueue:(dispatch_queue_t _Nonnull)clientQueue
@@ -185,9 +185,9 @@
 - (void)disconnect:(dispatch_queue_t _Nonnull)clientQueue requestSentHandler:(nullable void (^)())requestSentHandler;
 
 /**
- @brief Initialize the Matter server and reconnect to a previously connected Video Player (if any)
+ @brief Start the Matter server and reconnect to a previously connected Video Player (if any)
  */
-- (void)initMatterServer;
+- (void)startMatterServer;
 
 /**
  @brief Stop the Matter server

@@ -510,9 +510,9 @@
     });
 }
 
-- (void)initMatterServer
+- (void)startMatterServer
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().initMatterServer() called");
+    ChipLogProgress(AppServer, "CastingServerBridge().startMatterServer() called");
 
     dispatch_sync(_chipWorkQueue, ^{
         // Initialize the Matter server
@@ -525,7 +525,7 @@
         // Now reconnect to the VideoPlayer the casting app was previously connected to (if any)
         if (self->_previouslyConnectedVideoPlayer != nil) {
             ChipLogProgress(
-                AppServer, "CastingServerBridge().initMatterServer() reconnecting to previously connected VideoPlayer...");
+                AppServer, "CastingServerBridge().startMatterServer() reconnecting to previously connected VideoPlayer...");
             err = CastingServer::GetInstance()->VerifyOrEstablishConnection(
                 *(self->_previouslyConnectedVideoPlayer), [](TargetVideoPlayerInfo * cppTargetVideoPlayerInfo) {},
                 [](CHIP_ERROR err) {}, [](TargetEndpointInfo * cppTargetEndpointInfo) {});

@@ -64,7 +64,7 @@ struct TvCastingApp: App {
                     {
                         if let castingServerBridge = CastingServerBridge.getSharedInstance()
                         {
-                            castingServerBridge.initMatterServer()
+                            castingServerBridge.startMatterServer()
                         }
                     }
                     firstAppActivation = false
