@@ -1901,6 +1901,15 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDActiv
 
     return err;
 }
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDCheckinMsg()
+{
+    ChipLogDetail(DeviceLayer, "TODO : Sending Checking Message");
+
+    // TODO #24243 : Implement Checking message
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
 #endif
 
 template <class ImplClass>

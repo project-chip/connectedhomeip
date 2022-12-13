@@ -226,6 +226,11 @@ void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
 {
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+        DeviceLayer::ConnectivityMgr().RequestSEDCheckinMsg();
+#endif
+
         BindingCommandData * data = Platform::New<BindingCommandData>();
         data->clusterId           = chip::app::Clusters::OnOff::Id;
 

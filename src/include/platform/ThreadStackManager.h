@@ -183,6 +183,13 @@ private:
      * @param[in]  onOff  true if active mode should be enabled and false otherwise.
      */
     CHIP_ERROR RequestSEDActiveMode(bool onOff);
+
+
+    /**
+     * Request the sending of a checking message either at the end of a long sleep period or upon user interaction
+    */
+    CHIP_ERROR RequestSEDCheckinMsg(void);
+
 #endif
 
     bool HaveMeshConnectivity();
@@ -405,6 +412,11 @@ inline CHIP_ERROR ThreadStackManager::SetSEDIntervalsConfig(const ConnectivityMa
 inline CHIP_ERROR ThreadStackManager::RequestSEDActiveMode(bool onOff)
 {
     return static_cast<ImplClass *>(this)->_RequestSEDActiveMode(onOff);
+}
+
+inline CHIP_ERROR ThreadStackManager::RequestSEDCheckinMsg(void)
+{
+    return static_cast<ImplClass *>(this)->_RequestSEDCheckinMsg();
 }
 #endif
 

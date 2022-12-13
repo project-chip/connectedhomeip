@@ -67,6 +67,7 @@ protected:
     CHIP_ERROR _GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
     CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
     CHIP_ERROR _RequestSEDActiveMode(bool onOff);
+    CHIP_ERROR _RequestSEDCheckinMsg(void);
 #endif
     bool _IsThreadAttached();
     bool _IsThreadProvisioned();
@@ -160,6 +161,12 @@ template <class ImplClass>
 inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_RequestSEDActiveMode(bool onOff)
 {
     return ThreadStackMgrImpl().RequestSEDActiveMode(onOff);
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_RequestSEDCheckinMsg(void)
+{
+    return ThreadStackMgrImpl().RequestSEDCheckinMsg();
 }
 #endif
 

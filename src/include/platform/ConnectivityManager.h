@@ -225,6 +225,11 @@ public:
      * @param[in]  onOff  true if active mode should be enabled and false otherwise.
      */
     CHIP_ERROR RequestSEDActiveMode(bool onOff);
+
+    /**
+     * Request the sending of a checking message either at the end of a long sleep period or upon user interaction
+     */
+    CHIP_ERROR RequestSEDCheckinMsg(void);
 #endif
 
     // CHIPoBLE service methods
@@ -483,6 +488,11 @@ inline CHIP_ERROR ConnectivityManager::SetSEDIntervalsConfig(const SEDIntervalsC
 inline CHIP_ERROR ConnectivityManager::RequestSEDActiveMode(bool onOff)
 {
     return static_cast<ImplClass *>(this)->_RequestSEDActiveMode(onOff);
+}
+
+inline CHIP_ERROR ConnectivityManager::RequestSEDCheckinMsg(void)
+{
+    return static_cast<ImplClass *>(this)->_RequestSEDCheckinMsg();
 }
 #endif
 

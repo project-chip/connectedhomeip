@@ -503,6 +503,13 @@ CHIP_ERROR ThreadStackManagerImpl::_RequestSEDActiveMode(bool onOff)
     ChipLogError(DeviceLayer, "SED intervals config is not supported on linux");
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
+
+CHIP_ERROR ThreadStackManagerImpl::_RequestSEDCheckinMsg(void)
+{
+    ChipLogError(DeviceLayer, "SED intervals config is not supported on linux");
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 #endif
 
 bool ThreadStackManagerImpl::_HaveMeshConnectivity()
