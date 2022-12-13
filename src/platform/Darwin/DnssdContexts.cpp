@@ -166,10 +166,8 @@ CHIP_ERROR MdnsContexts::Add(GenericContext * context, DNSServiceRef sdRef)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MdnsContexts::Remove(GenericContext * context)
+bool MdnsContexts::RemoveWithoutDeleting(GenericContext * context)
 {
-    bool found = false;
-
     std::vector<GenericContext *>::const_iterator iter = mContexts.cbegin();
     while (iter != mContexts.cend())
     {
@@ -179,12 +177,20 @@ CHIP_ERROR MdnsContexts::Remove(GenericContext * context)
             continue;
         }
 
-        Delete(*iter);
         mContexts.erase(iter);
-        found = true;
-        break;
+        return true;
     }
 
+    return false;
+}
+
+CHIP_ERROR MdnsContexts::Remove(GenericContext * context)
+{
+    bool found = RemoveWithoutDeleting(context);
+    if (found)
+    {
+        Delete(context);
+    }
     return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
@@ -251,6 +257,19 @@ CHIP_ERROR MdnsContexts::GetRegisterContextOfType(const char * type, RegisterCon
     return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
+ResolveContext * MdnsContexts::GetExistingResolveForInstanceName(const char * instanceName)
+{
+    for (auto & ctx : mContexts)
+    {
+        if (ctx->type == ContextType::Resolve && (static_cast<ResolveContext *>(ctx))->Matches(instanceName))
+        {
+            return static_cast<ResolveContext *>(ctx);
+        }
+    }
+
+    return nullptr;
+}
+
 RegisterContext::RegisterContext(const char * sType, const char * instanceName, DnssdPublishCallback cb, void * cbContext)
 {
     type     = ContextType::Register;
@@ -305,12 +324,15 @@ void BrowseContext::DispatchPartialSuccess()
     services.clear();
 }
 
-ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType)
+ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,
+                               const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse)
 {
-    type     = ContextType::Resolve;
-    context  = cbContext;
-    callback = cb;
-    protocol = GetProtocol(cbAddressType);
+    type            = ContextType::Resolve;
+    context         = cbContext;
+    callback        = cb;
+    protocol        = GetProtocol(cbAddressType);
+    instanceName    = instanceNameToResolve;
+    consumerCounter = std::move(consumerCounterToUse);
 }
 
 ResolveContext::~ResolveContext() {}
@@ -318,12 +340,24 @@ ResolveContext::~ResolveContext() {}
 void ResolveContext::DispatchFailure(DNSServiceErrorType err)
 {
     ChipLogError(Discovery, "Mdns: Resolve failure (%s)", Error::ToString(err));
+    // Remove before dispatching, so calls back into
+    // ChipDnssdResolveNoLongerNeeded don't find us and try to also remove us.
+    bool needDelete = MdnsContexts::GetInstance().RemoveWithoutDeleting(this);
+
     callback(context, nullptr, Span<Inet::IPAddress>(), Error::ToChipError(err));
-    MdnsContexts::GetInstance().Remove(this);
+
+    if (needDelete)
+    {
+        MdnsContexts::GetInstance().Delete(this);
+    }
 }
 
 void ResolveContext::DispatchSuccess()
 {
+    // Remove before dispatching, so calls back into
+    // ChipDnssdResolveNoLongerNeeded don't find us and try to also remove us.
+    bool needDelete = MdnsContexts::GetInstance().RemoveWithoutDeleting(this);
+
     for (auto & interface : interfaces)
     {
         auto & ips = interface.second.addresses;
@@ -339,7 +373,10 @@ void ResolveContext::DispatchSuccess()
         break;
     }
 
-    MdnsContexts::GetInstance().Remove(this);
+    if (needDelete)
+    {
+        MdnsContexts::GetInstance().Delete(this);
+    }
 }
 
 CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct sockaddr * address)

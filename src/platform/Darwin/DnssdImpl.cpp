@@ -344,7 +344,23 @@ static CHIP_ERROR Resolve(void * context, DnssdResolveCallback callback, uint32_
     ChipLogDetail(Discovery, "Resolve type=%s name=%s interface=%" PRIu32, StringOrNullMarker(type), StringOrNullMarker(name),
                   interfaceId);
 
-    auto sdCtx = chip::Platform::New<ResolveContext>(context, callback, addressType);
+    // This is a little silly, in that resolves for the same name, type, etc get
+    // coalesced by the underlying mDNSResponder anyway.  But we need to keep
+    // track of our context/callback/etc, (even though in practice it's always
+    // exactly the same) and the interface id (which might actually be different
+    // for different Resolve calls). So for now just keep using a
+    // ResolveContext to track all that.
+    std::shared_ptr<uint32_t> counterHolder;
+    if (auto existingCtx = MdnsContexts::GetInstance().GetExistingResolveForInstanceName(name))
+    {
+        counterHolder = existingCtx->consumerCounter;
+    }
+    else
+    {
+        counterHolder = std::make_shared<uint32_t>(0);
+    }
+
+    auto sdCtx = chip::Platform::New<ResolveContext>(context, callback, addressType, name, std::move(counterHolder));
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
 
     auto err = DNSServiceCreateConnection(&sdCtx->serviceRef);
@@ -354,7 +370,12 @@ static CHIP_ERROR Resolve(void * context, DnssdResolveCallback callback, uint32_
     err            = DNSServiceResolve(&sdRefCopy, kResolveFlags, interfaceId, name, type, kLocalDot, OnResolve, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
-    return MdnsContexts::GetInstance().Add(sdCtx, sdCtx->serviceRef);
+    CHIP_ERROR retval = MdnsContexts::GetInstance().Add(sdCtx, sdCtx->serviceRef);
+    if (retval == CHIP_NO_ERROR)
+    {
+        (*(sdCtx->consumerCounter))++;
+    }
+    return retval;
 }
 
 } // namespace
@@ -448,6 +469,27 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
     auto regtype     = GetFullType(service);
     auto interfaceId = GetInterfaceId(interface);
     return Resolve(context, callback, interfaceId, service->mAddressType, regtype.c_str(), service->mName);
+}
+
+void ChipDnssdResolveNoLongerNeeded(const char * instanceName)
+{
+    auto existingCtx = MdnsContexts::GetInstance().GetExistingResolveForInstanceName(instanceName);
+    VerifyOrReturn(existingCtx != nullptr);
+    VerifyOrReturn(*existingCtx->consumerCounter != 0);
+
+    (*existingCtx->consumerCounter)--;
+
+    if (*existingCtx->consumerCounter == 0)
+    {
+        // No more consumers; clear out all of these resolves so they don't
+        // stick around.  Dispatch timeout failure on all of them to make sure
+        // whatever kicked them off cleans up resources as needed.
+        do
+        {
+            existingCtx->Finalize(kDNSServiceErr_Timeout);
+            existingCtx = MdnsContexts::GetInstance().GetExistingResolveForInstanceName(instanceName);
+        } while (existingCtx != nullptr);
+    }
 }
 
 CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)

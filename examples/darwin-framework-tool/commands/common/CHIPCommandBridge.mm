@@ -26,7 +26,6 @@
 
 #include "MTRError_Utils.h"
 
-const uint16_t kListenPort = 5541;
 static CHIPToolPersistentStorageDelegate * storage = nil;
 std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
 std::map<std::string, MTRDeviceController *> CHIPCommandBridge::mControllers;
@@ -118,7 +117,6 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
     }
 
     auto params = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
-    params.port = @(kListenPort);
     params.shouldStartServer = YES;
     params.otaProviderDelegate = mOTADelegate;
     NSArray<NSData *> * paaCertResults;
