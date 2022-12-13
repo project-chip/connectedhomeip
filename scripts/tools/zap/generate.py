@@ -28,6 +28,7 @@ from dataclasses import dataclass
 
 from zap_execution import ZapTool
 
+
 @dataclass
 class CmdLineArgs:
     zapFile: str
