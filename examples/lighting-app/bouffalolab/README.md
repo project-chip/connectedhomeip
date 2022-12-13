@@ -97,9 +97,11 @@ and BL706 develop board `XT-ZB6-DevKit`.
     `chip-bl702-lighting-example.flash.py` will generate under build output
     folder for BL602 or BL702 building.
 
-    > Note 1, `*.flash.py` should be ran under Matter build environment; 
-    > if python module `bflb_iot_tool` is not found, please try to do `source scripts/bootstrap.sh` or install as `pip3 install bflb-iot-tool`.<br>
-    > Note 2, different build options will generate different output folder.
+    > Note 1, `*.flash.py` should be ran under Matter build environment; if
+    > python module `bflb_iot_tool` is not found, please try to do
+    > `source scripts/bootstrap.sh` or install as
+    > `pip3 install bflb-iot-tool`.<br> Note 2, different build options will
+    > generate different output folder.
 
     Download operation steps as below, please check `help` option of script for
     more detail.
@@ -138,7 +140,8 @@ and BL706 develop board `XT-ZB6-DevKit`.
             > Note, better to append --erase option to download image for BL602
             > develop board at first time.
 
--   Using `Bouffalo Lab` GUI flash tool `BLDevCube`, please download on [this page](https://dev.bouffalolab.com/download).
+-   Using `Bouffalo Lab` GUI flash tool `BLDevCube`, please download on
+    [this page](https://dev.bouffalolab.com/download).
     -   Hold BOOT pin and reset chip, put the board in download mode.
     -   Select `DTS` file;
     -   Select Partition Table under
@@ -205,10 +208,10 @@ sudo ot-ctl dataset active -x
         ```
 
     > `<node_id>`, which is node ID assigned to device within chip-tool
-    > fabric<br> `<wifi_ssid>`, Wi-Fi network SSID<br> `<wifi_passwd>`,
-    > Wi-FI network password<br> `<thread_operational_dataset>`, Thread
-    > network credential which running `sudo ot-ctl dataset active -x` command
-    > on border router to get.
+    > fabric<br> `<wifi_ssid>`, Wi-Fi network SSID<br> `<wifi_passwd>`, Wi-FI
+    > network password<br> `<thread_operational_dataset>`, Thread network
+    > credential which running `sudo ot-ctl dataset active -x` command on border
+    > router to get.
 
 ### Cluster control
 
