@@ -38,8 +38,9 @@
 #include <lib/support/TestGroupData.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/KeyValueStoreManager.h>
+#ifndef JAVA_MATTER_CONTROLLER_TEST
 #include <platform/android/CHIPP256KeypairBridge.h>
-
+#endif // JAVA_MATTER_CONTROLLER_TEST
 using namespace chip;
 using namespace chip::Controller;
 using namespace chip::Credentials;
@@ -53,11 +54,13 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
     }
     mController->Shutdown();
 
+#ifndef JAVA_MATTER_CONTROLLER_TEST
     if (mKeypairBridge != nullptr)
     {
         chip::Platform::Delete(mKeypairBridge);
         mKeypairBridge = nullptr;
     }
+#endif // JAVA_MATTER_CONTROLLER_TEST
     if (mDeviceAttestationDelegateBridge != nullptr)
     {
         delete mDeviceAttestationDelegateBridge;
@@ -90,7 +93,12 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId, chip::FabricId fabricId, const chip::CATValues & cats,
     chip::System::Layer * systemLayer, chip::Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager,
-    chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager, AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr,
+    chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager,
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+    ExampleOperationalCredentialsIssuerPtr opCredsIssuerPtr,
+#else
+    AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr,
+#endif
     jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate,
     jbyteArray ipkEpochKey, jobject paaCertsArrayList, jobject cdCertsArrayList, uint16_t listenPort, uint16_t controllerVendorId,
     uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread, bool skipCommissioningComplete,
@@ -140,11 +148,22 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     std::unique_ptr<AndroidDeviceControllerWrapper> wrapper(
         new AndroidDeviceControllerWrapper(std::move(controller), std::move(opCredsIssuerPtr)));
 
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+    if (wrapper->mExampleStorage.Init() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Init Storage failure");
+        return nullptr;
+    }
+    chip::PersistentStorageDelegate * wrapperStorage = &wrapper->mExampleStorage;
+    wrapper->SetJavaObjectRef(vm, deviceControllerObj);
+    chip::Controller::ExampleOperationalCredentialsIssuer * opCredsIssuer = wrapper->mOpCredsIssuer.get();
+#else
     chip::PersistentStorageDelegate * wrapperStorage = wrapper.get();
 
     wrapper->SetJavaObjectRef(vm, deviceControllerObj);
 
     chip::Controller::AndroidOperationalCredentialsIssuer * opCredsIssuer = wrapper->mOpCredsIssuer.get();
+#endif
 
     // Initialize device attestation verifier
     const Credentials::AttestationTrustStore * trustStore;
@@ -262,9 +281,12 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         return nullptr;
     }
     initParams.opCertStore = &wrapper->mOpCertStore;
-
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+    opCredsIssuer->Initialize(wrapper->mExampleStorage);
+#else
     // TODO: Init IPK Epoch Key in opcreds issuer, so that commissionees get the right IPK
     opCredsIssuer->Initialize(*wrapper.get(), &wrapper->mAutoCommissioner, wrapper.get()->mJavaObjectRef);
+#endif
 
     Platform::ScopedMemoryBuffer<uint8_t> noc;
     if (!noc.Alloc(kMaxCHIPDERCertLength))
@@ -293,12 +315,12 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 
     // The lifetime of the ephemeralKey variable must be kept until SetupParams is saved.
     Crypto::P256Keypair ephemeralKey;
-
+#ifndef JAVA_MATTER_CONTROLLER_TEST
     if (rootCertificate != nullptr && nodeOperationalCertificate != nullptr && keypairDelegate != nullptr)
     {
         CHIPP256KeypairBridge * nativeKeypairBridge = wrapper->GetP256KeypairBridge();
         nativeKeypairBridge->SetDelegate(keypairDelegate);
-        *errInfoOnFailure = nativeKeypairBridge->Initialize();
+        *errInfoOnFailure = nativeKeypairBridge->Initialize(Crypto::ECPKeyTarget::ECDSA);
         if (*errInfoOnFailure != CHIP_NO_ERROR)
         {
             return nullptr;
@@ -330,11 +352,12 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         setupParams.controllerNOC  = chip::ByteSpan(wrapper->mNocCertificate.data(), wrapper->mNocCertificate.size());
     }
     else
+#endif // JAVA_MATTER_CONTROLLER_TEST
     {
         ChipLogProgress(Controller,
                         "No existing credentials provided: generating ephemeral local NOC chain with OperationalCredentialsIssuer");
 
-        *errInfoOnFailure = ephemeralKey.Initialize();
+        *errInfoOnFailure = ephemeralKey.Initialize(Crypto::ECPKeyTarget::ECDSA);
         if (*errInfoOnFailure != CHIP_NO_ERROR)
         {
             return nullptr;

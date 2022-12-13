@@ -29,7 +29,8 @@ if (chip_enable_pw_rpc) {
 assert(chip_build_tools)
 
 chip_codegen("chip-bridge-codegen") {
-  input = "${chip_root}/examples/bridge-app/bridge-common/bridge-app.matter"
+  input =
+      "${chip_root}/examples/dynamic-bridge-app/bridge-common/bridge-app.matter"
   generator = "bridge"
 
   outputs = [

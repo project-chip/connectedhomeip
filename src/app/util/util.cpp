@@ -18,13 +18,13 @@
 #include "app/util/common.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/print-cluster.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/ember-compatibility-functions.h>
+#include <app/util/generic-callbacks.h>
 
 // TODO: figure out a clear path for compile-time codegen
 #include <app/PluginApplicationCallbacks.h>
@@ -41,9 +41,6 @@ using namespace chip;
 //------------------------------------------------------------------------------
 // Globals
 
-// Storage and functions for turning on and off devices
-bool afDeviceEnabled[MAX_ENDPOINT_COUNT];
-
 #ifdef EMBER_AF_ENABLE_STATISTICS
 // a variable containing the number of messages send from the utilities
 // since emberAfInit was called.
@@ -51,8 +48,8 @@ uint32_t afNumPktsSent;
 #endif
 
 const EmberAfClusterName zclClusterNames[] = {
-    CLUSTER_IDS_TO_NAMES              // defined in print-cluster.h
-    { ZCL_NULL_CLUSTER_ID, nullptr }, // terminator
+    CLUSTER_IDS_TO_NAMES            // defined in print-cluster.h
+    { kInvalidClusterId, nullptr }, // terminator
 };
 
 // A pointer to the current command being processed
@@ -83,27 +80,12 @@ EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 
 //------------------------------------------------------------------------------
 
-// Device enabled/disabled functions
-
-void emberAfSetDeviceEnabled(EndpointId endpoint, bool enabled)
-{
-    uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index != 0xFFFF && index < sizeof(afDeviceEnabled))
-    {
-        afDeviceEnabled[index] = enabled;
-    }
-#ifdef ZCL_USING_BASIC_CLUSTER_DEVICE_ENABLED_ATTRIBUTE
-    emberAfWriteServerAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_DEVICE_ENABLED_ATTRIBUTE_ID, (uint8_t *) &enabled,
-                                ZCL_BOOLEAN_ATTRIBUTE_TYPE);
-#endif
-}
-
 // Is the device identifying?
 bool emberAfIsDeviceIdentifying(EndpointId endpoint)
 {
 #ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
     uint16_t identifyTime;
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, app::Clusters::Identify::Id, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
                                                       (uint8_t *) &identifyTime, sizeof(identifyTime));
     return (status == EMBER_ZCL_STATUS_SUCCESS && 0 < identifyTime);
 #else
@@ -167,14 +149,12 @@ void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
         // emberAfPopNetworkIndex();
     }
 
-    memset(afDeviceEnabled, true, emberAfEndpointCount());
-
     MATTER_PLUGINS_INIT
 
     emAfCallInits();
 }
 
-void emberAfTick(void)
+void emberAfTick()
 {
     // Call the AFV2-specific per-endpoint callbacks
     // Anything that defines callbacks as void *TickCallback(void) is called in
@@ -217,7 +197,7 @@ void MatterFanControlPluginServerInitCallback() {}
 // such as after a leave network. This allows zcl utils to clear state
 // that should not be kept when changing networks
 // ****************************************
-void emberAfStackDown(void)
+void emberAfStackDown()
 {
     emberAfRegistrationAbortCallback();
 }
@@ -230,7 +210,7 @@ uint16_t emberAfFindClusterNameIndex(ClusterId cluster)
 {
     static_assert(sizeof(ClusterId) == 4, "May need to adjust our index type or somehow define it in terms of cluster id type");
     uint16_t index = 0;
-    while (zclClusterNames[index].id != ZCL_NULL_CLUSTER_ID)
+    while (zclClusterNames[index].id != kInvalidClusterId)
     {
         if (zclClusterNames[index].id == cluster)
         {
@@ -264,7 +244,7 @@ void emberAfDecodeAndPrintCluster(ClusterId cluster)
 // If it is invalid, we just return the
 // EMBER_AF_NULL_MANUFACTURER_CODE, which we tend to use
 // for references to the standard library.
-uint16_t emberAfGetMfgCodeFromCurrentCommand(void)
+uint16_t emberAfGetMfgCodeFromCurrentCommand()
 {
     if (emberAfCurrentCommand() != nullptr)
     {
@@ -296,7 +276,7 @@ void emberAfSetRetryOverride(EmberAfRetryOverride value)
     emberAfApsRetryOverride = value;
 }
 
-EmberAfRetryOverride emberAfGetRetryOverride(void)
+EmberAfRetryOverride emberAfGetRetryOverride()
 {
     return (EmberAfRetryOverride) emberAfApsRetryOverride;
 }
@@ -330,7 +310,7 @@ void emberAfSetDisableDefaultResponse(EmberAfDisableDefaultResponse value)
     }
 }
 
-EmberAfDisableDefaultResponse emberAfGetDisableDefaultResponse(void)
+EmberAfDisableDefaultResponse emberAfGetDisableDefaultResponse()
 {
     return (EmberAfDisableDefaultResponse) emAfDisableDefaultResponse;
 }

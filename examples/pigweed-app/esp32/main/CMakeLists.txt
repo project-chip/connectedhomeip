@@ -43,4 +43,5 @@ target_link_libraries(${COMPONENT_LIB} PUBLIC
     pw_log
     pw_rpc.nanopb.echo_service
     pw_rpc.server
+    pw_sys_io
 )

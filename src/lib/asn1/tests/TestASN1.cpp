@@ -571,7 +571,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestASN1(void)
+int TestASN1()
 {
     nlTestSuite theSuite = { "Support-ASN1", &sTests[0], nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

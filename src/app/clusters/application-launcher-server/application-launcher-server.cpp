@@ -471,7 +471,7 @@ exit:
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
-void MatterApplicationLauncherPluginServerInitCallback(void)
+void MatterApplicationLauncherPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gApplicationLauncherAttrAccess);
 }

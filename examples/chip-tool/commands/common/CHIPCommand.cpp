@@ -421,7 +421,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(const CommissionerIdentity & iden
         chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
         chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
 
-        ReturnLogErrorOnFailure(ephemeralKey.Initialize());
+        ReturnLogErrorOnFailure(ephemeralKey.Initialize(chip::Crypto::ECPKeyTarget::ECDSA));
 
         ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(identity.mLocalNodeId, fabricId,
                                                                             mCommissionerStorage.GetCommissionerCATs(),

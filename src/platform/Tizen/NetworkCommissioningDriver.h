@@ -17,9 +17,10 @@
 
 #pragma once
 
-#include <platform/NetworkCommissioning.h>
 #include <string>
 #include <vector>
+
+#include <platform/NetworkCommissioning.h>
 
 namespace chip {
 namespace DeviceLayer {

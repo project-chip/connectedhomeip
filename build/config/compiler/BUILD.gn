@@ -194,9 +194,8 @@ config("optimize_default") {
 config("disabled_warnings") {
   cflags = [
     "-Wno-deprecated-declarations",
-    "-Wno-unknown-warning-option",
-    "-Wno-maybe-uninitialized",
     "-Wno-missing-field-initializers",
+    "-Wno-unknown-warning-option",
     "-Wno-unused-parameter",
   ]
   if (!is_debug) {
@@ -205,8 +204,9 @@ config("disabled_warnings") {
   }
   if (!is_clang) {
     cflags += [
-      "-Wno-psabi",
       "-Wno-cast-function-type",
+      "-Wno-psabi",
+      "-Wno-maybe-uninitialized",
     ]
   }
 }
@@ -225,7 +225,8 @@ config("warnings_common") {
   }
 
   if (current_os != "mac" && current_os != "ios" && current_os != "linux" &&
-      current_os != "win" && current_os != "tizen" && current_os != "webos") {
+      current_os != "win" && current_os != "tizen" && current_os != "webos" &&
+      current_os != "cmsis-rtos") {
     cflags += [ "-Wstack-usage=8192" ]
   }
 }
@@ -291,9 +292,12 @@ config("disabled_warnings_third_party") {
   cflags = [
     "-Wno-unused",
     "-Wno-format",
-    "-Wno-maybe-uninitialized",
     "-Wno-address",
   ]
+
+  if (!is_clang) {
+    cflags += [ "-Wno-maybe-uninitialized" ]
+  }
 }
 
 config("warnings_third_party") {
@@ -381,7 +385,6 @@ config("sanitize_address") {
 
 config("sanitize_thread") {
   cflags = [ "-fsanitize=thread" ]
-
   ldflags = cflags
 }
 
@@ -399,11 +402,16 @@ config("sanitize_undefined_behavior") {
     "-fvisibility=hidden",
     "-fsanitize=undefined",
     "-fsanitize=float-divide-by-zero",
-    "-fsanitize=unsigned-integer-overflow",
-    "-fsanitize=implicit-conversion",
-    "-fsanitize=nullability",
-    "-fno-sanitize=vptr,function",
   ]
+  if (is_clang) {
+    cflags += [
+      "-fsanitize=unsigned-integer-overflow",
+      "-fsanitize=implicit-conversion",
+      "-fsanitize=nullability",
+      "-fno-sanitize=vptr,function",
+    ]
+  }
+
   ldflags = cflags
 }
 

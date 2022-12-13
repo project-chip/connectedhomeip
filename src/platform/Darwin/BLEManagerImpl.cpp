@@ -88,7 +88,17 @@ void BLEManagerImpl::_Shutdown()
     }
 }
 
-bool BLEManagerImpl::_IsAdvertisingEnabled(void)
+CHIP_ERROR BLEManagerImpl::PrepareConnection()
+{
+    if (mConnectionDelegate)
+    {
+        static_cast<BleConnectionDelegateImpl *>(mConnectionDelegate)->PrepareConnection();
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_INCORRECT_STATE;
+}
+
+bool BLEManagerImpl::_IsAdvertisingEnabled()
 {
     ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
     return false;
@@ -106,7 +116,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-bool BLEManagerImpl::_IsAdvertising(void)
+bool BLEManagerImpl::_IsAdvertising()
 {
     ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
     return false;
@@ -129,7 +139,7 @@ BleLayer * BLEManagerImpl::_GetBleLayer()
     return this;
 }
 
-uint16_t BLEManagerImpl::_NumConnections(void)
+uint16_t BLEManagerImpl::_NumConnections()
 {
     ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
     return 0;

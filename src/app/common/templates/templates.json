@@ -59,11 +59,6 @@
             "output": "callback.h"
         },
         {
-            "path": "../../zap-templates/templates/app/cluster-id.zapt",
-            "name": "ZCL cluster-id header",
-            "output": "cluster-id.h"
-        },
-        {
             "path": "../../zap-templates/templates/app/command-id.zapt",
             "name": "ZCL command-id header",
             "output": "command-id.h"

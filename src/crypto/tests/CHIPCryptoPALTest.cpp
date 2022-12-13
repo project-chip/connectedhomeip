@@ -839,7 +839,7 @@ static void TestECDSA_Signing_SHA256_Msg(nlTestSuite * inSuite, void * inContext
 
     Test_P256Keypair keypair;
 
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(reinterpret_cast<const uint8_t *>(msg), msg_length, signature);
@@ -858,7 +858,7 @@ static void TestECDSA_Signing_SHA256_Hash(nlTestSuite * inSuite, void * inContex
     size_t msg_length   = sizeof(msg);
 
     Test_P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     // TODO: Need to make this large number (1k+) to catch some signature serialization corner cases
     //       but this is too slow on QEMU/embedded, so we need to parametrize. Signing with ECDSA
@@ -894,7 +894,7 @@ static void TestECDSA_ValidationFailsDifferentMessage(nlTestSuite * inSuite, voi
     size_t msg_length = strlen(msg);
 
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(reinterpret_cast<const uint8_t *>(msg), msg_length, signature);
@@ -914,7 +914,7 @@ static void TestECDSA_ValidationFailIncorrectMsgSignature(nlTestSuite * inSuite,
     size_t msg_length = strlen(msg);
 
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(reinterpret_cast<const uint8_t *>(msg), msg_length, signature);
@@ -937,7 +937,7 @@ static void TestECDSA_ValidationFailIncorrectHashSignature(nlTestSuite * inSuite
     NL_TEST_ASSERT(inSuite, Hash_SHA256(&msg[0], msg_length, &hash[0]) == CHIP_NO_ERROR);
 
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(msg, msg_length, signature);
@@ -955,7 +955,7 @@ static void TestECDSA_SigningMsgInvalidParams(nlTestSuite * inSuite, void * inCo
     size_t msg_length   = strlen(reinterpret_cast<const char *>(msg));
 
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(nullptr, msg_length, signature);
@@ -974,7 +974,7 @@ static void TestECDSA_ValidationMsgInvalidParam(nlTestSuite * inSuite, void * in
     size_t msg_length = strlen(msg);
 
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(reinterpret_cast<const uint8_t *>(msg), msg_length, signature);
@@ -1000,7 +1000,7 @@ static void TestECDSA_ValidationHashInvalidParam(nlTestSuite * inSuite, void * i
     NL_TEST_ASSERT(inSuite, Hash_SHA256(&msg[0], msg_length, &hash[0]) == CHIP_NO_ERROR);
 
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
     CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(msg, msg_length, signature);
@@ -1019,14 +1019,14 @@ static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
     Test_P256Keypair keypair1;
-    NL_TEST_ASSERT(inSuite, keypair1.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair1.Initialize(ECPKeyTarget::ECDH) == CHIP_NO_ERROR);
 
 #ifdef ENABLE_HSM_EC_KEY
     Test_P256Keypair keypair2(HSM_ECC_KEYID + 1);
 #else
     Test_P256Keypair keypair2;
 #endif
-    NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair2.Initialize(ECPKeyTarget::ECDH) == CHIP_NO_ERROR);
 
     P256ECDHDerivedSecret out_secret1;
     out_secret1[0] = 0;
@@ -1125,7 +1125,7 @@ static void TestP256_Keygen(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     const char * msg         = "Test Message for Keygen";
     const uint8_t * test_msg = Uint8::from_const_char(msg);
@@ -1308,7 +1308,7 @@ void TestCSR_GenDirect(nlTestSuite * inSuite, void * inContext)
 
     Test_P256Keypair keypair;
 
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     // Validate case of buffer too small
     uint8_t csrBufTooSmall[kMAX_CSR_Length - 1];
@@ -1351,7 +1351,7 @@ static void TestCSR_GenByKeypair(nlTestSuite * inSuite, void * inContext)
     size_t length = sizeof(csr);
 
     Test_P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, keypair.NewCertificateSigningRequest(csr, length) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, length > 0);
 
@@ -1380,7 +1380,7 @@ static void TestKeypair_Serialize(nlTestSuite * inSuite, void * inContext)
     HeapChecker heapChecker(inSuite);
     Test_P256Keypair keypair;
 
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     P256SerializedKeypair serialized;
     NL_TEST_ASSERT(inSuite, keypair.Serialize(serialized) == CHIP_NO_ERROR);

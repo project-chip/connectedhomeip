@@ -19,7 +19,7 @@ RUN set -x \
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN set -x \
     && mkdir -p /opt/NordicSemiconductor/nRF5_tools/ \
-    && curl --location https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-12-1/nRFCommandLineTools10121Linuxamd64.tar.gz \
+    && curl --location https://nsscprodmedia.blob.core.windows.net/prod/software-and-other-downloads/desktop-software/nrf-command-line-tools/sw/versions-10-x-x/10-12-1/nrfcommandlinetools10121linuxamd64.tar.gz \
     | tar zxvf - \
     && tar xvf JLink_Linux_V688a_x86_64.tgz -C /opt/NordicSemiconductor/nRF5_tools/ \
     && tar xvf nRF-Command-Line-Tools_10_12_1.tar -C /opt/NordicSemiconductor/nRF5_tools/ \

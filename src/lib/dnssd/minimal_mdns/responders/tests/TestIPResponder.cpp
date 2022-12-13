@@ -42,7 +42,7 @@ public:
     {
 
         NL_TEST_ASSERT(mSuite, (record.GetType() == QType::A) || (record.GetType() == QType::AAAA));
-        NL_TEST_ASSERT(mSuite, record.GetClass() == QClass::IN);
+        NL_TEST_ASSERT(mSuite, record.GetClass() == QClass::IN_FLUSH);
         NL_TEST_ASSERT(mSuite, record.GetName() == kNames);
     }
 
@@ -135,7 +135,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestIP(void)
+int TestIP()
 {
     nlTestSuite theSuite = { "IP", sTests, &Setup, &Teardown };
     nlTestRunner(&theSuite, nullptr);

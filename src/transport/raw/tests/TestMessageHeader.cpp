@@ -548,7 +548,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestMessageHeader(void)
+int TestMessageHeader()
 {
     nlTestSuite theSuite = { "Transport-MessageHeader", &sTests[0], nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

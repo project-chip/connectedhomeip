@@ -110,7 +110,7 @@ Status Start()
                 continue;
             }
 
-            server.ProcessPacket(frame.data(), hdlc_channel_output).IgnoreError();
+            server.ProcessPacket(frame.data()).IgnoreError();
         }
     }
 }

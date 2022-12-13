@@ -29,8 +29,15 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
 #include <lib/support/TimeUtils.h>
-#include <platform/android/CHIPP256KeypairBridge.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+#include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <controller/ExamplePersistentStorage.h>
+#else
+#include <platform/android/AndroidChipPlatform-JNI.h>
+#include <platform/android/CHIPP256KeypairBridge.h>
+#endif // JAVA_MATTER_CONTROLLER_TEST
 
 #include "AndroidOperationalCredentialsIssuer.h"
 #include "AttestationTrustStoreBridge.h"
@@ -52,6 +59,7 @@ public:
     jobject JavaObjectRef() { return mJavaObjectRef; }
     jlong ToJNIHandle();
 
+#ifndef JAVA_MATTER_CONTROLLER_TEST
     /**
      * Returns a CHIPP256KeypairBridge which can be used to delegate signing operations
      * to a KeypairDelegate in the Java layer. Note that this will always return a pointer
@@ -65,6 +73,7 @@ public:
         }
         return mKeypairBridge;
     }
+#endif // JAVA_MATTER_CONTROLLER_TEST
 
     void CallJavaMethod(const char * methodName, jint argument);
     CHIP_ERROR InitializeOperationalCredentialsIssuer();
@@ -110,7 +119,11 @@ public:
         return reinterpret_cast<AndroidDeviceControllerWrapper *>(handle);
     }
 
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+    using ExampleOperationalCredentialsIssuerPtr = std::unique_ptr<chip::Controller::ExampleOperationalCredentialsIssuer>;
+#else
     using AndroidOperationalCredentialsIssuerPtr = std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer>;
+#endif
 
     /**
      * Initializes a new CHIPDeviceController using the given parameters, and returns a pointer to the
@@ -149,13 +162,21 @@ public:
                 const chip::CATValues & cats, chip::System::Layer * systemLayer,
                 chip::Inet::EndPointManager<chip::Inet::TCPEndPoint> * tcpEndPointManager,
                 chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
-                AndroidOperationalCredentialsIssuerPtr opCredsIssuer, jobject keypairDelegate, jbyteArray rootCertificate,
-                jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey,
-                jobject paaCertsArrayList, jobject cdCertsArrayList, uint16_t listenPort, uint16_t controllerVendorId,
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+                ExampleOperationalCredentialsIssuerPtr opCredsIssuer,
+#else
+                AndroidOperationalCredentialsIssuerPtr opCredsIssuer,
+#endif
+                jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate,
+                jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId,
                 uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread,
                 bool skipCommissioningComplete, CHIP_ERROR * errInfoOnFailure);
 
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+    chip::Controller::ExampleOperationalCredentialsIssuer * GetAndroidOperationalCredentialsIssuer()
+#else
     chip::Controller::AndroidOperationalCredentialsIssuer * GetAndroidOperationalCredentialsIssuer()
+#endif
     {
         return mOpCredsIssuer.get();
     }
@@ -180,15 +201,21 @@ private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
 
     ChipDeviceControllerPtr mController;
-    AndroidOperationalCredentialsIssuerPtr mOpCredsIssuer;
+
     // TODO: This may need to be injected as a GroupDataProvider*
     chip::Credentials::GroupDataProviderImpl mGroupDataProvider;
     // TODO: This may need to be injected as an OperationalCertificateStore *
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
 
-    JavaVM * mJavaVM                       = nullptr;
-    jobject mJavaObjectRef                 = nullptr;
+    JavaVM * mJavaVM       = nullptr;
+    jobject mJavaObjectRef = nullptr;
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+    ExampleOperationalCredentialsIssuerPtr mOpCredsIssuer;
+    PersistentStorage mExampleStorage;
+#else
+    AndroidOperationalCredentialsIssuerPtr mOpCredsIssuer;
     CHIPP256KeypairBridge * mKeypairBridge = nullptr;
+#endif // JAVA_MATTER_CONTROLLER_TEST
 
     // These fields allow us to release the string/byte array memory later.
     jstring ssidStr                    = nullptr;
@@ -206,12 +233,20 @@ private:
 
     chip::Credentials::PartialDACVerifier mPartialDACVerifier;
 
+
     DeviceAttestationDelegateBridge * mDeviceAttestationDelegateBridge        = nullptr;
     AttestationTrustStoreBridge * mAttestationTrustStoreBridge                = nullptr;
     chip::Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
 
-    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, AndroidOperationalCredentialsIssuerPtr opCredsIssuer) :
-        mController(std::move(controller)), mOpCredsIssuer(std::move(opCredsIssuer))
+    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller,
+#ifdef JAVA_MATTER_CONTROLLER_TEST
+                                   ExampleOperationalCredentialsIssuerPtr opCredsIssuer
+#else
+                                   AndroidOperationalCredentialsIssuerPtr opCredsIssuer
+#endif
+                                   ) :
+        mController(std::move(controller)),
+        mOpCredsIssuer(std::move(opCredsIssuer))
     {}
 };
 

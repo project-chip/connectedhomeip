@@ -232,6 +232,7 @@ class ServerClusterInstantiation:
 class DeviceType:
     name: str
     code: int
+    version: int
 
 
 @dataclass

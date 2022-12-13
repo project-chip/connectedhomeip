@@ -16,23 +16,32 @@
  */
 
 #include "DnssdImpl.h"
-#include "MainLoop.h"
 
 #include <algorithm>
+#include <cerrno>
+#include <cstdlib>
 #include <cstring>
-#include <net/if.h>
 #include <sstream>
+#include <string>
 #include <utility>
 
+// Note: Include dns-sd-internal.h is needed, this source file uses some undocumented functions.
+#include <dns-sd-internal.h>
+#include <dns-sd.h>
+#include <glib.h>
 #include <lib/dnssd/platform/Dnssd.h>
-#include <lib/support/CHIPMem.h>
+#include <net/if.h>
+
+#include <inet/InetBuildConfig.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/Span.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/PlatformManager.h>
 
-#include <dns-sd-internal.h>
-#include <glib.h>
+#include "MainLoop.h"
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
 #endif
@@ -111,8 +120,8 @@ gboolean RegisterAsync(GMainLoop * mainLoop, gpointer userData)
     rCtx->mMainLoop = mainLoop;
 
     int ret = dnssd_register_local_service(rCtx->mServiceHandle, OnRegister, rCtx);
-    VerifyOrReturnError(ret == DNSSD_ERROR_NONE,
-                        (ChipLogError(DeviceLayer, "dnssd_register_local_service() failed. ret: %d", ret), false));
+    VerifyOrReturnValue(ret == DNSSD_ERROR_NONE, false,
+                        ChipLogError(DeviceLayer, "dnssd_register_local_service() failed. ret: %d", ret));
 
     rCtx->mIsRegistered = true;
     return true;
@@ -200,8 +209,8 @@ void OnBrowse(dnssd_service_state_e state, dnssd_service_h service, void * data)
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_interface() failed. ret: %d", ret));
 
     interfaceId = if_nametoindex(ifaceName);
-    VerifyOrExit(interfaceId > 0,
-                 (ChipLogError(DeviceLayer, "if_nametoindex() failed. errno: %d", errno), ret = DNSSD_ERROR_OPERATION_FAILED));
+    VerifyOrExit(interfaceId > 0, ChipLogError(DeviceLayer, "if_nametoindex() failed. errno: %d", errno);
+                 ret = DNSSD_ERROR_OPERATION_FAILED);
 
     if (state == DNSSD_SERVICE_STATE_AVAILABLE)
     {
@@ -244,8 +253,8 @@ gboolean BrowseAsync(GMainLoop * mainLoop, gpointer userData)
     else
     {
         char iface[IF_NAMESIZE + 1] = "";
-        VerifyOrReturnError(if_indextoname(interfaceId, iface) != nullptr,
-                            (ChipLogError(DeviceLayer, "if_indextoname() failed. errno: %d", errno), false));
+        VerifyOrReturnValue(if_indextoname(interfaceId, iface) != nullptr, false,
+                            ChipLogError(DeviceLayer, "if_indextoname() failed. errno: %d", errno));
         ret = dnssd_browse_service(bCtx->mType, iface, &bCtx->mBrowserHandle, OnBrowse, bCtx);
     }
 
@@ -310,15 +319,9 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     chip::Inet::IPAddress ipAddr;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // In fact, if cancel resolve fails, we can not do anything about it
-    int ret = dnssd_cancel_resolve_service(service);
-
     rCtx->MainLoopQuit();
 
-    ret = result;
-    VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "DNSsd %s: Error: %d", __func__, ret));
-
-    ret = dnssd_service_get_name(service, &name);
+    int ret = dnssd_service_get_name(service, &name);
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_name() failed. ret: %d", ret));
 
     chip::Platform::CopyString(dnssdService.mName, name);
@@ -404,8 +407,7 @@ gboolean ResolveAsync(GMainLoop * mainLoop, gpointer userData)
     rCtx->mMainLoop = mainLoop;
 
     int ret = dnssd_resolve_service(rCtx->mServiceHandle, OnResolve, rCtx);
-    VerifyOrReturnError(ret == DNSSD_ERROR_NONE,
-                        (ChipLogError(DeviceLayer, "dnssd_resolve_service() failed. ret: %d", ret), false));
+    VerifyOrReturnValue(ret == DNSSD_ERROR_NONE, false, ChipLogError(DeviceLayer, "dnssd_resolve_service() failed. ret: %d", ret));
 
     rCtx->mIsResolving = true;
     return true;
@@ -467,10 +469,6 @@ BrowseContext::~BrowseContext()
         g_source_destroy(mTimeoutSource);
         g_source_unref(mTimeoutSource);
     }
-    if (mIsBrowsing)
-    {
-        dnssd_cancel_browse_service(mBrowserHandle);
-    }
 }
 
 ResolveContext::ResolveContext(DnssdTizen * instance, const char * name, const char * type, uint32_t interfaceId,
@@ -485,13 +483,7 @@ ResolveContext::ResolveContext(DnssdTizen * instance, const char * name, const c
     mCbContext = context;
 }
 
-ResolveContext::~ResolveContext()
-{
-    if (mIsResolving)
-    {
-        dnssd_cancel_resolve_service(mServiceHandle);
-    }
-}
+ResolveContext::~ResolveContext() {}
 
 CHIP_ERROR DnssdTizen::Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
@@ -527,7 +519,7 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
         std::lock_guard<std::mutex> lock(mMutex);
 
         auto iServiceCtx = std::find_if(mContexts.begin(), mContexts.end(), [fullType, service, interfaceId](const auto & ctx) {
-            VerifyOrReturnError(ctx->mContextType == ContextType::Register, false);
+            VerifyOrReturnValue(ctx->mContextType == ContextType::Register, false);
             auto * rCtx = static_cast<RegisterContext *>(ctx.get());
             return strcmp(rCtx->mName, service.mName) == 0 && strcmp(rCtx->mType, fullType.c_str()) == 0 &&
                 rCtx->mPort == service.mPort && rCtx->mInterfaceId == interfaceId;
@@ -559,25 +551,26 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
     // Local service will be freed by the RegisterContext destructor
     int ret            = dnssd_create_local_service(fullType.c_str(), &serviceCtx->mServiceHandle);
     auto serviceHandle = serviceCtx->mServiceHandle;
-    VerifyOrExit(ret == DNSSD_ERROR_NONE,
-                 (ChipLogError(DeviceLayer, "dnssd_create_local_service() failed. ret: %d", ret), err = GetChipError(ret)));
+    VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_create_local_service() failed. ret: %d", ret);
+                 err = GetChipError(ret));
 
     ret = dnssd_service_set_name(serviceHandle, service.mName);
-    VerifyOrExit(ret == DNSSD_ERROR_NONE,
-                 (ChipLogError(DeviceLayer, "dnssd_service_set_name() failed. ret: %d", ret), err = GetChipError(ret)));
+    VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_set_name() failed. ret: %d", ret);
+                 err = GetChipError(ret));
 
     ret = dnssd_service_set_port(serviceHandle, service.mPort);
-    VerifyOrExit(ret == DNSSD_ERROR_NONE,
-                 (ChipLogError(DeviceLayer, "dnssd_service_set_port() failed. ret: %d", ret), err = GetChipError(ret)));
+    VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_set_port() failed. ret: %d", ret);
+                 err = GetChipError(ret));
 
     if (interfaceId > 0)
     {
         char iface[IF_NAMESIZE + 1] = "";
         VerifyOrExit(if_indextoname(interfaceId, iface) != nullptr,
-                     (ChipLogError(DeviceLayer, "if_indextoname() failed. errno: %d", errno), err = CHIP_ERROR_INTERNAL));
+                     ChipLogError(DeviceLayer, "if_indextoname() failed. errno: %d", errno);
+                     err = CHIP_ERROR_INTERNAL);
         ret = dnssd_service_set_interface(serviceHandle, iface);
-        VerifyOrExit(ret == DNSSD_ERROR_NONE,
-                     (ChipLogError(DeviceLayer, "dnssd_service_set_interface() failed. ret: %d", ret), err = GetChipError(ret)));
+        VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_set_interface() failed. ret: %d", ret);
+                     err = GetChipError(ret));
     }
 
     for (size_t i = 0; i < service.mTextEntrySize; ++i)
@@ -585,8 +578,8 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
         TextEntry entry = service.mTextEntries[i];
         VerifyOrReturnError(chip::CanCastTo<unsigned short>(entry.mDataSize), CHIP_ERROR_INVALID_ARGUMENT);
         ret = dnssd_service_add_txt_record(serviceHandle, entry.mKey, static_cast<unsigned short>(entry.mDataSize), entry.mData);
-        VerifyOrExit(ret == DNSSD_ERROR_NONE,
-                     (ChipLogError(DeviceLayer, "dnssd_service_add_txt_record() failed. ret: %d", ret), err = GetChipError(ret)));
+        VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_add_txt_record() failed. ret: %d", ret);
+                     err = GetChipError(ret));
     }
 
     ok = DeviceLayer::Internal::MainLoop::Instance().AsyncRequest(RegisterAsync, serviceCtx);
@@ -662,12 +655,13 @@ CHIP_ERROR DnssdTizen::Resolve(const DnssdService & browseResult, chip::Inet::In
     {
         char iface[IF_NAMESIZE + 1] = "";
         VerifyOrExit(if_indextoname(interfaceId, iface) != nullptr,
-                     (ChipLogError(DeviceLayer, "if_indextoname() failed. errno: %d", errno), err = CHIP_ERROR_INTERNAL));
+                     ChipLogError(DeviceLayer, "if_indextoname() failed. errno: %d", errno);
+                     err = CHIP_ERROR_INTERNAL);
         ret = dnssd_create_remote_service(fullType.c_str(), browseResult.mName, iface, &resolveCtx->mServiceHandle);
     }
 
-    VerifyOrExit(ret == DNSSD_ERROR_NONE,
-                 (ChipLogError(DeviceLayer, "dnssd_create_remote_service() failed. ret: %d", ret), err = GetChipError(ret)));
+    VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_create_remote_service() failed. ret: %d", ret);
+                 err = GetChipError(ret));
 
     ok = DeviceLayer::Internal::MainLoop::Instance().AsyncRequest(ResolveAsync, resolveCtx);
     VerifyOrExit(ok, err = CHIP_ERROR_INTERNAL);
@@ -825,6 +819,8 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId
 
     return DnssdTizen::GetInstance().Resolve(*browseResult, interface, callback, context);
 }
+
+void ChipDnssdResolveNoLongerNeeded(const char * instanceName) {}
 
 CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
 {

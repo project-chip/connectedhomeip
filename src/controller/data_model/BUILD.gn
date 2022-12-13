@@ -31,6 +31,12 @@ chip_data_model("data_model") {
 }
 
 if (current_os == "android" || build_java_matter_controller) {
+  config("java-build-config") {
+    if (build_java_matter_controller) {
+      include_dirs = java_matter_controller_dependent_paths
+    }
+  }
+
   chip_codegen("java-jni-generate") {
     input = "controller-clusters.matter"
     generator = "java"
@@ -167,12 +173,21 @@ if (current_os == "android" || build_java_matter_controller) {
       "jni/UnitTestingClient-ReadImpl.cpp",
       "jni/UnitTestingClient-InvokeSubscribeImpl.cpp",
     ]
+
+    deps = [
+      ":data_model",
+      "${chip_root}/src/platform:platform_buildconfig",
+    ]
+
+    public_configs = [ ":java-build-config" ]
   }
 
   source_set("java-jni-sources") {
-    sources = get_target_outputs(":java-jni-generate")
+    public_configs = [
+      ":java-build-config",
+      "${chip_root}/src:includes",
+    ]
 
-    public_configs = [ "${chip_root}/src:includes" ]
     deps = [
       ":data_model",
       ":java-jni-generate",
@@ -182,7 +197,6 @@ if (current_os == "android" || build_java_matter_controller) {
     ]
 
     if (build_java_matter_controller) {
-      include_dirs = java_matter_controller_dependent_paths
       deps += [ "${chip_root}/src/platform/Linux" ]
     } else {
       deps += [ "${chip_root}/src/platform/android" ]

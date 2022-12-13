@@ -27,7 +27,7 @@ CHIP_ERROR SerializableU64SetBase::Deserialize(ByteSpan serialized)
 {
     VerifyOrReturnError(serialized.size() <= MaxSerializedSize(), CHIP_ERROR_INVALID_ARGUMENT);
     memcpy(mData, serialized.data(), serialized.size());
-    mNextAvailable = static_cast<uint16_t>(serialized.size()) / static_cast<uint16_t>(sizeof(uint64_t));
+    mNextAvailable = static_cast<uint16_t>(serialized.size() / sizeof(uint64_t));
 
     // Our serialized data is always little-endian; swap to native.
     SwapByteOrderIfNeeded();

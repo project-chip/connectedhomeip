@@ -25,7 +25,6 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include <app/clusters/door-lock-server/door-lock-server.h>
@@ -400,16 +399,31 @@ void AppTask::LockActionEventHandler(AppEvent * event)
     }
 
     case AppEvent::kEventType_Button: {
-        if (LockMgr().NextState() == true)
+
+        P6_LOG("%s [Action: %d]", __FUNCTION__, event->ButtonEvent.Action);
+
+        if (event->ButtonEvent.Action == APP_BUTTON_LONG_PRESS)
         {
-            action = LockManager::LOCK_ACTION;
+            P6_LOG("Sending a lock jammed event");
+
+            /* Generating Door Lock Jammed event */
+            DoorLockServer::Instance().SendLockAlarmEvent(1 /* Endpoint Id */, DlAlarmCode::kLockJammed);
+
+            return;
         }
         else
         {
-            action = LockManager::UNLOCK_ACTION;
-        }
+            if (LockMgr().NextState() == true)
+            {
+                action = LockManager::LOCK_ACTION;
+            }
+            else
+            {
+                action = LockManager::UNLOCK_ACTION;
+            }
 
-        actor = AppEvent::kEventType_Button;
+            actor = AppEvent::kEventType_Button;
+        }
         break;
     }
 

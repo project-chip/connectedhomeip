@@ -19,13 +19,16 @@
 #     CMake utilities for managing and retrieving Zephyr build configuration
 #
 
-# Retrieve Zephyr compiler flags for the given language (C or CXX)
+#
+# Retrieve Zephyr compiler flags for the given language.
+#
+# Arguments:
+#   VAR   Name of list variable in the parent scope to be appended with the result
+#   LANG  Programming language: C or CXX
+#
 function(zephyr_get_compile_flags VAR LANG)
-    # We want to treat all zephyr-provided headers as system headers, so
-    # warnings in them don't trigger -Werror.  That means that for the headers
-    # zephyr returns as "non-system" headers (the ones from
-    # zephyr_get_include_directories_for_lang) we need to manually replace "-I"
-    # with "-isystem".
+    # Replace "-I" with "-isystem" to treat all Zephyr headers as system headers
+    # that do not trigger -Werror.
     zephyr_get_include_directories_for_lang_as_string(${LANG} INCLUDES)
     string(REGEX REPLACE "(^| )-I" "\\1-isystem" INCLUDES ${INCLUDES})
     zephyr_get_system_include_directories_for_lang_as_string(${LANG} SYSTEM_INCLUDES)
@@ -34,14 +37,12 @@ function(zephyr_get_compile_flags VAR LANG)
     set(${VAR} ${INCLUDES} ${SYSTEM_INCLUDES} ${DEFINES} ${FLAGS} ${${VAR}} PARENT_SCOPE)
 endfunction()
 
-# Add include directories to the zephyr interface target.
-# It works like zephyr_include_directories(), doesn't prepend the directories with
-# the current directory. Hence it works correctly with generator expressions, too.
-function(zephyr_include_directories_raw)
-    target_include_directories(zephyr_interface INTERFACE ${ARGN})
-endfunction()
-
-# Select gnu++<YY> standard based on Kconfig configuration
+#
+# Select gnu++<YY> standard matching C++ standard configured via Kconfig.
+#
+# Arguments:
+#   VAR  Name of list variable to be appended with the selected "-std=gnu++<YY>" flag
+#
 macro(zephyr_get_gnu_cpp_standard VAR)
     if (CONFIG_STD_CPP11)
         list(APPEND ${VAR} -std=gnu++11)
@@ -67,11 +68,16 @@ function(zephyr_set_openthread_config_impl OT_DIR CONFIG_FILE)
     set_property(DIRECTORY ${OT_DIR} PROPERTY COMPILE_DEFINITIONS ${DEFINES})
 
     foreach(SUBDIR ${SUBDIRS})
-    zephyr_set_openthread_config_impl(${SUBDIR} ${CONFIG_FILE})
+        zephyr_set_openthread_config_impl(${SUBDIR} ${CONFIG_FILE})
     endforeach()
 endfunction()
 
-# Replace Zephyr-supplied configuration file with a custom one
+#
+# Replace Zephyr-supplied configuration file with a custom one.
+#
+# Arguments:
+#   CONFIG_PATH  Path to OpenThread configuration file
+#
 function(zephyr_set_openthread_config CONFIG_PATH)
     get_filename_component(CONFIG_DIR ${CONFIG_PATH} DIRECTORY)
     get_filename_component(CONFIG_FILE ${CONFIG_PATH} NAME)

@@ -51,6 +51,9 @@ protected:
 
 private:
     DeviceProxy * GetDeviceProxyForStep(CommissioningStage nextStage);
+
+    // Adjust the failsafe timer if CommissioningDelegate GetCASEFailsafeTimerSeconds is set
+    void SetCASEFailsafeTimerIfNeeded();
     void ReleaseDAC();
     void ReleasePAI();
 
@@ -68,6 +71,22 @@ private:
     Optional<System::Clock::Timeout> GetCommandTimeout(DeviceProxy * device, CommissioningStage stage) const;
     EndpointId GetEndpoint(const CommissioningStage & stage) const;
     CommissioningStage GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr);
+
+    // Helper function to determine whether next stage should be kWiFiNetworkSetup,
+    // kThreadNetworkSetup or kCleanup, depending whether network information has
+    // been provided that matches the thread/wifi endpoint of the target.
+    CommissioningStage GetNextCommissioningStageNetworkSetup(CommissioningStage currentStage, CHIP_ERROR & lastErr);
+
+    // Helper function to determine if a scan attempt should be made given the
+    // scan attempt commissioning params and the corresponding network endpoint of
+    // the target.
+    bool IsScanNeeded()
+    {
+        return ((mParams.GetAttemptWiFiNetworkScan().ValueOr(false) &&
+                 mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId) ||
+                (mParams.GetAttemptThreadNetworkScan().ValueOr(false) &&
+                 mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId));
+    };
 
     bool mStopCommissioning = false;
 

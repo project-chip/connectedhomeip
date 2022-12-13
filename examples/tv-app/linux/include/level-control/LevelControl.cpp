@@ -21,8 +21,8 @@
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -40,7 +40,7 @@ static EmberAfLevelControlState stateTable[EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER
 
 static EmberAfLevelControlState * getState(EndpointId endpoint)
 {
-    uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID);
+    uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, LevelControl::Id);
     return (ep == 0xFF ? NULL : &stateTable[ep]);
 }
 
@@ -89,7 +89,7 @@ static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize,
         }
         break;
     default:
-        status = EMBER_ZCL_STATUS_INVALID_FIELD;
+        status = EMBER_ZCL_STATUS_INVALID_COMMAND;
         goto send_default_response;
     }
 
@@ -118,7 +118,7 @@ static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize,
     }
 
 send_default_response:
-    if (emberAfCurrentCommand()->apsFrame->clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID)
+    if (emberAfCurrentCommand()->apsFrame->clusterId == LevelControl::Id)
     {
         emberAfSendImmediateDefaultResponse(status);
     }

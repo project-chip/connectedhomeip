@@ -58,7 +58,6 @@ enum
     ZCL_STRUCT_ATTRIBUTE_TYPE            = 0x4C, // Structure
     ZCL_TOD_ATTRIBUTE_TYPE               = 0xE0, // Time of day
     ZCL_DATE_ATTRIBUTE_TYPE              = 0xE1, // Date
-    ZCL_UTC_ATTRIBUTE_TYPE               = 0xE2, // UTC Time
     ZCL_EPOCH_US_ATTRIBUTE_TYPE          = 0xE3, // Epoch Microseconds
     ZCL_EPOCH_S_ATTRIBUTE_TYPE           = 0xE4, // Epoch Seconds
     ZCL_SYSTIME_US_ATTRIBUTE_TYPE        = 0xE5, // System Time Microseconds

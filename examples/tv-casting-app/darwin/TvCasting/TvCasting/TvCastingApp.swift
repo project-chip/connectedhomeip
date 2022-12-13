@@ -38,6 +38,12 @@ struct TvCastingApp: App {
                         }
                         appParameters.rotatingDeviceIdUniqueId = Data(rotatingDeviceIdUniqueId)
                         
+                        let onboardingParameters: OnboardingPayload = OnboardingPayload()
+                        onboardingParameters.setupPasscode = 20202021
+                        onboardingParameters.setupDiscriminator = 3840
+                        
+                        appParameters.onboardingPayload = onboardingParameters
+                        
                         castingServerBridge.initApp(appParameters, clientQueue: DispatchQueue.main, initAppStatusHandler: { (result: Bool) -> () in
                             self.Log.info("initApp result \(result)")
                         })

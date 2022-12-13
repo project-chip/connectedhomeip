@@ -50,6 +50,7 @@ struct GenericContext
 };
 
 struct RegisterContext;
+struct ResolveContext;
 
 class MdnsContexts
 {
@@ -80,6 +81,18 @@ public:
      *             registered context.
      */
     CHIP_ERROR GetRegisterContextOfType(const char * type, RegisterContext ** context);
+
+    /**
+     * Return a pointer to an existing ResolveContext for the given
+     * instanceName, if any.  Returns nullptr if there are none.
+     */
+    ResolveContext * GetExistingResolveForInstanceName(const char * instanceName);
+
+    /**
+     * Remove context from the list, if it's present in the list.  Return
+     * whether it was present.
+     */
+    bool RemoveWithoutDeleting(GenericContext * context);
 
     void Delete(GenericContext * context);
 
@@ -141,8 +154,11 @@ struct ResolveContext : public GenericContext
     DnssdResolveCallback callback;
     std::map<uint32_t, InterfaceInfo> interfaces;
     DNSServiceProtocol protocol;
+    std::string instanceName;
+    std::shared_ptr<uint32_t> consumerCounter;
 
-    ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType);
+    ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,
+                   const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse);
     virtual ~ResolveContext();
 
     void DispatchFailure(DNSServiceErrorType err) override;
@@ -155,6 +171,7 @@ struct ResolveContext : public GenericContext
     void OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostname, uint16_t port, uint16_t txtLen,
                         const unsigned char * txtRecord);
     bool HasInterface();
+    bool Matches(const char * otherInstanceName) const { return instanceName == otherInstanceName; }
 };
 
 } // namespace Dnssd

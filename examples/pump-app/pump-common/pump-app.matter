@@ -1247,7 +1247,7 @@ client cluster OccupancySensing = 1030 {
 }
 
 endpoint 0 {
-  device type pump = 22;
+  device type pump = 22, version 1;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Descriptor {
@@ -1415,7 +1415,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type pump = 771;
+  device type pump = 771, version 1;
   binding cluster OccupancySensing;
 
   server cluster Identify {

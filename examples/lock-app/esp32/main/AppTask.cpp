@@ -23,7 +23,7 @@
 #include "esp_log.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/af-enums.h>
@@ -467,8 +467,8 @@ void AppTask::UpdateClusterState(chip::System::Layer *, void * context)
     uint8_t newValue = !BoltLockMgr().IsUnlocked();
 
     // write the new on/off value
-    EmberAfStatus status =
-        emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    EmberAfStatus status = emberAfWriteAttribute(1, chip::app::Clusters::OnOff::Id, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &newValue,
+                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ESP_LOGI(TAG, "ERR: updating on/off %x", status);

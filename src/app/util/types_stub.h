@@ -451,8 +451,6 @@ enum
  */
 struct EmberBindingTableEntry
 {
-    EmberBindingTableEntry() = default;
-
     static EmberBindingTableEntry ForNode(chip::FabricIndex fabric, chip::NodeId node, chip::EndpointId localEndpoint,
                                           chip::EndpointId remoteEndpoint, chip::Optional<chip::ClusterId> cluster)
     {

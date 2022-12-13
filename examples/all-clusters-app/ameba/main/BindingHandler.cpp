@@ -17,10 +17,15 @@
  */
 
 #include "BindingHandler.h"
-#include "app/CommandSender.h"
+#include "ColorControlCommands.h"
+#include "IdentifyCommand.h"
+#include "LevelControlCommands.h"
+#include "OnOffCommands.h"
+#include "ThermostatCommands.h"
 #include "app/clusters/bindings/BindingManager.h"
 #include "app/server/Server.h"
 #include "controller/InvokeInteraction.h"
+#include "controller/ReadInteraction.h"
 #include "platform/CHIPDeviceLayer.h"
 #include <app/clusters/bindings/bindings.h>
 #include <lib/support/CodeUtils.h>
@@ -40,95 +45,84 @@ using Shell::streamer_get;
 using Shell::streamer_printf;
 
 Engine sShellSwitchSubCommands;
-Engine sShellSwitchOnOffSubCommands;
-
 Engine sShellSwitchGroupsSubCommands;
-Engine sShellSwitchGroupsOnOffSubCommands;
-
 Engine sShellSwitchBindingSubCommands;
 #endif // defined(ENABLE_CHIP_SHELL)
 
 namespace {
-
-void ProcessOnOffUnicastBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding,
-                                       OperationalDeviceProxy * peer_device)
-{
-    auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
-        ChipLogProgress(NotSpecified, "OnOff command succeeds");
-    };
-
-    auto onFailure = [](CHIP_ERROR error) {
-        ChipLogError(NotSpecified, "OnOff command failed: %" CHIP_ERROR_FORMAT, error.Format());
-    };
-
-    VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
-    switch (commandId)
-    {
-    case Clusters::OnOff::Commands::Toggle::Id:
-        Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         toggleCommand, onSuccess, onFailure);
-        break;
-
-    case Clusters::OnOff::Commands::On::Id:
-        Clusters::OnOff::Commands::On::Type onCommand;
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         onCommand, onSuccess, onFailure);
-        break;
-
-    case Clusters::OnOff::Commands::Off::Id:
-        Clusters::OnOff::Commands::Off::Type offCommand;
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         offCommand, onSuccess, onFailure);
-        break;
-    }
-}
-
-void ProcessOnOffGroupBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding)
-{
-    Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
-
-    switch (commandId)
-    {
-    case Clusters::OnOff::Commands::Toggle::Id:
-        Clusters::OnOff::Commands::Toggle::Type toggleCommand;
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, toggleCommand);
-        break;
-
-    case Clusters::OnOff::Commands::On::Id:
-        Clusters::OnOff::Commands::On::Type onCommand;
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, onCommand);
-
-        break;
-
-    case Clusters::OnOff::Commands::Off::Id:
-        Clusters::OnOff::Commands::Off::Type offCommand;
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, offCommand);
-        break;
-    }
-}
-
 void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device, void * context)
 {
     VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
     BindingCommandData * data = static_cast<BindingCommandData *>(context);
 
-    if (binding.type == EMBER_MULTICAST_BINDING && data->isGroup)
+    if (data->isReadAttribute)
     {
-        switch (data->clusterId)
+        // It should always enter here if isReadAttribute is true
+        if (binding.type == EMBER_UNICAST_BINDING && !data->isGroup)
         {
-        case Clusters::OnOff::Id:
-            ProcessOnOffGroupBindingCommand(data->commandId, binding);
-            break;
+            switch (data->clusterId)
+            {
+            case Clusters::Identify::Id:
+                ProcessIdentifyUnicastBindingRead(data, binding, peer_device);
+                break;
+            case Clusters::OnOff::Id:
+                ProcessOnOffUnicastBindingRead(data, binding, peer_device);
+                break;
+            case Clusters::LevelControl::Id:
+                ProcessLevelControlUnicastBindingRead(data, binding, peer_device);
+                break;
+            case Clusters::ColorControl::Id:
+                ProcessColorControlUnicastBindingRead(data, binding, peer_device);
+                break;
+            case Clusters::Thermostat::Id:
+                ProcessThermostatUnicastBindingRead(data, binding, peer_device);
+                break;
+            }
         }
     }
-    else if (binding.type == EMBER_UNICAST_BINDING && !data->isGroup)
+    else
     {
-        switch (data->clusterId)
+        if (binding.type == EMBER_MULTICAST_BINDING && data->isGroup)
         {
-        case Clusters::OnOff::Id:
-            ProcessOnOffUnicastBindingCommand(data->commandId, binding, peer_device);
-            break;
+            switch (data->clusterId)
+            {
+            case Clusters::Identify::Id:
+                ProcessIdentifyGroupBindingCommand(data, binding);
+                break;
+            case Clusters::OnOff::Id:
+                ProcessOnOffGroupBindingCommand(data, binding);
+                break;
+            case Clusters::LevelControl::Id:
+                ProcessColorControlGroupBindingCommand(data, binding);
+                break;
+            case Clusters::ColorControl::Id:
+                ProcessColorControlGroupBindingCommand(data, binding);
+                break;
+            case Clusters::Thermostat::Id:
+                ProcessThermostatGroupBindingCommand(data, binding);
+                break;
+            }
+        }
+        else if (binding.type == EMBER_UNICAST_BINDING && !data->isGroup)
+        {
+            switch (data->clusterId)
+            {
+            case Clusters::Identify::Id:
+                ProcessIdentifyUnicastBindingCommand(data, binding, peer_device);
+                break;
+            case Clusters::OnOff::Id:
+                ProcessOnOffUnicastBindingCommand(data, binding, peer_device);
+                break;
+            case Clusters::LevelControl::Id:
+                ProcessLevelControlUnicastBindingCommand(data, binding, peer_device);
+                break;
+            case Clusters::ColorControl::Id:
+                ProcessColorControlUnicastBindingCommand(data, binding, peer_device);
+                break;
+            case Clusters::Thermostat::Id:
+                ProcessThermostatUnicastBindingCommand(data, binding, peer_device);
+                break;
+            }
         }
     }
 }
@@ -149,7 +143,7 @@ void InitBindingHandlerInternal(intptr_t arg)
     chip::BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
 }
 
-#ifdef CONFIG_ENABLE_CHIP_SHELL
+#if CONFIG_ENABLE_CHIP_SHELL
 
 /********************************************************
  * Switch shell functions
@@ -169,56 +163,6 @@ CHIP_ERROR SwitchCommandHandler(int argc, char ** argv)
     }
 
     return sShellSwitchSubCommands.ExecCommand(argc, argv);
-}
-
-/********************************************************
- * OnOff switch shell functions
- *********************************************************/
-
-CHIP_ERROR OnOffHelpHandler(int argc, char ** argv)
-{
-    sShellSwitchOnOffSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR OnOffSwitchCommandHandler(int argc, char ** argv)
-{
-    if (argc == 0)
-    {
-        return OnOffHelpHandler(argc, argv);
-    }
-
-    return sShellSwitchOnOffSubCommands.ExecCommand(argc, argv);
-}
-
-CHIP_ERROR OnSwitchCommandHandler(int argc, char ** argv)
-{
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::On::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR OffSwitchCommandHandler(int argc, char ** argv)
-{
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::Off::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ToggleSwitchCommandHandler(int argc, char ** argv)
-{
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::Toggle::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
 }
 
 /********************************************************
@@ -292,59 +236,6 @@ CHIP_ERROR GroupsSwitchCommandHandler(int argc, char ** argv)
     return sShellSwitchGroupsSubCommands.ExecCommand(argc, argv);
 }
 
-/********************************************************
- * Groups OnOff switch shell functions
- *********************************************************/
-
-CHIP_ERROR GroupsOnOffHelpHandler(int argc, char ** argv)
-{
-    sShellSwitchGroupsOnOffSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR GroupsOnOffSwitchCommandHandler(int argc, char ** argv)
-{
-    if (argc == 0)
-    {
-        return GroupsOnOffHelpHandler(argc, argv);
-    }
-
-    return sShellSwitchGroupsOnOffSubCommands.ExecCommand(argc, argv);
-}
-
-CHIP_ERROR GroupOnSwitchCommandHandler(int argc, char ** argv)
-{
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::On::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-    data->isGroup             = true;
-
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR GroupOffSwitchCommandHandler(int argc, char ** argv)
-{
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::Off::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-    data->isGroup             = true;
-
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR GroupToggleSwitchCommandHandler(int argc, char ** argv)
-{
-    BindingCommandData * data = Platform::New<BindingCommandData>();
-    data->commandId           = Clusters::OnOff::Commands::Toggle::Id;
-    data->clusterId           = Clusters::OnOff::Id;
-    data->isGroup             = true;
-
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
-    return CHIP_NO_ERROR;
-}
-
 /**
  * @brief configures switch matter shell
  *
@@ -354,27 +245,332 @@ static void RegisterSwitchCommands()
 
     static const shell_command_t sSwitchSubCommands[] = {
         { &SwitchHelpHandler, "help", "Usage: switch <subcommand>" },
+        { &IdentifySwitchCommandHandler, "identify", " Usage: switch identify <subcommand>" },
         { &OnOffSwitchCommandHandler, "onoff", " Usage: switch onoff <subcommand>" },
+        { &LevelControlSwitchCommandHandler, "levelcontrol", " Usage: switch levlecontrol <subcommand>" },
+        { &ColorControlSwitchCommandHandler, "colorcontrol", " Usage: switch colorcontrol <subcommand>" },
+        { &ThermostatSwitchCommandHandler, "thermostat", " Usage: switch thermostat <subcommand>" },
         { &GroupsSwitchCommandHandler, "groups", "Usage: switch groups <subcommand>" },
         { &BindingSwitchCommandHandler, "binding", "Usage: switch binding <subcommand>" }
     };
 
-    static const shell_command_t sSwitchOnOffSubCommands[] = {
-        { &OnOffHelpHandler, "help", "Usage : switch ononff <subcommand>" },
-        { &OnSwitchCommandHandler, "on", "Sends on command to bound lighting app" },
-        { &OffSwitchCommandHandler, "off", "Sends off command to bound lighting app" },
-        { &ToggleSwitchCommandHandler, "toggle", "Sends toggle command to bound lighting app" }
+    static const shell_command_t sSwitchIdentifySubCommands[] = {
+        { &IdentifyHelpHandler, "help", "Usage: switch identify <subcommand>" },
+        { &IdentifyCommandHandler, "identify", "identify Usage: switch identify identify" },
+        { &TriggerEffectSwitchCommandHandler, "triggereffect", "triggereffect Usage: switch identify triggereffect" },
+        { &IdentifyRead, "read", "Usage : switch identify read <attribute>" }
     };
 
-    static const shell_command_t sSwitchGroupsSubCommands[] = { { &GroupsHelpHandler, "help", "Usage: switch groups <subcommand>" },
-                                                                { &GroupsOnOffSwitchCommandHandler, "onoff",
-                                                                  "Usage: switch groups onoff <subcommand>" } };
+    static const shell_command_t sSwitchIdentifyReadSubCommands[] = {
+        { &IdentifyReadHelpHandler, "help", "Usage : switch identify read <attribute>" },
+        { &IdentifyReadAttributeList, "attlist", "Read attribute list" },
+        { &IdentifyReadIdentifyTime, "identifytime", "Read identifytime attribute" },
+        { &IdentifyReadIdentifyType, "identifytype", "Read identifytype attribute" },
+    };
+
+    static const shell_command_t sSwitchOnOffSubCommands[] = {
+        { &OnOffHelpHandler, "help", "Usage: switch ononff <subcommand>" },
+        { &OnSwitchCommandHandler, "on", "on Usage: switch onoff on" },
+        { &OffSwitchCommandHandler, "off", "off Usage: switch onoff off" },
+        { &ToggleSwitchCommandHandler, "toggle", "toggle Usage: switch onoff toggle" },
+        { &OffWithEffectSwitchCommandHandler, "offWE", "off-with-effect Usage: switch onoff offWE <EffectId> <EffectVariant>" },
+        { &OnWithRecallGlobalSceneSwitchCommandHandler, "onWRGS", "on-with-recall-global-scene Usage: switch onoff onWRGS" },
+        { &OnWithTimedOffSwitchCommandHandler, "onWTO",
+          "on-with-timed-off Usage: switch onoff onWTO <OnOffControl> <OnTime> <OffWaitTime>" },
+        { &OnOffRead, "read", "Usage : switch onoff read <attribute>" }
+    };
+
+    static const shell_command_t sSwitchOnOffReadSubCommands[] = {
+        { &OnOffReadHelpHandler, "help", "Usage : switch ononff read <attribute>" },
+        { &OnOffReadAttributeList, "attlist", "Read attribute list" },
+        { &OnOffReadOnOff, "onoff", "Read onoff attribute" },
+        { &OnOffReadGlobalSceneControl, "GSC", "Read GlobalSceneControl attribute" },
+        { &OnOffReadOnTime, "ontime", "Read ontime attribute" },
+        { &OnOffReadOffWaitTime, "offwaittime", "Read offwaittime attribute" },
+        { &OnOffReadStartUpOnOff, "SOO", "Read startuponoff attribute" },
+    };
+
+    static const shell_command_t sSwitchLevelControlSubCommands[] = {
+        { &LevelControlHelpHandler, "help", "Usage: switch levelcontrol <subcommand>" },
+        { &MoveToLevelSwitchCommandHandler, "movetolevel",
+          "movetolevel Usage: switch levelcontrol movetolevel <level> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveSwitchCommandHandler, "move",
+          "move Usage: switch levelcontrol move <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &StepSwitchCommandHandler, "step",
+          "step Usage: switch levelcontrol step <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &StopSwitchCommandHandler, "stop", "step Usage: switch levelcontrol stop <optionsmask> <optionsoverride>" },
+        { &MoveToLevelWithOnOffSwitchCommandHandler, "MTLWOO",
+          "movetolevelwithonoff Usage: switch levelcontrol MTLWOO <level> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveWithOnOffSwitchCommandHandler, "MWOO",
+          "movewithonoff Usage: switch levelcontrol MWOO <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &StepWithOnOffSwitchCommandHandler, "stepWOO",
+          "stepwithonoff Usage: switch levelcontrol stepWOO <stepmode> <stepsize> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &StopWithOnOffSwitchCommandHandler, "stopWOO",
+          "stopwithonoff Usage: switch levelcontrol stopWOO <optionsmask> <optionsoverride>" },
+        { &LevelControlRead, "read", "Usage : switch levelcontrol read <attribute>" }
+    };
+
+    static const shell_command_t sSwitchLevelControlReadSubCommands[] = {
+        { &LevelControlReadHelpHandler, "help", "Usage : switch levelcontrol read <attribute>" },
+        { &LevelControlReadAttributeList, "attlist", "Read attribute list" },
+        { &LevelControlReadCurrentLevel, "currentlevel", "Read currentlevel attribute" },
+        { &LevelControlReadRemainingTime, "remainingtime", "Read remainingtime attribute" },
+        { &LevelControlReadMinLevel, "minlevel", "Read minlevel attribute" },
+        { &LevelControlReadMaxLevel, "maxlevel", "Read maxlevel attribute" },
+        { &LevelControlReadCurrentFrequency, "currentfrequency", "Read currentfrequency attribute" },
+        { &LevelControlReadMinFrequency, "minfrequency", "Read minfrequency attribute" },
+        { &LevelControlReadMaxFrequency, "maxfrequency", "Read maxfrequency attribute" },
+        { &LevelControlReadOptions, "options", "Read options attribute" },
+        { &LevelControlReadOnOffTransitionTime, "OOTT", "Read onofftransitiontime attribute" },
+        { &LevelControlReadOnLevel, "onlevel", "Read onlevel attribute" },
+        { &LevelControlReadOnTransitionTime, "OnTT", "Read ontransitiontime attribute" },
+        { &LevelControlReadOffTransitionTime, "OffTT", "Read offtransitiontime attribute" },
+        { &LevelControlReadDefaultMoveRate, "DMR", "Read defaultmoverate attribute" },
+        { &LevelControlReadStartUpCurrentLevel, "SUCL", "Read startupcurrentlevel attribute" },
+    };
+
+    static const shell_command_t sSwitchColorControlSubCommands[] = {
+        { &ColorControlHelpHandler, "help", "Usage: switch colorcontrol <subcommand>" },
+        { &MoveToHueCommandHandler, "movetohue",
+          "movetohue Usage: switch colorcontrol movetohue <hue> <direction> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveHueCommandHandler, "movehue",
+          "movehue Usage: switch colorcontrol movehue <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &StepHueCommandHandler, "stephue",
+          "stephue Usage: switch colorcontrol stephue <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveToSaturationCommandHandler, "movetosat",
+          "movetosaturation Usage: switch colorcontrol movetosat <saturation> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveSaturationCommandHandler, "movesat",
+          "movesaturation Usage: switch colorcontrol movesat <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &StepSaturationCommandHandler, "stepsat",
+          "stepsaturation Usage: switch colorcontrol stepsat <stepmode> <stepsize> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &MoveToHueAndSaturationCommandHandler, "movetoHS",
+          "movetohueandsaturation Usage: switch colorcontrol movetoHS <hue> <saturation> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &MoveToColorCommandHandler, "movetocolor",
+          "movetocolor Usage: switch colorcontrol movetocolor <colorx> <colory> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveColorCommandHandler, "movecolor",
+          "movecolor Usage: switch colorcontrol movecolor <ratex> <ratey> <optionsmask> <optionsoverride>" },
+        { &StepColorCommandHandler, "stepcolor",
+          "stepcolor Usage: switch colorcontrol stepcolor <stepx> <stepy> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &MoveToColorTemperatureCommandHandler, "movetoCT",
+          "movetocolortemperature Usage: switch colorcontrol movetoCT <colortempmireds> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &EnhancedMoveToHueCommandHandler, "Emovetohue",
+          "enhancedmovetohue Usage: switch colorcontrol Emovetohue <enhancedhue> <direction> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &EnhancedMoveHueCommandHandler, "Emovehue",
+          "enhancedmovehue Usage: switch colorcontrol Emovehue <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &EnhancedStepHueCommandHandler, "Estephue",
+          "enhancedstephue Usage: switch colorcontrol Estephue <stepmode> <stepsize> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &EnhancedMoveToHueAndSaturationCommandHandler, "EmovetoHS",
+          "enhancedmovetohueandsaturation Usage: switch colorcontrol EmovetoHS <enhancedhue> <saturation> <transitiontime> "
+          "<optionsmask> <optionsoverride>" },
+        { &ColorLoopSetCommandHandler, "colorloopset",
+          "colorloopset Usage: switch colorcontrol colorloopset <updateflags> <action> <direction> <time> <starhue> <optionsmask> "
+          "<optionsoverride>" },
+        { &StopMoveStepCommandHandler, "stopmovestep",
+          "stopmovestep Usage: switch colorcontrol stopmovestep <optionsmask> <optionsoverride>" },
+        { &MoveColorTemperatureCommandHandler, "moveCT",
+          "movecolortemperature Usage: switch colorcontrol moveCT <movemode> <rate> <colortempminmireds> <colortempmaxmireds> "
+          "<optionsmask> <optionsoverride>" },
+        { &StepColorTemperatureCommandHandler, "stepCT",
+          "stepcolortemperature Usage: switch colorcontrol stepCT <stepmode> <stepsize> <transitiontime> <colortempminmireds> "
+          "<colortempmaxmireds> <optionsmask> <optionsoverride>" },
+        { &ColorControlRead, "read", "Usage : switch colorcontrol read <attribute>" }
+    };
+
+    static const shell_command_t sSwitchColorControlReadSubCommands[] = {
+        // fill in read color control attributes commands
+        { &ColorControlReadHelpHandler, "help", "Usage : switch colorcontrol read <attribute>" },
+        { &ColorControlReadAttributeList, "attlist", "Read attribute list" },
+        { &ColorControlReadCurrentHue, "currenthue", "Read currenthue attribute" },
+        { &ColorControlReadCurrentSaturation, "currentsat", "Read currentsaturaion attribute" },
+        { &ColorControlReadRemainingTime, "remaintime", "Read remainingtime attribute" },
+        { &ColorControlReadCurrentX, "current-x", "Read current-x attribute" },
+        { &ColorControlReadCurrentY, "current-y", "Read current-y attribute" },
+        { &ColorControlReadDriftCompensation, "driftcomp", "Read driftcompensation attribute" },
+        { &ColorControlReadCompensationText, "comptext", "Read compensationtext attribute" },
+        { &ColorControlReadColorTemperature, "colortemp", "Read colortemperature attribute" },
+        { &ColorControlReadColorMode, "colormode", "Read colormode attribute" },
+        { &ColorControlReadOptions, "options", "Read options attribute" },
+        { &ColorControlReadNumberOfPrimaries, "noofprimaries", "Read numberofprimaries attribute" },
+        { &ColorControlReadPrimary1X, "primary1x", "Read primary1x attribute" },
+        { &ColorControlReadPrimary1Y, "primary1y", "Read primary1y attribute" },
+        { &ColorControlReadPrimary1Intensity, "primary1intensity", "Read primary1intensity attribute" },
+        { &ColorControlReadPrimary2X, "primary2x", "Read primary2x attribute" },
+        { &ColorControlReadPrimary2Y, "primary2y", "Read primary2y attribute" },
+        { &ColorControlReadPrimary2Intensity, "primary2intensity", "Read primary2intensity attribute" },
+        { &ColorControlReadPrimary3X, "primary3x", "Read primary3x attribute" },
+        { &ColorControlReadPrimary3Y, "primary3y", "Read primary3y attribute" },
+        { &ColorControlReadPrimary3Intensity, "primary3intensity", "Read primary3intensity attribute" },
+        { &ColorControlReadPrimary4X, "primary4x", "Read primary4x attribute" },
+        { &ColorControlReadPrimary4Y, "primary4y", "Read primary4y attribute" },
+        { &ColorControlReadPrimary4Intensity, "primary4intensity", "Read primary4intensity attribute" },
+        { &ColorControlReadPrimary5X, "primary5x", "Read primary5x attribute" },
+        { &ColorControlReadPrimary5Y, "primary5y", "Read primary5y attribute" },
+        { &ColorControlReadPrimary5Intensity, "primary5intensity", "Read primary5intensity attribute" },
+        { &ColorControlReadPrimary6X, "primary6x", "Read primary6x attribute" },
+        { &ColorControlReadPrimary6Y, "primary6y", "Read primary6y attribute" },
+        { &ColorControlReadPrimary6Intensity, "primary6intensity", "Read primary6intensity attribute" },
+        { &ColorControlReadWhitePointX, "whitepointx", "Read whitepointx attribute" },
+        { &ColorControlReadWhitePointY, "whitepointy", "Read whitepointy attribute" },
+        { &ColorControlReadColorPointRX, "colorpointrx", "Read colorpointrx attribute" },
+        { &ColorControlReadColorPointRY, "colorpointry", "Read colorpointry attribute" },
+        { &ColorControlReadColorPointRIntensity, "colorpointrintensity", "Read colorpointrintensity attribute" },
+        { &ColorControlReadColorPointGX, "colorpointgx", "Read colorpointgx attribute" },
+        { &ColorControlReadColorPointGY, "colorpointgy", "Read colorpointgy attribute" },
+        { &ColorControlReadColorPointGIntensity, "colorpointgintensity", "Read colorpointgintensity attribute" },
+        { &ColorControlReadColorPointBX, "colorpointbx", "Read colorpointbx attribute" },
+        { &ColorControlReadColorPointBY, "colorpointby", "Read colorpointby attribute" },
+        { &ColorControlReadColorPointBIntensity, "colorpointbintensity", "Read colorpointbintensity attribute" },
+        { &ColorControlReadEnhancedCurrentHue, "Ecurrenthue", "Read enhancedcurrenthue attribute" },
+        { &ColorControlReadEnhancedColorMode, "Ecolormode", "Read enhancedcolormode attribute" },
+        { &ColorControlReadColorLoopActive, "colorloopactive", "Read colorloopactive attribute" },
+        { &ColorControlReadColorLoopDirection, "colorloopdirection", "Read colorloopdirection attribute" },
+        { &ColorControlReadColorLoopTime, "colorlooptime", "Read colorlooptime attribute" },
+        { &ColorControlReadColorLoopStartEnhancedHue, "colorloopstartenhancedhue", "Read colorloopstartenhancedHue attribute" },
+        { &ColorControlReadColorLoopStoredEnhancedHue, "colorloopstoredenhancedhue", "Read colorloopstoredenhancedHue attribute" },
+        { &ColorControlReadColorCapabilities, "colorcapabilities", "Read colorcapabilities attribute" },
+        { &ColorControlReadColorTempPhysicalMinMireds, "colortempphyminmireds", "Read colortempphysicalminmireds attribute" },
+        { &ColorControlReadColorTempPhysicalMaxMireds, "colortempphymaxmireds", "Read colortempphysicalmaxmireds attribute" },
+        { &ColorControlReadCoupleColorTempToLevelMinMireds, "CCTTMM", "Read couplecolortemptolevelminmireds attribute" },
+        { &ColorControlReadStartUpColorTemperatureMireds, "SUCTM", "Read startupcolortempmireds attribute" },
+    };
+
+    static const shell_command_t sSwitchThermostatSubCommands[] = {
+        { &ThermostatHelpHandler, "help", "Usage: switch thermostat <subcommand>" },
+        { &SetpointRaiseLowerSwitchCommandHandler, "SPRL", "setpointraiselower Usage: switch thermostat SPRL <mode> <amount>" },
+        { &ThermostatRead, "read", "Usage : switch thermostat read <attribute>" }
+    };
+
+    static const shell_command_t sSwitchThermostatReadSubCommands[] = {
+        { &ThermostatReadHelpHandler, "help", "Usage : switch thermostat read <attribute>" },
+        { &ThermostatReadAttributeList, "attlist", "Read attribute list" },
+        { &ThermostatReadLocalTemperature, "localtemp", "Read localtemperature attribute" },
+        { &ThermostatReadAbsMinHeatSetpointLimit, "absminHSL", "Read absminheatsetpointlimit attribute" },
+        { &ThermostatReadAbsMaxHeatSetpointLimit, "absmaxHSL", "Read absmaxheatsetpointlimit attribute" },
+        { &ThermostatReadAbsMinCoolSetpointLimit, "absminCSL", "Read absmincoolsetpointlimit attribute" },
+        { &ThermostatReadAbsMaxCoolSetpointLimit, "absmaxCSL", "Read absmaxcoolsetpointlimit attribute" },
+        { &ThermostatReadPiCoolingDemand, "picoolingdemand", "Read picoolingdemand attribute" },
+        { &ThermostatReadPiHeatingDemand, "piheatingdemand", "Read piheatingdemand attribute" },
+        { &ThermostatReadOccupiedCoolingSetpoint, "OCS", "Read occupiedcoolingsetpoint attribute" },
+        { &ThermostatReadOccupiedHeatingSetpoint, "OHS", "Read occupiedheatingsetpoint attribute" },
+        { &ThermostatReadMinHeatSetpointLimit, "minHSL", "Read minheatsetpointlimit attribute" },
+        { &ThermostatReadMaxHeatSetpointLimit, "maxHSL", "Read maxheatsetpointlimit attribute" },
+        { &ThermostatReadMinCoolSetpointLimit, "minCSL", "Read mincoolsetpointlimit attribute" },
+        { &ThermostatReadMaxCoolSetpointLimit, "maxCSL", "Read maxcoolsetpointlimit attribute" },
+        { &ThermostatReadControlSequenceOfOperation, "CSOP", "Read controlsequenceofoperation attribute" },
+        { &ThermostatReadSystemMode, "systemmode", "Read systemmode attribute" },
+    };
+
+    static const shell_command_t sSwitchGroupsSubCommands[] = {
+        { &GroupsHelpHandler, "help", "Usage: switch groups <subcommand>" },
+        { &GroupsOnOffSwitchCommandHandler, "onoff", "Usage: switch groups onoff <subcommand>" },
+        { &GroupsLevelControlSwitchCommandHandler, "levelcontrol", "Usage: switch groups levelcontrol <subcommand>" },
+        { &GroupsColorControlSwitchCommandHandler, "colorcontrol", "Usage: switch groups colorcontrol <subcommand>" },
+        { &GroupsThermostatSwitchCommandHandler, "thermostat", "Usage: switch groups thermostat <subcommand>" },
+    };
+
+    static const shell_command_t sSwitchGroupsIdentifySubCommands[] = {
+        { &GroupsIdentifyHelpHandler, "help", "Usage: switch groups onoff <subcommand>" },
+        { &GroupIdentifyCommandHandler, "identify", "Sends identify command to bound group" },
+        { &GroupTriggerEffectSwitchCommandHandler, "triggereffect", "Sends triggereffect command to group" },
+    };
 
     static const shell_command_t sSwitchGroupsOnOffSubCommands[] = {
         { &GroupsOnOffHelpHandler, "help", "Usage: switch groups onoff <subcommand>" },
         { &GroupOnSwitchCommandHandler, "on", "Sends on command to bound group" },
         { &GroupOffSwitchCommandHandler, "off", "Sends off command to bound group" },
-        { &GroupToggleSwitchCommandHandler, "toggle", "Sends toggle command to group" }
+        { &GroupToggleSwitchCommandHandler, "toggle", "Sends toggle command to group" },
+        { &GroupOffWithEffectSwitchCommandHandler, "offWE", "Sends off-with-effect command to group" },
+        { &GroupOnWithRecallGlobalSceneSwitchCommandHandler, "onWRGS", "Sends on-with-recall-global-scene command to group" },
+        { &GroupOnWithTimedOffSwitchCommandHandler, "onWTO", "Sends on-with-timed-off command to group" }
+    };
+
+    static const shell_command_t sSwitchGroupsLevelControlSubCommands[] = {
+        { &GroupsLevelControlHelpHandler, "help", "Usage: switch groupos levelcontrol <subcommand>" },
+        { &GroupsMoveToLevelSwitchCommandHandler, "movetolevel",
+          "movetolevel Usage: switch groups levelcontrol movetolevel <level> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &GroupsMoveSwitchCommandHandler, "move",
+          "move Usage: switch groups levelcontrol move <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &GroupsStepSwitchCommandHandler, "step",
+          "step Usage: switch groups levelcontrol step <stepmode> <stepsize> <transitiontime> <optionsmask> <optionsoverride>" },
+        { &GroupsStopSwitchCommandHandler, "stop", "step Usage: switch groups levelcontrol stop <optionsmask> <optionsoverride>" },
+        { &GroupsMoveToLevelWithOnOffSwitchCommandHandler, "MTLWOO",
+          "movetolevelwithonoff Usage: switch groups levelcontrol MTLWOO <level> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsMoveWithOnOffSwitchCommandHandler, "MWOO",
+          "movewithonoff Usage: switch groups levelcontrol MWOO <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &GroupsStepWithOnOffSwitchCommandHandler, "stepWOO",
+          "stepwithonoff Usage: switch groups levelcontrol stepWOO <stepmode> <stepsize> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsStopWithOnOffSwitchCommandHandler, "stopWOO",
+          "stopwithonoff Usage: switch groups levelcontrol stopWOO <optionsmask> <optionsoverride>" },
+    };
+
+    static const shell_command_t sSwitchGroupsColorControlSubCommands[] = {
+        { &GroupsColorControlHelpHandler, "help", "Usage: switch groups colorcontrol <subcommand>" },
+        { &GroupsMoveToHueCommandHandler, "movetohue",
+          "movetohue Usage: switch groups colorcontrol movetohue <hue> <direction> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsMoveHueCommandHandler, "movehue",
+          "movehue Usage: switch groups colorcontrol movehue <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &GroupsStepHueCommandHandler, "stephue",
+          "stephue Usage: switch groups colorcontrol stephue <stepmode> <stepsize> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsMoveToSaturationCommandHandler, "movetosat",
+          "movetosaturation Usage: switch groups colorcontrol movetosat <saturation> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsMoveSaturationCommandHandler, "movesat",
+          "movesaturation Usage: switch groups colorcontrol movesat <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &GroupsStepSaturationCommandHandler, "stepsat",
+          "stepsaturation Usage: switch groups colorcontrol stepsat <stepmode> <stepsize> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsMoveToHueAndSaturationCommandHandler, "movetoHS",
+          "movetohueandsaturation Usage: switch groups colorcontrol movetoHS <hue> <saturation> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsMoveToColorCommandHandler, "movetocolor",
+          "movetocolor Usage: switch groups colorcontrol movetocolor <colorx> <colory> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsMoveColorCommandHandler, "movecolor",
+          "movecolor Usage: switch groups colorcontrol movecolor <ratex> <ratey> <optionsmask> <optionsoverride>" },
+        { &GroupsStepColorCommandHandler, "stepcolor",
+          "stepcolor Usage: switch groups colorcontrol stepcolor <stepx> <stepy> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsMoveToColorTemperatureCommandHandler, "movetoCT",
+          "movetocolortemperature Usage: switch groups colorcontrol movetoCT <colortempmireds> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsEnhancedMoveToHueCommandHandler, "Emovetohue",
+          "enhancedmovetohue Usage: switch groups colorcontrol Emovetohue <enhancedhue> <direction> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsEnhancedMoveHueCommandHandler, "Emovehue",
+          "enhancedmovehue Usage: switch groups colorcontrol Emovehue <movemode> <rate> <optionsmask> <optionsoverride>" },
+        { &GroupsEnhancedStepHueCommandHandler, "Estephue",
+          "enhancedstephue Usage: switch gropus colorcontrol Estephue <stepmode> <stepsize> <transitiontime> <optionsmask> "
+          "<optionsoverride>" },
+        { &GroupsEnhancedMoveToHueAndSaturationCommandHandler, "EmovetoHS",
+          "enhancedmovetohueandsaturation Usage: switch groups colorcontrol EmovetoHS <enhancedhue> <saturation> <transitiontime> "
+          "<optionsmask> <optionsoverride>" },
+        { &GroupsColorLoopSetCommandHandler, "colorloopset",
+          "colorloopset Usage: switch groups colorcontrol colorloopset <updateflags> <action> <direction> <time> <starhue> "
+          "<optionsmask> <optionsoverride>" },
+        { &GroupsStopMoveStepCommandHandler, "stopmovestep",
+          "stopmovestep Usage: switch groups colorcontrol stopmovestep <optionsmask> <optionsoverride>" },
+        { &GroupsMoveColorTemperatureCommandHandler, "moveCT",
+          "movecolortemperature Usage: switch groups colorcontrol moveCT <movemode> <rate> <colortempminmireds> "
+          "<colortempmaxmireds> <optionsmask> <optionsoverride>" },
+        { &GroupsStepColorTemperatureCommandHandler, "stepCT",
+          "stepcolortemperature Usage: switch groups colorcontrol stepCT <stepmode> <stepsize> <transitiontime> "
+          "<colortempminmireds> <colortempmaxmireds> <optionsmask> <optionsoverride>" },
+    };
+
+    static const shell_command_t sSwitchGroupsThermostatSubCommands[] = {
+        { &GroupsThermostatHelpHandler, "help", "Usage: switch groups thermostat <subcommand>" },
+        { &GroupsSetpointRaiseLowerSwitchCommandHandler, "SPRL",
+          "setpointraiselower Usage: switch groups thermostat SPRL <mode> <amount>" },
     };
 
     static const shell_command_t sSwitchBindingSubCommands[] = {
@@ -386,8 +582,31 @@ static void RegisterSwitchCommands()
     static const shell_command_t sSwitchCommand = { &SwitchCommandHandler, "switch",
                                                     "Light-switch commands. Usage: switch <subcommand>" };
 
+    // Register groups command
+    sShellSwitchGroupsIdentifySubCommands.RegisterCommands(sSwitchGroupsIdentifySubCommands,
+                                                           ArraySize(sSwitchGroupsIdentifySubCommands));
     sShellSwitchGroupsOnOffSubCommands.RegisterCommands(sSwitchGroupsOnOffSubCommands, ArraySize(sSwitchGroupsOnOffSubCommands));
+    sShellSwitchGroupsLevelControlSubCommands.RegisterCommands(sSwitchGroupsLevelControlSubCommands,
+                                                               ArraySize(sSwitchGroupsLevelControlSubCommands));
+    sShellSwitchGroupsColorControlSubCommands.RegisterCommands(sSwitchGroupsColorControlSubCommands,
+                                                               ArraySize(sSwitchGroupsColorControlSubCommands));
+    sShellSwitchGroupsThermostatSubCommands.RegisterCommands(sSwitchGroupsThermostatSubCommands,
+                                                             ArraySize(sSwitchGroupsThermostatSubCommands));
+
+    // Register commands
+    sShellSwitchIdentifySubCommands.RegisterCommands(sSwitchIdentifySubCommands, ArraySize(sSwitchIdentifySubCommands));
+    sShellSwitchIdentifyReadSubCommands.RegisterCommands(sSwitchIdentifyReadSubCommands, ArraySize(sSwitchIdentifyReadSubCommands));
     sShellSwitchOnOffSubCommands.RegisterCommands(sSwitchOnOffSubCommands, ArraySize(sSwitchOnOffSubCommands));
+    sShellSwitchOnOffReadSubCommands.RegisterCommands(sSwitchOnOffReadSubCommands, ArraySize(sSwitchOnOffReadSubCommands));
+    sShellSwitchLevelControlSubCommands.RegisterCommands(sSwitchLevelControlSubCommands, ArraySize(sSwitchLevelControlSubCommands));
+    sShellSwitchLevelControlReadSubCommands.RegisterCommands(sSwitchLevelControlReadSubCommands,
+                                                             ArraySize(sSwitchLevelControlReadSubCommands));
+    sShellSwitchColorControlSubCommands.RegisterCommands(sSwitchColorControlSubCommands, ArraySize(sSwitchColorControlSubCommands));
+    sShellSwitchColorControlReadSubCommands.RegisterCommands(sSwitchColorControlReadSubCommands,
+                                                             ArraySize(sSwitchColorControlReadSubCommands));
+    sShellSwitchThermostatSubCommands.RegisterCommands(sSwitchThermostatSubCommands, ArraySize(sSwitchThermostatSubCommands));
+    sShellSwitchThermostatReadSubCommands.RegisterCommands(sSwitchThermostatReadSubCommands,
+                                                           ArraySize(sSwitchThermostatReadSubCommands));
     sShellSwitchGroupsSubCommands.RegisterCommands(sSwitchGroupsSubCommands, ArraySize(sSwitchGroupsSubCommands));
     sShellSwitchBindingSubCommands.RegisterCommands(sSwitchBindingSubCommands, ArraySize(sSwitchBindingSubCommands));
     sShellSwitchSubCommands.RegisterCommands(sSwitchSubCommands, ArraySize(sSwitchSubCommands));
