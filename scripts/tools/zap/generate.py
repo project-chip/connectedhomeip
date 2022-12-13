@@ -23,8 +23,10 @@ import tempfile
 import subprocess
 import sys
 import urllib.request
+
 from dataclasses import dataclass
 
+from zap_execution import ZapTool
 
 @dataclass
 class CmdLineArgs:
@@ -158,22 +160,7 @@ def extractGeneratedIdl(output_dir, zap_config_path):
 
 
 def runGeneration(zap_file, zcl_file, templates_file, output_dir, parallel):
-    # Accepted environment variables, in order:
-    #
-    # ZAP_DEVELOPMENT_PATH - the path to a zap development environment. This is
-    #                        a zap checkout, used for local development
-    # ZAP_INSTALL_PATH     - the path where zap-cli exists. This is if zap-cli
-    #                        is NOT in the current path
-
-    if 'ZAP_DEVELOPMENT_PATH' in os.environ:
-        generate_cmd = ['node', 'src-script/zap-start.js', 'generate']
-        working_directory = os.environ['ZAP_DEVELOPMENT_PATH']
-    elif 'ZAP_INSTALL_PATH' in os.environ:
-        generate_cmd = [os.path.join(os.environ['ZAP_INSTALL_PATH'], 'zap-cli'), 'generate']
-        working_directory = None
-    else:
-        generate_cmd = ['zap-cli', 'generate']
-        working_directory = None
+    tool = ZapTool()
 
     args = ['-z', zcl_file, '-g', templates_file, '-i', zap_file, '-o', output_dir]
 
@@ -181,20 +168,7 @@ def runGeneration(zap_file, zcl_file, templates_file, output_dir, parallel):
         # Parallel-compatible runs will need separate state
         args.append('--tempState')
 
-    try:
-        subprocess.check_call(generate_cmd + args, cwd=working_directory)
-    except FileNotFoundError as e:
-        print(f'FAILED TO EXECUTE ZAP GENERATION: {e.strerror} - "{e.filename}"')
-        print('*'*80)
-        print('* You may need to install zap. Please ensure one of these applies:')
-        print('* - `zap-cli` is in $PATH. Install from https://github.com/project-chip/zap/releases')
-        print('*   see docs/guides/BUILDING.md for details')
-        print('* - `zap-cli` is in $ZAP_INSTALL_PATH. Use this option if you')
-        print('*   installed zap but do not want to update $PATH')
-        print('* - Point $ZAP_DEVELOPMENT_PATH to your local copy of zap that you')
-        print('*   develop on (to use a developer build of zap)')
-        print('*'*80)
-        sys.exit(1)
+    tool.run('generate', *args)
 
     extractGeneratedIdl(output_dir, zap_file)
 
