@@ -14,5 +14,5 @@ queueTtl: 21600s
 
 artifacts:
     objects:
-        location: "gs://matter-build-automation-artifacts/$PROJECT_ID/$COMMIT_SHA/"        
-        paths: ["/coverage_html.tar.gz"]
+        location: "gs://matter-build-automation-coverage-logs/$PROJECT_ID/$COMMIT_SHA/"
+        paths: ["/workspace/coverage_html.tar.gz"]
