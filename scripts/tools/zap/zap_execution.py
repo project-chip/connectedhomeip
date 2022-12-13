@@ -32,6 +32,7 @@ from typing import Tuple
 #      binaries also require a zap update)
 MIN_ZAP_VERSION = '2022.11.29'
 
+
 class ZapTool:
     def __init__(self):
         # Accepted environment variables, in order:
