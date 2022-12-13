@@ -13,6 +13,7 @@ An example showing the use of Matter on the Infineon CY8CKIT-062S2-43012 board.
         -   [Commissioning over BLE](#commissioning-over-ble)
             -   [Notes](#notes)
         -   [Cluster control](#cluster-control)
+        -   [Factory Reset](#factory-reset)
     -   [OTA Software Update](#ota-software-update)
 
 <hr>
@@ -136,6 +137,16 @@ commands. These power cycle the BlueTooth hardware and disable BR/EDR mode.
     Press `USER_BTN1` on the board to toggle between Light ON and OFF states.
     Light ON and OFF can be observed with 'LED9' on the board. This LED is
     configured with `LIGHT_LED` in `include/AppConfig.h`.
+
+### Factory Reset
+
+-   Commissioned Wi-Fi Credentials can be cleared by pressing `USER_BTN2` button
+    on the board. All the data configured on the device during the initial
+    commissioning will be deleted and device will be ready for commissioning
+    again.
+
+-   Pressing the button again within 5 seconds will cancel the factory reset of
+    the board.
 
 ## OTA Software Update
 
