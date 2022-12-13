@@ -71,5 +71,6 @@ class CommissioningTest:
         if self.command_name == 'onnetwork-long':
             code = self.TestCmdOnnetworkLong(self.nodeid, self.setup_payload, self.discriminator, self.timeout)
             if code != 0:
-                logging.error(f"Testing onnetwork-long pairing failed with error {code}")
-                raise Exception("Failed to pair onnetwork device")
+                raise Exception(f"Testing onnetwork-long pairing failed with error {code}")
+        else:
+            raise Exception(f"Unsupported command {self.command_name}")

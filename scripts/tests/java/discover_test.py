@@ -66,5 +66,6 @@ class DiscoverTest:
         if self.command_name == 'commissionables':
             code = self.TestCmdCommissionables()
             if code != 0:
-                logging.error(f"Testing command commissionables failed with error {code}")
-                raise Exception("Failed to discover commissionables devices")
+                raise Exception(f"Testing command commissionables failed with error {code}")
+        else:
+            raise Exception(f"Unsupported command {self.command_name}")

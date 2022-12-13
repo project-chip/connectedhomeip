@@ -90,7 +90,8 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
         test = CommissioningTest(log_cooking_threads, log_queue, command, tool_args)
         try:
             test.RunTest()
-        except Exception:
+        except Exception as e:
+            logging.error(e)
             sys.exit(1)
     elif tool_cluster == 'discover':
         logging.info("Testing discover cluster")
@@ -98,7 +99,8 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
         test = DiscoverTest(log_cooking_threads, log_queue, command, tool_args)
         try:
             test.RunTest()
-        except Exception:
+        except Exception as e:
+            logging.error(e)
             sys.exit(1)
 
     app_exit_code = 0
