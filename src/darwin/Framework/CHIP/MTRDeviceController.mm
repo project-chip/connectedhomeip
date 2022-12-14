@@ -123,7 +123,6 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         if ([self checkForInitError:(_operationalCredentialsDelegate != nullptr) logMsg:kErrorOperationalCredentialsInit]) {
             return nil;
         }
-        _operationalCredentialsDelegate->setChipWorkQueue(_chipWorkQueue);
     }
     return self;
 }
@@ -544,13 +543,11 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
 {
-    VerifyOrReturn([self checkIsRunning]);
-
-    dispatch_async(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning]);
-
-        self->_deviceControllerDelegateBridge->setDelegate(self, delegate, queue);
-    });
+    [self
+        asyncDispatchToMatterQueue:^() {
+            self->_deviceControllerDelegateBridge->setDelegate(self, delegate, queue);
+        }
+                      errorHandler:nil];
 }
 
 - (BOOL)setOperationalCertificateIssuer:(nullable id<MTROperationalCertificateIssuer>)operationalCertificateIssuer
@@ -692,68 +689,54 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     return deviceProxy->GetDeviceTransportType() == chip::Transport::Type::kBle;
 }
 
-- (BOOL)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
+- (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion
 {
-    if (![self checkIsRunning]) {
-        return NO;
-    }
+    [self
+        asyncGetCommissionerOnMatterQueue:^(chip::Controller::DeviceCommissioner * commissioner) {
+            auto connectionBridge = new MTRDeviceConnectionBridge(completion);
 
-    dispatch_async(_chipWorkQueue, ^{
-        NSError * error;
-        if (![self checkIsRunning:&error]) {
-            completion(nullptr, chip::NullOptional, error);
-            return;
+            // MTRDeviceConnectionBridge always delivers errors async via
+            // completion.
+            connectionBridge->connect(commissioner, nodeID);
         }
-
-        auto connectionBridge = new MTRDeviceConnectionBridge(completion);
-
-        // MTRDeviceConnectionBridge always delivers errors async via
-        // completion.
-        connectionBridge->connect(self->_cppCommissioner, nodeID);
-    });
-
-    return YES;
+        errorHandler:^(NSError * error) {
+            completion(nullptr, chip::NullOptional, error);
+        }];
 }
 
-- (BOOL)getSessionForCommissioneeDevice:(chip::NodeId)deviceID completion:(MTRInternalDeviceConnectionCallback)completion
+- (void)getSessionForCommissioneeDevice:(chip::NodeId)deviceID completion:(MTRInternalDeviceConnectionCallback)completion
 {
-    if (![self checkIsRunning]) {
-        return NO;
-    }
+    [self
+        asyncGetCommissionerOnMatterQueue:^(chip::Controller::DeviceCommissioner * commissioner) {
+            chip::CommissioneeDeviceProxy * deviceProxy;
+            CHIP_ERROR err = commissioner->GetDeviceBeingCommissioned(deviceID, &deviceProxy);
+            if (err != CHIP_NO_ERROR) {
+                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:err]);
+                return;
+            }
 
-    dispatch_async(_chipWorkQueue, ^{
-        NSError * error;
-        if (![self checkIsRunning:&error]) {
+            chip::Optional<chip::SessionHandle> session = deviceProxy->GetSecureSession();
+            if (!session.HasValue() || !session.Value()->AsSecureSession()->IsPASESession()) {
+                completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+                return;
+            }
+
+            completion(deviceProxy->GetExchangeManager(), session, nil);
+        }
+        errorHandler:^(NSError * error) {
             completion(nullptr, chip::NullOptional, error);
-            return;
-        }
-
-        chip::CommissioneeDeviceProxy * deviceProxy;
-        CHIP_ERROR err = self->_cppCommissioner->GetDeviceBeingCommissioned(deviceID, &deviceProxy);
-        if (err != CHIP_NO_ERROR) {
-            completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:err]);
-            return;
-        }
-
-        chip::Optional<chip::SessionHandle> session = deviceProxy->GetSecureSession();
-        if (!session.HasValue() || !session.Value()->AsSecureSession()->IsPASESession()) {
-            completion(nullptr, chip::NullOptional, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
-            return;
-        }
-
-        completion(deviceProxy->GetExchangeManager(), session, nil);
-    });
-
-    return YES;
+        }];
 }
 
-- (void)asyncDispatchToMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
-                      errorHandler:(void (^)(NSError *))errorHandler
+- (void)asyncGetCommissionerOnMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
+                             errorHandler:(nullable MTRDeviceErrorHandler)errorHandler
 {
     {
         NSError * error;
         if (![self checkIsRunning:&error]) {
-            errorHandler(error);
+            if (errorHandler != nil) {
+                errorHandler(error);
+            }
             return;
         }
     }
@@ -761,12 +744,22 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     dispatch_async(_chipWorkQueue, ^{
         NSError * error;
         if (![self checkIsRunning:&error]) {
-            errorHandler(error);
+            if (errorHandler != nil) {
+                errorHandler(error);
+            }
             return;
         }
 
         block(self.cppCommissioner);
     });
+}
+
+- (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler
+{
+    auto adapter = ^(chip::Controller::DeviceCommissioner *) {
+        block();
+    };
+    [self asyncGetCommissionerOnMatterQueue:adapter errorHandler:errorHandler];
 }
 
 - (void)syncRunOnWorkQueue:(SyncWorkQueueBlock)block error:(NSError * __autoreleasing *)error
@@ -782,13 +775,11 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 - (id)syncRunOnWorkQueueWithReturnValue:(SyncWorkQueueBlockWithReturnValue)block error:(NSError * __autoreleasing *)error
 {
     __block id rv = nil;
-
-    VerifyOrReturnValue([self checkIsRunning:error], rv);
-
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
+    auto adapter = ^{
         rv = block();
-    });
+    };
+
+    [self syncRunOnWorkQueue:adapter error:error];
 
     return rv;
 }
@@ -796,13 +787,10 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 - (BOOL)syncRunOnWorkQueueWithBoolReturnValue:(SyncWorkQueueBlockWithBoolReturnValue)block error:(NSError * __autoreleasing *)error
 {
     __block BOOL success = NO;
-
-    VerifyOrReturnValue([self checkIsRunning:error], success);
-
-    dispatch_sync(_chipWorkQueue, ^{
-        VerifyOrReturn([self checkIsRunning:error]);
+    auto adapter = ^{
         success = block();
-    });
+    };
+    [self syncRunOnWorkQueue:adapter error:error];
 
     return success;
 }
@@ -1001,22 +989,24 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
     // We know getSessionForNode will return YES here, since we already checked
     // that we are running.
-    return [self getSessionForNode:deviceID
-                        completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
-                            const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
-                            // Create an MTRBaseDevice for the node id involved, now that our
-                            // CASE session is primed.  We don't actually care about the session
-                            // information here.
-                            dispatch_async(queue, ^{
-                                MTRBaseDevice * device;
-                                if (error == nil) {
-                                    device = [[MTRBaseDevice alloc] initWithNodeID:@(deviceID) controller:self];
-                                } else {
-                                    device = nil;
-                                }
-                                completion(device, error);
-                            });
-                        }];
+    [self getSessionForNode:deviceID
+                 completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
+                     const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error) {
+                     // Create an MTRBaseDevice for the node id involved, now that our
+                     // CASE session is primed.  We don't actually care about the session
+                     // information here.
+                     dispatch_async(queue, ^{
+                         MTRBaseDevice * device;
+                         if (error == nil) {
+                             device = [[MTRBaseDevice alloc] initWithNodeID:@(deviceID) controller:self];
+                         } else {
+                             device = nil;
+                         }
+                         completion(device, error);
+                     });
+                 }];
+
+    return YES;
 }
 
 - (BOOL)pairDevice:(uint64_t)deviceID

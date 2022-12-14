@@ -139,7 +139,7 @@ public:
         LogRequestStart();
 
         [device.deviceController
-            asyncDispatchToMatterQueue:^(chip::Controller::DeviceCommissioner *) {
+            asyncDispatchToMatterQueue:^() {
                 CHIP_ERROR err = action(mSuccess, mFailure);
                 if (err != CHIP_NO_ERROR) {
                     NSLog(@"Failure performing action. C++-mangled success callback type: '%s', error: %s", typeid(T).name(),
@@ -159,31 +159,22 @@ public:
     {
         LogRequestStart();
 
-        BOOL ok = [device.deviceController
-            getSessionForCommissioneeDevice:device.nodeID
-                                 completion:^(chip::Messaging::ExchangeManager * exchangeManager,
-                                     const chip::Optional<chip::SessionHandle> & session, NSError * error) {
-                                     MaybeDoAction(exchangeManager, session, error);
-                                 }];
-
-        if (ok == NO) {
-            OnFailureFn(this, CHIP_ERROR_INCORRECT_STATE);
-        }
+        [device.deviceController getSessionForCommissioneeDevice:device.nodeID
+                                                      completion:^(chip::Messaging::ExchangeManager * exchangeManager,
+                                                          const chip::Optional<chip::SessionHandle> & session, NSError * error) {
+                                                          MaybeDoAction(exchangeManager, session, error);
+                                                      }];
     }
 
     void ActionWithNodeID(chip::NodeId nodeID, MTRDeviceController * controller)
     {
         LogRequestStart();
 
-        BOOL ok = [controller getSessionForNode:nodeID
-                                     completion:^(chip::Messaging::ExchangeManager * exchangeManager,
-                                         const chip::Optional<chip::SessionHandle> & session, NSError * error) {
-                                         MaybeDoAction(exchangeManager, session, error);
-                                     }];
-
-        if (ok == NO) {
-            OnFailureFn(this, CHIP_ERROR_INCORRECT_STATE);
-        }
+        [controller getSessionForNode:nodeID
+                           completion:^(chip::Messaging::ExchangeManager * exchangeManager,
+                               const chip::Optional<chip::SessionHandle> & session, NSError * error) {
+                               MaybeDoAction(exchangeManager, session, error);
+                           }];
     }
 
     void LogRequestStart()

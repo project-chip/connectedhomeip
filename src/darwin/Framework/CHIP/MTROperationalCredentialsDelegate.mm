@@ -22,6 +22,7 @@
 #import <Security/Security.h>
 
 #import "MTRCertificates.h"
+#import "MTRDeviceController_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "NSDataSpanConversion.h"
 
@@ -219,54 +220,55 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
 void MTROperationalCredentialsDelegate::ExternalNOCChainGenerated(
     MTROperationalCertificateInfo * _Nullable info, NSError * _Nullable error)
 {
-    MTRDeviceController * __weak weakController = mWeakController;
-    dispatch_async(mChipWorkQueue, ^{
-        MTRDeviceController * strongController = weakController;
-        if (strongController == nil || !strongController.isRunning) {
-            // No longer safe to touch "this"
-            return;
+    // Dispatch will only happen if the controller is still running, which means we
+    // are safe to touch our members.
+    [mWeakController
+        asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
+            assertChipStackLockedByCurrentThread();
+
+            if (mOnNOCCompletionCallback == nullptr) {
+                return;
+            }
+
+            auto * onCompletion = mOnNOCCompletionCallback;
+            mOnNOCCompletionCallback = nullptr;
+
+            if (mCppCommissioner != commissioner) {
+                // Quite unexpected!
+                return;
+            }
+
+            if (info == nil) {
+                onCompletion->mCall(onCompletion->mContext, [MTRError errorToCHIPErrorCode:error], ByteSpan(), ByteSpan(),
+                    ByteSpan(), NullOptional, NullOptional);
+                return;
+            }
+
+            auto commissioningParameters = commissioner->GetCommissioningParameters();
+            if (!commissioningParameters.HasValue()) {
+                return;
+            }
+
+            AesCcm128KeySpan ipk = commissioningParameters.Value().GetIpk().ValueOr(GetIPK());
+
+            Optional<NodeId> adminSubject;
+            if (info.adminSubject != nil) {
+                adminSubject.SetValue(info.adminSubject.unsignedLongLongValue);
+            } else {
+                adminSubject = commissioningParameters.Value().GetAdminSubject();
+            }
+
+            ByteSpan intermediateCertificate;
+            if (info.intermediateCertificate != nil) {
+                intermediateCertificate = AsByteSpan(info.intermediateCertificate);
+            }
+
+            onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, AsByteSpan(info.operationalCertificate),
+                intermediateCertificate, AsByteSpan(info.rootCertificate), MakeOptional(ipk), adminSubject);
         }
-
-        if (mOnNOCCompletionCallback == nullptr) {
-            return;
-        }
-
-        auto * onCompletion = mOnNOCCompletionCallback;
-        mOnNOCCompletionCallback = nullptr;
-
-        if (mCppCommissioner == nullptr) {
-            // Quite unexpected, since we checked that our controller is running already.
-            return;
-        }
-
-        if (info == nil) {
-            onCompletion->mCall(onCompletion->mContext, [MTRError errorToCHIPErrorCode:error], ByteSpan(), ByteSpan(), ByteSpan(),
-                NullOptional, NullOptional);
-            return;
-        }
-
-        auto commissioningParameters = mCppCommissioner->GetCommissioningParameters();
-        if (!commissioningParameters.HasValue()) {
-            return;
-        }
-
-        AesCcm128KeySpan ipk = commissioningParameters.Value().GetIpk().ValueOr(GetIPK());
-
-        Optional<NodeId> adminSubject;
-        if (info.adminSubject != nil) {
-            adminSubject.SetValue(info.adminSubject.unsignedLongLongValue);
-        } else {
-            adminSubject = commissioningParameters.Value().GetAdminSubject();
-        }
-
-        ByteSpan intermediateCertificate;
-        if (info.intermediateCertificate != nil) {
-            intermediateCertificate = AsByteSpan(info.intermediateCertificate);
-        }
-
-        onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, AsByteSpan(info.operationalCertificate), intermediateCertificate,
-            AsByteSpan(info.rootCertificate), MakeOptional(ipk), adminSubject);
-    });
+                             // If we can't run the block, we're torn down and should
+                             // just do nothing.
+                             errorHandler:nil];
 }
 
 CHIP_ERROR MTROperationalCredentialsDelegate::LocalGenerateNOCChain(const chip::ByteSpan & csrElements,

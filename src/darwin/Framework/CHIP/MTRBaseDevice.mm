@@ -137,7 +137,7 @@ static void PurgeReadClientContainers(
 
     // Destroy read clients in the work queue
     [controller
-        asyncDispatchToMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
+        asyncDispatchToMatterQueue:^() {
             for (MTRReadClientContainer * container in listToDelete) {
                 if (container.readClientPtr) {
                     Platform::Delete(container.readClientPtr);
@@ -193,7 +193,7 @@ static void CauseReadClientFailure(
     [readClientContainersLock unlock];
 
     [controller
-        asyncDispatchToMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
+        asyncDispatchToMatterQueue:^() {
             for (MTRReadClientContainer * container in listToFail) {
                 // Send auto resubscribe request again by read clients, which must fail.
                 chip::app::ReadPrepareParams readParams;
@@ -1373,7 +1373,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
     }
 
     [self.deviceController
-        asyncDispatchToMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
+        asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
             auto resultCallback = ^(CHIP_ERROR status, const SetupPayload & payload) {
                 if (status != CHIP_NO_ERROR) {
                     dispatch_async(queue, ^{
