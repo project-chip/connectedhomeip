@@ -70,10 +70,8 @@ class Efr32App(Enum):
     def BuildRoot(self, root):
         if self == Efr32App.UNIT_TEST:
             return os.path.join(root, 'src', 'test_driver', 'efr32')
-        if self == Efr32App.LIGHT:
-            return os.path.join(root, 'examples', self.ExampleName(), 'silabs/efr32')
         else:
-            return os.path.join(root, 'examples', self.ExampleName(), 'efr32')
+            return os.path.join(root, 'examples', self.ExampleName(), 'silabs/efr32')
 
 
 class Efr32Board(Enum):

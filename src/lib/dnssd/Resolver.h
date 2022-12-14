@@ -369,10 +369,37 @@ public:
      * This will trigger a DNSSD query.
      *
      * When the operation succeeds or fails, and a resolver delegate has been registered,
-     * the result of the operation is passed to the delegate's `OnNodeIdResolved` or
-     * `OnNodeIdResolutionFailed` method, respectively.
+     * the result of the operation is passed to the delegate's `OnOperationalNodeResolved` or
+     * `OnOperationalNodeResolutionFailed` method, respectively.
+     *
+     * Multiple calls to ResolveNodeId may be coalesced by the implementation
+     * and lead to just one call to
+     * OnOperationalNodeResolved/OnOperationalNodeResolutionFailed, as long as
+     * the later calls cause the underlying querying mechanism to re-query as if
+     * there were no coalescing.
+     *
+     * A single call to ResolveNodeId may lead to multiple calls to
+     * OnOperationalNodeResolved with different IP addresses.
+     *
+     * @see NodeIdResolutionNoLongerNeeded.
      */
     virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId) = 0;
+
+    /*
+     * Notify the resolver that one of the consumers that called ResolveNodeId
+     * successfully no longer needs the resolution result (e.g. because it got
+     * the result via OnOperationalNodeResolved, or got an via
+     * OnOperationalNodeResolutionFailed, or no longer cares about future
+     * updates).
+     *
+     * There must be a NodeIdResolutionNoLongerNeeded call that matches every
+     * successful ResolveNodeId call.  In particular, implementations of
+     * OnOperationalNodeResolved and OnOperationalNodeResolutionFailed must call
+     * NodeIdResolutionNoLongerNeeded once for each prior successful call to
+     * ResolveNodeId for the relevant PeerId that has not yet had a matching
+     * NodeIdResolutionNoLongerNeeded call made.
+     */
+    virtual void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) = 0;
 
     /**
      * Finds all commissionable nodes matching the given filter.

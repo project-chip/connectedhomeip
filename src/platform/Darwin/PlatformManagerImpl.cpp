@@ -161,5 +161,14 @@ bool PlatformManagerImpl::_IsChipStackLockedByCurrentThread() const
 };
 #endif
 
+CHIP_ERROR PlatformManagerImpl::PrepareCommissioning()
+{
+    auto error = CHIP_NO_ERROR;
+#if CONFIG_NETWORK_LAYER_BLE
+    error = Internal::BLEMgrImpl().PrepareConnection();
+#endif // CONFIG_NETWORK_LAYER_BLE
+    return error;
+}
+
 } // namespace DeviceLayer
 } // namespace chip

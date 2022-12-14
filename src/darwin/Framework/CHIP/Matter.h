@@ -49,10 +49,10 @@
 #import <Matter/MTRKeypair.h>
 #import <Matter/MTRLogging.h>
 #import <Matter/MTRManualSetupPayloadParser.h>
-#import <Matter/MTRNOCChainIssuer.h>
 #import <Matter/MTROTAHeader.h>
 #import <Matter/MTROTAProviderDelegate.h>
 #import <Matter/MTROnboardingPayloadParser.h>
+#import <Matter/MTROperationalCertificateIssuer.h>
 #import <Matter/MTRQRCodeSetupPayloadParser.h>
 #import <Matter/MTRSetupPayload.h>
 #import <Matter/MTRStorage.h>
