@@ -190,6 +190,74 @@ static void TestChipCert_ChipToX509(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_TLV_TAG);
 }
 
+static void TestChipCert_ChipToX509_ErrorCases(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err;
+    uint8_t outCertBuf[kMaxDERCertLength];
+
+    for (auto chipCert : gTestCert_ChipToX509_ErrorCases)
+    {
+        MutableByteSpan outCert(outCertBuf);
+
+        err = ConvertChipCertToX509Cert(chipCert, outCert);
+        NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+    }
+}
+
+static void TestChipCert_ChipCertLoad_ErrorCases(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err;
+    ChipCertificateSet certSet;
+
+    err = certSet.Init(1);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    for (auto chipCert : gTestCert_ChipCertLoad_ErrorCases)
+    {
+        err = certSet.LoadCert(chipCert, sNullDecodeFlag);
+        NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+
+        certSet.Clear();
+    }
+
+    certSet.Release();
+}
+
+static void TestChipCert_ValidateChipRCAC_ErrorCases(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err;
+
+    for (auto chipCert : gTestCert_ValidateChipRCAC_ErrorCases)
+    {
+        err = ValidateChipRCAC(chipCert);
+        NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+    }
+}
+
+static void TestChipCert_GetCertType_ErrorCases(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err;
+    ChipCertificateSet certSet;
+
+    err = certSet.Init(1);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    for (auto chipCert : gTestCert_GetCertType_ErrorCases)
+    {
+        uint8_t certType;
+
+        err = certSet.LoadCert(chipCert, sNullDecodeFlag);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = certSet.GetCertSet()->mSubjectDN.GetCertType(certType);
+        NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR || certType == kCertType_NotSpecified);
+
+        certSet.Clear();
+    }
+
+    certSet.Release();
+}
+
 static void TestChipCert_X509ToChip(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
@@ -210,6 +278,20 @@ static void TestChipCert_X509ToChip(nlTestSuite * inSuite, void * inContext)
         err = ConvertX509CertToChipCert(inCert, outCert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, expectedOutCert.data_equal(outCert));
+    }
+}
+
+static void TestChipCert_X509ToChip_ErrorCases(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err;
+    uint8_t outCertBuf[kMaxCHIPCertLength];
+
+    for (auto derCert : gTestCert_X509ToChip_ErrorCases)
+    {
+        MutableByteSpan outCert(outCertBuf);
+
+        err = ConvertX509CertToChipCert(derCert, outCert);
+        NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
     }
 }
 
@@ -1875,14 +1957,14 @@ static void TestChipCert_ExtractAndValidateCATsFromOpCert(nlTestSuite * inSuite,
     // Error case: NOC with invalid CAT version.
     {
         CATValues cats;
-        CHIP_ERROR err = ExtractCATsFromOpCert(kTestErrorCert_NOC_0001_InvCATVerZero_Cert, cats);
+        CHIP_ERROR err = ExtractCATsFromOpCert(ByteSpan(sChipTest_NOC_Subject_CAT_Invalid_Cert_CHIP), cats);
         NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // Error case: NOC with multiple versions of the same CAT tag.
     {
         CATValues cats;
-        CHIP_ERROR err = ExtractCATsFromOpCert(kTestErrorCert_NOC_0002_InvCATMulVers_Cert, cats);
+        CHIP_ERROR err = ExtractCATsFromOpCert(ByteSpan(sChipTest_NOC_Subject_CAT_Twice_Cert_CHIP), cats);
         NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_CERT_DN);
     }
 }
@@ -2038,7 +2120,12 @@ int TestChipCert_Teardown(void * inContext)
 // clang-format off
 static const nlTest sTests[] = {
     NL_TEST_DEF("Test CHIP Certificate CHIP to X509 Conversion", TestChipCert_ChipToX509),
+    NL_TEST_DEF("Test CHIP Certificate CHIP to X509 Conversion - Error Cases", TestChipCert_ChipToX509_ErrorCases),
+    NL_TEST_DEF("Test CHIP Certificate Loading - Error Cases", TestChipCert_ChipCertLoad_ErrorCases),
+    NL_TEST_DEF("Test CHIP Certificate Validate RCAC - Error Cases", TestChipCert_ValidateChipRCAC_ErrorCases),
+    NL_TEST_DEF("Test CHIP Certificate Get Cert Type from Subject - Error Cases", TestChipCert_GetCertType_ErrorCases),
     NL_TEST_DEF("Test CHIP Certificate X509 to CHIP Conversion", TestChipCert_X509ToChip),
+    NL_TEST_DEF("Test CHIP Certificate X509 to CHIP Conversion - Error Cases", TestChipCert_X509ToChip_ErrorCases),
     NL_TEST_DEF("Test CHIP Certificate Distinguish Name", TestChipCert_ChipDN),
     NL_TEST_DEF("Test CHIP Certificate Validation", TestChipCert_CertValidation),
     NL_TEST_DEF("Test CHIP Certificate Validation time", TestChipCert_CertValidTime),

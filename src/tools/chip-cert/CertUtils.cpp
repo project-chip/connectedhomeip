@@ -500,7 +500,7 @@ bool SetKeyUsageExtension(X509 * cert, bool isCA, CertStructConfig & certConfig)
  *           value of the BIT STRING subjectPublicKey (excluding the tag,
  *           length, and number of unused bits).
  */
-bool AddSubjectKeyId(X509 * cert)
+bool AddSubjectKeyId(X509 * cert, bool isSKIDLengthValid)
 {
     bool res             = true;
     ASN1_BIT_STRING * pk = X509_get0_pubkey_bitstr(cert);
@@ -519,6 +519,11 @@ bool AddSubjectKeyId(X509 * cert)
         ExitNow(res = false);
     }
 
+    if (!isSKIDLengthValid)
+    {
+        pkHashLen--;
+    }
+
     if (!ASN1_STRING_set(pkHashOS.get(), pkHash, static_cast<int>(pkHashLen)))
     {
         ReportOpenSSLErrorAndExit("ASN1_STRING_set", res = false);
@@ -533,7 +538,7 @@ exit:
     return res;
 }
 
-bool AddAuthorityKeyId(X509 * cert, X509 * caCert)
+bool AddAuthorityKeyId(X509 * cert, X509 * caCert, bool isAKIDLengthValid)
 {
     bool res = true;
     int isCritical;
@@ -544,6 +549,11 @@ bool AddAuthorityKeyId(X509 * cert, X509 * caCert)
     if (akid->keyid == nullptr)
     {
         ReportOpenSSLErrorAndExit("X509_get_ext_d2i", res = false);
+    }
+
+    if (!isAKIDLengthValid)
+    {
+        akid->keyid->length = 19;
     }
 
     if (!X509_add1_ext_i2d(cert, NID_authority_key_identifier, akid.get(), 0, X509V3_ADD_APPEND))
@@ -922,7 +932,7 @@ bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP
     // Add a subject key id extension for the certificate.
     if (certConfig.IsExtensionSKIDPresent())
     {
-        res = AddSubjectKeyId(newCert);
+        res = AddSubjectKeyId(newCert, certConfig.IsExtensionSKIDLengthValid());
         VerifyTrueOrExit(res);
     }
 
@@ -932,9 +942,9 @@ bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP
     {
         if ((certType == kCertType_Root) && !certConfig.IsExtensionSKIDPresent())
         {
-            res = AddSubjectKeyId(newCert);
+            res = AddSubjectKeyId(newCert, certConfig.IsExtensionSKIDLengthValid());
             VerifyTrueOrExit(res);
-            res = AddAuthorityKeyId(newCert, newCert);
+            res = AddAuthorityKeyId(newCert, newCert, certConfig.IsExtensionAKIDLengthValid());
             VerifyTrueOrExit(res);
 
             // Remove that temporary added subject key id
@@ -949,7 +959,7 @@ bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP
         }
         else
         {
-            res = AddAuthorityKeyId(newCert, caCert);
+            res = AddAuthorityKeyId(newCert, caCert, certConfig.IsExtensionAKIDLengthValid());
             VerifyTrueOrExit(res);
         }
     }
@@ -1110,7 +1120,7 @@ CHIP_ERROR MakeCertChipTLV(uint8_t certType, const ToolChipDN * subjectDN, X509 
                 if (certConfig.IsExtensionBasicCAPresent())
                 {
                     ReturnErrorOnFailure(writer.PutBoolean(ContextTag(kTag_BasicConstraints_IsCA),
-                                                           certConfig.IsExtensionBasicCACorrect() ? true : false));
+                                                           certConfig.IsExtensionBasicCACorrect() ? isCA : !isCA));
                 }
                 // TODO
                 if (pathLen != kPathLength_NotSpecified)
@@ -1146,7 +1156,11 @@ CHIP_ERROR MakeCertChipTLV(uint8_t certType, const ToolChipDN * subjectDN, X509 
             if (certConfig.IsExtensionBasicPresent())
             {
                 ReturnErrorOnFailure(writer.StartContainer(ContextTag(kTag_BasicConstraints), kTLVType_Structure, containerType3));
-                ReturnErrorOnFailure(writer.PutBoolean(ContextTag(kTag_BasicConstraints_IsCA), false));
+                if (certConfig.IsExtensionBasicCAPresent())
+                {
+                    ReturnErrorOnFailure(writer.PutBoolean(ContextTag(kTag_BasicConstraints_IsCA),
+                                                           certConfig.IsExtensionBasicCACorrect() ? isCA : !isCA));
+                }
                 ReturnErrorOnFailure(writer.EndContainer(containerType3));
             }
 
@@ -1190,14 +1204,16 @@ CHIP_ERROR MakeCertChipTLV(uint8_t certType, const ToolChipDN * subjectDN, X509 
         if (certConfig.IsExtensionSKIDPresent())
         {
             ReturnErrorOnFailure(Crypto::Hash_SHA1(subjectPubkey, sizeof(subjectPubkey), keyid));
-            ReturnErrorOnFailure(writer.Put(ContextTag(kTag_SubjectKeyIdentifier), ByteSpan(keyid)));
+            size_t keyIdLen = certConfig.IsExtensionSKIDLengthValid() ? sizeof(keyid) : sizeof(keyid) - 1;
+            ReturnErrorOnFailure(writer.Put(ContextTag(kTag_SubjectKeyIdentifier), ByteSpan(keyid, keyIdLen)));
         }
 
         // authority key identifier
         if (certConfig.IsExtensionAKIDPresent())
         {
             ReturnErrorOnFailure(Crypto::Hash_SHA1(issuerPubkey, sizeof(issuerPubkey), keyid));
-            ReturnErrorOnFailure(writer.Put(ContextTag(kTag_AuthorityKeyIdentifier), ByteSpan(keyid)));
+            size_t keyIdLen = certConfig.IsExtensionAKIDLengthValid() ? sizeof(keyid) : sizeof(keyid) - 1;
+            ReturnErrorOnFailure(writer.Put(ContextTag(kTag_AuthorityKeyIdentifier), ByteSpan(keyid, keyIdLen)));
         }
 
         for (uint8_t i = 0; i < futureExtsCount; i++)
@@ -1252,7 +1268,7 @@ bool ResignCert(X509 * cert, X509 * caCert, EVP_PKEY * caKey)
         }
     }
 
-    res = AddAuthorityKeyId(cert, caCert);
+    res = AddAuthorityKeyId(cert, caCert, true);
     VerifyTrueOrExit(res);
 
     if (!X509_sign(cert, caKey, EVP_sha256()))
@@ -1418,14 +1434,14 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
     if (certConfig.IsExtensionSKIDPresent())
     {
         // Add a subject key id extension for the certificate.
-        res = AddSubjectKeyId(newCert);
+        res = AddSubjectKeyId(newCert, certConfig.IsExtensionSKIDLengthValid());
         VerifyTrueOrExit(res);
     }
 
     if (certConfig.IsExtensionAKIDPresent())
     {
         // Add the authority key id extension from the signing certificate.
-        res = AddAuthorityKeyId(newCert, caCert);
+        res = AddAuthorityKeyId(newCert, caCert, certConfig.IsExtensionAKIDLengthValid());
         VerifyTrueOrExit(res);
     }
 
