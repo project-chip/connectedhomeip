@@ -26,7 +26,7 @@ import unittest
 from yamltests.definitions import *
 from yamltests.parser import TestParser
 
-source_struct = '''<?xml version="1.0"?>
+simple_test_description = '''<?xml version="1.0"?>
   <configurator>
     <struct name="TestStruct">
         <cluster code="0x1234"/>
@@ -69,7 +69,8 @@ tests:
 
 class TestYamlParser(unittest.TestCase):
     def setUp(self):
-        self._definitions = SpecDefinitions([ParseSource(source=io.StringIO(source_struct), name='source_struct')])
+        self._definitions = SpecDefinitions(
+            [ParseSource(source=io.StringIO(simple_test_description), name='simple_test_description')])
         self._temp_file = tempfile.NamedTemporaryFile(suffix='.yaml')
         with open(self._temp_file.name, 'w') as f:
             f.writelines(simple_test_yaml)
