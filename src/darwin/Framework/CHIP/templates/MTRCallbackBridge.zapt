@@ -1,7 +1,7 @@
 {{> header excludeZapComment=true}}
 
 #import <Foundation/Foundation.h>
-#import "MTRCallbackBridgeBase_internal.h"
+#import "MTRCallbackBridgeBase.h"
 
 #include <app/data-model/DecodableList.h>
 #include <app/util/im-client-callbacks.h>
