@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,15 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # BL602 board used
-  bl702_board = "BL-IOT-DVK"
-}
-
-if (bl702_board == "") {
-  bl702_board = "BL-IOT-DVK"
-}
-
-assert(bl702_board != "", "bl702_board must be specified")
-
-board_defines = []
+riscv_arch = "rv32imfc"
+riscv_abi = "ilp32f"
+#  riscv_cpu = ""
+#  riscv_float_abi = "hard"
+#  riscv_fpu = ""
