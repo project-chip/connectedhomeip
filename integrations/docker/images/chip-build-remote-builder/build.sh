@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,13 +16,8 @@
 # limitations under the License.
 #
 
+# build.sh   - utility for building (and optionally) tagging and pushing
+#               the a Docker image
 #
-# temporary wrapper build script until we can build something better
-#  https://github.com/project-chip/connectedhomeip/issues/710
-#
-set -e
-find "$(git rev-parse --show-toplevel)"/integrations/docker/images/ -name Dockerfile ! -path "*chip-cert-bins/*" ! -path "*chip-build-remote-builder/*" | while read -r dockerfile; do
-    pushd "$(dirname "$dockerfile")" >/dev/null
-    ./build.sh "$@"
-    popd >/dev/null
-done
+
+gcloud builds submit --config=cloudbuild.yaml .
