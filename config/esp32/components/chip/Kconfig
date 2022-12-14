@@ -319,7 +319,7 @@ menu "CHIP Device Layer"
         config WIFI_STATION_RECONNECT_INTERVAL
             int "WiFi Station Interface Reconnect Interval (ms)"
             range 0 65535
-            default 5000
+            default 100
             depends on ENABLE_WIFI_STATION
             help
                 The interval at which the CHIP platform will attempt to reconnect to the configured WiFi network (in milliseconds).
