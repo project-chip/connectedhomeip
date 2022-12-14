@@ -13,9 +13,6 @@
 # limitations under the License.
 
 declare_args() {
-  # Root directory for bl602 SDK build files.
-  bl602_sdk_build_root =
-      "//third_party/connectedhomeip/third_party/bouffalolab/bl602"
 
   bouffalolab_iot_sdk_build_root = 
       "//third_party/connectedhomeip/third_party/bouffalolab"

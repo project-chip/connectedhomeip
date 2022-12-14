@@ -22,10 +22,6 @@
 
 #include <stdio.h>
 
-extern "C" {
-#include <blog.h>
-}
-
 #ifdef PW_RPC_ENABLED
 #include "PigweedLogger.h"
 #endif

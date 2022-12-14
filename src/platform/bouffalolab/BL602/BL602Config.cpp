@@ -33,7 +33,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <blog.h>
 #include <easyflash.h>
 #include <utils_log.h>
 
@@ -138,7 +137,7 @@ exit:
 CHIP_ERROR BL602Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
-    char tmpVal[bufSize] = { 0 };
+    char tmpVal[32] = { 0 };
     size_t ret;
 
     ret = ef_get_env_blob(key.name, tmpVal, sizeof(tmpVal) - 1, NULL);
@@ -158,7 +157,7 @@ exit:
 CHIP_ERROR BL602Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
-    char tmpVal[bufSize] = { 0 };
+    char tmpVal[32] = { 0 };
     size_t ret;
     size_t savedLen = 0;
 

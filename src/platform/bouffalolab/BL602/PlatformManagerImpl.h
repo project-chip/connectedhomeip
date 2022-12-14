@@ -25,18 +25,11 @@
 #pragma once
 
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
+#include <aos/yloop.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-typedef struct
-{
-    uint32_t time;
-    uint16_t type;
-    uint16_t code;
-    unsigned long value;
-    unsigned long extra;
-} input_event_t;
 
 /**
  * Concrete implementation of the PlatformManager singleton object for the BL602 platform.

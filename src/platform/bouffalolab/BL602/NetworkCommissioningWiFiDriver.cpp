@@ -21,7 +21,7 @@
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
-#include <tcpip.h>
+#include <lwip/tcpip.h>
 #include <wifi_mgmr_ext.h>
 
 #include <limits>
