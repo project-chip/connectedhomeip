@@ -61,10 +61,10 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
         MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBasicID")
     = 0x00000028,
     MTRClusterOtaSoftwareUpdateProviderID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeOtaSoftwareUpdateProviderID")
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeOTASoftwareUpdateProviderID")
     = 0x00000029,
     MTRClusterOtaSoftwareUpdateRequestorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeOtaSoftwareUpdateRequestorID")
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeOTASoftwareUpdateRequestorID")
     = 0x0000002A,
     MTRClusterLocalizationConfigurationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeLocalizationConfigurationID")
@@ -190,7 +190,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
         MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeOccupancySensingID")
     = 0x00000406,
     MTRClusterWakeOnLanID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeWakeOnLanID")
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeWakeOnLANID")
     = 0x00000503,
     MTRClusterChannelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeChannelID")
@@ -796,7 +796,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 
     // Cluster AccessControl deprecated attribute names
     MTRClusterAccessControlAttributeAclID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccessControlAttributeAclID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccessControlAttributeACLID")
     = 0x00000000,
     MTRClusterAccessControlAttributeExtensionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccessControlAttributeExtensionID")
@@ -991,20 +991,20 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     // Cluster OtaSoftwareUpdateProvider deprecated attribute names
     MTRClusterOtaSoftwareUpdateProviderAttributeGeneratedCommandListID API_AVAILABLE(
         ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeGeneratedCommandListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
     MTRClusterOtaSoftwareUpdateProviderAttributeAcceptedCommandListID API_AVAILABLE(
         ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeAcceptedCommandListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
     MTRClusterOtaSoftwareUpdateProviderAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeAttributeListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterOtaSoftwareUpdateProviderAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeFeatureMapID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterOtaSoftwareUpdateProviderAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeClusterRevisionID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateProviderAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster OTASoftwareUpdateProvider attributes
@@ -1022,34 +1022,34 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     // Cluster OtaSoftwareUpdateRequestor deprecated attribute names
     MTRClusterOtaSoftwareUpdateRequestorAttributeDefaultOtaProvidersID API_AVAILABLE(
         ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeDefaultOtaProvidersID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOtaProvidersID")
     = 0x00000000,
     MTRClusterOtaSoftwareUpdateRequestorAttributeUpdatePossibleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdatePossibleID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdatePossibleID")
     = 0x00000001,
     MTRClusterOtaSoftwareUpdateRequestorAttributeUpdateStateID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdateStateID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdateStateID")
     = 0x00000002,
     MTRClusterOtaSoftwareUpdateRequestorAttributeUpdateStateProgressID API_AVAILABLE(
         ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdateStateProgressID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdateStateProgressID")
     = 0x00000003,
     MTRClusterOtaSoftwareUpdateRequestorAttributeGeneratedCommandListID API_AVAILABLE(
         ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeGeneratedCommandListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
     MTRClusterOtaSoftwareUpdateRequestorAttributeAcceptedCommandListID API_AVAILABLE(
         ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeAcceptedCommandListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
     MTRClusterOtaSoftwareUpdateRequestorAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeAttributeListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterOtaSoftwareUpdateRequestorAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeFeatureMapID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterOtaSoftwareUpdateRequestorAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeClusterRevisionID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster OTASoftwareUpdateRequestor attributes
@@ -4064,15 +4064,15 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = 0x00000002,
     MTRClusterOccupancySensingAttributePirOccupiedToUnoccupiedDelayID API_AVAILABLE(
         ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributePirOccupiedToUnoccupiedDelayID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributePIROccupiedToUnoccupiedDelayID")
     = 0x00000010,
     MTRClusterOccupancySensingAttributePirUnoccupiedToOccupiedDelayID API_AVAILABLE(
         ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedDelayID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributePIRUnoccupiedToOccupiedDelayID")
     = 0x00000011,
     MTRClusterOccupancySensingAttributePirUnoccupiedToOccupiedThresholdID API_AVAILABLE(
         ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedThresholdID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributePIRUnoccupiedToOccupiedThresholdID")
     = 0x00000012,
     MTRClusterOccupancySensingAttributeUltrasonicOccupiedToUnoccupiedDelayID API_AVAILABLE(
         ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -4145,22 +4145,22 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 
     // Cluster WakeOnLan deprecated attribute names
     MTRClusterWakeOnLanAttributeMACAddressID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLanAttributeMACAddressID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLANAttributeMACAddressID")
     = 0x00000000,
     MTRClusterWakeOnLanAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLanAttributeGeneratedCommandListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLANAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
     MTRClusterWakeOnLanAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLanAttributeAcceptedCommandListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLANAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
     MTRClusterWakeOnLanAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLanAttributeAttributeListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLANAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterWakeOnLanAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLanAttributeFeatureMapID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLANAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterWakeOnLanAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLanAttributeClusterRevisionID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLANAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster WakeOnLAN attributes
@@ -5861,19 +5861,19 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
 
     // Cluster OtaSoftwareUpdateProvider deprecated command id names
     MTRClusterOtaSoftwareUpdateProviderCommandQueryImageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandQueryImageID")
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandQueryImageID")
     = 0x00000000,
     MTRClusterOtaSoftwareUpdateProviderCommandQueryImageResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandQueryImageResponseID")
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandQueryImageResponseID")
     = 0x00000001,
     MTRClusterOtaSoftwareUpdateProviderCommandApplyUpdateRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandApplyUpdateRequestID")
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandApplyUpdateRequestID")
     = 0x00000002,
     MTRClusterOtaSoftwareUpdateProviderCommandApplyUpdateResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandApplyUpdateResponseID")
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandApplyUpdateResponseID")
     = 0x00000003,
     MTRClusterOtaSoftwareUpdateProviderCommandNotifyUpdateAppliedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandNotifyUpdateAppliedID")
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandNotifyUpdateAppliedID")
     = 0x00000004,
 
     // Cluster OTASoftwareUpdateProvider commands
@@ -5885,7 +5885,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
 
     // Cluster OtaSoftwareUpdateRequestor deprecated command id names
     MTRClusterOtaSoftwareUpdateRequestorCommandAnnounceOtaProviderID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOtaSoftwareUpdateRequestorCommandAnnounceOtaProviderID")
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOTASoftwareUpdateRequestorCommandAnnounceOtaProviderID")
     = 0x00000000,
 
     // Cluster OTASoftwareUpdateRequestor commands
@@ -6806,13 +6806,13 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
 
     // Cluster OtaSoftwareUpdateRequestor deprecated event names
     MTRClusterOtaSoftwareUpdateRequestorEventStateTransitionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterOtaSoftwareUpdateRequestorEventStateTransitionID")
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterOTASoftwareUpdateRequestorEventStateTransitionID")
     = 0x00000000,
     MTRClusterOtaSoftwareUpdateRequestorEventVersionAppliedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterOtaSoftwareUpdateRequestorEventVersionAppliedID")
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterOTASoftwareUpdateRequestorEventVersionAppliedID")
     = 0x00000001,
     MTRClusterOtaSoftwareUpdateRequestorEventDownloadErrorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterOtaSoftwareUpdateRequestorEventDownloadErrorID")
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterOTASoftwareUpdateRequestorEventDownloadErrorID")
     = 0x00000002,
 
     // Cluster OTASoftwareUpdateRequestor events
