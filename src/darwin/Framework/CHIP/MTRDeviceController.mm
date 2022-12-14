@@ -79,7 +79,8 @@ static NSString * const kErrorSpake2pVerifierGenerationFailed = @"PASE verifier 
 static NSString * const kErrorSpake2pVerifierSerializationFailed = @"PASE verifier serialization failed";
 
 typedef void (^SyncWorkQueueBlock)(void);
-typedef BOOL (^SyncWorkQueueBlockWithReturnValue)(void);
+typedef id (^SyncWorkQueueBlockWithReturnValue)(void);
+typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 @interface MTRDeviceController ()
 
@@ -369,14 +370,9 @@ typedef BOOL (^SyncWorkQueueBlockWithReturnValue)(void);
 
 - (NSNumber *)controllerNodeID
 {
-    __block NSNumber * nodeID = nil;
+    auto block = ^NSNumber * { return @(self->_cppCommissioner->GetNodeId()); };
 
-    auto block = ^{
-        nodeID = @(self->_cppCommissioner->GetNodeId());
-    };
-
-    [self syncRunOnWorkQueue:block error:nil];
-
+    NSNumber * nodeID = [self syncRunOnWorkQueueWithReturnValue:block error:nil];
     if (!nodeID) {
         MTR_LOG_ERROR("A controller has no node id if it has not been started");
     }
@@ -388,7 +384,7 @@ typedef BOOL (^SyncWorkQueueBlockWithReturnValue)(void);
                                    newNodeID:(NSNumber *)newNodeID
                                        error:(NSError * __autoreleasing *)error
 {
-    auto block = ^{
+    auto block = ^BOOL {
         // Try to get a QR code if possible (because it has a better
         // discriminator, etc), then fall back to manual code if that fails.
         NSString * pairingCode = [payload qrCodeString:nil];
@@ -405,14 +401,14 @@ typedef BOOL (^SyncWorkQueueBlockWithReturnValue)(void);
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
 
-    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
+    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
 }
 
 - (BOOL)commissionNodeWithID:(NSNumber *)nodeID
          commissioningParams:(MTRCommissioningParameters *)commissioningParams
                        error:(NSError * __autoreleasing *)error
 {
-    auto block = ^{
+    auto block = ^BOOL {
         chip::Controller::CommissioningParameters params;
         if (commissioningParams.csrNonce) {
             params.SetCSRNonce(AsByteSpan(commissioningParams.csrNonce));
@@ -458,14 +454,14 @@ typedef BOOL (^SyncWorkQueueBlockWithReturnValue)(void);
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
 
-    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
+    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
 }
 
 - (BOOL)continueCommissioningDevice:(void *)device
            ignoreAttestationFailure:(BOOL)ignoreAttestationFailure
                               error:(NSError * __autoreleasing *)error
 {
-    auto block = ^{
+    auto block = ^BOOL {
         auto lastAttestationResult = self->_deviceAttestationDelegateBridge
             ? self->_deviceAttestationDelegateBridge->attestationVerificationResult()
             : chip::Credentials::AttestationVerificationResult::kSuccess;
@@ -476,45 +472,43 @@ typedef BOOL (^SyncWorkQueueBlockWithReturnValue)(void);
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
 
-    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
+    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
 }
 
 - (BOOL)cancelCommissioningForNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
-    auto block = ^{
+    auto block = ^BOOL {
         self->_operationalCredentialsDelegate->ResetDeviceID();
         auto errorCode = self.cppCommissioner->StopPairing([nodeID unsignedLongLongValue]);
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error];
     };
 
-    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
+    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
 }
 
 - (BOOL)prepareCommissioningSession:(NSError * __autoreleasing *)error
 {
-    auto block = ^{
+    auto block = ^BOOL {
         auto errorCode = chip::DeviceLayer::PlatformMgrImpl().PrepareCommissioning();
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPrepareCommissioning error:error];
     };
 
-    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
+    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
 }
 
 - (MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
-    __block MTRBaseDevice * device = nil;
-
-    auto block = ^{
+    auto block = ^MTRBaseDevice *
+    {
         chip::CommissioneeDeviceProxy * deviceProxy;
 
         auto errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(nodeID.unsignedLongLongValue, &deviceProxy);
-        VerifyOrReturn(![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error]);
+        VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorStopPairing error:error], nil);
 
-        device = [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
+        return [[MTRBaseDevice alloc] initWithPASEDevice:deviceProxy controller:self];
     };
 
-    [self syncRunOnWorkQueue:block error:error];
-    return device;
+    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
 }
 
 - (MTRBaseDevice *)baseDeviceForNodeID:(NSNumber *)nodeID
@@ -578,7 +572,7 @@ typedef BOOL (^SyncWorkQueueBlockWithReturnValue)(void);
         return YES;
     };
 
-    return [self syncRunOnWorkQueueWithReturnValue:block error:nil];
+    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:nil];
 }
 
 + (nullable NSData *)computePASEVerifierForSetupPasscode:(NSNumber *)setupPasscode
@@ -604,24 +598,22 @@ typedef BOOL (^SyncWorkQueueBlockWithReturnValue)(void);
 
 - (NSData * _Nullable)attestationChallengeForDeviceID:(NSNumber *)deviceID
 {
-    __block NSData * attestationChallenge = nil;
-
-    auto block = ^{
+    auto block = ^NSData *
+    {
         chip::CommissioneeDeviceProxy * deviceProxy;
         auto errorCode = self.cppCommissioner->GetDeviceBeingCommissioned([deviceID unsignedLongLongValue], &deviceProxy);
-        VerifyOrReturn(![MTRDeviceController checkForError:errorCode logMsg:kErrorGetCommissionee error:nil]);
+        VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorGetCommissionee error:nil], nil);
 
         uint8_t challengeBuffer[chip::Crypto::kAES_CCM128_Key_Length];
         chip::ByteSpan challenge(challengeBuffer);
 
         errorCode = deviceProxy->GetAttestationChallenge(challenge);
-        VerifyOrReturn(![MTRDeviceController checkForError:errorCode logMsg:kErrorGetAttestationChallenge error:nil]);
+        VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorGetAttestationChallenge error:nil], nil);
 
-        attestationChallenge = AsData(challenge);
+        return AsData(challenge);
     };
 
-    [self syncRunOnWorkQueue:block error:nil];
-    return attestationChallenge;
+    return [self syncRunOnWorkQueueWithReturnValue:block error:nil];
 }
 
 - (BOOL)checkForInitError:(BOOL)condition logMsg:(NSString *)logMsg
@@ -787,7 +779,21 @@ typedef BOOL (^SyncWorkQueueBlockWithReturnValue)(void);
     });
 }
 
-- (BOOL)syncRunOnWorkQueueWithReturnValue:(SyncWorkQueueBlockWithReturnValue)block error:(NSError * __autoreleasing *)error
+- (id)syncRunOnWorkQueueWithReturnValue:(SyncWorkQueueBlockWithReturnValue)block error:(NSError * __autoreleasing *)error
+{
+    __block id rv = nil;
+
+    VerifyOrReturnValue([self checkIsRunning:error], rv);
+
+    dispatch_sync(_chipWorkQueue, ^{
+        VerifyOrReturn([self checkIsRunning:error]);
+        rv = block();
+    });
+
+    return rv;
+}
+
+- (BOOL)syncRunOnWorkQueueWithBoolReturnValue:(SyncWorkQueueBlockWithBoolReturnValue)block error:(NSError * __autoreleasing *)error
 {
     __block BOOL success = NO;
 
@@ -1018,7 +1024,7 @@ typedef BOOL (^SyncWorkQueueBlockWithReturnValue)(void);
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
 {
-    auto block = ^{
+    auto block = ^BOOL {
         std::string manualPairingCode;
         chip::SetupPayload payload;
         payload.discriminator.SetLongValue(discriminator);
@@ -1032,7 +1038,7 @@ typedef BOOL (^SyncWorkQueueBlockWithReturnValue)(void);
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
 
-    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
+    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
 }
 
 - (BOOL)pairDevice:(uint64_t)deviceID
@@ -1041,7 +1047,7 @@ typedef BOOL (^SyncWorkQueueBlockWithReturnValue)(void);
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
 {
-    auto block = ^{
+    auto block = ^BOOL {
         chip::Inet::IPAddress addr;
         chip::Inet::IPAddress::FromString([address UTF8String], addr);
         chip::Transport::PeerAddress peerAddress = chip::Transport::PeerAddress::UDP(addr, port);
@@ -1053,18 +1059,18 @@ typedef BOOL (^SyncWorkQueueBlockWithReturnValue)(void);
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
 
-    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
+    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
 }
 
 - (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error
 {
-    auto block = ^{
+    auto block = ^BOOL {
         self->_operationalCredentialsDelegate->SetDeviceID(deviceID);
         auto errorCode = self.cppCommissioner->EstablishPASEConnection(deviceID, [onboardingPayload UTF8String]);
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPairDevice error:error];
     };
 
-    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
+    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
 }
 
 - (BOOL)commissionDevice:(uint64_t)deviceID
@@ -1094,13 +1100,13 @@ typedef BOOL (^SyncWorkQueueBlockWithReturnValue)(void);
         return NO;
     }
 
-    auto block = ^{
+    auto block = ^BOOL {
         auto errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenBasicCommissioningWindow(
             self.cppCommissioner, deviceID, chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)));
         return ![MTRDeviceController checkForError:errorCode logMsg:kErrorOpenPairingWindow error:error];
     };
 
-    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
+    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
 }
 
 - (NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
@@ -1133,30 +1139,29 @@ typedef BOOL (^SyncWorkQueueBlockWithReturnValue)(void);
         return nil;
     }
 
-    __block NSString * rv = nil;
-
-    auto block = ^{
+    auto block = ^NSString *
+    {
         chip::SetupPayload setupPayload;
         auto errorCode = chip::Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(self.cppCommissioner, deviceID,
             chip::System::Clock::Seconds16(static_cast<uint16_t>(duration)), chip::Crypto::kSpake2p_Min_PBKDF_Iterations,
             static_cast<uint16_t>(discriminator), chip::MakeOptional(static_cast<uint32_t>(setupPIN)), chip::NullOptional,
             setupPayload);
 
-        VerifyOrReturn(![MTRDeviceController checkForError:errorCode logMsg:kErrorOpenPairingWindow error:error]);
+        VerifyOrReturnValue(![MTRDeviceController checkForError:errorCode logMsg:kErrorOpenPairingWindow error:error], nil);
 
         chip::ManualSetupPayloadGenerator generator(setupPayload);
         std::string outCode;
 
-        if (generator.payloadDecimalStringRepresentation(outCode) == CHIP_NO_ERROR) {
-            MTR_LOG_ERROR("Setup code is %s", outCode.c_str());
-            rv = [NSString stringWithCString:outCode.c_str() encoding:[NSString defaultCStringEncoding]];
-        } else {
+        if (CHIP_NO_ERROR != generator.payloadDecimalStringRepresentation(outCode)) {
             MTR_LOG_ERROR("Failed to get decimal setup code");
+            return nil;
         }
+
+        MTR_LOG_ERROR("Setup code is %s", outCode.c_str());
+        return [NSString stringWithCString:outCode.c_str() encoding:[NSString defaultCStringEncoding]];
     };
 
-    [self syncRunOnWorkQueue:block error:error];
-    return rv;
+    return [self syncRunOnWorkQueueWithReturnValue:block error:error];
 }
 
 - (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode iterations:(uint32_t)iterations salt:(NSData *)salt
