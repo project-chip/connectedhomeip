@@ -19,75 +19,71 @@
 # to a more appropriate spot. For now, having this file to do some quick checks
 # is arguably better then no checks at all.
 
-import glob
-import os
+import io
+import tempfile
 import unittest
-import functools
-from pathlib import Path
 
 from yamltests.definitions import *
 from yamltests.parser import TestParser
 
-_DEFAULT_MATTER_ROOT = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..'))
-_YAML_TEST_SUITE_PATH = os.path.abspath(
-    os.path.join(_DEFAULT_MATTER_ROOT, 'src/app/tests/suites'))
+source_struct = '''<?xml version="1.0"?>
+  <configurator>
+    <struct name="TestStruct">
+        <cluster code="0x1234"/>
+        <item name="a" type="boolean"/>
+    </struct>
 
-_CLUSTER_DEFINITION_DIRECTORY = os.path.abspath(
-    os.path.join(_DEFAULT_MATTER_ROOT, 'src/app/zap-templates/zcl/data-model'))
+    <cluster>
+      <name>Test</name>
+      <code>0x1234</code>
+    </cluster>
+
+  </configurator>
+'''
+
+simple_test_yaml = '''
+name: Test Cluster Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Test"
+    endpoint: 1
+
+tests:
+    - label: "Send Test Command"
+      command: "test"
+
+    - label: "Send Test Not Handled Command"
+      command: "testNotHandled"
+      response:
+          error: INVALID_COMMAND
+
+    - label: "Send Test Specific Command"
+      command: "testSpecific"
+      response:
+          values:
+              - name: "returnValue"
+                value: 7
+'''
 
 
-def sort_with_global_attribute_first(a, b):
-    if a.endswith('global-attributes.xml'):
-        return -1
-    elif b.endswith('global-attributes.xml'):
-        return 1
-    elif a > b:
-        return 1
-    elif a == b:
-        return 0
-    elif a < b:
-        return -1
-
-
-class TestYamlParser(unittest.TestCase):
+class TestYamlParserNew(unittest.TestCase):
     def setUp(self):
-        # TODO we should not be reliant on an external YAML file. Possible that we should have
-        # either a local .yaml testfile, of the file contents should exist in this file where we
-        # write out the yaml file to temp directory for our testing use. This approach was taken
-        # since this test is better than no test.
-        yaml_test_suite_path = Path(_YAML_TEST_SUITE_PATH)
-        if not yaml_test_suite_path.exists():
-            raise FileNotFoundError(f'Expected directory {_YAML_TEST_SUITE_PATH} to exist')
-        yaml_test_filename = 'TestCluster.yaml'
-        path_to_test = None
-        for path in yaml_test_suite_path.rglob(yaml_test_filename):
-            if not path.is_file():
-                continue
-            if path.name != yaml_test_filename:
-                continue
-            path_to_test = str(path)
-            break
-        if path_to_test is None:
-            raise FileNotFoundError(f'Could not file {yaml_test_filename} in directory {_YAML_TEST_SUITE_PATH}')
+        self._definitions = SpecDefinitions([ParseSource(source=io.StringIO(source_struct), name='source_struct')])
+        self._temp_file = tempfile.NamedTemporaryFile(suffix='.yaml')
+        with open(self._temp_file.name, 'w') as f:
+            f.writelines(simple_test_yaml)
         pics_file = None
+        self._yaml_parser = TestParser(self._temp_file.name, pics_file, self._definitions)
 
-        # TODO Again we should not be reliant on extneral XML files. But some test (even brittal)
-        # are better than no tests.
-
-        filenames = glob.glob(_CLUSTER_DEFINITION_DIRECTORY + '/*/*.xml', recursive=False)
-        filenames.sort(key=functools.cmp_to_key(sort_with_global_attribute_first))
-        sources = [ParseSource(source=name) for name in filenames]
-        specifications = SpecDefinitions(sources)
-
-        self._yaml_parser = TestParser(path_to_test, pics_file, specifications)
-
-    def test_able_to_iterate_over_all_tests(self):
+    def test_foobar(self):
         # self._yaml_parser.tests implements `__next__`, which does value substitution. We are
         # simply ensure there is no exceptions raise.
+        count = 0
         for idx, test_step in enumerate(self._yaml_parser.tests):
+            count += 1
             pass
-        self.assertTrue(True)
+        self.assertEqual(count, 3)
 
 
 def main():
