@@ -25,16 +25,16 @@ declare_args() {
   # Location of the bl702 SDK.
   bl_iot_sdk_root = "${chip_root}/third_party/bouffalolab/repo"
 
-  enable_zigbee = false
-
   enable_cdc_module = false
+
+  thread_port_1_3 = false
 
   plat_name = "bl602"
 }
 
 assert(bl_iot_sdk_root != "", "bl_iot_sdk_root must be specified")
 
-# Defines an bl702 SDK build target.
+# Defines an Bouffa Lab IOT SDK build target.
 #
 # Parameters:
 #   bl_iot_sdk_root - The location of Bouffalo Lab IOT SDK.
@@ -64,6 +64,10 @@ template("bl_iot_sdk") {
     ]
     if (defined(invoker.defines)) {
       defines += invoker.defines
+    }
+
+    if (plat_name=="bl702") {
+      defines += ["BL702=BL702"]
     }
 
     include_dirs = []
@@ -136,43 +140,43 @@ template("bl_iot_sdk") {
     include_dirs = [ "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/MCU_Common/soft_crc" ]
 
     sources = [
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_acomp.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_adc.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_aon.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_cam.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_clock.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_common.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_dac.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_dma.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_ef_ctrl.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_emac.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_glb.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_hbn.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_i2c.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_i2c_gpio_sim.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_i2s.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_ir.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_kys.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_l1c.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_mjpeg.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_pds.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_psram.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_pwm.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_qdec.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_romapi.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_sec_dbg.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_sec_eng.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_sf_cfg.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_sf_cfg_ext.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_sf_ctrl.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_sflash.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_sflash_ext.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_spi.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_timer.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_uart.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_usb.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_xip_sflash.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/bl702_xip_sflash_ext.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_acomp.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_adc.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_aon.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_cam.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_clock.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_common.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_dac.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_dma.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_ef_ctrl.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_emac.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_glb.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_hbn.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_i2c.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_i2c_gpio_sim.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_i2s.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_ir.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_kys.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_l1c.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_mjpeg.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_pds.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_psram.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_pwm.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_qdec.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_romapi.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_sec_dbg.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_sec_eng.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_sf_cfg.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_sf_cfg_ext.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_sf_ctrl.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_sflash.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_sflash_ext.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_spi.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_timer.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_uart.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_usb.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_xip_sflash.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_xip_sflash_ext.c",
     ]
 
     public_configs = [ ":${sdk_target_name}_config" ]
@@ -237,7 +241,6 @@ template("bl_iot_sdk") {
     if (plat_name == "bl702") {
       defines = [
         "CFG_USE_XTAL32K=1",
-        "BL702",
       ]
     }
 
@@ -469,7 +472,6 @@ template("bl_iot_sdk") {
     ]
 
     if (plat_name == "bl702") {
-      defines += [ "BL702" ]
       libs = [ "${bl_iot_sdk_root}/components/network/ble/blecontroller_702_std/lib/libblecontroller_702_std.a" ]
     }
 
@@ -519,6 +521,9 @@ template("bl_iot_sdk") {
 
   config("${sdk_target_name}_config_openthread_port") {
     defines = [ "OT_FREERTOS_ENABLE=1" ]
+    if (thread_port_1_3) {
+      defines += [ "OT_THREAD_PORT_1_3" ]
+    }
 
     include_dirs = [
       "${chip_root}/platform/${plat_name}",
@@ -526,6 +531,10 @@ template("bl_iot_sdk") {
       "${chip_root}/third_party/openthread/repo/examples/platforms",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/include",
     ]
+
+    if (thread_port_1_3) {
+      include_dirs += [ "${bl_iot_sdk_root}/components/network/thread/openthread_utils/include" ]
+    }
   }
 
   source_set("${sdk_target_name}_openthread") {
@@ -533,6 +542,7 @@ template("bl_iot_sdk") {
 
     include_dirs = [
       "${bl_iot_sdk_root}/components/network/lmac154/include",
+      "${bl_iot_sdk_root}/components/network/thread/openthread_port",
       "${openthread_root}/examples/platforms/utils/",
       "${openthread_root}/examples",
     ]
@@ -545,10 +555,16 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_misc.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_radio.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_settings.c",
-      "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_uart.c",
     ]
 
     libs = [ "${bl_iot_sdk_root}/components/network/lmac154/lib/liblmac154.a" ]
+
+    if (thread_port_1_3) {
+      sources += [
+        "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_linkmetric.c",
+      ]
+      libs += [ "${bl_iot_sdk_root}/components/network/thread/openthread_utils/lib/libopenthread_utils.a" ]
+    }
 
     public_configs = [
       ":${sdk_target_name}_config",
@@ -556,7 +572,7 @@ template("bl_iot_sdk") {
     ]
 
     public_deps = [
-      "${bl702_sdk_build_root}:mbedtls",
+      "${bouffalolab_iot_sdk_build_root}/bl702:mbedtls",
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
       "${openthread_root}/src/core:libopenthread_core_headers",
     ]
@@ -723,43 +739,6 @@ template("bl_iot_sdk") {
     ]
   }
 
-  config("${sdk_target_name}_zigbee_config") {
-    _include_dirs = [
-      "${bl_iot_sdk_root}/components/network/zigbee/zbstack/",
-      "${bl_iot_sdk_root}/components/network/zigbee/zbstack/include",
-      "${bl_iot_sdk_root}/components/network/zigbee/zbstack/include/core",
-      "${bl_iot_sdk_root}/components/network/zigbee/zbstack/include/zcl",
-      "${bl_iot_sdk_root}/components/network/zigbee/zbcli/",
-    ]
-
-    defines = [ "CFG_ZIGBEE_TOUCHLINK=1" ]
-
-    cflags = []
-    foreach(include_dir, _include_dirs) {
-      cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
-    }
-  }
-
-  source_set("${sdk_target_name}_zigbee") {
-    #sources = [ "${bl_iot_sdk_root}/components/network/zigbee/zbcli/zb_stack_cli.c" ]
-
-    libs = [
-      "${bl_iot_sdk_root}/components/network/zigbee/zbstack/lib/libzbstack.a",
-      "${bl_iot_sdk_root}/components/network/zigbee/zbstack/lib/libzbstackex.a",
-    ]
-
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_zigbee_config",
-    ]
-    ldflags = [ "-Wl,--defsym=__LD_CONFIG_FLASH_SIZE=0x100000" ]
-    cflags = [
-      "-Wno-implicit-function-declaration",
-      "-Wno-incompatible-pointer-types",
-      "-Wno-unused-variable",
-    ]
-  }
-
   group(sdk_target_name) {
     public_deps = [
       ":${sdk_target_name}_soc",
@@ -781,10 +760,6 @@ template("bl_iot_sdk") {
     if (chip_enable_wifi) {
       public_deps += [ ":${sdk_target_name}_lwip_port" ]
       public_deps += [ ":${sdk_target_name}_lwip" ]
-    }
-
-    if (enable_zigbee && invoker.bl_plat_name == "bl702") {
-      public_deps += [ ":${sdk_target_name}_zigbee" ]
     }
 
     if (enable_cdc_module && invoker.bl_plat_name == "bl702") {
