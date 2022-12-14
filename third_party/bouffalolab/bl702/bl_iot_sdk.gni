@@ -124,9 +124,9 @@ template("bl_iot_sdk") {
     sources = [
       "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}/evb/src/boot/gcc/start.S",
       "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}/evb/src/debug.c",
+      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}/evb/src/strntoumax.c",
       "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}/evb/src/memmove.c",
       "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}/evb/src/sscanf.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}/evb/src/strntoumax.c",
       "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}/evb/src/vprint.c",
       "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}/evb/src/vsscanf.c",
     ]
