@@ -29,13 +29,9 @@ pw_python_package("yamltests") {
     "parser.py",
   ]
 
-  python_deps = [
-    "${chip_root}/scripts/idl",
-  ]
+  python_deps = [ "${chip_root}/scripts/idl" ]
 
-  tests = [
-    "test_spec_definitions.py",
-  ]
+  tests = [ "test_spec_definitions.py" ]
 
   # TODO: at a future time consider enabling all (* or missing) here to get
   #       pylint checking these files
