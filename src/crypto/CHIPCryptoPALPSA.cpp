@@ -20,7 +20,7 @@
  *      PSA Crypto API based implementation of CHIP crypto primitives
  */
 
-#include "CHIPCryptoPAL.h"
+#include "CHIPCryptoPALPSA.h"
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -500,21 +500,6 @@ mbedtls_ecp_group_id MapECPGroupId(SupportedECPKeyTypes keyType)
     }
 }
 
-struct PsaP256KeypairContext
-{
-    psa_key_id_t key_id;
-};
-
-static inline PsaP256KeypairContext & to_keypair_ctx(P256KeypairContext & context)
-{
-    return *SafePointerCast<PsaP256KeypairContext *>(&context);
-}
-
-static inline const PsaP256KeypairContext & to_const_keypair_ctx(const P256KeypairContext & context)
-{
-    return *SafePointerCast<const PsaP256KeypairContext *>(&context);
-}
-
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
@@ -523,7 +508,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
     CHIP_ERROR error                      = CHIP_NO_ERROR;
     psa_status_t status                   = PSA_SUCCESS;
     size_t outputLen                      = 0;
-    const PsaP256KeypairContext & context = to_const_keypair_ctx(mKeypair);
+    const PSAP256KeypairContext & context = toConstPSAContext(mKeypair);
 
     status = psa_sign_message(context.key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), msg, msg_length, out_signature.Bytes(),
                               out_signature.Capacity(), &outputLen);
@@ -600,7 +585,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
 
     CHIP_ERROR error                      = CHIP_NO_ERROR;
     psa_status_t status                   = PSA_SUCCESS;
-    const PsaP256KeypairContext & context = to_const_keypair_ctx(mKeypair);
+    const PSAP256KeypairContext & context = toConstPSAContext(mKeypair);
     const size_t outputSize               = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
     size_t outputLength;
 
@@ -653,7 +638,7 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     CHIP_ERROR error                = CHIP_NO_ERROR;
     psa_status_t status             = PSA_SUCCESS;
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
-    PsaP256KeypairContext & context = to_keypair_ctx(mKeypair);
+    PSAP256KeypairContext & context = toPSAContext(mKeypair);
     size_t publicKeyLength          = 0;
 
     // Type based on ECC with the elliptic curve SECP256r1 -> PSA_ECC_FAMILY_SECP_R1
@@ -695,7 +680,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
 {
     CHIP_ERROR error                      = CHIP_NO_ERROR;
     psa_status_t status                   = PSA_SUCCESS;
-    const PsaP256KeypairContext & context = to_const_keypair_ctx(mKeypair);
+    const PSAP256KeypairContext & context = toConstPSAContext(mKeypair);
     const size_t outputSize               = output.Length() == 0 ? output.Capacity() : output.Length();
     Encoding::BufferWriter bbuf(output, outputSize);
     uint8_t privateKey[kP256_PrivateKey_Length];
@@ -723,7 +708,7 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     CHIP_ERROR error                = CHIP_NO_ERROR;
     psa_status_t status             = PSA_SUCCESS;
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
-    PsaP256KeypairContext & context = to_keypair_ctx(mKeypair);
+    PSAP256KeypairContext & context = toPSAContext(mKeypair);
     Encoding::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
 
     Clear();
@@ -751,7 +736,7 @@ void P256Keypair::Clear()
 {
     if (mInitialized)
     {
-        PsaP256KeypairContext & context = to_keypair_ctx(mKeypair);
+        PSAP256KeypairContext & context = toPSAContext(mKeypair);
         psa_destroy_key(context.key_id);
         memset(&context, 0, sizeof(context));
         mInitialized = false;

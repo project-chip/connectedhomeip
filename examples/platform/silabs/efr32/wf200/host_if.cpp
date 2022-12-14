@@ -357,6 +357,8 @@ static void sl_wfx_connect_callback(sl_wfx_connect_ind_body_t connect_indication
 {
     uint8_t * mac   = connect_indication_body.mac;
     uint32_t status = connect_indication_body.status;
+    ap_info.chan    = connect_indication_body.channel;
+    memcpy(&ap_info.security, &wifi_provision.security, sizeof(wifi_provision.security));
     switch (status)
     {
     case WFM_STATUS_SUCCESS: {

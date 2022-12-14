@@ -197,7 +197,7 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const Emb
 
     if (realIndex >= MAX_ENDPOINT_COUNT)
     {
-        return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+        return EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
     }
     if (id == kInvalidEndpointId)
     {
@@ -207,7 +207,7 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const Emb
     auto serverClusterCount = emberAfClusterCountForEndpointType(ep, /* server = */ true);
     if (dataVersionStorage.size() < serverClusterCount)
     {
-        return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+        return EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
     }
 
     index = static_cast<uint16_t>(realIndex);
@@ -415,7 +415,7 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
     {
         if (bufferSize < 1)
         {
-            return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+            return EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
         }
         emberAfCopyString(dest, src, bufferSize - 1);
     }
@@ -423,7 +423,7 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
     {
         if (bufferSize < 2)
         {
-            return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+            return EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
         }
         emberAfCopyLongString(dest, src, bufferSize - 2);
     }
@@ -431,7 +431,7 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
     {
         if (bufferSize < 2)
         {
-            return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+            return EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
         }
 
         // Just copy the length.
@@ -441,7 +441,7 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
     {
         if (!ignoreReadLength && readLength < am->size)
         {
-            return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+            return EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
         }
         if (src == nullptr)
         {
@@ -545,7 +545,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                     if (!emberAfAttributeWriteAccessCallback(attRecord->endpoint, attRecord->clusterId,
                                                                              am->attributeId))
                                     {
-                                        return EMBER_ZCL_STATUS_NOT_AUTHORIZED;
+                                        return EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS;
                                     }
                                 }
                                 else
@@ -560,7 +560,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                     if (!emberAfAttributeReadAccessCallback(attRecord->endpoint, attRecord->clusterId,
                                                                             am->attributeId))
                                     {
-                                        return EMBER_ZCL_STATUS_NOT_AUTHORIZED;
+                                        return EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS;
                                     }
                                 }
 

@@ -21,5 +21,6 @@ declare_args() {
   chip_external_mbedtls = false
 }
 
-assert(!chip_external_mbedtls || chip_crypto == "mbedtls",
-       "Use of external mbedtls requires the mbedtls crypto impl")
+assert(
+    !chip_external_mbedtls || chip_crypto == "mbedtls" || chip_crypto == "psa",
+    "Use of external mbedtls requires the mbedtls or psa crypto impl")

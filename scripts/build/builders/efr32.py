@@ -15,6 +15,7 @@
 import os
 from enum import Enum, auto
 import shlex
+import subprocess
 
 from .gn import GnBuilder
 
@@ -69,10 +70,8 @@ class Efr32App(Enum):
     def BuildRoot(self, root):
         if self == Efr32App.UNIT_TEST:
             return os.path.join(root, 'src', 'test_driver', 'efr32')
-        if self == Efr32App.LIGHT:
-            return os.path.join(root, 'examples', self.ExampleName(), 'silabs/efr32')
         else:
-            return os.path.join(root, 'examples', self.ExampleName(), 'efr32')
+            return os.path.join(root, 'examples', self.ExampleName(), 'silabs/efr32')
 
 
 class Efr32Board(Enum):
@@ -132,7 +131,8 @@ class Efr32Builder(GnBuilder):
                  enable_wifi_ipv4: bool = False,
                  enable_additional_data_advertising: bool = False,
                  enable_ot_lib: bool = False,
-                 enable_ot_coap_lib: bool = False
+                 enable_ot_coap_lib: bool = False,
+                 no_version: bool = False
                  ):
         super(Efr32Builder, self).__init__(
             root=app.BuildRoot(root),
@@ -199,6 +199,12 @@ class Efr32Builder(GnBuilder):
         if enable_ot_coap_lib:
             self.extra_gn_options.append(
                 'use_silabs_thread_lib=true chip_openthread_target="../silabs:ot-efr32-cert" use_thread_coap_lib=true openthread_external_platform=""')
+
+        if not no_version:
+            shortCommitSha = subprocess.check_output(['git', 'describe', '--always', '--dirty']).decode('ascii').strip()
+            branchName = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode('ascii').strip()
+            self.extra_gn_options.append(
+                'sl_matter_version_str="v1.0-%s-%s"' % (branchName, shortCommitSha))
 
     def GnBuildArgs(self):
         return self.extra_gn_options

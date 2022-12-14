@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
@@ -67,16 +66,6 @@ static_library("SiWx917") {
   }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
-
-  # Add pigweed KVS
-  deps = [
-    "$dir_pw_kvs:crc16",
-    "$dir_pw_log",
-  ]
-  public_deps += [
-    "$dir_pw_checksum",
-    "$dir_pw_kvs",
-  ]
 
   if (chip_enable_wifi) {
     sources += [

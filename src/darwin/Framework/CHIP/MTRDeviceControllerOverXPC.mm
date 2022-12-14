@@ -31,7 +31,8 @@ static dispatch_queue_t globalWorkQueue;
 static void SetupXPCQueue(void)
 {
     dispatch_once(&workQueueInitOnceToken, ^{
-        globalWorkQueue = dispatch_queue_create("com.apple.matter.framework.xpc.workqueue", DISPATCH_QUEUE_SERIAL);
+        globalWorkQueue
+            = dispatch_queue_create("org.csa-iot.matter.framework.xpc.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     });
 }
 
