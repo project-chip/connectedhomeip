@@ -67,6 +67,15 @@ public:
     ~OperationalCredentialsCluster() {}
 };
 
+class DLL_EXPORT FixedLabelCluster : public ClusterBase
+{
+public:
+    FixedLabelCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::FixedLabel::Id, endpoint)
+    {}
+    ~FixedLabelCluster() {}
+};
+
 class DLL_EXPORT ModeSelectCluster : public ClusterBase
 {
 public:

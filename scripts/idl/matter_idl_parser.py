@@ -299,7 +299,8 @@ class MatterIdlTransformer(Transformer):
                 elif operation == AttributeOperation.WRITE:
                     acl['writeacl'] = access
                 else:
-                    raise Exception("Unknown attribute operation: %r" % operation)
+                    raise Exception(
+                        "Unknown attribute operation: %r" % operation)
 
         return (args[-1], acl)
 
@@ -357,8 +358,8 @@ class MatterIdlTransformer(Transformer):
         return endpoint
 
     @v_args(inline=True)
-    def endpoint_device_type(self, name, code):
-        return AddDeviceTypeToEndpointTransform(DeviceType(name=name, code=code))
+    def endpoint_device_type(self, name, code, version):
+        return AddDeviceTypeToEndpointTransform(DeviceType(name=name, code=code, version=version))
 
     @v_args(inline=True)
     def endpoint_cluster_binding(self, id):
@@ -417,7 +418,8 @@ class ParserWithLines:
         self.skip_meta = skip_meta
 
     def parse(self, file, file_name: str = None):
-        idl = MatterIdlTransformer(self.skip_meta).transform(self.parser.parse(file))
+        idl = MatterIdlTransformer(self.skip_meta).transform(
+            self.parser.parse(file))
         idl.parse_file_name = file_name
         return idl
 

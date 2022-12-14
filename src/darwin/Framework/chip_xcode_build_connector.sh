@@ -113,6 +113,12 @@ declare -a args=(
     )
 }
 
+[[ $CHIP_INET_CONFIG_ENABLE_IPV4 == NO ]] && {
+    args+=(
+        'chip_inet_config_enable_ipv4=false'
+    )
+}
+
 # search current (or $2) and its parent directories until
 #  a name match is found, which is output on stdout
 find_in_ancestors() {

@@ -116,8 +116,13 @@ static MTRBaseDevice * GetConnectedDevice(void)
 
 @end
 
+typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *, id> *> *);
+
 @interface MTRDeviceTestDelegate : NSObject <MTRDeviceDelegate>
 @property (nonatomic) dispatch_block_t onSubscriptionEstablished;
+@property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onAttributeDataReceived;
+@property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onEventDataReceived;
+@property (nonatomic, nullable) dispatch_block_t onSubscriptionDropped;
 @end
 
 @implementation MTRDeviceTestDelegate
@@ -125,15 +130,23 @@ static MTRBaseDevice * GetConnectedDevice(void)
 {
     if (state == MTRDeviceStateReachable) {
         self.onSubscriptionEstablished();
+    } else if (state == MTRDeviceStateUnknown && self.onSubscriptionDropped != nil) {
+        self.onSubscriptionDropped();
     }
 }
 
 - (void)device:(MTRDevice *)device receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
+    if (self.onAttributeDataReceived != nil) {
+        self.onAttributeDataReceived(attributeReport);
+    }
 }
 
 - (void)device:(MTRDevice *)device receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
+    if (self.onEventDataReceived != nil) {
+        self.onEventDataReceived(eventReport);
+    }
 }
 
 @end
@@ -1369,9 +1382,68 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [subscriptionExpectation fulfill];
     };
 
+    __block unsigned attributeReportsReceived = 0;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        attributeReportsReceived += data.count;
+    };
+
+    __block unsigned eventReportsReceived = 0;
+    delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        eventReportsReceived += data.count;
+    };
+
     [device setDelegate:delegate queue:queue];
 
     [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    XCTAssertNotEqual(attributeReportsReceived, 0);
+
+    attributeReportsReceived = 0;
+    eventReportsReceived = 0;
+
+    XCTestExpectation * resubscriptionExpectation = [self expectationWithDescription:@"Resubscription has happened"];
+    delegate.onSubscriptionEstablished = ^() {
+        [resubscriptionExpectation fulfill];
+    };
+
+    XCTestExpectation * subscriptionDroppedExpectation = [self expectationWithDescription:@"Subscription has dropped"];
+    delegate.onSubscriptionDropped = ^() {
+        [subscriptionDroppedExpectation fulfill];
+    };
+
+    // Now trigger another subscription which will cause ours to drop; we should re-subscribe after that.
+    MTRBaseDevice * baseDevice = GetConnectedDevice();
+    __auto_type params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
+    params.resubscribeIfLost = NO;
+    params.replaceExistingSubscriptions = YES;
+    // Create second subscription which will cancel the first subscription.  We
+    // can use a non-existent path here to cut down on the work that gets done.
+    [baseDevice subscribeAttributeWithEndpointId:@10000
+                                       clusterId:@6
+                                     attributeId:@0
+                                     minInterval:@(1)
+                                     maxInterval:@(2)
+                                          params:params
+                                     clientQueue:queue
+                                   reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+                                   }
+                         subscriptionEstablished:^() {
+                         }];
+
+    [self waitForExpectations:@[ subscriptionDroppedExpectation, resubscriptionExpectation ] timeout:60 enforceOrder:YES];
+
+    // Now make sure we ignore later tests.  Ideally we would just unsubscribe
+    // or remove the delegate, but there's no good way to do that.
+    delegate.onSubscriptionEstablished = ^() {
+    };
+    delegate.onSubscriptionDropped = nil;
+    delegate.onAttributeDataReceived = nil;
+    delegate.onEventDataReceived = nil;
+
+    // Make sure we got no updated reports (because we had a cluster state cache
+    // with data versions) during the resubscribe.
+    XCTAssertEqual(attributeReportsReceived, 0);
+    XCTAssertEqual(eventReportsReceived, 0);
 }
 
 - (void)test018_SubscriptionErrorWhenNotResubscribing

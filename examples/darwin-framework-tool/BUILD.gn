@@ -27,6 +27,11 @@ assert(chip_build_tools)
 
 declare_args() {
   chip_codesign = current_os == "ios"
+
+  # When config_enable_yaml_tests is false, the Matter SDK options are not available.
+  if (!config_enable_yaml_tests) {
+    chip_inet_config_enable_ipv4 = true
+  }
 }
 
 sdk = "macosx"
@@ -66,6 +71,10 @@ action("build-darwin-framework") {
       "--target_arch",
       mac_target_arch,
     ]
+  }
+
+  if (defined(chip_inet_config_enable_ipv4) && !chip_inet_config_enable_ipv4) {
+    args += [ "--no-ipv4" ]
   }
 
   output_name = "Matter.framework"

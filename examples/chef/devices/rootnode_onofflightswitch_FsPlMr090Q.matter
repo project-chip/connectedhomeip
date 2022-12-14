@@ -1115,7 +1115,7 @@ server cluster FixedLabel = 64 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22;
+  device type rootdevice = 22, version 1;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Groups {
@@ -1278,7 +1278,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 259;
+  device type anonymousEndpointType = 259, version 1;
   binding cluster OnOff;
   binding cluster Binding;
 

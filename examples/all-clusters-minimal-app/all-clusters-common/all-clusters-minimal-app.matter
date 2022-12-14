@@ -3270,7 +3270,7 @@ server cluster UnitTesting = 4294048773 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22;
+  device type rootdevice = 22, version 1;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Identify {
@@ -3510,7 +3510,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type onofflight = 256;
+  device type onofflight = 256, version 1;
 
   server cluster Identify {
     ram      attribute identifyTime;
@@ -3892,7 +3892,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type onofflight = 256;
+  device type onofflight = 256, version 1;
 
   server cluster Groups {
     ram      attribute nameSupport;
@@ -3932,7 +3932,7 @@ endpoint 2 {
   }
 }
 endpoint 65534 {
-  device type anonymousEndpointType = 61442;
+  device type anonymousEndpointType = 61442, version 1;
 
   server cluster NetworkCommissioning {
     callback attribute maxNetworks;

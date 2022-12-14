@@ -88,6 +88,16 @@ void BLEManagerImpl::_Shutdown()
     }
 }
 
+CHIP_ERROR BLEManagerImpl::PrepareConnection()
+{
+    if (mConnectionDelegate)
+    {
+        static_cast<BleConnectionDelegateImpl *>(mConnectionDelegate)->PrepareConnection();
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_INCORRECT_STATE;
+}
+
 bool BLEManagerImpl::_IsAdvertisingEnabled()
 {
     ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);

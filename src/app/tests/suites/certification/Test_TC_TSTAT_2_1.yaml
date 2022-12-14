@@ -541,7 +541,7 @@ tests:
       attribute: "SetpointChangeSourceTimestamp"
       response:
           constraints:
-              type: utc
+              type: epoch_s
 
     - label: "Read OccupiedSetback attribute from the DUT"
       PICS: TSTAT.S.F02

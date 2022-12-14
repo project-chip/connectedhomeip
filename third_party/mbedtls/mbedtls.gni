@@ -31,7 +31,11 @@ template("mbedtls_target") {
     ]
 
     if (is_clang) {
-      cflags += [ "-Wno-shorten-64-to-32" ]
+      cflags += [
+        "-Wno-shorten-64-to-32",
+        "-Wno-unused-but-set-variable",  # bignum.c: variable 't' set but not
+                                         # used
+      ]
     }
   }
 
