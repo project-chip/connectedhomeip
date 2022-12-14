@@ -108,31 +108,36 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Ensure we have a CASE session to the given node ID and then call the provided
  * connection callback.  This may be called on any queue (including the Matter
- * event queue) and will always call the provided connection callback on the
- * Matter queue, asynchronously.  Consumers must be prepared to run on the
- * Matter queue (an in particular must not use any APIs that will try to do sync
- * dispatch to the Matter queue).
+ * event queue) and on success will always call the provided connection callback
+ * on the Matter queue, asynchronously.  Consumers must be prepared to run on
+ * the Matter queue (an in particular must not use any APIs that will try to do
+ * sync dispatch to the Matter queue).
  *
- * If the controller is not running when this function is called, will return NO
- * and never invoke the completion.  If the controller is not running when the
- * async dispatch on the Matter queue would happen, an error will be dispatched
- * to the completion handler.
+ * If the controller is not running when this function is called, it will
+ * synchronously invoke the completion with an error, on whatever queue
+ * getSessionForNode was called on.
+ *
+ * If the controller is not running when the async dispatch on the Matter queue
+ * happens, the completion will be invoked with an error on the Matter queue.
  */
-- (BOOL)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
+- (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
 
 /**
  * Get a session for the commissionee device with the given device id.  This may
- * be called on any queue (including the Matter event queue) and will always
- * call the provided connection callback on the Matter queue, asynchronously.
- * Consumers must be prepared to run on the Matter queue (an in particular must
- * not use any APIs that will try to do sync dispatch to the Matter queue).
+ * be called on any queue (including the Matter event queue) and on success will
+ * always call the provided connection callback on the Matter queue,
+ * asynchronously.  Consumers must be prepared to run on the Matter queue (an in
+ * particular must not use any APIs that will try to do sync dispatch to the
+ * Matter queue).
  *
- * If the controller is not running when this function is called, will return NO
- * and never invoke the completion.  If the controller is not running when the
- * async dispatch on the Matter queue would happen, an error will be dispatched
- * to the completion handler.
+ * If the controller is not running when this function is called, it will
+ * synchronously invoke the completion with an error, on whatever queue
+ * getSessionForCommissioneeDevice was called on.
+ *
+ * If the controller is not running when the async dispatch on the Matter queue
+ * happens, the completion will be invoked with an error on the Matter queue.
  */
-- (BOOL)getSessionForCommissioneeDevice:(chip::NodeId)deviceID completion:(MTRInternalDeviceConnectionCallback)completion;
+- (void)getSessionForCommissioneeDevice:(chip::NodeId)deviceID completion:(MTRInternalDeviceConnectionCallback)completion;
 
 /**
  * Invalidate the CASE session for the given node ID.  This is a temporary thing
@@ -150,9 +155,22 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * The DeviceCommissioner pointer passed to the callback should only be used
  * synchronously during the callback invocation.
+ *
+ * If the error handler is nil, failure to run the block will be silent.
  */
-- (void)asyncDispatchToMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
-                      errorHandler:(void (^)(NSError *))errorHandler;
+- (void)asyncGetCommissionerOnMatterQueue:(void (^)(chip::Controller::DeviceCommissioner *))block
+                             errorHandler:(nullable MTRDeviceErrorHandler)errorHandler;
+
+/**
+ * Try to asynchronously dispatch the given block on the Matter queue.  If the
+ * controller is not running either at call time or when the block would be
+ * about to run, the provided error handler will be called with an error.  Note
+ * that this means the error handler might be called on an arbitrary queue, and
+ * might be called before this function returns or after it returns.
+ *
+ * If the error handler is nil, failure to run the block will be silent.
+ */
+- (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler;
 
 /**
  * Get an MTRBaseDevice for the given node id.  This exists to allow subclasses
