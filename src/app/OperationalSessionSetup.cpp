@@ -221,12 +221,10 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
 
 CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ReliableMessageProtocolConfig & config)
 {
-    mCASEClient = mInitParams.clientPool->Allocate(CASEClientInitParams{
-        mInitParams.sessionManager, mInitParams.sessionResumptionStorage, mInitParams.certificateValidityPolicy,
-        mInitParams.exchangeMgr, mFabricTable, mInitParams.groupDataProvider, mInitParams.mrpLocalConfig });
+    mCASEClient = mClientPool->Allocate();
     ReturnErrorCodeIf(mCASEClient == nullptr, CHIP_ERROR_NO_MEMORY);
 
-    CHIP_ERROR err = mCASEClient->EstablishSession(mPeerId, mDeviceAddress, config, this);
+    CHIP_ERROR err = mCASEClient->EstablishSession(mInitParams, mPeerId, mDeviceAddress, config, this);
     if (err != CHIP_NO_ERROR)
     {
         CleanupCASEClient();
@@ -330,7 +328,7 @@ void OperationalSessionSetup::CleanupCASEClient()
 {
     if (mCASEClient)
     {
-        mInitParams.clientPool->Release(mCASEClient);
+        mClientPool->Release(mCASEClient);
         mCASEClient = nullptr;
     }
 }
@@ -364,7 +362,7 @@ OperationalSessionSetup::~OperationalSessionSetup()
     if (mCASEClient)
     {
         // Make sure we don't leak it.
-        mInitParams.clientPool->Release(mCASEClient);
+        mClientPool->Release(mCASEClient);
     }
 }
 
@@ -382,7 +380,7 @@ CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
         return CHIP_NO_ERROR;
     }
 
-    auto const * fabricInfo = mFabricTable->FindFabricWithIndex(mPeerId.GetFabricIndex());
+    auto const * fabricInfo = mInitParams.fabricTable->FindFabricWithIndex(mPeerId.GetFabricIndex());
     VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     PeerId peerId(fabricInfo->GetCompressedFabricId(), mPeerId.GetNodeId());
