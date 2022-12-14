@@ -23,12 +23,6 @@ body:
       attributes:
           label: Explanation
           description: "(Optional) If other, why do you think this is trivial?"
-          value: |
-              1.
-              2.
-              3.
-              ...
-          render: bash
       validations:
           required: false
     - type: dropdown
