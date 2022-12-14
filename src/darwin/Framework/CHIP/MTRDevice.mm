@@ -306,9 +306,9 @@ private:
     [self _changeState:MTRDeviceStateReachable];
 
     id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (delegate && [delegate respondsToSelector:@selector(deviceStartedCommunicating:)]) {
+    if (delegate && [delegate respondsToSelector:@selector(didReceiveCommunicationFromDevice:)]) {
         dispatch_async(_delegateQueue, ^{
-            [delegate deviceStartedCommunicating:self];
+            [delegate didReceiveCommunicationFromDevice:self];
         });
     }
 
