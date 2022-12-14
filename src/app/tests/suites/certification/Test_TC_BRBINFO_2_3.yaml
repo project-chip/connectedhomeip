@@ -15,9 +15,12 @@
 
 name: 3.2.3. [TC-BRBINFO-2.3] Attributes [DUT-Client]
 
+PICS:
+    - BRBINFO.C
+
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Bridged Device Basic Information"
     endpoint: 0
 
 tests:
