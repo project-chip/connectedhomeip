@@ -15,9 +15,12 @@
 
 name: 3.2.2. [TC-BRBINFO-2.2] Events [DUT-Server]
 
+PICS:
+    - BRBINFO.S
+
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Bridged Device Basic Information"
     endpoint: 0
 
 tests:
