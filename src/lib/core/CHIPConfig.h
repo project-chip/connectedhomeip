@@ -1270,6 +1270,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_MINMDNS_MAX_PARALLEL_RESOLVES 2
 #endif // CHIP_CONFIG_MINMDNS_MAX_PARALLEL_RESOLVES
 
+/**
+ * def CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS
+ *
+ * @brief Determines the maximum number of node resolve results (PeerAddresses) to keep
+ *        for establishing an operational session.
+ *
+ */
+#ifndef CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS
+#define CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS 1
+#endif // CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS
+
 /*
  * @def CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
  *
