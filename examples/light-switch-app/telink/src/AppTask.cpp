@@ -271,7 +271,7 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
     }
     else
     {
-        LOG_INF("Device already commissioned")
+        LOG_INF("Device already commissioned");
     }
 }
 
