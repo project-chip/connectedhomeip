@@ -462,7 +462,19 @@ jobs:
                       --target linux-x64-java-matter-controller \
                       build \
                    "
-            - name: Run Tests
+            - name: Run Discover Tests
+              timeout-minutes: 65
+              run: |
+                  scripts/run_in_build_env.sh \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "discover" \
+                     --tool-args "commissionables" \
+                     --factoryreset \
+                  '
+            - name: Run Pairing Tests
               timeout-minutes: 65
               run: |
                   scripts/run_in_build_env.sh \

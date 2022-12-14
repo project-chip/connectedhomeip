@@ -30,21 +30,17 @@ from colorama import Fore, Style
 from java.base import DumpProgramOutputToQueue
 
 
-class CommissioningTest:
+class DiscoverTest:
     def __init__(self, thread_list: typing.List[threading.Thread], queue: queue.Queue, cmd: [], args: str):
         self.thread_list = thread_list
         self.queue = queue
         self.command = cmd
 
-        parser = argparse.ArgumentParser(description='Process pairing arguments.')
+        parser = argparse.ArgumentParser(description='Process discover arguments.')
 
         parser.add_argument('command', help="Command name")
-        parser.add_argument('-t', '--timeout', help="The program will return with timeout after specified seconds", default='200')
-        parser.add_argument('-a', '--address', help="Address of the device")
-        parser.add_argument('-s', '--setup-payload', dest='setup_payload',
-                            help="Setup Payload (manual pairing code or QR code content)")
-        parser.add_argument('-n', '--nodeid', help="The Node ID issued to the device", default='1')
-        parser.add_argument('-d', '--discriminator', help="Discriminator of the device", default='3840')
+        parser.add_argument('-n', '--nodeid', help="DNS-SD name corresponding with the given node ID", default='1')
+        parser.add_argument('-f', '--fabricid', help="DNS-SD name corresponding with the given fabric ID", default='1')
         parser.add_argument('-p', '--paa-trust-store-path', dest='paa_trust_store_path',
                             help="Path that contains valid and trusted PAA Root Certificates")
 
@@ -52,14 +48,12 @@ class CommissioningTest:
 
         self.command_name = args.command
         self.nodeid = args.nodeid
-        self.setup_payload = args.setup_payload
-        self.discriminator = args.discriminator
-        self.timeout = args.timeout
+        self.fabricid = args.fabricid
 
         logging.basicConfig(level=logging.INFO)
 
-    def TestCmdOnnetworkLong(self, nodeid, setuppin, discriminator, timeout):
-        java_command = self.command + ['pairing', 'onnetwork-long', nodeid, setuppin, discriminator, timeout]
+    def TestCmdCommissionables(self):
+        java_command = self.command + ['discover', 'commissionables']
         logging.info(f"Execute: {java_command}")
         java_process = subprocess.Popen(
             java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -67,10 +61,11 @@ class CommissioningTest:
         return java_process.wait()
 
     def RunTest(self):
-        logging.info("Testing onnetwork-long pairing")
-        if self.command_name == 'onnetwork-long':
-            code = self.TestCmdOnnetworkLong(self.nodeid, self.setup_payload, self.discriminator, self.timeout)
+        logging.info("Testing discovering commissionables devices")
+
+        if self.command_name == 'commissionables':
+            code = self.TestCmdCommissionables()
             if code != 0:
-                raise Exception(f"Testing onnetwork-long pairing failed with error {code}")
+                raise Exception(f"Testing command commissionables failed with error {code}")
         else:
             raise Exception(f"Unsupported command {self.command_name}")
