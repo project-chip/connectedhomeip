@@ -16,6 +16,21 @@
  *
  */
 
+/**
+ * This file allocate/free memory using the chip platform abstractions
+ * (Platform::MemoryCalloc and Platform::MemoryFree) for hosting a subset of the
+ * data model internal types until they are consumed by the DataModel::Encode machinery:
+ *   - chip::app:DataModel::List<T>
+ *   - chip::ByteSpan
+ *   - chip::CharSpan
+ *
+ * Memory allocation happens during the 'Setup' phase, while memory deallocation happens
+ * during the 'Finalize' phase.
+ *
+ * The 'Finalize' phase during the destructor phase, and if needed, 'Finalize' will call
+ * the 'Finalize' phase of its descendant.
+ */
+
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -173,17 +188,44 @@ public:
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        if (strlen(value.asCString()) % 2 != 0)
+        auto str         = value.asString();
+        auto size        = str.size();
+        uint8_t * buffer = nullptr;
+
+        if (IsStrString(str.c_str()))
         {
-            ChipLogError(chipTool, "Error while encoding %s as an octet string: Odd number of characters.", label);
-            return CHIP_ERROR_INVALID_STRING_LENGTH;
+            // Skip the prefix
+            str.erase(0, kStrStringPrefixLen);
+            size = str.size();
+
+            buffer = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(size, sizeof(uint8_t)));
+            memcpy(buffer, str.c_str(), size);
+        }
+        else
+        {
+            if (IsHexString(str.c_str()))
+            {
+                // Skip the prefix
+                str.erase(0, kHexStringPrefixLen);
+                size = str.size();
+            }
+
+            if (size % 2 != 0)
+            {
+                ChipLogError(chipTool, "Error while encoding %s as a hex string: Odd number of characters.", label);
+                return CHIP_ERROR_INVALID_STRING_LENGTH;
+            }
+
+            buffer = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(size / 2, sizeof(uint8_t)));
+            size   = chip::Encoding::HexToBytes(str.c_str(), size, buffer, size / 2);
+            if (size == 0)
+            {
+                ChipLogError(chipTool, "Error while encoding %s as a hex string.", label);
+                return CHIP_ERROR_INTERNAL;
+            }
         }
 
-        size_t size       = strlen(value.asCString());
-        auto buffer       = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(size / 2, sizeof(uint8_t)));
-        size_t octetCount = chip::Encoding::HexToBytes(value.asCString(), size, buffer, size / 2);
-
-        request = chip::ByteSpan(buffer, octetCount);
+        request = chip::ByteSpan(buffer, size);
         return CHIP_NO_ERROR;
     }
 
