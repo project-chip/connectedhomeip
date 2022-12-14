@@ -108,9 +108,9 @@ private:
         return mCallback.GetHighestReceivedEventNumber(aEventNumber);
     }
 
-    void OnUnsolicitedCommunication(ReadClient * apReadClient) override
+    void OnUnsolicitedMessageFromPublisher(ReadClient * apReadClient) override
     {
-        return mCallback.OnUnsolicitedCommunication(apReadClient);
+        return mCallback.OnUnsolicitedMessageFromPublisher(apReadClient);
     }
 
     /*

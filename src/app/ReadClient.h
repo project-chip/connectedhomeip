@@ -236,9 +236,9 @@ public:
         }
 
         /**
-         * OnUnsolicitedCommunication will be called for a subscription ReadClient
-         * when any incoming communication happens with a matching node on
-         * the fabric.
+         * OnUnsolicitedMessageFromPublisher will be called for a subscription
+         * ReadClient when any incoming message is received from a matching
+         * node on the fabric.
          *
          * This callback will be called:
          *   - When receiving any unsolicited communication from the node
@@ -246,7 +246,7 @@ public:
          *
          * @param[in] apReadClient the ReadClient for the subscription.
          */
-        virtual void OnUnsolicitedCommunication(ReadClient * apReadClient)
+        virtual void OnUnsolicitedMessageFromPublisher(ReadClient * apReadClient)
         {
             ChipLogDetail(DataManagement, "%s ReadClient[%p]", __func__, this);
         }
@@ -304,7 +304,7 @@ public:
 
     void OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
 
-    void OnUnsolicitedCommunication() { mpCallback.OnUnsolicitedCommunication(this); }
+    void OnUnsolicitedMessageFromPublisher() { mpCallback.OnUnsolicitedMessageFromPublisher(this); }
 
     auto GetSubscriptionId() const
     {

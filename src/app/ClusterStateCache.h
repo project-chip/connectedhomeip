@@ -596,9 +596,9 @@ private:
                                                      const Span<AttributePathParams> & aAttributePaths,
                                                      bool & aEncodedDataVersionList) override;
 
-    void OnUnsolicitedCommunication(ReadClient * apReadClient) override
+    void OnUnsolicitedMessageFromPublisher(ReadClient * apReadClient) override
     {
-        return mCallback.OnUnsolicitedCommunication(apReadClient);
+        return mCallback.OnUnsolicitedMessageFromPublisher(apReadClient);
     }
 
     // Commit the pending cluster data version, if there is one.

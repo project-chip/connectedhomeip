@@ -645,7 +645,7 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
         }
 
         // Notify Subscriptions about incoming communication from node
-        readClient->OnUnsolicitedCommunication();
+        readClient->OnUnsolicitedMessageFromPublisher();
 
         if (!readClient->IsMatchingSubscriptionId(subscriptionId))
         {

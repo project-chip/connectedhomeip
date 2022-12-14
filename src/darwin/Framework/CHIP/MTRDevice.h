@@ -195,11 +195,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 
 @optional
 /**
- * deviceIsCommunicating:
+ * deviceStartedCommunicating:
  *
  * Notifies delegate the device is currently communicating
  */
-- (void)deviceIsCommunicating:(MTRDevice *)device;
+- (void)deviceStartedCommunicating:(MTRDevice *)device;
 
 @end
 

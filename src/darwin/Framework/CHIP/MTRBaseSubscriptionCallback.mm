@@ -112,11 +112,11 @@ CHIP_ERROR MTRBaseSubscriptionCallback::OnResubscriptionNeeded(ReadClient * apRe
     return CHIP_NO_ERROR;
 }
 
-void MTRBaseSubscriptionCallback::OnUnsolicitedCommunication(ReadClient *)
+void MTRBaseSubscriptionCallback::OnUnsolicitedMessageFromPublisher(ReadClient *)
 {
-    if (mUnsolicitedCommunicationHandler) {
-        auto unsolicitedCommunicationHandler = mUnsolicitedCommunicationHandler;
-        unsolicitedCommunicationHandler();
+    if (mUnsolicitedMessageFromPublisherHandler) {
+        auto unsolicitedMessageFromPublisherHandler = mUnsolicitedMessageFromPublisherHandler;
+        unsolicitedMessageFromPublisherHandler();
     }
 }
 

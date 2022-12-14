@@ -114,9 +114,9 @@ public:
     SubscriptionCallback(DataReportCallback attributeReportCallback, DataReportCallback eventReportCallback,
         ErrorCallback errorCallback, MTRDeviceResubscriptionScheduledHandler resubscriptionCallback,
         SubscriptionEstablishedHandler subscriptionEstablishedHandler, OnDoneHandler onDoneHandler,
-        UnsolicitedCommunicationHandler unsolicitedCommunicationHandler)
+        UnsolicitedMessageFromPublisherHandler unsolicitedMessageFromPublisherHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
-            subscriptionEstablishedHandler, onDoneHandler, unsolicitedCommunicationHandler)
+            subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler)
     {
     }
 
@@ -299,16 +299,16 @@ private:
     os_unfair_lock_unlock(&self->_lock);
 }
 
-- (void)_handleUnsolicitedCommunication
+- (void)_handleUnsolicitedMessageFromPublisher
 {
     os_unfair_lock_lock(&self->_lock);
 
     [self _changeState:MTRDeviceStateReachable];
 
     id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (delegate && [delegate respondsToSelector:@selector(deviceIsCommunicating:)]) {
+    if (delegate && [delegate respondsToSelector:@selector(deviceStartedCommunicating:)]) {
         dispatch_async(_delegateQueue, ^{
-            [delegate deviceIsCommunicating:self];
+            [delegate deviceStartedCommunicating:self];
         });
     }
 
@@ -462,10 +462,10 @@ private:
                                           });
                                       },
                                       ^(void) {
-                                          MTR_LOG_INFO("%@ got unsolicited communication", self);
+                                          MTR_LOG_INFO("%@ got unsolicited message from publisher", self);
                                           dispatch_async(self.queue, ^{
-                                              // OnUnsolicitedCommunication
-                                              [self _handleUnsolicitedCommunication];
+                                              // OnUnsolicitedMessageFromPublisher
+                                              [self _handleUnsolicitedMessageFromPublisher];
                                           });
                                       });
 
