@@ -67,7 +67,7 @@ tests:
 '''
 
 
-class TestYamlParserNew(unittest.TestCase):
+class TestYamlParser(unittest.TestCase):
     def setUp(self):
         self._definitions = SpecDefinitions([ParseSource(source=io.StringIO(source_struct), name='source_struct')])
         self._temp_file = tempfile.NamedTemporaryFile(suffix='.yaml')
@@ -76,7 +76,7 @@ class TestYamlParserNew(unittest.TestCase):
         pics_file = None
         self._yaml_parser = TestParser(self._temp_file.name, pics_file, self._definitions)
 
-    def test_foobar(self):
+    def test_able_to_iterate_over_all_parsed_tests(self):
         # self._yaml_parser.tests implements `__next__`, which does value substitution. We are
         # simply ensure there is no exceptions raise.
         count = 0
