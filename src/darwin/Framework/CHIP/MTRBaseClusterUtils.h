@@ -16,8 +16,8 @@
 #import <Foundation/Foundation.h>
 
 #import "MTRBaseDevice.h"
-#import "MTRCluster_internal.h"
-#import "zap-generated/MTRCallbackBridge_internal.h"
+#import "MTRCallbackBridge.h"
+#import "MTRCluster_Internal.h"
 
 #include <app/CommandSender.h>
 #include <app/ReadClient.h>

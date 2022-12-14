@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MTRCallbackBridgeBase_internal.h"
+#import "MTRCallbackBridgeBase.h"
 #import <Foundation/Foundation.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
