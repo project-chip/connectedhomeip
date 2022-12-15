@@ -43,6 +43,16 @@ CHIP_ERROR SlWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     mpScanCallback        = nullptr;
     mpConnectCallback     = nullptr;
 
+#ifdef CHIP_ONNETWORK_PAIRING
+    memcpy(&mSavedNetwork.ssid[0], CHIP_WIFI_SSID, sizeof(CHIP_WIFI_SSID));
+    memcpy(&mSavedNetwork.credentials[0], CHIP_WIFI_PSK, sizeof(CHIP_WIFI_PSK));
+    credentialsLen               = sizeof(CHIP_WIFI_PSK);
+    ssidLen                      = sizeof(CHIP_WIFI_SSID);
+    mSavedNetwork.credentialsLen = credentialsLen;
+    mSavedNetwork.ssidLen        = ssidLen;
+    mStagingNetwork              = mSavedNetwork;
+    err                          = CHIP_NO_ERROR;
+#else
     // If reading fails, wifi is not provisioned, no need to go further.
     err = SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_WiFiSSID, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid),
                                            ssidLen);
@@ -55,7 +65,7 @@ CHIP_ERROR SlWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     mSavedNetwork.credentialsLen = credentialsLen;
     mSavedNetwork.ssidLen        = ssidLen;
     mStagingNetwork              = mSavedNetwork;
-
+#endif
     ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
     return err;
 }
