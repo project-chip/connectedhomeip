@@ -79,14 +79,14 @@ _EVENT_COMMANDS = [
 
 
 class PostProcessCheckStatus(Enum):
-    '''Inidcates the post processing check step status.'''
+    '''Indicates the post processing check step status.'''
     SUCCESS = 'success',
     WARNING = 'warning',
     ERROR = 'error'
 
 
 class PostProcessCheckType(Enum):
-    '''Inidcates the post processing check step type.'''
+    '''Indicates the post processing check step type.'''
     IM_STATUS = 'IMStatus',
     CLUSTER_STATUS = 'ClusterStatus',
     RESPONSE_VALIDATION = 'Response',
@@ -181,10 +181,6 @@ class _TestStepWithPlaceholders:
     is only known after an earlier test step's has executed and the result successfully post
     processed.
     '''
-    is_enabled = True
-    is_command = False
-    is_attribute = False
-    is_event = False
 
     def __init__(self, test: dict, config: dict, definitions):
         # Disabled tests are not parsed in order to allow the test to be added to the test
@@ -365,10 +361,6 @@ class TestStep:
     @property
     def is_enabled(self):
         return self._test.is_enabled
-
-    @property
-    def is_command(self):
-        return self._test.is_command
 
     @property
     def is_attribute(self):
@@ -655,10 +647,15 @@ class TestStep:
 
 
 class YamlTests:
-    _tests: list[_TestStepWithPlaceholders]
-    _index: 0
+    '''Parses YAML tests and becomes an iterator to provide 'TestStep's
 
-    count: 0
+    The provided TestStep is expected to be used by a runner/adapter to run the test step and
+    provide the response from the device to the TestStep object.
+
+    Currently this is a one time use object. Eventually this should be refactored to take a
+    runner/adapter as an argument and run through all test steps and should be reusable for
+    multiple runs.
+    '''
 
     def __init__(self, parsing_config_variable_storage: dict, definitions, tests: dict):
         self._parsing_config_variable_storage = parsing_config_variable_storage
@@ -690,11 +687,6 @@ class YamlTests:
 
 
 class TestParser:
-    name: None
-    PICS: None
-    tests: None
-    _parsing_config_variable_storage: dict = {}
-
     def __init__(self, test_file, pics_file, definitions):
         # TODO Needs supports for PICS file
         with open(test_file) as f:

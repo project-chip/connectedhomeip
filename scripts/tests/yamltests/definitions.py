@@ -40,23 +40,24 @@ class _ItemType(enum.Enum):
 
 
 class SpecDefinitions:
-    __clusters_by_id: dict[int, Cluster] = {}
-    __commands_by_id: dict[int, dict[int, Command]] = {}
-    __responses_by_id: dict[int, dict[int, Struct]] = {}
-    __attributes_by_id: dict[int, dict[int, Attribute]] = {}
-    __events_by_id: dict[int, dict[int, Event]] = {}
-
-    __clusters_by_name: dict[str, int] = {}
-    __commands_by_name: dict[str, int] = {}
-    __responses_by_name: dict[str, int] = {}
-    __attributes_by_name: dict[str, int] = {}
-    __events_by_name: dict[str, int] = {}
-
-    __bitmaps_by_name: dict[str, dict[str, Bitmap]] = {}
-    __enums_by_name: dict[str, dict[str, Enum]] = {}
-    __structs_by_name: dict[str, dict[str, Struct]] = {}
 
     def __init__(self, sources: List[ParseSource]):
+        self.__clusters_by_id: dict[int, Cluster] = {}
+        self.__commands_by_id: dict[int, dict[int, Command]] = {}
+        self.__responses_by_id: dict[int, dict[int, Struct]] = {}
+        self.__attributes_by_id: dict[int, dict[int, Attribute]] = {}
+        self.__events_by_id: dict[int, dict[int, Event]] = {}
+
+        self.__clusters_by_name: dict[str, int] = {}
+        self.__commands_by_name: dict[str, int] = {}
+        self.__responses_by_name: dict[str, int] = {}
+        self.__attributes_by_name: dict[str, int] = {}
+        self.__events_by_name: dict[str, int] = {}
+
+        self.__bitmaps_by_name: dict[str, dict[str, Bitmap]] = {}
+        self.__enums_by_name: dict[str, dict[str, Enum]] = {}
+        self.__structs_by_name: dict[str, dict[str, Struct]] = {}
+
         idl = ParseXmls(sources)
 
         for cluster in idl.clusters:
