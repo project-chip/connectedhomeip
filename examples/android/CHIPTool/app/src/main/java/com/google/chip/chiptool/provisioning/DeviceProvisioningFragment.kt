@@ -139,9 +139,11 @@ class DeviceProvisioningFragment : Fragment() {
       if (thread != null) {
         network = NetworkCredentials.forThread(NetworkCredentials.ThreadCredentials(thread.operationalDataset))
       }
-      deviceController.setDeviceAttestationFailureCallback(600
+      deviceController.setDeviceAttestationFailureCallback(DEVICE_ATTESTATION_FAILED_TIMEOUT
       ) { devicePtr, errorCode ->
-        Log.i(TAG, "Device attestation errorCode: $errorCode")
+        Log.i(TAG, "Device attestation errorCode: $errorCode, " +
+                "Look at 'src/credentials/attestation_verifier/DeviceAttestationVerifier.h' " +
+                "AttestationVerificationResult enum to understand the errors")
         requireActivity().runOnUiThread(Runnable {
           val alertDialog: AlertDialog? = activity?.let {
             val builder = AlertDialog.Builder(it)
@@ -232,6 +234,13 @@ class DeviceProvisioningFragment : Fragment() {
     private const val ARG_DEVICE_INFO = "device_info"
     private const val ARG_NETWORK_CREDENTIALS = "network_credentials"
     private const val STATUS_PAIRING_SUCCESS = 0
+
+    /**
+     * Set for the fail-safe timer before onDeviceAttestationFailed is invoked.
+     *
+     * This time depends on the Commissioning timeout of your app.
+     */
+    private const val DEVICE_ATTESTATION_FAILED_TIMEOUT = 600
 
     /**
      * Return a new instance of [DeviceProvisioningFragment]. [networkCredentialsParcelable] can be null for

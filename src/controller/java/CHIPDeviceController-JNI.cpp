@@ -85,7 +85,7 @@ static CHIP_ERROR ParseEventPathList(jobject eventPathList, std::vector<app::Eve
 static CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId);
 static CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard);
 static CHIP_ERROR CreateDeviceAttestationDelegateBridge(JNIEnv * env, jlong handle, jobject deviceAttestationDelegate,
-                                                        jint failSafeExpiryTimeout,
+                                                        jint failSafeExpiryTimeoutSecs,
                                                         DeviceAttestationDelegateBridge ** deviceAttestationDelegateBridge);
 
 namespace {
@@ -429,7 +429,7 @@ exit:
 }
 
 JNI_METHOD(void, setDeviceAttestationDelegate)
-(JNIEnv * env, jobject self, jlong handle, jint failSafeExpiryTimeout, jobject deviceAttestationDelegate)
+(JNIEnv * env, jobject self, jlong handle, jint failSafeExpiryTimeoutSecs, jobject deviceAttestationDelegate)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -440,7 +440,7 @@ JNI_METHOD(void, setDeviceAttestationDelegate)
     {
         wrapper->ClearDeviceAttestationDelegateBridge();
         DeviceAttestationDelegateBridge * deviceAttestationDelegateBridge = nullptr;
-        err = CreateDeviceAttestationDelegateBridge(env, handle, deviceAttestationDelegate, failSafeExpiryTimeout,
+        err = CreateDeviceAttestationDelegateBridge(env, handle, deviceAttestationDelegate, failSafeExpiryTimeoutSecs,
                                                     &deviceAttestationDelegateBridge);
         VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
         wrapper->SetDeviceAttestationDelegateBridge(deviceAttestationDelegateBridge);
@@ -1526,11 +1526,11 @@ exit:
 }
 
 CHIP_ERROR CreateDeviceAttestationDelegateBridge(JNIEnv * env, jlong handle, jobject deviceAttestationDelegate,
-                                                 jint failSafeExpiryTimeout,
+                                                 jint failSafeExpiryTimeoutSecs,
                                                  DeviceAttestationDelegateBridge ** deviceAttestationDelegateBridge)
 {
     CHIP_ERROR err                        = CHIP_NO_ERROR;
-    chip::Optional<uint16_t> timeoutSecs  = chip::MakeOptional(static_cast<uint16_t>(failSafeExpiryTimeout));
+    chip::Optional<uint16_t> timeoutSecs  = chip::MakeOptional(static_cast<uint16_t>(failSafeExpiryTimeoutSecs));
     bool shouldWaitAfterDeviceAttestation = false;
     jclass completionCallbackCls          = nullptr;
     jobject deviceAttestationDelegateRef  = env->NewGlobalRef(deviceAttestationDelegate);
