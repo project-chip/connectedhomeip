@@ -127,7 +127,6 @@ const factoryData gFactoryData = {
     },
 };
 
-
 CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto::P256Keypair & keypair)
 {
     Crypto::P256SerializedKeypair serialized_keypair;
