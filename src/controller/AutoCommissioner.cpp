@@ -154,6 +154,12 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         mParams.SetSkipCommissioningComplete(params.GetSkipCommissioningComplete().Value());
     }
 
+    if (params.GetNonConcurrentCommissioning().HasValue())
+    {
+        ChipLogProgress(Controller, "Setting Non-Concurrent commissioning from parameters");
+        mParams.SetNonConcurrentCommissioning(params.GetNonConcurrentCommissioning().Value());
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -432,12 +438,15 @@ Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(DeviceProxy
         break;
     }
 
-    // Adjust the timeout for our session transport latency, if we have access
-    // to a session.
-    auto sessionHandle = device->GetSecureSession();
-    if (sessionHandle.HasValue())
+    if (!mParams.GetNonConcurrentCommissioning().ValueOr(false))
     {
-        timeout = sessionHandle.Value()->ComputeRoundTripTimeout(timeout);
+        // Adjust the timeout for our session transport latency, if we have access
+        // to a session.
+        auto sessionHandle = device->GetSecureSession();
+        if (sessionHandle.HasValue())
+        {
+            timeout = sessionHandle.Value()->ComputeRoundTripTimeout(timeout);
+        }
     }
 
     // Enforce the spec minimal timeout.  Maybe this enforcement should live in
@@ -615,6 +624,13 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // storing the returned certs, so just return here without triggering the next stage.
             return NOCChainGenerated(report.Get<NocChain>().noc, report.Get<NocChain>().icac, report.Get<NocChain>().rcac,
                                      report.Get<NocChain>().ipk, report.Get<NocChain>().adminSubject);
+        case CommissioningStage::kWiFiNetworkEnable:
+        case CommissioningStage::kThreadNetworkEnable:
+            if (mParams.GetNonConcurrentCommissioning().ValueOr(false))
+            {
+                mCommissioneeDeviceProxy = nullptr;
+            }
+            break;
         case CommissioningStage::kFindOperational:
             mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;
             break;
@@ -661,7 +677,8 @@ DeviceProxy * AutoCommissioner::GetDeviceProxyForStep(CommissioningStage nextSta
 CHIP_ERROR AutoCommissioner::PerformStep(CommissioningStage nextStage)
 {
     DeviceProxy * proxy = GetDeviceProxyForStep(nextStage);
-    if (proxy == nullptr)
+    if ((!mParams.GetNonConcurrentCommissioning().ValueOr(false) || nextStage != CommissioningStage::kFindOperational) &&
+        proxy == nullptr)
     {
         ChipLogError(Controller, "Invalid device for commissioning");
         return CHIP_ERROR_INCORRECT_STATE;

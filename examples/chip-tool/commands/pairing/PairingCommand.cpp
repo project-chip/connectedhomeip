@@ -68,10 +68,12 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     return err;
 }
 
-CommissioningParameters PairingCommand::GetCommissioningParameters()
+CommissioningParameters PairingCommand::GetCommissioningParameters(NodeId remoteId)
 {
     auto params = CommissioningParameters();
     params.SetSkipCommissioningComplete(mSkipCommissioningComplete.ValueOr(false));
+    params.SetNonConcurrentCommissioning(mNonConcurrent.ValueOr(false));
+    params.SetRemoteNodeId(remoteId);
 
     switch (mNetworkType)
     {
@@ -98,7 +100,7 @@ CHIP_ERROR PairingCommand::PaseWithCode(NodeId remoteId)
 
 CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
 {
-    CommissioningParameters commissioningParams = GetCommissioningParameters();
+    CommissioningParameters commissioningParams = GetCommissioningParameters(remoteId);
 
     // If no network discovery behavior and no network credentials are provided, assume that the pairing command is trying to pair
     // with an on-network device.
@@ -124,7 +126,7 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
     }
     else
     {
-        auto commissioningParams = GetCommissioningParameters();
+        auto commissioningParams = GetCommissioningParameters(remoteId);
         err                      = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
     }
     return err;

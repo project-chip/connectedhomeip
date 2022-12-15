@@ -1642,18 +1642,46 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
 {
     // Once this stage is complete, reset mDeviceBeingCommissioned - this will be reset when the delegate calls the next step.
     MATTER_TRACE_EVENT_SCOPE("CommissioningStageComplete", "DeviceCommissioner");
-    if (mDeviceBeingCommissioned == nullptr)
+    NodeId nodeId       = kUndefinedNodeId;
+    DeviceProxy * proxy = nullptr;
+    if (mCommissioningDelegate != nullptr &&
+        mCommissioningDelegate->GetCommissioningParameters().GetNonConcurrentCommissioning().ValueOr(false))
     {
-        // We are getting a stray callback (e.g. due to un-cancellable
-        // operations) when we are not in fact commissioning anything.  Just
-        // ignore it.
-        return;
+        if (mDeviceBeingCommissioned != nullptr)
+        {
+            nodeId = mDeviceBeingCommissioned->GetDeviceId();
+            proxy  = mDeviceBeingCommissioned;
+            if (mCommissioningStage == kThreadNetworkEnable || mCommissioningStage == kWiFiNetworkEnable)
+            {
+                ReleaseCommissioneeDevice(reinterpret_cast<CommissioneeDeviceProxy *>(proxy));
+                proxy = nullptr;
+            }
+        }
+        else if (mCommissioningStage == kFindOperational &&
+                 mCommissioningDelegate->GetCommissioningParameters().GetRemoteNodeId().HasValue())
+        {
+            nodeId = mCommissioningDelegate->GetCommissioningParameters().GetRemoteNodeId().Value();
+            proxy  = nullptr;
+        }
+        else
+        {
+            return;
+        }
     }
+    else
+    {
+        if (mDeviceBeingCommissioned == nullptr)
+        {
+            // We are getting a stray callback (e.g. due to un-cancellable
+            // operations) when we are not in fact commissioning anything.  Just
+            // ignore it.
+            return;
+        }
 
-    NodeId nodeId            = mDeviceBeingCommissioned->GetDeviceId();
-    DeviceProxy * proxy      = mDeviceBeingCommissioned;
+        nodeId = mDeviceBeingCommissioned->GetDeviceId();
+        proxy  = mDeviceBeingCommissioned;
+    }
     mDeviceBeingCommissioned = nullptr;
-
     if (mPairingDelegate != nullptr)
     {
         mPairingDelegate->OnCommissioningStatusUpdate(PeerId(GetCompressedFabricId(), nodeId), mCommissioningStage, err);
@@ -1692,19 +1720,31 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, Messaging::Exchange
         return;
     }
 
-    if (commissioner->mDeviceBeingCommissioned == nullptr ||
-        commissioner->mDeviceBeingCommissioned->GetDeviceId() != sessionHandle->GetPeer().GetNodeId())
+    if (commissioner->mCommissioningDelegate == nullptr)
     {
-        // Not the device we are trying to commission.
         return;
     }
-
-    if (commissioner->mCommissioningDelegate != nullptr)
+    if (commissioner->mCommissioningDelegate->GetCommissioningParameters().GetNonConcurrentCommissioning().ValueOr(false))
     {
-        CommissioningDelegate::CommissioningReport report;
-        report.Set<OperationalNodeFoundData>(OperationalNodeFoundData(OperationalDeviceProxy(&exchangeMgr, sessionHandle)));
-        commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+        auto remoteId = commissioner->mCommissioningDelegate->GetCommissioningParameters().GetRemoteNodeId();
+        if (!remoteId.HasValue() || remoteId.Value() != sessionHandle->GetPeer().GetNodeId())
+        {
+            return;
+        }
     }
+    else
+    {
+        if (commissioner->mDeviceBeingCommissioned == nullptr ||
+            commissioner->mDeviceBeingCommissioned->GetDeviceId() != sessionHandle->GetPeer().GetNodeId())
+        {
+            // Not the device we are trying to commission.
+            return;
+        }
+    }
+
+    CommissioningDelegate::CommissioningReport report;
+    report.Set<OperationalNodeFoundData>(OperationalNodeFoundData(OperationalDeviceProxy(&exchangeMgr, sessionHandle)));
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
 void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
@@ -2445,7 +2485,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     break;
     case CommissioningStage::kFindOperational: {
         // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
-        auto scopedPeerId = GetPeerScopedId(proxy->GetDeviceId());
+        auto scopedPeerId = GetPeerScopedId(params.GetRemoteNodeId().Value());
         mSystemState->CASESessionMgr()->FindOrEstablishSession(scopedPeerId, &mOnDeviceConnectedCallback,
                                                                &mOnDeviceConnectionFailureCallback);
     }

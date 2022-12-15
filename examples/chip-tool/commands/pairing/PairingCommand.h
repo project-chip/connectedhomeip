@@ -142,6 +142,7 @@ public:
         }
 
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+        AddArgument("non-concurrent", 0, 1, &mNonConcurrent);
     }
 
     /////////// CHIPCommand Interface /////////
@@ -165,7 +166,7 @@ private:
     CHIP_ERROR PairWithCode(NodeId remoteId);
     CHIP_ERROR PaseWithCode(NodeId remoteId);
     CHIP_ERROR Unpair(NodeId remoteId);
-    chip::Controller::CommissioningParameters GetCommissioningParameters();
+    chip::Controller::CommissioningParameters GetCommissioningParameters(NodeId remoteId);
 
     const PairingMode mPairingMode;
     const PairingNetworkType mNetworkType;
@@ -177,6 +178,7 @@ private:
     chip::Optional<bool> mUseOnlyOnNetworkDiscovery;
     chip::Optional<bool> mPaseOnly;
     chip::Optional<bool> mSkipCommissioningComplete;
+    chip::Optional<bool> mNonConcurrent;
     uint16_t mRemotePort;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;

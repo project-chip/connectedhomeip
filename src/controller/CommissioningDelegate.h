@@ -415,6 +415,13 @@ public:
         return *this;
     }
 
+    Optional<bool> GetNonConcurrentCommissioning() const { return mNonConcurrentCommissioning; }
+    CommissioningParameters & SetNonConcurrentCommissioning(bool nonConcurrentCommissioning)
+    {
+        mNonConcurrentCommissioning = MakeOptional(nonConcurrentCommissioning);
+        return *this;
+    }
+
     // Check for matching fabric on target device by reading fabric list and looking for a
     // fabricId and RootCert match. If a match is detected, then use GetNodeId() to
     // access the nodeId for the device on the matching fabric.
@@ -457,6 +464,7 @@ private:
     Optional<bool> mAttemptWiFiNetworkScan;
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
     Optional<bool> mSkipCommissioningComplete;
+    Optional<bool> mNonConcurrentCommissioning;
     bool mCheckForMatchingFabric = false;
 };
 
