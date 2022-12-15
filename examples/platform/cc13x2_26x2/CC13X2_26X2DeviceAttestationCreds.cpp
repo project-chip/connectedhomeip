@@ -30,10 +30,6 @@ namespace CC13X2_26X2 {
 
 namespace {
 
-extern "C" {
-
-extern void cc13x2_26x2Log(const char * aFormat, ...);
-
 typedef struct
 {
     const uint32_t len;
@@ -131,7 +127,6 @@ const factoryData gFactoryData = {
     },
 };
 
-} // extern "C"
 
 CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto::P256Keypair & keypair)
 {
