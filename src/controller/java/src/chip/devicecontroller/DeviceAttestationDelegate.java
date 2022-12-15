@@ -19,17 +19,17 @@ package chip.devicecontroller;
  * when device
  * attestation fails, and the client can decide to continue or stop the
  * commissioning.
- * 
+ *
  * For example:
- * 
+ *
  * <pre>
  * // Continue commissioning
  * deviceController.continueCommissioning(devicePtr, true)
- * 
+ *
  * // Stop commissioning
  * deviceController.continueCommissioning(devicePtr, true)
  * </pre>
- * 
+ *
  */
 public interface DeviceAttestationDelegate {
 
