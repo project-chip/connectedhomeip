@@ -21,6 +21,7 @@ import logging
 from chip import ChipDeviceCtrl
 import chip.clusters as Clusters
 from chip.ChipStack import *
+from chip.interaction_model import Status, InteractionModelError
 from chip.storage import PersistentStorage
 import chip.logging
 import chip.native
@@ -39,6 +40,7 @@ import json
 import uuid
 import asyncio
 
+from mobly import asserts
 from mobly import base_test
 from mobly.config_parser import TestRunConfig, ENV_MOBLY_LOGPATH
 from mobly import logger
@@ -58,7 +60,7 @@ _DEFAULT_ADMIN_VENDOR_ID = 0xFFF1
 _DEFAULT_STORAGE_PATH = "admin_storage.json"
 _DEFAULT_LOG_PATH = "/tmp/matter_testing/logs"
 _DEFAULT_CONTROLLER_NODE_ID = 112233
-_DEFAULT_DUT_NODE_ID = 111
+_DEFAULT_DUT_NODE_ID = 0x12344321
 _DEFAULT_TRUST_ROOT_INDEX = 1
 
 # Mobly cannot deal with user config passing of ctypes objects,
@@ -267,6 +269,37 @@ class MatterBaseTest(base_test.BaseTestClass):
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)])
         data = result[endpoint]
         return list(data.values())[0][attribute]
+
+    async def read_single_attribute_check_success(self, cluster: object, attribute: object, dev_ctrl: ChipDeviceCtrl=None, node_id: int=None, endpoint: int=0) -> object:
+        if dev_ctrl is None:
+            dev_ctrl = self.default_controller
+        if node_id is None:
+            node_id = self.dut_node_id
+
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)])
+        attr_ret = result[endpoint][cluster][attribute]
+        err_msg = "Error reading {}:{}".format(str(cluster), str(attribute))
+        asserts.assert_true(attr_ret is not None, err_msg)
+        asserts.assert_false(isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure), err_msg)
+        return attr_ret
+
+    async def read_single_attribute_expect_error(self, cluster: object, attribute: object, error: Status, dev_ctrl: ChipDeviceCtrl=None, node_id: int=None, endpoint: int=0) -> object:
+        if dev_ctrl is None:
+            dev_ctrl = self.default_controller
+        if node_id is None:
+            node_id = self.dut_node_id
+
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)])
+        attr_ret = result[endpoint][cluster][attribute]
+        err_msg = "Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
+        asserts.assert_true(attr_ret is not None, err_msg)
+        asserts.assert_true(isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure), err_msg)
+        asserts.assert_true(isinstance(attr_ret.Reason, InteractionModelError), err_msg)
+        asserts.assert_equal(attr_ret.Reason.status, error, err_msg)
+        return attr_ret
+
+    def print_step(self, stepnum: int, title:str) -> None:
+        logging.info('***** Test Step %d : %s', stepnum, title)
 
 
 def generate_mobly_test_config(matter_test_config: MatterTestConfig):
