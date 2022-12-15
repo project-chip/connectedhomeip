@@ -23,7 +23,11 @@ package chip.devicecontroller;
  * For example:
  * 
  * <pre>
- * deviceController.continueCommissioning(devicePtr, false)
+ * // Continue commissioning
+ * deviceController.continueCommissioning(devicePtr, true)
+ * 
+ * // Stop commissioning
+ * deviceController.continueCommissioning(devicePtr, true)
  * </pre>
  * 
  */
