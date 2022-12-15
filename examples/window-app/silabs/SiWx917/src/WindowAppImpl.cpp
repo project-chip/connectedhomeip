@@ -173,7 +173,7 @@ void WindowAppImpl::OnTaskCallback(void * parameter)
     SILABS_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */
     sWiFiNetworkCommissioningInstance.Init();
-    /* added for commisioning with wifi */
+    /* added for commissioning with wifi */
 #endif
 
     sInstance.Run();
