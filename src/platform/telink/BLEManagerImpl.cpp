@@ -358,6 +358,9 @@ CHIP_ERROR BLEManagerImpl::_InitStack(void)
     /* Init connection mode */
     blc_ll_initConnection_module();
 
+    /*set rf power index*/
+    rf_set_power_level_index(RF_POWER_INDEX_P9p11dBm);
+
     /* Init GAP */
     err = _InitGap();
     SuccessOrExit(err);
