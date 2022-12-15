@@ -17,29 +17,48 @@
 
 #include "ClientMonitoringRegistrationTable.h"
 
-namespace chip {
+#include <lib/support/DefaultStorageKeyAllocator.h>
 
-/**********************************************************
- * Attributes Definition
- *********************************************************/
+namespace chip {
 
 /**********************************************************
  * ClientMonitoringRegistrationTable Implementation
  *********************************************************/
 
-ClientMonitoringRegistrationTable::ClientMonitoringRegistrationTable(FabricIndex fabricIndex)
+ClientMonitoringRegistrationTable::ClientMonitoringRegistrationTable(PersistentStorageDelegate & storage) : mStorage(storage) {}
+
+CHIP_ERROR ClientMonitoringRegistrationTable::LoadFromStorage(FabricIndex fabricIndex)
 {
-    this->LoadFromStorage(fabricIndex);
+    uint8_t buffer[kRegStorageSize] = { 0 };
+    uint16_t size                   = sizeof(buffer);
+
+    ReturnErrorOnFailure(
+        mStorage.SyncGetKeyValue(DefaultStorageKeyAllocator::ClientMonitoringTableEntry(fabricIndex).KeyName(), buffer, size));
+
+    TLV::TLVReader reader;
+    reader.Init(buffer, size);
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+
+    ReturnErrorOnFailure(mRegisteredClient.Decode(reader));
+
+    mRegisteredClient.fabricIndex = fabricIndex;
+
+    return CHIP_NO_ERROR;
 }
 
-void ClientMonitoringRegistrationTable::LoadFromStorage(FabricIndex fabricIndex)
+CHIP_ERROR ClientMonitoringRegistrationTable::SaveToStorage()
 {
-    // TODO: Implement load from NVM logic
-}
+    ReturnErrorOnFailure(IsRegisteredClientValid());
 
-void ClientMonitoringRegistrationTable::SaveToStorage()
-{
-    // Store to NVM based of class attributes
+    uint8_t buffer[kRegStorageSize] = { 0 };
+    TLV::TLVWriter writer;
+
+    writer.Init(buffer);
+    ReturnErrorOnFailure(mRegisteredClient.EncodeForWrite(writer, TLV::AnonymousTag()));
+    ReturnErrorOnFailure(writer.Finalize());
+
+    return mStorage.SyncSetKeyValue(DefaultStorageKeyAllocator::ClientMonitoringTableEntry(mRegisteredClient.fabricIndex).KeyName(),
+                                    buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
 NodeId ClientMonitoringRegistrationTable::getClientNodeId()
@@ -57,6 +76,11 @@ FabricIndex ClientMonitoringRegistrationTable::getFaricIndex()
     return mRegisteredClient.fabricIndex;
 }
 
+app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::Type ClientMonitoringRegistrationTable::getRegisteredClient()
+{
+    return mRegisteredClient;
+}
+
 void ClientMonitoringRegistrationTable::setClientNodeId(NodeId clientNodeId)
 {
     mRegisteredClient.clientNodeId = clientNodeId;
@@ -70,6 +94,13 @@ void ClientMonitoringRegistrationTable::setICid(uint64_t ICid)
 void ClientMonitoringRegistrationTable::setFabricIndex(FabricIndex fabric)
 {
     mRegisteredClient.fabricIndex = fabric;
+}
+
+CHIP_ERROR ClientMonitoringRegistrationTable::IsRegisteredClientValid()
+{
+    return (mRegisteredClient.clientNodeId != 0 && mRegisteredClient.ICid != 0 && mRegisteredClient.fabricIndex != 0)
+        ? CHIP_NO_ERROR
+        : CHIP_ERROR_INVALID_ARGUMENT;
 }
 
 } // namespace chip

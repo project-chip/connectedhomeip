@@ -19,8 +19,8 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/CHIPDeviceConfig.h>
 
 namespace chip {
 class ClientMonitoringRegistrationTable
@@ -28,15 +28,17 @@ class ClientMonitoringRegistrationTable
 public:
     using MonitoringRegistrationStruct = chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::Type;
 
-    ClientMonitoringRegistrationTable(FabricIndex fabricIndex);
+    ClientMonitoringRegistrationTable(PersistentStorageDelegate & storage);
     ~ClientMonitoringRegistrationTable(){};
 
-    void SaveToStorage();
+    CHIP_ERROR SaveToStorage();
+    CHIP_ERROR LoadFromStorage(FabricIndex fabricIndex);
 
     // Getter
     NodeId getClientNodeId();
     uint64_t getICid();
     FabricIndex getFaricIndex();
+    MonitoringRegistrationStruct getRegisteredClient();
 
     // Setter
     void setClientNodeId(NodeId clientNodeId);
@@ -44,8 +46,11 @@ public:
     void setFabricIndex(FabricIndex fabric);
 
 private:
-    void LoadFromStorage(FabricIndex fabricIndex);
+    static constexpr uint8_t kRegStorageSize = TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(uint64_t), sizeof(FabricIndex));
+
+    CHIP_ERROR IsRegisteredClientValid();
     MonitoringRegistrationStruct mRegisteredClient;
+    PersistentStorageDelegate & mStorage;
 };
 
 } // namespace chip
