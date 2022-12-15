@@ -49,91 +49,59 @@ public:
 class InteractionModelReports
 {
 public:
-    InteractionModelReports(chip::app::ReadClient::Callback * callback) : mBufferedReadAdapter(*callback) {}
+    InteractionModelReports(chip::app::ReadClient::Callback * callback) : mBufferedReadAdapter(*callback) { ResetOptions(); }
 
 protected:
     CHIP_ERROR ReadAttribute(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
-                             std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
-                             const chip::Optional<bool> & fabricFiltered                         = chip::Optional<bool>(true),
-                             const chip::Optional<std::vector<chip::DataVersion>> & dataVersions = chip::NullOptional)
+                             std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds)
     {
-        return ReportAttribute(device, endpointIds, clusterIds, attributeIds, chip::app::ReadClient::InteractionType::Read, 0, 0,
-                               fabricFiltered, dataVersions, chip::NullOptional, chip::NullOptional);
+        return ReportAttribute(device, endpointIds, clusterIds, attributeIds, chip::app::ReadClient::InteractionType::Read);
     }
 
     CHIP_ERROR SubscribeAttribute(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
-                                  std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
-                                  uint16_t minInterval, uint16_t maxInterval, const chip::Optional<bool> & fabricFiltered,
-                                  const chip::Optional<std::vector<chip::DataVersion>> & dataVersions,
-                                  const chip::Optional<bool> & keepSubscriptions, const chip::Optional<bool> & autoResubscribe)
+                                  std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds)
     {
-        return ReportAttribute(device, endpointIds, clusterIds, attributeIds, chip::app::ReadClient::InteractionType::Subscribe,
-                               minInterval, maxInterval, fabricFiltered, dataVersions, keepSubscriptions, autoResubscribe);
+        return ReportAttribute(device, endpointIds, clusterIds, attributeIds, chip::app::ReadClient::InteractionType::Subscribe);
     }
 
     CHIP_ERROR ReportAttribute(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                                std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
-                               chip::app::ReadClient::InteractionType interactionType, uint16_t minInterval, uint16_t maxInterval,
-                               const chip::Optional<bool> & fabricFiltered,
-                               const chip::Optional<std::vector<chip::DataVersion>> & dataVersions,
-                               const chip::Optional<bool> & keepSubscriptions, const chip::Optional<bool> & autoResubscribe);
+                               chip::app::ReadClient::InteractionType interactionType);
 
     CHIP_ERROR ReadEvent(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
-                         std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds,
-                         const chip::Optional<bool> & fabricFiltered           = chip::Optional<bool>(true),
-                         const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional)
+                         std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds)
     {
-        return ReportEvent(device, endpointIds, clusterIds, eventIds, chip::app::ReadClient::InteractionType::Read, 0, 0,
-                           fabricFiltered, eventNumber, chip::NullOptional, chip::NullOptional, chip::NullOptional);
+        return ReportEvent(device, endpointIds, clusterIds, eventIds, chip::app::ReadClient::InteractionType::Read);
     }
 
     CHIP_ERROR SubscribeEvent(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
-                              std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds, uint16_t minInterval,
-                              uint16_t maxInterval, const chip::Optional<bool> & fabricFiltered,
-                              const chip::Optional<chip::EventNumber> & eventNumber, const chip::Optional<bool> & keepSubscriptions,
-                              const chip::Optional<std::vector<bool>> & isUrgents, const chip::Optional<bool> & autoResubscribe)
+                              std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds)
     {
-        return ReportEvent(device, endpointIds, clusterIds, eventIds, chip::app::ReadClient::InteractionType::Subscribe,
-                           minInterval, maxInterval, fabricFiltered, eventNumber, keepSubscriptions, isUrgents, autoResubscribe);
+        return ReportEvent(device, endpointIds, clusterIds, eventIds, chip::app::ReadClient::InteractionType::Subscribe);
     }
 
     CHIP_ERROR ReportEvent(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                            std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds,
-                           chip::app::ReadClient::InteractionType interactionType, uint16_t minInterval, uint16_t maxInterval,
-                           const chip::Optional<bool> & fabricFiltered, const chip::Optional<chip::EventNumber> & eventNumber,
-                           const chip::Optional<bool> & keepSubscriptions, const chip::Optional<std::vector<bool>> & isUrgents,
-                           const chip::Optional<bool> & autoResubscribe);
+                           chip::app::ReadClient::InteractionType interactionType);
 
     CHIP_ERROR ReadAll(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                        std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
-                       std::vector<chip::EventId> eventIds,
-                       const chip::Optional<bool> & fabricFiltered                         = chip::Optional<bool>(true),
-                       const chip::Optional<std::vector<chip::DataVersion>> & dataVersions = chip::NullOptional,
-                       const chip::Optional<chip::EventNumber> & eventNumber               = chip::NullOptional)
+                       std::vector<chip::EventId> eventIds)
     {
-        return ReportAll(device, endpointIds, clusterIds, attributeIds, eventIds, chip::app::ReadClient::InteractionType::Read, 0,
-                         0, fabricFiltered, dataVersions, eventNumber);
+        return ReportAll(device, endpointIds, clusterIds, attributeIds, eventIds, chip::app::ReadClient::InteractionType::Read);
     }
 
     CHIP_ERROR SubscribeAll(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                             std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
-                            std::vector<chip::EventId> eventIds, uint16_t minInterval = 0, uint16_t maxInterval = 0,
-                            const chip::Optional<bool> & fabricFiltered           = chip::Optional<bool>(true),
-                            const chip::Optional<chip::EventNumber> & eventNumber = chip::NullOptional,
-                            const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional)
+                            std::vector<chip::EventId> eventIds)
     {
-        return ReportAll(device, endpointIds, clusterIds, attributeIds, eventIds, chip::app::ReadClient::InteractionType::Subscribe,
-                         minInterval, maxInterval, fabricFiltered, chip::NullOptional, eventNumber, keepSubscriptions);
+        return ReportAll(device, endpointIds, clusterIds, attributeIds, eventIds,
+                         chip::app::ReadClient::InteractionType::Subscribe);
     }
 
     CHIP_ERROR ReportAll(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                          std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
-                         std::vector<chip::EventId> eventIds, chip::app::ReadClient::InteractionType interactionType,
-                         uint16_t minInterval = 0, uint16_t maxInterval = 0,
-                         const chip::Optional<bool> & fabricFiltered                         = chip::Optional<bool>(true),
-                         const chip::Optional<std::vector<chip::DataVersion>> & dataVersions = chip::NullOptional,
-                         const chip::Optional<chip::EventNumber> & eventNumber               = chip::NullOptional,
-                         const chip::Optional<bool> & keepSubscriptions                      = chip::NullOptional);
+                         std::vector<chip::EventId> eventIds, chip::app::ReadClient::InteractionType interactionType);
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams);
 
@@ -143,6 +111,105 @@ protected:
 
     std::vector<std::unique_ptr<chip::app::ReadClient>> mReadClients;
     chip::app::BufferedReadCallback mBufferedReadAdapter;
+
+    InteractionModelReports & SetDataVersions(const std::vector<chip::DataVersion> & dataVersions)
+    {
+        mDataVersions.SetValue(dataVersions);
+        return *this;
+    }
+
+    InteractionModelReports & SetDataVersions(const chip::Optional<std::vector<chip::DataVersion>> & dataVersions)
+    {
+        mDataVersions = dataVersions;
+        return *this;
+    }
+
+    InteractionModelReports & SetIsUrgents(const std::vector<bool> isUrgents)
+    {
+        mIsUrgents.SetValue(isUrgents);
+        return *this;
+    }
+
+    InteractionModelReports & SetIsUrgents(const chip::Optional<std::vector<bool>> & isUrgents)
+    {
+        mIsUrgents = isUrgents;
+        return *this;
+    }
+
+    InteractionModelReports & SetEventNumber(const chip::Optional<chip::EventNumber> & eventNumber)
+    {
+        mEventNumber = eventNumber;
+        return *this;
+    }
+
+    InteractionModelReports & SetEventNumber(chip::EventNumber eventNumber)
+    {
+        mEventNumber.SetValue(eventNumber);
+        return *this;
+    }
+
+    InteractionModelReports & SetFabricFiltered(bool fabricFiltered)
+    {
+        mFabricFiltered.SetValue(fabricFiltered);
+        return *this;
+    }
+
+    InteractionModelReports & SetKeepSubscriptions(bool keepSubscriptions)
+    {
+        mKeepSubscriptions.SetValue(keepSubscriptions);
+        return *this;
+    }
+
+    InteractionModelReports & SetKeepSubscriptions(const chip::Optional<bool> & keepSubscriptions)
+    {
+        mKeepSubscriptions = keepSubscriptions;
+        return *this;
+    }
+
+    InteractionModelReports & SetAutoResubscribe(bool autoResubscribe)
+    {
+        mAutoResubscribe.SetValue(autoResubscribe);
+        return *this;
+    }
+
+    InteractionModelReports & SetAutoResubscribe(const chip::Optional<bool> & autoResubscribe)
+    {
+        mAutoResubscribe = autoResubscribe;
+        return *this;
+    }
+
+    InteractionModelReports & SetMinInterval(uint16_t minInterval)
+    {
+        mMinInterval = minInterval;
+        return *this;
+    }
+
+    InteractionModelReports & SetMaxInterval(uint16_t maxInterval)
+    {
+        mMaxInterval = maxInterval;
+        return *this;
+    }
+
+    void ResetOptions()
+    {
+        mDataVersions      = chip::NullOptional;
+        mIsUrgents         = chip::NullOptional;
+        mEventNumber       = chip::NullOptional;
+        mFabricFiltered    = chip::Optional<bool>(true);
+        mKeepSubscriptions = chip::NullOptional;
+        mAutoResubscribe   = chip::NullOptional;
+        mMinInterval       = 0;
+        mMaxInterval       = 0;
+    }
+
+    chip::Optional<std::vector<chip::DataVersion>> mDataVersions;
+    chip::Optional<std::vector<bool>> mIsUrgents;
+    chip::Optional<chip::EventNumber> mEventNumber;
+    chip::Optional<bool> mFabricFiltered;
+    chip::Optional<bool> mKeepSubscriptions;
+    chip::Optional<bool> mAutoResubscribe;
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
 };
 
 class InteractionModelCommands
