@@ -215,35 +215,31 @@ protected:
 class InteractionModelCommands
 {
 public:
-    InteractionModelCommands(chip::app::CommandSender::Callback * callback) : mCallback(callback) {}
+    InteractionModelCommands(chip::app::CommandSender::Callback * callback) : mCallback(callback) { ResetOptions(); }
 
 protected:
     template <class T>
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                           chip::CommandId commandId, const T & value,
-                           const chip::Optional<uint16_t> & timedInteractionTimeoutMs = chip::NullOptional,
-                           const chip::Optional<bool> & suppressResponse              = chip::NullOptional,
-                           const chip::Optional<uint16_t> & repeatCount               = chip::NullOptional,
-                           const chip::Optional<uint16_t> & repeatDelayInMs           = chip::NullOptional)
+                           chip::CommandId commandId, const T & value)
     {
-        uint16_t repeat = repeatCount.ValueOr(1);
+        uint16_t repeat = mRepeatCount.ValueOr(1);
         while (repeat--)
         {
 
             chip::app::CommandPathParams commandPath = { endpointId, clusterId, commandId,
                                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
             auto commandSender = std::make_unique<chip::app::CommandSender>(mCallback, device->GetExchangeManager(),
-                                                                            timedInteractionTimeoutMs.HasValue());
+                                                                            mTimedInteractionTimeoutMs.HasValue());
             VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-            ReturnErrorOnFailure(commandSender->AddRequestDataNoTimedCheck(commandPath, value, timedInteractionTimeoutMs,
-                                                                           suppressResponse.ValueOr(false)));
+            ReturnErrorOnFailure(commandSender->AddRequestDataNoTimedCheck(commandPath, value, mTimedInteractionTimeoutMs,
+                                                                           mSuppressResponse.ValueOr(false)));
             ReturnErrorOnFailure(commandSender->SendCommandRequest(device->GetSecureSession().Value()));
             mCommandSender.push_back(std::move(commandSender));
 
-            if (repeatDelayInMs.HasValue())
+            if (mRepeatDelayInMs.HasValue())
             {
-                chip::test_utils::SleepMillis(repeatDelayInMs.Value());
+                chip::test_utils::SleepMillis(mRepeatDelayInMs.Value());
             }
         }
         return CHIP_NO_ERROR;
@@ -276,6 +272,67 @@ protected:
 
     std::vector<std::unique_ptr<chip::app::CommandSender>> mCommandSender;
     chip::app::CommandSender::Callback * mCallback;
+
+    InteractionModelCommands & SetTimedInteractionTimeoutMs(uint16_t timedInteractionTimeoutMs)
+    {
+        mTimedInteractionTimeoutMs.SetValue(timedInteractionTimeoutMs);
+        return *this;
+    }
+
+    InteractionModelCommands & SetTimedInteractionTimeoutMs(const chip::Optional<uint16_t> & timedInteractionTimeoutMs)
+    {
+        mTimedInteractionTimeoutMs = timedInteractionTimeoutMs;
+        return *this;
+    }
+
+    InteractionModelCommands & SetSuppressResponse(bool suppressResponse)
+    {
+        mSuppressResponse.SetValue(suppressResponse);
+        return *this;
+    }
+
+    InteractionModelCommands & SetSuppressResponse(const chip::Optional<bool> & suppressResponse)
+    {
+        mSuppressResponse = suppressResponse;
+        return *this;
+    }
+
+    InteractionModelCommands & SetRepeatCount(uint16_t repeatCount)
+    {
+        mRepeatCount.SetValue(repeatCount);
+        return *this;
+    }
+
+    InteractionModelCommands & SetRepeatCount(const chip::Optional<uint16_t> & repeatCount)
+    {
+        mRepeatCount = repeatCount;
+        return *this;
+    }
+
+    InteractionModelCommands & SetRepeatDelayInMs(uint16_t repeatDelayInMs)
+    {
+        mRepeatDelayInMs.SetValue(repeatDelayInMs);
+        return *this;
+    }
+
+    InteractionModelCommands & SetRepeatDelayInMs(const chip::Optional<uint16_t> & repeatDelayInMs)
+    {
+        mRepeatDelayInMs = repeatDelayInMs;
+        return *this;
+    }
+
+    void ResetOptions()
+    {
+        mTimedInteractionTimeoutMs = chip::NullOptional;
+        mSuppressResponse          = chip::NullOptional;
+        mRepeatCount               = chip::NullOptional;
+        mRepeatDelayInMs           = chip::NullOptional;
+    }
+
+    chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
+    chip::Optional<bool> mSuppressResponse;
+    chip::Optional<uint16_t> mRepeatCount;
+    chip::Optional<uint16_t> mRepeatDelayInMs;
 };
 
 class InteractionModelWriter
@@ -476,8 +533,11 @@ public:
         chip::DeviceProxy * device = GetDevice(identity);
         VerifyOrReturnError(device != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        return InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value, timedInteractionTimeoutMs,
-                                                     suppressResponse);
+        InteractionModelCommands::ResetOptions();
+        InteractionModelCommands::SetTimedInteractionTimeoutMs(timedInteractionTimeoutMs);
+        InteractionModelCommands::SetSuppressResponse(suppressResponse);
+
+        return InteractionModelCommands::SendCommand(device, endpointId, clusterId, commandId, value);
     }
 
     template <class T>
