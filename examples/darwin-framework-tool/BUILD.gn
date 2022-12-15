@@ -124,6 +124,7 @@ executable("darwin-framework-tool") {
     "${chip_root}/examples/chip-tool/commands/common/Command.h",
     "${chip_root}/examples/chip-tool/commands/common/Commands.cpp",
     "${chip_root}/examples/chip-tool/commands/common/Commands.h",
+    "${chip_root}/examples/chip-tool/commands/common/HexConversion.h",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
     "commands/clusters/ClusterCommandBridge.h",
     "commands/clusters/ModelCommandBridge.mm",
