@@ -5086,7 +5086,7 @@
           - WakeOnLan
       attributes:
           Descriptor:
-              - DeviceType
+              - DeviceList
           AccessControl:
               - Acl
           OccupancySensing:
@@ -5103,3 +5103,9 @@
       apis:
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
+  renames:
+      clusters:
+          UnitTesting: TestCluster
+      attributes:
+          Descriptor:
+              DeviceTypeList: DeviceList
