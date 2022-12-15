@@ -62,7 +62,7 @@ Mac OS.
     sudo bash scripts/setup.sh
     ```
 
-    Please execute following command export `BOUFFALOLAB_SDK_ROOT` before
+    Please execute following command to export `BOUFFALOLAB_SDK_ROOT` before
     building.
 
     ```
@@ -74,34 +74,25 @@ Mac OS.
 The following steps take examples for BL602 develop board `BL602-IoT-Matter-V1`
 and BL706 develop board `XT-ZB6-DevKit`.
 
--   Build lighting app
+-   Build lighting app with UART baudrate 2000000
 
     ```
     ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light build
     ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light build
     ```
 
--   UART baudrate is 2000000 by default; for baudrate 115200, please build
-    target name with `-115200` appended
+-   Build lighting app with UART baudrate 115200
 
-    ```shell
+    ```
     ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light-115200 build
     ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-115200 build
     ```
 
--   Build target name with `-rpc` appended for rpc enabled as following
-    commands.
+-   Build lighting app with RPC enabled and UART baudrate 115200.
 
-    ```shell
+    ```
     ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light-rpc build
     ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-rpc build
-    ```
-
--   For multiple build options ,such as UART baudrate 115200 + rpc, please try
-
-    ```shell
-    ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light-rpc-115200 build
-    ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-rpc-115200 build
     ```
 
 ## Download image
@@ -113,9 +104,11 @@ and BL706 develop board `XT-ZB6-DevKit`.
     `chip-bl702-lighting-example.flash.py` will generate under build output
     folder for BL602 or BL702 building.
 
-    > Note, different build options will generate different output folder.
-
-    > Note, make sure terminal is under Matter build environment.
+    > Note 1, `*.flash.py` should be ran under Matter build environment; if
+    > python module `bflb_iot_tool` is not found, please try to do
+    > `source scripts/bootstrap.sh` or install as
+    > `pip3 install bflb-iot-tool`.<br> Note 2, different build options will
+    > generate different output folder.
 
     Download operation steps as below, please check `help` option of script for
     more detail.
@@ -154,7 +147,8 @@ and BL706 develop board `XT-ZB6-DevKit`.
             > Note, better to append --erase option to download image for BL602
             > develop board at first time.
 
--   Using `Bouffalo Lab` GUI flash tool`BLDevCube`
+-   Using `Bouffalo Lab` GUI flash tool `BLDevCube`, please download on
+    [this page](https://dev.bouffalolab.com/download).
     -   Hold BOOT pin and reset chip, put the board in download mode.
     -   Select `DTS` file;
     -   Select Partition Table under
@@ -168,7 +162,7 @@ and BL706 develop board `XT-ZB6-DevKit`.
 ## Run the example
 
 -   You can open the serial console. For example, if the device is at
-    `/dev/ttyACM0`:
+    `/dev/ttyACM0` with UART baudrate 2000000 built:
 
         ```shell
         picocom -b 2000000 /dev/ttyACM0
@@ -182,11 +176,10 @@ and BL706 develop board `XT-ZB6-DevKit`.
 -   To do factory reset, press BOOT button over 4 seconds, release BOOT button
     after led blink stopped.
 
-## Test with chip-tool
+## Test Commission and Control with chip-tool
 
 Please follow [chip_tool_guide](../../../docs/guides/chip_tool_guide.md) and
-[guide](../../chip-tool/README.md) to build and use Matter official test
-chip-tool.
+[guide](../../chip-tool/README.md) to build and use chip-tool for test.
 
 ### Prerequisite for Thread Protocol
 
@@ -202,7 +195,7 @@ router to get Thread network credential.
 sudo ot-ctl dataset active -x
 ```
 
-#### Commissioning over BLE
+### Commissioning over BLE
 
 -   Reset the board or factory reset the board
 
@@ -222,10 +215,10 @@ sudo ot-ctl dataset active -x
         ```
 
     > `<node_id>`, which is node ID assigned to device within chip-tool
-    > fabric<br> > `<wifi_ssid>`, Wi-Fi network SSID<br> > `<wifi_passwd>`,
-    > Wi-FI network password<br> > `<thread_operational_dataset>`, Thread
-    > network credential which running `sudo ot-ctl dataset active -x` command
-    > on border router to get.<br>
+    > fabric<br> `<wifi_ssid>`, Wi-Fi network SSID<br> `<wifi_passwd>`, Wi-FI
+    > network password<br> `<thread_operational_dataset>`, Thread network
+    > credential which running `sudo ot-ctl dataset active -x` command on border
+    > router to get.
 
 ### Cluster control
 
@@ -263,7 +256,7 @@ After successful commissioning, cluster commands available to control the board.
     ./chip-tool identify identify 10 <node_id> 1
     ```
 
-## OTA software upgrade with ota-provider-app
+## Test OTA software upgrade with ota-provider-app
 
 Please take [guide](../../ota-provider-app/linux/README.md) for more detail on
 ota-provider-app build and usage.
@@ -309,13 +302,14 @@ ota-provider-app build and usage.
 
 ### Start ota software upgrade
 
--   BLE commission BL702 lighting if not commissioned.
+-   BLE commission BL602/BL702 lighting if not commissioned.
 -   Start OTA software upgrade process
     ```shell
     ./chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 <node_id_to_lighting_app> 0
     ```
-    where `<node_id_to_lighting_app>` is node id of BL702 lighting app.
--   After OTA software upgrade gets done, BL702 will get reboot automatically.
+    where `<node_id_to_lighting_app>` is node id of BL602/BL702 lighting app.
+-   After OTA software upgrade gets done, BL602/BL702 will get reboot
+    automatically.
 
 ## Run RPC Console
 

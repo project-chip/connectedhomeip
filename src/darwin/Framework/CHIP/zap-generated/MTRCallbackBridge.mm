@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MTRCallbackBridge_internal.h"
+#import "MTRCallbackBridge.h"
 #import "MTRCommandPayloadsObjc.h"
 #import "MTRStructsObjc.h"
 
