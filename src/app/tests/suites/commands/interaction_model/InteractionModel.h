@@ -344,25 +344,20 @@ protected:
     template <class T>
     CHIP_ERROR WriteAttribute(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                               std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
-                              const std::vector<T> & values,
-                              const chip::Optional<uint16_t> & timedInteractionTimeoutMs          = chip::NullOptional,
-                              const chip::Optional<bool> & suppressResponse                       = chip::NullOptional,
-                              const chip::Optional<std::vector<chip::DataVersion>> & dataVersions = chip::NullOptional,
-                              const chip::Optional<uint16_t> & repeatCount                        = chip::NullOptional,
-                              const chip::Optional<uint16_t> & repeatDelayInMs                    = chip::NullOptional)
+                              const std::vector<T> & values)
     {
         InteractionModelConfig::AttributePathsConfig pathsConfig;
         ReturnErrorOnFailure(
-            InteractionModelConfig::GetAttributePaths(endpointIds, clusterIds, attributeIds, dataVersions, pathsConfig));
+            InteractionModelConfig::GetAttributePaths(endpointIds, clusterIds, attributeIds, mDataVersions, pathsConfig));
 
         VerifyOrReturnError(pathsConfig.count == values.size() || values.size() == 1, CHIP_ERROR_INVALID_ARGUMENT);
 
-        uint16_t repeat = repeatCount.ValueOr(1);
+        uint16_t repeat = mRepeatCount.ValueOr(1);
         while (repeat--)
         {
 
             mWriteClient = std::make_unique<chip::app::WriteClient>(device->GetExchangeManager(), &mChunkedWriteCallback,
-                                                                    timedInteractionTimeoutMs, suppressResponse.ValueOr(false));
+                                                                    mTimedInteractionTimeoutMs, mSuppressResponse.ValueOr(false));
             VerifyOrReturnError(mWriteClient != nullptr, CHIP_ERROR_NO_MEMORY);
 
             for (uint8_t i = 0; i < pathsConfig.count; i++)
@@ -375,9 +370,9 @@ protected:
 
             ReturnErrorOnFailure(mWriteClient->SendWriteRequest(device->GetSecureSession().Value()));
 
-            if (repeatDelayInMs.HasValue())
+            if (mRepeatDelayInMs.HasValue())
             {
-                chip::test_utils::SleepMillis(repeatDelayInMs.Value());
+                chip::test_utils::SleepMillis(mRepeatDelayInMs.Value());
             }
         }
 
@@ -386,16 +381,10 @@ protected:
 
     template <class T>
     CHIP_ERROR WriteAttribute(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
-                              std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds, const T & value,
-                              const chip::Optional<uint16_t> & timedInteractionTimeoutMs          = chip::NullOptional,
-                              const chip::Optional<bool> & suppressResponse                       = chip::NullOptional,
-                              const chip::Optional<std::vector<chip::DataVersion>> & dataVersions = chip::NullOptional,
-                              const chip::Optional<uint16_t> & repeatCount                        = chip::NullOptional,
-                              const chip::Optional<uint16_t> & repeatDelayInMs                    = chip::NullOptional)
+                              std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds, const T & value)
     {
         std::vector<T> values = { value };
-        return WriteAttribute(device, endpointIds, clusterIds, attributeIds, values, timedInteractionTimeoutMs, suppressResponse,
-                              dataVersions, repeatCount, repeatDelayInMs);
+        return WriteAttribute(device, endpointIds, clusterIds, attributeIds, values);
     }
 
     template <class T>
@@ -437,6 +426,81 @@ protected:
 
     std::unique_ptr<chip::app::WriteClient> mWriteClient;
     chip::app::ChunkedWriteCallback mChunkedWriteCallback;
+
+    InteractionModelWriter & SetTimedInteractionTimeoutMs(uint16_t timedInteractionTimeoutMs)
+    {
+        mTimedInteractionTimeoutMs.SetValue(timedInteractionTimeoutMs);
+        return *this;
+    }
+
+    InteractionModelWriter & SetTimedInteractionTimeoutMs(const chip::Optional<uint16_t> & timedInteractionTimeoutMs)
+    {
+        mTimedInteractionTimeoutMs = timedInteractionTimeoutMs;
+        return *this;
+    }
+
+    InteractionModelWriter & SetSuppressResponse(bool suppressResponse)
+    {
+        mSuppressResponse.SetValue(suppressResponse);
+        return *this;
+    }
+
+    InteractionModelWriter & SetSuppressResponse(const chip::Optional<bool> & suppressResponse)
+    {
+        mSuppressResponse = suppressResponse;
+        return *this;
+    }
+
+    InteractionModelWriter & SetDataVersions(const std::vector<chip::DataVersion> & dataVersions)
+    {
+        mDataVersions.SetValue(dataVersions);
+        return *this;
+    }
+
+    InteractionModelWriter & SetDataVersions(const chip::Optional<std::vector<chip::DataVersion>> & dataVersions)
+    {
+        mDataVersions = dataVersions;
+        return *this;
+    }
+
+    InteractionModelWriter & SetRepeatCount(uint16_t repeatCount)
+    {
+        mRepeatCount.SetValue(repeatCount);
+        return *this;
+    }
+
+    InteractionModelWriter & SetRepeatCount(const chip::Optional<uint16_t> & repeatCount)
+    {
+        mRepeatCount = repeatCount;
+        return *this;
+    }
+
+    InteractionModelWriter & SetRepeatDelayInMs(uint16_t repeatDelayInMs)
+    {
+        mRepeatDelayInMs.SetValue(repeatDelayInMs);
+        return *this;
+    }
+
+    InteractionModelWriter & SetRepeatDelayInMs(const chip::Optional<uint16_t> & repeatDelayInMs)
+    {
+        mRepeatDelayInMs = repeatDelayInMs;
+        return *this;
+    }
+
+    void ResetOptions()
+    {
+        mTimedInteractionTimeoutMs = chip::NullOptional;
+        mSuppressResponse          = chip::NullOptional;
+        mDataVersions              = chip::NullOptional;
+        mRepeatCount               = chip::NullOptional;
+        mRepeatDelayInMs           = chip::NullOptional;
+    }
+
+    chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
+    chip::Optional<std::vector<chip::DataVersion>> mDataVersions;
+    chip::Optional<bool> mSuppressResponse;
+    chip::Optional<uint16_t> mRepeatCount;
+    chip::Optional<uint16_t> mRepeatDelayInMs;
 
 private:
     template <typename T>
@@ -509,8 +573,12 @@ public:
             optionalDataVersions.SetValue(dataVersions);
         }
 
-        return InteractionModelWriter::WriteAttribute(device, endpointIds, clusterIds, attributeIds, value,
-                                                      timedInteractionTimeoutMs, suppressResponse, optionalDataVersions);
+        InteractionModelWriter::ResetOptions();
+        InteractionModelWriter::SetTimedInteractionTimeoutMs(timedInteractionTimeoutMs);
+        InteractionModelWriter::SetSuppressResponse(suppressResponse);
+        InteractionModelWriter::SetDataVersions(optionalDataVersions);
+
+        return InteractionModelWriter::WriteAttribute(device, endpointIds, clusterIds, attributeIds, value);
     }
 
     template <class T>
