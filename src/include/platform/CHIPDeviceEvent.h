@@ -317,21 +317,10 @@ enum OtaState
     kOtaApplyFailed,
 };
 
-enum class CleanupStatus
-{
-    kCompleted,
-    kCancelled
-};
-
 /**
  * A pointer to a function that performs work asynchronously.
  */
 typedef void (*AsyncWorkFunct)(intptr_t arg);
-
-/**
- * A pointer to a function that performs cleanup asynchronously.
- */
-typedef void (*AsyncCleanupFunct)(intptr_t arg, CleanupStatus status);
 
 inline ConnectivityChange GetConnectivityChange(bool prevState, bool newState)
 {
@@ -379,7 +368,6 @@ struct ChipDeviceEvent final
         {
             intptr_t Arg;
             AsyncWorkFunct WorkFunct;
-            AsyncCleanupFunct CleanupFunct;
         } CallWorkFunct;
         struct
         {
