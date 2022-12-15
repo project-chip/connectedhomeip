@@ -173,7 +173,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         jint listSize;
         JniReferences::GetInstance().GetListSize(paaCertsArrayList, listSize);
         std::vector<std::vector<uint8_t>> paaCerts;
-        for (uint8_t i = 0; i < listSize; i++)
+        for (jint i = 0; i < listSize; i++)
         {
             jobject paaCertObj = nullptr;
             err                = JniReferences::GetInstance().GetListItem(paaCertsArrayList, i, paaCertObj);
