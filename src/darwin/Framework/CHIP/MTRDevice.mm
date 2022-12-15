@@ -162,7 +162,8 @@ private:
         _nodeID = [nodeID copy];
         _fabricIndex = controller.fabricIndex;
         _deviceController = controller;
-        _queue = dispatch_queue_create("com.apple.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL);
+        _queue
+            = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _readCache = [NSMutableDictionary dictionary];
         _expectedValueCache = [NSMutableDictionary dictionary];
         _asyncCallbackWorkQueue = [[MTRAsyncCallbackWorkQueue alloc] initWithContext:self queue:_queue];

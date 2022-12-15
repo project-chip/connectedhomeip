@@ -23,7 +23,8 @@
 
 MTRPersistentStorageDelegateBridge::MTRPersistentStorageDelegateBridge(id<MTRStorage> delegate)
     : mDelegate(delegate)
-    , mWorkQueue(dispatch_queue_create("com.csa.matter.framework.storage.workqueue", DISPATCH_QUEUE_SERIAL))
+    , mWorkQueue(
+          dispatch_queue_create("org.csa-iot.matter.framework.storage.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL))
 {
 }
 

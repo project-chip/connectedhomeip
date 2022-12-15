@@ -134,6 +134,8 @@ PyChipError pychip_DeviceController_SetWiFiCredentials(const char * ssid, const 
 PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                                            uint32_t setupPINCode, chip::NodeId nodeid);
+PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::DeviceCommissioner * devCtrl, uint32_t setupPINCode,
+                                                            uint16_t discriminator, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 
 PyChipError pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
@@ -465,6 +467,17 @@ PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::Dev
     params.SetPeerAddress(addr).SetDiscriminator(0);
     return ToPyChipError(devCtrl->EstablishPASEConnection(nodeid, params));
 }
+
+PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::DeviceCommissioner * devCtrl, uint32_t setupPINCode,
+                                                            uint16_t discriminator, chip::NodeId nodeid)
+{
+    chip::Transport::PeerAddress addr;
+    RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
+    addr.SetTransportType(chip::Transport::Type::kBle);
+    params.SetPeerAddress(addr).SetDiscriminator(discriminator);
+    return ToPyChipError(devCtrl->EstablishPASEConnection(nodeid, params));
+}
+
 PyChipError pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
     CommissioningParameters params;
@@ -643,6 +656,11 @@ PyChipError pychip_GetDeviceBeingCommissioned(chip::Controller::DeviceCommission
 PyChipError pychip_ExpireSessions(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId)
 {
     VerifyOrReturnError((devCtrl != nullptr) && (devCtrl->SessionMgr() != nullptr), ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    //
+    // Stop any active pairing sessions to this node.
+    //
+    devCtrl->StopPairing(nodeId);
 
     //
     // Since we permit multiple controllers on the same fabric each associated with a different fabric index, expiring a session

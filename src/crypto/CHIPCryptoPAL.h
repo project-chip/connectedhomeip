@@ -471,7 +471,7 @@ public:
     /** Release resources associated with this key pair */
     void Clear();
 
-private:
+protected:
     P256PublicKey mPublicKey;
     mutable P256KeypairContext mKeypair;
     bool mInitialized = false;

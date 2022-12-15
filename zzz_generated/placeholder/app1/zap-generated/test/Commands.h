@@ -171,11 +171,1637 @@ private:
     }
 };
 
+class Test_TC_ACT_3_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_ACT_3_1_SimulatedSuite() : TestCommand("Test_TC_ACT_3_1_Simulated", 4)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACT_3_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "Read attribute: ActionList");
+            return WaitAttribute(GetEndpoint(0), Actions::Id, Actions::Attributes::ActionList::Id);
+        }
+        case 2: {
+            LogStep(2, "Read attribute: EndpointLists");
+            return WaitAttribute(GetEndpoint(0), Actions::Id, Actions::Attributes::EndpointLists::Id);
+        }
+        case 3: {
+            LogStep(3, "Read attribute: SetupURL");
+            return WaitAttribute(GetEndpoint(0), Actions::Id, Actions::Attributes::SetupURL::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_BOOL_3_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_BOOL_3_1_SimulatedSuite() : TestCommand("Test_TC_BOOL_3_1_Simulated", 2)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_BOOL_3_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "Read attribute: StateValue");
+            return WaitAttribute(GetEndpoint(0), BooleanState::Id, BooleanState::Attributes::StateValue::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DESC_2_2_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_DESC_2_2_SimulatedSuite() : TestCommand("Test_TC_DESC_2_2_Simulated", 5)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DESC_2_2_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "DUT reads DeviceTypeList from TH.");
+            VerifyOrDo(!ShouldSkip("DESC.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), Descriptor::Id, Descriptor::Attributes::DeviceTypeList::Id);
+        }
+        case 2: {
+            LogStep(2, "DUT reads ServerList from the TH");
+            VerifyOrDo(!ShouldSkip("DESC.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), Descriptor::Id, Descriptor::Attributes::ServerList::Id);
+        }
+        case 3: {
+            LogStep(3, "DUT reads ClientList attribute from the TH");
+            VerifyOrDo(!ShouldSkip("DESC.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), Descriptor::Id, Descriptor::Attributes::ClientList::Id);
+        }
+        case 4: {
+            LogStep(4, "DUT reads PartsList attribute from the TH");
+            VerifyOrDo(!ShouldSkip("DESC.C.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), Descriptor::Id, Descriptor::Attributes::PartsList::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DGETH_3_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_DGETH_3_1_SimulatedSuite() : TestCommand("Test_TC_DGETH_3_1_Simulated", 10)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DGETH_3_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "Read attribute: PHYRate");
+            VerifyOrDo(!ShouldSkip("DGETH.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
+                                 EthernetNetworkDiagnostics::Attributes::PHYRate::Id);
+        }
+        case 2: {
+            LogStep(2, "Read attribute: FullDuplex");
+            VerifyOrDo(!ShouldSkip("DGETH.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
+                                 EthernetNetworkDiagnostics::Attributes::FullDuplex::Id);
+        }
+        case 3: {
+            LogStep(3, "Read attribute: PacketRxCount");
+            VerifyOrDo(!ShouldSkip("DGETH.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
+                                 EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id);
+        }
+        case 4: {
+            LogStep(4, "Read attribute: PacketTxCount");
+            VerifyOrDo(!ShouldSkip("DGETH.C.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
+                                 EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id);
+        }
+        case 5: {
+            LogStep(5, "Read attribute: TxErrCount");
+            VerifyOrDo(!ShouldSkip("DGETH.C.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
+                                 EthernetNetworkDiagnostics::Attributes::TxErrCount::Id);
+        }
+        case 6: {
+            LogStep(6, "Read attribute: CollisionCount");
+            VerifyOrDo(!ShouldSkip("DGETH.C.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
+                                 EthernetNetworkDiagnostics::Attributes::CollisionCount::Id);
+        }
+        case 7: {
+            LogStep(7, "Read attribute: OverrunCount");
+            VerifyOrDo(!ShouldSkip("DGETH.C.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
+                                 EthernetNetworkDiagnostics::Attributes::OverrunCount::Id);
+        }
+        case 8: {
+            LogStep(8, "Read attribute: CarrierDetect");
+            VerifyOrDo(!ShouldSkip("DGETH.C.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
+                                 EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id);
+        }
+        case 9: {
+            LogStep(9, "Read attribute: TimeSinceReset");
+            VerifyOrDo(!ShouldSkip("DGETH.C.A0008"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
+                                 EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DGETH_3_2_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_DGETH_3_2_SimulatedSuite() : TestCommand("Test_TC_DGETH_3_2_Simulated", 2)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DGETH_3_2_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "DUT sends ResetCounts to TH");
+            VerifyOrDo(!ShouldSkip("DGETH.C.C00.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
+                               EthernetNetworkDiagnostics::Commands::ResetCounts::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DGSW_3_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_DGSW_3_1_SimulatedSuite() : TestCommand("Test_TC_DGSW_3_1_Simulated", 5)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DGSW_3_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "Read attribute: ThreadMetrics");
+            VerifyOrDo(!ShouldSkip("DGSW.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), SoftwareDiagnostics::Id, SoftwareDiagnostics::Attributes::ThreadMetrics::Id);
+        }
+        case 2: {
+            LogStep(2, "Read attribute: CurrentHeapFree");
+            VerifyOrDo(!ShouldSkip("DGSW.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), SoftwareDiagnostics::Id, SoftwareDiagnostics::Attributes::CurrentHeapFree::Id);
+        }
+        case 3: {
+            LogStep(3, "Read attribute: CurrentHeapUsed");
+            VerifyOrDo(!ShouldSkip("DGSW.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), SoftwareDiagnostics::Id, SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id);
+        }
+        case 4: {
+            LogStep(4, "Read attribute: CurrentHeapHighWatermark");
+            VerifyOrDo(!ShouldSkip("DGSW.C.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), SoftwareDiagnostics::Id,
+                                 SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DGSW_3_2_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_DGSW_3_2_SimulatedSuite() : TestCommand("Test_TC_DGSW_3_2_Simulated", 2)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DGSW_3_2_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "DUT sends ResetWatermarks to TH");
+            VerifyOrDo(!ShouldSkip("DGSW.C.C00.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(0), SoftwareDiagnostics::Id, SoftwareDiagnostics::Commands::ResetWatermarks::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DGWIFI_3_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_DGWIFI_3_1_SimulatedSuite() : TestCommand("Test_TC_DGWIFI_3_1_Simulated", 14)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DGWIFI_3_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "Read attribute: BSSID");
+            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Attributes::Bssid::Id);
+        }
+        case 2: {
+            LogStep(2, "Read attribute: SecurityType");
+            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Attributes::SecurityType::Id);
+        }
+        case 3: {
+            LogStep(3, "Read attribute: WiFiVersion");
+            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Attributes::WiFiVersion::Id);
+        }
+        case 4: {
+            LogStep(4, "Read attribute: ChannelNumber");
+            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Attributes::ChannelNumber::Id);
+        }
+        case 5: {
+            LogStep(5, "Read attribute: RSSI");
+            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Attributes::Rssi::Id);
+        }
+        case 6: {
+            LogStep(6, "Read attribute: BeaconLostCount");
+            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id,
+                                 WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id);
+        }
+        case 7: {
+            LogStep(7, "Read attribute: BeaconRxCount");
+            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id);
+        }
+        case 8: {
+            LogStep(8, "Read attribute: PacketMulticastRxCount");
+            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id,
+                                 WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id);
+        }
+        case 9: {
+            LogStep(9, "Read attribute: PacketMulticastTxCount");
+            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0008"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id,
+                                 WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id);
+        }
+        case 10: {
+            LogStep(10, "Read attribute: PacketUnicastRxCount");
+            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0009"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id,
+                                 WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id);
+        }
+        case 11: {
+            LogStep(11, "Read attribute: PacketUnicastTxCount");
+            VerifyOrDo(!ShouldSkip("DGWIFI.C.A000a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id,
+                                 WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id);
+        }
+        case 12: {
+            LogStep(12, "Read attribute: CurrentMaxRate");
+            VerifyOrDo(!ShouldSkip("DGWIFI.C.A000b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id,
+                                 WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id);
+        }
+        case 13: {
+            LogStep(13, "Read attribute: OverrunCount");
+            VerifyOrDo(!ShouldSkip("DGWIFI.C.A000c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Attributes::OverrunCount::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DGWIFI_3_2_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_DGWIFI_3_2_SimulatedSuite() : TestCommand("Test_TC_DGWIFI_3_2_Simulated", 2)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DGWIFI_3_2_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "DUT sends ResetCounts command to TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.C00.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(0), WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Commands::ResetCounts::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_FLW_3_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_FLW_3_1_SimulatedSuite() : TestCommand("Test_TC_FLW_3_1_Simulated", 5)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_FLW_3_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "Read attribute: MeasuredValue");
+            return WaitAttribute(GetEndpoint(0), FlowMeasurement::Id, FlowMeasurement::Attributes::MeasuredValue::Id);
+        }
+        case 2: {
+            LogStep(2, "Read attribute: MinMeasuredValue");
+            return WaitAttribute(GetEndpoint(0), FlowMeasurement::Id, FlowMeasurement::Attributes::MinMeasuredValue::Id);
+        }
+        case 3: {
+            LogStep(3, "Read attribute: MaxMeasuredValue");
+            return WaitAttribute(GetEndpoint(0), FlowMeasurement::Id, FlowMeasurement::Attributes::MaxMeasuredValue::Id);
+        }
+        case 4: {
+            LogStep(4, "Read attribute: Tolerance");
+            return WaitAttribute(GetEndpoint(0), FlowMeasurement::Id, FlowMeasurement::Attributes::Tolerance::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_G_3_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_G_3_1_SimulatedSuite() : TestCommand("Test_TC_G_3_1_Simulated", 2)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_G_3_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "DUT reads NameSupport attribute value from TH");
+            VerifyOrDo(!ShouldSkip("G.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), Groups::Id, Groups::Attributes::NameSupport::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_I_3_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_I_3_1_SimulatedSuite() : TestCommand("Test_TC_I_3_1_Simulated", 5)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_I_3_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "Read attribute: identify time");
+            return WaitAttribute(GetEndpoint(1), Identify::Id, Identify::Attributes::IdentifyTime::Id);
+        }
+        case 2: {
+            LogStep(2, "write attribute: identify time");
+            return WaitAttribute(GetEndpoint(1), Identify::Id, Identify::Attributes::IdentifyTime::Id);
+        }
+        case 3: {
+            LogStep(3, "Readback attribute: identify time");
+            return WaitAttribute(GetEndpoint(1), Identify::Id, Identify::Attributes::IdentifyTime::Id);
+        }
+        case 4: {
+            LogStep(4, "Read attribute: identifytype");
+            return WaitAttribute(GetEndpoint(1), Identify::Id, Identify::Attributes::IdentifyType::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_PRS_3_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_PRS_3_1_SimulatedSuite() : TestCommand("Test_TC_PRS_3_1_Simulated", 10)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_PRS_3_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "Read attribute: MeasuredValue");
+            return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::MeasuredValue::Id);
+        }
+        case 2: {
+            LogStep(2, "Read attribute: MinMeasuredValue");
+            return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::MinMeasuredValue::Id);
+        }
+        case 3: {
+            LogStep(3, "Read attribute: MaxMeasuredValue");
+            return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::MaxMeasuredValue::Id);
+        }
+        case 4: {
+            LogStep(4, "Read attribute: Tolerance");
+            return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::Tolerance::Id);
+        }
+        case 5: {
+            LogStep(5, "Read attribute: ScaledValue");
+            return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::ScaledValue::Id);
+        }
+        case 6: {
+            LogStep(6, "Read attribute: MinScaledValue");
+            return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::MinScaledValue::Id);
+        }
+        case 7: {
+            LogStep(7, "Read attribute: MaxScaledValue");
+            return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::MaxScaledValue::Id);
+        }
+        case 8: {
+            LogStep(8, "Read attribute: ScaledTolerance");
+            return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::ScaledTolerance::Id);
+        }
+        case 9: {
+            LogStep(9, "Read attribute: Scale");
+            return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::Scale::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_PS_3_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_PS_3_1_SimulatedSuite() : TestCommand("Test_TC_PS_3_1_Simulated", 32)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_PS_3_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "Read attribute: Status");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::Status::Id);
+        }
+        case 2: {
+            LogStep(2, "Read attribute: Order");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::Order::Id);
+        }
+        case 3: {
+            LogStep(3, "Read attribute: Description");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::Description::Id);
+        }
+        case 4: {
+            LogStep(4, "Read attribute: WiredAssessedInputVoltage");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::WiredAssessedInputVoltage::Id);
+        }
+        case 5: {
+            LogStep(5, "Read attribute: WiredAssessedInputFrequency");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::WiredAssessedInputFrequency::Id);
+        }
+        case 6: {
+            LogStep(6, "Read attribute: WiredCurrentType");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::WiredCurrentType::Id);
+        }
+        case 7: {
+            LogStep(7, "Read attribute: WiredAssessedCurrent");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::WiredAssessedCurrent::Id);
+        }
+        case 8: {
+            LogStep(8, "Read attribute: WiredNominalVoltage");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::WiredNominalVoltage::Id);
+        }
+        case 9: {
+            LogStep(9, "Read attribute: WiredPresent");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::WiredPresent::Id);
+        }
+        case 10: {
+            LogStep(10, "Read attribute: WiredMaximumCurrent");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::WiredMaximumCurrent::Id);
+        }
+        case 11: {
+            LogStep(11, "Read attribute: ActiveWiredFaults");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::ActiveWiredFaults::Id);
+        }
+        case 12: {
+            LogStep(12, "Read attribute: BatVoltage");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatVoltage::Id);
+        }
+        case 13: {
+            LogStep(13, "Read attribute: BatPercentRemaining");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatPercentRemaining::Id);
+        }
+        case 14: {
+            LogStep(14, "Read attribute: BatTimeRemaining");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatTimeRemaining::Id);
+        }
+        case 15: {
+            LogStep(15, "Read attribute: BatChargeLevel");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatChargeLevel::Id);
+        }
+        case 16: {
+            LogStep(16, "Read attribute: BatReplacementNeeded");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatReplacementNeeded::Id);
+        }
+        case 17: {
+            LogStep(17, "Read attribute: BatReplaceability");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatReplaceability::Id);
+        }
+        case 18: {
+            LogStep(18, "Read attribute: BatPresent");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatPresent::Id);
+        }
+        case 19: {
+            LogStep(19, "Read attribute: ActiveBatFaults");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::ActiveBatFaults::Id);
+        }
+        case 20: {
+            LogStep(20, "Read attribute: BatReplacementDescription");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatReplacementDescription::Id);
+        }
+        case 21: {
+            LogStep(21, "Read attribute: BatCommonDesignation");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatCommonDesignation::Id);
+        }
+        case 22: {
+            LogStep(22, "Read attribute: BatANSIDesignation");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatANSIDesignation::Id);
+        }
+        case 23: {
+            LogStep(23, "Read attribute: BatIECDesignation");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatIECDesignation::Id);
+        }
+        case 24: {
+            LogStep(24, "Read attribute: BatApprovedChemistry");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatApprovedChemistry::Id);
+        }
+        case 25: {
+            LogStep(25, "Read attribute: BatCapacity");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatCapacity::Id);
+        }
+        case 26: {
+            LogStep(26, "Read attribute: BatQuantity");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatQuantity::Id);
+        }
+        case 27: {
+            LogStep(27, "Read attribute: BatChargeState");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatChargeState::Id);
+        }
+        case 28: {
+            LogStep(28, "Read attribute: BatTimeToFullCharge");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatTimeToFullCharge::Id);
+        }
+        case 29: {
+            LogStep(29, "Read attribute: BatFunctionalWhileCharging");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatFunctionalWhileCharging::Id);
+        }
+        case 30: {
+            LogStep(30, "Read attribute: BatChargingCurrent");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::BatChargingCurrent::Id);
+        }
+        case 31: {
+            LogStep(31, "Read attribute: ActiveBatChargeFaults");
+            return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::ActiveBatChargeFaults::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_PSCFG_3_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_PSCFG_3_1_SimulatedSuite() : TestCommand("Test_TC_PSCFG_3_1_Simulated", 2)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_PSCFG_3_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "Read attribute: Sources");
+            return WaitAttribute(GetEndpoint(0), PowerSourceConfiguration::Id, PowerSourceConfiguration::Attributes::Sources::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_RH_3_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_RH_3_1_SimulatedSuite() : TestCommand("Test_TC_RH_3_1_Simulated", 5)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_RH_3_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "Read attribute MeasuredValue");
+            return WaitAttribute(GetEndpoint(0), RelativeHumidityMeasurement::Id,
+                                 RelativeHumidityMeasurement::Attributes::MeasuredValue::Id);
+        }
+        case 2: {
+            LogStep(2, "Read attribute MinMeasuredValue");
+            return WaitAttribute(GetEndpoint(0), RelativeHumidityMeasurement::Id,
+                                 RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Id);
+        }
+        case 3: {
+            LogStep(3, "Read attribute MaxMeasuredValue");
+            return WaitAttribute(GetEndpoint(0), RelativeHumidityMeasurement::Id,
+                                 RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Id);
+        }
+        case 4: {
+            LogStep(4, "Read attribute Tolerance");
+            return WaitAttribute(GetEndpoint(0), RelativeHumidityMeasurement::Id,
+                                 RelativeHumidityMeasurement::Attributes::Tolerance::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_SWTCH_3_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_SWTCH_3_1_SimulatedSuite() : TestCommand("Test_TC_SWTCH_3_1_Simulated", 4)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_SWTCH_3_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "Read NumberOfPositions attribute");
+            return WaitAttribute(GetEndpoint(0), Switch::Id, Switch::Attributes::NumberOfPositions::Id);
+        }
+        case 2: {
+            LogStep(2, "Read CurrentPosition attribute");
+            return WaitAttribute(GetEndpoint(0), Switch::Id, Switch::Attributes::CurrentPosition::Id);
+        }
+        case 3: {
+            LogStep(3, "Read MultiPressMax attribute");
+            return WaitAttribute(GetEndpoint(0), Switch::Id, Switch::Attributes::MultiPressMax::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_WNCV_5_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_WNCV_5_1_SimulatedSuite() : TestCommand("Test_TC_WNCV_5_1_Simulated", 6)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_WNCV_5_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the device to be commissioned");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissioning::Type value;
+            return WaitForCommissioning(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "DUT reads the FeatureMap attribute from TH");
+            VerifyOrDo(!ShouldSkip("WNCV.C.Afffc"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), WindowCovering::Id, WindowCovering::Attributes::FeatureMap::Id);
+        }
+        case 2: {
+            LogStep(2, "DUT reads the Type attribute from TH");
+            VerifyOrDo(!ShouldSkip("WNCV.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), WindowCovering::Id, WindowCovering::Attributes::Type::Id);
+        }
+        case 3: {
+            LogStep(3, "DUT reads the EndProductType attribute from TH");
+            VerifyOrDo(!ShouldSkip("WNCV.C.A000d"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), WindowCovering::Id, WindowCovering::Attributes::EndProductType::Id);
+        }
+        case 4: {
+            LogStep(4, "DUT reads the Mode attribute from TH");
+            VerifyOrDo(!ShouldSkip("WNCV.C.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), WindowCovering::Id, WindowCovering::Attributes::Mode::Id);
+        }
+        case 5: {
+            LogStep(5, "DUT reads the ConfigStatus attribute from TH");
+            VerifyOrDo(!ShouldSkip("WNCV.C.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), WindowCovering::Id, WindowCovering::Attributes::ConfigStatus::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
 {
     if (testName == "Test_TC_BINFO_2_3_Simulated")
     {
         return std::unique_ptr<Test_TC_BINFO_2_3_SimulatedSuite>(new Test_TC_BINFO_2_3_SimulatedSuite());
+    }
+    if (testName == "Test_TC_ACT_3_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_ACT_3_1_SimulatedSuite>(new Test_TC_ACT_3_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_BOOL_3_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_BOOL_3_1_SimulatedSuite>(new Test_TC_BOOL_3_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_DESC_2_2_Simulated")
+    {
+        return std::unique_ptr<Test_TC_DESC_2_2_SimulatedSuite>(new Test_TC_DESC_2_2_SimulatedSuite());
+    }
+    if (testName == "Test_TC_DGETH_3_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_DGETH_3_1_SimulatedSuite>(new Test_TC_DGETH_3_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_DGETH_3_2_Simulated")
+    {
+        return std::unique_ptr<Test_TC_DGETH_3_2_SimulatedSuite>(new Test_TC_DGETH_3_2_SimulatedSuite());
+    }
+    if (testName == "Test_TC_DGSW_3_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_DGSW_3_1_SimulatedSuite>(new Test_TC_DGSW_3_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_DGSW_3_2_Simulated")
+    {
+        return std::unique_ptr<Test_TC_DGSW_3_2_SimulatedSuite>(new Test_TC_DGSW_3_2_SimulatedSuite());
+    }
+    if (testName == "Test_TC_DGWIFI_3_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_DGWIFI_3_1_SimulatedSuite>(new Test_TC_DGWIFI_3_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_DGWIFI_3_2_Simulated")
+    {
+        return std::unique_ptr<Test_TC_DGWIFI_3_2_SimulatedSuite>(new Test_TC_DGWIFI_3_2_SimulatedSuite());
+    }
+    if (testName == "Test_TC_FLW_3_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_FLW_3_1_SimulatedSuite>(new Test_TC_FLW_3_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_G_3_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_G_3_1_SimulatedSuite>(new Test_TC_G_3_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_I_3_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_I_3_1_SimulatedSuite>(new Test_TC_I_3_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_PRS_3_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_PRS_3_1_SimulatedSuite>(new Test_TC_PRS_3_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_PS_3_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_PS_3_1_SimulatedSuite>(new Test_TC_PS_3_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_PSCFG_3_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_PSCFG_3_1_SimulatedSuite>(new Test_TC_PSCFG_3_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_RH_3_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_RH_3_1_SimulatedSuite>(new Test_TC_RH_3_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_SWTCH_3_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_SWTCH_3_1_SimulatedSuite>(new Test_TC_SWTCH_3_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_WNCV_5_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_WNCV_5_1_SimulatedSuite>(new Test_TC_WNCV_5_1_SimulatedSuite());
     }
 
     return nullptr;
@@ -185,4 +1811,22 @@ void PrintTestCommands()
 {
     ChipLogError(chipTool, "Supported commands:");
     ChipLogError(chipTool, "\t* Test_TC_BINFO_2_3_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_ACT_3_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_BOOL_3_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_DESC_2_2_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_DGETH_3_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_DGETH_3_2_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_DGSW_3_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_DGSW_3_2_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_DGWIFI_3_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_DGWIFI_3_2_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_FLW_3_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_G_3_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_I_3_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_PRS_3_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_PS_3_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_PSCFG_3_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_RH_3_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_SWTCH_3_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_WNCV_5_1_Simulated");
 }

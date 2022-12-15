@@ -619,10 +619,18 @@ CHIP_ERROR DiscoveryImplPlatform::FinalizeServiceUpdate()
     return ChipDnssdFinalizeServiceUpdate();
 }
 
-CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
+CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId)
 {
     ReturnErrorOnFailure(InitImpl());
-    return mResolverProxy.ResolveNodeId(peerId, type);
+    return mResolverProxy.ResolveNodeId(peerId);
+}
+
+void DiscoveryImplPlatform::NodeIdResolutionNoLongerNeeded(const PeerId & peerId)
+{
+    char name[Common::kInstanceNameMaxLength + 1];
+    ReturnOnFailure(MakeInstanceName(name, sizeof(name), peerId));
+
+    ChipDnssdResolveNoLongerNeeded(name);
 }
 
 CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissionableNodes(DiscoveryFilter filter)
@@ -664,22 +672,36 @@ Resolver & chip::Dnssd::Resolver::Instance()
     return DiscoveryImplPlatform::GetInstance();
 }
 
-CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
+CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogProgress(Discovery, "Resolving " ChipLogFormatX64 ":" ChipLogFormatX64 " ...",
                     ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
 
-    mDelegate->Retain();
-
     DnssdService service;
 
     ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), peerId));
     Platform::CopyString(service.mType, kOperationalServiceName);
     service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolTcp;
-    service.mAddressType = type;
-    return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeIdResolve, mDelegate);
+    service.mAddressType = Inet::IPAddressType::kAny;
+
+    mDelegate->Retain();
+
+    CHIP_ERROR err = ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeIdResolve, mDelegate);
+    if (err != CHIP_NO_ERROR)
+    {
+        mDelegate->Release();
+    }
+    return err;
+}
+
+void ResolverProxy::NodeIdResolutionNoLongerNeeded(const PeerId & peerId)
+{
+    char name[Common::kInstanceNameMaxLength + 1];
+    ReturnOnFailure(MakeInstanceName(name, sizeof(name), peerId));
+
+    ChipDnssdResolveNoLongerNeeded(name);
 }
 
 ResolverProxy::~ResolverProxy()

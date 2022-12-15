@@ -540,6 +540,8 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
     return error;
 }
 
+void ChipDnssdResolveNoLongerNeeded(const char * instanceName) {}
+
 CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;

@@ -67,8 +67,8 @@ def BuildHostFakeTarget():
         TargetPart('tests', app=HostApp.TESTS),
     ])
 
-    target.AppendModifier("mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-mbedtls')
-    target.AppendModifier("boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-boringssl')
+    target.AppendModifier("mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
+    target.AppendModifier("boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-mbedtls')
     target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
     target.AppendModifier("ubsan", use_ubsan=True)
@@ -136,8 +136,8 @@ def BuildHostTarget():
     target.AppendModifier("no-ble", enable_ble=False)
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("no-thread", enable_thread=False)
-    target.AppendModifier("mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-mbedtls')
-    target.AppendModifier("boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-boringssl')
+    target.AppendModifier("mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
+    target.AppendModifier("boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-mbedtls')
     target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
     target.AppendModifier("ubsan", use_ubsan=True)

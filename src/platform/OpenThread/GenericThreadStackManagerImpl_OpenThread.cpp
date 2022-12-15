@@ -1162,7 +1162,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
                     averageRssi.SetNonNull(neighInfo.mAverageRssi);
                 }
 
-                if (neighInfo.mAverageRssi == OT_RADIO_RSSI_INVALID)
+                if (neighInfo.mLastRssi == OT_RADIO_RSSI_INVALID)
                 {
                     lastRssi.SetNull();
                 }
