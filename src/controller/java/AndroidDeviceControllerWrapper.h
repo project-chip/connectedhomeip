@@ -105,15 +105,9 @@ public:
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
 
-    chip::Controller::AutoCommissioner * GetAutoCommissioner()
-    {
-        return &mAutoCommissioner;
-    }
+    chip::Controller::AutoCommissioner * GetAutoCommissioner() { return &mAutoCommissioner; }
 
-    chip::Credentials::PartialDACVerifier * GetPartialDACVerifier()
-    {
-        return &mPartialDACVerifier;
-    }
+    chip::Credentials::PartialDACVerifier * GetPartialDACVerifier() { return &mPartialDACVerifier; }
 
     const chip::Controller::CommissioningParameters & GetCommissioningParameters() const
     {
@@ -194,10 +188,7 @@ public:
         mDeviceAttestationDelegateBridge = deviceAttestationDelegateBridge;
     }
 
-    DeviceAttestationDelegateBridge * GetDeviceAttestationDelegateBridge()
-    {
-        return mDeviceAttestationDelegateBridge;
-    }
+    DeviceAttestationDelegateBridge * GetDeviceAttestationDelegateBridge() { return mDeviceAttestationDelegateBridge; }
 
     void ClearDeviceAttestationDelegateBridge()
     {
