@@ -19,43 +19,37 @@ import("${chip_root}/src/lib/lib.gni")
 
 declare_args() {
 
-  # Location of the bl602 SDK.
   bl_iot_sdk_root = "${chip_root}/third_party/bouffalolab/repo"
 }
 
 assert(bl_iot_sdk_root != "", "bl_iot_sdk_root must be specified")
 
-# Defines an Bouffalo Lab SDK build target.
+# Defines an Bouffa Lab IOT SDK build target.
 #
 # Parameters:
-#   bl_iot_sdk_root - The location of the bl602 SDK.
+#   bl_iot_sdk_root - The location of Bouffalo Lab IOT SDK.
 #   sources - The sources files to build.
 template("bl_iot_sdk") {
-
   sdk_target_name = target_name
 
   config("${sdk_target_name}_config") {
 
-    include_dirs = [
-      "${chip_root}/third_party/mbedtls/repo/include",
-    ]
-
     defines = [
-      "MBEDTLS_CONFIG_FILE=\"bl602-chip-mbedtls-config.h\"",
+      "__FILENAME__=strrchr(__FILE__,'/')?strrchr(__FILE__,'/')+1:__FILE__",
       "ARCH_RISCV",
-
-      "BL602_USE_HAL_DRIVER=1",
       "BL602=BL602",
+      "BL602_USE_HAL_DRIVER=1",
 
       "CFG_CHIP_BL602",
 
-      "__FILENAME__=strrchr(__FILE__,'/')?strrchr(__FILE__,'/')+1:__FILE__",
+      "MBEDTLS_CONFIG_FILE=\"bl602-chip-mbedtls-config.h\"",
 
       #dump backtrace
       "CONF_ENABLE_FRAME_PTR=1",
       "CONF_ENABLE_FUNC_BACKTRACE_ELF=out/bl602-light/chip-bl602-lighting-example.out",
     ]
 
+    include_dirs = [ "${chip_root}/third_party/mbedtls/repo/include" ]
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
     }
@@ -240,14 +234,6 @@ template("bl_iot_sdk") {
 
   source_set("${sdk_target_name}_hosal") {
 
-    include_dirs = [
-
-      "${bl_iot_sdk_root}/components/sys/blmtd/include",
-
-      "${bl_iot_sdk_root}/components/stage/cli/cli/include/",
-      "${bl_iot_sdk_root}/components/stage/blog",
-    ]
-
     sources = [
       "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_adc.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_boot2.c",
@@ -304,10 +290,19 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_wdg.c",
 
       "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_aes.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_common.c",
       "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_pka.c",
       "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_sha.c",
     ]
 
+    cflags_c = [
+      "-Wno-sign-compare",
+      "-Wno-shadow",
+      "-Wno-unused-but-set-variable",
+      "-Wno-old-style-declaration",
+      "-Wno-stringop-overflow",
+      "-Wno-format-truncation",
+    ]
     configs += [ 
       ":${sdk_target_name}_config_wifi",
       ":${sdk_target_name}_config_BSP_Driver",
@@ -320,15 +315,6 @@ template("bl_iot_sdk") {
     public_configs = [ 
       ":${sdk_target_name}_config", 
       ":${sdk_target_name}_config_hosal"
-    ]
-
-    cflags_c = [
-      "-Wno-sign-compare",
-      "-Wno-shadow",
-      "-Wno-old-style-declaration",
-      "-Wno-unused-but-set-variable",
-      "-Wno-stringop-overflow",
-      "-Wno-format-truncation",
     ]
   }
 
@@ -392,9 +378,6 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_stage") {
-    include_dirs = [ 
-      "${bl_iot_sdk_root}/components/sys/blmtd/include",
-    ]
 
     sources = [
       "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt.c",
@@ -422,6 +405,7 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_BSP_Driver",
       ":${sdk_target_name}_config_freertos",
       ":${sdk_target_name}_config_fs",
+      ":${sdk_target_name}_config_sys",
       ":${sdk_target_name}_config_utils",
     ]
     public_configs = [ 
@@ -435,13 +419,12 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/sys/bloop/bloop/include",
       "${bl_iot_sdk_root}/components/sys/bloop/looprt/include",
       "${bl_iot_sdk_root}/components/sys/bloop/loopset/include",
+      "${bl_iot_sdk_root}/components/sys/blmtd/include",
     ]
   }
 
   source_set("${sdk_target_name}_sys") {
     include_dirs = [
-
-      "${bl_iot_sdk_root}/components/sys/blmtd/include",
       "${bl_iot_sdk_root}/components/sys/bltime/include",
     ]
     sources = [ 
@@ -534,7 +517,6 @@ template("bl_iot_sdk") {
       "CONFIG_BT_ASSERT",
       "CFG_BLE_STACK_DBG_PRINT",
     ]
-
 
     cflags_cc = [ "-Wno-conversion" ]
   }
@@ -837,7 +819,6 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/lwip/src/netif/bridgeif_fdb.c",
       "${bl_iot_sdk_root}/components/network/lwip/src/netif/ethernet.c",
       "${bl_iot_sdk_root}/components/network/lwip/src/netif/zepif.c",
-      "${bl_iot_sdk_root}/components/network/lwip/src/apps/mdns/mdns.c" 
     ]
     sources += [
       "${bl_iot_sdk_root}/components/network/lwip/src/core/def.c",
@@ -894,7 +875,9 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/lwip/src/api/sockets.c",
       "${bl_iot_sdk_root}/components/network/lwip/src/api/tcpip.c",
     ]
-
+    sources += [ 
+      "${bl_iot_sdk_root}/components/network/lwip/src/apps/mdns/mdns.c" 
+    ]
     sources += [
       "${bl_iot_sdk_root}/components/network/lwip_dhcpd/dhcp_server_raw.c",
     ]

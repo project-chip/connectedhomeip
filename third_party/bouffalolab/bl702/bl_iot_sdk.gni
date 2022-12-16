@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import("//args.gni")
 import("//build_overrides/bouffalolab_iot_sdk.gni")
 import("//build_overrides/chip.gni")
@@ -22,14 +21,12 @@ import("${chip_root}/src/lib/lib.gni")
 import("${mbedtls_root}/mbedtls.gni")
 
 declare_args() {
-  # Location of the bl702 SDK.
+
   bl_iot_sdk_root = "${chip_root}/third_party/bouffalolab/repo"
 
   enable_cdc_module = false
 
   thread_port_1_3 = false
-
-  plat_name = "bl602"
 }
 
 assert(bl_iot_sdk_root != "", "bl_iot_sdk_root must be specified")
@@ -50,159 +47,151 @@ template("bl_iot_sdk") {
     enable_cdc_module = invoker.enable_cdc_module
   }
 
-  if (defined(invoker.bl_plat_name)) {
-    plat_name = invoker.bl_plat_name
-  }
-
   config("${sdk_target_name}_config") {
     defines = [
-      "BFLB_USE_ROM_DRIVER=1",
-      "BFLB_USE_HAL_DRIVER=1",
       "__FILENAME__=strrchr(__FILE__,'/')?strrchr(__FILE__,'/')+1:__FILE__",
       "ARCH_RISCV",
+      "BL702=BL702",
+      "BFLB_USE_ROM_DRIVER=1",
+      "BFLB_USE_HAL_DRIVER=1",
+
       "bl706_iot=1",
     ]
-    if (defined(invoker.defines)) {
-      defines += invoker.defines
-    }
-
-    if (plat_name=="bl702") {
-      defines += ["BL702=BL702"]
-    }
 
     include_dirs = []
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
     }
+    
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
+    }
 
-    include_dirs += [
-      "${bl_iot_sdk_root}/components/platform/hosal/include",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/include",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal",
-      "${bl_iot_sdk_root}/components/platform/hosal/sec_common",
-
-      "${bl_iot_sdk_root}",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_freertos/config",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_freertos/portable/GCC/RISC-V",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_freertos/portable/GCC/RISC-V/chip_specific_extensions/RV32F_float_abi_single",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_freertos/panic",
-
-      "${bl_iot_sdk_root}/components/utils/include/",
-
-      "${bl_iot_sdk_root}/components/stage/yloop/include",
-      "${bl_iot_sdk_root}/components/stage/blfdt/inc",
-      "${bl_iot_sdk_root}/components/stage/blog/",
-      "${bl_iot_sdk_root}/components/stage/cli/cli/include",
-      "${bl_iot_sdk_root}/components/stage/coredump/inc",
-      "${bl_iot_sdk_root}/components/stage/easyflash4/inc",
-
-      "${bl_iot_sdk_root}/components/fs/vfs/include",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/inc",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/regs",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/startup",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/MCU_Common/misc",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/risc-v/Core/Include",
-    ]
-
-    cflags = []
-    cflags_c = []
     if (defined(invoker.freertos_config)) {
-      cflags_c += [
+      cflags_c = [
         "-include",
         rebase_path("${invoker.freertos_config}", root_build_dir),
       ]
     }
+  }
 
-    if (defined(invoker.defines)) {
-      defines += invoker.defines
-    }
+
+  config("${sdk_target_name}_config_soc") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_rf/include"
+    ]
   }
 
   source_set("${sdk_target_name}_soc") {
     defines = [ "CFG_CPP_ENABLE" ]
 
     sources = [
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}/evb/src/boot/gcc/start.S",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}/evb/src/debug.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}/evb/src/strntoumax.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}/evb/src/memmove.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}/evb/src/sscanf.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}/evb/src/vprint.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}/evb/src/vsscanf.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702/evb/src/boot/gcc/start.S",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702/evb/src/debug.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702/evb/src/strntoumax.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702/evb/src/vprint.c",
     ]
-    if (plat_name == "bl702") {
-      libs = [ "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_rf/lib/libbl702_rf.a" ]
-    }
+
+    libs = [ "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_rf/lib/libbl702_rf.a" ]
+
     cflags_c = [ "-Wno-format-truncation" ]
   }
 
+  config("${sdk_target_name}_config_BSP_Driver") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/inc",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/regs",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/startup",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/risc-v/Core/Include",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/MCU_Common/soft_crc",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/MCU_Common/misc",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Common/platform/"
+    ]
+  }
+
   source_set("${sdk_target_name}_BSP_Driver") {
-    include_dirs = [ "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/MCU_Common/soft_crc" ]
 
     sources = [
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_acomp.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_adc.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_aon.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_cam.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_clock.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_common.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_dac.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_dma.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_ef_ctrl.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_emac.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_glb.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_hbn.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_i2c.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_i2c_gpio_sim.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_i2s.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_ir.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_kys.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_l1c.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_mjpeg.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_pds.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_psram.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_pwm.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_qdec.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_romapi.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_sec_dbg.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_sec_eng.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_sf_cfg.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_sf_cfg_ext.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_sf_ctrl.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_sflash.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_sflash_ext.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_spi.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_timer.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_uart.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_usb.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_xip_sflash.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Driver/std_drv/src/${plat_name}_xip_sflash_ext.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_acomp.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_adc.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_aon.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_cam.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_clock.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_common.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_dac.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_dma.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_ef_ctrl.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_emac.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_glb.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_hbn.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_i2c.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_i2c_gpio_sim.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_i2s.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_ir.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_kys.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_l1c.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_mjpeg.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_pds.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_psram.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_pwm.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_qdec.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_romapi.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_sec_dbg.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_sec_eng.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_sf_cfg.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_sf_cfg_ext.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_sf_ctrl.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_sflash.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_sflash_ext.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_spi.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_timer.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_uart.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_usb.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_xip_sflash.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Driver/std_drv/src/bl702_xip_sflash_ext.c",
     ]
 
-    public_configs = [ ":${sdk_target_name}_config" ]
+    configs += [
+      ":${sdk_target_name}_config_freertos",
+    ]
+    public_configs = [ 
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_BSP_Driver",
+    ]
     cflags_c = [
       "-Wno-sign-compare",
       "-Wno-unused-variable",
     ]
   }
 
-  source_set("${sdk_target_name}_${plat_name}_freertos") {
+  config("${sdk_target_name}_config_freertos") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/config",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/portable/GCC/RISC-V",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/panic",
+    ]
+  }
+
+  source_set("${sdk_target_name}_bl702_freertos") {
     defines = [ "portasmHANDLE_INTERRUPT=interrupt_entry" ]
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/portable/GCC/RISC-V/chip_specific_extensions/RV32F_float_abi_single",
+    ]
 
     sources = [
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_freertos/event_groups.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_freertos/list.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_freertos/misaligned/fp_asm.S",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_freertos/misaligned/misaligned_ldst.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_freertos/panic/panic_c.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_freertos/portable/GCC/RISC-V/port.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_freertos/portable/GCC/RISC-V/portASM.S",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_freertos/portable/MemMang/heap_5.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_freertos/portable/MemMang/heap_5_psram.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_freertos/queue.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_freertos/stream_buffer.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_freertos/tasks.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_freertos/timers.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/event_groups.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/list.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/misaligned/fp_asm.S",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/misaligned/misaligned_ldst.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/panic/panic_c.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/portable/GCC/RISC-V/port.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/portable/GCC/RISC-V/portASM.S",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/portable/MemMang/heap_5.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/portable/MemMang/heap_5_psram.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/queue.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/stream_buffer.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/tasks.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_freertos/timers.c",
     ]
 
     cflags_c = [
@@ -210,26 +199,29 @@ template("bl_iot_sdk") {
       "-Wno-old-style-declaration",
     ]
 
-    public_configs = [ ":${sdk_target_name}_config" ]
+    public_configs = [ 
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_freertos",
+    ]
   }
 
-  source_set("${sdk_target_name}_${plat_name}_usb_cdc") {
+  source_set("${sdk_target_name}_bl702_usb_cdc") {
     include_dirs = [
       "${bl_iot_sdk_root}/components/fs/vfs/include",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_usb_cdc/Inc",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_usb_cdc/Inc",
     ]
 
     sources = [
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_usb_cdc/Src/${plat_name}_hal_pcd.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_usb_cdc/Src/${plat_name}_usb_cdc.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_usb_cdc/Src/usb_device.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_usb_cdc/Src/usbd_cdc.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_usb_cdc/Src/usbd_cdc_if.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_usb_cdc/Src/usbd_conf.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_usb_cdc/Src/usbd_core.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_usb_cdc/Src/usbd_ctlreq.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_usb_cdc/Src/usbd_desc.c",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_usb_cdc/Src/usbd_ioreq.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_usb_cdc/Src/bl702_hal_pcd.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_usb_cdc/Src/bl702_usb_cdc.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_usb_cdc/Src/usb_device.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_usb_cdc/Src/usbd_cdc.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_usb_cdc/Src/usbd_cdc_if.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_usb_cdc/Src/usbd_conf.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_usb_cdc/Src/usbd_core.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_usb_cdc/Src/usbd_ctlreq.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_usb_cdc/Src/usbd_desc.c",
+      "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_usb_cdc/Src/usbd_ioreq.c",
     ]
 
     cflags_c = [ "-Wno-sign-compare" ]
@@ -237,72 +229,69 @@ template("bl_iot_sdk") {
     public_configs = [ ":${sdk_target_name}_config" ]
   }
 
+  config("${sdk_target_name}_config_hosal") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/platform/hosal/include",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/include",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal",
+      "${bl_iot_sdk_root}/components/platform/hosal/sec_common",
+    ]
+
+    cflags_cc = ["-Wno-literal-suffix"]
+  }
+
   source_set("${sdk_target_name}_hosal") {
-    if (plat_name == "bl702") {
       defines = [
         "CFG_USE_XTAL32K=1",
       ]
-    }
-
-    include_dirs = [
-      "${bl_iot_sdk_root}/components/sys/bloop/looprt/include/",
-      "${bl_iot_sdk_root}/components/sys/bloop/bloop/include/",
-      "${bl_iot_sdk_root}/components/sys/bloop/loopset/include/",
-      "${bl_iot_sdk_root}/components/sys/blmtd/include",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_rf/include/",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/MCU_Common/soft_crc",
-      "${bl_iot_sdk_root}/components/platform/soc/${plat_name}/${plat_name}_std/BSP_Common/platform",
-    ]
 
     sources = [
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_adc.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_boot2.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_chip.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_cks.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_dma.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_efuse.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_emac.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_flash.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_gpio.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_hbn.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_ir.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_irq.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_pds.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_psram.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_pwm.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_rtc.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_sec.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_sys.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_timer.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_uart.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_wdt.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/bl_wireless.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hal_board.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hal_boot2.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hal_button.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hal_gpio.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hal_hbn.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hal_hwtimer.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hal_pds.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hal_sys.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hal_tcal.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hosal_adc.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hosal_dac.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hosal_dma.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hosal_flash.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hosal_gpio.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hosal_i2c.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hosal_ota.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hosal_pwm.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hosal_rng.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hosal_rtc.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hosal_spi.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hosal_timer.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hosal_uart.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/${plat_name}_hal/hosal_wdg.c",
-    ]
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_adc.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_boot2.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_chip.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_cks.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_dma.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_efuse.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_emac.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_flash.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_gpio.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_hbn.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_ir.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_irq.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_pds.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_psram.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_pwm.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_rtc.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_sec.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_sys.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_timer.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_uart.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_wdt.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_wireless.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hal_board.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hal_boot2.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hal_button.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hal_gpio.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hal_hbn.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hal_hwtimer.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hal_pds.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hal_sys.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hal_tcal.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hosal_adc.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hosal_dac.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hosal_dma.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hosal_flash.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hosal_gpio.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hosal_i2c.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hosal_ota.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hosal_pwm.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hosal_rng.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hosal_rtc.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hosal_spi.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hosal_timer.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hosal_uart.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/hosal_wdg.c",
 
-    sources += [
       "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_aes.c",
       "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_common.c",
       "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_pka.c",
@@ -314,13 +303,30 @@ template("bl_iot_sdk") {
     cflags_c = [
       "-Wno-unused-variable",
       "-Wno-sign-compare",
+      "-Wno-enum-conversion",
       "-Wno-old-style-declaration",
       "-Wno-stringop-overflow",
-      "-Wno-enum-conversion",
       "-Wno-format-truncation",
     ]
+    configs += [ 
+      ":${sdk_target_name}_config_soc",
+      ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_stage",
+      ":${sdk_target_name}_config_sys",
+      ":${sdk_target_name}_config_fs",
+      ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_freertos",
+    ]
+    public_configs = [ 
+      ":${sdk_target_name}_config", 
+      ":${sdk_target_name}_config_hosal"
+    ]
+  }
 
-    public_configs = [ ":${sdk_target_name}_config" ]
+  config("${sdk_target_name}_config_fs") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/fs/vfs/include",
+    ]
   }
 
   source_set("${sdk_target_name}_fs") {
@@ -339,7 +345,17 @@ template("bl_iot_sdk") {
       "-Wno-sign-compare",
       "-Wno-builtin-declaration-mismatch",
     ]
-    public_configs = [ ":${sdk_target_name}_config" ]
+    configs += [ 
+      ":${sdk_target_name}_config_hosal", 
+      ":${sdk_target_name}_config_stage", 
+      ":${sdk_target_name}_config_fs", 
+      ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_freertos",
+    ]
+    public_configs = [ 
+      ":${sdk_target_name}_config", 
+      ":${sdk_target_name}_config_fs"
+    ]
   }
 
   source_set("${sdk_target_name}_libc") {
@@ -349,11 +365,24 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/libc/newlibc/syscalls.c",
     ]
     cflags_c = [ "-Wno-builtin-declaration-mismatch" ]
+    configs += [
+      ":${sdk_target_name}_config_freertos",
+    ]
     public_configs = [ ":${sdk_target_name}_config" ]
   }
 
+  config("${sdk_target_name}_config_stage") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/stage/easyflash4/inc",
+      "${bl_iot_sdk_root}/components/stage/yloop/include",
+      "${bl_iot_sdk_root}/components/stage/blog",
+      "${bl_iot_sdk_root}/components/stage/yloop/include/aos",
+      "${bl_iot_sdk_root}/components/stage/blfdt/inc",
+      "${bl_iot_sdk_root}/components/stage/cli/cli/include",
+    ]
+  }
+
   source_set("${sdk_target_name}_stage") {
-    include_dirs = [ "${bl_iot_sdk_root}/components/sys/blmtd/include" ]
 
     sources = [
       "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt.c",
@@ -377,15 +406,52 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/stage/yloop/src/yloop.c",
     ]
     cflags_c = [ "-Wno-sign-compare" ]
-    public_configs = [ ":${sdk_target_name}_config" ]
+    configs += [
+      ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_freertos",
+      ":${sdk_target_name}_config_fs",
+      ":${sdk_target_name}_config_sys",
+      ":${sdk_target_name}_config_utils",
+    ]
+    public_configs = [ 
+      ":${sdk_target_name}_config", 
+      ":${sdk_target_name}_config_stage" 
+    ]
+  }
+
+  config("${sdk_target_name}_config_sys") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/sys/bloop/bloop/include",
+      "${bl_iot_sdk_root}/components/sys/bloop/looprt/include",
+      "${bl_iot_sdk_root}/components/sys/bloop/loopset/include",
+      "${bl_iot_sdk_root}/components/sys/blmtd/include",
+    ]
   }
 
   source_set("${sdk_target_name}_sys") {
-    include_dirs = [ "${bl_iot_sdk_root}/components/sys/blmtd/include" ]
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/sys/bltime/include",
+    ]
+    sources = [ 
+      "${bl_iot_sdk_root}/components/sys/blmtd/bl_mtd.c",
+      "${bl_iot_sdk_root}/components/sys/bltime/bl_sys_time.c",
+    ]
+    configs += [
+      ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_hosal",
+      ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_freertos",
+    ]
+    public_configs = [ 
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_sys"
+    ]
+  }
 
-    sources = [ "${bl_iot_sdk_root}/components/sys/blmtd/bl_mtd.c" ]
-
-    public_configs = [ ":${sdk_target_name}_config" ]
+  config("${sdk_target_name}_config_utils") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/utils/include/",
+    ]
   }
 
   source_set("${sdk_target_name}_utils") {
@@ -414,12 +480,19 @@ template("bl_iot_sdk") {
       "-Wno-shadow",
       "-Wno-sign-compare",
     ]
-
-    public_configs = [ ":${sdk_target_name}_config" ]
+    configs += [
+      ":${sdk_target_name}_config_hosal",
+      ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_freertos",
+    ]
+    public_configs = [ 
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_utils"
+    ]
   }
 
   config("${sdk_target_name}_ble_config") {
-    _include_dirs = [
+    include_dirs = [
       "${bl_iot_sdk_root}/components/network/ble/blecontroller/ble_inc",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/include",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/include/bluetooth",
@@ -449,10 +522,8 @@ template("bl_iot_sdk") {
       "CONFIG_BT_ASSERT",
       "CFG_BLE_STACK_DBG_PRINT",
     ]
-    cflags = []
-    foreach(include_dir, _include_dirs) {
-      cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
-    }
+
+    cflags_cc = [ "-Wno-conversion" ]
   }
 
   source_set("${sdk_target_name}_ble") {
@@ -471,9 +542,7 @@ template("bl_iot_sdk") {
       "CONFIG_BT_SETTINGS_USE_PRINTK",
     ]
 
-    if (plat_name == "bl702") {
-      libs = [ "${bl_iot_sdk_root}/components/network/ble/blecontroller_702_std/lib/libblecontroller_702_std.a" ]
-    }
+    libs = [ "${bl_iot_sdk_root}/components/network/ble/blecontroller_702_std/lib/libblecontroller_702_std.a" ]
 
     include_dirs = [
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common",
@@ -503,8 +572,15 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/port/bl_port.c",
     ]
 
-    configs += [ ":${sdk_target_name}_config" ]
-    public_configs = [ ":${sdk_target_name}_ble_config" ]
+    configs += [
+      ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_freertos",
+      ":${sdk_target_name}_config_utils"
+    ]
+    public_configs = [ 
+      ":${sdk_target_name}_config", 
+      ":${sdk_target_name}_ble_config"
+    ]
 
     cflags_c = [
       "-Wno-sign-compare",
@@ -526,7 +602,7 @@ template("bl_iot_sdk") {
     }
 
     include_dirs = [
-      "${chip_root}/platform/${plat_name}",
+      "${chip_root}/platform/bl702",
       "${chip_root}/third_party/openthread/repo/src/core",
       "${chip_root}/third_party/openthread/repo/examples/platforms",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/include",
@@ -566,6 +642,13 @@ template("bl_iot_sdk") {
       libs += [ "${bl_iot_sdk_root}/components/network/thread/openthread_utils/lib/libopenthread_utils.a" ]
     }
 
+    configs += [
+      ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_utils",
+      ":${sdk_target_name}_config_hosal",
+      ":${sdk_target_name}_config_stage",
+      ":${sdk_target_name}_config_freertos",
+    ]
     public_configs = [
       ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_openthread_port",
@@ -583,7 +666,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/lwip/lwip-port",
       "${bl_iot_sdk_root}/components/network/lwip/lwip-port/config",
       "${bl_iot_sdk_root}/components/stage/virt_net/include",
-      "${bl_iot_sdk_root}/components/stage/throughput/${plat_name}/inc",
+      "${bl_iot_sdk_root}/components/stage/throughput/bl702/inc",
     ]
 
     defines = [
@@ -620,7 +703,7 @@ template("bl_iot_sdk") {
     #    ]
 
     #    sources += [
-    #      "${bl_iot_sdk_root}/components/stage/throughput/${plat_name}/src/tp_spi_master.c",
+    #      "${bl_iot_sdk_root}/components/stage/throughput/bl702/src/tp_spi_master.c",
     #    ]
     #    sources += [
     #      "${bl_iot_sdk_root}/components/stage/virt_net/src/virt_net.c",
@@ -637,9 +720,13 @@ template("bl_iot_sdk") {
   }
 
   config("${sdk_target_name}_config_lwip") {
-    _include_dirs = [
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/network/lwip/lwip-port/config",
       "${bl_iot_sdk_root}/components/network/lwip/src/include",
-      # "${bl_iot_sdk_root}/components/network/lwip_mdns",
+      "${bl_iot_sdk_root}/components/network/lwip/src/include/lwip/apps",
+      "${bl_iot_sdk_root}/components/network/lwip/lwip-port",
+      "${bl_iot_sdk_root}/components/network/lwip/lwip-port/FreeRTOS",
+      "${bl_iot_sdk_root}/components/network/lwip/lwip-port/hook",
     ]
 
     defines = [
@@ -647,28 +734,24 @@ template("bl_iot_sdk") {
       "LWIP_IPV4=1",
       "LWIP_IPV6_DHCP6=1",
       "LWIP_IPV6_SCOPES=0",
-      "PBUF_POOL_SIZE=12",
+      "PBUF_POOL_SIZE=20",
       "PBUF_POOL_BUFSIZE=(1280+150)",
     ]
-
-    cflags = []
-    foreach(include_dir, _include_dirs) {
-      cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
-    }
   }
 
   source_set("${sdk_target_name}_lwip") {
-    sources = [
-      "${bl_iot_sdk_root}/components/network/lwip/src/api/api_lib.c",
-      "${bl_iot_sdk_root}/components/network/lwip/src/api/api_msg.c",
-      "${bl_iot_sdk_root}/components/network/lwip/src/api/err.c",
-      "${bl_iot_sdk_root}/components/network/lwip/src/api/if_api.c",
-      "${bl_iot_sdk_root}/components/network/lwip/src/api/netbuf.c",
-      "${bl_iot_sdk_root}/components/network/lwip/src/api/netifapi.c",
-      "${bl_iot_sdk_root}/components/network/lwip/src/api/sockets.c",
-      "${bl_iot_sdk_root}/components/network/lwip/src/api/tcpip.c",
-    ]
 
+    sources = [
+      "${bl_iot_sdk_root}/components/network/lwip/lwip-port/FreeRTOS/ethernetif.c",
+      "${bl_iot_sdk_root}/components/network/lwip/lwip-port/FreeRTOS/sys_arch.c",
+    ]
+    sources += [
+      "${bl_iot_sdk_root}/components/network/lwip/src/netif/slipif.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/netif/bridgeif.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/netif/bridgeif_fdb.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/netif/ethernet.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/netif/zepif.c",
+    ]
     sources += [
       "${bl_iot_sdk_root}/components/network/lwip/src/core/def.c",
       "${bl_iot_sdk_root}/components/network/lwip/src/core/dns.c",
@@ -687,9 +770,6 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/lwip/src/core/tcp_out.c",
       "${bl_iot_sdk_root}/components/network/lwip/src/core/timeouts.c",
       "${bl_iot_sdk_root}/components/network/lwip/src/core/udp.c",
-      "${bl_iot_sdk_root}/components/network/lwip/src/include/lwip/priv/api_msg.h",
-      "${bl_iot_sdk_root}/components/network/lwip/src/include/lwip/priv/memp_std.h",
-      "${bl_iot_sdk_root}/components/network/lwip/src/include/lwip/priv/nd6_priv.h",
     ]
 
     sources += [
@@ -717,24 +797,26 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/lwip/src/core/ipv6/nd6.c",
     ]
 
-    sources +=
-        [ "${bl_iot_sdk_root}/components/network/lwip/src/netif/slipif.c" ]
-    sources +=
-        [ "${bl_iot_sdk_root}/components/network/lwip/src/netif/bridgeif.c" ]
     sources += [
-      "${bl_iot_sdk_root}/components/network/lwip/src/netif/bridgeif_fdb.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/api/api_lib.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/api/api_msg.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/api/err.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/api/if_api.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/api/netbuf.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/api/netifapi.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/api/sockets.c",
+      "${bl_iot_sdk_root}/components/network/lwip/src/api/tcpip.c",
     ]
-    sources +=
-        [ "${bl_iot_sdk_root}/components/network/lwip/src/netif/ethernet.c" ]
-    sources +=
-        [ "${bl_iot_sdk_root}/components/network/lwip/src/netif/zepif.c" ]
 
-    sources +=
-        [ "${bl_iot_sdk_root}/components/network/lwip/src/apps/mdns/mdns.c" ]
+    sources += [ 
+      "${bl_iot_sdk_root}/components/network/lwip/src/apps/mdns/mdns.c" 
+    ]
 
+    configs += [
+      ":${sdk_target_name}_config_freertos",
+    ]
     public_configs = [
       ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_lwip_port",
       ":${sdk_target_name}_config_lwip",
     ]
   }
@@ -742,15 +824,15 @@ template("bl_iot_sdk") {
   group(sdk_target_name) {
     public_deps = [
       ":${sdk_target_name}_soc",
-      ":${sdk_target_name}_${plat_name}_freertos",
       ":${sdk_target_name}_BSP_Driver",
+      ":${sdk_target_name}_bl702_freertos",
       ":${sdk_target_name}_hosal",
-      ":${sdk_target_name}_ble",
       ":${sdk_target_name}_fs",
       ":${sdk_target_name}_libc",
       ":${sdk_target_name}_stage",
       ":${sdk_target_name}_sys",
       ":${sdk_target_name}_utils",
+      ":${sdk_target_name}_ble",
     ]
 
     if (chip_enable_openthread) {
@@ -762,9 +844,9 @@ template("bl_iot_sdk") {
       public_deps += [ ":${sdk_target_name}_lwip" ]
     }
 
-    if (enable_cdc_module && invoker.bl_plat_name == "bl702") {
+    if (enable_cdc_module) {
       public_deps += [
-        ":${sdk_target_name}_${plat_name}_usb_cdc",
+        ":${sdk_target_name}_bl702_usb_cdc",
       ]
     }
   }

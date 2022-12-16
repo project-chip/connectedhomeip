@@ -61,7 +61,6 @@ bl_iot_sdk("sdk") {
   ]
 
   freertos_config = "${examples_plat_dir}/FreeRTOSConfig.h"
-  bl_plat_name = "bl702"
 
   defines = [
     "INCLUDE_xSemaphoreGetMutexHolder=1",
