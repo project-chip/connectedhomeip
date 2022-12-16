@@ -40,6 +40,7 @@
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
 #include <controller/DevicePairingDelegate.h>
+#include <controller/DeviceUnpair.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <controller/SetUpCodePairer.h>
 #include <credentials/FabricTable.h>
@@ -370,7 +371,8 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
                                       public Protocols::UserDirectedCommissioning::InstanceNameResolver,
 #endif
                                       public SessionEstablishmentDelegate,
-                                      public app::ClusterStateCache::Callback
+                                      public app::ClusterStateCache::Callback,
+                                      public DeviceUnpair::Callback
 {
 public:
     DeviceCommissioner();
@@ -529,6 +531,8 @@ public:
      * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR UnpairDevice(NodeId remoteDeviceId);
+
+    void OnDeviceUnpair(NodeId remoteDeviceId, CHIP_ERROR err) override;
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
@@ -912,6 +916,8 @@ private:
     Credentials::AttestationVerificationResult mAttestationResult;
     Platform::UniquePtr<Credentials::DeviceAttestationVerifier::AttestationDeviceInfo> mAttestationDeviceInfo;
     Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
+
+    Platform::UniquePtr<DeviceUnpair> mDeviceUnpair;
 };
 
 } // namespace Controller

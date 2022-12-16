@@ -894,8 +894,30 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 
 CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
 {
-    // TODO: Send unpairing message to the remote device.
-    return CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    MATTER_TRACE_EVENT_SCOPE("UnpairDevice", "DeviceCommissioner");
+
+    Platform::UniquePtr<DeviceUnpair> deviceUnpair(new DeviceUnpair());
+    deviceUnpair->RegisterCallback(this);
+    CommissioneeDeviceProxy * commissioneeDeviceProxy = nullptr;
+    if (CHIP_NO_ERROR == GetDeviceBeingCommissioned(remoteDeviceId, &commissioneeDeviceProxy)) {
+        deviceUnpair->UnpairDevice(commissioneeDeviceProxy, remoteDeviceId);
+    } else {
+        err = GetConnectedDevice(remoteDeviceId, &deviceUnpair->GetConnectedCallback(), &deviceUnpair->GetConnectionFailureCallback());
+    }
+
+    mDeviceUnpair = std::move(deviceUnpair);
+
+    return err;
+}
+
+void DeviceCommissioner::OnDeviceUnpair(NodeId remoteDeviceId, CHIP_ERROR err)
+{
+    mDeviceUnpair = nullptr;
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnPairingDeleted(err);
+    }
 }
 
 void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)

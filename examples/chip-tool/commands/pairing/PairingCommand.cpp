@@ -162,7 +162,6 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
 {
     CHIP_ERROR err = CurrentCommissioner().UnpairDevice(remoteId);
-    SetCommandExitStatus(err);
     return err;
 }
 
