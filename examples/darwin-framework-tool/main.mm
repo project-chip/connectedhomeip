@@ -24,7 +24,6 @@
 #include "commands/payload/Commands.h"
 #include "commands/provider/Commands.h"
 #include "commands/storage/Commands.h"
-#include "commands/discover/Commands.h"
 
 #include <zap-generated/cluster/Commands.h>
 #include <zap-generated/test/Commands.h>
@@ -46,7 +45,6 @@ int main(int argc, const char * argv[])
         registerCommandsStorage(commands);
         registerCommandsTests(commands);
         registerClusters(commands);
-        registerCommandsDiscover(commands);
         return commands.Run(argc, (char **) argv);
     }
 }

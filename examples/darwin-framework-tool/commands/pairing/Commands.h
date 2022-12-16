@@ -30,12 +30,6 @@ public:
     PairCode() : PairingCommandBridge("code", PairingMode::Code, PairingNetworkType::None) {}
 };
 
-class PairWithIPAddress : public PairingCommandBridge
-{
-public:
-    PairWithIPAddress() : PairingCommandBridge("ethernet", PairingMode::Ethernet, PairingNetworkType::Ethernet) {}
-};
-
 class PairCodeWifi : public PairingCommandBridge
 {
 public:
@@ -72,7 +66,6 @@ void registerCommandsPairing(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<PairCode>(),
-        make_unique<PairWithIPAddress>(),
         make_unique<PairCodeWifi>(),
         make_unique<PairCodeThread>(),
         make_unique<PairBleWiFi>(),

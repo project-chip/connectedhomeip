@@ -314,9 +314,6 @@ extern NSString * const MTRArrayValueType;
  *
  * If all of endpointID, clusterID, eventID are nil, all events on the
  * device will be read.
- *
- * A non-nil eventID along with a nil clusterID will only succeed if the
- * event ID is for a global event that applies to all clusters.
  */
 
 - (void)readEventsWithEndpointID:(NSNumber * _Nullable)endpointID
