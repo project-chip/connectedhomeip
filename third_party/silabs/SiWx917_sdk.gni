@@ -23,8 +23,9 @@ import("silabs_board.gni")
 declare_args() {
   # Location of the efr32 SDK.
   efr32_sdk_root = "${chip_root}/third_party/silabs/gecko_sdk"
-  sdk_support_root = "${chip_root}/third_party/silabs/matter_support" 
-  wiseconnect_sdk_root = "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk" 
+  sdk_support_root = "${chip_root}/third_party/silabs/matter_support"
+  wiseconnect_sdk_root =
+      "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
   wisemcu_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
   examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 
@@ -267,10 +268,9 @@ template("efr32_sdk") {
 
       # Bluetooth
       "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
-      "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
       "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
+      "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
       "${wiseconnect_sdk_root}/sapi/driver/rsi_bt_ble.c",
-
       "${wisemcu_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/clock_update.c",
       "${wisemcu_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_comparator.c",
       "${wisemcu_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_egpio.c",

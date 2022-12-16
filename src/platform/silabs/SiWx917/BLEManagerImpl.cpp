@@ -31,9 +31,7 @@
 
 //#include "rail.h"
 extern "C" {
-#include <stdbool.h>
 #include "FreeRTOS.h"
-#include <stdbool.h>
 #include "event_groups.h"
 #include "task.h"
 #include "timers.h"
@@ -42,6 +40,7 @@ extern "C" {
 #include "wfx_sl_ble_init.h"
 #include <rsi_driver.h>
 #include <rsi_utils.h>
+#include <stdbool.h>
 }
 #include <ble/CHIPBleServiceData.h>
 #include <lib/support/CodeUtils.h>
@@ -118,45 +117,45 @@ void sl_ble_event_handling_task(void)
         }
         switch (event_id)
         {
-            case RSI_BLE_CONN_EVENT: {
-                rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
-                chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectEvent();
-            	WFX_RSI_LOG("%s Module got connected", __func__);
-            }
-            break;
-            case RSI_BLE_DISCONN_EVENT: {
-                // event invokes when disconnection was completed
+        case RSI_BLE_CONN_EVENT: {
+            rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
+            chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectEvent();
+            WFX_RSI_LOG("%s Module got connected", __func__);
+        }
+        break;
+        case RSI_BLE_DISCONN_EVENT: {
+            // event invokes when disconnection was completed
             WFX_RSI_LOG("%s Module got Disconnected", __func__);
-                chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectionCloseEvent(event_msg.reason);
-                // clear the served event
-                rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
-            }
-            break;
-            case RSI_BLE_MTU_EVENT: {
-                // event invokes when write/notification events received
+            chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectionCloseEvent(event_msg.reason);
+            // clear the served event
+            rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
+        }
+        break;
+        case RSI_BLE_MTU_EVENT: {
+            // event invokes when write/notification events received
             WFX_RSI_LOG("%s RSI_BLE_MTU_EVENT", __func__);
-                chip::DeviceLayer::Internal::BLEMgrImpl().UpdateMtu(event_msg.rsi_ble_mtu);
-                // clear the served event
-                rsi_ble_app_clear_event(RSI_BLE_MTU_EVENT);
-            }
-            break;
-            case RSI_BLE_GATT_WRITE_EVENT: {
-                // event invokes when write/notification events received
+            chip::DeviceLayer::Internal::BLEMgrImpl().UpdateMtu(event_msg.rsi_ble_mtu);
+            // clear the served event
+            rsi_ble_app_clear_event(RSI_BLE_MTU_EVENT);
+        }
+        break;
+        case RSI_BLE_GATT_WRITE_EVENT: {
+            // event invokes when write/notification events received
             WFX_RSI_LOG("%s RSI_BLE_GATT_WRITE_EVENT", __func__);
-                chip::DeviceLayer::Internal::BLEMgrImpl().HandleWriteEvent(event_msg.rsi_ble_write);
-                // clear the served event
-                rsi_ble_app_clear_event(RSI_BLE_GATT_WRITE_EVENT);
-            }
-            break;
-            case RSI_BLE_GATT_INDICATION_CONFIRMATION: {
+            chip::DeviceLayer::Internal::BLEMgrImpl().HandleWriteEvent(event_msg.rsi_ble_write);
+            // clear the served event
+            rsi_ble_app_clear_event(RSI_BLE_GATT_WRITE_EVENT);
+        }
+        break;
+        case RSI_BLE_GATT_INDICATION_CONFIRMATION: {
             WFX_RSI_LOG("%s indication confirmation", __func__);
-                chip::DeviceLayer::Internal::BLEMgrImpl().HandleTxConfirmationEvent(1);
-                rsi_ble_app_clear_event(RSI_BLE_GATT_INDICATION_CONFIRMATION);
-            }
-            break;
+            chip::DeviceLayer::Internal::BLEMgrImpl().HandleTxConfirmationEvent(1);
+            rsi_ble_app_clear_event(RSI_BLE_GATT_INDICATION_CONFIRMATION);
+        }
+        break;
 
-            case RSI_BLE_RESP_ATT_VALUE: {
-                WFX_RSI_LOG("RSI_BLE : RESP_ATT confirmation");
+        case RSI_BLE_RESP_ATT_VALUE: {
+            WFX_RSI_LOG("RSI_BLE : RESP_ATT confirmation");
         }
         default:
             break;
@@ -206,8 +205,8 @@ namespace {
 #define BLE_CONFIG_MIN_INTERVAL (16) // Time = Value x 1.25 ms = 30ms
 #define BLE_CONFIG_MAX_INTERVAL (80) // Time = Value x 1.25 ms = 100ms
 #define BLE_CONFIG_LATENCY (0)
-#define BLE_CONFIG_TIMEOUT (100) // Time = Value x 10 ms = 1s
-#define BLE_CONFIG_MIN_CE_LENGTH (0) // Leave to min value
+#define BLE_CONFIG_TIMEOUT (100)          // Time = Value x 10 ms = 1s
+#define BLE_CONFIG_MIN_CE_LENGTH (0)      // Leave to min value
 #define BLE_CONFIG_MAX_CE_LENGTH (0xFFFF) // Leave to max value
 
 #define BLE__DEFAULT_TIMER_PERIOD 1
@@ -433,7 +432,8 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 {
     int32_t status = 0;
     WFX_RSI_LOG("In send indication");
-    status = rsi_ble_indicate_value(event_msg.resp_enh_conn.dev_addr, event_msg.rsi_ble_measurement_hndl, (data->DataLength()), data->Start());
+    status = rsi_ble_indicate_value(event_msg.resp_enh_conn.dev_addr, event_msg.rsi_ble_measurement_hndl, (data->DataLength()),
+                                    data->Start());
     if (status != RSI_SUCCESS)
     {
         WFX_RSI_LOG("indication %d failed with error code %lx ", status);
@@ -671,7 +671,7 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
     return err;
 }
 
-void BLEManagerImpl::UpdateMtu(rsi_ble_event_mtu_t  evt)
+void BLEManagerImpl::UpdateMtu(rsi_ble_event_mtu_t evt)
 {
     CHIPoBLEConState * bleConnState = GetConnectionState(event_msg.connectionHandle);
     if (bleConnState != NULL)
@@ -753,7 +753,7 @@ void BLEManagerImpl::HandleWriteEvent(rsi_ble_event_write_t evt)
 
     WFX_RSI_LOG("event_msg.rsi_ble_gatt_server_client_config_hndl = %d", event_msg.rsi_ble_gatt_server_client_config_hndl);
 
-    if (evt.handle[0] == (uint8_t) event_msg.rsi_ble_gatt_server_client_config_hndl) //TODO:: compare the handle exactly
+    if (evt.handle[0] == (uint8_t) event_msg.rsi_ble_gatt_server_client_config_hndl) // TODO:: compare the handle exactly
     {
         WFX_RSI_LOG("Inside HandleTXCharCCCDWrite ");
         HandleTXCharCCCDWrite(&evt);
@@ -764,10 +764,10 @@ void BLEManagerImpl::HandleWriteEvent(rsi_ble_event_write_t evt)
     }
 }
 
-//TODO:: Need to implement this
+// TODO:: Need to implement this
 void BLEManagerImpl::HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
     bool isIndicationEnabled = false;
     ChipDeviceEvent event;
 
@@ -799,7 +799,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt)
 
 void BLEManagerImpl::HandleRXCharWrite(rsi_ble_event_write_t * evt)
 {
-    uint8_t conId = 1;
+    uint8_t conId  = 1;
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle buf;
     uint16_t writeLen = evt->length;
