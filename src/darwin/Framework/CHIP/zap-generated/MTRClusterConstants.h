@@ -99,7 +99,6 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterApplicationBasicID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeApplicationBasicID") = 0x0000050D,
     MTRClusterAccountLoginID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeAccountLoginID") = 0x0000050E,
     MTRClusterElectricalMeasurementID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeElectricalMeasurementID") = 0x00000B04,
-    MTRClusterClientMonitoringID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeClientMonitoringID") = 0x00001046,
     MTRClusterTestClusterID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeUnitTestingID") = 0xFFF1FC05,
     MTRClusterFaultInjectionID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeFaultInjectionID") = 0xFFF1FC06,
     MTRClusterIDTypeIdentifyID MTR_NEWLY_AVAILABLE = 0x00000003,
@@ -569,9 +568,8 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster Descriptor deprecated attribute names
-    MTRClusterDescriptorAttributeDeviceTypeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID")
-        API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
+    MTRClusterDescriptorAttributeDeviceTypeListID API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID")
     = 0x00000000,
     MTRClusterDescriptorAttributeDeviceListID MTR_NEWLY_DEPRECATED(
         "Please use MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID")
@@ -4889,35 +4887,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterElectricalMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
-    // Cluster ClientMonitoring deprecated attribute names
-    MTRClusterClientMonitoringAttributeIdleModeIntervalID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterClientMonitoringAttributeIdleModeIntervalID")
-    = 0x00000000,
-    MTRClusterClientMonitoringAttributeActiveModeIntervalID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterClientMonitoringAttributeActiveModeIntervalID")
-    = 0x00000001,
-    MTRClusterClientMonitoringAttributeActiveModeThresholdID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterClientMonitoringAttributeActiveModeThresholdID")
-    = 0x00000002,
-    MTRClusterClientMonitoringAttributeExpectedClientsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterClientMonitoringAttributeExpectedClientsID")
-    = 0x00000003,
-    MTRClusterClientMonitoringAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterClientMonitoringAttributeGeneratedCommandListID")
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterClientMonitoringAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterClientMonitoringAttributeAcceptedCommandListID")
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterClientMonitoringAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterClientMonitoringAttributeAttributeListID")
-    = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterClientMonitoringAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterClientMonitoringAttributeFeatureMapID")
-    = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterClientMonitoringAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterClientMonitoringAttributeClusterRevisionID")
-    = MTRClusterGlobalAttributeClusterRevisionID,
-
     // Cluster ClientMonitoring attributes
     MTRAttributeIDTypeClusterClientMonitoringAttributeIdleModeIntervalID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterClientMonitoringAttributeActiveModeIntervalID MTR_NEWLY_AVAILABLE = 0x00000001,
@@ -5159,8 +5128,8 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRClusterTestClusterAttributeNullableRangeRestrictedInt16sID MTR_NEWLY_DEPRECATED(
         "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableRangeRestrictedInt16sID")
     = 0x00004029,
-    MTRClusterTestClusterAttributeWriteOnlyInt8uID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeWriteOnlyInt8uID")
+    MTRClusterTestClusterAttributeWriteOnlyInt8uID API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeWriteOnlyInt8uID")
     = 0x0000402A,
     MTRClusterTestClusterAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
         "Please use MTRAttributeIDTypeClusterUnitTestingAttributeGeneratedCommandListID")
@@ -6245,14 +6214,6 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterElectricalMeasurementCommandGetProfileInfoCommandID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileResponseCommandID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileCommandID MTR_NEWLY_AVAILABLE = 0x00000001,
-
-    // Cluster ClientMonitoring deprecated command id names
-    MTRClusterClientMonitoringCommandRegisterClientMonitoringID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterClientMonitoringCommandRegisterClientMonitoringID")
-    = 0x00000000,
-    MTRClusterClientMonitoringCommandStayAwakeRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterClientMonitoringCommandStayAwakeRequestID")
-    = 0x00000001,
 
     // Cluster ClientMonitoring commands
     MTRCommandIDTypeClusterClientMonitoringCommandRegisterClientMonitoringID MTR_NEWLY_AVAILABLE = 0x00000000,

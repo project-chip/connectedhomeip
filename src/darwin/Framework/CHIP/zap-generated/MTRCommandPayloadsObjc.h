@@ -1388,21 +1388,21 @@ NS_ASSUME_NONNULL_BEGIN
 MTR_NEWLY_AVAILABLE
 @interface MTROTASoftwareUpdateProviderClusterQueryImageParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull vendorId;
+@property (nonatomic, copy) NSNumber * _Nonnull vendorId MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull productId;
+@property (nonatomic, copy) NSNumber * _Nonnull productId MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
+@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nonnull protocolsSupported;
+@property (nonatomic, copy) NSArray * _Nonnull protocolsSupported MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable hardwareVersion;
+@property (nonatomic, copy) NSNumber * _Nullable hardwareVersion MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable location;
+@property (nonatomic, copy) NSString * _Nullable location MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable requestorCanConsent;
+@property (nonatomic, copy) NSNumber * _Nullable requestorCanConsent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSData * _Nullable metadataForProvider;
+@property (nonatomic, copy) NSData * _Nullable metadataForProvider MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1427,21 +1427,21 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImagePa
 MTR_NEWLY_AVAILABLE
 @interface MTROTASoftwareUpdateProviderClusterQueryImageResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable delayedActionTime;
+@property (nonatomic, copy) NSNumber * _Nullable delayedActionTime MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable imageURI;
+@property (nonatomic, copy) NSString * _Nullable imageURI MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable softwareVersion;
+@property (nonatomic, copy) NSNumber * _Nullable softwareVersion MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable softwareVersionString;
+@property (nonatomic, copy) NSString * _Nullable softwareVersionString MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSData * _Nullable updateToken;
+@property (nonatomic, copy) NSData * _Nullable updateToken MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable userConsentNeeded;
+@property (nonatomic, copy) NSNumber * _Nullable userConsentNeeded MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSData * _Nullable metadataForRequestor;
+@property (nonatomic, copy) NSData * _Nullable metadataForRequestor MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1467,9 +1467,9 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImageRe
 MTR_NEWLY_AVAILABLE
 @interface MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull updateToken;
+@property (nonatomic, copy) NSData * _Nonnull updateToken MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy, getter=getNewVersion) NSNumber * _Nonnull newVersion;
+@property (nonatomic, copy, getter=getNewVersion) NSNumber * _Nonnull newVersion MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1494,9 +1494,9 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterApplyUpdateR
 MTR_NEWLY_AVAILABLE
 @interface MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull action;
+@property (nonatomic, copy) NSNumber * _Nonnull action MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull delayedActionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull delayedActionTime MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1523,9 +1523,9 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterApplyUpdateR
 MTR_NEWLY_AVAILABLE
 @interface MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull updateToken;
+@property (nonatomic, copy) NSData * _Nonnull updateToken MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
+@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1551,15 +1551,15 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterNotifyUpdate
 MTR_NEWLY_AVAILABLE
 @interface MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull providerNodeId;
+@property (nonatomic, copy) NSNumber * _Nonnull providerNodeId MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull vendorId;
+@property (nonatomic, copy) NSNumber * _Nonnull vendorId MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull announcementReason;
+@property (nonatomic, copy) NSNumber * _Nonnull announcementReason MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSData * _Nullable metadataForNode;
+@property (nonatomic, copy) NSData * _Nullable metadataForNode MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull endpoint;
+@property (nonatomic, copy) NSNumber * _Nonnull endpoint MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4855,11 +4855,12 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 @end
 
+MTR_NEWLY_AVAILABLE
 @interface MTRClientMonitoringClusterRegisterClientMonitoringParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull clientNodeId;
+@property (nonatomic, copy) NSNumber * _Nonnull clientNodeId MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull iCid;
+@property (nonatomic, copy) NSNumber * _Nonnull iCid MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4877,6 +4878,7 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOta
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 @end
 
+MTR_NEWLY_AVAILABLE
 @interface MTRClientMonitoringClusterStayAwakeRequestParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -4921,7 +4923,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestParams")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestSpecificResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull returnValue;
+@property (nonatomic, copy) NSNumber * _Nonnull returnValue MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4970,7 +4972,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNotHandledParams")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestAddArgumentsResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull returnValue;
+@property (nonatomic, copy) NSNumber * _Nonnull returnValue MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5019,7 +5021,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSpecificParams")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestSimpleArgumentResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull returnValue;
+@property (nonatomic, copy) NSNumber * _Nonnull returnValue MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5068,17 +5070,17 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestUnknownCommandParams")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestStructArrayArgumentResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nonnull arg2;
+@property (nonatomic, copy) NSArray * _Nonnull arg2 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nonnull arg3;
+@property (nonatomic, copy) NSArray * _Nonnull arg3 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nonnull arg4;
+@property (nonatomic, copy) NSArray * _Nonnull arg4 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg5;
+@property (nonatomic, copy) NSNumber * _Nonnull arg5 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg6;
+@property (nonatomic, copy) NSNumber * _Nonnull arg6 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5104,9 +5106,9 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentRes
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestAddArgumentsParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg1;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg2;
+@property (nonatomic, copy) NSNumber * _Nonnull arg2 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5131,7 +5133,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestAddArgumentsParams")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestListInt8UReverseResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5157,7 +5159,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseRespon
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestSimpleArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg1;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5182,9 +5184,9 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleArgumentRequestP
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEnumsResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg1;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg2;
+@property (nonatomic, copy) NSNumber * _Nonnull arg2 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5210,17 +5212,17 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsResponseParams")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestStructArrayArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nonnull arg2;
+@property (nonatomic, copy) NSArray * _Nonnull arg2 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nonnull arg3;
+@property (nonatomic, copy) NSArray * _Nonnull arg3 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nonnull arg4;
+@property (nonatomic, copy) NSArray * _Nonnull arg4 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg5;
+@property (nonatomic, copy) NSNumber * _Nonnull arg5 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg6;
+@property (nonatomic, copy) NSNumber * _Nonnull arg6 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5245,13 +5247,13 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentReq
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestNullableOptionalResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull wasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull wasPresent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable wasNull;
+@property (nonatomic, copy) NSNumber * _Nullable wasNull MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable value;
+@property (nonatomic, copy) NSNumber * _Nullable value MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable originalValue;
+@property (nonatomic, copy) NSNumber * _Nullable originalValue MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5277,7 +5279,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalRespon
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestStructArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg1;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5302,61 +5304,61 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestStructArgumentRequestP
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestComplexNullableOptionalResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull nullableIntWasNull;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableIntWasNull MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable nullableIntValue;
+@property (nonatomic, copy) NSNumber * _Nullable nullableIntValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionalIntWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull optionalIntWasPresent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable optionalIntValue;
+@property (nonatomic, copy) NSNumber * _Nullable optionalIntValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalIntWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalIntWasPresent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalIntWasNull;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalIntWasNull MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalIntValue;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalIntValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull nullableStringWasNull;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableStringWasNull MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable nullableStringValue;
+@property (nonatomic, copy) NSString * _Nullable nullableStringValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionalStringWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull optionalStringWasPresent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable optionalStringValue;
+@property (nonatomic, copy) NSString * _Nullable optionalStringValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalStringWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalStringWasPresent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalStringWasNull;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalStringWasNull MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable nullableOptionalStringValue;
+@property (nonatomic, copy) NSString * _Nullable nullableOptionalStringValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull nullableStructWasNull;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableStructWasNull MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableStructValue;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableStructValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionalStructWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull optionalStructWasPresent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable optionalStructValue;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable optionalStructValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalStructWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalStructWasPresent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalStructWasNull;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalStructWasNull MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableOptionalStructValue;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableOptionalStructValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull nullableListWasNull;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableListWasNull MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nullable nullableListValue;
+@property (nonatomic, copy) NSArray * _Nullable nullableListValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionalListWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull optionalListWasPresent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nullable optionalListValue;
+@property (nonatomic, copy) NSArray * _Nullable optionalListValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalListWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalListWasPresent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalListWasNull;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalListWasNull MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nullable nullableOptionalListValue;
+@property (nonatomic, copy) NSArray * _Nullable nullableOptionalListValue MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5383,7 +5385,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptiona
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestNestedStructArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRUnitTestingClusterNestedStruct * _Nonnull arg1;
+@property (nonatomic, copy) MTRUnitTestingClusterNestedStruct * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5408,7 +5410,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructArgumentRe
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterBooleanResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull value;
+@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5434,7 +5436,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterBooleanResponseParams")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestListStructArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5459,7 +5461,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListStructArgumentRequ
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterSimpleStructResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg1;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5485,7 +5487,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterSimpleStructResponseParams
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestListInt8UArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5510,7 +5512,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UArgumentReque
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEmitTestEventResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull value;
+@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5536,7 +5538,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventResponseP
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestNestedStructListArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRUnitTestingClusterNestedStructList * _Nonnull arg1;
+@property (nonatomic, copy) MTRUnitTestingClusterNestedStructList * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5562,7 +5564,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructListArgume
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull value;
+@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5589,7 +5591,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEv
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5615,7 +5617,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListNestedStructListAr
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestListInt8UReverseRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5640,9 +5642,9 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseReques
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEnumsRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg1;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg2;
+@property (nonatomic, copy) NSNumber * _Nonnull arg2 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5667,7 +5669,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsRequestParams")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestNullableOptionalRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nullable arg1;
+@property (nonatomic, copy) NSNumber * _Nullable arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5692,29 +5694,29 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalReques
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestComplexNullableOptionalRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nullable nullableInt;
+@property (nonatomic, copy) NSNumber * _Nullable nullableInt MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable optionalInt;
+@property (nonatomic, copy) NSNumber * _Nullable optionalInt MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalInt;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalInt MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable nullableString;
+@property (nonatomic, copy) NSString * _Nullable nullableString MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable optionalString;
+@property (nonatomic, copy) NSString * _Nullable optionalString MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable nullableOptionalString;
+@property (nonatomic, copy) NSString * _Nullable nullableOptionalString MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableStruct;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableStruct MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable optionalStruct;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable optionalStruct MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableOptionalStruct;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableOptionalStruct MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nullable nullableList;
+@property (nonatomic, copy) NSArray * _Nullable nullableList MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nullable optionalList;
+@property (nonatomic, copy) NSArray * _Nullable optionalList MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nullable nullableOptionalList;
+@property (nonatomic, copy) NSArray * _Nullable nullableOptionalList MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5740,7 +5742,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptiona
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterSimpleStructEchoRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg1;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5788,7 +5790,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTimedInvokeRequestParams")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nullable arg1;
+@property (nonatomic, copy) NSNumber * _Nullable arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5814,11 +5816,11 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleOptionalArgument
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEmitTestEventRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg1;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg2;
+@property (nonatomic, copy) NSNumber * _Nonnull arg2 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg3;
+@property (nonatomic, copy) NSNumber * _Nonnull arg3 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5843,7 +5845,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventRequestPa
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg1;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

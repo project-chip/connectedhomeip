@@ -1,0 +1,5111 @@
+# The magic value "future" for versions can be used once we are
+# tracking a release but don't know what its version numbers will be.
+#
+# Each release has:
+# * A name (labeled "release")
+# * A versions field which is either a dictionary of per-OS versions, or "future"
+# * "introduced" and "deprecated" fields, which are dictionaries with the following keys:
+#   * "clusters": An array of cluster names
+#   * "attributes": A dictionary with cluster names as keys and arrays of
+#                   attribute names as values.
+#   * "commands": A dictionary with cluster names as keys and arrays of
+#                 command names as values.
+#   * "command fields": A dictionary with cluster names as keys and dictionaries
+#                       as values.  Those dictionaries have command names as
+#                       keys and arrays of field names as values.
+#   * "structs": A dictionary with cluster names as keys and arrays of
+#                struct names as values.
+#   * "struct fields": A dictionary with cluster names as keys and dictionaries
+#                      as values.  Those dictionaries have struct names as
+#                      keys and arrays of field names as values.
+#   * "events": A dictionary with cluster names as keys and arrays of
+#               event names as values.
+#   * "event fields": A dictionary with cluster names as keys and dictionaries
+#                     as values.  Those dictionaries have event names as
+#                     keys and arrays of field names as values.
+#   * "enums": A dictionary with cluster names as keys and arrays of
+#              enum names as values.
+#   * "enum values": A dictionary with cluster names as keys and dictionaries
+#                    as values.  Those dictionaries have enum names as
+#                    keys and arrays of enum value names as values.
+#   * "bitmaps": A dictionary with cluster names as keys and arrays of
+#                bitmap names as values.
+#   * "bitmap values": A dictionary with cluster names as keys and dictionaries
+#                      as values.  Those dictionaries have bitmap names as
+#                      keys and arrays of bitmap value names as values.
+#   * "ids": Can contain clusters, attributes, commands, events as described
+#            above inside it, but just indicates whether the id was
+#            introduced/deprecated, not the construct itself.
+#   * "global attributes": An array of names of global attributes.
+#   * "apis": An array of API labels that codegen can use.
+
+- release: "Initial release"
+  versions:
+      ""
+      # For now initial versions are "" to minimize changes to generated code
+      # until after the initial landing.
+  #    ios: "16.1"
+  #    macos: "13.0"
+  #    watchos: "9.1"
+  #    tvos: "16.1"
+  introduced:
+      clusters:
+          - Identify
+          - Groups
+          - Scenes
+          - OnOff
+          - OnOffSwitchConfiguration
+          - LevelControl
+          - BinaryInputBasic
+          - Descriptor
+          - Binding
+          - AccessControl
+          - Actions
+          - Basic
+          - OtaSoftwareUpdateProvider
+          - OtaSoftwareUpdateRequestor
+          - LocalizationConfiguration
+          - TimeFormatLocalization
+          - UnitLocalization
+          - PowerSourceConfiguration
+          - PowerSource
+          - GeneralCommissioning
+          - NetworkCommissioning
+          - DiagnosticLogs
+          - GeneralDiagnostics
+          - SoftwareDiagnostics
+          - ThreadNetworkDiagnostics
+          - WiFiNetworkDiagnostics
+          - EthernetNetworkDiagnostics
+          - BridgedDeviceBasic
+          - Switch
+          - AdministratorCommissioning
+          - OperationalCredentials
+          - GroupKeyManagement
+          - FixedLabel
+          - UserLabel
+          - BooleanState
+          - ModeSelect
+          - DoorLock
+          - WindowCovering
+          - BarrierControl
+          - PumpConfigurationAndControl
+          - Thermostat
+          - FanControl
+          - ThermostatUserInterfaceConfiguration
+          - ColorControl
+          - BallastConfiguration
+          - IlluminanceMeasurement
+          - TemperatureMeasurement
+          - PressureMeasurement
+          - FlowMeasurement
+          - RelativeHumidityMeasurement
+          - OccupancySensing
+          - WakeOnLan
+          - Channel
+          - TargetNavigator
+          - MediaPlayback
+          - MediaInput
+          - LowPower
+          - KeypadInput
+          - ContentLauncher
+          - AudioOutput
+          - ApplicationLauncher
+          - ApplicationBasic
+          - AccountLogin
+          - ElectricalMeasurement
+          - TestCluster
+      attributes:
+          Identify:
+              - IdentifyTime
+              - IdentifyType
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          Groups:
+              - NameSupport
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          Scenes:
+              - SceneCount
+              - CurrentScene
+              - CurrentGroup
+              - SceneValid
+              - NameSupport
+              - LastConfiguredBy
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          OnOff:
+              - OnOff
+              - GlobalSceneControl
+              - OnTime
+              - OffWaitTime
+              - StartUpOnOff
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          OnOffSwitchConfiguration:
+              - SwitchType
+              - SwitchActions
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          LevelControl:
+              - CurrentLevel
+              - RemainingTime
+              - MinLevel
+              - MaxLevel
+              - CurrentFrequency
+              - MinFrequency
+              - MaxFrequency
+              - Options
+              - OnOffTransitionTime
+              - OnLevel
+              - OnTransitionTime
+              - OffTransitionTime
+              - DefaultMoveRate
+              - StartUpCurrentLevel
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          BinaryInputBasic:
+              - ActiveText
+              - Description
+              - InactiveText
+              - OutOfService
+              - Polarity
+              - PresentValue
+              - Reliability
+              - StatusFlags
+              - ApplicationType
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          Descriptor:
+              - DeviceList
+              - ServerList
+              - ClientList
+              - PartsList
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          Binding:
+              - Binding
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          AccessControl:
+              - Acl
+              - Extension
+              - SubjectsPerAccessControlEntry
+              - TargetsPerAccessControlEntry
+              - AccessControlEntriesPerFabric
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          Actions:
+              - ActionList
+              - EndpointLists
+              - SetupURL
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          Basic:
+              - DataModelRevision
+              - VendorName
+              - VendorID
+              - ProductName
+              - ProductID
+              - NodeLabel
+              - Location
+              - HardwareVersion
+              - HardwareVersionString
+              - SoftwareVersion
+              - SoftwareVersionString
+              - ManufacturingDate
+              - PartNumber
+              - ProductURL
+              - ProductLabel
+              - SerialNumber
+              - LocalConfigDisabled
+              - Reachable
+              - UniqueID
+              - CapabilityMinima
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          OtaSoftwareUpdateProvider:
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          OtaSoftwareUpdateRequestor:
+              - DefaultOtaProviders
+              - UpdatePossible
+              - UpdateState
+              - UpdateStateProgress
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          LocalizationConfiguration:
+              - ActiveLocale
+              - SupportedLocales
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          TimeFormatLocalization:
+              - HourFormat
+              - ActiveCalendarType
+              - SupportedCalendarTypes
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          UnitLocalization:
+              - TemperatureUnit
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          PowerSourceConfiguration:
+              - Sources
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          PowerSource:
+              - Status
+              - Order
+              - Description
+              - WiredAssessedInputVoltage
+              - WiredAssessedInputFrequency
+              - WiredCurrentType
+              - WiredAssessedCurrent
+              - WiredNominalVoltage
+              - WiredMaximumCurrent
+              - WiredPresent
+              - ActiveWiredFaults
+              - BatVoltage
+              - BatPercentRemaining
+              - BatTimeRemaining
+              - BatChargeLevel
+              - BatReplacementNeeded
+              - BatReplaceability
+              - BatPresent
+              - ActiveBatFaults
+              - BatReplacementDescription
+              - BatCommonDesignation
+              - BatANSIDesignation
+              - BatIECDesignation
+              - BatApprovedChemistry
+              - BatCapacity
+              - BatQuantity
+              - BatChargeState
+              - BatTimeToFullCharge
+              - BatFunctionalWhileCharging
+              - BatChargingCurrent
+              - ActiveBatChargeFaults
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          GeneralCommissioning:
+              - Breadcrumb
+              - BasicCommissioningInfo
+              - RegulatoryConfig
+              - LocationCapability
+              - SupportsConcurrentConnection
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          NetworkCommissioning:
+              - MaxNetworks
+              - Networks
+              - ScanMaxTimeSeconds
+              - ConnectMaxTimeSeconds
+              - InterfaceEnabled
+              - LastNetworkingStatus
+              - LastNetworkID
+              - LastConnectErrorValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          DiagnosticLogs:
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          GeneralDiagnostics:
+              - NetworkInterfaces
+              - RebootCount
+              - UpTime
+              - TotalOperationalHours
+              - BootReasons
+              - ActiveHardwareFaults
+              - ActiveRadioFaults
+              - ActiveNetworkFaults
+              - TestEventTriggersEnabled
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          SoftwareDiagnostics:
+              - ThreadMetrics
+              - CurrentHeapFree
+              - CurrentHeapUsed
+              - CurrentHeapHighWatermark
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ThreadNetworkDiagnostics:
+              - Channel
+              - RoutingRole
+              - NetworkName
+              - PanId
+              - ExtendedPanId
+              - MeshLocalPrefix
+              - OverrunCount
+              - NeighborTableList
+              - RouteTableList
+              - PartitionId
+              - Weighting
+              - DataVersion
+              - StableDataVersion
+              - LeaderRouterId
+              - DetachedRoleCount
+              - ChildRoleCount
+              - RouterRoleCount
+              - LeaderRoleCount
+              - AttachAttemptCount
+              - PartitionIdChangeCount
+              - BetterPartitionAttachAttemptCount
+              - ParentChangeCount
+              - TxTotalCount
+              - TxUnicastCount
+              - TxBroadcastCount
+              - TxAckRequestedCount
+              - TxAckedCount
+              - TxNoAckRequestedCount
+              - TxDataCount
+              - TxDataPollCount
+              - TxBeaconCount
+              - TxBeaconRequestCount
+              - TxOtherCount
+              - TxRetryCount
+              - TxDirectMaxRetryExpiryCount
+              - TxIndirectMaxRetryExpiryCount
+              - TxErrCcaCount
+              - TxErrAbortCount
+              - TxErrBusyChannelCount
+              - RxTotalCount
+              - RxUnicastCount
+              - RxBroadcastCount
+              - RxDataCount
+              - RxDataPollCount
+              - RxBeaconCount
+              - RxBeaconRequestCount
+              - RxOtherCount
+              - RxAddressFilteredCount
+              - RxDestAddrFilteredCount
+              - RxDuplicatedCount
+              - RxErrNoFrameCount
+              - RxErrUnknownNeighborCount
+              - RxErrInvalidSrcAddrCount
+              - RxErrSecCount
+              - RxErrFcsCount
+              - RxErrOtherCount
+              - ActiveTimestamp
+              - PendingTimestamp
+              - Delay
+              - SecurityPolicy
+              - ChannelPage0Mask
+              - OperationalDatasetComponents
+              - ActiveNetworkFaultsList
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          WiFiNetworkDiagnostics:
+              - Bssid
+              - SecurityType
+              - WiFiVersion
+              - ChannelNumber
+              - Rssi
+              - BeaconLostCount
+              - BeaconRxCount
+              - PacketMulticastRxCount
+              - PacketMulticastTxCount
+              - PacketUnicastRxCount
+              - PacketUnicastTxCount
+              - CurrentMaxRate
+              - OverrunCount
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          EthernetNetworkDiagnostics:
+              - PHYRate
+              - FullDuplex
+              - PacketRxCount
+              - PacketTxCount
+              - TxErrCount
+              - CollisionCount
+              - OverrunCount
+              - CarrierDetect
+              - TimeSinceReset
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          BridgedDeviceBasic:
+              - VendorName
+              - VendorID
+              - ProductName
+              - NodeLabel
+              - HardwareVersion
+              - HardwareVersionString
+              - SoftwareVersion
+              - SoftwareVersionString
+              - ManufacturingDate
+              - PartNumber
+              - ProductURL
+              - ProductLabel
+              - SerialNumber
+              - Reachable
+              - UniqueID
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          Switch:
+              - NumberOfPositions
+              - CurrentPosition
+              - MultiPressMax
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          AdministratorCommissioning:
+              - WindowStatus
+              - AdminFabricIndex
+              - AdminVendorId
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          OperationalCredentials:
+              - NOCs
+              - Fabrics
+              - SupportedFabrics
+              - CommissionedFabrics
+              - TrustedRootCertificates
+              - CurrentFabricIndex
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          GroupKeyManagement:
+              - GroupKeyMap
+              - GroupTable
+              - MaxGroupsPerFabric
+              - MaxGroupKeysPerFabric
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          FixedLabel:
+              - LabelList
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          UserLabel:
+              - LabelList
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          BooleanState:
+              - StateValue
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ModeSelect:
+              - Description
+              - StandardNamespace
+              - SupportedModes
+              - CurrentMode
+              - StartUpMode
+              - OnMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          DoorLock:
+              - LockState
+              - LockType
+              - ActuatorEnabled
+              - DoorState
+              - DoorOpenEvents
+              - DoorClosedEvents
+              - OpenPeriod
+              - NumberOfTotalUsersSupported
+              - NumberOfPINUsersSupported
+              - NumberOfRFIDUsersSupported
+              - NumberOfWeekDaySchedulesSupportedPerUser
+              - NumberOfYearDaySchedulesSupportedPerUser
+              - NumberOfHolidaySchedulesSupported
+              - MaxPINCodeLength
+              - MinPINCodeLength
+              - MaxRFIDCodeLength
+              - MinRFIDCodeLength
+              - CredentialRulesSupport
+              - NumberOfCredentialsSupportedPerUser
+              - Language
+              - LEDSettings
+              - AutoRelockTime
+              - SoundVolume
+              - OperatingMode
+              - SupportedOperatingModes
+              - DefaultConfigurationRegister
+              - EnableLocalProgramming
+              - EnableOneTouchLocking
+              - EnableInsideStatusLED
+              - EnablePrivacyModeButton
+              - LocalProgrammingFeatures
+              - WrongCodeEntryLimit
+              - UserCodeTemporaryDisableTime
+              - SendPINOverTheAir
+              - RequirePINforRemoteOperation
+              - ExpiringUserTimeout
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          WindowCovering:
+              - Type
+              - PhysicalClosedLimitLift
+              - PhysicalClosedLimitTilt
+              - CurrentPositionLift
+              - CurrentPositionTilt
+              - NumberOfActuationsLift
+              - NumberOfActuationsTilt
+              - ConfigStatus
+              - CurrentPositionLiftPercentage
+              - CurrentPositionTiltPercentage
+              - OperationalStatus
+              - TargetPositionLiftPercent100ths
+              - TargetPositionTiltPercent100ths
+              - EndProductType
+              - CurrentPositionLiftPercent100ths
+              - CurrentPositionTiltPercent100ths
+              - InstalledOpenLimitLift
+              - InstalledClosedLimitLift
+              - InstalledOpenLimitTilt
+              - InstalledClosedLimitTilt
+              - Mode
+              - SafetyStatus
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          BarrierControl:
+              - BarrierMovingState
+              - BarrierSafetyStatus
+              - BarrierCapabilities
+              - BarrierOpenEvents
+              - BarrierCloseEvents
+              - BarrierCommandOpenEvents
+              - BarrierCommandCloseEvents
+              - BarrierOpenPeriod
+              - BarrierClosePeriod
+              - BarrierPosition
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          PumpConfigurationAndControl:
+              - MaxPressure
+              - MaxSpeed
+              - MaxFlow
+              - MinConstPressure
+              - MaxConstPressure
+              - MinCompPressure
+              - MaxCompPressure
+              - MinConstSpeed
+              - MaxConstSpeed
+              - MinConstFlow
+              - MaxConstFlow
+              - MinConstTemp
+              - MaxConstTemp
+              - PumpStatus
+              - EffectiveOperationMode
+              - EffectiveControlMode
+              - Capacity
+              - Speed
+              - LifetimeRunningHours
+              - Power
+              - LifetimeEnergyConsumed
+              - OperationMode
+              - ControlMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          Thermostat:
+              - LocalTemperature
+              - OutdoorTemperature
+              - Occupancy
+              - AbsMinHeatSetpointLimit
+              - AbsMaxHeatSetpointLimit
+              - AbsMinCoolSetpointLimit
+              - AbsMaxCoolSetpointLimit
+              - PICoolingDemand
+              - PIHeatingDemand
+              - HVACSystemTypeConfiguration
+              - LocalTemperatureCalibration
+              - OccupiedCoolingSetpoint
+              - OccupiedHeatingSetpoint
+              - UnoccupiedCoolingSetpoint
+              - UnoccupiedHeatingSetpoint
+              - MinHeatSetpointLimit
+              - MaxHeatSetpointLimit
+              - MinCoolSetpointLimit
+              - MaxCoolSetpointLimit
+              - MinSetpointDeadBand
+              - RemoteSensing
+              - ControlSequenceOfOperation
+              - SystemMode
+              - ThermostatRunningMode
+              - StartOfWeek
+              - NumberOfWeeklyTransitions
+              - NumberOfDailyTransitions
+              - TemperatureSetpointHold
+              - TemperatureSetpointHoldDuration
+              - ThermostatProgrammingOperationMode
+              - ThermostatRunningState
+              - SetpointChangeSource
+              - SetpointChangeAmount
+              - SetpointChangeSourceTimestamp
+              - OccupiedSetback
+              - OccupiedSetbackMin
+              - OccupiedSetbackMax
+              - UnoccupiedSetback
+              - UnoccupiedSetbackMin
+              - UnoccupiedSetbackMax
+              - EmergencyHeatDelta
+              - ACType
+              - ACCapacity
+              - ACRefrigerantType
+              - ACCompressorType
+              - ACErrorCode
+              - ACLouverPosition
+              - ACCoilTemperature
+              - ACCapacityformat
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          FanControl:
+              - FanMode
+              - FanModeSequence
+              - PercentSetting
+              - PercentCurrent
+              - SpeedMax
+              - SpeedSetting
+              - SpeedCurrent
+              - RockSupport
+              - RockSetting
+              - WindSupport
+              - WindSetting
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ThermostatUserInterfaceConfiguration:
+              - TemperatureDisplayMode
+              - KeypadLockout
+              - ScheduleProgrammingVisibility
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ColorControl:
+              - CurrentHue
+              - CurrentSaturation
+              - RemainingTime
+              - CurrentX
+              - CurrentY
+              - DriftCompensation
+              - CompensationText
+              - ColorTemperatureMireds
+              - ColorMode
+              - Options
+              - NumberOfPrimaries
+              - Primary1X
+              - Primary1Y
+              - Primary1Intensity
+              - Primary2X
+              - Primary2Y
+              - Primary2Intensity
+              - Primary3X
+              - Primary3Y
+              - Primary3Intensity
+              - Primary4X
+              - Primary4Y
+              - Primary4Intensity
+              - Primary5X
+              - Primary5Y
+              - Primary5Intensity
+              - Primary6X
+              - Primary6Y
+              - Primary6Intensity
+              - WhitePointX
+              - WhitePointY
+              - ColorPointRX
+              - ColorPointRY
+              - ColorPointRIntensity
+              - ColorPointGX
+              - ColorPointGY
+              - ColorPointGIntensity
+              - ColorPointBX
+              - ColorPointBY
+              - ColorPointBIntensity
+              - EnhancedCurrentHue
+              - EnhancedColorMode
+              - ColorLoopActive
+              - ColorLoopDirection
+              - ColorLoopTime
+              - ColorLoopStartEnhancedHue
+              - ColorLoopStoredEnhancedHue
+              - ColorCapabilities
+              - ColorTempPhysicalMinMireds
+              - ColorTempPhysicalMaxMireds
+              - CoupleColorTempToLevelMinMireds
+              - StartUpColorTemperatureMireds
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          BallastConfiguration:
+              - PhysicalMinLevel
+              - PhysicalMaxLevel
+              - BallastStatus
+              - MinLevel
+              - MaxLevel
+              - IntrinsicBalanceFactor
+              - BallastFactorAdjustment
+              - LampQuantity
+              - LampType
+              - LampManufacturer
+              - LampRatedHours
+              - LampBurnHours
+              - LampAlarmMode
+              - LampBurnHoursTripPoint
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          IlluminanceMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - Tolerance
+              - LightSensorType
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          TemperatureMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - Tolerance
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          PressureMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - Tolerance
+              - ScaledValue
+              - MinScaledValue
+              - MaxScaledValue
+              - ScaledTolerance
+              - Scale
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          FlowMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - Tolerance
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          RelativeHumidityMeasurement:
+              - MeasuredValue
+              - MinMeasuredValue
+              - MaxMeasuredValue
+              - Tolerance
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          OccupancySensing:
+              - Occupancy
+              - OccupancySensorType
+              - OccupancySensorTypeBitmap
+              - PirOccupiedToUnoccupiedDelay
+              - PirUnoccupiedToOccupiedDelay
+              - PirUnoccupiedToOccupiedThreshold
+              - UltrasonicOccupiedToUnoccupiedDelay
+              - UltrasonicUnoccupiedToOccupiedDelay
+              - UltrasonicUnoccupiedToOccupiedThreshold
+              - PhysicalContactOccupiedToUnoccupiedDelay
+              - PhysicalContactUnoccupiedToOccupiedDelay
+              - PhysicalContactUnoccupiedToOccupiedThreshold
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          WakeOnLan:
+              - MACAddress
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          Channel:
+              - ChannelList
+              - Lineup
+              - CurrentChannel
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          TargetNavigator:
+              - TargetList
+              - CurrentTarget
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          MediaPlayback:
+              - CurrentState
+              - StartTime
+              - Duration
+              - SampledPosition
+              - PlaybackSpeed
+              - SeekRangeEnd
+              - SeekRangeStart
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          MediaInput:
+              - InputList
+              - CurrentInput
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          LowPower:
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          KeypadInput:
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ContentLauncher:
+              - AcceptHeader
+              - SupportedStreamingProtocols
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          AudioOutput:
+              - OutputList
+              - CurrentOutput
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ApplicationLauncher:
+              - CatalogList
+              - CurrentApp
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ApplicationBasic:
+              - VendorName
+              - VendorID
+              - ApplicationName
+              - ProductID
+              - Application
+              - Status
+              - ApplicationVersion
+              - AllowedVendorList
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          AccountLogin:
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          ElectricalMeasurement:
+              - MeasurementType
+              - DcVoltage
+              - DcVoltageMin
+              - DcVoltageMax
+              - DcCurrent
+              - DcCurrentMin
+              - DcCurrentMax
+              - DcPower
+              - DcPowerMin
+              - DcPowerMax
+              - DcVoltageMultiplier
+              - DcVoltageDivisor
+              - DcCurrentMultiplier
+              - DcCurrentDivisor
+              - DcPowerMultiplier
+              - DcPowerDivisor
+              - AcFrequency
+              - AcFrequencyMin
+              - AcFrequencyMax
+              - NeutralCurrent
+              - TotalActivePower
+              - TotalReactivePower
+              - TotalApparentPower
+              - Measured1stHarmonicCurrent
+              - Measured3rdHarmonicCurrent
+              - Measured5thHarmonicCurrent
+              - Measured7thHarmonicCurrent
+              - Measured9thHarmonicCurrent
+              - Measured11thHarmonicCurrent
+              - MeasuredPhase1stHarmonicCurrent
+              - MeasuredPhase3rdHarmonicCurrent
+              - MeasuredPhase5thHarmonicCurrent
+              - MeasuredPhase7thHarmonicCurrent
+              - MeasuredPhase9thHarmonicCurrent
+              - MeasuredPhase11thHarmonicCurrent
+              - AcFrequencyMultiplier
+              - AcFrequencyDivisor
+              - PowerMultiplier
+              - PowerDivisor
+              - HarmonicCurrentMultiplier
+              - PhaseHarmonicCurrentMultiplier
+              - InstantaneousVoltage
+              - InstantaneousLineCurrent
+              - InstantaneousActiveCurrent
+              - InstantaneousReactiveCurrent
+              - InstantaneousPower
+              - RmsVoltage
+              - RmsVoltageMin
+              - RmsVoltageMax
+              - RmsCurrent
+              - RmsCurrentMin
+              - RmsCurrentMax
+              - ActivePower
+              - ActivePowerMin
+              - ActivePowerMax
+              - ReactivePower
+              - ApparentPower
+              - PowerFactor
+              - AverageRmsVoltageMeasurementPeriod
+              - AverageRmsUnderVoltageCounter
+              - RmsExtremeOverVoltagePeriod
+              - RmsExtremeUnderVoltagePeriod
+              - RmsVoltageSagPeriod
+              - RmsVoltageSwellPeriod
+              - AcVoltageMultiplier
+              - AcVoltageDivisor
+              - AcCurrentMultiplier
+              - AcCurrentDivisor
+              - AcPowerMultiplier
+              - AcPowerDivisor
+              - OverloadAlarmsMask
+              - VoltageOverload
+              - CurrentOverload
+              - AcOverloadAlarmsMask
+              - AcVoltageOverload
+              - AcCurrentOverload
+              - AcActivePowerOverload
+              - AcReactivePowerOverload
+              - AverageRmsOverVoltage
+              - AverageRmsUnderVoltage
+              - RmsExtremeOverVoltage
+              - RmsExtremeUnderVoltage
+              - RmsVoltageSag
+              - RmsVoltageSwell
+              - LineCurrentPhaseB
+              - ActiveCurrentPhaseB
+              - ReactiveCurrentPhaseB
+              - RmsVoltagePhaseB
+              - RmsVoltageMinPhaseB
+              - RmsVoltageMaxPhaseB
+              - RmsCurrentPhaseB
+              - RmsCurrentMinPhaseB
+              - RmsCurrentMaxPhaseB
+              - ActivePowerPhaseB
+              - ActivePowerMinPhaseB
+              - ActivePowerMaxPhaseB
+              - ReactivePowerPhaseB
+              - ApparentPowerPhaseB
+              - PowerFactorPhaseB
+              - AverageRmsVoltageMeasurementPeriodPhaseB
+              - AverageRmsOverVoltageCounterPhaseB
+              - AverageRmsUnderVoltageCounterPhaseB
+              - RmsExtremeOverVoltagePeriodPhaseB
+              - RmsExtremeUnderVoltagePeriodPhaseB
+              - RmsVoltageSagPeriodPhaseB
+              - RmsVoltageSwellPeriodPhaseB
+              - LineCurrentPhaseC
+              - ActiveCurrentPhaseC
+              - ReactiveCurrentPhaseC
+              - RmsVoltagePhaseC
+              - RmsVoltageMinPhaseC
+              - RmsVoltageMaxPhaseC
+              - RmsCurrentPhaseC
+              - RmsCurrentMinPhaseC
+              - RmsCurrentMaxPhaseC
+              - ActivePowerPhaseC
+              - ActivePowerMinPhaseC
+              - ActivePowerMaxPhaseC
+              - ReactivePowerPhaseC
+              - ApparentPowerPhaseC
+              - PowerFactorPhaseC
+              - AverageRmsVoltageMeasurementPeriodPhaseC
+              - AverageRmsOverVoltageCounterPhaseC
+              - AverageRmsUnderVoltageCounterPhaseC
+              - RmsExtremeOverVoltagePeriodPhaseC
+              - RmsExtremeUnderVoltagePeriodPhaseC
+              - RmsVoltageSagPeriodPhaseC
+              - RmsVoltageSwellPeriodPhaseC
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          TestCluster:
+              - Boolean
+              - Bitmap8
+              - Bitmap16
+              - Bitmap32
+              - Bitmap64
+              - Int8u
+              - Int16u
+              - Int24u
+              - Int32u
+              - Int40u
+              - Int48u
+              - Int56u
+              - Int64u
+              - Int8s
+              - Int16s
+              - Int24s
+              - Int32s
+              - Int40s
+              - Int48s
+              - Int56s
+              - Int64s
+              - Enum8
+              - Enum16
+              - FloatSingle
+              - FloatDouble
+              - OctetString
+              - ListInt8u
+              - ListOctetString
+              - ListStructOctetString
+              - LongOctetString
+              - CharString
+              - LongCharString
+              - EpochUs
+              - EpochS
+              - VendorId
+              - ListNullablesAndOptionalsStruct
+              - EnumAttr
+              - StructAttr
+              - RangeRestrictedInt8u
+              - RangeRestrictedInt8s
+              - RangeRestrictedInt16u
+              - RangeRestrictedInt16s
+              - ListLongOctetString
+              - ListFabricScoped
+              - TimedWriteBoolean
+              - GeneralErrorBoolean
+              - ClusterErrorBoolean
+              - Unsupported
+              - NullableBoolean
+              - NullableBitmap8
+              - NullableBitmap16
+              - NullableBitmap32
+              - NullableBitmap64
+              - NullableInt8u
+              - NullableInt16u
+              - NullableInt24u
+              - NullableInt32u
+              - NullableInt40u
+              - NullableInt48u
+              - NullableInt56u
+              - NullableInt64u
+              - NullableInt8s
+              - NullableInt16s
+              - NullableInt24s
+              - NullableInt32s
+              - NullableInt40s
+              - NullableInt48s
+              - NullableInt56s
+              - NullableInt64s
+              - NullableEnum8
+              - NullableEnum16
+              - NullableFloatSingle
+              - NullableFloatDouble
+              - NullableOctetString
+              - NullableCharString
+              - NullableEnumAttr
+              - NullableStruct
+              - NullableRangeRestrictedInt8u
+              - NullableRangeRestrictedInt8s
+              - NullableRangeRestrictedInt16u
+              - NullableRangeRestrictedInt16s
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+      commands:
+          Identify:
+              - Identify
+              - TriggerEffect
+          Groups:
+              - AddGroup
+              - AddGroupResponse
+              - ViewGroup
+              - ViewGroupResponse
+              - GetGroupMembership
+              - GetGroupMembershipResponse
+              - RemoveGroup
+              - RemoveGroupResponse
+              - RemoveAllGroups
+              - AddGroupIfIdentifying
+          Scenes:
+              - AddScene
+              - AddSceneResponse
+              - ViewScene
+              - ViewSceneResponse
+              - RemoveScene
+              - RemoveSceneResponse
+              - RemoveAllScenes
+              - RemoveAllScenesResponse
+              - StoreScene
+              - StoreSceneResponse
+              - RecallScene
+              - GetSceneMembership
+              - GetSceneMembershipResponse
+              - EnhancedAddScene
+              - EnhancedAddSceneResponse
+              - EnhancedViewScene
+              - EnhancedViewSceneResponse
+              - CopyScene
+              - CopySceneResponse
+          OnOff:
+              - Off
+              - On
+              - Toggle
+              - OffWithEffect
+              - OnWithRecallGlobalScene
+              - OnWithTimedOff
+          LevelControl:
+              - MoveToLevel
+              - Move
+              - Step
+              - Stop
+              - MoveToLevelWithOnOff
+              - MoveWithOnOff
+              - StepWithOnOff
+              - StopWithOnOff
+              - MoveToClosestFrequency
+          Actions:
+              - InstantAction
+              - InstantActionWithTransition
+              - StartAction
+              - StartActionWithDuration
+              - StopAction
+              - PauseAction
+              - PauseActionWithDuration
+              - ResumeAction
+              - EnableAction
+              - EnableActionWithDuration
+              - DisableAction
+              - DisableActionWithDuration
+          Basic:
+              - MfgSpecificPing
+          OtaSoftwareUpdateProvider:
+              - QueryImage
+              - QueryImageResponse
+              - ApplyUpdateRequest
+              - ApplyUpdateResponse
+              - NotifyUpdateApplied
+          OtaSoftwareUpdateRequestor:
+              - AnnounceOtaProvider
+          GeneralCommissioning:
+              - ArmFailSafe
+              - ArmFailSafeResponse
+              - SetRegulatoryConfig
+              - SetRegulatoryConfigResponse
+              - CommissioningComplete
+              - CommissioningCompleteResponse
+          NetworkCommissioning:
+              - ScanNetworks
+              - ScanNetworksResponse
+              - AddOrUpdateWiFiNetwork
+              - AddOrUpdateThreadNetwork
+              - RemoveNetwork
+              - NetworkConfigResponse
+              - ConnectNetwork
+              - ConnectNetworkResponse
+              - ReorderNetwork
+          DiagnosticLogs:
+              - RetrieveLogsRequest
+              - RetrieveLogsResponse
+          GeneralDiagnostics:
+              - TestEventTrigger
+          SoftwareDiagnostics:
+              - ResetWatermarks
+          ThreadNetworkDiagnostics:
+              - ResetCounts
+          WiFiNetworkDiagnostics:
+              - ResetCounts
+          EthernetNetworkDiagnostics:
+              - ResetCounts
+          AdministratorCommissioning:
+              - OpenCommissioningWindow
+              - OpenBasicCommissioningWindow
+              - RevokeCommissioning
+          OperationalCredentials:
+              - AttestationRequest
+              - AttestationResponse
+              - CertificateChainRequest
+              - CertificateChainResponse
+              - CSRRequest
+              - CSRResponse
+              - AddNOC
+              - UpdateNOC
+              - NOCResponse
+              - UpdateFabricLabel
+              - RemoveFabric
+              - AddTrustedRootCertificate
+          GroupKeyManagement:
+              - KeySetWrite
+              - KeySetRead
+              - KeySetReadResponse
+              - KeySetRemove
+              - KeySetReadAllIndices
+              - KeySetReadAllIndicesResponse
+          ModeSelect:
+              - ChangeToMode
+          DoorLock:
+              - LockDoor
+              - UnlockDoor
+              - UnlockWithTimeout
+              - SetWeekDaySchedule
+              - GetWeekDaySchedule
+              - GetWeekDayScheduleResponse
+              - ClearWeekDaySchedule
+              - SetYearDaySchedule
+              - GetYearDaySchedule
+              - GetYearDayScheduleResponse
+              - ClearYearDaySchedule
+              - SetHolidaySchedule
+              - GetHolidaySchedule
+              - GetHolidayScheduleResponse
+              - ClearHolidaySchedule
+              - SetUser
+              - GetUser
+              - GetUserResponse
+              - ClearUser
+              - SetCredential
+              - SetCredentialResponse
+              - GetCredentialStatus
+              - GetCredentialStatusResponse
+              - ClearCredential
+          WindowCovering:
+              - UpOrOpen
+              - DownOrClose
+              - StopMotion
+              - GoToLiftValue
+              - GoToLiftPercentage
+              - GoToTiltValue
+              - GoToTiltPercentage
+          BarrierControl:
+              - BarrierControlGoToPercent
+              - BarrierControlStop
+          Thermostat:
+              - SetpointRaiseLower
+              - GetWeeklyScheduleResponse
+              - SetWeeklySchedule
+              - GetWeeklySchedule
+              - ClearWeeklySchedule
+          ColorControl:
+              - MoveToHue
+              - MoveHue
+              - StepHue
+              - MoveToSaturation
+              - MoveSaturation
+              - StepSaturation
+              - MoveToHueAndSaturation
+              - MoveToColor
+              - MoveColor
+              - StepColor
+              - MoveToColorTemperature
+              - EnhancedMoveToHue
+              - EnhancedMoveHue
+              - EnhancedStepHue
+              - EnhancedMoveToHueAndSaturation
+              - ColorLoopSet
+              - StopMoveStep
+              - MoveColorTemperature
+              - StepColorTemperature
+          Channel:
+              - ChangeChannel
+              - ChangeChannelResponse
+              - ChangeChannelByNumber
+              - SkipChannel
+          TargetNavigator:
+              - NavigateTarget
+              - NavigateTargetResponse
+          MediaPlayback:
+              - Play
+              - Pause
+              - StopPlayback
+              - StartOver
+              - Previous
+              - Next
+              - Rewind
+              - FastForward
+              - SkipForward
+              - SkipBackward
+              - PlaybackResponse
+              - Seek
+          MediaInput:
+              - SelectInput
+              - ShowInputStatus
+              - HideInputStatus
+              - RenameInput
+          LowPower:
+              - Sleep
+          KeypadInput:
+              - SendKey
+              - SendKeyResponse
+          ContentLauncher:
+              - LaunchContent
+              - LaunchURL
+              - LaunchResponse
+          AudioOutput:
+              - SelectOutput
+              - RenameOutput
+          ApplicationLauncher:
+              - LaunchApp
+              - StopApp
+              - HideApp
+              - LauncherResponse
+          AccountLogin:
+              - GetSetupPIN
+              - GetSetupPINResponse
+              - Login
+              - Logout
+          ElectricalMeasurement:
+              - GetProfileInfoResponseCommand
+              - GetProfileInfoCommand
+              - GetMeasurementProfileResponseCommand
+              - GetMeasurementProfileCommand
+          TestCluster:
+              - Test
+              - TestSpecificResponse
+              - TestNotHandled
+              - TestAddArgumentsResponse
+              - TestSpecific
+              - TestSimpleArgumentResponse
+              - TestUnknownCommand
+              - TestStructArrayArgumentResponse
+              - TestAddArguments
+              - TestListInt8UReverseResponse
+              - TestSimpleArgumentRequest
+              - TestEnumsResponse
+              - TestStructArrayArgumentRequest
+              - TestNullableOptionalResponse
+              - TestStructArgumentRequest
+              - TestComplexNullableOptionalResponse
+              - TestNestedStructArgumentRequest
+              - BooleanResponse
+              - TestListStructArgumentRequest
+              - SimpleStructResponse
+              - TestListInt8UArgumentRequest
+              - TestEmitTestEventResponse
+              - TestNestedStructListArgumentRequest
+              - TestEmitTestFabricScopedEventResponse
+              - TestListNestedStructListArgumentRequest
+              - TestListInt8UReverseRequest
+              - TestEnumsRequest
+              - TestNullableOptionalRequest
+              - TestComplexNullableOptionalRequest
+              - SimpleStructEchoRequest
+              - TimedInvokeRequest
+              - TestSimpleOptionalArgumentRequest
+              - TestEmitTestEventRequest
+              - TestEmitTestFabricScopedEventRequest
+      command fields:
+          Identify:
+              Identify:
+                  - identifyTime
+              TriggerEffect:
+                  - effectIdentifier
+                  - effectVariant
+          Groups:
+              AddGroup:
+                  - groupId
+                  - groupName
+              AddGroupResponse:
+                  - status
+                  - groupId
+              ViewGroup:
+                  - groupId
+              ViewGroupResponse:
+                  - status
+                  - groupId
+                  - groupName
+              GetGroupMembership:
+                  - groupList
+              GetGroupMembershipResponse:
+                  - capacity
+                  - groupList
+              RemoveGroup:
+                  - groupId
+              RemoveGroupResponse:
+                  - status
+                  - groupId
+              AddGroupIfIdentifying:
+                  - groupId
+                  - groupName
+          Scenes:
+              AddScene:
+                  - groupId
+                  - sceneId
+                  - transitionTime
+                  - sceneName
+                  - extensionFieldSets
+              AddSceneResponse:
+                  - status
+                  - groupId
+                  - sceneId
+              ViewScene:
+                  - groupId
+                  - sceneId
+              ViewSceneResponse:
+                  - status
+                  - groupId
+                  - sceneId
+                  - transitionTime
+                  - sceneName
+                  - extensionFieldSets
+              RemoveScene:
+                  - groupId
+                  - sceneId
+              RemoveSceneResponse:
+                  - status
+                  - groupId
+                  - sceneId
+              RemoveAllScenes:
+                  - groupId
+              RemoveAllScenesResponse:
+                  - status
+                  - groupId
+              StoreScene:
+                  - groupId
+                  - sceneId
+              StoreSceneResponse:
+                  - status
+                  - groupId
+                  - sceneId
+              RecallScene:
+                  - groupId
+                  - sceneId
+                  - transitionTime
+              GetSceneMembership:
+                  - groupId
+              GetSceneMembershipResponse:
+                  - status
+                  - capacity
+                  - groupId
+                  - sceneList
+              EnhancedAddScene:
+                  - groupId
+                  - sceneId
+                  - transitionTime
+                  - sceneName
+                  - extensionFieldSets
+              EnhancedAddSceneResponse:
+                  - status
+                  - groupId
+                  - sceneId
+              EnhancedViewScene:
+                  - groupId
+                  - sceneId
+              EnhancedViewSceneResponse:
+                  - status
+                  - groupId
+                  - sceneId
+                  - transitionTime
+                  - sceneName
+                  - extensionFieldSets
+              CopyScene:
+                  - mode
+                  - groupIdFrom
+                  - sceneIdFrom
+                  - groupIdTo
+                  - sceneIdTo
+              CopySceneResponse:
+                  - status
+                  - groupIdFrom
+                  - sceneIdFrom
+          OnOff:
+              OffWithEffect:
+                  - effectId
+                  - effectVariant
+              OnWithTimedOff:
+                  - onOffControl
+                  - onTime
+                  - offWaitTime
+          LevelControl:
+              MoveToLevel:
+                  - level
+                  - transitionTime
+                  - optionsMask
+                  - optionsOverride
+              Move:
+                  - moveMode
+                  - rate
+                  - optionsMask
+                  - optionsOverride
+              Step:
+                  - stepMode
+                  - stepSize
+                  - transitionTime
+                  - optionsMask
+                  - optionsOverride
+              Stop:
+                  - optionsMask
+                  - optionsOverride
+              MoveToLevelWithOnOff:
+                  - level
+                  - transitionTime
+                  - optionsMask
+                  - optionsOverride
+              MoveWithOnOff:
+                  - moveMode
+                  - rate
+                  - optionsMask
+                  - optionsOverride
+              StepWithOnOff:
+                  - stepMode
+                  - stepSize
+                  - transitionTime
+                  - optionsMask
+                  - optionsOverride
+              StopWithOnOff:
+                  - optionsMask
+                  - optionsOverride
+              MoveToClosestFrequency:
+                  - frequency
+          Actions:
+              InstantAction:
+                  - actionID
+                  - invokeID
+              InstantActionWithTransition:
+                  - actionID
+                  - invokeID
+                  - transitionTime
+              StartAction:
+                  - actionID
+                  - invokeID
+              StartActionWithDuration:
+                  - actionID
+                  - invokeID
+                  - duration
+              StopAction:
+                  - actionID
+                  - invokeID
+              PauseAction:
+                  - actionID
+                  - invokeID
+              PauseActionWithDuration:
+                  - actionID
+                  - invokeID
+                  - duration
+              ResumeAction:
+                  - actionID
+                  - invokeID
+              EnableAction:
+                  - actionID
+                  - invokeID
+              EnableActionWithDuration:
+                  - actionID
+                  - invokeID
+                  - duration
+              DisableAction:
+                  - actionID
+                  - invokeID
+              DisableActionWithDuration:
+                  - actionID
+                  - invokeID
+                  - duration
+          OtaSoftwareUpdateProvider:
+              QueryImage:
+                  - vendorId
+                  - productId
+                  - softwareVersion
+                  - protocolsSupported
+                  - hardwareVersion
+                  - location
+                  - requestorCanConsent
+                  - metadataForProvider
+              QueryImageResponse:
+                  - status
+                  - delayedActionTime
+                  - imageURI
+                  - softwareVersion
+                  - softwareVersionString
+                  - updateToken
+                  - userConsentNeeded
+                  - metadataForRequestor
+              ApplyUpdateRequest:
+                  - updateToken
+                  - newVersion
+              ApplyUpdateResponse:
+                  - action
+                  - delayedActionTime
+              NotifyUpdateApplied:
+                  - updateToken
+                  - softwareVersion
+          OtaSoftwareUpdateRequestor:
+              AnnounceOtaProvider:
+                  - providerNodeId
+                  - vendorId
+                  - announcementReason
+                  - metadataForNode
+                  - endpoint
+          GeneralCommissioning:
+              ArmFailSafe:
+                  - expiryLengthSeconds
+                  - breadcrumb
+              ArmFailSafeResponse:
+                  - errorCode
+                  - debugText
+              SetRegulatoryConfig:
+                  - newRegulatoryConfig
+                  - countryCode
+                  - breadcrumb
+              SetRegulatoryConfigResponse:
+                  - errorCode
+                  - debugText
+              CommissioningCompleteResponse:
+                  - errorCode
+                  - debugText
+          NetworkCommissioning:
+              ScanNetworks:
+                  - ssid
+                  - breadcrumb
+              ScanNetworksResponse:
+                  - networkingStatus
+                  - debugText
+                  - wiFiScanResults
+                  - threadScanResults
+              AddOrUpdateWiFiNetwork:
+                  - ssid
+                  - credentials
+                  - breadcrumb
+              AddOrUpdateThreadNetwork:
+                  - operationalDataset
+                  - breadcrumb
+              RemoveNetwork:
+                  - networkID
+                  - breadcrumb
+              NetworkConfigResponse:
+                  - networkingStatus
+                  - debugText
+                  - networkIndex
+              ConnectNetwork:
+                  - networkID
+                  - breadcrumb
+              ConnectNetworkResponse:
+                  - networkingStatus
+                  - debugText
+                  - errorValue
+              ReorderNetwork:
+                  - networkID
+                  - networkIndex
+                  - breadcrumb
+          DiagnosticLogs:
+              RetrieveLogsRequest:
+                  - intent
+                  - requestedProtocol
+                  - transferFileDesignator
+              RetrieveLogsResponse:
+                  - status
+                  - content
+                  - timeStamp
+                  - timeSinceBoot
+          GeneralDiagnostics:
+              TestEventTrigger:
+                  - enableKey
+                  - eventTrigger
+          SoftwareDiagnostics:
+          ThreadNetworkDiagnostics:
+          WiFiNetworkDiagnostics:
+          EthernetNetworkDiagnostics:
+          TimeSynchronization:
+              SetUtcTime:
+                  - utcTime
+                  - granularity
+                  - timeSource
+          AdministratorCommissioning:
+              OpenCommissioningWindow:
+                  - commissioningTimeout
+                  - pakeVerifier
+                  - discriminator
+                  - iterations
+                  - salt
+              OpenBasicCommissioningWindow:
+                  - commissioningTimeout
+          OperationalCredentials:
+              AttestationRequest:
+                  - attestationNonce
+              AttestationResponse:
+                  - attestationElements
+                  - signature
+              CertificateChainRequest:
+                  - certificateType
+              CertificateChainResponse:
+                  - certificate
+              CSRRequest:
+                  - csrNonce
+                  - isForUpdateNOC
+              CSRResponse:
+                  - nocsrElements
+                  - attestationSignature
+              AddNOC:
+                  - nocValue
+                  - icacValue
+                  - ipkValue
+                  - caseAdminSubject
+                  - adminVendorId
+              UpdateNOC:
+                  - nocValue
+                  - icacValue
+              NOCResponse:
+                  - statusCode
+                  - fabricIndex
+                  - debugText
+              UpdateFabricLabel:
+                  - label
+              RemoveFabric:
+                  - fabricIndex
+              AddTrustedRootCertificate:
+                  - rootCertificate
+          GroupKeyManagement:
+              KeySetWrite:
+                  - groupKeySet
+              KeySetRead:
+                  - groupKeySetID
+              KeySetReadResponse:
+                  - groupKeySet
+              KeySetRemove:
+                  - groupKeySetID
+              KeySetReadAllIndices:
+                  - groupKeySetIDs
+              KeySetReadAllIndicesResponse:
+                  - groupKeySetIDs
+          ModeSelect:
+              ChangeToMode:
+                  - newMode
+          DoorLock:
+              LockDoor:
+                  - pinCode
+              UnlockDoor:
+                  - pinCode
+              UnlockWithTimeout:
+                  - timeout
+                  - pinCode
+              SetWeekDaySchedule:
+                  - weekDayIndex
+                  - userIndex
+                  - daysMask
+                  - startHour
+                  - startMinute
+                  - endHour
+                  - endMinute
+              GetWeekDaySchedule:
+                  - weekDayIndex
+                  - userIndex
+              GetWeekDayScheduleResponse:
+                  - weekDayIndex
+                  - userIndex
+                  - status
+                  - daysMask
+                  - startHour
+                  - startMinute
+                  - endHour
+                  - endMinute
+              ClearWeekDaySchedule:
+                  - weekDayIndex
+                  - userIndex
+              SetYearDaySchedule:
+                  - yearDayIndex
+                  - userIndex
+                  - localStartTime
+                  - localEndTime
+              GetYearDaySchedule:
+                  - yearDayIndex
+                  - userIndex
+              GetYearDayScheduleResponse:
+                  - yearDayIndex
+                  - userIndex
+                  - status
+                  - localStartTime
+                  - localEndTime
+              ClearYearDaySchedule:
+                  - yearDayIndex
+                  - userIndex
+              SetHolidaySchedule:
+                  - holidayIndex
+                  - localStartTime
+                  - localEndTime
+                  - operatingMode
+              GetHolidaySchedule:
+                  - holidayIndex
+              GetHolidayScheduleResponse:
+                  - holidayIndex
+                  - status
+                  - localStartTime
+                  - localEndTime
+                  - operatingMode
+              ClearHolidaySchedule:
+                  - holidayIndex
+              SetUser:
+                  - operationType
+                  - userIndex
+                  - userName
+                  - userUniqueId
+                  - userStatus
+                  - userType
+                  - credentialRule
+              GetUser:
+                  - userIndex
+              GetUserResponse:
+                  - userIndex
+                  - userName
+                  - userUniqueId
+                  - userStatus
+                  - userType
+                  - credentialRule
+                  - credentials
+                  - creatorFabricIndex
+                  - lastModifiedFabricIndex
+                  - nextUserIndex
+              ClearUser:
+                  - userIndex
+              SetCredential:
+                  - operationType
+                  - credential
+                  - credentialData
+                  - userIndex
+                  - userStatus
+                  - userType
+              SetCredentialResponse:
+                  - status
+                  - userIndex
+                  - nextCredentialIndex
+              GetCredentialStatus:
+                  - credential
+              GetCredentialStatusResponse:
+                  - credentialExists
+                  - userIndex
+                  - creatorFabricIndex
+                  - lastModifiedFabricIndex
+                  - nextCredentialIndex
+              ClearCredential:
+                  - credential
+          WindowCovering:
+              GoToLiftValue:
+                  - liftValue
+              GoToLiftPercentage:
+                  - liftPercent100thsValue
+              GoToTiltValue:
+                  - tiltValue
+              GoToTiltPercentage:
+                  - tiltPercent100thsValue
+          BarrierControl:
+              BarrierControlGoToPercent:
+                  - percentOpen
+          Thermostat:
+              SetpointRaiseLower:
+                  - mode
+                  - amount
+              GetWeeklyScheduleResponse:
+                  - numberOfTransitionsForSequence
+                  - dayOfWeekForSequence
+                  - modeForSequence
+                  - transitions
+              SetWeeklySchedule:
+                  - numberOfTransitionsForSequence
+                  - dayOfWeekForSequence
+                  - modeForSequence
+                  - transitions
+              GetWeeklySchedule:
+                  - daysToReturn
+                  - modeToReturn
+          ColorControl:
+              MoveToHue:
+                  - hue
+                  - direction
+                  - transitionTime
+                  - optionsMask
+                  - optionsOverride
+              MoveHue:
+                  - moveMode
+                  - rate
+                  - optionsMask
+                  - optionsOverride
+              StepHue:
+                  - stepMode
+                  - stepSize
+                  - transitionTime
+                  - optionsMask
+                  - optionsOverride
+              MoveToSaturation:
+                  - saturation
+                  - transitionTime
+                  - optionsMask
+                  - optionsOverride
+              MoveSaturation:
+                  - moveMode
+                  - rate
+                  - optionsMask
+                  - optionsOverride
+              StepSaturation:
+                  - stepMode
+                  - stepSize
+                  - transitionTime
+                  - optionsMask
+                  - optionsOverride
+              MoveToHueAndSaturation:
+                  - hue
+                  - saturation
+                  - transitionTime
+                  - optionsMask
+                  - optionsOverride
+              MoveToColor:
+                  - colorX
+                  - colorY
+                  - transitionTime
+                  - optionsMask
+                  - optionsOverride
+              MoveColor:
+                  - rateX
+                  - rateY
+                  - optionsMask
+                  - optionsOverride
+              StepColor:
+                  - stepX
+                  - stepY
+                  - transitionTime
+                  - optionsMask
+                  - optionsOverride
+              MoveToColorTemperature:
+                  - colorTemperature
+                  - transitionTime
+                  - optionsMask
+                  - optionsOverride
+              EnhancedMoveToHue:
+                  - enhancedHue
+                  - direction
+                  - transitionTime
+                  - optionsMask
+                  - optionsOverride
+              EnhancedMoveHue:
+                  - moveMode
+                  - rate
+                  - optionsMask
+                  - optionsOverride
+              EnhancedStepHue:
+                  - stepMode
+                  - stepSize
+                  - transitionTime
+                  - optionsMask
+                  - optionsOverride
+              EnhancedMoveToHueAndSaturation:
+                  - enhancedHue
+                  - saturation
+                  - transitionTime
+                  - optionsMask
+                  - optionsOverride
+              ColorLoopSet:
+                  - updateFlags
+                  - action
+                  - direction
+                  - time
+                  - startHue
+                  - optionsMask
+                  - optionsOverride
+              StopMoveStep:
+                  - optionsMask
+                  - optionsOverride
+              MoveColorTemperature:
+                  - moveMode
+                  - rate
+                  - colorTemperatureMinimumMireds
+                  - colorTemperatureMaximumMireds
+                  - optionsMask
+                  - optionsOverride
+              StepColorTemperature:
+                  - stepMode
+                  - stepSize
+                  - transitionTime
+                  - colorTemperatureMinimumMireds
+                  - colorTemperatureMaximumMireds
+                  - optionsMask
+                  - optionsOverride
+          Channel:
+              ChangeChannel:
+                  - match
+              ChangeChannelResponse:
+                  - status
+                  - data
+              ChangeChannelByNumber:
+                  - majorNumber
+                  - minorNumber
+              SkipChannel:
+                  - count
+          TargetNavigator:
+              NavigateTarget:
+                  - target
+                  - data
+              NavigateTargetResponse:
+                  - status
+                  - data
+          MediaPlayback:
+              SkipForward:
+                  - deltaPositionMilliseconds
+              SkipBackward:
+                  - deltaPositionMilliseconds
+              PlaybackResponse:
+                  - status
+                  - data
+              Seek:
+                  - position
+          MediaInput:
+              SelectInput:
+                  - index
+              RenameInput:
+                  - index
+                  - name
+          LowPower:
+          KeypadInput:
+              SendKey:
+                  - keyCode
+              SendKeyResponse:
+                  - status
+          ContentLauncher:
+              LaunchContent:
+                  - search
+                  - autoPlay
+                  - data
+              LaunchURL:
+                  - contentURL
+                  - displayString
+                  - brandingInformation
+              LaunchResponse:
+                  - status
+                  - data
+          AudioOutput:
+              SelectOutput:
+                  - index
+              RenameOutput:
+                  - index
+                  - name
+          ApplicationLauncher:
+              LaunchApp:
+                  - application
+                  - data
+              StopApp:
+                  - application
+              HideApp:
+                  - application
+              LauncherResponse:
+                  - status
+                  - data
+          AccountLogin:
+              GetSetupPIN:
+                  - tempAccountIdentifier
+              GetSetupPINResponse:
+                  - setupPIN
+              Login:
+                  - tempAccountIdentifier
+                  - setupPIN
+          ElectricalMeasurement:
+              GetProfileInfoResponseCommand:
+                  - profileCount
+                  - profileIntervalPeriod
+                  - maxNumberOfIntervals
+                  - listOfAttributes
+              GetMeasurementProfileResponseCommand:
+                  - startTime
+                  - status
+                  - profileIntervalPeriod
+                  - numberOfIntervalsDelivered
+                  - attributeId
+                  - intervals
+              GetMeasurementProfileCommand:
+                  - attributeId
+                  - startTime
+                  - numberOfIntervals
+          TestCluster:
+              TestSpecificResponse:
+                  - returnValue
+              TestAddArgumentsResponse:
+                  - returnValue
+              TestSimpleArgumentResponse:
+                  - returnValue
+              TestStructArrayArgumentResponse:
+                  - arg1
+                  - arg2
+                  - arg3
+                  - arg4
+                  - arg5
+                  - arg6
+              TestAddArguments:
+                  - arg1
+                  - arg2
+              TestListInt8UReverseResponse:
+                  - arg1
+              TestSimpleArgumentRequest:
+                  - arg1
+              TestEnumsResponse:
+                  - arg1
+                  - arg2
+              TestStructArrayArgumentRequest:
+                  - arg1
+                  - arg2
+                  - arg3
+                  - arg4
+                  - arg5
+                  - arg6
+              TestNullableOptionalResponse:
+                  - wasPresent
+                  - wasNull
+                  - value
+                  - originalValue
+              TestStructArgumentRequest:
+                  - arg1
+              TestComplexNullableOptionalResponse:
+                  - nullableIntWasNull
+                  - nullableIntValue
+                  - optionalIntWasPresent
+                  - optionalIntValue
+                  - nullableOptionalIntWasPresent
+                  - nullableOptionalIntWasNull
+                  - nullableOptionalIntValue
+                  - nullableStringWasNull
+                  - nullableStringValue
+                  - optionalStringWasPresent
+                  - optionalStringValue
+                  - nullableOptionalStringWasPresent
+                  - nullableOptionalStringWasNull
+                  - nullableOptionalStringValue
+                  - nullableStructWasNull
+                  - nullableStructValue
+                  - optionalStructWasPresent
+                  - optionalStructValue
+                  - nullableOptionalStructWasPresent
+                  - nullableOptionalStructWasNull
+                  - nullableOptionalStructValue
+                  - nullableListWasNull
+                  - nullableListValue
+                  - optionalListWasPresent
+                  - optionalListValue
+                  - nullableOptionalListWasPresent
+                  - nullableOptionalListWasNull
+                  - nullableOptionalListValue
+              TestNestedStructArgumentRequest:
+                  - arg1
+              BooleanResponse:
+                  - value
+              TestListStructArgumentRequest:
+                  - arg1
+              SimpleStructResponse:
+                  - arg1
+              TestListInt8UArgumentRequest:
+                  - arg1
+              TestEmitTestEventResponse:
+                  - value
+              TestNestedStructListArgumentRequest:
+                  - arg1
+              TestEmitTestFabricScopedEventResponse:
+                  - value
+              TestListNestedStructListArgumentRequest:
+                  - arg1
+              TestListInt8UReverseRequest:
+                  - arg1
+              TestEnumsRequest:
+                  - arg1
+                  - arg2
+              TestNullableOptionalRequest:
+                  - arg1
+              TestComplexNullableOptionalRequest:
+                  - nullableInt
+                  - optionalInt
+                  - nullableOptionalInt
+                  - nullableString
+                  - optionalString
+                  - nullableOptionalString
+                  - nullableStruct
+                  - optionalStruct
+                  - nullableOptionalStruct
+                  - nullableList
+                  - optionalList
+                  - nullableOptionalList
+              SimpleStructEchoRequest:
+                  - arg1
+              TestSimpleOptionalArgumentRequest:
+                  - arg1
+              TestEmitTestEventRequest:
+                  - arg1
+                  - arg2
+                  - arg3
+              TestEmitTestFabricScopedEventRequest:
+                  - arg1
+          FaultInjection:
+              FailAtFault:
+                  - type
+                  - id
+                  - numCallsToSkip
+                  - numCallsToFail
+                  - takeMutex
+              FailRandomlyAtFault:
+                  - type
+                  - id
+                  - percentage
+      structs:
+          Scenes:
+              - AttributeValuePair
+              - ExtensionFieldSet
+          Descriptor:
+              - DeviceType
+          Binding:
+              - TargetStruct
+          AccessControl:
+              - Target
+              - AccessControlEntry
+              - ExtensionEntry
+          Actions:
+              - ActionStruct
+              - EndpointListStruct
+          Basic:
+              - CapabilityMinimaStruct
+          OtaSoftwareUpdateRequestor:
+              - ProviderLocation
+          PowerSource:
+              - BatChargeFaultChangeType
+              - BatFaultChangeType
+              - WiredFaultChangeType
+          GeneralCommissioning:
+              - BasicCommissioningInfo
+          NetworkCommissioning:
+              - NetworkInfo
+              - ThreadInterfaceScanResult
+              - WiFiInterfaceScanResult
+          GeneralDiagnostics:
+              - NetworkInterfaceType
+          SoftwareDiagnostics:
+              - ThreadMetrics
+          ThreadNetworkDiagnostics:
+              - NeighborTable
+              - OperationalDatasetComponents
+              - RouteTable
+              - SecurityPolicy
+          TimeSynchronization:
+              - DstOffsetType
+              - TimeZoneType
+          OperationalCredentials:
+              - FabricDescriptor
+              - NOCStruct
+          GroupKeyManagement:
+              - GroupInfoMapStruct
+              - GroupKeyMapStruct
+              - GroupKeySetStruct
+          FixedLabel:
+              - LabelStruct
+          UserLabel:
+              - LabelStruct
+          ModeSelect:
+              - SemanticTag
+              - ModeOptionStruct
+          DoorLock:
+              - DlCredential
+          Thermostat:
+              - ThermostatScheduleTransition
+          Channel:
+              - ChannelInfo
+              - LineupInfo
+          TargetNavigator:
+              - TargetInfo
+          MediaPlayback:
+              - PlaybackPosition
+          MediaInput:
+              - InputInfo
+          ContentLauncher:
+              - Dimension
+              - AdditionalInfo
+              - Parameter
+              - ContentSearch
+              - StyleInformation
+              - BrandingInformation
+          AudioOutput:
+              - OutputInfo
+          ApplicationLauncher:
+              - Application
+              - ApplicationEP
+          ApplicationBasic:
+              - ApplicationBasicApplication
+          TestCluster:
+              - SimpleStruct
+              - TestFabricScoped
+              - NullablesAndOptionalsStruct
+              - NestedStruct
+              - NestedStructList
+              - DoubleNestedStructList
+              - TestListStructOctet
+      struct fields:
+          Scenes:
+              AttributeValuePair:
+                  - attributeId
+                  - attributeValue
+              ExtensionFieldSet:
+                  - clusterId
+                  - attributeValueList
+          Descriptor:
+              DeviceType:
+                  - type
+                  - revision
+          Binding:
+              TargetStruct:
+                  - node
+                  - group
+                  - endpoint
+                  - cluster
+                  - fabricIndex
+          AccessControl:
+              Target:
+                  - cluster
+                  - endpoint
+                  - deviceType
+              AccessControlEntry:
+                  - privilege
+                  - authMode
+                  - subjects
+                  - targets
+                  - fabricIndex
+              ExtensionEntry:
+                  - data
+                  - fabricIndex
+          Actions:
+              ActionStruct:
+                  - actionID
+                  - name
+                  - type
+                  - endpointListID
+                  - supportedCommands
+                  - state
+              EndpointListStruct:
+                  - endpointListID
+                  - name
+                  - type
+                  - endpoints
+          Basic:
+              CapabilityMinimaStruct:
+                  - caseSessionsPerFabric
+                  - subscriptionsPerFabric
+          OtaSoftwareUpdateRequestor:
+              ProviderLocation:
+                  - providerNodeID
+                  - endpoint
+                  - fabricIndex
+          PowerSource:
+              BatChargeFaultChangeType:
+                  - current
+                  - previous
+              BatFaultChangeType:
+                  - current
+                  - previous
+              WiredFaultChangeType:
+                  - current
+                  - previous
+          GeneralCommissioning:
+              BasicCommissioningInfo:
+                  - failSafeExpiryLengthSeconds
+                  - maxCumulativeFailsafeSeconds
+          NetworkCommissioning:
+              NetworkInfo:
+                  - networkID
+                  - connected
+              ThreadInterfaceScanResult:
+                  - panId
+                  - extendedPanId
+                  - networkName
+                  - channel
+                  - version
+                  - extendedAddress
+                  - rssi
+                  - lqi
+              WiFiInterfaceScanResult:
+                  - security
+                  - ssid
+                  - bssid
+                  - channel
+                  - wiFiBand
+                  - rssi
+          GeneralDiagnostics:
+              NetworkInterfaceType:
+                  - name
+                  - isOperational
+                  - offPremiseServicesReachableIPv4
+                  - offPremiseServicesReachableIPv6
+                  - hardwareAddress
+                  - iPv4Addresses
+                  - iPv6Addresses
+                  - type
+          SoftwareDiagnostics:
+              ThreadMetrics:
+                  - id
+                  - name
+                  - stackFreeCurrent
+                  - stackFreeMinimum
+                  - stackSize
+          ThreadNetworkDiagnostics:
+              NeighborTable:
+                  - extAddress
+                  - age
+                  - rloc16
+                  - linkFrameCounter
+                  - mleFrameCounter
+                  - lqi
+                  - averageRssi
+                  - lastRssi
+                  - frameErrorRate
+                  - messageErrorRate
+                  - rxOnWhenIdle
+                  - fullThreadDevice
+                  - fullNetworkData
+                  - isChild
+              OperationalDatasetComponents:
+                  - activeTimestampPresent
+                  - pendingTimestampPresent
+                  - masterKeyPresent
+                  - networkNamePresent
+                  - extendedPanIdPresent
+                  - meshLocalPrefixPresent
+                  - delayPresent
+                  - panIdPresent
+                  - channelPresent
+                  - pskcPresent
+                  - securityPolicyPresent
+                  - channelMaskPresent
+              RouteTable:
+                  - extAddress
+                  - rloc16
+                  - routerId
+                  - nextHop
+                  - pathCost
+                  - lqiIn
+                  - lqiOut
+                  - age
+                  - allocated
+                  - linkEstablished
+              SecurityPolicy:
+                  - rotationTime
+                  - flags
+          TimeSynchronization:
+              DstOffsetType:
+                  - offset
+                  - validStarting
+                  - validUntil
+              TimeZoneType:
+                  - offset
+                  - validAt
+                  - name
+          OperationalCredentials:
+              FabricDescriptor:
+                  - rootPublicKey
+                  - vendorId
+                  - fabricId
+                  - nodeId
+                  - label
+                  - fabricIndex
+              NOCStruct:
+                  - noc
+                  - icac
+                  - fabricIndex
+          GroupKeyManagement:
+              GroupInfoMapStruct:
+                  - groupId
+                  - endpoints
+                  - groupName
+                  - fabricIndex
+              GroupKeyMapStruct:
+                  - groupId
+                  - groupKeySetID
+                  - fabricIndex
+              GroupKeySetStruct:
+                  - groupKeySetID
+                  - groupKeySecurityPolicy
+                  - epochKey0
+                  - epochStartTime0
+                  - epochKey1
+                  - epochStartTime1
+                  - epochKey2
+                  - epochStartTime2
+          FixedLabel:
+              LabelStruct:
+                  - label
+                  - value
+          UserLabel:
+              LabelStruct:
+                  - label
+                  - value
+          ModeSelect:
+              SemanticTag:
+                  - mfgCode
+                  - value
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - semanticTags
+          DoorLock:
+              DlCredential:
+                  - credentialType
+                  - credentialIndex
+          Thermostat:
+              ThermostatScheduleTransition:
+                  - transitionTime
+                  - heatSetpoint
+                  - coolSetpoint
+          Channel:
+              ChannelInfo:
+                  - majorNumber
+                  - minorNumber
+                  - name
+                  - callSign
+                  - affiliateCallSign
+              LineupInfo:
+                  - operatorName
+                  - lineupName
+                  - postalCode
+                  - lineupInfoType
+          TargetNavigator:
+              TargetInfo:
+                  - identifier
+                  - name
+          MediaPlayback:
+              PlaybackPosition:
+                  - updatedAt
+                  - position
+          MediaInput:
+              InputInfo:
+                  - index
+                  - inputType
+                  - name
+                  - descriptionString
+          ContentLauncher:
+              Dimension:
+                  - width
+                  - height
+                  - metric
+              AdditionalInfo:
+                  - name
+                  - value
+              Parameter:
+                  - type
+                  - value
+                  - externalIDList
+              ContentSearch:
+                  - parameterList
+              StyleInformation:
+                  - imageUrl
+                  - color
+                  - size
+              BrandingInformation:
+                  - providerName
+                  - background
+                  - logo
+                  - progressBar
+                  - splash
+                  - waterMark
+          AudioOutput:
+              OutputInfo:
+                  - index
+                  - outputType
+                  - name
+          ApplicationLauncher:
+              Application:
+                  - catalogVendorId
+                  - applicationId
+              ApplicationEP:
+                  - application
+                  - endpoint
+          ApplicationBasic:
+              ApplicationBasicApplication:
+                  - catalogVendorId
+                  - applicationId
+          TestCluster:
+              SimpleStruct:
+                  - a
+                  - b
+                  - c
+                  - d
+                  - e
+                  - f
+                  - g
+                  - h
+              TestFabricScoped:
+                  - fabricSensitiveInt8u
+                  - optionalFabricSensitiveInt8u
+                  - nullableFabricSensitiveInt8u
+                  - nullableOptionalFabricSensitiveInt8u
+                  - fabricSensitiveCharString
+                  - fabricSensitiveStruct
+                  - fabricSensitiveInt8uList
+                  - fabricIndex
+              NullablesAndOptionalsStruct:
+                  - nullableInt
+                  - optionalInt
+                  - nullableOptionalInt
+                  - nullableString
+                  - optionalString
+                  - nullableOptionalString
+                  - nullableStruct
+                  - optionalStruct
+                  - nullableOptionalStruct
+                  - nullableList
+                  - optionalList
+                  - nullableOptionalList
+              NestedStruct:
+                  - a
+                  - b
+                  - c
+              NestedStructList:
+                  - a
+                  - b
+                  - c
+                  - d
+                  - e
+                  - f
+                  - g
+              DoubleNestedStructList:
+                  - a
+              TestListStructOctet:
+                  - member1
+                  - member2
+      events:
+          AccessControl:
+              - AccessControlEntryChanged
+              - AccessControlExtensionChanged
+          Actions:
+              - StateChanged
+              - ActionFailed
+          Basic:
+              - StartUp
+              - ShutDown
+              - Leave
+              - ReachableChanged
+          OtaSoftwareUpdateRequestor:
+              - StateTransition
+              - VersionApplied
+              - DownloadError
+          GeneralDiagnostics:
+              - HardwareFaultChange
+              - RadioFaultChange
+              - NetworkFaultChange
+              - BootReason
+          SoftwareDiagnostics:
+              - SoftwareFault
+          ThreadNetworkDiagnostics:
+              - ConnectionStatus
+              - NetworkFaultChange
+          WiFiNetworkDiagnostics:
+              - Disconnection
+              - AssociationFailure
+              - ConnectionStatus
+          BridgedDeviceBasic:
+              - StartUp
+              - ShutDown
+              - Leave
+              - ReachableChanged
+          Switch:
+              - SwitchLatched
+              - InitialPress
+              - LongPress
+              - ShortRelease
+              - LongRelease
+              - MultiPressOngoing
+              - MultiPressComplete
+          BooleanState:
+              - StateChange
+          DoorLock:
+              - DoorLockAlarm
+              - DoorStateChange
+              - LockOperation
+              - LockOperationError
+              - LockUserChange
+          PumpConfigurationAndControl:
+              - SupplyVoltageLow
+              - SupplyVoltageHigh
+              - PowerMissingPhase
+              - SystemPressureLow
+              - SystemPressureHigh
+              - DryRunning
+              - MotorTemperatureHigh
+              - PumpMotorFatalFailure
+              - ElectronicTemperatureHigh
+              - PumpBlocked
+              - SensorFailure
+              - ElectronicNonFatalFailure
+              - ElectronicFatalFailure
+              - GeneralFault
+              - Leakage
+              - AirDetection
+              - TurbineOperation
+          TestCluster:
+              - TestEvent
+              - TestFabricScopedEvent
+      event fields:
+          AccessControl:
+              AccessControlEntryChanged:
+                  - adminNodeID
+                  - adminPasscodeID
+                  - changeType
+                  - latestValue
+                  - fabricIndex
+              AccessControlExtensionChanged:
+                  - adminNodeID
+                  - adminPasscodeID
+                  - changeType
+                  - latestValue
+                  - fabricIndex
+          Actions:
+              StateChanged:
+                  - actionID
+                  - invokeID
+                  - newState
+              ActionFailed:
+                  - actionID
+                  - invokeID
+                  - newState
+                  - error
+          Basic:
+              StartUp:
+                  - softwareVersion
+              Leave:
+                  - fabricIndex
+              ReachableChanged:
+                  - reachableNewValue
+          OtaSoftwareUpdateRequestor:
+              StateTransition:
+                  - previousState
+                  - newState
+                  - reason
+                  - targetSoftwareVersion
+              VersionApplied:
+                  - softwareVersion
+                  - productID
+              DownloadError:
+                  - softwareVersion
+                  - bytesDownloaded
+                  - progressPercent
+                  - platformCode
+          GeneralDiagnostics:
+              HardwareFaultChange:
+                  - current
+                  - previous
+              RadioFaultChange:
+                  - current
+                  - previous
+              NetworkFaultChange:
+                  - current
+                  - previous
+              BootReason:
+                  - bootReason
+          SoftwareDiagnostics:
+              SoftwareFault:
+                  - id
+                  - name
+                  - faultRecording
+          ThreadNetworkDiagnostics:
+              ConnectionStatus:
+                  - connectionStatus
+              NetworkFaultChange:
+                  - current
+                  - previous
+          WiFiNetworkDiagnostics:
+              Disconnection:
+                  - reasonCode
+              AssociationFailure:
+                  - associationFailure
+                  - status
+              ConnectionStatus:
+                  - connectionStatus
+          BridgedDeviceBasic:
+              StartUp:
+                  - softwareVersion
+              ReachableChanged:
+                  - reachableNewValue
+          Switch:
+              SwitchLatched:
+                  - newPosition
+              InitialPress:
+                  - newPosition
+              LongPress:
+                  - newPosition
+              ShortRelease:
+                  - previousPosition
+              LongRelease:
+                  - previousPosition
+              MultiPressOngoing:
+                  - newPosition
+                  - currentNumberOfPressesCounted
+              MultiPressComplete:
+                  - newPosition
+                  - totalNumberOfPressesCounted
+          BooleanState:
+              StateChange:
+                  - stateValue
+          DoorLock:
+              DoorLockAlarm:
+                  - alarmCode
+              DoorStateChange:
+                  - doorState
+              LockOperation:
+                  - lockOperationType
+                  - operationSource
+                  - userIndex
+                  - fabricIndex
+                  - sourceNode
+                  - credentials
+              LockOperationError:
+                  - lockOperationType
+                  - operationSource
+                  - operationError
+                  - userIndex
+                  - fabricIndex
+                  - sourceNode
+                  - credentials
+              LockUserChange:
+                  - lockDataType
+                  - dataOperationType
+                  - operationSource
+                  - userIndex
+                  - fabricIndex
+                  - sourceNode
+                  - dataIndex
+          PumpConfigurationAndControl:
+          TestCluster:
+              TestEvent:
+                  - arg1
+                  - arg2
+                  - arg3
+                  - arg4
+                  - arg5
+                  - arg6
+              TestFabricScopedEvent:
+                  - fabricIndex
+      enums:
+          Identify:
+              - IdentifyEffectIdentifier
+              - IdentifyEffectVariant
+              - IdentifyIdentifyType
+          OnOff:
+              - OnOffDelayedAllOffEffectVariant
+              - OnOffDyingLightEffectVariant
+              - OnOffEffectIdentifier
+              - OnOffStartUpOnOff
+          LevelControl:
+              - MoveMode
+              - StepMode
+          AccessControl:
+              - AuthMode
+              - ChangeTypeEnum
+              - Privilege
+          Actions:
+              - ActionErrorEnum
+              - ActionStateEnum
+              - ActionTypeEnum
+              - EndpointListTypeEnum
+          OtaSoftwareUpdateProvider:
+              - OTAApplyUpdateAction
+              - OTADownloadProtocol
+              - OTAQueryStatus
+          OtaSoftwareUpdateRequestor:
+              - OTAAnnouncementReason
+              - OTAChangeReasonEnum
+              - OTAUpdateStateEnum
+          TimeFormatLocalization:
+              - CalendarType
+              - HourFormat
+          UnitLocalization:
+              - TempUnit
+          PowerSource:
+              - BatChargeFault
+              - BatChargeLevel
+              - BatChargeState
+              - BatFault
+              - BatReplaceability
+              - PowerSourceStatus
+              - WiredCurrentType
+              - WiredFault
+          GeneralCommissioning:
+              - CommissioningError
+              - RegulatoryLocationType
+          NetworkCommissioning:
+              - NetworkCommissioningStatus
+              - WiFiBand
+          DiagnosticLogs:
+              - LogsIntent
+              - LogsStatus
+              - LogsTransferProtocol
+          GeneralDiagnostics:
+              - BootReasonType
+              - HardwareFaultType
+              - InterfaceType
+              - NetworkFaultType
+              - RadioFaultType
+          ThreadNetworkDiagnostics:
+              - NetworkFault
+              - RoutingRole
+              - ThreadConnectionStatus
+          WiFiNetworkDiagnostics:
+              - AssociationFailureCause
+              - SecurityType
+              - WiFiConnectionStatus
+              - WiFiVersionType
+          EthernetNetworkDiagnostics:
+              - PHYRateType
+          TimeSynchronization:
+              - GranularityEnum
+              - TimeSourceEnum
+          AdministratorCommissioning:
+              - CommissioningWindowStatus
+              - StatusCode
+          OperationalCredentials:
+              - OperationalCertStatus
+          GroupKeyManagement:
+              - GroupKeySecurityPolicy
+          DoorLock:
+              - DlAlarmCode
+              - DlCredentialRule
+              - DlCredentialType
+              - DlDataOperationType
+              - DlDoorState
+              - DlLockDataType
+              - DlLockOperationType
+              - DlLockState
+              - DlLockType
+              - DlOperatingMode
+              - DlOperationError
+              - DlOperationSource
+              - DlStatus
+              - DlUserStatus
+              - DlUserType
+              - DoorLockOperationEventCode
+              - DoorLockProgrammingEventCode
+              - DoorLockSetPinOrIdStatus
+              - DoorLockUserStatus
+              - DoorLockUserType
+          WindowCovering:
+              - EndProductType
+              - Type
+          PumpConfigurationAndControl:
+              - PumpControlMode
+              - PumpOperationMode
+          Thermostat:
+              - SetpointAdjustMode
+              - ThermostatControlSequence
+              - ThermostatRunningMode
+              - ThermostatSystemMode
+          FanControl:
+              - FanModeSequenceType
+              - FanModeType
+          ColorControl:
+              - ColorLoopAction
+              - ColorLoopDirection
+              - ColorMode
+              - HueDirection
+              - HueMoveMode
+              - HueStepMode
+              - SaturationMoveMode
+              - SaturationStepMode
+          IlluminanceMeasurement:
+              - LightSensorType
+          Channel:
+              - ChannelStatusEnum
+              - LineupInfoTypeEnum
+          TargetNavigator:
+              - TargetNavigatorStatusEnum
+          MediaPlayback:
+              - MediaPlaybackStatusEnum
+              - PlaybackStateEnum
+          MediaInput:
+              - InputTypeEnum
+          KeypadInput:
+              - CecKeyCode
+              - KeypadInputStatusEnum
+          ContentLauncher:
+              - ContentLaunchStatusEnum
+              - MetricTypeEnum
+              - ParameterEnum
+          AudioOutput:
+              - OutputTypeEnum
+          ApplicationLauncher:
+              - ApplicationLauncherStatusEnum
+          ApplicationBasic:
+              - ApplicationStatusEnum
+          TestCluster:
+              - SimpleEnum
+          FaultInjection:
+              - FaultType
+      enum values:
+          Identify:
+              IdentifyEffectIdentifier:
+                  - Blink
+                  - Breathe
+                  - Okay
+                  - ChannelChange
+                  - FinishEffect
+                  - StopEffect
+              IdentifyEffectVariant:
+                  - Default
+              IdentifyIdentifyType:
+                  - None
+                  - VisibleLight
+                  - VisibleLED
+                  - AudibleBeep
+                  - Display
+                  - Actuator
+          OnOff:
+              OnOffDelayedAllOffEffectVariant:
+                  - FadeToOffIn0p8Seconds
+                  - NoFade
+                  - 50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds
+              OnOffDyingLightEffectVariant:
+                  - 20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second
+              OnOffEffectIdentifier:
+                  - DelayedAllOff
+                  - DyingLight
+              OnOffStartUpOnOff:
+                  - Off
+                  - On
+                  - TogglePreviousOnOff
+          LevelControl:
+              MoveMode:
+                  - Up
+                  - Down
+              StepMode:
+                  - Up
+                  - Down
+          AccessControl:
+              AuthMode:
+                  - PASE
+                  - CASE
+                  - Group
+              ChangeTypeEnum:
+                  - Changed
+                  - Added
+                  - Removed
+              Privilege:
+                  - View
+                  - ProxyView
+                  - Operate
+                  - Manage
+                  - Administer
+          Actions:
+              ActionErrorEnum:
+                  - Unknown
+                  - Interrupted
+              ActionStateEnum:
+                  - Inactive
+                  - Active
+                  - Paused
+                  - Disabled
+              ActionTypeEnum:
+                  - Other
+                  - Scene
+                  - Sequence
+                  - Automation
+                  - Exception
+                  - Notification
+                  - Alarm
+              EndpointListTypeEnum:
+                  - Other
+                  - Room
+                  - Zone
+          OtaSoftwareUpdateProvider:
+              OTAApplyUpdateAction:
+                  - Proceed
+                  - AwaitNextAction
+                  - Discontinue
+              OTADownloadProtocol:
+                  - BDXSynchronous
+                  - BDXAsynchronous
+                  - HTTPS
+                  - VendorSpecific
+              OTAQueryStatus:
+                  - UpdateAvailable
+                  - Busy
+                  - NotAvailable
+                  - DownloadProtocolNotSupported
+          OtaSoftwareUpdateRequestor:
+              OTAAnnouncementReason:
+                  - SimpleAnnouncement
+                  - UpdateAvailable
+                  - UrgentUpdateAvailable
+              OTAChangeReasonEnum:
+                  - Unknown
+                  - Success
+                  - Failure
+                  - TimeOut
+                  - DelayByProvider
+              OTAUpdateStateEnum:
+                  - Unknown
+                  - Idle
+                  - Querying
+                  - DelayedOnQuery
+                  - Downloading
+                  - Applying
+                  - DelayedOnApply
+                  - RollingBack
+                  - DelayedOnUserConsent
+          TimeFormatLocalization:
+              CalendarType:
+                  - Buddhist
+                  - Chinese
+                  - Coptic
+                  - Ethiopian
+                  - Gregorian
+                  - Hebrew
+                  - Indian
+                  - Islamic
+                  - Japanese
+                  - Korean
+                  - Persian
+                  - Taiwanese
+              HourFormat:
+                  - 12hr
+                  - 24hr
+          UnitLocalization:
+              TempUnit:
+                  - Fahrenheit
+                  - Celsius
+                  - Kelvin
+          PowerSource:
+              BatChargeFault:
+                  - Unspecfied
+                  - AmbientTooHot
+                  - AmbientTooCold
+                  - BatteryTooHot
+                  - BatteryTooCold
+                  - BatteryAbsent
+                  - BatteryOverVoltage
+                  - BatteryUnderVoltage
+                  - ChargerOverVoltage
+                  - ChargerUnderVoltage
+                  - SafetyTimeout
+              BatChargeLevel:
+                  - Ok
+                  - Warning
+                  - Critical
+              BatChargeState:
+                  - Unknown
+                  - IsCharging
+                  - IsAtFullCharge
+                  - IsNotCharging
+              BatFault:
+                  - Unspecfied
+                  - OverTemp
+                  - UnderTemp
+              BatReplaceability:
+                  - Unspecified
+                  - NotReplaceable
+                  - UserReplaceable
+                  - FactoryReplaceable
+              PowerSourceStatus:
+                  - Unspecfied
+                  - Active
+                  - Standby
+                  - Unavailable
+              WiredCurrentType:
+                  - AC
+                  - DC
+              WiredFault:
+                  - Unspecfied
+                  - OverVoltage
+                  - UnderVoltage
+          GeneralCommissioning:
+              CommissioningError:
+                  - Ok
+                  - ValueOutsideRange
+                  - InvalidAuthentication
+                  - NoFailSafe
+                  - BusyWithOtherAdmin
+              RegulatoryLocationType:
+                  - Indoor
+                  - Outdoor
+                  - IndoorOutdoor
+          NetworkCommissioning:
+              NetworkCommissioningStatus:
+                  - Success
+                  - OutOfRange
+                  - BoundsExceeded
+                  - NetworkIDNotFound
+                  - DuplicateNetworkID
+                  - NetworkNotFound
+                  - RegulatoryError
+                  - AuthFailure
+                  - UnsupportedSecurity
+                  - OtherConnectionFailure
+                  - IPV6Failed
+                  - IPBindFailed
+                  - UnknownError
+              WiFiBand:
+                  - 2G4
+                  - 3G65
+                  - 5G
+                  - 6G
+                  - 60G
+          DiagnosticLogs:
+              LogsIntent:
+                  - EndUserSupport
+                  - NetworkDiag
+                  - CrashLogs
+              LogsStatus:
+                  - Success
+                  - Exhausted
+                  - NoLogs
+                  - Busy
+                  - Denied
+              LogsTransferProtocol:
+                  - ResponsePayload
+                  - BDX
+          GeneralDiagnostics:
+              BootReasonType:
+                  - Unspecified
+                  - PowerOnReboot
+                  - BrownOutReset
+                  - SoftwareWatchdogReset
+                  - HardwareWatchdogReset
+                  - SoftwareUpdateCompleted
+                  - SoftwareReset
+              HardwareFaultType:
+                  - Unspecified
+                  - Radio
+                  - Sensor
+                  - ResettableOverTemp
+                  - NonResettableOverTemp
+                  - PowerSource
+                  - VisualDisplayFault
+                  - AudioOutputFault
+                  - UserInterfaceFault
+                  - NonVolatileMemoryError
+                  - TamperDetected
+              InterfaceType:
+                  - Unspecified
+                  - WiFi
+                  - Ethernet
+                  - Cellular
+                  - Thread
+              NetworkFaultType:
+                  - Unspecified
+                  - HardwareFailure
+                  - NetworkJammed
+                  - ConnectionFailed
+              RadioFaultType:
+                  - Unspecified
+                  - WiFiFault
+                  - CellularFault
+                  - ThreadFault
+                  - NFCFault
+                  - BLEFault
+                  - EthernetFault
+          ThreadNetworkDiagnostics:
+              NetworkFault:
+                  - Unspecified
+                  - LinkDown
+                  - HardwareFailure
+                  - NetworkJammed
+              RoutingRole:
+                  - Unspecified
+                  - Unassigned
+                  - SleepyEndDevice
+                  - EndDevice
+                  - REED
+                  - Router
+                  - Leader
+              ThreadConnectionStatus:
+                  - Connected
+                  - NotConnected
+          WiFiNetworkDiagnostics:
+              AssociationFailureCause:
+                  - Unknown
+                  - AssociationFailed
+                  - AuthenticationFailed
+                  - SsidNotFound
+              SecurityType:
+                  - Unspecified
+                  - None
+                  - WEP
+                  - WPA
+                  - WPA2
+                  - WPA3
+              WiFiConnectionStatus:
+                  - Connected
+                  - NotConnected
+              WiFiVersionType:
+                  - 80211a
+                  - 80211b
+                  - 80211g
+                  - 80211n
+                  - 80211ac
+                  - 80211ax
+          EthernetNetworkDiagnostics:
+              PHYRateType:
+                  - 10M
+                  - 100M
+                  - 1000M
+                  - 25G
+                  - 5G
+                  - 10G
+                  - 40G
+                  - 100G
+                  - 200G
+                  - 400G
+          TimeSynchronization:
+              GranularityEnum:
+                  - NoTimeGranularity
+                  - MinutesGranularity
+                  - SecondsGranularity
+                  - MillisecondsGranularity
+                  - MicrosecondsGranularity
+              TimeSourceEnum:
+                  - None
+                  - Unknown
+                  - Admin
+                  - NodeTimeCluster
+                  - NonFabricSntp
+                  - NonFabricNtp
+                  - FabricSntp
+                  - FabricNtp
+                  - MixedNtp
+                  - NonFabricSntpNts
+                  - NonFabricNtpNts
+                  - FabricSntpNts
+                  - FabricNtpNts
+                  - MixedNtpNts
+                  - CloudSource
+                  - Ptp
+                  - Gnss
+          AdministratorCommissioning:
+              CommissioningWindowStatus:
+                  - WindowNotOpen
+                  - EnhancedWindowOpen
+                  - BasicWindowOpen
+              StatusCode:
+                  - Busy
+                  - PAKEParameterError
+                  - WindowNotOpen
+          OperationalCredentials:
+              OperationalCertStatus:
+                  - SUCCESS
+                  - InvalidPublicKey
+                  - InvalidNodeOpId
+                  - InvalidNOC
+                  - MissingCsr
+                  - TableFull
+                  - InvalidAdminSubject
+                  - FabricConflict
+                  - LabelConflict
+                  - InvalidFabricIndex
+          GroupKeyManagement:
+              GroupKeySecurityPolicy:
+                  - TrustFirst
+                  - CacheAndSync
+          DoorLock:
+              DlAlarmCode:
+                  - LockJammed
+                  - LockFactoryReset
+                  - LockRadioPowerCycled
+                  - WrongCodeEntryLimit
+                  - FrontEsceutcheonRemoved
+                  - DoorForcedOpen
+                  - DoorAjar
+                  - ForcedUser
+              DlCredentialRule:
+                  - Single
+                  - Double
+                  - Tri
+              DlCredentialType:
+                  - ProgrammingPIN
+                  - PIN
+                  - RFID
+                  - Fingerprint
+                  - FingerVein
+                  - Face
+              DlDataOperationType:
+                  - Add
+                  - Clear
+                  - Modify
+              DlDoorState:
+                  - DoorOpen
+                  - DoorClosed
+                  - DoorJammed
+                  - DoorForcedOpen
+                  - DoorUnspecifiedError
+                  - DoorAjar
+              DlLockDataType:
+                  - Unspecified
+                  - ProgrammingCode
+                  - UserIndex
+                  - WeekDaySchedule
+                  - YearDaySchedule
+                  - HolidaySchedule
+                  - PIN
+                  - RFID
+                  - Fingerprint
+              DlLockOperationType:
+                  - Lock
+                  - Unlock
+                  - NonAccessUserEvent
+                  - ForcedUserEvent
+              DlLockState:
+                  - NotFullyLocked
+                  - Locked
+                  - Unlocked
+              DlLockType:
+                  - DeadBolt
+                  - Magnetic
+                  - Other
+                  - Mortise
+                  - Rim
+                  - LatchBolt
+                  - CylindricalLock
+                  - TubularLock
+                  - InterconnectedLock
+                  - DeadLatch
+                  - DoorFurniture
+              DlOperatingMode:
+                  - Normal
+                  - Vacation
+                  - Privacy
+                  - NoRemoteLockUnlock
+                  - Passage
+              DlOperationError:
+                  - Unspecified
+                  - InvalidCredential
+                  - DisabledUserDenied
+                  - Restricted
+                  - InsufficientBattery
+              DlOperationSource:
+                  - Unspecified
+                  - Manual
+                  - ProprietaryRemote
+                  - Keypad
+                  - Auto
+                  - Button
+                  - Schedule
+                  - Remote
+                  - RFID
+                  - Biometric
+              DlStatus:
+                  - Success
+                  - Failure
+                  - Duplicate
+                  - Occupied
+                  - InvalidField
+                  - ResourceExhausted
+                  - NotFound
+              DlUserStatus:
+                  - Available
+                  - OccupiedEnabled
+                  - OccupiedDisabled
+              DlUserType:
+                  - UnrestrictedUser
+                  - YearDayScheduleUser
+                  - WeekDayScheduleUser
+                  - ProgrammingUser
+                  - NonAccessUser
+                  - ForcedUser
+                  - DisposableUser
+                  - ExpiringUser
+                  - ScheduleRestrictedUser
+                  - RemoteOnlyUser
+              DoorLockOperationEventCode:
+                  - UnknownOrMfgSpecific
+                  - Lock
+                  - Unlock
+                  - LockInvalidPinOrId
+                  - LockInvalidSchedule
+                  - UnlockInvalidPinOrId
+                  - UnlockInvalidSchedule
+                  - OneTouchLock
+                  - KeyLock
+                  - KeyUnlock
+                  - AutoLock
+                  - ScheduleLock
+                  - ScheduleUnlock
+                  - ManualLock
+                  - ManualUnlock
+              DoorLockProgrammingEventCode:
+                  - UnknownOrMfgSpecific
+                  - MasterCodeChanged
+                  - PinAdded
+                  - PinDeleted
+                  - PinChanged
+                  - IdAdded
+                  - IdDeleted
+              DoorLockSetPinOrIdStatus:
+                  - Success
+                  - GeneralFailure
+                  - MemoryFull
+                  - DuplicateCodeError
+              DoorLockUserStatus:
+                  - Available
+                  - OccupiedEnabled
+                  - OccupiedDisabled
+                  - NotSupported
+              DoorLockUserType:
+                  - Unrestricted
+                  - YearDayScheduleUser
+                  - WeekDayScheduleUser
+                  - MasterUser
+                  - NonAccessUser
+                  - NotSupported
+          WindowCovering:
+              EndProductType:
+                  - RollerShade
+                  - RomanShade
+                  - BalloonShade
+                  - WovenWood
+                  - PleatedShade
+                  - CellularShade
+                  - LayeredShade
+                  - LayeredShade2D
+                  - SheerShade
+                  - TiltOnlyInteriorBlind
+                  - InteriorBlind
+                  - VerticalBlindStripCurtain
+                  - InteriorVenetianBlind
+                  - ExteriorVenetianBlind
+                  - LateralLeftCurtain
+                  - LateralRightCurtain
+                  - CentralCurtain
+                  - RollerShutter
+                  - ExteriorVerticalScreen
+                  - AwningTerracePatio
+                  - AwningVerticalScreen
+                  - TiltOnlyPergola
+                  - SwingingShutter
+                  - SlidingShutter
+                  - Unknown
+              Type:
+                  - RollerShade
+                  - RollerShade2Motor
+                  - RollerShadeExterior
+                  - RollerShadeExterior2Motor
+                  - Drapery
+                  - Awning
+                  - Shutter
+                  - TiltBlindTiltOnly
+                  - TiltBlindLiftAndTilt
+                  - ProjectorScreen
+                  - Unknown
+          PumpConfigurationAndControl:
+              PumpControlMode:
+                  - ConstantSpeed
+                  - ConstantPressure
+                  - ProportionalPressure
+                  - ConstantFlow
+                  - ConstantTemperature
+                  - Automatic
+              PumpOperationMode:
+                  - Normal
+                  - Minimum
+                  - Maximum
+                  - Local
+          Thermostat:
+              SetpointAdjustMode:
+                  - HeatSetpoint
+                  - CoolSetpoint
+                  - HeatAndCoolSetpoints
+              ThermostatControlSequence:
+                  - CoolingOnly
+                  - CoolingWithReheat
+                  - HeatingOnly
+                  - HeatingWithReheat
+                  - CoolingAndHeating
+                  - CoolingAndHeatingWithReheat
+              ThermostatRunningMode:
+                  - Off
+                  - Cool
+                  - Heat
+              ThermostatSystemMode:
+                  - Off
+                  - Auto
+                  - Cool
+                  - Heat
+                  - EmergencyHeating
+                  - Precooling
+                  - FanOnly
+          FanControl:
+              FanModeSequenceType:
+                  - OffLowMedHigh
+                  - OffLowHigh
+                  - OffLowMedHighAuto
+                  - OffLowHighAuto
+                  - OffOnAuto
+                  - OffOn
+              FanModeType:
+                  - Off
+                  - Low
+                  - Medium
+                  - High
+                  - On
+                  - Auto
+                  - Smart
+          ColorControl:
+              ColorLoopAction:
+                  - Deactivate
+                  - ActivateFromColorLoopStartEnhancedHue
+                  - ActivateFromEnhancedCurrentHue
+              ColorLoopDirection:
+                  - DecrementHue
+                  - IncrementHue
+              ColorMode:
+                  - CurrentHueAndCurrentSaturation
+                  - CurrentXAndCurrentY
+                  - ColorTemperature
+              HueDirection:
+                  - ShortestDistance
+                  - LongestDistance
+                  - Up
+                  - Down
+              HueMoveMode:
+                  - Stop
+                  - Up
+                  - Down
+              HueStepMode:
+                  - Up
+                  - Down
+              SaturationMoveMode:
+                  - Stop
+                  - Up
+                  - Down
+              SaturationStepMode:
+                  - Up
+                  - Down
+          IlluminanceMeasurement:
+              LightSensorType:
+                  - Photodiode
+                  - CMOS
+          Channel:
+              ChannelStatusEnum:
+                  - Success
+                  - MultipleMatches
+                  - NoMatches
+              LineupInfoTypeEnum:
+                  - Mso
+          TargetNavigator:
+              TargetNavigatorStatusEnum:
+                  - Success
+                  - TargetNotFound
+                  - NotAllowed
+          MediaPlayback:
+              MediaPlaybackStatusEnum:
+                  - Success
+                  - InvalidStateForCommand
+                  - NotAllowed
+                  - NotActive
+                  - SpeedOutOfRange
+                  - SeekOutOfRange
+              PlaybackStateEnum:
+                  - Playing
+                  - Paused
+                  - NotPlaying
+                  - Buffering
+          MediaInput:
+              InputTypeEnum:
+                  - Internal
+                  - Aux
+                  - Coax
+                  - Composite
+                  - Hdmi
+                  - Input
+                  - Line
+                  - Optical
+                  - Video
+                  - Scart
+                  - Usb
+                  - Other
+          KeypadInput:
+              CecKeyCode:
+                  - Select
+                  - Up
+                  - Down
+                  - Left
+                  - Right
+                  - RightUp
+                  - RightDown
+                  - LeftUp
+                  - LeftDown
+                  - RootMenu
+                  - SetupMenu
+                  - ContentsMenu
+                  - FavoriteMenu
+                  - Exit
+                  - MediaTopMenu
+                  - MediaContextSensitiveMenu
+                  - NumberEntryMode
+                  - Number11
+                  - Number12
+                  - Number0OrNumber10
+                  - Numbers1
+                  - Numbers2
+                  - Numbers3
+                  - Numbers4
+                  - Numbers5
+                  - Numbers6
+                  - Numbers7
+                  - Numbers8
+                  - Numbers9
+                  - Dot
+                  - Enter
+                  - Clear
+                  - NextFavorite
+                  - ChannelUp
+                  - ChannelDown
+                  - PreviousChannel
+                  - SoundSelect
+                  - InputSelect
+                  - DisplayInformation
+                  - Help
+                  - PageUp
+                  - PageDown
+                  - Power
+                  - VolumeUp
+                  - VolumeDown
+                  - Mute
+                  - Play
+                  - Stop
+                  - Pause
+                  - Record
+                  - Rewind
+                  - FastForward
+                  - Eject
+                  - Forward
+                  - Backward
+                  - StopRecord
+                  - PauseRecord
+                  - Reserved
+                  - Angle
+                  - SubPicture
+                  - VideoOnDemand
+                  - ElectronicProgramGuide
+                  - TimerProgramming
+                  - InitialConfiguration
+                  - SelectBroadcastType
+                  - SelectSoundPresentation
+                  - PlayFunction
+                  - PausePlayFunction
+                  - RecordFunction
+                  - PauseRecordFunction
+                  - StopFunction
+                  - MuteFunction
+                  - RestoreVolumeFunction
+                  - TuneFunction
+                  - SelectMediaFunction
+                  - SelectAvInputFunction
+                  - SelectAudioInputFunction
+                  - PowerToggleFunction
+                  - PowerOffFunction
+                  - PowerOnFunction
+                  - F1Blue
+                  - F2Red
+                  - F3Green
+                  - F4Yellow
+                  - F5
+                  - Data
+              KeypadInputStatusEnum:
+                  - Success
+                  - UnsupportedKey
+                  - InvalidKeyInCurrentState
+          ContentLauncher:
+              ContentLaunchStatusEnum:
+                  - Success
+                  - UrlNotAvailable
+                  - AuthFailed
+              MetricTypeEnum:
+                  - PIXELS
+                  - PERCENTAGE
+              ParameterEnum:
+                  - Actor
+                  - Channel
+                  - Character
+                  - Director
+                  - Event
+                  - Franchise
+                  - Genre
+                  - League
+                  - Popularity
+                  - Provider
+                  - Sport
+                  - SportsTeam
+                  - Type
+          AudioOutput:
+              OutputTypeEnum:
+                  - Hdmi
+                  - Bt
+                  - Optical
+                  - Headphone
+                  - Internal
+                  - Other
+          ApplicationLauncher:
+              ApplicationLauncherStatusEnum:
+                  - Success
+                  - AppNotAvailable
+                  - SystemBusy
+          ApplicationBasic:
+              ApplicationStatusEnum:
+                  - Stopped
+                  - ActiveVisibleFocus
+                  - ActiveHidden
+                  - ActiveVisibleNotFocus
+          TestCluster:
+              SimpleEnum:
+                  - Unspecified
+                  - ValueA
+                  - ValueB
+                  - ValueC
+          FaultInjection:
+              FaultType:
+                  - Unspecified
+                  - SystemFault
+                  - InetFault
+                  - ChipFault
+                  - CertFault
+      bitmaps:
+          Groups:
+              - GroupClusterFeature
+          Scenes:
+              - ScenesCopyMode
+          OnOff:
+              - OnOffControl
+              - OnOffFeature
+              - SceneFeatures
+          LevelControl:
+              - LevelControlFeature
+          Actions:
+              - CommandBits
+          UnitLocalization:
+              - UnitLocalizationFeature
+          PowerSource:
+              - PowerSourceFeature
+          NetworkCommissioning:
+              - NetworkCommissioningFeature
+              - WiFiSecurity
+          SoftwareDiagnostics:
+              - SoftwareDiagnosticsFeature
+          ThreadNetworkDiagnostics:
+              - ThreadNetworkDiagnosticsFeature
+          ModeSelect:
+              - ModeSelectFeature
+          DoorLock:
+              - DlCredentialRuleMask
+              - DlCredentialRulesSupport
+              - DlDaysMaskMap
+              - DlDefaultConfigurationRegister
+              - DlKeypadOperationEventMask
+              - DlKeypadProgrammingEventMask
+              - DlLocalProgrammingFeatures
+              - DlManualOperationEventMask
+              - DlRFIDOperationEventMask
+              - DlRFIDProgrammingEventMask
+              - DlRemoteOperationEventMask
+              - DlRemoteProgrammingEventMask
+              - DlSupportedOperatingModes
+              - DoorLockDayOfWeek
+              - DoorLockFeature
+          WindowCovering:
+              - ConfigStatus
+              - Feature
+              - Mode
+              - OperationalStatus
+              - SafetyStatus
+          PumpConfigurationAndControl:
+              - PumpStatus
+          Thermostat:
+              - DayOfWeek
+              - ModeForSequence
+              - ThermostatFeature
+          FanControl:
+              - FanControlFeature
+              - RockSupportMask
+              - WindSettingMask
+              - WindSupportMask
+          ColorControl:
+              - ColorCapabilities
+              - ColorControlFeature
+              - ColorLoopUpdateFlags
+          PressureMeasurement:
+              - PressureFeature
+          Channel:
+              - ChannelFeature
+          MediaInput:
+              - MediaInputFeature
+          KeypadInput:
+              - KeypadInputFeature
+          ContentLauncher:
+              - ContentLauncherFeature
+              - SupportedStreamingProtocol
+          AudioOutput:
+              - AudioOutputFeature
+          ApplicationLauncher:
+              - ApplicationLauncherFeature
+          TestCluster:
+              - Bitmap16MaskMap
+              - Bitmap32MaskMap
+              - Bitmap64MaskMap
+              - Bitmap8MaskMap
+              - SimpleBitmap
+      bitmap values:
+          Groups:
+              GroupClusterFeature:
+                  - GroupNames
+          Scenes:
+              ScenesCopyMode:
+                  - CopyAllScenes
+          OnOff:
+              OnOffControl:
+                  - AcceptOnlyWhenOn
+              OnOffFeature:
+                  - Lighting
+              SceneFeatures:
+                  - SceneNames
+          LevelControl:
+              LevelControlFeature:
+                  - OnOff
+                  - Lighting
+                  - Frequency
+          Actions:
+              CommandBits:
+                  - InstantAction
+                  - InstantActionWithTransition
+                  - StartAction
+                  - StartActionWithDuration
+                  - StopAction
+                  - PauseAction
+                  - PauseActionWithDuration
+                  - ResumeAction
+                  - EnableAction
+                  - EnableActionWithDuration
+                  - DisableAction
+                  - DisableActionWithDuration
+          UnitLocalization:
+              UnitLocalizationFeature:
+                  - TemperatureUnit
+          PowerSource:
+              PowerSourceFeature:
+                  - Wired
+                  - Battery
+                  - Rechargeable
+                  - Replaceable
+          NetworkCommissioning:
+              NetworkCommissioningFeature:
+                  - WiFiNetworkInterface
+                  - ThreadNetworkInterface
+                  - EthernetNetworkInterface
+              WiFiSecurity:
+                  - Unencrypted
+                  - WepPersonal
+                  - WpaPersonal
+                  - Wpa2Personal
+                  - Wpa3Personal
+          SoftwareDiagnostics:
+              SoftwareDiagnosticsFeature:
+                  - WaterMarks
+          ThreadNetworkDiagnostics:
+              ThreadNetworkDiagnosticsFeature:
+                  - PacketCounts
+                  - ErrorCounts
+                  - MLECounts
+                  - MACCounts
+          ModeSelect:
+              ModeSelectFeature:
+                  - DEPONOFF
+          DoorLock:
+              DlCredentialRuleMask:
+                  - Single
+                  - Dual
+                  - Tri
+              DlCredentialRulesSupport:
+                  - Single
+                  - Dual
+                  - Tri
+              DlDaysMaskMap:
+                  - Sunday
+                  - Monday
+                  - Tuesday
+                  - Wednesday
+                  - Thursday
+                  - Friday
+                  - Saturday
+              DlDefaultConfigurationRegister:
+                  - EnableLocalProgrammingEnabled
+                  - KeypadInterfaceDefaultAccessEnabled
+                  - RemoteInterfaceDefaultAccessIsEnabled
+                  - SoundEnabled
+                  - AutoRelockTimeSet
+                  - LEDSettingsSet
+              DlKeypadOperationEventMask:
+                  - Unknown
+                  - Lock
+                  - Unlock
+                  - LockInvalidPIN
+                  - LockInvalidSchedule
+                  - UnlockInvalidCode
+                  - UnlockInvalidSchedule
+                  - NonAccessUserOpEvent
+              DlKeypadProgrammingEventMask:
+                  - Unknown
+                  - ProgrammingPINChanged
+                  - PINAdded
+                  - PINCleared
+                  - PINChanged
+              DlLocalProgrammingFeatures:
+                  - AddUsersCredentialsSchedulesLocally
+                  - ModifyUsersCredentialsSchedulesLocally
+                  - ClearUsersCredentialsSchedulesLocally
+                  - AdjustLockSettingsLocally
+              DlManualOperationEventMask:
+                  - Unknown
+                  - ThumbturnLock
+                  - ThumbturnUnlock
+                  - OneTouchLock
+                  - KeyLock
+                  - KeyUnlock
+                  - AutoLock
+                  - ScheduleLock
+                  - ScheduleUnlock
+                  - ManualLock
+                  - ManualUnlock
+              DlRFIDOperationEventMask:
+                  - Unknown
+                  - Lock
+                  - Unlock
+                  - LockInvalidRFID
+                  - LockInvalidSchedule
+                  - UnlockInvalidRFID
+                  - UnlockInvalidSchedule
+              DlRFIDProgrammingEventMask:
+                  - Unknown
+                  - RFIDCodeAdded
+                  - RFIDCodeCleared
+              DlRemoteOperationEventMask:
+                  - Unknown
+                  - Lock
+                  - Unlock
+                  - LockInvalidCode
+                  - LockInvalidSchedule
+                  - UnlockInvalidCode
+                  - UnlockInvalidSchedule
+              DlRemoteProgrammingEventMask:
+                  - Unknown
+                  - ProgrammingPINChanged
+                  - PINAdded
+                  - PINCleared
+                  - PINChanged
+                  - RFIDCodeAdded
+                  - RFIDCodeCleared
+              DlSupportedOperatingModes:
+                  - Normal
+                  - Vacation
+                  - Privacy
+                  - NoRemoteLockUnlock
+                  - Passage
+              DoorLockDayOfWeek:
+                  - Sunday
+                  - Monday
+                  - Tuesday
+                  - Wednesday
+                  - Thursday
+                  - Friday
+                  - Saturday
+              DoorLockFeature:
+                  - PINCredentials
+                  - RFIDCredentials
+                  - FingerCredentials
+                  - Logging
+                  - WeekDaySchedules
+                  - DoorPositionSensor
+                  - FaceCredentials
+                  - CredentialsOTA
+                  - UsersManagement
+                  - Notifications
+                  - YearDaySchedules
+                  - HolidaySchedules
+          WindowCovering:
+              ConfigStatus:
+                  - Operational
+                  - OnlineReserved
+                  - LiftMovementReversed
+                  - LiftPositionAware
+                  - TiltPositionAware
+                  - LiftEncoderControlled
+                  - TiltEncoderControlled
+              Feature:
+                  - Lift
+                  - Tilt
+                  - PositionAwareLift
+                  - AbsolutePosition
+                  - PositionAwareTilt
+              Mode:
+                  - MotorDirectionReversed
+                  - CalibrationMode
+                  - MaintenanceMode
+                  - LedFeedback
+              OperationalStatus:
+                  - Global
+                  - Lift
+                  - Tilt
+              SafetyStatus:
+                  - RemoteLockout
+                  - TamperDetection
+                  - FailedCommunication
+                  - PositionFailure
+                  - ThermalProtection
+                  - ObstacleDetected
+                  - Power
+                  - StopInput
+                  - MotorJammed
+                  - HardwareFailure
+                  - ManualOperation
+                  - Protection
+          PumpConfigurationAndControl:
+              PumpStatus:
+                  - DeviceFault
+                  - Supplyfault
+                  - SpeedLow
+                  - SpeedHigh
+                  - LocalOverride
+                  - Running
+                  - RemotePressure
+                  - RemoteFlow
+                  - RemoteTemperature
+          Thermostat:
+              DayOfWeek:
+                  - Sunday
+                  - Monday
+                  - Tuesday
+                  - Wednesday
+                  - Thursday
+                  - Friday
+                  - Saturday
+                  - AwayOrVacation
+              ModeForSequence:
+                  - HeatSetpointFieldPresent
+                  - CoolSetpointFieldPresent
+              ThermostatFeature:
+                  - Heating
+                  - Cooling
+                  - Occupancy
+                  - Schedule
+                  - Setback
+                  - Automode
+          FanControl:
+              FanControlFeature:
+                  - MultiSpeed
+                  - Auto
+                  - Rocking
+                  - Wind
+              RockSupportMask:
+                  - RockLeftRight
+                  - RockUpDown
+                  - RockRound
+              WindSettingMask:
+                  - SleepWind
+                  - NaturalWind
+              WindSupportMask:
+                  - SleepWind
+                  - NaturalWind
+          ColorControl:
+              ColorCapabilities:
+                  - HueSaturationSupported
+                  - EnhancedHueSupported
+                  - ColorLoopSupported
+                  - XYAttributesSupported
+                  - ColorTemperatureSupported
+              ColorControlFeature:
+                  - HueAndSaturation
+                  - EnhancedHue
+                  - ColorLoop
+                  - XY
+                  - ColorTemperature
+              ColorLoopUpdateFlags:
+                  - UpdateAction
+                  - UpdateDirection
+                  - UpdateTime
+                  - UpdateStartHue
+          PressureMeasurement:
+              PressureFeature:
+                  - EXT
+          Channel:
+              ChannelFeature:
+                  - ChannelList
+                  - LineupInfo
+          MediaInput:
+              MediaInputFeature:
+                  - NameUpdates
+          KeypadInput:
+              KeypadInputFeature:
+                  - NavigationKeyCodes
+                  - LocationKeys
+                  - NumberKeys
+          ContentLauncher:
+              ContentLauncherFeature:
+                  - ContentSearch
+                  - URLPlayback
+              SupportedStreamingProtocol:
+                  - DASH
+                  - HLS
+          AudioOutput:
+              AudioOutputFeature:
+                  - NameUpdates
+          ApplicationLauncher:
+              ApplicationLauncherFeature:
+                  - ApplicationPlatform
+          TestCluster:
+              Bitmap16MaskMap:
+                  - MaskVal1
+                  - MaskVal2
+                  - MaskVal3
+                  - MaskVal4
+              Bitmap32MaskMap:
+                  - MaskVal1
+                  - MaskVal2
+                  - MaskVal3
+                  - MaskVal4
+              Bitmap64MaskMap:
+                  - MaskVal1
+                  - MaskVal2
+                  - MaskVal3
+                  - MaskVal4
+              Bitmap8MaskMap:
+                  - MaskVal1
+                  - MaskVal2
+                  - MaskVal3
+                  - MaskVal4
+              SimpleBitmap:
+                  - ValueA
+                  - ValueB
+                  - ValueC
+      ids:
+          clusters:
+              - PulseWidthModulation
+              - TimeSynchronization
+              - ProxyConfiguration
+              - ProxyDiscovery
+              - ProxyValid
+              - FaultInjection
+          attributes:
+              PulseWidthModulation:
+                  - GeneratedCommandList
+                  - AcceptedCommandList
+                  - AttributeList
+                  - FeatureMap
+                  - ClusterRevision
+              TimeSynchronization:
+                  - GeneratedCommandList
+                  - AcceptedCommandList
+                  - AttributeList
+                  - FeatureMap
+                  - ClusterRevision
+                  - UTCTime
+                  - Granularity
+                  - TimeSource
+                  - TrustedTimeNodeId
+                  - DefaultNtp
+                  - TimeZone
+                  - DstOffset
+                  - LocalTime
+                  - TimeZoneDatabase
+                  - NtpServerPort
+              ProxyConfiguration:
+                  - GeneratedCommandList
+                  - AcceptedCommandList
+                  - AttributeList
+                  - FeatureMap
+                  - ClusterRevision
+              ProxyDiscovery:
+                  - GeneratedCommandList
+                  - AcceptedCommandList
+                  - AttributeList
+                  - FeatureMap
+                  - ClusterRevision
+              ProxyValid:
+                  - GeneratedCommandList
+                  - AcceptedCommandList
+                  - AttributeList
+                  - FeatureMap
+                  - ClusterRevision
+              FaultInjection:
+                  - GeneratedCommandList
+                  - AcceptedCommandList
+                  - AttributeList
+                  - FeatureMap
+                  - ClusterRevision
+          commands:
+              FaultInjection:
+                  - FailAtFault
+                  - FailRandomlyAtFault
+              TimeSynchronization:
+                  - SetUtcTime
+      command payloads:
+          FaultInjection:
+              - FailAtFault
+              - FailRandomlyAtFault
+          TimeSynchronization:
+              - SetUtcTime
+      global attributes:
+          - FeatureMap
+          - ClusterRevision
+          - AttributeList
+          - GeneratedCommandList
+          - AcceptedCommandList
+      apis:
+          - Timed Invoke for server to client commands
+          - Deprecated global attribute names
+
+- release: "First dot-release"
+  versions:
+      ios: "16.2"
+      macos: "13.1"
+      watchos: "9.2"
+      tvos: "16.2"
+  introduced:
+      attributes:
+          TestCluster:
+              - WriteOnlyInt8u
+      structs:
+          Descriptor:
+              - DeviceTypeStruct
+      struct fields:
+          Descriptor:
+              DeviceTypeStruct:
+                  - type
+                  - revision
+      bitmaps:
+          Switch:
+              - SwitchFeature
+          MediaPlayback:
+              - MediaPlaybackFeature
+      bitmap values:
+          Switch:
+              SwitchFeature:
+                  - LatchingSwitch
+                  - MomentarySwitch
+                  - MomentarySwitchRelease
+                  - MomentarySwitchLongPress
+                  - MomentarySwitchMultiPress
+          MediaPlayback:
+              MediaPlaybackFeature:
+                  - AdvancedSeek
+                  - VariableSpeed
+      ids:
+          attributes:
+              Descriptor:
+                  - DeviceTypeList
+
+- release: "First major API revamp"
+  versions: "future"
+  introduced:
+      clusters:
+          - OTASoftwareUpdateProvider
+          - OTASoftwareUpdateRequestor
+          - UnitTesting
+          - WakeOnLAN
+          - ClientMonitoring
+      attributes:
+          Descriptor:
+              # We really only started treating DeviceTypeList as DeviceTypeList in the API revamp,
+              # except in the list of attribute ids.
+              - DeviceTypeList
+          AccessControl:
+              - ACL
+          OccupancySensing:
+              - PIROccupiedToUnoccupiedDelay
+              - PIRUnoccupiedToOccupiedDelay
+              - PIRUnoccupiedToOccupiedThreshold
+          ClientMonitoring:
+              - IdleModeInterval
+              - ActiveModeInterval
+              - ActiveModeThreshold
+              - ExpectedClients
+              - FeatureMap
+              - ClusterRevision
+              - AttributeList
+              - GeneratedCommandList
+              - AcceptedCommandList
+          UnitTesting:
+              - Boolean
+              - Bitmap8
+              - Bitmap16
+              - Bitmap32
+              - Bitmap64
+              - Int8u
+              - Int16u
+              - Int24u
+              - Int32u
+              - Int40u
+              - Int48u
+              - Int56u
+              - Int64u
+              - Int8s
+              - Int16s
+              - Int24s
+              - Int32s
+              - Int40s
+              - Int48s
+              - Int56s
+              - Int64s
+              - Enum8
+              - Enum16
+              - FloatSingle
+              - FloatDouble
+              - OctetString
+              - ListInt8u
+              - ListOctetString
+              - ListStructOctetString
+              - LongOctetString
+              - CharString
+              - LongCharString
+              - EpochUs
+              - EpochS
+              - VendorId
+              - ListNullablesAndOptionalsStruct
+              - EnumAttr
+              - StructAttr
+              - RangeRestrictedInt8u
+              - RangeRestrictedInt8s
+              - RangeRestrictedInt16u
+              - RangeRestrictedInt16s
+              - ListLongOctetString
+              - ListFabricScoped
+              - TimedWriteBoolean
+              - GeneralErrorBoolean
+              - ClusterErrorBoolean
+              - Unsupported
+              - NullableBoolean
+              - NullableBitmap8
+              - NullableBitmap16
+              - NullableBitmap32
+              - NullableBitmap64
+              - NullableInt8u
+              - NullableInt16u
+              - NullableInt24u
+              - NullableInt32u
+              - NullableInt40u
+              - NullableInt48u
+              - NullableInt56u
+              - NullableInt64u
+              - NullableInt8s
+              - NullableInt16s
+              - NullableInt24s
+              - NullableInt32s
+              - NullableInt40s
+              - NullableInt48s
+              - NullableInt56s
+              - NullableInt64s
+              - NullableEnum8
+              - NullableEnum16
+              - NullableFloatSingle
+              - NullableFloatDouble
+              - NullableOctetString
+              - NullableCharString
+              - NullableEnumAttr
+              - NullableStruct
+              - NullableRangeRestrictedInt8u
+              - NullableRangeRestrictedInt8s
+              - NullableRangeRestrictedInt16u
+              - NullableRangeRestrictedInt16s
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+              - WriteOnlyInt8u
+          OTASoftwareUpdateProvider:
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          OTASoftwareUpdateRequestor:
+              - DefaultOtaProviders
+              - UpdatePossible
+              - UpdateState
+              - UpdateStateProgress
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          WakeOnLAN:
+              - MACAddress
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+      commands:
+          OTASoftwareUpdateProvider:
+              - QueryImage
+              - QueryImageResponse
+              - ApplyUpdateRequest
+              - ApplyUpdateResponse
+              - NotifyUpdateApplied
+          OTASoftwareUpdateRequestor:
+              - AnnounceOtaProvider
+          UnitTesting:
+              - Test
+              - TestSpecificResponse
+              - TestNotHandled
+              - TestAddArgumentsResponse
+              - TestSpecific
+              - TestSimpleArgumentResponse
+              - TestUnknownCommand
+              - TestStructArrayArgumentResponse
+              - TestAddArguments
+              - TestListInt8UReverseResponse
+              - TestSimpleArgumentRequest
+              - TestEnumsResponse
+              - TestStructArrayArgumentRequest
+              - TestNullableOptionalResponse
+              - TestStructArgumentRequest
+              - TestComplexNullableOptionalResponse
+              - TestNestedStructArgumentRequest
+              - BooleanResponse
+              - TestListStructArgumentRequest
+              - SimpleStructResponse
+              - TestListInt8UArgumentRequest
+              - TestEmitTestEventResponse
+              - TestNestedStructListArgumentRequest
+              - TestEmitTestFabricScopedEventResponse
+              - TestListNestedStructListArgumentRequest
+              - TestListInt8UReverseRequest
+              - TestEnumsRequest
+              - TestNullableOptionalRequest
+              - TestComplexNullableOptionalRequest
+              - SimpleStructEchoRequest
+              - TimedInvokeRequest
+              - TestSimpleOptionalArgumentRequest
+              - TestEmitTestEventRequest
+              - TestEmitTestFabricScopedEventRequest
+          ClientMonitoring:
+              - RegisterClientMonitoring
+              - StayAwakeRequest
+      command fields:
+          UnitTesting:
+              TestSpecificResponse:
+                  - returnValue
+              TestAddArgumentsResponse:
+                  - returnValue
+              TestSimpleArgumentResponse:
+                  - returnValue
+              TestStructArrayArgumentResponse:
+                  - arg1
+                  - arg2
+                  - arg3
+                  - arg4
+                  - arg5
+                  - arg6
+              TestAddArguments:
+                  - arg1
+                  - arg2
+              TestListInt8UReverseResponse:
+                  - arg1
+              TestSimpleArgumentRequest:
+                  - arg1
+              TestEnumsResponse:
+                  - arg1
+                  - arg2
+              TestStructArrayArgumentRequest:
+                  - arg1
+                  - arg2
+                  - arg3
+                  - arg4
+                  - arg5
+                  - arg6
+              TestNullableOptionalResponse:
+                  - wasPresent
+                  - wasNull
+                  - value
+                  - originalValue
+              TestStructArgumentRequest:
+                  - arg1
+              TestComplexNullableOptionalResponse:
+                  - nullableIntWasNull
+                  - nullableIntValue
+                  - optionalIntWasPresent
+                  - optionalIntValue
+                  - nullableOptionalIntWasPresent
+                  - nullableOptionalIntWasNull
+                  - nullableOptionalIntValue
+                  - nullableStringWasNull
+                  - nullableStringValue
+                  - optionalStringWasPresent
+                  - optionalStringValue
+                  - nullableOptionalStringWasPresent
+                  - nullableOptionalStringWasNull
+                  - nullableOptionalStringValue
+                  - nullableStructWasNull
+                  - nullableStructValue
+                  - optionalStructWasPresent
+                  - optionalStructValue
+                  - nullableOptionalStructWasPresent
+                  - nullableOptionalStructWasNull
+                  - nullableOptionalStructValue
+                  - nullableListWasNull
+                  - nullableListValue
+                  - optionalListWasPresent
+                  - optionalListValue
+                  - nullableOptionalListWasPresent
+                  - nullableOptionalListWasNull
+                  - nullableOptionalListValue
+              TestNestedStructArgumentRequest:
+                  - arg1
+              BooleanResponse:
+                  - value
+              TestListStructArgumentRequest:
+                  - arg1
+              SimpleStructResponse:
+                  - arg1
+              TestListInt8UArgumentRequest:
+                  - arg1
+              TestEmitTestEventResponse:
+                  - value
+              TestNestedStructListArgumentRequest:
+                  - arg1
+              TestEmitTestFabricScopedEventResponse:
+                  - value
+              TestListNestedStructListArgumentRequest:
+                  - arg1
+              TestListInt8UReverseRequest:
+                  - arg1
+              TestEnumsRequest:
+                  - arg1
+                  - arg2
+              TestNullableOptionalRequest:
+                  - arg1
+              TestComplexNullableOptionalRequest:
+                  - nullableInt
+                  - optionalInt
+                  - nullableOptionalInt
+                  - nullableString
+                  - optionalString
+                  - nullableOptionalString
+                  - nullableStruct
+                  - optionalStruct
+                  - nullableOptionalStruct
+                  - nullableList
+                  - optionalList
+                  - nullableOptionalList
+              SimpleStructEchoRequest:
+                  - arg1
+              TestSimpleOptionalArgumentRequest:
+                  - arg1
+              TestEmitTestEventRequest:
+                  - arg1
+                  - arg2
+                  - arg3
+              TestEmitTestFabricScopedEventRequest:
+                  - arg1
+          OTASoftwareUpdateProvider:
+              QueryImage:
+                  - vendorId
+                  - productId
+                  - softwareVersion
+                  - protocolsSupported
+                  - hardwareVersion
+                  - location
+                  - requestorCanConsent
+                  - metadataForProvider
+              QueryImageResponse:
+                  - status
+                  - delayedActionTime
+                  - imageURI
+                  - softwareVersion
+                  - softwareVersionString
+                  - updateToken
+                  - userConsentNeeded
+                  - metadataForRequestor
+              ApplyUpdateRequest:
+                  - updateToken
+                  - newVersion
+              ApplyUpdateResponse:
+                  - action
+                  - delayedActionTime
+              NotifyUpdateApplied:
+                  - updateToken
+                  - softwareVersion
+          OTASoftwareUpdateRequestor:
+              AnnounceOtaProvider:
+                  - providerNodeId
+                  - vendorId
+                  - announcementReason
+                  - metadataForNode
+                  - endpoint
+          ClientMonitoring:
+              RegisterClientMonitoring:
+                  - clientNodeId
+                  - iCid
+      structs:
+          OTASoftwareUpdateRequestor:
+              - ProviderLocation
+          UnitTesting:
+              - SimpleStruct
+              - TestFabricScoped
+              - NullablesAndOptionalsStruct
+              - NestedStruct
+              - NestedStructList
+              - DoubleNestedStructList
+              - TestListStructOctet
+          ClientMonitoring:
+              - MonitoringRegistration
+      struct fields:
+          UnitTesting:
+              SimpleStruct:
+                  - a
+                  - b
+                  - c
+                  - d
+                  - e
+                  - f
+                  - g
+                  - h
+              TestFabricScoped:
+                  - fabricSensitiveInt8u
+                  - optionalFabricSensitiveInt8u
+                  - nullableFabricSensitiveInt8u
+                  - nullableOptionalFabricSensitiveInt8u
+                  - fabricSensitiveCharString
+                  - fabricSensitiveStruct
+                  - fabricSensitiveInt8uList
+                  - fabricIndex
+              NullablesAndOptionalsStruct:
+                  - nullableInt
+                  - optionalInt
+                  - nullableOptionalInt
+                  - nullableString
+                  - optionalString
+                  - nullableOptionalString
+                  - nullableStruct
+                  - optionalStruct
+                  - nullableOptionalStruct
+                  - nullableList
+                  - optionalList
+                  - nullableOptionalList
+              NestedStruct:
+                  - a
+                  - b
+                  - c
+              NestedStructList:
+                  - a
+                  - b
+                  - c
+                  - d
+                  - e
+                  - f
+                  - g
+              DoubleNestedStructList:
+                  - a
+              TestListStructOctet:
+                  - member1
+                  - member2
+          OTASoftwareUpdateRequestor:
+              ProviderLocation:
+                  - providerNodeID
+                  - endpoint
+                  - fabricIndex
+          ClientMonitoring:
+              MonitoringRegistration:
+                  - clientNodeId
+                  - iCid
+                  - fabricIndex
+      events:
+          OTASoftwareUpdateRequestor:
+              - StateTransition
+              - VersionApplied
+              - DownloadError
+          UnitTesting:
+              - TestEvent
+              - TestFabricScopedEvent
+      event fields:
+          Switch:
+              MultiPressComplete:
+                  - previousPosition
+          UnitTesting:
+              TestEvent:
+                  - arg1
+                  - arg2
+                  - arg3
+                  - arg4
+                  - arg5
+                  - arg6
+              TestFabricScopedEvent:
+                  - fabricIndex
+          OTASoftwareUpdateRequestor:
+              StateTransition:
+                  - previousState
+                  - newState
+                  - reason
+                  - targetSoftwareVersion
+              VersionApplied:
+                  - softwareVersion
+                  - productID
+              DownloadError:
+                  - softwareVersion
+                  - bytesDownloaded
+                  - progressPercent
+                  - platformCode
+      enums:
+          OTASoftwareUpdateProvider:
+              - OTAApplyUpdateAction
+              - OTADownloadProtocol
+              - OTAQueryStatus
+          OTASoftwareUpdateRequestor:
+              - OTAAnnouncementReason
+              - OTAChangeReasonEnum
+              - OTAUpdateStateEnum
+          UnitTesting:
+              - SimpleEnum
+      enum values:
+          OTASoftwareUpdateProvider:
+              OTAApplyUpdateAction:
+                  - Proceed
+                  - AwaitNextAction
+                  - Discontinue
+              OTADownloadProtocol:
+                  - BDXSynchronous
+                  - BDXAsynchronous
+                  - HTTPS
+                  - VendorSpecific
+              OTAQueryStatus:
+                  - UpdateAvailable
+                  - Busy
+                  - NotAvailable
+                  - DownloadProtocolNotSupported
+          OTASoftwareUpdateRequestor:
+              OTAAnnouncementReason:
+                  - SimpleAnnouncement
+                  - UpdateAvailable
+                  - UrgentUpdateAvailable
+              OTAChangeReasonEnum:
+                  - Unknown
+                  - Success
+                  - Failure
+                  - TimeOut
+                  - DelayByProvider
+              OTAUpdateStateEnum:
+                  - Unknown
+                  - Idle
+                  - Querying
+                  - DelayedOnQuery
+                  - Downloading
+                  - Applying
+                  - DelayedOnApply
+                  - RollingBack
+                  - DelayedOnUserConsent
+          UnitTesting:
+              SimpleEnum:
+                  - Unspecified
+                  - ValueA
+                  - ValueB
+                  - ValueC
+      bitmaps:
+          UnitTesting:
+              - Bitmap8MaskMap
+              - Bitmap16MaskMap
+              - Bitmap32MaskMap
+              - Bitmap64MaskMap
+              - SimpleBitmap
+          LevelControl:
+              - LevelControlOptions
+      bitmap values:
+          UnitTesting:
+              Bitmap8MaskMap:
+                  - MaskVal1
+                  - MaskVal2
+                  - MaskVal3
+                  - MaskVal4
+              Bitmap16MaskMap:
+                  - MaskVal1
+                  - MaskVal2
+                  - MaskVal3
+                  - MaskVal4
+              Bitmap32MaskMap:
+                  - MaskVal1
+                  - MaskVal2
+                  - MaskVal3
+                  - MaskVal4
+              Bitmap64MaskMap:
+                  - MaskVal1
+                  - MaskVal2
+                  - MaskVal3
+                  - MaskVal4
+              SimpleBitmap:
+                  - ValueA
+                  - ValueB
+                  - ValueC
+          LevelControl:
+              LevelControlOptions:
+                  - ExecuteIfOff
+                  - CoupleColorTempToLevel
+  deprecated:
+      clusters:
+          - OtaSoftwareUpdateProvider
+          - OtaSoftwareUpdateRequestor
+          - TestCluster
+          - WakeOnLan
+      attributes:
+          Descriptor:
+              - DeviceList
+          AccessControl:
+              - Acl
+          OccupancySensing:
+              - PirOccupiedToUnoccupiedDelay
+              - PirUnoccupiedToOccupiedDelay
+              - PirUnoccupiedToOccupiedThreshold
+      structs:
+          Descriptor:
+              - DeviceType
+      event fields:
+          Switch:
+              MultiPressComplete:
+                  - newPosition
+      apis:
+          - Timed Invoke for server to client commands
+          - Deprecated global attribute names
+  renames:
+      clusters:
+          UnitTesting: TestCluster
+      attributes:
+          Descriptor:
+              DeviceTypeList: DeviceList
