@@ -42,6 +42,13 @@ template("bouffalolab_executable") {
 
     "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_2M.toml",
   ]
+
+  if (invoker.bl_plat_name == "bl602") {
+    flashing_script_inputs += [
+      "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_4M.toml",
+    ]
+  }
+
   copy(flashing_runtime_target) {
     sources = flashing_script_inputs
     outputs = [ "${root_out_dir}/{{source_file_part}}" ]
@@ -54,10 +61,22 @@ template("bouffalolab_executable") {
   flashing_options += [ "--chipname" ]
   flashing_options += [ "${invoker.bl_plat_name}" ]
   flashing_options += [ "--xtal" ]
-  flashing_options += [ "32M" ]
+  if (invoker.bl_plat_name == "bl602") {
+    flashing_options += [ "40M" ]
+  }
+  else if (invoker.bl_plat_name == "bl702") {
+    flashing_options += [ "32M" ]
+  }
+
   flashing_options += [ "--pt" ]
-  flashing_options +=
-      [ rebase_path("partition_cfg_2M.toml", root_out_dir, root_out_dir) ]
+  if (invoker.board == "BL602-IOT-DVK-3S") {
+    flashing_options +=
+        [ rebase_path("partition_cfg_2M.toml", root_out_dir, root_out_dir) ]
+  } else {
+    flashing_options +=
+        [ rebase_path("partition_cfg_4M.toml", root_out_dir, root_out_dir) ]
+  }
+
   flashing_options += [ "--ota" ]
   flashing_options += [ "ota_images/" ]
 

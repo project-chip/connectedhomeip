@@ -90,7 +90,7 @@ else
     baudrate=2000000
     optArgs=""
 
-    optArgs=custom_toolchain=\"$MATTER_ROOT/examples/platform/bouffalolab/common/toolchain:riscv_gcc\"
+    optArgs=custom_toolchain=\"$MATTER_ROOT/config/bouffalolab/toolchain:riscv_gcc\"
 
     shift
     shift
