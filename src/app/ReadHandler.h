@@ -252,6 +252,8 @@ private:
      *  @retval #Others If fails to send report data
      *  @retval #CHIP_NO_ERROR On success.
      *
+     *  If an error is returned, the ReadHandler guarantees that it is not in
+     *  a state where it's waiting for a response.
      */
     CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks);
 
