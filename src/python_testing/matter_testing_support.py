@@ -270,7 +270,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         data = result[endpoint]
         return list(data.values())[0][attribute]
 
-    async def read_single_attribute_check_success(self, cluster: object, attribute: object, dev_ctrl: ChipDeviceCtrl=None, node_id: int=None, endpoint: int=0) -> object:
+    async def read_single_attribute_check_success(self, cluster: object, attribute: object, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = 0) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -283,7 +283,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         asserts.assert_false(isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure), err_msg)
         return attr_ret
 
-    async def read_single_attribute_expect_error(self, cluster: object, attribute: object, error: Status, dev_ctrl: ChipDeviceCtrl=None, node_id: int=None, endpoint: int=0) -> object:
+    async def read_single_attribute_expect_error(self, cluster: object, attribute: object, error: Status, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = 0) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -298,7 +298,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         asserts.assert_equal(attr_ret.Reason.status, error, err_msg)
         return attr_ret
 
-    def print_step(self, stepnum: int, title:str) -> None:
+    def print_step(self, stepnum: int, title: str) -> None:
         logging.info('***** Test Step %d : %s', stepnum, title)
 
 

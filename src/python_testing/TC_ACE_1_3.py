@@ -22,8 +22,9 @@ import logging
 from mobly import asserts
 
 
-def acl_subject(cat:int) -> int:
+def acl_subject(cat: int) -> int:
     return 0xFFFFFFFD00000000 | cat
+
 
 class TC_ACE_1_3(MatterBaseTest):
 
@@ -54,7 +55,7 @@ class TC_ACE_1_3(MatterBaseTest):
         cat2v1 = cat2_id | 0x0001
         cat2v2 = cat2_id | 0x0002
         cat2v3 = cat2_id | 0x0003
-        logging.info('cat1v1 0x%x', cat1v1);
+        logging.info('cat1v1 0x%x', cat1v1)
 
         self.print_step(1, "Commissioning, already done")
         TH0 = self.default_controller
@@ -129,7 +130,6 @@ class TC_ACE_1_3(MatterBaseTest):
         self.print_step(13, "TH3 reads EP0 descriptor - expect UNSUPPORTED_ACCESS")
         await self.read_descriptor_expect_unsupported_access(TH3)
 
-
         self.print_step(14, "TH0 writes ACL TH3 view on EP0")
         th3_view = Clusters.AccessControl.Structs.AccessControlEntry(privilege=Clusters.AccessControl.Enums.Privilege.kView,
                                                                      authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
@@ -164,7 +164,6 @@ class TC_ACE_1_3(MatterBaseTest):
         self.print_step(21, "TH3 reads EP0 descriptor - expect UNSUPPORTED_ACCESS")
         await self.read_descriptor_expect_unsupported_access(TH3)
 
-
         self.print_step(22, "TH0 writes ACL TH1 TH3 view on EP0")
         th13_view = Clusters.AccessControl.Structs.AccessControlEntry(privilege=Clusters.AccessControl.Enums.Privilege.kView,
                                                                       authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
@@ -182,7 +181,6 @@ class TC_ACE_1_3(MatterBaseTest):
         self.print_step(25, "TH3 reads EP0 descriptor - expect SUCCESS")
         await self.read_descriptor_expect_success(TH3)
 
-
         self.print_step(26, "TH0 writes ACL TH2 TH3 view on EP0")
         th23_view = Clusters.AccessControl.Structs.AccessControlEntry(privilege=Clusters.AccessControl.Enums.Privilege.kView,
                                                                       authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
@@ -199,7 +197,6 @@ class TC_ACE_1_3(MatterBaseTest):
 
         self.print_step(29, "TH3 reads EP0 descriptor - expect SUCCESS")
         await self.read_descriptor_expect_success(TH3)
-
 
         self.print_step(30, "TH0 writes ACL TH1 TH2 TH3 view on EP0")
         th123_view = Clusters.AccessControl.Structs.AccessControlEntry(privilege=Clusters.AccessControl.Enums.Privilege.kView,
@@ -222,7 +219,7 @@ class TC_ACE_1_3(MatterBaseTest):
         cat1v1_view = Clusters.AccessControl.Structs.AccessControlEntry(privilege=Clusters.AccessControl.Enums.Privilege.kView,
                                                                         authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
                                                                         subjects=[acl_subject(cat1v1)],
-                                                                         targets=[Clusters.AccessControl.Structs.Target(endpoint=0)])
+                                                                        targets=[Clusters.AccessControl.Structs.Target(endpoint=0)])
         acl = [TH0_admin_acl, cat1v1_view]
         await self.write_acl(acl)
 
@@ -239,7 +236,7 @@ class TC_ACE_1_3(MatterBaseTest):
         cat1v2_view = Clusters.AccessControl.Structs.AccessControlEntry(privilege=Clusters.AccessControl.Enums.Privilege.kView,
                                                                         authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
                                                                         subjects=[acl_subject(cat1v2)],
-                                                                         targets=[Clusters.AccessControl.Structs.Target(endpoint=0)])
+                                                                        targets=[Clusters.AccessControl.Structs.Target(endpoint=0)])
 
         acl = [TH0_admin_acl, cat1v2_view]
         await self.write_acl(acl)
@@ -253,12 +250,11 @@ class TC_ACE_1_3(MatterBaseTest):
         self.print_step(41, "TH3 reads EP0 descriptor - expect UNSUPPORTED_ACCESS")
         await self.read_descriptor_expect_unsupported_access(TH3)
 
-
         self.print_step(42, "TH0 writes ACL cat1v3 view on EP0")
         cat1v3_view = Clusters.AccessControl.Structs.AccessControlEntry(privilege=Clusters.AccessControl.Enums.Privilege.kView,
                                                                         authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
                                                                         subjects=[acl_subject(cat1v3)],
-                                                                         targets=[Clusters.AccessControl.Structs.Target(endpoint=0)])
+                                                                        targets=[Clusters.AccessControl.Structs.Target(endpoint=0)])
 
         acl = [TH0_admin_acl, cat1v3_view]
         await self.write_acl(acl)
@@ -272,12 +268,11 @@ class TC_ACE_1_3(MatterBaseTest):
         self.print_step(45, "TH3 reads EP0 descriptor - expect UNSUPPORTED_ACCESS")
         await self.read_descriptor_expect_unsupported_access(TH3)
 
-
         self.print_step(46, "TH0 writes ACL cat2v1 view on EP0")
         cat2v1_view = Clusters.AccessControl.Structs.AccessControlEntry(privilege=Clusters.AccessControl.Enums.Privilege.kView,
                                                                         authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
                                                                         subjects=[acl_subject(cat2v1)],
-                                                                         targets=[Clusters.AccessControl.Structs.Target(endpoint=0)])
+                                                                        targets=[Clusters.AccessControl.Structs.Target(endpoint=0)])
 
         acl = [TH0_admin_acl, cat2v1_view]
         await self.write_acl(acl)
@@ -295,7 +290,7 @@ class TC_ACE_1_3(MatterBaseTest):
         cat2v2_view = Clusters.AccessControl.Structs.AccessControlEntry(privilege=Clusters.AccessControl.Enums.Privilege.kView,
                                                                         authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
                                                                         subjects=[acl_subject(cat2v2)],
-                                                                         targets=[Clusters.AccessControl.Structs.Target(endpoint=0)])
+                                                                        targets=[Clusters.AccessControl.Structs.Target(endpoint=0)])
 
         acl = [TH0_admin_acl, cat2v2_view]
         await self.write_acl(acl)
@@ -309,12 +304,11 @@ class TC_ACE_1_3(MatterBaseTest):
         self.print_step(53, "TH3 reads EP0 descriptor - expect SUCCESS")
         await self.read_descriptor_expect_success(TH3)
 
-
         self.print_step(54, "TH0 writes ACL cat2v3 view on EP0")
         cat2v3_view = Clusters.AccessControl.Structs.AccessControlEntry(privilege=Clusters.AccessControl.Enums.Privilege.kView,
                                                                         authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
                                                                         subjects=[acl_subject(cat2v3)],
-                                                                         targets=[Clusters.AccessControl.Structs.Target(endpoint=0)])
+                                                                        targets=[Clusters.AccessControl.Structs.Target(endpoint=0)])
 
         acl = [TH0_admin_acl, cat2v3_view]
         await self.write_acl(acl)
@@ -332,6 +326,7 @@ class TC_ACE_1_3(MatterBaseTest):
 
         acl = [TH0_admin_acl]
         await self.write_acl(acl)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
