@@ -633,11 +633,6 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
     ReadClient * foundSubscription = nullptr;
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
-        if (!readClient->IsSubscriptionActive())
-        {
-            continue;
-        }
-
         auto peer = apExchangeContext->GetSessionHandle()->GetPeer();
         if (readClient->GetFabricIndex() != peer.GetFabricIndex() || readClient->GetPeerNodeId() != peer.GetNodeId())
         {
@@ -646,6 +641,11 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
 
         // Notify Subscriptions about incoming communication from node
         readClient->OnUnsolicitedMessageFromPublisher();
+
+        if (!readClient->IsSubscriptionActive())
+        {
+            continue;
+        }
 
         if (!readClient->IsMatchingSubscriptionId(subscriptionId))
         {
