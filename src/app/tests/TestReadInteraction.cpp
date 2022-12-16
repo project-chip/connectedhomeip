@@ -319,6 +319,7 @@ public:
     static void TestSubscribeRoundtripStatusReportTimeout(nlTestSuite * apSuite, void * apContext);
     static void TestPostSubscribeRoundtripStatusReportTimeout(nlTestSuite * apSuite, void * apContext);
     static void TestReadChunkingStatusReportTimeout(nlTestSuite * apSuite, void * apContext);
+    static void TestReadReportFailure(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeRoundtripChunkStatusReportTimeout(nlTestSuite * apSuite, void * apContext);
     static void TestPostSubscribeRoundtripChunkStatusReportTimeout(nlTestSuite * apSuite, void * apContext);
     static void TestPostSubscribeRoundtripChunkReportTimeout(nlTestSuite * apSuite, void * apContext);
@@ -2531,6 +2532,57 @@ void TestReadInteraction::TestReadChunkingStatusReportTimeout(nlTestSuite * apSu
     ctx.CreateSessionBobToAlice();
 }
 
+// ReadClient sends the read request, but handler fails to send the one report (SendMessage returns an error).
+// Since this is an un-chunked read, we are not in the AwaitingReportResponse state, so the "reports in flight"
+// counter should not increase.
+void TestReadInteraction::TestReadReportFailure(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+
+    chip::app::AttributePathParams attributePathParams[1];
+    attributePathParams[0].mEndpointId  = Test::kMockEndpoint2;
+    attributePathParams[0].mClusterId   = Test::MockClusterId(3);
+    attributePathParams[0].mAttributeId = Test::MockAttributeId(1);
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    readPrepareParams.mpEventPathParamsList        = nullptr;
+    readPrepareParams.mEventPathParamsListSize     = 0;
+    readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = 1;
+
+    {
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+                                   chip::app::ReadClient::InteractionType::Read);
+
+        ctx.GetLoopback().mNumMessagesToAllowBeforeError = 1;
+        ctx.GetLoopback().mMessageSendError              = CHIP_ERROR_INCORRECT_STATE;
+        err                                              = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().GetNumReportsInFlight() == 0);
+        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 0);
+
+        ctx.GetLoopback().mNumMessagesToAllowBeforeError = 0;
+        ctx.GetLoopback().mMessageSendError              = CHIP_NO_ERROR;
+    }
+
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
 void TestReadInteraction::TestSubscribeRoundtripChunkStatusReportTimeout(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -4155,6 +4207,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestSubscribeRoundtripStatusReportTimeout", chip::app::TestReadInteraction::TestSubscribeRoundtripStatusReportTimeout),
     NL_TEST_DEF("TestPostSubscribeRoundtripStatusReportTimeout", chip::app::TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout),
     NL_TEST_DEF("TestReadChunkingStatusReportTimeout", chip::app::TestReadInteraction::TestReadChunkingStatusReportTimeout),
+    NL_TEST_DEF("TestReadReportFailure", chip::app::TestReadInteraction::TestReadReportFailure),
     NL_TEST_DEF("TestSubscribeRoundtripChunkStatusReportTimeout", chip::app::TestReadInteraction::TestSubscribeRoundtripChunkStatusReportTimeout),
     NL_TEST_DEF("TestPostSubscribeRoundtripChunkStatusReportTimeout", chip::app::TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout),
     NL_TEST_DEF("TestPostSubscribeRoundtripChunkReportTimeout", chip::app::TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout),
