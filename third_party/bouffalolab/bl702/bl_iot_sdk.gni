@@ -54,8 +54,6 @@ template("bl_iot_sdk") {
       "BL702=BL702",
       "BFLB_USE_ROM_DRIVER=1",
       "BFLB_USE_HAL_DRIVER=1",
-
-      "bl706_iot=1",
     ]
 
     include_dirs = []
@@ -106,6 +104,10 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/MCU_Common/soft_crc",
       "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/MCU_Common/misc",
       "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_std/BSP_Common/platform/"
+    ]
+
+    defines = [
+      "bl706_iot",
     ]
   }
 
@@ -807,7 +809,6 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/lwip/src/api/sockets.c",
       "${bl_iot_sdk_root}/components/network/lwip/src/api/tcpip.c",
     ]
-
     sources += [ 
       "${bl_iot_sdk_root}/components/network/lwip/src/apps/mdns/mdns.c" 
     ]
