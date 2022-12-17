@@ -104,6 +104,7 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_soc") {
+
     defines = [ "BL602_MATTER_SUPPORT" ]
 
     sources = [
@@ -273,7 +274,8 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hal_pds.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hal_sys.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hal_wifi.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_adc.c",
+#     hosal_adc.c is included by the code in wifi module
+#      "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_adc.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_dac.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_dma.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/hosal_efuse.c",
@@ -650,6 +652,8 @@ template("bl_iot_sdk") {
 
   source_set("${sdk_target_name}_wifi") {
 
+    defines = [ "BL602_MATTER_SUPPORT" ]
+
     include_dirs = [
       "${bl_iot_sdk_root}/components/os/bl_os_adapter/bl_os_adapter",
       "${bl_iot_sdk_root}/components/network/dns_server/include",
@@ -758,6 +762,7 @@ template("bl_iot_sdk") {
     ]
 
     configs += [
+      ":${sdk_target_name}_config_BSP_Driver",
       ":${sdk_target_name}_config_stage",
       ":${sdk_target_name}_config_lwip",
       ":${sdk_target_name}_config_blcrypto_suite",
@@ -799,6 +804,9 @@ template("bl_iot_sdk") {
       "LWIP_IPV4=1",
       "LWIP_IPV6_DHCP6=1",
       "LWIP_IPV6_SCOPES=0",
+      "LWIP_AUTOIP=1",
+      "LWIP_IPV6_MLD=1",
+      "LWIP_ND6_RDNSS_MAX_DNS_SERVERS=1",
       "PBUF_POOL_SIZE=20",
       "PBUF_POOL_BUFSIZE=(1280+150)",
       "CONFIG_ENABLE_IPV6_ADDR_CALLBACK",
