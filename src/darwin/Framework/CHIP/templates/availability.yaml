@@ -38,16 +38,16 @@
 #            introduced/deprecated, not the construct itself.
 #   * "global attributes": An array of names of global attributes.
 #   * "apis": An array of API labels that codegen can use.
+#   * "renames": Can contain clusters, attributes, etc as described above, with
+#                the one difference that instead of an array the value is a hash
+#                with new names as keys and old names as values.
 
 - release: "Initial release"
   versions:
-      ""
-      # For now initial versions are "" to minimize changes to generated code
-      # until after the initial landing.
-  #    ios: "16.1"
-  #    macos: "13.0"
-  #    watchos: "9.1"
-  #    tvos: "16.1"
+      ios: "16.1"
+      macos: "13.0"
+      watchos: "9.1"
+      tvos: "16.1"
   introduced:
       clusters:
           - Identify

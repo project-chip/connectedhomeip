@@ -21,86 +21,219 @@
 #pragma mark - Clusters IDs
 
 typedef NS_ENUM(uint32_t, MTRClusterIDType) {
-    MTRClusterIdentifyID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeIdentifyID") = 0x00000003,
-    MTRClusterGroupsID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeGroupsID") = 0x00000004,
-    MTRClusterScenesID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeScenesID") = 0x00000005,
-    MTRClusterOnOffID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeOnOffID") = 0x00000006,
-    MTRClusterOnOffSwitchConfigurationID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeOnOffSwitchConfigurationID") = 0x00000007,
-    MTRClusterLevelControlID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeLevelControlID") = 0x00000008,
-    MTRClusterBinaryInputBasicID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBinaryInputBasicID") = 0x0000000F,
-    MTRClusterPulseWidthModulationID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypePulseWidthModulationID") = 0x0000001C,
-    MTRClusterDescriptorID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeDescriptorID") = 0x0000001D,
-    MTRClusterBindingID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBindingID") = 0x0000001E,
-    MTRClusterAccessControlID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeAccessControlID") = 0x0000001F,
-    MTRClusterActionsID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeActionsID") = 0x00000025,
-    MTRClusterBasicID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBasicID") = 0x00000028,
-    MTRClusterOtaSoftwareUpdateProviderID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeOtaSoftwareUpdateProviderID")
+    MTRClusterIdentifyID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeIdentifyID")
+    = 0x00000003,
+    MTRClusterGroupsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeGroupsID")
+    = 0x00000004,
+    MTRClusterScenesID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeScenesID")
+    = 0x00000005,
+    MTRClusterOnOffID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeOnOffID")
+    = 0x00000006,
+    MTRClusterOnOffSwitchConfigurationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeOnOffSwitchConfigurationID")
+    = 0x00000007,
+    MTRClusterLevelControlID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeLevelControlID")
+    = 0x00000008,
+    MTRClusterBinaryInputBasicID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBinaryInputBasicID")
+    = 0x0000000F,
+    MTRClusterPulseWidthModulationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypePulseWidthModulationID")
+    = 0x0000001C,
+    MTRClusterDescriptorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeDescriptorID")
+    = 0x0000001D,
+    MTRClusterBindingID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBindingID")
+    = 0x0000001E,
+    MTRClusterAccessControlID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeAccessControlID")
+    = 0x0000001F,
+    MTRClusterActionsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeActionsID")
+    = 0x00000025,
+    MTRClusterBasicID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBasicID")
+    = 0x00000028,
+    MTRClusterOtaSoftwareUpdateProviderID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeOtaSoftwareUpdateProviderID")
     = 0x00000029,
-    MTRClusterOtaSoftwareUpdateRequestorID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeOtaSoftwareUpdateRequestorID")
+    MTRClusterOtaSoftwareUpdateRequestorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeOtaSoftwareUpdateRequestorID")
     = 0x0000002A,
-    MTRClusterLocalizationConfigurationID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeLocalizationConfigurationID")
+    MTRClusterLocalizationConfigurationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeLocalizationConfigurationID")
     = 0x0000002B,
-    MTRClusterTimeFormatLocalizationID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeTimeFormatLocalizationID") = 0x0000002C,
-    MTRClusterUnitLocalizationID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeUnitLocalizationID") = 0x0000002D,
-    MTRClusterPowerSourceConfigurationID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypePowerSourceConfigurationID") = 0x0000002E,
-    MTRClusterPowerSourceID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypePowerSourceID") = 0x0000002F,
-    MTRClusterGeneralCommissioningID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeGeneralCommissioningID") = 0x00000030,
-    MTRClusterNetworkCommissioningID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeNetworkCommissioningID") = 0x00000031,
-    MTRClusterDiagnosticLogsID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeDiagnosticLogsID") = 0x00000032,
-    MTRClusterGeneralDiagnosticsID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeGeneralDiagnosticsID") = 0x00000033,
-    MTRClusterSoftwareDiagnosticsID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeSoftwareDiagnosticsID") = 0x00000034,
-    MTRClusterThreadNetworkDiagnosticsID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeThreadNetworkDiagnosticsID") = 0x00000035,
-    MTRClusterWiFiNetworkDiagnosticsID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeWiFiNetworkDiagnosticsID") = 0x00000036,
-    MTRClusterEthernetNetworkDiagnosticsID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeEthernetNetworkDiagnosticsID")
+    MTRClusterTimeFormatLocalizationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeTimeFormatLocalizationID")
+    = 0x0000002C,
+    MTRClusterUnitLocalizationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeUnitLocalizationID")
+    = 0x0000002D,
+    MTRClusterPowerSourceConfigurationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypePowerSourceConfigurationID")
+    = 0x0000002E,
+    MTRClusterPowerSourceID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypePowerSourceID")
+    = 0x0000002F,
+    MTRClusterGeneralCommissioningID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeGeneralCommissioningID")
+    = 0x00000030,
+    MTRClusterNetworkCommissioningID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeNetworkCommissioningID")
+    = 0x00000031,
+    MTRClusterDiagnosticLogsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeDiagnosticLogsID")
+    = 0x00000032,
+    MTRClusterGeneralDiagnosticsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeGeneralDiagnosticsID")
+    = 0x00000033,
+    MTRClusterSoftwareDiagnosticsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeSoftwareDiagnosticsID")
+    = 0x00000034,
+    MTRClusterThreadNetworkDiagnosticsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeThreadNetworkDiagnosticsID")
+    = 0x00000035,
+    MTRClusterWiFiNetworkDiagnosticsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeWiFiNetworkDiagnosticsID")
+    = 0x00000036,
+    MTRClusterEthernetNetworkDiagnosticsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeEthernetNetworkDiagnosticsID")
     = 0x00000037,
-    MTRClusterTimeSynchronizationID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeTimeSynchronizationID") = 0x00000038,
-    MTRClusterBridgedDeviceBasicID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBridgedDeviceBasicID") = 0x00000039,
-    MTRClusterSwitchID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeSwitchID") = 0x0000003B,
-    MTRClusterAdministratorCommissioningID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeAdministratorCommissioningID")
+    MTRClusterTimeSynchronizationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeTimeSynchronizationID")
+    = 0x00000038,
+    MTRClusterBridgedDeviceBasicID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBridgedDeviceBasicID")
+    = 0x00000039,
+    MTRClusterSwitchID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeSwitchID")
+    = 0x0000003B,
+    MTRClusterAdministratorCommissioningID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeAdministratorCommissioningID")
     = 0x0000003C,
-    MTRClusterOperationalCredentialsID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeOperationalCredentialsID") = 0x0000003E,
-    MTRClusterGroupKeyManagementID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeGroupKeyManagementID") = 0x0000003F,
-    MTRClusterFixedLabelID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeFixedLabelID") = 0x00000040,
-    MTRClusterUserLabelID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeUserLabelID") = 0x00000041,
-    MTRClusterProxyConfigurationID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeProxyConfigurationID") = 0x00000042,
-    MTRClusterProxyDiscoveryID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeProxyDiscoveryID") = 0x00000043,
-    MTRClusterProxyValidID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeProxyValidID") = 0x00000044,
-    MTRClusterBooleanStateID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBooleanStateID") = 0x00000045,
-    MTRClusterModeSelectID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeModeSelectID") = 0x00000050,
-    MTRClusterDoorLockID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeDoorLockID") = 0x00000101,
-    MTRClusterWindowCoveringID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeWindowCoveringID") = 0x00000102,
-    MTRClusterBarrierControlID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBarrierControlID") = 0x00000103,
-    MTRClusterPumpConfigurationAndControlID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypePumpConfigurationAndControlID")
+    MTRClusterOperationalCredentialsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeOperationalCredentialsID")
+    = 0x0000003E,
+    MTRClusterGroupKeyManagementID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeGroupKeyManagementID")
+    = 0x0000003F,
+    MTRClusterFixedLabelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeFixedLabelID")
+    = 0x00000040,
+    MTRClusterUserLabelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeUserLabelID")
+    = 0x00000041,
+    MTRClusterProxyConfigurationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeProxyConfigurationID")
+    = 0x00000042,
+    MTRClusterProxyDiscoveryID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeProxyDiscoveryID")
+    = 0x00000043,
+    MTRClusterProxyValidID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeProxyValidID")
+    = 0x00000044,
+    MTRClusterBooleanStateID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBooleanStateID")
+    = 0x00000045,
+    MTRClusterModeSelectID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeModeSelectID")
+    = 0x00000050,
+    MTRClusterDoorLockID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeDoorLockID")
+    = 0x00000101,
+    MTRClusterWindowCoveringID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeWindowCoveringID")
+    = 0x00000102,
+    MTRClusterBarrierControlID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBarrierControlID")
+    = 0x00000103,
+    MTRClusterPumpConfigurationAndControlID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypePumpConfigurationAndControlID")
     = 0x00000200,
-    MTRClusterThermostatID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeThermostatID") = 0x00000201,
-    MTRClusterFanControlID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeFanControlID") = 0x00000202,
-    MTRClusterThermostatUserInterfaceConfigurationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRClusterIDTypeThermostatUserInterfaceConfigurationID")
+    MTRClusterThermostatID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeThermostatID")
+    = 0x00000201,
+    MTRClusterFanControlID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeFanControlID")
+    = 0x00000202,
+    MTRClusterThermostatUserInterfaceConfigurationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeThermostatUserInterfaceConfigurationID")
     = 0x00000204,
-    MTRClusterColorControlID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeColorControlID") = 0x00000300,
-    MTRClusterBallastConfigurationID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBallastConfigurationID") = 0x00000301,
-    MTRClusterIlluminanceMeasurementID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeIlluminanceMeasurementID") = 0x00000400,
-    MTRClusterTemperatureMeasurementID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeTemperatureMeasurementID") = 0x00000402,
-    MTRClusterPressureMeasurementID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypePressureMeasurementID") = 0x00000403,
-    MTRClusterFlowMeasurementID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeFlowMeasurementID") = 0x00000404,
-    MTRClusterRelativeHumidityMeasurementID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeRelativeHumidityMeasurementID")
+    MTRClusterColorControlID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeColorControlID")
+    = 0x00000300,
+    MTRClusterBallastConfigurationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBallastConfigurationID")
+    = 0x00000301,
+    MTRClusterIlluminanceMeasurementID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeIlluminanceMeasurementID")
+    = 0x00000400,
+    MTRClusterTemperatureMeasurementID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeTemperatureMeasurementID")
+    = 0x00000402,
+    MTRClusterPressureMeasurementID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypePressureMeasurementID")
+    = 0x00000403,
+    MTRClusterFlowMeasurementID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeFlowMeasurementID")
+    = 0x00000404,
+    MTRClusterRelativeHumidityMeasurementID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeRelativeHumidityMeasurementID")
     = 0x00000405,
-    MTRClusterOccupancySensingID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeOccupancySensingID") = 0x00000406,
-    MTRClusterWakeOnLanID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeWakeOnLanID") = 0x00000503,
-    MTRClusterChannelID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeChannelID") = 0x00000504,
-    MTRClusterTargetNavigatorID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeTargetNavigatorID") = 0x00000505,
-    MTRClusterMediaPlaybackID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeMediaPlaybackID") = 0x00000506,
-    MTRClusterMediaInputID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeMediaInputID") = 0x00000507,
-    MTRClusterLowPowerID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeLowPowerID") = 0x00000508,
-    MTRClusterKeypadInputID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeKeypadInputID") = 0x00000509,
-    MTRClusterContentLauncherID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeContentLauncherID") = 0x0000050A,
-    MTRClusterAudioOutputID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeAudioOutputID") = 0x0000050B,
-    MTRClusterApplicationLauncherID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeApplicationLauncherID") = 0x0000050C,
-    MTRClusterApplicationBasicID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeApplicationBasicID") = 0x0000050D,
-    MTRClusterAccountLoginID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeAccountLoginID") = 0x0000050E,
-    MTRClusterElectricalMeasurementID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeElectricalMeasurementID") = 0x00000B04,
-    MTRClusterTestClusterID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeUnitTestingID") = 0xFFF1FC05,
-    MTRClusterFaultInjectionID MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeFaultInjectionID") = 0xFFF1FC06,
+    MTRClusterOccupancySensingID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeOccupancySensingID")
+    = 0x00000406,
+    MTRClusterWakeOnLanID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeWakeOnLanID")
+    = 0x00000503,
+    MTRClusterChannelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeChannelID")
+    = 0x00000504,
+    MTRClusterTargetNavigatorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeTargetNavigatorID")
+    = 0x00000505,
+    MTRClusterMediaPlaybackID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeMediaPlaybackID")
+    = 0x00000506,
+    MTRClusterMediaInputID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeMediaInputID")
+    = 0x00000507,
+    MTRClusterLowPowerID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeLowPowerID")
+    = 0x00000508,
+    MTRClusterKeypadInputID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeKeypadInputID")
+    = 0x00000509,
+    MTRClusterContentLauncherID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeContentLauncherID")
+    = 0x0000050A,
+    MTRClusterAudioOutputID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeAudioOutputID")
+    = 0x0000050B,
+    MTRClusterApplicationLauncherID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeApplicationLauncherID")
+    = 0x0000050C,
+    MTRClusterApplicationBasicID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeApplicationBasicID")
+    = 0x0000050D,
+    MTRClusterAccountLoginID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeAccountLoginID")
+    = 0x0000050E,
+    MTRClusterElectricalMeasurementID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeElectricalMeasurementID")
+    = 0x00000B04,
+    MTRClusterTestClusterID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeUnitTestingID")
+    = 0xFFF1FC05,
+    MTRClusterFaultInjectionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeFaultInjectionID")
+    = 0xFFF1FC06,
     MTRClusterIDTypeIdentifyID MTR_NEWLY_AVAILABLE = 0x00000003,
     MTRClusterIDTypeGroupsID MTR_NEWLY_AVAILABLE = 0x00000004,
     MTRClusterIDTypeScenesID MTR_NEWLY_AVAILABLE = 0x00000005,
@@ -179,17 +312,20 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
 
 typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     // Deprecated global attribute names
-    MTRClusterGlobalAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID")
+    MTRClusterGlobalAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID")
     = 0x0000FFF8,
-    MTRClusterGlobalAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID")
+    MTRClusterGlobalAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID")
     = 0x0000FFF9,
-    MTRClusterGlobalAttributeAttributeListID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeGlobalAttributeAttributeListID")
+    MTRClusterGlobalAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeGlobalAttributeAttributeListID")
     = 0x0000FFFB,
-    MTRClusterGlobalAttributeFeatureMapID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeGlobalAttributeFeatureMapID")
+    MTRClusterGlobalAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeGlobalAttributeFeatureMapID")
     = 0x0000FFFC,
-    MTRClusterGlobalAttributeClusterRevisionID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeGlobalAttributeClusterRevisionID")
+    MTRClusterGlobalAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeGlobalAttributeClusterRevisionID")
     = 0x0000FFFD,
 
     // Global attributes
@@ -200,26 +336,26 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeGlobalAttributeClusterRevisionID MTR_NEWLY_AVAILABLE = 0x0000FFFD,
 
     // Cluster Identify deprecated attribute names
-    MTRClusterIdentifyAttributeIdentifyTimeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterIdentifyAttributeIdentifyTimeID")
+    MTRClusterIdentifyAttributeIdentifyTimeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterIdentifyAttributeIdentifyTimeID")
     = 0x00000000,
-    MTRClusterIdentifyAttributeIdentifyTypeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterIdentifyAttributeIdentifyTypeID")
+    MTRClusterIdentifyAttributeIdentifyTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterIdentifyAttributeIdentifyTypeID")
     = 0x00000001,
-    MTRClusterIdentifyAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterIdentifyAttributeGeneratedCommandListID")
+    MTRClusterIdentifyAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterIdentifyAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterIdentifyAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterIdentifyAttributeAcceptedCommandListID")
+    MTRClusterIdentifyAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterIdentifyAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterIdentifyAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterIdentifyAttributeAttributeListID")
+    MTRClusterIdentifyAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterIdentifyAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterIdentifyAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterIdentifyAttributeFeatureMapID")
+    MTRClusterIdentifyAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterIdentifyAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterIdentifyAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterIdentifyAttributeClusterRevisionID")
+    MTRClusterIdentifyAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterIdentifyAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster Identify attributes
@@ -236,21 +372,23 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster Groups deprecated attribute names
-    MTRClusterGroupsAttributeNameSupportID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGroupsAttributeNameSupportID")
+    MTRClusterGroupsAttributeNameSupportID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGroupsAttributeNameSupportID")
     = 0x00000000,
-    MTRClusterGroupsAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGroupsAttributeGeneratedCommandListID")
+    MTRClusterGroupsAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGroupsAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterGroupsAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGroupsAttributeAcceptedCommandListID")
+    MTRClusterGroupsAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGroupsAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterGroupsAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGroupsAttributeAttributeListID")
+    MTRClusterGroupsAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGroupsAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterGroupsAttributeFeatureMapID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGroupsAttributeFeatureMapID")
+    MTRClusterGroupsAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGroupsAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterGroupsAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGroupsAttributeClusterRevisionID")
+    MTRClusterGroupsAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGroupsAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster Groups attributes
@@ -265,34 +403,38 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster Scenes deprecated attribute names
-    MTRClusterScenesAttributeSceneCountID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeSceneCountID")
+    MTRClusterScenesAttributeSceneCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeSceneCountID")
     = 0x00000000,
-    MTRClusterScenesAttributeCurrentSceneID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterScenesAttributeCurrentSceneID")
+    MTRClusterScenesAttributeCurrentSceneID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeCurrentSceneID")
     = 0x00000001,
-    MTRClusterScenesAttributeCurrentGroupID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterScenesAttributeCurrentGroupID")
+    MTRClusterScenesAttributeCurrentGroupID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeCurrentGroupID")
     = 0x00000002,
-    MTRClusterScenesAttributeSceneValidID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeSceneValidID")
+    MTRClusterScenesAttributeSceneValidID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeSceneValidID")
     = 0x00000003,
-    MTRClusterScenesAttributeNameSupportID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeNameSupportID")
+    MTRClusterScenesAttributeNameSupportID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeNameSupportID")
     = 0x00000004,
-    MTRClusterScenesAttributeLastConfiguredByID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterScenesAttributeLastConfiguredByID")
+    MTRClusterScenesAttributeLastConfiguredByID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeLastConfiguredByID")
     = 0x00000005,
-    MTRClusterScenesAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterScenesAttributeGeneratedCommandListID")
+    MTRClusterScenesAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterScenesAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterScenesAttributeAcceptedCommandListID")
+    MTRClusterScenesAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterScenesAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterScenesAttributeAttributeListID")
+    MTRClusterScenesAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterScenesAttributeFeatureMapID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeFeatureMapID")
+    MTRClusterScenesAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterScenesAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterScenesAttributeClusterRevisionID")
+    MTRClusterScenesAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster Scenes attributes
@@ -312,29 +454,35 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster OnOff deprecated attribute names
-    MTRClusterOnOffAttributeOnOffID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffAttributeOnOffID") = 0x00000000,
-    MTRClusterOnOffAttributeGlobalSceneControlID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOnOffAttributeGlobalSceneControlID")
+    MTRClusterOnOffAttributeOnOffID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffAttributeOnOffID")
+    = 0x00000000,
+    MTRClusterOnOffAttributeGlobalSceneControlID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffAttributeGlobalSceneControlID")
     = 0x00004000,
-    MTRClusterOnOffAttributeOnTimeID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffAttributeOnTimeID")
+    MTRClusterOnOffAttributeOnTimeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffAttributeOnTimeID")
     = 0x00004001,
-    MTRClusterOnOffAttributeOffWaitTimeID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffAttributeOffWaitTimeID")
+    MTRClusterOnOffAttributeOffWaitTimeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffAttributeOffWaitTimeID")
     = 0x00004002,
-    MTRClusterOnOffAttributeStartUpOnOffID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffAttributeStartUpOnOffID")
+    MTRClusterOnOffAttributeStartUpOnOffID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffAttributeStartUpOnOffID")
     = 0x00004003,
-    MTRClusterOnOffAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOnOffAttributeGeneratedCommandListID")
+    MTRClusterOnOffAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterOnOffAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOnOffAttributeAcceptedCommandListID")
+    MTRClusterOnOffAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterOnOffAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOnOffAttributeAttributeListID")
+    MTRClusterOnOffAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterOnOffAttributeFeatureMapID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffAttributeFeatureMapID")
+    MTRClusterOnOffAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterOnOffAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOnOffAttributeClusterRevisionID")
+    MTRClusterOnOffAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster OnOff attributes
@@ -353,26 +501,27 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster OnOffSwitchConfiguration deprecated attribute names
-    MTRClusterOnOffSwitchConfigurationAttributeSwitchTypeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchTypeID")
+    MTRClusterOnOffSwitchConfigurationAttributeSwitchTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchTypeID")
     = 0x00000000,
-    MTRClusterOnOffSwitchConfigurationAttributeSwitchActionsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchActionsID")
+    MTRClusterOnOffSwitchConfigurationAttributeSwitchActionsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchActionsID")
     = 0x00000010,
-    MTRClusterOnOffSwitchConfigurationAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeGeneratedCommandListID")
+    MTRClusterOnOffSwitchConfigurationAttributeGeneratedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterOnOffSwitchConfigurationAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeAcceptedCommandListID")
+    MTRClusterOnOffSwitchConfigurationAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterOnOffSwitchConfigurationAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeAttributeListID")
+    MTRClusterOnOffSwitchConfigurationAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterOnOffSwitchConfigurationAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeFeatureMapID")
+    MTRClusterOnOffSwitchConfigurationAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterOnOffSwitchConfigurationAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeClusterRevisionID")
+    MTRClusterOnOffSwitchConfigurationAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster OnOffSwitchConfiguration attributes
@@ -390,62 +539,62 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster LevelControl deprecated attribute names
-    MTRClusterLevelControlAttributeCurrentLevelID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeCurrentLevelID")
+    MTRClusterLevelControlAttributeCurrentLevelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeCurrentLevelID")
     = 0x00000000,
-    MTRClusterLevelControlAttributeRemainingTimeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeRemainingTimeID")
+    MTRClusterLevelControlAttributeRemainingTimeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeRemainingTimeID")
     = 0x00000001,
-    MTRClusterLevelControlAttributeMinLevelID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeMinLevelID")
+    MTRClusterLevelControlAttributeMinLevelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeMinLevelID")
     = 0x00000002,
-    MTRClusterLevelControlAttributeMaxLevelID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeMaxLevelID")
+    MTRClusterLevelControlAttributeMaxLevelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeMaxLevelID")
     = 0x00000003,
-    MTRClusterLevelControlAttributeCurrentFrequencyID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeCurrentFrequencyID")
+    MTRClusterLevelControlAttributeCurrentFrequencyID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeCurrentFrequencyID")
     = 0x00000004,
-    MTRClusterLevelControlAttributeMinFrequencyID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeMinFrequencyID")
+    MTRClusterLevelControlAttributeMinFrequencyID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeMinFrequencyID")
     = 0x00000005,
-    MTRClusterLevelControlAttributeMaxFrequencyID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeMaxFrequencyID")
+    MTRClusterLevelControlAttributeMaxFrequencyID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeMaxFrequencyID")
     = 0x00000006,
-    MTRClusterLevelControlAttributeOptionsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeOptionsID")
+    MTRClusterLevelControlAttributeOptionsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeOptionsID")
     = 0x0000000F,
-    MTRClusterLevelControlAttributeOnOffTransitionTimeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeOnOffTransitionTimeID")
+    MTRClusterLevelControlAttributeOnOffTransitionTimeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeOnOffTransitionTimeID")
     = 0x00000010,
-    MTRClusterLevelControlAttributeOnLevelID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeOnLevelID")
+    MTRClusterLevelControlAttributeOnLevelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeOnLevelID")
     = 0x00000011,
-    MTRClusterLevelControlAttributeOnTransitionTimeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeOnTransitionTimeID")
+    MTRClusterLevelControlAttributeOnTransitionTimeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeOnTransitionTimeID")
     = 0x00000012,
-    MTRClusterLevelControlAttributeOffTransitionTimeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeOffTransitionTimeID")
+    MTRClusterLevelControlAttributeOffTransitionTimeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeOffTransitionTimeID")
     = 0x00000013,
-    MTRClusterLevelControlAttributeDefaultMoveRateID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeDefaultMoveRateID")
+    MTRClusterLevelControlAttributeDefaultMoveRateID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeDefaultMoveRateID")
     = 0x00000014,
-    MTRClusterLevelControlAttributeStartUpCurrentLevelID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeStartUpCurrentLevelID")
+    MTRClusterLevelControlAttributeStartUpCurrentLevelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeStartUpCurrentLevelID")
     = 0x00004000,
-    MTRClusterLevelControlAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeGeneratedCommandListID")
+    MTRClusterLevelControlAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterLevelControlAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeAcceptedCommandListID")
+    MTRClusterLevelControlAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterLevelControlAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeAttributeListID")
+    MTRClusterLevelControlAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterLevelControlAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeFeatureMapID")
+    MTRClusterLevelControlAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterLevelControlAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLevelControlAttributeClusterRevisionID")
+    MTRClusterLevelControlAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLevelControlAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster LevelControl attributes
@@ -474,47 +623,47 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster BinaryInputBasic deprecated attribute names
-    MTRClusterBinaryInputBasicAttributeActiveTextID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeActiveTextID")
+    MTRClusterBinaryInputBasicAttributeActiveTextID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeActiveTextID")
     = 0x00000004,
-    MTRClusterBinaryInputBasicAttributeDescriptionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeDescriptionID")
+    MTRClusterBinaryInputBasicAttributeDescriptionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeDescriptionID")
     = 0x0000001C,
-    MTRClusterBinaryInputBasicAttributeInactiveTextID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeInactiveTextID")
+    MTRClusterBinaryInputBasicAttributeInactiveTextID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeInactiveTextID")
     = 0x0000002E,
-    MTRClusterBinaryInputBasicAttributeOutOfServiceID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeOutOfServiceID")
+    MTRClusterBinaryInputBasicAttributeOutOfServiceID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeOutOfServiceID")
     = 0x00000051,
-    MTRClusterBinaryInputBasicAttributePolarityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributePolarityID")
+    MTRClusterBinaryInputBasicAttributePolarityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributePolarityID")
     = 0x00000054,
-    MTRClusterBinaryInputBasicAttributePresentValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributePresentValueID")
+    MTRClusterBinaryInputBasicAttributePresentValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributePresentValueID")
     = 0x00000055,
-    MTRClusterBinaryInputBasicAttributeReliabilityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeReliabilityID")
+    MTRClusterBinaryInputBasicAttributeReliabilityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeReliabilityID")
     = 0x00000067,
-    MTRClusterBinaryInputBasicAttributeStatusFlagsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeStatusFlagsID")
+    MTRClusterBinaryInputBasicAttributeStatusFlagsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeStatusFlagsID")
     = 0x0000006F,
-    MTRClusterBinaryInputBasicAttributeApplicationTypeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeApplicationTypeID")
+    MTRClusterBinaryInputBasicAttributeApplicationTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeApplicationTypeID")
     = 0x00000100,
-    MTRClusterBinaryInputBasicAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeGeneratedCommandListID")
+    MTRClusterBinaryInputBasicAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterBinaryInputBasicAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeAcceptedCommandListID")
+    MTRClusterBinaryInputBasicAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterBinaryInputBasicAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeAttributeListID")
+    MTRClusterBinaryInputBasicAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterBinaryInputBasicAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeFeatureMapID")
+    MTRClusterBinaryInputBasicAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterBinaryInputBasicAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeClusterRevisionID")
+    MTRClusterBinaryInputBasicAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster BinaryInputBasic attributes
@@ -539,20 +688,20 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster PulseWidthModulation deprecated attribute names
-    MTRClusterPulseWidthModulationAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPulseWidthModulationAttributeGeneratedCommandListID")
+    MTRClusterPulseWidthModulationAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPulseWidthModulationAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterPulseWidthModulationAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPulseWidthModulationAttributeAcceptedCommandListID")
+    MTRClusterPulseWidthModulationAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPulseWidthModulationAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterPulseWidthModulationAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPulseWidthModulationAttributeAttributeListID")
+    MTRClusterPulseWidthModulationAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPulseWidthModulationAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterPulseWidthModulationAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPulseWidthModulationAttributeFeatureMapID")
+    MTRClusterPulseWidthModulationAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPulseWidthModulationAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterPulseWidthModulationAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPulseWidthModulationAttributeClusterRevisionID")
+    MTRClusterPulseWidthModulationAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPulseWidthModulationAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster PulseWidthModulation attributes
@@ -571,32 +720,32 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRClusterDescriptorAttributeDeviceTypeListID API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID")
     = 0x00000000,
-    MTRClusterDescriptorAttributeDeviceListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID")
+    MTRClusterDescriptorAttributeDeviceListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID")
     = 0x00000000,
-    MTRClusterDescriptorAttributeServerListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDescriptorAttributeServerListID")
+    MTRClusterDescriptorAttributeServerListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDescriptorAttributeServerListID")
     = 0x00000001,
-    MTRClusterDescriptorAttributeClientListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDescriptorAttributeClientListID")
+    MTRClusterDescriptorAttributeClientListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDescriptorAttributeClientListID")
     = 0x00000002,
-    MTRClusterDescriptorAttributePartsListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDescriptorAttributePartsListID")
+    MTRClusterDescriptorAttributePartsListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDescriptorAttributePartsListID")
     = 0x00000003,
-    MTRClusterDescriptorAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDescriptorAttributeGeneratedCommandListID")
+    MTRClusterDescriptorAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDescriptorAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterDescriptorAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDescriptorAttributeAcceptedCommandListID")
+    MTRClusterDescriptorAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDescriptorAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterDescriptorAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDescriptorAttributeAttributeListID")
+    MTRClusterDescriptorAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDescriptorAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterDescriptorAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDescriptorAttributeFeatureMapID")
+    MTRClusterDescriptorAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDescriptorAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterDescriptorAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDescriptorAttributeClusterRevisionID")
+    MTRClusterDescriptorAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDescriptorAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster Descriptor attributes
@@ -615,21 +764,23 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster Binding deprecated attribute names
-    MTRClusterBindingAttributeBindingID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBindingAttributeBindingID")
+    MTRClusterBindingAttributeBindingID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBindingAttributeBindingID")
     = 0x00000000,
-    MTRClusterBindingAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBindingAttributeGeneratedCommandListID")
+    MTRClusterBindingAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBindingAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterBindingAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBindingAttributeAcceptedCommandListID")
+    MTRClusterBindingAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBindingAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterBindingAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBindingAttributeAttributeListID")
+    MTRClusterBindingAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBindingAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterBindingAttributeFeatureMapID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBindingAttributeFeatureMapID")
+    MTRClusterBindingAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBindingAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterBindingAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBindingAttributeClusterRevisionID")
+    MTRClusterBindingAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBindingAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster Binding attributes
@@ -644,34 +795,35 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster AccessControl deprecated attribute names
-    MTRClusterAccessControlAttributeAclID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccessControlAttributeAclID")
+    MTRClusterAccessControlAttributeAclID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccessControlAttributeAclID")
     = 0x00000000,
-    MTRClusterAccessControlAttributeExtensionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAccessControlAttributeExtensionID")
+    MTRClusterAccessControlAttributeExtensionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccessControlAttributeExtensionID")
     = 0x00000001,
-    MTRClusterAccessControlAttributeSubjectsPerAccessControlEntryID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAccessControlAttributeSubjectsPerAccessControlEntryID")
+    MTRClusterAccessControlAttributeSubjectsPerAccessControlEntryID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccessControlAttributeSubjectsPerAccessControlEntryID")
     = 0x00000002,
-    MTRClusterAccessControlAttributeTargetsPerAccessControlEntryID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAccessControlAttributeTargetsPerAccessControlEntryID")
+    MTRClusterAccessControlAttributeTargetsPerAccessControlEntryID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccessControlAttributeTargetsPerAccessControlEntryID")
     = 0x00000003,
-    MTRClusterAccessControlAttributeAccessControlEntriesPerFabricID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAccessControlAttributeAccessControlEntriesPerFabricID")
+    MTRClusterAccessControlAttributeAccessControlEntriesPerFabricID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccessControlAttributeAccessControlEntriesPerFabricID")
     = 0x00000004,
-    MTRClusterAccessControlAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAccessControlAttributeGeneratedCommandListID")
+    MTRClusterAccessControlAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccessControlAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterAccessControlAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAccessControlAttributeAcceptedCommandListID")
+    MTRClusterAccessControlAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccessControlAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterAccessControlAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAccessControlAttributeAttributeListID")
+    MTRClusterAccessControlAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccessControlAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterAccessControlAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAccessControlAttributeFeatureMapID")
+    MTRClusterAccessControlAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccessControlAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterAccessControlAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAccessControlAttributeClusterRevisionID")
+    MTRClusterAccessControlAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccessControlAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster AccessControl attributes
@@ -691,26 +843,29 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster Actions deprecated attribute names
-    MTRClusterActionsAttributeActionListID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterActionsAttributeActionListID")
+    MTRClusterActionsAttributeActionListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterActionsAttributeActionListID")
     = 0x00000000,
-    MTRClusterActionsAttributeEndpointListsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterActionsAttributeEndpointListsID")
+    MTRClusterActionsAttributeEndpointListsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterActionsAttributeEndpointListsID")
     = 0x00000001,
-    MTRClusterActionsAttributeSetupURLID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterActionsAttributeSetupURLID")
+    MTRClusterActionsAttributeSetupURLID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterActionsAttributeSetupURLID")
     = 0x00000002,
-    MTRClusterActionsAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterActionsAttributeGeneratedCommandListID")
+    MTRClusterActionsAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterActionsAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterActionsAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterActionsAttributeAcceptedCommandListID")
+    MTRClusterActionsAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterActionsAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterActionsAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterActionsAttributeAttributeListID")
+    MTRClusterActionsAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterActionsAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterActionsAttributeFeatureMapID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterActionsAttributeFeatureMapID")
+    MTRClusterActionsAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterActionsAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterActionsAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterActionsAttributeClusterRevisionID")
+    MTRClusterActionsAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterActionsAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster Actions attributes
@@ -727,67 +882,80 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster Basic deprecated attribute names
-    MTRClusterBasicAttributeDataModelRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBasicAttributeDataModelRevisionID")
+    MTRClusterBasicAttributeDataModelRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeDataModelRevisionID")
     = 0x00000000,
-    MTRClusterBasicAttributeVendorNameID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeVendorNameID")
+    MTRClusterBasicAttributeVendorNameID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeVendorNameID")
     = 0x00000001,
-    MTRClusterBasicAttributeVendorIDID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeVendorIDID")
+    MTRClusterBasicAttributeVendorIDID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeVendorIDID")
     = 0x00000002,
-    MTRClusterBasicAttributeProductNameID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeProductNameID")
+    MTRClusterBasicAttributeProductNameID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeProductNameID")
     = 0x00000003,
-    MTRClusterBasicAttributeProductIDID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeProductIDID")
+    MTRClusterBasicAttributeProductIDID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeProductIDID")
     = 0x00000004,
-    MTRClusterBasicAttributeNodeLabelID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeNodeLabelID")
+    MTRClusterBasicAttributeNodeLabelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeNodeLabelID")
     = 0x00000005,
-    MTRClusterBasicAttributeLocationID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeLocationID")
+    MTRClusterBasicAttributeLocationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeLocationID")
     = 0x00000006,
-    MTRClusterBasicAttributeHardwareVersionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBasicAttributeHardwareVersionID")
+    MTRClusterBasicAttributeHardwareVersionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeHardwareVersionID")
     = 0x00000007,
-    MTRClusterBasicAttributeHardwareVersionStringID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBasicAttributeHardwareVersionStringID")
+    MTRClusterBasicAttributeHardwareVersionStringID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeHardwareVersionStringID")
     = 0x00000008,
-    MTRClusterBasicAttributeSoftwareVersionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBasicAttributeSoftwareVersionID")
+    MTRClusterBasicAttributeSoftwareVersionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeSoftwareVersionID")
     = 0x00000009,
-    MTRClusterBasicAttributeSoftwareVersionStringID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBasicAttributeSoftwareVersionStringID")
+    MTRClusterBasicAttributeSoftwareVersionStringID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeSoftwareVersionStringID")
     = 0x0000000A,
-    MTRClusterBasicAttributeManufacturingDateID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBasicAttributeManufacturingDateID")
+    MTRClusterBasicAttributeManufacturingDateID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeManufacturingDateID")
     = 0x0000000B,
-    MTRClusterBasicAttributePartNumberID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributePartNumberID")
+    MTRClusterBasicAttributePartNumberID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributePartNumberID")
     = 0x0000000C,
-    MTRClusterBasicAttributeProductURLID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeProductURLID")
+    MTRClusterBasicAttributeProductURLID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeProductURLID")
     = 0x0000000D,
-    MTRClusterBasicAttributeProductLabelID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeProductLabelID")
+    MTRClusterBasicAttributeProductLabelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeProductLabelID")
     = 0x0000000E,
-    MTRClusterBasicAttributeSerialNumberID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeSerialNumberID")
+    MTRClusterBasicAttributeSerialNumberID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeSerialNumberID")
     = 0x0000000F,
-    MTRClusterBasicAttributeLocalConfigDisabledID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBasicAttributeLocalConfigDisabledID")
+    MTRClusterBasicAttributeLocalConfigDisabledID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeLocalConfigDisabledID")
     = 0x00000010,
-    MTRClusterBasicAttributeReachableID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeReachableID")
+    MTRClusterBasicAttributeReachableID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeReachableID")
     = 0x00000011,
-    MTRClusterBasicAttributeUniqueIDID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeUniqueIDID")
+    MTRClusterBasicAttributeUniqueIDID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeUniqueIDID")
     = 0x00000012,
-    MTRClusterBasicAttributeCapabilityMinimaID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBasicAttributeCapabilityMinimaID")
+    MTRClusterBasicAttributeCapabilityMinimaID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeCapabilityMinimaID")
     = 0x00000013,
-    MTRClusterBasicAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBasicAttributeGeneratedCommandListID")
+    MTRClusterBasicAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterBasicAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBasicAttributeAcceptedCommandListID")
+    MTRClusterBasicAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterBasicAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBasicAttributeAttributeListID")
+    MTRClusterBasicAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterBasicAttributeFeatureMapID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeFeatureMapID")
+    MTRClusterBasicAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterBasicAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBasicAttributeClusterRevisionID")
+    MTRClusterBasicAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster Basic attributes
@@ -821,20 +989,22 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster OtaSoftwareUpdateProvider deprecated attribute names
-    MTRClusterOtaSoftwareUpdateProviderAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeGeneratedCommandListID")
+    MTRClusterOtaSoftwareUpdateProviderAttributeGeneratedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterOtaSoftwareUpdateProviderAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeAcceptedCommandListID")
+    MTRClusterOtaSoftwareUpdateProviderAttributeAcceptedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterOtaSoftwareUpdateProviderAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeAttributeListID")
+    MTRClusterOtaSoftwareUpdateProviderAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterOtaSoftwareUpdateProviderAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeFeatureMapID")
+    MTRClusterOtaSoftwareUpdateProviderAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterOtaSoftwareUpdateProviderAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeClusterRevisionID")
+    MTRClusterOtaSoftwareUpdateProviderAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateProviderAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster OTASoftwareUpdateProvider attributes
@@ -850,32 +1020,36 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster OtaSoftwareUpdateRequestor deprecated attribute names
-    MTRClusterOtaSoftwareUpdateRequestorAttributeDefaultOtaProvidersID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeDefaultOtaProvidersID")
+    MTRClusterOtaSoftwareUpdateRequestorAttributeDefaultOtaProvidersID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeDefaultOtaProvidersID")
     = 0x00000000,
-    MTRClusterOtaSoftwareUpdateRequestorAttributeUpdatePossibleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdatePossibleID")
+    MTRClusterOtaSoftwareUpdateRequestorAttributeUpdatePossibleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdatePossibleID")
     = 0x00000001,
-    MTRClusterOtaSoftwareUpdateRequestorAttributeUpdateStateID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdateStateID")
+    MTRClusterOtaSoftwareUpdateRequestorAttributeUpdateStateID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdateStateID")
     = 0x00000002,
-    MTRClusterOtaSoftwareUpdateRequestorAttributeUpdateStateProgressID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdateStateProgressID")
+    MTRClusterOtaSoftwareUpdateRequestorAttributeUpdateStateProgressID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeUpdateStateProgressID")
     = 0x00000003,
-    MTRClusterOtaSoftwareUpdateRequestorAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeGeneratedCommandListID")
+    MTRClusterOtaSoftwareUpdateRequestorAttributeGeneratedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterOtaSoftwareUpdateRequestorAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeAcceptedCommandListID")
+    MTRClusterOtaSoftwareUpdateRequestorAttributeAcceptedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterOtaSoftwareUpdateRequestorAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeAttributeListID")
+    MTRClusterOtaSoftwareUpdateRequestorAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterOtaSoftwareUpdateRequestorAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeFeatureMapID")
+    MTRClusterOtaSoftwareUpdateRequestorAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterOtaSoftwareUpdateRequestorAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeClusterRevisionID")
+    MTRClusterOtaSoftwareUpdateRequestorAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOtaSoftwareUpdateRequestorAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster OTASoftwareUpdateRequestor attributes
@@ -895,26 +1069,28 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster LocalizationConfiguration deprecated attribute names
-    MTRClusterLocalizationConfigurationAttributeActiveLocaleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLocalizationConfigurationAttributeActiveLocaleID")
+    MTRClusterLocalizationConfigurationAttributeActiveLocaleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLocalizationConfigurationAttributeActiveLocaleID")
     = 0x00000000,
-    MTRClusterLocalizationConfigurationAttributeSupportedLocalesID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLocalizationConfigurationAttributeSupportedLocalesID")
+    MTRClusterLocalizationConfigurationAttributeSupportedLocalesID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLocalizationConfigurationAttributeSupportedLocalesID")
     = 0x00000001,
-    MTRClusterLocalizationConfigurationAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLocalizationConfigurationAttributeGeneratedCommandListID")
+    MTRClusterLocalizationConfigurationAttributeGeneratedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLocalizationConfigurationAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterLocalizationConfigurationAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLocalizationConfigurationAttributeAcceptedCommandListID")
+    MTRClusterLocalizationConfigurationAttributeAcceptedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLocalizationConfigurationAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterLocalizationConfigurationAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLocalizationConfigurationAttributeAttributeListID")
+    MTRClusterLocalizationConfigurationAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLocalizationConfigurationAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterLocalizationConfigurationAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLocalizationConfigurationAttributeFeatureMapID")
+    MTRClusterLocalizationConfigurationAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLocalizationConfigurationAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterLocalizationConfigurationAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLocalizationConfigurationAttributeClusterRevisionID")
+    MTRClusterLocalizationConfigurationAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLocalizationConfigurationAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster LocalizationConfiguration attributes
@@ -932,29 +1108,30 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster TimeFormatLocalization deprecated attribute names
-    MTRClusterTimeFormatLocalizationAttributeHourFormatID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeHourFormatID")
+    MTRClusterTimeFormatLocalizationAttributeHourFormatID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeHourFormatID")
     = 0x00000000,
-    MTRClusterTimeFormatLocalizationAttributeActiveCalendarTypeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeActiveCalendarTypeID")
+    MTRClusterTimeFormatLocalizationAttributeActiveCalendarTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeActiveCalendarTypeID")
     = 0x00000001,
-    MTRClusterTimeFormatLocalizationAttributeSupportedCalendarTypesID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeSupportedCalendarTypesID")
+    MTRClusterTimeFormatLocalizationAttributeSupportedCalendarTypesID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeSupportedCalendarTypesID")
     = 0x00000002,
-    MTRClusterTimeFormatLocalizationAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeGeneratedCommandListID")
+    MTRClusterTimeFormatLocalizationAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterTimeFormatLocalizationAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeAcceptedCommandListID")
+    MTRClusterTimeFormatLocalizationAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterTimeFormatLocalizationAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeAttributeListID")
+    MTRClusterTimeFormatLocalizationAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterTimeFormatLocalizationAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeFeatureMapID")
+    MTRClusterTimeFormatLocalizationAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterTimeFormatLocalizationAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeClusterRevisionID")
+    MTRClusterTimeFormatLocalizationAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeFormatLocalizationAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster TimeFormatLocalization attributes
@@ -973,23 +1150,23 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster UnitLocalization deprecated attribute names
-    MTRClusterUnitLocalizationAttributeTemperatureUnitID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitLocalizationAttributeTemperatureUnitID")
+    MTRClusterUnitLocalizationAttributeTemperatureUnitID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitLocalizationAttributeTemperatureUnitID")
     = 0x00000000,
-    MTRClusterUnitLocalizationAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitLocalizationAttributeGeneratedCommandListID")
+    MTRClusterUnitLocalizationAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitLocalizationAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterUnitLocalizationAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitLocalizationAttributeAcceptedCommandListID")
+    MTRClusterUnitLocalizationAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitLocalizationAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterUnitLocalizationAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitLocalizationAttributeAttributeListID")
+    MTRClusterUnitLocalizationAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitLocalizationAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterUnitLocalizationAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitLocalizationAttributeFeatureMapID")
+    MTRClusterUnitLocalizationAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitLocalizationAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterUnitLocalizationAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitLocalizationAttributeClusterRevisionID")
+    MTRClusterUnitLocalizationAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitLocalizationAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster UnitLocalization attributes
@@ -1006,23 +1183,24 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster PowerSourceConfiguration deprecated attribute names
-    MTRClusterPowerSourceConfigurationAttributeSourcesID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID")
+    MTRClusterPowerSourceConfigurationAttributeSourcesID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeSourcesID")
     = 0x00000000,
-    MTRClusterPowerSourceConfigurationAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeGeneratedCommandListID")
+    MTRClusterPowerSourceConfigurationAttributeGeneratedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterPowerSourceConfigurationAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeAcceptedCommandListID")
+    MTRClusterPowerSourceConfigurationAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterPowerSourceConfigurationAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeAttributeListID")
+    MTRClusterPowerSourceConfigurationAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterPowerSourceConfigurationAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeFeatureMapID")
+    MTRClusterPowerSourceConfigurationAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterPowerSourceConfigurationAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeClusterRevisionID")
+    MTRClusterPowerSourceConfigurationAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceConfigurationAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster PowerSourceConfiguration attributes
@@ -1039,111 +1217,113 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster PowerSource deprecated attribute names
-    MTRClusterPowerSourceAttributeStatusID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeStatusID")
+    MTRClusterPowerSourceAttributeStatusID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeStatusID")
     = 0x00000000,
-    MTRClusterPowerSourceAttributeOrderID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeOrderID")
+    MTRClusterPowerSourceAttributeOrderID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeOrderID")
     = 0x00000001,
-    MTRClusterPowerSourceAttributeDescriptionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeDescriptionID")
+    MTRClusterPowerSourceAttributeDescriptionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeDescriptionID")
     = 0x00000002,
-    MTRClusterPowerSourceAttributeWiredAssessedInputVoltageID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeWiredAssessedInputVoltageID")
+    MTRClusterPowerSourceAttributeWiredAssessedInputVoltageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeWiredAssessedInputVoltageID")
     = 0x00000003,
-    MTRClusterPowerSourceAttributeWiredAssessedInputFrequencyID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeWiredAssessedInputFrequencyID")
+    MTRClusterPowerSourceAttributeWiredAssessedInputFrequencyID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeWiredAssessedInputFrequencyID")
     = 0x00000004,
-    MTRClusterPowerSourceAttributeWiredCurrentTypeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeWiredCurrentTypeID")
+    MTRClusterPowerSourceAttributeWiredCurrentTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeWiredCurrentTypeID")
     = 0x00000005,
-    MTRClusterPowerSourceAttributeWiredAssessedCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeWiredAssessedCurrentID")
+    MTRClusterPowerSourceAttributeWiredAssessedCurrentID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeWiredAssessedCurrentID")
     = 0x00000006,
-    MTRClusterPowerSourceAttributeWiredNominalVoltageID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeWiredNominalVoltageID")
+    MTRClusterPowerSourceAttributeWiredNominalVoltageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeWiredNominalVoltageID")
     = 0x00000007,
-    MTRClusterPowerSourceAttributeWiredMaximumCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeWiredMaximumCurrentID")
+    MTRClusterPowerSourceAttributeWiredMaximumCurrentID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeWiredMaximumCurrentID")
     = 0x00000008,
-    MTRClusterPowerSourceAttributeWiredPresentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeWiredPresentID")
+    MTRClusterPowerSourceAttributeWiredPresentID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeWiredPresentID")
     = 0x00000009,
-    MTRClusterPowerSourceAttributeActiveWiredFaultsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeActiveWiredFaultsID")
+    MTRClusterPowerSourceAttributeActiveWiredFaultsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeActiveWiredFaultsID")
     = 0x0000000A,
-    MTRClusterPowerSourceAttributeBatVoltageID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatVoltageID")
+    MTRClusterPowerSourceAttributeBatVoltageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatVoltageID")
     = 0x0000000B,
-    MTRClusterPowerSourceAttributeBatPercentRemainingID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatPercentRemainingID")
+    MTRClusterPowerSourceAttributeBatPercentRemainingID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatPercentRemainingID")
     = 0x0000000C,
-    MTRClusterPowerSourceAttributeBatTimeRemainingID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatTimeRemainingID")
+    MTRClusterPowerSourceAttributeBatTimeRemainingID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatTimeRemainingID")
     = 0x0000000D,
-    MTRClusterPowerSourceAttributeBatChargeLevelID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatChargeLevelID")
+    MTRClusterPowerSourceAttributeBatChargeLevelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatChargeLevelID")
     = 0x0000000E,
-    MTRClusterPowerSourceAttributeBatReplacementNeededID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatReplacementNeededID")
+    MTRClusterPowerSourceAttributeBatReplacementNeededID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatReplacementNeededID")
     = 0x0000000F,
-    MTRClusterPowerSourceAttributeBatReplaceabilityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatReplaceabilityID")
+    MTRClusterPowerSourceAttributeBatReplaceabilityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatReplaceabilityID")
     = 0x00000010,
-    MTRClusterPowerSourceAttributeBatPresentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatPresentID")
+    MTRClusterPowerSourceAttributeBatPresentID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatPresentID")
     = 0x00000011,
-    MTRClusterPowerSourceAttributeActiveBatFaultsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeActiveBatFaultsID")
+    MTRClusterPowerSourceAttributeActiveBatFaultsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeActiveBatFaultsID")
     = 0x00000012,
-    MTRClusterPowerSourceAttributeBatReplacementDescriptionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatReplacementDescriptionID")
+    MTRClusterPowerSourceAttributeBatReplacementDescriptionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatReplacementDescriptionID")
     = 0x00000013,
-    MTRClusterPowerSourceAttributeBatCommonDesignationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatCommonDesignationID")
+    MTRClusterPowerSourceAttributeBatCommonDesignationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatCommonDesignationID")
     = 0x00000014,
-    MTRClusterPowerSourceAttributeBatANSIDesignationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatANSIDesignationID")
+    MTRClusterPowerSourceAttributeBatANSIDesignationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatANSIDesignationID")
     = 0x00000015,
-    MTRClusterPowerSourceAttributeBatIECDesignationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatIECDesignationID")
+    MTRClusterPowerSourceAttributeBatIECDesignationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatIECDesignationID")
     = 0x00000016,
-    MTRClusterPowerSourceAttributeBatApprovedChemistryID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatApprovedChemistryID")
+    MTRClusterPowerSourceAttributeBatApprovedChemistryID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatApprovedChemistryID")
     = 0x00000017,
-    MTRClusterPowerSourceAttributeBatCapacityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatCapacityID")
+    MTRClusterPowerSourceAttributeBatCapacityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatCapacityID")
     = 0x00000018,
-    MTRClusterPowerSourceAttributeBatQuantityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatQuantityID")
+    MTRClusterPowerSourceAttributeBatQuantityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatQuantityID")
     = 0x00000019,
-    MTRClusterPowerSourceAttributeBatChargeStateID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatChargeStateID")
+    MTRClusterPowerSourceAttributeBatChargeStateID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatChargeStateID")
     = 0x0000001A,
-    MTRClusterPowerSourceAttributeBatTimeToFullChargeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatTimeToFullChargeID")
+    MTRClusterPowerSourceAttributeBatTimeToFullChargeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatTimeToFullChargeID")
     = 0x0000001B,
-    MTRClusterPowerSourceAttributeBatFunctionalWhileChargingID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatFunctionalWhileChargingID")
+    MTRClusterPowerSourceAttributeBatFunctionalWhileChargingID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatFunctionalWhileChargingID")
     = 0x0000001C,
-    MTRClusterPowerSourceAttributeBatChargingCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatChargingCurrentID")
+    MTRClusterPowerSourceAttributeBatChargingCurrentID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeBatChargingCurrentID")
     = 0x0000001D,
-    MTRClusterPowerSourceAttributeActiveBatChargeFaultsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeActiveBatChargeFaultsID")
+    MTRClusterPowerSourceAttributeActiveBatChargeFaultsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeActiveBatChargeFaultsID")
     = 0x0000001E,
-    MTRClusterPowerSourceAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeGeneratedCommandListID")
+    MTRClusterPowerSourceAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterPowerSourceAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeAcceptedCommandListID")
+    MTRClusterPowerSourceAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterPowerSourceAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeAttributeListID")
+    MTRClusterPowerSourceAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterPowerSourceAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeFeatureMapID")
+    MTRClusterPowerSourceAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterPowerSourceAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPowerSourceAttributeClusterRevisionID")
+    MTRClusterPowerSourceAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPowerSourceAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster PowerSource attributes
@@ -1189,35 +1369,36 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster GeneralCommissioning deprecated attribute names
-    MTRClusterGeneralCommissioningAttributeBreadcrumbID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeBreadcrumbID")
+    MTRClusterGeneralCommissioningAttributeBreadcrumbID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeBreadcrumbID")
     = 0x00000000,
-    MTRClusterGeneralCommissioningAttributeBasicCommissioningInfoID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeBasicCommissioningInfoID")
+    MTRClusterGeneralCommissioningAttributeBasicCommissioningInfoID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeBasicCommissioningInfoID")
     = 0x00000001,
-    MTRClusterGeneralCommissioningAttributeRegulatoryConfigID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeRegulatoryConfigID")
+    MTRClusterGeneralCommissioningAttributeRegulatoryConfigID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeRegulatoryConfigID")
     = 0x00000002,
-    MTRClusterGeneralCommissioningAttributeLocationCapabilityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeLocationCapabilityID")
+    MTRClusterGeneralCommissioningAttributeLocationCapabilityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeLocationCapabilityID")
     = 0x00000003,
-    MTRClusterGeneralCommissioningAttributeSupportsConcurrentConnectionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeSupportsConcurrentConnectionID")
+    MTRClusterGeneralCommissioningAttributeSupportsConcurrentConnectionID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeSupportsConcurrentConnectionID")
     = 0x00000004,
-    MTRClusterGeneralCommissioningAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeGeneratedCommandListID")
+    MTRClusterGeneralCommissioningAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterGeneralCommissioningAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeAcceptedCommandListID")
+    MTRClusterGeneralCommissioningAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterGeneralCommissioningAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeAttributeListID")
+    MTRClusterGeneralCommissioningAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterGeneralCommissioningAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeFeatureMapID")
+    MTRClusterGeneralCommissioningAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterGeneralCommissioningAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeClusterRevisionID")
+    MTRClusterGeneralCommissioningAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralCommissioningAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster GeneralCommissioning attributes
@@ -1238,44 +1419,44 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster NetworkCommissioning deprecated attribute names
-    MTRClusterNetworkCommissioningAttributeMaxNetworksID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeMaxNetworksID")
+    MTRClusterNetworkCommissioningAttributeMaxNetworksID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeMaxNetworksID")
     = 0x00000000,
-    MTRClusterNetworkCommissioningAttributeNetworksID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeNetworksID")
+    MTRClusterNetworkCommissioningAttributeNetworksID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeNetworksID")
     = 0x00000001,
-    MTRClusterNetworkCommissioningAttributeScanMaxTimeSecondsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeScanMaxTimeSecondsID")
+    MTRClusterNetworkCommissioningAttributeScanMaxTimeSecondsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeScanMaxTimeSecondsID")
     = 0x00000002,
-    MTRClusterNetworkCommissioningAttributeConnectMaxTimeSecondsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeConnectMaxTimeSecondsID")
+    MTRClusterNetworkCommissioningAttributeConnectMaxTimeSecondsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeConnectMaxTimeSecondsID")
     = 0x00000003,
-    MTRClusterNetworkCommissioningAttributeInterfaceEnabledID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeInterfaceEnabledID")
+    MTRClusterNetworkCommissioningAttributeInterfaceEnabledID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeInterfaceEnabledID")
     = 0x00000004,
-    MTRClusterNetworkCommissioningAttributeLastNetworkingStatusID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeLastNetworkingStatusID")
+    MTRClusterNetworkCommissioningAttributeLastNetworkingStatusID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeLastNetworkingStatusID")
     = 0x00000005,
-    MTRClusterNetworkCommissioningAttributeLastNetworkIDID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeLastNetworkIDID")
+    MTRClusterNetworkCommissioningAttributeLastNetworkIDID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeLastNetworkIDID")
     = 0x00000006,
-    MTRClusterNetworkCommissioningAttributeLastConnectErrorValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeLastConnectErrorValueID")
+    MTRClusterNetworkCommissioningAttributeLastConnectErrorValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeLastConnectErrorValueID")
     = 0x00000007,
-    MTRClusterNetworkCommissioningAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeGeneratedCommandListID")
+    MTRClusterNetworkCommissioningAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterNetworkCommissioningAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeAcceptedCommandListID")
+    MTRClusterNetworkCommissioningAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterNetworkCommissioningAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeAttributeListID")
+    MTRClusterNetworkCommissioningAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterNetworkCommissioningAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeFeatureMapID")
+    MTRClusterNetworkCommissioningAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterNetworkCommissioningAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeClusterRevisionID")
+    MTRClusterNetworkCommissioningAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterNetworkCommissioningAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster NetworkCommissioning attributes
@@ -1299,20 +1480,20 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster DiagnosticLogs deprecated attribute names
-    MTRClusterDiagnosticLogsAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDiagnosticLogsAttributeGeneratedCommandListID")
+    MTRClusterDiagnosticLogsAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDiagnosticLogsAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterDiagnosticLogsAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDiagnosticLogsAttributeAcceptedCommandListID")
+    MTRClusterDiagnosticLogsAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDiagnosticLogsAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterDiagnosticLogsAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDiagnosticLogsAttributeAttributeListID")
+    MTRClusterDiagnosticLogsAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDiagnosticLogsAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterDiagnosticLogsAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDiagnosticLogsAttributeFeatureMapID")
+    MTRClusterDiagnosticLogsAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDiagnosticLogsAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterDiagnosticLogsAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDiagnosticLogsAttributeClusterRevisionID")
+    MTRClusterDiagnosticLogsAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDiagnosticLogsAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster DiagnosticLogs attributes
@@ -1328,47 +1509,47 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster GeneralDiagnostics deprecated attribute names
-    MTRClusterGeneralDiagnosticsAttributeNetworkInterfacesID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeNetworkInterfacesID")
+    MTRClusterGeneralDiagnosticsAttributeNetworkInterfacesID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeNetworkInterfacesID")
     = 0x00000000,
-    MTRClusterGeneralDiagnosticsAttributeRebootCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeRebootCountID")
+    MTRClusterGeneralDiagnosticsAttributeRebootCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeRebootCountID")
     = 0x00000001,
-    MTRClusterGeneralDiagnosticsAttributeUpTimeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeUpTimeID")
+    MTRClusterGeneralDiagnosticsAttributeUpTimeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeUpTimeID")
     = 0x00000002,
-    MTRClusterGeneralDiagnosticsAttributeTotalOperationalHoursID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTotalOperationalHoursID")
+    MTRClusterGeneralDiagnosticsAttributeTotalOperationalHoursID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTotalOperationalHoursID")
     = 0x00000003,
-    MTRClusterGeneralDiagnosticsAttributeBootReasonsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonsID")
+    MTRClusterGeneralDiagnosticsAttributeBootReasonsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonsID")
     = 0x00000004,
-    MTRClusterGeneralDiagnosticsAttributeActiveHardwareFaultsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveHardwareFaultsID")
+    MTRClusterGeneralDiagnosticsAttributeActiveHardwareFaultsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveHardwareFaultsID")
     = 0x00000005,
-    MTRClusterGeneralDiagnosticsAttributeActiveRadioFaultsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveRadioFaultsID")
+    MTRClusterGeneralDiagnosticsAttributeActiveRadioFaultsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveRadioFaultsID")
     = 0x00000006,
-    MTRClusterGeneralDiagnosticsAttributeActiveNetworkFaultsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveNetworkFaultsID")
+    MTRClusterGeneralDiagnosticsAttributeActiveNetworkFaultsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveNetworkFaultsID")
     = 0x00000007,
-    MTRClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID")
+    MTRClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTestEventTriggersEnabledID")
     = 0x00000008,
-    MTRClusterGeneralDiagnosticsAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeGeneratedCommandListID")
+    MTRClusterGeneralDiagnosticsAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterGeneralDiagnosticsAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAcceptedCommandListID")
+    MTRClusterGeneralDiagnosticsAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterGeneralDiagnosticsAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAttributeListID")
+    MTRClusterGeneralDiagnosticsAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterGeneralDiagnosticsAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeFeatureMapID")
+    MTRClusterGeneralDiagnosticsAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterGeneralDiagnosticsAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeClusterRevisionID")
+    MTRClusterGeneralDiagnosticsAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster GeneralDiagnostics attributes
@@ -1393,32 +1574,32 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster SoftwareDiagnostics deprecated attribute names
-    MTRClusterSoftwareDiagnosticsAttributeThreadMetricsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeThreadMetricsID")
+    MTRClusterSoftwareDiagnosticsAttributeThreadMetricsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeThreadMetricsID")
     = 0x00000000,
-    MTRClusterSoftwareDiagnosticsAttributeCurrentHeapFreeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeCurrentHeapFreeID")
+    MTRClusterSoftwareDiagnosticsAttributeCurrentHeapFreeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeCurrentHeapFreeID")
     = 0x00000001,
-    MTRClusterSoftwareDiagnosticsAttributeCurrentHeapUsedID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeCurrentHeapUsedID")
+    MTRClusterSoftwareDiagnosticsAttributeCurrentHeapUsedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeCurrentHeapUsedID")
     = 0x00000002,
-    MTRClusterSoftwareDiagnosticsAttributeCurrentHeapHighWatermarkID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeCurrentHeapHighWatermarkID")
+    MTRClusterSoftwareDiagnosticsAttributeCurrentHeapHighWatermarkID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeCurrentHeapHighWatermarkID")
     = 0x00000003,
-    MTRClusterSoftwareDiagnosticsAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeGeneratedCommandListID")
+    MTRClusterSoftwareDiagnosticsAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterSoftwareDiagnosticsAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeAcceptedCommandListID")
+    MTRClusterSoftwareDiagnosticsAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterSoftwareDiagnosticsAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeAttributeListID")
+    MTRClusterSoftwareDiagnosticsAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterSoftwareDiagnosticsAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeFeatureMapID")
+    MTRClusterSoftwareDiagnosticsAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterSoftwareDiagnosticsAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeClusterRevisionID")
+    MTRClusterSoftwareDiagnosticsAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterSoftwareDiagnosticsAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster SoftwareDiagnostics attributes
@@ -1438,209 +1619,225 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ThreadNetworkDiagnostics deprecated attribute names
-    MTRClusterThreadNetworkDiagnosticsAttributeChannelID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeChannelID")
+    MTRClusterThreadNetworkDiagnosticsAttributeChannelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeChannelID")
     = 0x00000000,
-    MTRClusterThreadNetworkDiagnosticsAttributeRoutingRoleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRoutingRoleID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRoutingRoleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRoutingRoleID")
     = 0x00000001,
-    MTRClusterThreadNetworkDiagnosticsAttributeNetworkNameID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNetworkNameID")
+    MTRClusterThreadNetworkDiagnosticsAttributeNetworkNameID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNetworkNameID")
     = 0x00000002,
-    MTRClusterThreadNetworkDiagnosticsAttributePanIdID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePanIdID")
+    MTRClusterThreadNetworkDiagnosticsAttributePanIdID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePanIdID")
     = 0x00000003,
-    MTRClusterThreadNetworkDiagnosticsAttributeExtendedPanIdID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeExtendedPanIdID")
+    MTRClusterThreadNetworkDiagnosticsAttributeExtendedPanIdID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeExtendedPanIdID")
     = 0x00000004,
-    MTRClusterThreadNetworkDiagnosticsAttributeMeshLocalPrefixID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeMeshLocalPrefixID")
+    MTRClusterThreadNetworkDiagnosticsAttributeMeshLocalPrefixID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeMeshLocalPrefixID")
     = 0x00000005,
-    MTRClusterThreadNetworkDiagnosticsAttributeOverrunCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeOverrunCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeOverrunCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeOverrunCountID")
     = 0x00000006,
-    MTRClusterThreadNetworkDiagnosticsAttributeNeighborTableListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableListID")
+    MTRClusterThreadNetworkDiagnosticsAttributeNeighborTableListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableListID")
     = 0x00000007,
-    MTRClusterThreadNetworkDiagnosticsAttributeRouteTableListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableListID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRouteTableListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableListID")
     = 0x00000008,
-    MTRClusterThreadNetworkDiagnosticsAttributePartitionIdID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePartitionIdID")
+    MTRClusterThreadNetworkDiagnosticsAttributePartitionIdID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePartitionIdID")
     = 0x00000009,
-    MTRClusterThreadNetworkDiagnosticsAttributeWeightingID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeWeightingID")
+    MTRClusterThreadNetworkDiagnosticsAttributeWeightingID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeWeightingID")
     = 0x0000000A,
-    MTRClusterThreadNetworkDiagnosticsAttributeDataVersionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeDataVersionID")
+    MTRClusterThreadNetworkDiagnosticsAttributeDataVersionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeDataVersionID")
     = 0x0000000B,
-    MTRClusterThreadNetworkDiagnosticsAttributeStableDataVersionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeStableDataVersionID")
+    MTRClusterThreadNetworkDiagnosticsAttributeStableDataVersionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeStableDataVersionID")
     = 0x0000000C,
-    MTRClusterThreadNetworkDiagnosticsAttributeLeaderRouterIdID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeLeaderRouterIdID")
+    MTRClusterThreadNetworkDiagnosticsAttributeLeaderRouterIdID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeLeaderRouterIdID")
     = 0x0000000D,
-    MTRClusterThreadNetworkDiagnosticsAttributeDetachedRoleCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeDetachedRoleCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeDetachedRoleCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeDetachedRoleCountID")
     = 0x0000000E,
-    MTRClusterThreadNetworkDiagnosticsAttributeChildRoleCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeChildRoleCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeChildRoleCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeChildRoleCountID")
     = 0x0000000F,
-    MTRClusterThreadNetworkDiagnosticsAttributeRouterRoleCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouterRoleCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRouterRoleCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouterRoleCountID")
     = 0x00000010,
-    MTRClusterThreadNetworkDiagnosticsAttributeLeaderRoleCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeLeaderRoleCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeLeaderRoleCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeLeaderRoleCountID")
     = 0x00000011,
-    MTRClusterThreadNetworkDiagnosticsAttributeAttachAttemptCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAttachAttemptCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeAttachAttemptCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAttachAttemptCountID")
     = 0x00000012,
-    MTRClusterThreadNetworkDiagnosticsAttributePartitionIdChangeCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePartitionIdChangeCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributePartitionIdChangeCountID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePartitionIdChangeCountID")
     = 0x00000013,
-    MTRClusterThreadNetworkDiagnosticsAttributeBetterPartitionAttachAttemptCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeBetterPartitionAttachAttemptCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeBetterPartitionAttachAttemptCountID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeBetterPartitionAttachAttemptCountID")
     = 0x00000014,
-    MTRClusterThreadNetworkDiagnosticsAttributeParentChangeCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeParentChangeCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeParentChangeCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeParentChangeCountID")
     = 0x00000015,
-    MTRClusterThreadNetworkDiagnosticsAttributeTxTotalCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxTotalCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeTxTotalCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxTotalCountID")
     = 0x00000016,
-    MTRClusterThreadNetworkDiagnosticsAttributeTxUnicastCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxUnicastCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeTxUnicastCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxUnicastCountID")
     = 0x00000017,
-    MTRClusterThreadNetworkDiagnosticsAttributeTxBroadcastCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxBroadcastCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeTxBroadcastCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxBroadcastCountID")
     = 0x00000018,
-    MTRClusterThreadNetworkDiagnosticsAttributeTxAckRequestedCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxAckRequestedCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeTxAckRequestedCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxAckRequestedCountID")
     = 0x00000019,
-    MTRClusterThreadNetworkDiagnosticsAttributeTxAckedCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxAckedCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeTxAckedCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxAckedCountID")
     = 0x0000001A,
-    MTRClusterThreadNetworkDiagnosticsAttributeTxNoAckRequestedCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxNoAckRequestedCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeTxNoAckRequestedCountID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxNoAckRequestedCountID")
     = 0x0000001B,
-    MTRClusterThreadNetworkDiagnosticsAttributeTxDataCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxDataCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeTxDataCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxDataCountID")
     = 0x0000001C,
-    MTRClusterThreadNetworkDiagnosticsAttributeTxDataPollCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxDataPollCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeTxDataPollCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxDataPollCountID")
     = 0x0000001D,
-    MTRClusterThreadNetworkDiagnosticsAttributeTxBeaconCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxBeaconCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeTxBeaconCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxBeaconCountID")
     = 0x0000001E,
-    MTRClusterThreadNetworkDiagnosticsAttributeTxBeaconRequestCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxBeaconRequestCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeTxBeaconRequestCountID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxBeaconRequestCountID")
     = 0x0000001F,
-    MTRClusterThreadNetworkDiagnosticsAttributeTxOtherCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxOtherCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeTxOtherCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxOtherCountID")
     = 0x00000020,
-    MTRClusterThreadNetworkDiagnosticsAttributeTxRetryCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxRetryCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeTxRetryCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxRetryCountID")
     = 0x00000021,
-    MTRClusterThreadNetworkDiagnosticsAttributeTxDirectMaxRetryExpiryCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxDirectMaxRetryExpiryCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeTxDirectMaxRetryExpiryCountID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxDirectMaxRetryExpiryCountID")
     = 0x00000022,
-    MTRClusterThreadNetworkDiagnosticsAttributeTxIndirectMaxRetryExpiryCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxIndirectMaxRetryExpiryCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeTxIndirectMaxRetryExpiryCountID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxIndirectMaxRetryExpiryCountID")
     = 0x00000023,
-    MTRClusterThreadNetworkDiagnosticsAttributeTxErrCcaCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxErrCcaCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeTxErrCcaCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxErrCcaCountID")
     = 0x00000024,
-    MTRClusterThreadNetworkDiagnosticsAttributeTxErrAbortCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxErrAbortCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeTxErrAbortCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxErrAbortCountID")
     = 0x00000025,
-    MTRClusterThreadNetworkDiagnosticsAttributeTxErrBusyChannelCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxErrBusyChannelCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeTxErrBusyChannelCountID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeTxErrBusyChannelCountID")
     = 0x00000026,
-    MTRClusterThreadNetworkDiagnosticsAttributeRxTotalCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxTotalCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRxTotalCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxTotalCountID")
     = 0x00000027,
-    MTRClusterThreadNetworkDiagnosticsAttributeRxUnicastCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxUnicastCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRxUnicastCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxUnicastCountID")
     = 0x00000028,
-    MTRClusterThreadNetworkDiagnosticsAttributeRxBroadcastCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxBroadcastCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRxBroadcastCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxBroadcastCountID")
     = 0x00000029,
-    MTRClusterThreadNetworkDiagnosticsAttributeRxDataCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDataCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRxDataCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDataCountID")
     = 0x0000002A,
-    MTRClusterThreadNetworkDiagnosticsAttributeRxDataPollCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDataPollCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRxDataPollCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDataPollCountID")
     = 0x0000002B,
-    MTRClusterThreadNetworkDiagnosticsAttributeRxBeaconCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxBeaconCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRxBeaconCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxBeaconCountID")
     = 0x0000002C,
-    MTRClusterThreadNetworkDiagnosticsAttributeRxBeaconRequestCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxBeaconRequestCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRxBeaconRequestCountID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxBeaconRequestCountID")
     = 0x0000002D,
-    MTRClusterThreadNetworkDiagnosticsAttributeRxOtherCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxOtherCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRxOtherCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxOtherCountID")
     = 0x0000002E,
-    MTRClusterThreadNetworkDiagnosticsAttributeRxAddressFilteredCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxAddressFilteredCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRxAddressFilteredCountID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxAddressFilteredCountID")
     = 0x0000002F,
-    MTRClusterThreadNetworkDiagnosticsAttributeRxDestAddrFilteredCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDestAddrFilteredCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRxDestAddrFilteredCountID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDestAddrFilteredCountID")
     = 0x00000030,
-    MTRClusterThreadNetworkDiagnosticsAttributeRxDuplicatedCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDuplicatedCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRxDuplicatedCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxDuplicatedCountID")
     = 0x00000031,
-    MTRClusterThreadNetworkDiagnosticsAttributeRxErrNoFrameCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrNoFrameCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRxErrNoFrameCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrNoFrameCountID")
     = 0x00000032,
-    MTRClusterThreadNetworkDiagnosticsAttributeRxErrUnknownNeighborCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrUnknownNeighborCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRxErrUnknownNeighborCountID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrUnknownNeighborCountID")
     = 0x00000033,
-    MTRClusterThreadNetworkDiagnosticsAttributeRxErrInvalidSrcAddrCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrInvalidSrcAddrCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRxErrInvalidSrcAddrCountID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrInvalidSrcAddrCountID")
     = 0x00000034,
-    MTRClusterThreadNetworkDiagnosticsAttributeRxErrSecCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrSecCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRxErrSecCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrSecCountID")
     = 0x00000035,
-    MTRClusterThreadNetworkDiagnosticsAttributeRxErrFcsCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrFcsCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRxErrFcsCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrFcsCountID")
     = 0x00000036,
-    MTRClusterThreadNetworkDiagnosticsAttributeRxErrOtherCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrOtherCountID")
+    MTRClusterThreadNetworkDiagnosticsAttributeRxErrOtherCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRxErrOtherCountID")
     = 0x00000037,
-    MTRClusterThreadNetworkDiagnosticsAttributeActiveTimestampID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeActiveTimestampID")
+    MTRClusterThreadNetworkDiagnosticsAttributeActiveTimestampID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeActiveTimestampID")
     = 0x00000038,
-    MTRClusterThreadNetworkDiagnosticsAttributePendingTimestampID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePendingTimestampID")
+    MTRClusterThreadNetworkDiagnosticsAttributePendingTimestampID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePendingTimestampID")
     = 0x00000039,
-    MTRClusterThreadNetworkDiagnosticsAttributeDelayID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeDelayID")
+    MTRClusterThreadNetworkDiagnosticsAttributeDelayID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeDelayID")
     = 0x0000003A,
-    MTRClusterThreadNetworkDiagnosticsAttributeSecurityPolicyID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeSecurityPolicyID")
+    MTRClusterThreadNetworkDiagnosticsAttributeSecurityPolicyID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeSecurityPolicyID")
     = 0x0000003B,
-    MTRClusterThreadNetworkDiagnosticsAttributeChannelPage0MaskID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeChannelPage0MaskID")
+    MTRClusterThreadNetworkDiagnosticsAttributeChannelPage0MaskID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeChannelPage0MaskID")
     = 0x0000003C,
-    MTRClusterThreadNetworkDiagnosticsAttributeOperationalDatasetComponentsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeOperationalDatasetComponentsID")
+    MTRClusterThreadNetworkDiagnosticsAttributeOperationalDatasetComponentsID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeOperationalDatasetComponentsID")
     = 0x0000003D,
-    MTRClusterThreadNetworkDiagnosticsAttributeActiveNetworkFaultsListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeActiveNetworkFaultsListID")
+    MTRClusterThreadNetworkDiagnosticsAttributeActiveNetworkFaultsListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeActiveNetworkFaultsListID")
     = 0x0000003E,
-    MTRClusterThreadNetworkDiagnosticsAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeGeneratedCommandListID")
+    MTRClusterThreadNetworkDiagnosticsAttributeGeneratedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterThreadNetworkDiagnosticsAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAcceptedCommandListID")
+    MTRClusterThreadNetworkDiagnosticsAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterThreadNetworkDiagnosticsAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAttributeListID")
+    MTRClusterThreadNetworkDiagnosticsAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterThreadNetworkDiagnosticsAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeFeatureMapID")
+    MTRClusterThreadNetworkDiagnosticsAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterThreadNetworkDiagnosticsAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeClusterRevisionID")
+    MTRClusterThreadNetworkDiagnosticsAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster ThreadNetworkDiagnostics attributes
@@ -1719,59 +1916,61 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster WiFiNetworkDiagnostics deprecated attribute names
-    MTRClusterWiFiNetworkDiagnosticsAttributeBssidID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBssidID")
+    MTRClusterWiFiNetworkDiagnosticsAttributeBssidID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBssidID")
     = 0x00000000,
-    MTRClusterWiFiNetworkDiagnosticsAttributeSecurityTypeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeSecurityTypeID")
+    MTRClusterWiFiNetworkDiagnosticsAttributeSecurityTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeSecurityTypeID")
     = 0x00000001,
-    MTRClusterWiFiNetworkDiagnosticsAttributeWiFiVersionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeWiFiVersionID")
+    MTRClusterWiFiNetworkDiagnosticsAttributeWiFiVersionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeWiFiVersionID")
     = 0x00000002,
-    MTRClusterWiFiNetworkDiagnosticsAttributeChannelNumberID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeChannelNumberID")
+    MTRClusterWiFiNetworkDiagnosticsAttributeChannelNumberID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeChannelNumberID")
     = 0x00000003,
-    MTRClusterWiFiNetworkDiagnosticsAttributeRssiID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRssiID")
+    MTRClusterWiFiNetworkDiagnosticsAttributeRssiID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRssiID")
     = 0x00000004,
-    MTRClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID")
+    MTRClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID")
     = 0x00000005,
-    MTRClusterWiFiNetworkDiagnosticsAttributeBeaconRxCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconRxCountID")
+    MTRClusterWiFiNetworkDiagnosticsAttributeBeaconRxCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconRxCountID")
     = 0x00000006,
-    MTRClusterWiFiNetworkDiagnosticsAttributePacketMulticastRxCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketMulticastRxCountID")
+    MTRClusterWiFiNetworkDiagnosticsAttributePacketMulticastRxCountID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketMulticastRxCountID")
     = 0x00000007,
-    MTRClusterWiFiNetworkDiagnosticsAttributePacketMulticastTxCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketMulticastTxCountID")
+    MTRClusterWiFiNetworkDiagnosticsAttributePacketMulticastTxCountID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketMulticastTxCountID")
     = 0x00000008,
-    MTRClusterWiFiNetworkDiagnosticsAttributePacketUnicastRxCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketUnicastRxCountID")
+    MTRClusterWiFiNetworkDiagnosticsAttributePacketUnicastRxCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketUnicastRxCountID")
     = 0x00000009,
-    MTRClusterWiFiNetworkDiagnosticsAttributePacketUnicastTxCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketUnicastTxCountID")
+    MTRClusterWiFiNetworkDiagnosticsAttributePacketUnicastTxCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketUnicastTxCountID")
     = 0x0000000A,
-    MTRClusterWiFiNetworkDiagnosticsAttributeCurrentMaxRateID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeCurrentMaxRateID")
+    MTRClusterWiFiNetworkDiagnosticsAttributeCurrentMaxRateID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeCurrentMaxRateID")
     = 0x0000000B,
-    MTRClusterWiFiNetworkDiagnosticsAttributeOverrunCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeOverrunCountID")
+    MTRClusterWiFiNetworkDiagnosticsAttributeOverrunCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeOverrunCountID")
     = 0x0000000C,
-    MTRClusterWiFiNetworkDiagnosticsAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeGeneratedCommandListID")
+    MTRClusterWiFiNetworkDiagnosticsAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterWiFiNetworkDiagnosticsAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeAcceptedCommandListID")
+    MTRClusterWiFiNetworkDiagnosticsAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterWiFiNetworkDiagnosticsAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeAttributeListID")
+    MTRClusterWiFiNetworkDiagnosticsAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterWiFiNetworkDiagnosticsAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeFeatureMapID")
+    MTRClusterWiFiNetworkDiagnosticsAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterWiFiNetworkDiagnosticsAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeClusterRevisionID")
+    MTRClusterWiFiNetworkDiagnosticsAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster WiFiNetworkDiagnostics attributes
@@ -1800,47 +1999,49 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster EthernetNetworkDiagnostics deprecated attribute names
-    MTRClusterEthernetNetworkDiagnosticsAttributePHYRateID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributePHYRateID")
+    MTRClusterEthernetNetworkDiagnosticsAttributePHYRateID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributePHYRateID")
     = 0x00000000,
-    MTRClusterEthernetNetworkDiagnosticsAttributeFullDuplexID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeFullDuplexID")
+    MTRClusterEthernetNetworkDiagnosticsAttributeFullDuplexID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeFullDuplexID")
     = 0x00000001,
-    MTRClusterEthernetNetworkDiagnosticsAttributePacketRxCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributePacketRxCountID")
+    MTRClusterEthernetNetworkDiagnosticsAttributePacketRxCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributePacketRxCountID")
     = 0x00000002,
-    MTRClusterEthernetNetworkDiagnosticsAttributePacketTxCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributePacketTxCountID")
+    MTRClusterEthernetNetworkDiagnosticsAttributePacketTxCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributePacketTxCountID")
     = 0x00000003,
-    MTRClusterEthernetNetworkDiagnosticsAttributeTxErrCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeTxErrCountID")
+    MTRClusterEthernetNetworkDiagnosticsAttributeTxErrCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeTxErrCountID")
     = 0x00000004,
-    MTRClusterEthernetNetworkDiagnosticsAttributeCollisionCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeCollisionCountID")
+    MTRClusterEthernetNetworkDiagnosticsAttributeCollisionCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeCollisionCountID")
     = 0x00000005,
-    MTRClusterEthernetNetworkDiagnosticsAttributeOverrunCountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeOverrunCountID")
+    MTRClusterEthernetNetworkDiagnosticsAttributeOverrunCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeOverrunCountID")
     = 0x00000006,
-    MTRClusterEthernetNetworkDiagnosticsAttributeCarrierDetectID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeCarrierDetectID")
+    MTRClusterEthernetNetworkDiagnosticsAttributeCarrierDetectID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeCarrierDetectID")
     = 0x00000007,
-    MTRClusterEthernetNetworkDiagnosticsAttributeTimeSinceResetID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeTimeSinceResetID")
+    MTRClusterEthernetNetworkDiagnosticsAttributeTimeSinceResetID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeTimeSinceResetID")
     = 0x00000008,
-    MTRClusterEthernetNetworkDiagnosticsAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeGeneratedCommandListID")
+    MTRClusterEthernetNetworkDiagnosticsAttributeGeneratedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterEthernetNetworkDiagnosticsAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeAcceptedCommandListID")
+    MTRClusterEthernetNetworkDiagnosticsAttributeAcceptedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterEthernetNetworkDiagnosticsAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeAttributeListID")
+    MTRClusterEthernetNetworkDiagnosticsAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterEthernetNetworkDiagnosticsAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeFeatureMapID")
+    MTRClusterEthernetNetworkDiagnosticsAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterEthernetNetworkDiagnosticsAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeClusterRevisionID")
+    MTRClusterEthernetNetworkDiagnosticsAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterEthernetNetworkDiagnosticsAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster EthernetNetworkDiagnostics attributes
@@ -1865,50 +2066,50 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster TimeSynchronization deprecated attribute names
-    MTRClusterTimeSynchronizationAttributeUTCTimeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID")
+    MTRClusterTimeSynchronizationAttributeUTCTimeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID")
     = 0x00000000,
-    MTRClusterTimeSynchronizationAttributeGranularityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeGranularityID")
+    MTRClusterTimeSynchronizationAttributeGranularityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeGranularityID")
     = 0x00000001,
-    MTRClusterTimeSynchronizationAttributeTimeSourceID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeSourceID")
+    MTRClusterTimeSynchronizationAttributeTimeSourceID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeSourceID")
     = 0x00000002,
-    MTRClusterTimeSynchronizationAttributeTrustedTimeNodeIdID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeTrustedTimeNodeIdID")
+    MTRClusterTimeSynchronizationAttributeTrustedTimeNodeIdID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeTrustedTimeNodeIdID")
     = 0x00000003,
-    MTRClusterTimeSynchronizationAttributeDefaultNtpID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeDefaultNtpID")
+    MTRClusterTimeSynchronizationAttributeDefaultNtpID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeDefaultNtpID")
     = 0x00000004,
-    MTRClusterTimeSynchronizationAttributeTimeZoneID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneID")
+    MTRClusterTimeSynchronizationAttributeTimeZoneID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneID")
     = 0x00000005,
-    MTRClusterTimeSynchronizationAttributeDstOffsetID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeDstOffsetID")
+    MTRClusterTimeSynchronizationAttributeDstOffsetID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeDstOffsetID")
     = 0x00000006,
-    MTRClusterTimeSynchronizationAttributeLocalTimeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeLocalTimeID")
+    MTRClusterTimeSynchronizationAttributeLocalTimeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeLocalTimeID")
     = 0x00000007,
-    MTRClusterTimeSynchronizationAttributeTimeZoneDatabaseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneDatabaseID")
+    MTRClusterTimeSynchronizationAttributeTimeZoneDatabaseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneDatabaseID")
     = 0x00000008,
-    MTRClusterTimeSynchronizationAttributeNtpServerPortID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeNtpServerPortID")
+    MTRClusterTimeSynchronizationAttributeNtpServerPortID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeNtpServerPortID")
     = 0x00000009,
-    MTRClusterTimeSynchronizationAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeGeneratedCommandListID")
+    MTRClusterTimeSynchronizationAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterTimeSynchronizationAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeAcceptedCommandListID")
+    MTRClusterTimeSynchronizationAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterTimeSynchronizationAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeAttributeListID")
+    MTRClusterTimeSynchronizationAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterTimeSynchronizationAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeFeatureMapID")
+    MTRClusterTimeSynchronizationAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterTimeSynchronizationAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeClusterRevisionID")
+    MTRClusterTimeSynchronizationAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster TimeSynchronization attributes
@@ -1934,65 +2135,65 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster BridgedDeviceBasic deprecated attribute names
-    MTRClusterBridgedDeviceBasicAttributeVendorNameID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeVendorNameID")
+    MTRClusterBridgedDeviceBasicAttributeVendorNameID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeVendorNameID")
     = 0x00000001,
-    MTRClusterBridgedDeviceBasicAttributeVendorIDID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeVendorIDID")
+    MTRClusterBridgedDeviceBasicAttributeVendorIDID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeVendorIDID")
     = 0x00000002,
-    MTRClusterBridgedDeviceBasicAttributeProductNameID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeProductNameID")
+    MTRClusterBridgedDeviceBasicAttributeProductNameID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeProductNameID")
     = 0x00000003,
-    MTRClusterBridgedDeviceBasicAttributeNodeLabelID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeNodeLabelID")
+    MTRClusterBridgedDeviceBasicAttributeNodeLabelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeNodeLabelID")
     = 0x00000005,
-    MTRClusterBridgedDeviceBasicAttributeHardwareVersionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeHardwareVersionID")
+    MTRClusterBridgedDeviceBasicAttributeHardwareVersionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeHardwareVersionID")
     = 0x00000007,
-    MTRClusterBridgedDeviceBasicAttributeHardwareVersionStringID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeHardwareVersionStringID")
+    MTRClusterBridgedDeviceBasicAttributeHardwareVersionStringID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeHardwareVersionStringID")
     = 0x00000008,
-    MTRClusterBridgedDeviceBasicAttributeSoftwareVersionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeSoftwareVersionID")
+    MTRClusterBridgedDeviceBasicAttributeSoftwareVersionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeSoftwareVersionID")
     = 0x00000009,
-    MTRClusterBridgedDeviceBasicAttributeSoftwareVersionStringID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeSoftwareVersionStringID")
+    MTRClusterBridgedDeviceBasicAttributeSoftwareVersionStringID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeSoftwareVersionStringID")
     = 0x0000000A,
-    MTRClusterBridgedDeviceBasicAttributeManufacturingDateID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeManufacturingDateID")
+    MTRClusterBridgedDeviceBasicAttributeManufacturingDateID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeManufacturingDateID")
     = 0x0000000B,
-    MTRClusterBridgedDeviceBasicAttributePartNumberID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributePartNumberID")
+    MTRClusterBridgedDeviceBasicAttributePartNumberID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributePartNumberID")
     = 0x0000000C,
-    MTRClusterBridgedDeviceBasicAttributeProductURLID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeProductURLID")
+    MTRClusterBridgedDeviceBasicAttributeProductURLID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeProductURLID")
     = 0x0000000D,
-    MTRClusterBridgedDeviceBasicAttributeProductLabelID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeProductLabelID")
+    MTRClusterBridgedDeviceBasicAttributeProductLabelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeProductLabelID")
     = 0x0000000E,
-    MTRClusterBridgedDeviceBasicAttributeSerialNumberID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeSerialNumberID")
+    MTRClusterBridgedDeviceBasicAttributeSerialNumberID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeSerialNumberID")
     = 0x0000000F,
-    MTRClusterBridgedDeviceBasicAttributeReachableID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeReachableID")
+    MTRClusterBridgedDeviceBasicAttributeReachableID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeReachableID")
     = 0x00000011,
-    MTRClusterBridgedDeviceBasicAttributeUniqueIDID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeUniqueIDID")
+    MTRClusterBridgedDeviceBasicAttributeUniqueIDID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeUniqueIDID")
     = 0x00000012,
-    MTRClusterBridgedDeviceBasicAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeGeneratedCommandListID")
+    MTRClusterBridgedDeviceBasicAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterBridgedDeviceBasicAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeAcceptedCommandListID")
+    MTRClusterBridgedDeviceBasicAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterBridgedDeviceBasicAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeAttributeListID")
+    MTRClusterBridgedDeviceBasicAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterBridgedDeviceBasicAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeFeatureMapID")
+    MTRClusterBridgedDeviceBasicAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterBridgedDeviceBasicAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeClusterRevisionID")
+    MTRClusterBridgedDeviceBasicAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBridgedDeviceBasicAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster BridgedDeviceBasic attributes
@@ -2023,28 +2224,29 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster Switch deprecated attribute names
-    MTRClusterSwitchAttributeNumberOfPositionsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterSwitchAttributeNumberOfPositionsID")
+    MTRClusterSwitchAttributeNumberOfPositionsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterSwitchAttributeNumberOfPositionsID")
     = 0x00000000,
-    MTRClusterSwitchAttributeCurrentPositionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterSwitchAttributeCurrentPositionID")
+    MTRClusterSwitchAttributeCurrentPositionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterSwitchAttributeCurrentPositionID")
     = 0x00000001,
-    MTRClusterSwitchAttributeMultiPressMaxID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterSwitchAttributeMultiPressMaxID")
+    MTRClusterSwitchAttributeMultiPressMaxID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterSwitchAttributeMultiPressMaxID")
     = 0x00000002,
-    MTRClusterSwitchAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterSwitchAttributeGeneratedCommandListID")
+    MTRClusterSwitchAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterSwitchAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterSwitchAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterSwitchAttributeAcceptedCommandListID")
+    MTRClusterSwitchAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterSwitchAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterSwitchAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterSwitchAttributeAttributeListID")
+    MTRClusterSwitchAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterSwitchAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterSwitchAttributeFeatureMapID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterSwitchAttributeFeatureMapID")
+    MTRClusterSwitchAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterSwitchAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterSwitchAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterSwitchAttributeClusterRevisionID")
+    MTRClusterSwitchAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterSwitchAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster Switch attributes
@@ -2061,29 +2263,31 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster AdministratorCommissioning deprecated attribute names
-    MTRClusterAdministratorCommissioningAttributeWindowStatusID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAdministratorCommissioningAttributeWindowStatusID")
+    MTRClusterAdministratorCommissioningAttributeWindowStatusID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAdministratorCommissioningAttributeWindowStatusID")
     = 0x00000000,
-    MTRClusterAdministratorCommissioningAttributeAdminFabricIndexID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAdminFabricIndexID")
+    MTRClusterAdministratorCommissioningAttributeAdminFabricIndexID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAdminFabricIndexID")
     = 0x00000001,
-    MTRClusterAdministratorCommissioningAttributeAdminVendorIdID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAdminVendorIdID")
+    MTRClusterAdministratorCommissioningAttributeAdminVendorIdID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAdminVendorIdID")
     = 0x00000002,
-    MTRClusterAdministratorCommissioningAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAdministratorCommissioningAttributeGeneratedCommandListID")
+    MTRClusterAdministratorCommissioningAttributeGeneratedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAdministratorCommissioningAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterAdministratorCommissioningAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAcceptedCommandListID")
+    MTRClusterAdministratorCommissioningAttributeAcceptedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterAdministratorCommissioningAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAttributeListID")
+    MTRClusterAdministratorCommissioningAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAdministratorCommissioningAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterAdministratorCommissioningAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAdministratorCommissioningAttributeFeatureMapID")
+    MTRClusterAdministratorCommissioningAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAdministratorCommissioningAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterAdministratorCommissioningAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAdministratorCommissioningAttributeClusterRevisionID")
+    MTRClusterAdministratorCommissioningAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAdministratorCommissioningAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster AdministratorCommissioning attributes
@@ -2102,38 +2306,39 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster OperationalCredentials deprecated attribute names
-    MTRClusterOperationalCredentialsAttributeNOCsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeNOCsID")
+    MTRClusterOperationalCredentialsAttributeNOCsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeNOCsID")
     = 0x00000000,
-    MTRClusterOperationalCredentialsAttributeFabricsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeFabricsID")
+    MTRClusterOperationalCredentialsAttributeFabricsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeFabricsID")
     = 0x00000001,
-    MTRClusterOperationalCredentialsAttributeSupportedFabricsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeSupportedFabricsID")
+    MTRClusterOperationalCredentialsAttributeSupportedFabricsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeSupportedFabricsID")
     = 0x00000002,
-    MTRClusterOperationalCredentialsAttributeCommissionedFabricsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeCommissionedFabricsID")
+    MTRClusterOperationalCredentialsAttributeCommissionedFabricsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeCommissionedFabricsID")
     = 0x00000003,
-    MTRClusterOperationalCredentialsAttributeTrustedRootCertificatesID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeTrustedRootCertificatesID")
+    MTRClusterOperationalCredentialsAttributeTrustedRootCertificatesID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeTrustedRootCertificatesID")
     = 0x00000004,
-    MTRClusterOperationalCredentialsAttributeCurrentFabricIndexID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeCurrentFabricIndexID")
+    MTRClusterOperationalCredentialsAttributeCurrentFabricIndexID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeCurrentFabricIndexID")
     = 0x00000005,
-    MTRClusterOperationalCredentialsAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeGeneratedCommandListID")
+    MTRClusterOperationalCredentialsAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterOperationalCredentialsAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeAcceptedCommandListID")
+    MTRClusterOperationalCredentialsAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterOperationalCredentialsAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeAttributeListID")
+    MTRClusterOperationalCredentialsAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterOperationalCredentialsAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeFeatureMapID")
+    MTRClusterOperationalCredentialsAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterOperationalCredentialsAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeClusterRevisionID")
+    MTRClusterOperationalCredentialsAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOperationalCredentialsAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster OperationalCredentials attributes
@@ -2155,32 +2360,32 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster GroupKeyManagement deprecated attribute names
-    MTRClusterGroupKeyManagementAttributeGroupKeyMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGroupKeyManagementAttributeGroupKeyMapID")
+    MTRClusterGroupKeyManagementAttributeGroupKeyMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGroupKeyManagementAttributeGroupKeyMapID")
     = 0x00000000,
-    MTRClusterGroupKeyManagementAttributeGroupTableID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGroupKeyManagementAttributeGroupTableID")
+    MTRClusterGroupKeyManagementAttributeGroupTableID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGroupKeyManagementAttributeGroupTableID")
     = 0x00000001,
-    MTRClusterGroupKeyManagementAttributeMaxGroupsPerFabricID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGroupKeyManagementAttributeMaxGroupsPerFabricID")
+    MTRClusterGroupKeyManagementAttributeMaxGroupsPerFabricID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGroupKeyManagementAttributeMaxGroupsPerFabricID")
     = 0x00000002,
-    MTRClusterGroupKeyManagementAttributeMaxGroupKeysPerFabricID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGroupKeyManagementAttributeMaxGroupKeysPerFabricID")
+    MTRClusterGroupKeyManagementAttributeMaxGroupKeysPerFabricID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGroupKeyManagementAttributeMaxGroupKeysPerFabricID")
     = 0x00000003,
-    MTRClusterGroupKeyManagementAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGroupKeyManagementAttributeGeneratedCommandListID")
+    MTRClusterGroupKeyManagementAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGroupKeyManagementAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterGroupKeyManagementAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGroupKeyManagementAttributeAcceptedCommandListID")
+    MTRClusterGroupKeyManagementAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGroupKeyManagementAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterGroupKeyManagementAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGroupKeyManagementAttributeAttributeListID")
+    MTRClusterGroupKeyManagementAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGroupKeyManagementAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterGroupKeyManagementAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGroupKeyManagementAttributeFeatureMapID")
+    MTRClusterGroupKeyManagementAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGroupKeyManagementAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterGroupKeyManagementAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterGroupKeyManagementAttributeClusterRevisionID")
+    MTRClusterGroupKeyManagementAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGroupKeyManagementAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster GroupKeyManagement attributes
@@ -2200,23 +2405,23 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster FixedLabel deprecated attribute names
-    MTRClusterFixedLabelAttributeLabelListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFixedLabelAttributeLabelListID")
+    MTRClusterFixedLabelAttributeLabelListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFixedLabelAttributeLabelListID")
     = 0x00000000,
-    MTRClusterFixedLabelAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFixedLabelAttributeGeneratedCommandListID")
+    MTRClusterFixedLabelAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFixedLabelAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterFixedLabelAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFixedLabelAttributeAcceptedCommandListID")
+    MTRClusterFixedLabelAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFixedLabelAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterFixedLabelAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFixedLabelAttributeAttributeListID")
+    MTRClusterFixedLabelAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFixedLabelAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterFixedLabelAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFixedLabelAttributeFeatureMapID")
+    MTRClusterFixedLabelAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFixedLabelAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterFixedLabelAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFixedLabelAttributeClusterRevisionID")
+    MTRClusterFixedLabelAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFixedLabelAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster FixedLabel attributes
@@ -2232,23 +2437,23 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster UserLabel deprecated attribute names
-    MTRClusterUserLabelAttributeLabelListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUserLabelAttributeLabelListID")
+    MTRClusterUserLabelAttributeLabelListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUserLabelAttributeLabelListID")
     = 0x00000000,
-    MTRClusterUserLabelAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUserLabelAttributeGeneratedCommandListID")
+    MTRClusterUserLabelAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUserLabelAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterUserLabelAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUserLabelAttributeAcceptedCommandListID")
+    MTRClusterUserLabelAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUserLabelAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterUserLabelAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUserLabelAttributeAttributeListID")
+    MTRClusterUserLabelAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUserLabelAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterUserLabelAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUserLabelAttributeFeatureMapID")
+    MTRClusterUserLabelAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUserLabelAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterUserLabelAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUserLabelAttributeClusterRevisionID")
+    MTRClusterUserLabelAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUserLabelAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster UserLabel attributes
@@ -2264,20 +2469,20 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ProxyConfiguration deprecated attribute names
-    MTRClusterProxyConfigurationAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyConfigurationAttributeGeneratedCommandListID")
+    MTRClusterProxyConfigurationAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterProxyConfigurationAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterProxyConfigurationAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyConfigurationAttributeAcceptedCommandListID")
+    MTRClusterProxyConfigurationAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterProxyConfigurationAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterProxyConfigurationAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyConfigurationAttributeAttributeListID")
+    MTRClusterProxyConfigurationAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterProxyConfigurationAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterProxyConfigurationAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyConfigurationAttributeFeatureMapID")
+    MTRClusterProxyConfigurationAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterProxyConfigurationAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterProxyConfigurationAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyConfigurationAttributeClusterRevisionID")
+    MTRClusterProxyConfigurationAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterProxyConfigurationAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster ProxyConfiguration attributes
@@ -2293,20 +2498,20 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ProxyDiscovery deprecated attribute names
-    MTRClusterProxyDiscoveryAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyDiscoveryAttributeGeneratedCommandListID")
+    MTRClusterProxyDiscoveryAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterProxyDiscoveryAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterProxyDiscoveryAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyDiscoveryAttributeAcceptedCommandListID")
+    MTRClusterProxyDiscoveryAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterProxyDiscoveryAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterProxyDiscoveryAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyDiscoveryAttributeAttributeListID")
+    MTRClusterProxyDiscoveryAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterProxyDiscoveryAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterProxyDiscoveryAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyDiscoveryAttributeFeatureMapID")
+    MTRClusterProxyDiscoveryAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterProxyDiscoveryAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterProxyDiscoveryAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyDiscoveryAttributeClusterRevisionID")
+    MTRClusterProxyDiscoveryAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterProxyDiscoveryAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster ProxyDiscovery attributes
@@ -2322,20 +2527,20 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ProxyValid deprecated attribute names
-    MTRClusterProxyValidAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyValidAttributeGeneratedCommandListID")
+    MTRClusterProxyValidAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterProxyValidAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterProxyValidAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyValidAttributeAcceptedCommandListID")
+    MTRClusterProxyValidAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterProxyValidAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterProxyValidAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyValidAttributeAttributeListID")
+    MTRClusterProxyValidAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterProxyValidAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterProxyValidAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyValidAttributeFeatureMapID")
+    MTRClusterProxyValidAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterProxyValidAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterProxyValidAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterProxyValidAttributeClusterRevisionID")
+    MTRClusterProxyValidAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterProxyValidAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster ProxyValid attributes
@@ -2350,23 +2555,23 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster BooleanState deprecated attribute names
-    MTRClusterBooleanStateAttributeStateValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBooleanStateAttributeStateValueID")
+    MTRClusterBooleanStateAttributeStateValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBooleanStateAttributeStateValueID")
     = 0x00000000,
-    MTRClusterBooleanStateAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBooleanStateAttributeGeneratedCommandListID")
+    MTRClusterBooleanStateAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBooleanStateAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterBooleanStateAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBooleanStateAttributeAcceptedCommandListID")
+    MTRClusterBooleanStateAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBooleanStateAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterBooleanStateAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBooleanStateAttributeAttributeListID")
+    MTRClusterBooleanStateAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBooleanStateAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterBooleanStateAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBooleanStateAttributeFeatureMapID")
+    MTRClusterBooleanStateAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBooleanStateAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterBooleanStateAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBooleanStateAttributeClusterRevisionID")
+    MTRClusterBooleanStateAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBooleanStateAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster BooleanState attributes
@@ -2382,37 +2587,38 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ModeSelect deprecated attribute names
-    MTRClusterModeSelectAttributeDescriptionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterModeSelectAttributeDescriptionID")
+    MTRClusterModeSelectAttributeDescriptionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterModeSelectAttributeDescriptionID")
     = 0x00000000,
-    MTRClusterModeSelectAttributeStandardNamespaceID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterModeSelectAttributeStandardNamespaceID")
+    MTRClusterModeSelectAttributeStandardNamespaceID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterModeSelectAttributeStandardNamespaceID")
     = 0x00000001,
-    MTRClusterModeSelectAttributeSupportedModesID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterModeSelectAttributeSupportedModesID")
+    MTRClusterModeSelectAttributeSupportedModesID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterModeSelectAttributeSupportedModesID")
     = 0x00000002,
-    MTRClusterModeSelectAttributeCurrentModeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterModeSelectAttributeCurrentModeID")
+    MTRClusterModeSelectAttributeCurrentModeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterModeSelectAttributeCurrentModeID")
     = 0x00000003,
-    MTRClusterModeSelectAttributeStartUpModeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterModeSelectAttributeStartUpModeID")
+    MTRClusterModeSelectAttributeStartUpModeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterModeSelectAttributeStartUpModeID")
     = 0x00000004,
-    MTRClusterModeSelectAttributeOnModeID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterModeSelectAttributeOnModeID")
+    MTRClusterModeSelectAttributeOnModeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterModeSelectAttributeOnModeID")
     = 0x00000005,
-    MTRClusterModeSelectAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterModeSelectAttributeGeneratedCommandListID")
+    MTRClusterModeSelectAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterModeSelectAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterModeSelectAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterModeSelectAttributeAcceptedCommandListID")
+    MTRClusterModeSelectAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterModeSelectAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterModeSelectAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterModeSelectAttributeAttributeListID")
+    MTRClusterModeSelectAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterModeSelectAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterModeSelectAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterModeSelectAttributeFeatureMapID")
+    MTRClusterModeSelectAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterModeSelectAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterModeSelectAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterModeSelectAttributeClusterRevisionID")
+    MTRClusterModeSelectAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterModeSelectAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster ModeSelect attributes
@@ -2433,124 +2639,130 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster DoorLock deprecated attribute names
-    MTRClusterDoorLockAttributeLockStateID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeLockStateID")
+    MTRClusterDoorLockAttributeLockStateID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeLockStateID")
     = 0x00000000,
-    MTRClusterDoorLockAttributeLockTypeID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeLockTypeID")
+    MTRClusterDoorLockAttributeLockTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeLockTypeID")
     = 0x00000001,
-    MTRClusterDoorLockAttributeActuatorEnabledID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeActuatorEnabledID")
+    MTRClusterDoorLockAttributeActuatorEnabledID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeActuatorEnabledID")
     = 0x00000002,
-    MTRClusterDoorLockAttributeDoorStateID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeDoorStateID")
+    MTRClusterDoorLockAttributeDoorStateID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeDoorStateID")
     = 0x00000003,
-    MTRClusterDoorLockAttributeDoorOpenEventsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeDoorOpenEventsID")
+    MTRClusterDoorLockAttributeDoorOpenEventsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeDoorOpenEventsID")
     = 0x00000004,
-    MTRClusterDoorLockAttributeDoorClosedEventsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeDoorClosedEventsID")
+    MTRClusterDoorLockAttributeDoorClosedEventsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeDoorClosedEventsID")
     = 0x00000005,
-    MTRClusterDoorLockAttributeOpenPeriodID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeOpenPeriodID")
+    MTRClusterDoorLockAttributeOpenPeriodID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeOpenPeriodID")
     = 0x00000006,
-    MTRClusterDoorLockAttributeNumberOfTotalUsersSupportedID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeNumberOfTotalUsersSupportedID")
+    MTRClusterDoorLockAttributeNumberOfTotalUsersSupportedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeNumberOfTotalUsersSupportedID")
     = 0x00000011,
-    MTRClusterDoorLockAttributeNumberOfPINUsersSupportedID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeNumberOfPINUsersSupportedID")
+    MTRClusterDoorLockAttributeNumberOfPINUsersSupportedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeNumberOfPINUsersSupportedID")
     = 0x00000012,
-    MTRClusterDoorLockAttributeNumberOfRFIDUsersSupportedID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeNumberOfRFIDUsersSupportedID")
+    MTRClusterDoorLockAttributeNumberOfRFIDUsersSupportedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeNumberOfRFIDUsersSupportedID")
     = 0x00000013,
-    MTRClusterDoorLockAttributeNumberOfWeekDaySchedulesSupportedPerUserID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeNumberOfWeekDaySchedulesSupportedPerUserID")
+    MTRClusterDoorLockAttributeNumberOfWeekDaySchedulesSupportedPerUserID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeNumberOfWeekDaySchedulesSupportedPerUserID")
     = 0x00000014,
-    MTRClusterDoorLockAttributeNumberOfYearDaySchedulesSupportedPerUserID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeNumberOfYearDaySchedulesSupportedPerUserID")
+    MTRClusterDoorLockAttributeNumberOfYearDaySchedulesSupportedPerUserID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeNumberOfYearDaySchedulesSupportedPerUserID")
     = 0x00000015,
-    MTRClusterDoorLockAttributeNumberOfHolidaySchedulesSupportedID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeNumberOfHolidaySchedulesSupportedID")
+    MTRClusterDoorLockAttributeNumberOfHolidaySchedulesSupportedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeNumberOfHolidaySchedulesSupportedID")
     = 0x00000016,
-    MTRClusterDoorLockAttributeMaxPINCodeLengthID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeMaxPINCodeLengthID")
+    MTRClusterDoorLockAttributeMaxPINCodeLengthID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeMaxPINCodeLengthID")
     = 0x00000017,
-    MTRClusterDoorLockAttributeMinPINCodeLengthID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeMinPINCodeLengthID")
+    MTRClusterDoorLockAttributeMinPINCodeLengthID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeMinPINCodeLengthID")
     = 0x00000018,
-    MTRClusterDoorLockAttributeMaxRFIDCodeLengthID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeMaxRFIDCodeLengthID")
+    MTRClusterDoorLockAttributeMaxRFIDCodeLengthID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeMaxRFIDCodeLengthID")
     = 0x00000019,
-    MTRClusterDoorLockAttributeMinRFIDCodeLengthID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeMinRFIDCodeLengthID")
+    MTRClusterDoorLockAttributeMinRFIDCodeLengthID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeMinRFIDCodeLengthID")
     = 0x0000001A,
-    MTRClusterDoorLockAttributeCredentialRulesSupportID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeCredentialRulesSupportID")
+    MTRClusterDoorLockAttributeCredentialRulesSupportID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeCredentialRulesSupportID")
     = 0x0000001B,
-    MTRClusterDoorLockAttributeNumberOfCredentialsSupportedPerUserID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeNumberOfCredentialsSupportedPerUserID")
+    MTRClusterDoorLockAttributeNumberOfCredentialsSupportedPerUserID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeNumberOfCredentialsSupportedPerUserID")
     = 0x0000001C,
-    MTRClusterDoorLockAttributeLanguageID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeLanguageID")
+    MTRClusterDoorLockAttributeLanguageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeLanguageID")
     = 0x00000021,
-    MTRClusterDoorLockAttributeLEDSettingsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeLEDSettingsID")
+    MTRClusterDoorLockAttributeLEDSettingsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeLEDSettingsID")
     = 0x00000022,
-    MTRClusterDoorLockAttributeAutoRelockTimeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeAutoRelockTimeID")
+    MTRClusterDoorLockAttributeAutoRelockTimeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeAutoRelockTimeID")
     = 0x00000023,
-    MTRClusterDoorLockAttributeSoundVolumeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeSoundVolumeID")
+    MTRClusterDoorLockAttributeSoundVolumeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeSoundVolumeID")
     = 0x00000024,
-    MTRClusterDoorLockAttributeOperatingModeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeOperatingModeID")
+    MTRClusterDoorLockAttributeOperatingModeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeOperatingModeID")
     = 0x00000025,
-    MTRClusterDoorLockAttributeSupportedOperatingModesID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeSupportedOperatingModesID")
+    MTRClusterDoorLockAttributeSupportedOperatingModesID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeSupportedOperatingModesID")
     = 0x00000026,
-    MTRClusterDoorLockAttributeDefaultConfigurationRegisterID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeDefaultConfigurationRegisterID")
+    MTRClusterDoorLockAttributeDefaultConfigurationRegisterID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeDefaultConfigurationRegisterID")
     = 0x00000027,
-    MTRClusterDoorLockAttributeEnableLocalProgrammingID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeEnableLocalProgrammingID")
+    MTRClusterDoorLockAttributeEnableLocalProgrammingID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeEnableLocalProgrammingID")
     = 0x00000028,
-    MTRClusterDoorLockAttributeEnableOneTouchLockingID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeEnableOneTouchLockingID")
+    MTRClusterDoorLockAttributeEnableOneTouchLockingID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeEnableOneTouchLockingID")
     = 0x00000029,
-    MTRClusterDoorLockAttributeEnableInsideStatusLEDID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeEnableInsideStatusLEDID")
+    MTRClusterDoorLockAttributeEnableInsideStatusLEDID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeEnableInsideStatusLEDID")
     = 0x0000002A,
-    MTRClusterDoorLockAttributeEnablePrivacyModeButtonID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeEnablePrivacyModeButtonID")
+    MTRClusterDoorLockAttributeEnablePrivacyModeButtonID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeEnablePrivacyModeButtonID")
     = 0x0000002B,
-    MTRClusterDoorLockAttributeLocalProgrammingFeaturesID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeLocalProgrammingFeaturesID")
+    MTRClusterDoorLockAttributeLocalProgrammingFeaturesID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeLocalProgrammingFeaturesID")
     = 0x0000002C,
-    MTRClusterDoorLockAttributeWrongCodeEntryLimitID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeWrongCodeEntryLimitID")
+    MTRClusterDoorLockAttributeWrongCodeEntryLimitID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeWrongCodeEntryLimitID")
     = 0x00000030,
-    MTRClusterDoorLockAttributeUserCodeTemporaryDisableTimeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeUserCodeTemporaryDisableTimeID")
+    MTRClusterDoorLockAttributeUserCodeTemporaryDisableTimeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeUserCodeTemporaryDisableTimeID")
     = 0x00000031,
-    MTRClusterDoorLockAttributeSendPINOverTheAirID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeSendPINOverTheAirID")
+    MTRClusterDoorLockAttributeSendPINOverTheAirID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeSendPINOverTheAirID")
     = 0x00000032,
-    MTRClusterDoorLockAttributeRequirePINforRemoteOperationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeRequirePINforRemoteOperationID")
+    MTRClusterDoorLockAttributeRequirePINforRemoteOperationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeRequirePINforRemoteOperationID")
     = 0x00000033,
-    MTRClusterDoorLockAttributeExpiringUserTimeoutID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeExpiringUserTimeoutID")
+    MTRClusterDoorLockAttributeExpiringUserTimeoutID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeExpiringUserTimeoutID")
     = 0x00000035,
-    MTRClusterDoorLockAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeGeneratedCommandListID")
+    MTRClusterDoorLockAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterDoorLockAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeAcceptedCommandListID")
+    MTRClusterDoorLockAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterDoorLockAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeAttributeListID")
+    MTRClusterDoorLockAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterDoorLockAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeFeatureMapID")
+    MTRClusterDoorLockAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterDoorLockAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterDoorLockAttributeClusterRevisionID")
+    MTRClusterDoorLockAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterDoorLockAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster DoorLock attributes
@@ -2601,86 +2813,90 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster WindowCovering deprecated attribute names
-    MTRClusterWindowCoveringAttributeTypeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeTypeID")
+    MTRClusterWindowCoveringAttributeTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeTypeID")
     = 0x00000000,
-    MTRClusterWindowCoveringAttributePhysicalClosedLimitLiftID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributePhysicalClosedLimitLiftID")
+    MTRClusterWindowCoveringAttributePhysicalClosedLimitLiftID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributePhysicalClosedLimitLiftID")
     = 0x00000001,
-    MTRClusterWindowCoveringAttributePhysicalClosedLimitTiltID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributePhysicalClosedLimitTiltID")
+    MTRClusterWindowCoveringAttributePhysicalClosedLimitTiltID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributePhysicalClosedLimitTiltID")
     = 0x00000002,
-    MTRClusterWindowCoveringAttributeCurrentPositionLiftID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionLiftID")
+    MTRClusterWindowCoveringAttributeCurrentPositionLiftID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionLiftID")
     = 0x00000003,
-    MTRClusterWindowCoveringAttributeCurrentPositionTiltID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionTiltID")
+    MTRClusterWindowCoveringAttributeCurrentPositionTiltID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionTiltID")
     = 0x00000004,
-    MTRClusterWindowCoveringAttributeNumberOfActuationsLiftID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeNumberOfActuationsLiftID")
+    MTRClusterWindowCoveringAttributeNumberOfActuationsLiftID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeNumberOfActuationsLiftID")
     = 0x00000005,
-    MTRClusterWindowCoveringAttributeNumberOfActuationsTiltID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeNumberOfActuationsTiltID")
+    MTRClusterWindowCoveringAttributeNumberOfActuationsTiltID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeNumberOfActuationsTiltID")
     = 0x00000006,
-    MTRClusterWindowCoveringAttributeConfigStatusID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeConfigStatusID")
+    MTRClusterWindowCoveringAttributeConfigStatusID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeConfigStatusID")
     = 0x00000007,
-    MTRClusterWindowCoveringAttributeCurrentPositionLiftPercentageID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionLiftPercentageID")
+    MTRClusterWindowCoveringAttributeCurrentPositionLiftPercentageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionLiftPercentageID")
     = 0x00000008,
-    MTRClusterWindowCoveringAttributeCurrentPositionTiltPercentageID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionTiltPercentageID")
+    MTRClusterWindowCoveringAttributeCurrentPositionTiltPercentageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionTiltPercentageID")
     = 0x00000009,
-    MTRClusterWindowCoveringAttributeOperationalStatusID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeOperationalStatusID")
+    MTRClusterWindowCoveringAttributeOperationalStatusID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeOperationalStatusID")
     = 0x0000000A,
-    MTRClusterWindowCoveringAttributeTargetPositionLiftPercent100thsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeTargetPositionLiftPercent100thsID")
+    MTRClusterWindowCoveringAttributeTargetPositionLiftPercent100thsID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeTargetPositionLiftPercent100thsID")
     = 0x0000000B,
-    MTRClusterWindowCoveringAttributeTargetPositionTiltPercent100thsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeTargetPositionTiltPercent100thsID")
+    MTRClusterWindowCoveringAttributeTargetPositionTiltPercent100thsID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeTargetPositionTiltPercent100thsID")
     = 0x0000000C,
-    MTRClusterWindowCoveringAttributeEndProductTypeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeEndProductTypeID")
+    MTRClusterWindowCoveringAttributeEndProductTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeEndProductTypeID")
     = 0x0000000D,
-    MTRClusterWindowCoveringAttributeCurrentPositionLiftPercent100thsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionLiftPercent100thsID")
+    MTRClusterWindowCoveringAttributeCurrentPositionLiftPercent100thsID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionLiftPercent100thsID")
     = 0x0000000E,
-    MTRClusterWindowCoveringAttributeCurrentPositionTiltPercent100thsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionTiltPercent100thsID")
+    MTRClusterWindowCoveringAttributeCurrentPositionTiltPercent100thsID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionTiltPercent100thsID")
     = 0x0000000F,
-    MTRClusterWindowCoveringAttributeInstalledOpenLimitLiftID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledOpenLimitLiftID")
+    MTRClusterWindowCoveringAttributeInstalledOpenLimitLiftID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledOpenLimitLiftID")
     = 0x00000010,
-    MTRClusterWindowCoveringAttributeInstalledClosedLimitLiftID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledClosedLimitLiftID")
+    MTRClusterWindowCoveringAttributeInstalledClosedLimitLiftID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledClosedLimitLiftID")
     = 0x00000011,
-    MTRClusterWindowCoveringAttributeInstalledOpenLimitTiltID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledOpenLimitTiltID")
+    MTRClusterWindowCoveringAttributeInstalledOpenLimitTiltID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledOpenLimitTiltID")
     = 0x00000012,
-    MTRClusterWindowCoveringAttributeInstalledClosedLimitTiltID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledClosedLimitTiltID")
+    MTRClusterWindowCoveringAttributeInstalledClosedLimitTiltID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledClosedLimitTiltID")
     = 0x00000013,
-    MTRClusterWindowCoveringAttributeModeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeModeID")
+    MTRClusterWindowCoveringAttributeModeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeModeID")
     = 0x00000017,
-    MTRClusterWindowCoveringAttributeSafetyStatusID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeSafetyStatusID")
+    MTRClusterWindowCoveringAttributeSafetyStatusID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeSafetyStatusID")
     = 0x0000001A,
-    MTRClusterWindowCoveringAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeGeneratedCommandListID")
+    MTRClusterWindowCoveringAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterWindowCoveringAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeAcceptedCommandListID")
+    MTRClusterWindowCoveringAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterWindowCoveringAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeAttributeListID")
+    MTRClusterWindowCoveringAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterWindowCoveringAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeFeatureMapID")
+    MTRClusterWindowCoveringAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterWindowCoveringAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWindowCoveringAttributeClusterRevisionID")
+    MTRClusterWindowCoveringAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWindowCoveringAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster WindowCovering attributes
@@ -2718,50 +2934,50 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster BarrierControl deprecated attribute names
-    MTRClusterBarrierControlAttributeBarrierMovingStateID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierMovingStateID")
+    MTRClusterBarrierControlAttributeBarrierMovingStateID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierMovingStateID")
     = 0x00000001,
-    MTRClusterBarrierControlAttributeBarrierSafetyStatusID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierSafetyStatusID")
+    MTRClusterBarrierControlAttributeBarrierSafetyStatusID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierSafetyStatusID")
     = 0x00000002,
-    MTRClusterBarrierControlAttributeBarrierCapabilitiesID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCapabilitiesID")
+    MTRClusterBarrierControlAttributeBarrierCapabilitiesID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCapabilitiesID")
     = 0x00000003,
-    MTRClusterBarrierControlAttributeBarrierOpenEventsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierOpenEventsID")
+    MTRClusterBarrierControlAttributeBarrierOpenEventsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierOpenEventsID")
     = 0x00000004,
-    MTRClusterBarrierControlAttributeBarrierCloseEventsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCloseEventsID")
+    MTRClusterBarrierControlAttributeBarrierCloseEventsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCloseEventsID")
     = 0x00000005,
-    MTRClusterBarrierControlAttributeBarrierCommandOpenEventsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCommandOpenEventsID")
+    MTRClusterBarrierControlAttributeBarrierCommandOpenEventsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCommandOpenEventsID")
     = 0x00000006,
-    MTRClusterBarrierControlAttributeBarrierCommandCloseEventsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCommandCloseEventsID")
+    MTRClusterBarrierControlAttributeBarrierCommandCloseEventsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCommandCloseEventsID")
     = 0x00000007,
-    MTRClusterBarrierControlAttributeBarrierOpenPeriodID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierOpenPeriodID")
+    MTRClusterBarrierControlAttributeBarrierOpenPeriodID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierOpenPeriodID")
     = 0x00000008,
-    MTRClusterBarrierControlAttributeBarrierClosePeriodID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierClosePeriodID")
+    MTRClusterBarrierControlAttributeBarrierClosePeriodID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierClosePeriodID")
     = 0x00000009,
-    MTRClusterBarrierControlAttributeBarrierPositionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierPositionID")
+    MTRClusterBarrierControlAttributeBarrierPositionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierPositionID")
     = 0x0000000A,
-    MTRClusterBarrierControlAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBarrierControlAttributeGeneratedCommandListID")
+    MTRClusterBarrierControlAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterBarrierControlAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBarrierControlAttributeAcceptedCommandListID")
+    MTRClusterBarrierControlAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterBarrierControlAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBarrierControlAttributeAttributeListID")
+    MTRClusterBarrierControlAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterBarrierControlAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBarrierControlAttributeFeatureMapID")
+    MTRClusterBarrierControlAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterBarrierControlAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBarrierControlAttributeClusterRevisionID")
+    MTRClusterBarrierControlAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster BarrierControl attributes
@@ -2787,89 +3003,95 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster PumpConfigurationAndControl deprecated attribute names
-    MTRClusterPumpConfigurationAndControlAttributeMaxPressureID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxPressureID")
+    MTRClusterPumpConfigurationAndControlAttributeMaxPressureID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxPressureID")
     = 0x00000000,
-    MTRClusterPumpConfigurationAndControlAttributeMaxSpeedID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxSpeedID")
+    MTRClusterPumpConfigurationAndControlAttributeMaxSpeedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxSpeedID")
     = 0x00000001,
-    MTRClusterPumpConfigurationAndControlAttributeMaxFlowID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxFlowID")
+    MTRClusterPumpConfigurationAndControlAttributeMaxFlowID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxFlowID")
     = 0x00000002,
-    MTRClusterPumpConfigurationAndControlAttributeMinConstPressureID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstPressureID")
+    MTRClusterPumpConfigurationAndControlAttributeMinConstPressureID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstPressureID")
     = 0x00000003,
-    MTRClusterPumpConfigurationAndControlAttributeMaxConstPressureID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstPressureID")
+    MTRClusterPumpConfigurationAndControlAttributeMaxConstPressureID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstPressureID")
     = 0x00000004,
-    MTRClusterPumpConfigurationAndControlAttributeMinCompPressureID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinCompPressureID")
+    MTRClusterPumpConfigurationAndControlAttributeMinCompPressureID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinCompPressureID")
     = 0x00000005,
-    MTRClusterPumpConfigurationAndControlAttributeMaxCompPressureID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxCompPressureID")
+    MTRClusterPumpConfigurationAndControlAttributeMaxCompPressureID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxCompPressureID")
     = 0x00000006,
-    MTRClusterPumpConfigurationAndControlAttributeMinConstSpeedID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstSpeedID")
+    MTRClusterPumpConfigurationAndControlAttributeMinConstSpeedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstSpeedID")
     = 0x00000007,
-    MTRClusterPumpConfigurationAndControlAttributeMaxConstSpeedID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstSpeedID")
+    MTRClusterPumpConfigurationAndControlAttributeMaxConstSpeedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstSpeedID")
     = 0x00000008,
-    MTRClusterPumpConfigurationAndControlAttributeMinConstFlowID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstFlowID")
+    MTRClusterPumpConfigurationAndControlAttributeMinConstFlowID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstFlowID")
     = 0x00000009,
-    MTRClusterPumpConfigurationAndControlAttributeMaxConstFlowID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstFlowID")
+    MTRClusterPumpConfigurationAndControlAttributeMaxConstFlowID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstFlowID")
     = 0x0000000A,
-    MTRClusterPumpConfigurationAndControlAttributeMinConstTempID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstTempID")
+    MTRClusterPumpConfigurationAndControlAttributeMinConstTempID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMinConstTempID")
     = 0x0000000B,
-    MTRClusterPumpConfigurationAndControlAttributeMaxConstTempID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstTempID")
+    MTRClusterPumpConfigurationAndControlAttributeMaxConstTempID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeMaxConstTempID")
     = 0x0000000C,
-    MTRClusterPumpConfigurationAndControlAttributePumpStatusID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributePumpStatusID")
+    MTRClusterPumpConfigurationAndControlAttributePumpStatusID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributePumpStatusID")
     = 0x00000010,
-    MTRClusterPumpConfigurationAndControlAttributeEffectiveOperationModeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeEffectiveOperationModeID")
+    MTRClusterPumpConfigurationAndControlAttributeEffectiveOperationModeID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeEffectiveOperationModeID")
     = 0x00000011,
-    MTRClusterPumpConfigurationAndControlAttributeEffectiveControlModeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeEffectiveControlModeID")
+    MTRClusterPumpConfigurationAndControlAttributeEffectiveControlModeID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeEffectiveControlModeID")
     = 0x00000012,
-    MTRClusterPumpConfigurationAndControlAttributeCapacityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeCapacityID")
+    MTRClusterPumpConfigurationAndControlAttributeCapacityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeCapacityID")
     = 0x00000013,
-    MTRClusterPumpConfigurationAndControlAttributeSpeedID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeSpeedID")
+    MTRClusterPumpConfigurationAndControlAttributeSpeedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeSpeedID")
     = 0x00000014,
-    MTRClusterPumpConfigurationAndControlAttributeLifetimeRunningHoursID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeLifetimeRunningHoursID")
+    MTRClusterPumpConfigurationAndControlAttributeLifetimeRunningHoursID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeLifetimeRunningHoursID")
     = 0x00000015,
-    MTRClusterPumpConfigurationAndControlAttributePowerID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributePowerID")
+    MTRClusterPumpConfigurationAndControlAttributePowerID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributePowerID")
     = 0x00000016,
-    MTRClusterPumpConfigurationAndControlAttributeLifetimeEnergyConsumedID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeLifetimeEnergyConsumedID")
+    MTRClusterPumpConfigurationAndControlAttributeLifetimeEnergyConsumedID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeLifetimeEnergyConsumedID")
     = 0x00000017,
-    MTRClusterPumpConfigurationAndControlAttributeOperationModeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeOperationModeID")
+    MTRClusterPumpConfigurationAndControlAttributeOperationModeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeOperationModeID")
     = 0x00000020,
-    MTRClusterPumpConfigurationAndControlAttributeControlModeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeControlModeID")
+    MTRClusterPumpConfigurationAndControlAttributeControlModeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeControlModeID")
     = 0x00000021,
-    MTRClusterPumpConfigurationAndControlAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeGeneratedCommandListID")
+    MTRClusterPumpConfigurationAndControlAttributeGeneratedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterPumpConfigurationAndControlAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeAcceptedCommandListID")
+    MTRClusterPumpConfigurationAndControlAttributeAcceptedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterPumpConfigurationAndControlAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeAttributeListID")
+    MTRClusterPumpConfigurationAndControlAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterPumpConfigurationAndControlAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeFeatureMapID")
+    MTRClusterPumpConfigurationAndControlAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterPumpConfigurationAndControlAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeClusterRevisionID")
+    MTRClusterPumpConfigurationAndControlAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPumpConfigurationAndControlAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster PumpConfigurationAndControl attributes
@@ -2908,166 +3130,168 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster Thermostat deprecated attribute names
-    MTRClusterThermostatAttributeLocalTemperatureID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeLocalTemperatureID")
+    MTRClusterThermostatAttributeLocalTemperatureID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeLocalTemperatureID")
     = 0x00000000,
-    MTRClusterThermostatAttributeOutdoorTemperatureID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeOutdoorTemperatureID")
+    MTRClusterThermostatAttributeOutdoorTemperatureID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeOutdoorTemperatureID")
     = 0x00000001,
-    MTRClusterThermostatAttributeOccupancyID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeOccupancyID")
+    MTRClusterThermostatAttributeOccupancyID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeOccupancyID")
     = 0x00000002,
-    MTRClusterThermostatAttributeAbsMinHeatSetpointLimitID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeAbsMinHeatSetpointLimitID")
+    MTRClusterThermostatAttributeAbsMinHeatSetpointLimitID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeAbsMinHeatSetpointLimitID")
     = 0x00000003,
-    MTRClusterThermostatAttributeAbsMaxHeatSetpointLimitID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeAbsMaxHeatSetpointLimitID")
+    MTRClusterThermostatAttributeAbsMaxHeatSetpointLimitID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeAbsMaxHeatSetpointLimitID")
     = 0x00000004,
-    MTRClusterThermostatAttributeAbsMinCoolSetpointLimitID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeAbsMinCoolSetpointLimitID")
+    MTRClusterThermostatAttributeAbsMinCoolSetpointLimitID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeAbsMinCoolSetpointLimitID")
     = 0x00000005,
-    MTRClusterThermostatAttributeAbsMaxCoolSetpointLimitID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeAbsMaxCoolSetpointLimitID")
+    MTRClusterThermostatAttributeAbsMaxCoolSetpointLimitID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeAbsMaxCoolSetpointLimitID")
     = 0x00000006,
-    MTRClusterThermostatAttributePICoolingDemandID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributePICoolingDemandID")
+    MTRClusterThermostatAttributePICoolingDemandID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributePICoolingDemandID")
     = 0x00000007,
-    MTRClusterThermostatAttributePIHeatingDemandID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributePIHeatingDemandID")
+    MTRClusterThermostatAttributePIHeatingDemandID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributePIHeatingDemandID")
     = 0x00000008,
-    MTRClusterThermostatAttributeHVACSystemTypeConfigurationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeHVACSystemTypeConfigurationID")
+    MTRClusterThermostatAttributeHVACSystemTypeConfigurationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeHVACSystemTypeConfigurationID")
     = 0x00000009,
-    MTRClusterThermostatAttributeLocalTemperatureCalibrationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeLocalTemperatureCalibrationID")
+    MTRClusterThermostatAttributeLocalTemperatureCalibrationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeLocalTemperatureCalibrationID")
     = 0x00000010,
-    MTRClusterThermostatAttributeOccupiedCoolingSetpointID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeOccupiedCoolingSetpointID")
+    MTRClusterThermostatAttributeOccupiedCoolingSetpointID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeOccupiedCoolingSetpointID")
     = 0x00000011,
-    MTRClusterThermostatAttributeOccupiedHeatingSetpointID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeOccupiedHeatingSetpointID")
+    MTRClusterThermostatAttributeOccupiedHeatingSetpointID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeOccupiedHeatingSetpointID")
     = 0x00000012,
-    MTRClusterThermostatAttributeUnoccupiedCoolingSetpointID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedCoolingSetpointID")
+    MTRClusterThermostatAttributeUnoccupiedCoolingSetpointID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedCoolingSetpointID")
     = 0x00000013,
-    MTRClusterThermostatAttributeUnoccupiedHeatingSetpointID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedHeatingSetpointID")
+    MTRClusterThermostatAttributeUnoccupiedHeatingSetpointID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedHeatingSetpointID")
     = 0x00000014,
-    MTRClusterThermostatAttributeMinHeatSetpointLimitID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeMinHeatSetpointLimitID")
+    MTRClusterThermostatAttributeMinHeatSetpointLimitID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeMinHeatSetpointLimitID")
     = 0x00000015,
-    MTRClusterThermostatAttributeMaxHeatSetpointLimitID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeMaxHeatSetpointLimitID")
+    MTRClusterThermostatAttributeMaxHeatSetpointLimitID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeMaxHeatSetpointLimitID")
     = 0x00000016,
-    MTRClusterThermostatAttributeMinCoolSetpointLimitID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeMinCoolSetpointLimitID")
+    MTRClusterThermostatAttributeMinCoolSetpointLimitID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeMinCoolSetpointLimitID")
     = 0x00000017,
-    MTRClusterThermostatAttributeMaxCoolSetpointLimitID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeMaxCoolSetpointLimitID")
+    MTRClusterThermostatAttributeMaxCoolSetpointLimitID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeMaxCoolSetpointLimitID")
     = 0x00000018,
-    MTRClusterThermostatAttributeMinSetpointDeadBandID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeMinSetpointDeadBandID")
+    MTRClusterThermostatAttributeMinSetpointDeadBandID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeMinSetpointDeadBandID")
     = 0x00000019,
-    MTRClusterThermostatAttributeRemoteSensingID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeRemoteSensingID")
+    MTRClusterThermostatAttributeRemoteSensingID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeRemoteSensingID")
     = 0x0000001A,
-    MTRClusterThermostatAttributeControlSequenceOfOperationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeControlSequenceOfOperationID")
+    MTRClusterThermostatAttributeControlSequenceOfOperationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeControlSequenceOfOperationID")
     = 0x0000001B,
-    MTRClusterThermostatAttributeSystemModeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeSystemModeID")
+    MTRClusterThermostatAttributeSystemModeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeSystemModeID")
     = 0x0000001C,
-    MTRClusterThermostatAttributeThermostatRunningModeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeThermostatRunningModeID")
+    MTRClusterThermostatAttributeThermostatRunningModeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeThermostatRunningModeID")
     = 0x0000001E,
-    MTRClusterThermostatAttributeStartOfWeekID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeStartOfWeekID")
+    MTRClusterThermostatAttributeStartOfWeekID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeStartOfWeekID")
     = 0x00000020,
-    MTRClusterThermostatAttributeNumberOfWeeklyTransitionsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeNumberOfWeeklyTransitionsID")
+    MTRClusterThermostatAttributeNumberOfWeeklyTransitionsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeNumberOfWeeklyTransitionsID")
     = 0x00000021,
-    MTRClusterThermostatAttributeNumberOfDailyTransitionsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeNumberOfDailyTransitionsID")
+    MTRClusterThermostatAttributeNumberOfDailyTransitionsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeNumberOfDailyTransitionsID")
     = 0x00000022,
-    MTRClusterThermostatAttributeTemperatureSetpointHoldID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldID")
+    MTRClusterThermostatAttributeTemperatureSetpointHoldID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldID")
     = 0x00000023,
-    MTRClusterThermostatAttributeTemperatureSetpointHoldDurationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldDurationID")
+    MTRClusterThermostatAttributeTemperatureSetpointHoldDurationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldDurationID")
     = 0x00000024,
-    MTRClusterThermostatAttributeThermostatProgrammingOperationModeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeThermostatProgrammingOperationModeID")
+    MTRClusterThermostatAttributeThermostatProgrammingOperationModeID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeThermostatProgrammingOperationModeID")
     = 0x00000025,
-    MTRClusterThermostatAttributeThermostatRunningStateID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeThermostatRunningStateID")
+    MTRClusterThermostatAttributeThermostatRunningStateID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeThermostatRunningStateID")
     = 0x00000029,
-    MTRClusterThermostatAttributeSetpointChangeSourceID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeSetpointChangeSourceID")
+    MTRClusterThermostatAttributeSetpointChangeSourceID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeSetpointChangeSourceID")
     = 0x00000030,
-    MTRClusterThermostatAttributeSetpointChangeAmountID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeSetpointChangeAmountID")
+    MTRClusterThermostatAttributeSetpointChangeAmountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeSetpointChangeAmountID")
     = 0x00000031,
-    MTRClusterThermostatAttributeSetpointChangeSourceTimestampID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeSetpointChangeSourceTimestampID")
+    MTRClusterThermostatAttributeSetpointChangeSourceTimestampID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeSetpointChangeSourceTimestampID")
     = 0x00000032,
-    MTRClusterThermostatAttributeOccupiedSetbackID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeOccupiedSetbackID")
+    MTRClusterThermostatAttributeOccupiedSetbackID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeOccupiedSetbackID")
     = 0x00000034,
-    MTRClusterThermostatAttributeOccupiedSetbackMinID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeOccupiedSetbackMinID")
+    MTRClusterThermostatAttributeOccupiedSetbackMinID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeOccupiedSetbackMinID")
     = 0x00000035,
-    MTRClusterThermostatAttributeOccupiedSetbackMaxID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeOccupiedSetbackMaxID")
+    MTRClusterThermostatAttributeOccupiedSetbackMaxID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeOccupiedSetbackMaxID")
     = 0x00000036,
-    MTRClusterThermostatAttributeUnoccupiedSetbackID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedSetbackID")
+    MTRClusterThermostatAttributeUnoccupiedSetbackID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedSetbackID")
     = 0x00000037,
-    MTRClusterThermostatAttributeUnoccupiedSetbackMinID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedSetbackMinID")
+    MTRClusterThermostatAttributeUnoccupiedSetbackMinID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedSetbackMinID")
     = 0x00000038,
-    MTRClusterThermostatAttributeUnoccupiedSetbackMaxID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedSetbackMaxID")
+    MTRClusterThermostatAttributeUnoccupiedSetbackMaxID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeUnoccupiedSetbackMaxID")
     = 0x00000039,
-    MTRClusterThermostatAttributeEmergencyHeatDeltaID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeEmergencyHeatDeltaID")
+    MTRClusterThermostatAttributeEmergencyHeatDeltaID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeEmergencyHeatDeltaID")
     = 0x0000003A,
-    MTRClusterThermostatAttributeACTypeID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeACTypeID")
+    MTRClusterThermostatAttributeACTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeACTypeID")
     = 0x00000040,
-    MTRClusterThermostatAttributeACCapacityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeACCapacityID")
+    MTRClusterThermostatAttributeACCapacityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeACCapacityID")
     = 0x00000041,
-    MTRClusterThermostatAttributeACRefrigerantTypeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeACRefrigerantTypeID")
+    MTRClusterThermostatAttributeACRefrigerantTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeACRefrigerantTypeID")
     = 0x00000042,
-    MTRClusterThermostatAttributeACCompressorTypeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeACCompressorTypeID")
+    MTRClusterThermostatAttributeACCompressorTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeACCompressorTypeID")
     = 0x00000043,
-    MTRClusterThermostatAttributeACErrorCodeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeACErrorCodeID")
+    MTRClusterThermostatAttributeACErrorCodeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeACErrorCodeID")
     = 0x00000044,
-    MTRClusterThermostatAttributeACLouverPositionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeACLouverPositionID")
+    MTRClusterThermostatAttributeACLouverPositionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeACLouverPositionID")
     = 0x00000045,
-    MTRClusterThermostatAttributeACCoilTemperatureID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeACCoilTemperatureID")
+    MTRClusterThermostatAttributeACCoilTemperatureID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeACCoilTemperatureID")
     = 0x00000046,
-    MTRClusterThermostatAttributeACCapacityformatID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeACCapacityformatID")
+    MTRClusterThermostatAttributeACCapacityformatID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeACCapacityformatID")
     = 0x00000047,
-    MTRClusterThermostatAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID")
+    MTRClusterThermostatAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterThermostatAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeAcceptedCommandListID")
+    MTRClusterThermostatAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterThermostatAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeAttributeListID")
+    MTRClusterThermostatAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterThermostatAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeFeatureMapID")
+    MTRClusterThermostatAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterThermostatAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatAttributeClusterRevisionID")
+    MTRClusterThermostatAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster Thermostat attributes
@@ -3131,52 +3355,53 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster FanControl deprecated attribute names
-    MTRClusterFanControlAttributeFanModeID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFanControlAttributeFanModeID")
+    MTRClusterFanControlAttributeFanModeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFanControlAttributeFanModeID")
     = 0x00000000,
-    MTRClusterFanControlAttributeFanModeSequenceID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFanControlAttributeFanModeSequenceID")
+    MTRClusterFanControlAttributeFanModeSequenceID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFanControlAttributeFanModeSequenceID")
     = 0x00000001,
-    MTRClusterFanControlAttributePercentSettingID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFanControlAttributePercentSettingID")
+    MTRClusterFanControlAttributePercentSettingID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFanControlAttributePercentSettingID")
     = 0x00000002,
-    MTRClusterFanControlAttributePercentCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFanControlAttributePercentCurrentID")
+    MTRClusterFanControlAttributePercentCurrentID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFanControlAttributePercentCurrentID")
     = 0x00000003,
-    MTRClusterFanControlAttributeSpeedMaxID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFanControlAttributeSpeedMaxID")
+    MTRClusterFanControlAttributeSpeedMaxID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFanControlAttributeSpeedMaxID")
     = 0x00000004,
-    MTRClusterFanControlAttributeSpeedSettingID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFanControlAttributeSpeedSettingID")
+    MTRClusterFanControlAttributeSpeedSettingID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFanControlAttributeSpeedSettingID")
     = 0x00000005,
-    MTRClusterFanControlAttributeSpeedCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFanControlAttributeSpeedCurrentID")
+    MTRClusterFanControlAttributeSpeedCurrentID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFanControlAttributeSpeedCurrentID")
     = 0x00000006,
-    MTRClusterFanControlAttributeRockSupportID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFanControlAttributeRockSupportID")
+    MTRClusterFanControlAttributeRockSupportID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFanControlAttributeRockSupportID")
     = 0x00000007,
-    MTRClusterFanControlAttributeRockSettingID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFanControlAttributeRockSettingID")
+    MTRClusterFanControlAttributeRockSettingID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFanControlAttributeRockSettingID")
     = 0x00000008,
-    MTRClusterFanControlAttributeWindSupportID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFanControlAttributeWindSupportID")
+    MTRClusterFanControlAttributeWindSupportID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFanControlAttributeWindSupportID")
     = 0x00000009,
-    MTRClusterFanControlAttributeWindSettingID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFanControlAttributeWindSettingID")
+    MTRClusterFanControlAttributeWindSettingID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFanControlAttributeWindSettingID")
     = 0x0000000A,
-    MTRClusterFanControlAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFanControlAttributeGeneratedCommandListID")
+    MTRClusterFanControlAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFanControlAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterFanControlAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFanControlAttributeAcceptedCommandListID")
+    MTRClusterFanControlAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFanControlAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterFanControlAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFanControlAttributeAttributeListID")
+    MTRClusterFanControlAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFanControlAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterFanControlAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFanControlAttributeFeatureMapID")
+    MTRClusterFanControlAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFanControlAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterFanControlAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFanControlAttributeClusterRevisionID")
+    MTRClusterFanControlAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFanControlAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster FanControl attributes
@@ -3202,29 +3427,41 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ThermostatUserInterfaceConfiguration deprecated attribute names
-    MTRClusterThermostatUserInterfaceConfigurationAttributeTemperatureDisplayModeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeTemperatureDisplayModeID")
+    MTRClusterThermostatUserInterfaceConfigurationAttributeTemperatureDisplayModeID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeTemperatureDisplayModeID")
     = 0x00000000,
-    MTRClusterThermostatUserInterfaceConfigurationAttributeKeypadLockoutID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeKeypadLockoutID")
+    MTRClusterThermostatUserInterfaceConfigurationAttributeKeypadLockoutID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeKeypadLockoutID")
     = 0x00000001,
-    MTRClusterThermostatUserInterfaceConfigurationAttributeScheduleProgrammingVisibilityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeScheduleProgrammingVisibilityID")
+    MTRClusterThermostatUserInterfaceConfigurationAttributeScheduleProgrammingVisibilityID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeScheduleProgrammingVisibilityID")
     = 0x00000002,
-    MTRClusterThermostatUserInterfaceConfigurationAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeGeneratedCommandListID")
+    MTRClusterThermostatUserInterfaceConfigurationAttributeGeneratedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterThermostatUserInterfaceConfigurationAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeAcceptedCommandListID")
+    MTRClusterThermostatUserInterfaceConfigurationAttributeAcceptedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterThermostatUserInterfaceConfigurationAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeAttributeListID")
+    MTRClusterThermostatUserInterfaceConfigurationAttributeAttributeListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterThermostatUserInterfaceConfigurationAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeFeatureMapID")
+    MTRClusterThermostatUserInterfaceConfigurationAttributeFeatureMapID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterThermostatUserInterfaceConfigurationAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeClusterRevisionID")
+    MTRClusterThermostatUserInterfaceConfigurationAttributeClusterRevisionID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThermostatUserInterfaceConfigurationAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster ThermostatUserInterfaceConfiguration attributes
@@ -3244,176 +3481,176 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ColorControl deprecated attribute names
-    MTRClusterColorControlAttributeCurrentHueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeCurrentHueID")
+    MTRClusterColorControlAttributeCurrentHueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeCurrentHueID")
     = 0x00000000,
-    MTRClusterColorControlAttributeCurrentSaturationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeCurrentSaturationID")
+    MTRClusterColorControlAttributeCurrentSaturationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeCurrentSaturationID")
     = 0x00000001,
-    MTRClusterColorControlAttributeRemainingTimeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeRemainingTimeID")
+    MTRClusterColorControlAttributeRemainingTimeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeRemainingTimeID")
     = 0x00000002,
-    MTRClusterColorControlAttributeCurrentXID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeCurrentXID")
+    MTRClusterColorControlAttributeCurrentXID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeCurrentXID")
     = 0x00000003,
-    MTRClusterColorControlAttributeCurrentYID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeCurrentYID")
+    MTRClusterColorControlAttributeCurrentYID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeCurrentYID")
     = 0x00000004,
-    MTRClusterColorControlAttributeDriftCompensationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeDriftCompensationID")
+    MTRClusterColorControlAttributeDriftCompensationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeDriftCompensationID")
     = 0x00000005,
-    MTRClusterColorControlAttributeCompensationTextID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeCompensationTextID")
+    MTRClusterColorControlAttributeCompensationTextID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeCompensationTextID")
     = 0x00000006,
-    MTRClusterColorControlAttributeColorTemperatureMiredsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorTemperatureMiredsID")
+    MTRClusterColorControlAttributeColorTemperatureMiredsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorTemperatureMiredsID")
     = 0x00000007,
-    MTRClusterColorControlAttributeColorModeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorModeID")
+    MTRClusterColorControlAttributeColorModeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorModeID")
     = 0x00000008,
-    MTRClusterColorControlAttributeOptionsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeOptionsID")
+    MTRClusterColorControlAttributeOptionsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeOptionsID")
     = 0x0000000F,
-    MTRClusterColorControlAttributeNumberOfPrimariesID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeNumberOfPrimariesID")
+    MTRClusterColorControlAttributeNumberOfPrimariesID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeNumberOfPrimariesID")
     = 0x00000010,
-    MTRClusterColorControlAttributePrimary1XID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributePrimary1XID")
+    MTRClusterColorControlAttributePrimary1XID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributePrimary1XID")
     = 0x00000011,
-    MTRClusterColorControlAttributePrimary1YID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributePrimary1YID")
+    MTRClusterColorControlAttributePrimary1YID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributePrimary1YID")
     = 0x00000012,
-    MTRClusterColorControlAttributePrimary1IntensityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributePrimary1IntensityID")
+    MTRClusterColorControlAttributePrimary1IntensityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributePrimary1IntensityID")
     = 0x00000013,
-    MTRClusterColorControlAttributePrimary2XID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributePrimary2XID")
+    MTRClusterColorControlAttributePrimary2XID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributePrimary2XID")
     = 0x00000015,
-    MTRClusterColorControlAttributePrimary2YID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributePrimary2YID")
+    MTRClusterColorControlAttributePrimary2YID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributePrimary2YID")
     = 0x00000016,
-    MTRClusterColorControlAttributePrimary2IntensityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributePrimary2IntensityID")
+    MTRClusterColorControlAttributePrimary2IntensityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributePrimary2IntensityID")
     = 0x00000017,
-    MTRClusterColorControlAttributePrimary3XID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributePrimary3XID")
+    MTRClusterColorControlAttributePrimary3XID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributePrimary3XID")
     = 0x00000019,
-    MTRClusterColorControlAttributePrimary3YID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributePrimary3YID")
+    MTRClusterColorControlAttributePrimary3YID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributePrimary3YID")
     = 0x0000001A,
-    MTRClusterColorControlAttributePrimary3IntensityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributePrimary3IntensityID")
+    MTRClusterColorControlAttributePrimary3IntensityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributePrimary3IntensityID")
     = 0x0000001B,
-    MTRClusterColorControlAttributePrimary4XID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributePrimary4XID")
+    MTRClusterColorControlAttributePrimary4XID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributePrimary4XID")
     = 0x00000020,
-    MTRClusterColorControlAttributePrimary4YID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributePrimary4YID")
+    MTRClusterColorControlAttributePrimary4YID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributePrimary4YID")
     = 0x00000021,
-    MTRClusterColorControlAttributePrimary4IntensityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributePrimary4IntensityID")
+    MTRClusterColorControlAttributePrimary4IntensityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributePrimary4IntensityID")
     = 0x00000022,
-    MTRClusterColorControlAttributePrimary5XID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributePrimary5XID")
+    MTRClusterColorControlAttributePrimary5XID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributePrimary5XID")
     = 0x00000024,
-    MTRClusterColorControlAttributePrimary5YID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributePrimary5YID")
+    MTRClusterColorControlAttributePrimary5YID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributePrimary5YID")
     = 0x00000025,
-    MTRClusterColorControlAttributePrimary5IntensityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributePrimary5IntensityID")
+    MTRClusterColorControlAttributePrimary5IntensityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributePrimary5IntensityID")
     = 0x00000026,
-    MTRClusterColorControlAttributePrimary6XID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributePrimary6XID")
+    MTRClusterColorControlAttributePrimary6XID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributePrimary6XID")
     = 0x00000028,
-    MTRClusterColorControlAttributePrimary6YID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributePrimary6YID")
+    MTRClusterColorControlAttributePrimary6YID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributePrimary6YID")
     = 0x00000029,
-    MTRClusterColorControlAttributePrimary6IntensityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributePrimary6IntensityID")
+    MTRClusterColorControlAttributePrimary6IntensityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributePrimary6IntensityID")
     = 0x0000002A,
-    MTRClusterColorControlAttributeWhitePointXID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeWhitePointXID")
+    MTRClusterColorControlAttributeWhitePointXID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeWhitePointXID")
     = 0x00000030,
-    MTRClusterColorControlAttributeWhitePointYID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeWhitePointYID")
+    MTRClusterColorControlAttributeWhitePointYID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeWhitePointYID")
     = 0x00000031,
-    MTRClusterColorControlAttributeColorPointRXID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorPointRXID")
+    MTRClusterColorControlAttributeColorPointRXID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorPointRXID")
     = 0x00000032,
-    MTRClusterColorControlAttributeColorPointRYID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorPointRYID")
+    MTRClusterColorControlAttributeColorPointRYID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorPointRYID")
     = 0x00000033,
-    MTRClusterColorControlAttributeColorPointRIntensityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorPointRIntensityID")
+    MTRClusterColorControlAttributeColorPointRIntensityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorPointRIntensityID")
     = 0x00000034,
-    MTRClusterColorControlAttributeColorPointGXID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorPointGXID")
+    MTRClusterColorControlAttributeColorPointGXID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorPointGXID")
     = 0x00000036,
-    MTRClusterColorControlAttributeColorPointGYID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorPointGYID")
+    MTRClusterColorControlAttributeColorPointGYID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorPointGYID")
     = 0x00000037,
-    MTRClusterColorControlAttributeColorPointGIntensityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorPointGIntensityID")
+    MTRClusterColorControlAttributeColorPointGIntensityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorPointGIntensityID")
     = 0x00000038,
-    MTRClusterColorControlAttributeColorPointBXID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorPointBXID")
+    MTRClusterColorControlAttributeColorPointBXID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorPointBXID")
     = 0x0000003A,
-    MTRClusterColorControlAttributeColorPointBYID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorPointBYID")
+    MTRClusterColorControlAttributeColorPointBYID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorPointBYID")
     = 0x0000003B,
-    MTRClusterColorControlAttributeColorPointBIntensityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorPointBIntensityID")
+    MTRClusterColorControlAttributeColorPointBIntensityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorPointBIntensityID")
     = 0x0000003C,
-    MTRClusterColorControlAttributeEnhancedCurrentHueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeEnhancedCurrentHueID")
+    MTRClusterColorControlAttributeEnhancedCurrentHueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeEnhancedCurrentHueID")
     = 0x00004000,
-    MTRClusterColorControlAttributeEnhancedColorModeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeEnhancedColorModeID")
+    MTRClusterColorControlAttributeEnhancedColorModeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeEnhancedColorModeID")
     = 0x00004001,
-    MTRClusterColorControlAttributeColorLoopActiveID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorLoopActiveID")
+    MTRClusterColorControlAttributeColorLoopActiveID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorLoopActiveID")
     = 0x00004002,
-    MTRClusterColorControlAttributeColorLoopDirectionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorLoopDirectionID")
+    MTRClusterColorControlAttributeColorLoopDirectionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorLoopDirectionID")
     = 0x00004003,
-    MTRClusterColorControlAttributeColorLoopTimeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorLoopTimeID")
+    MTRClusterColorControlAttributeColorLoopTimeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorLoopTimeID")
     = 0x00004004,
-    MTRClusterColorControlAttributeColorLoopStartEnhancedHueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorLoopStartEnhancedHueID")
+    MTRClusterColorControlAttributeColorLoopStartEnhancedHueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorLoopStartEnhancedHueID")
     = 0x00004005,
-    MTRClusterColorControlAttributeColorLoopStoredEnhancedHueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorLoopStoredEnhancedHueID")
+    MTRClusterColorControlAttributeColorLoopStoredEnhancedHueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorLoopStoredEnhancedHueID")
     = 0x00004006,
-    MTRClusterColorControlAttributeColorCapabilitiesID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorCapabilitiesID")
+    MTRClusterColorControlAttributeColorCapabilitiesID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorCapabilitiesID")
     = 0x0000400A,
-    MTRClusterColorControlAttributeColorTempPhysicalMinMiredsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorTempPhysicalMinMiredsID")
+    MTRClusterColorControlAttributeColorTempPhysicalMinMiredsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorTempPhysicalMinMiredsID")
     = 0x0000400B,
-    MTRClusterColorControlAttributeColorTempPhysicalMaxMiredsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeColorTempPhysicalMaxMiredsID")
+    MTRClusterColorControlAttributeColorTempPhysicalMaxMiredsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeColorTempPhysicalMaxMiredsID")
     = 0x0000400C,
-    MTRClusterColorControlAttributeCoupleColorTempToLevelMinMiredsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeCoupleColorTempToLevelMinMiredsID")
+    MTRClusterColorControlAttributeCoupleColorTempToLevelMinMiredsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeCoupleColorTempToLevelMinMiredsID")
     = 0x0000400D,
-    MTRClusterColorControlAttributeStartUpColorTemperatureMiredsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeStartUpColorTemperatureMiredsID")
+    MTRClusterColorControlAttributeStartUpColorTemperatureMiredsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeStartUpColorTemperatureMiredsID")
     = 0x00004010,
-    MTRClusterColorControlAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeGeneratedCommandListID")
+    MTRClusterColorControlAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterColorControlAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeAcceptedCommandListID")
+    MTRClusterColorControlAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterColorControlAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeAttributeListID")
+    MTRClusterColorControlAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterColorControlAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeFeatureMapID")
+    MTRClusterColorControlAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterColorControlAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterColorControlAttributeClusterRevisionID")
+    MTRClusterColorControlAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterColorControlAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster ColorControl attributes
@@ -3480,62 +3717,62 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster BallastConfiguration deprecated attribute names
-    MTRClusterBallastConfigurationAttributePhysicalMinLevelID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributePhysicalMinLevelID")
+    MTRClusterBallastConfigurationAttributePhysicalMinLevelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributePhysicalMinLevelID")
     = 0x00000000,
-    MTRClusterBallastConfigurationAttributePhysicalMaxLevelID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributePhysicalMaxLevelID")
+    MTRClusterBallastConfigurationAttributePhysicalMaxLevelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributePhysicalMaxLevelID")
     = 0x00000001,
-    MTRClusterBallastConfigurationAttributeBallastStatusID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeBallastStatusID")
+    MTRClusterBallastConfigurationAttributeBallastStatusID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeBallastStatusID")
     = 0x00000002,
-    MTRClusterBallastConfigurationAttributeMinLevelID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeMinLevelID")
+    MTRClusterBallastConfigurationAttributeMinLevelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeMinLevelID")
     = 0x00000010,
-    MTRClusterBallastConfigurationAttributeMaxLevelID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeMaxLevelID")
+    MTRClusterBallastConfigurationAttributeMaxLevelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeMaxLevelID")
     = 0x00000011,
-    MTRClusterBallastConfigurationAttributeIntrinsicBalanceFactorID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBalanceFactorID")
+    MTRClusterBallastConfigurationAttributeIntrinsicBalanceFactorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeIntrinsicBalanceFactorID")
     = 0x00000014,
-    MTRClusterBallastConfigurationAttributeBallastFactorAdjustmentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeBallastFactorAdjustmentID")
+    MTRClusterBallastConfigurationAttributeBallastFactorAdjustmentID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeBallastFactorAdjustmentID")
     = 0x00000015,
-    MTRClusterBallastConfigurationAttributeLampQuantityID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeLampQuantityID")
+    MTRClusterBallastConfigurationAttributeLampQuantityID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeLampQuantityID")
     = 0x00000020,
-    MTRClusterBallastConfigurationAttributeLampTypeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeLampTypeID")
+    MTRClusterBallastConfigurationAttributeLampTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeLampTypeID")
     = 0x00000030,
-    MTRClusterBallastConfigurationAttributeLampManufacturerID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeLampManufacturerID")
+    MTRClusterBallastConfigurationAttributeLampManufacturerID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeLampManufacturerID")
     = 0x00000031,
-    MTRClusterBallastConfigurationAttributeLampRatedHoursID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeLampRatedHoursID")
+    MTRClusterBallastConfigurationAttributeLampRatedHoursID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeLampRatedHoursID")
     = 0x00000032,
-    MTRClusterBallastConfigurationAttributeLampBurnHoursID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeLampBurnHoursID")
+    MTRClusterBallastConfigurationAttributeLampBurnHoursID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeLampBurnHoursID")
     = 0x00000033,
-    MTRClusterBallastConfigurationAttributeLampAlarmModeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeLampAlarmModeID")
+    MTRClusterBallastConfigurationAttributeLampAlarmModeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeLampAlarmModeID")
     = 0x00000034,
-    MTRClusterBallastConfigurationAttributeLampBurnHoursTripPointID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeLampBurnHoursTripPointID")
+    MTRClusterBallastConfigurationAttributeLampBurnHoursTripPointID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeLampBurnHoursTripPointID")
     = 0x00000035,
-    MTRClusterBallastConfigurationAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeGeneratedCommandListID")
+    MTRClusterBallastConfigurationAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterBallastConfigurationAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeAcceptedCommandListID")
+    MTRClusterBallastConfigurationAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterBallastConfigurationAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeAttributeListID")
+    MTRClusterBallastConfigurationAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterBallastConfigurationAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeFeatureMapID")
+    MTRClusterBallastConfigurationAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterBallastConfigurationAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeClusterRevisionID")
+    MTRClusterBallastConfigurationAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBallastConfigurationAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster BallastConfiguration attributes
@@ -3565,35 +3802,35 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster IlluminanceMeasurement deprecated attribute names
-    MTRClusterIlluminanceMeasurementAttributeMeasuredValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeMeasuredValueID")
+    MTRClusterIlluminanceMeasurementAttributeMeasuredValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeMeasuredValueID")
     = 0x00000000,
-    MTRClusterIlluminanceMeasurementAttributeMinMeasuredValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeMinMeasuredValueID")
+    MTRClusterIlluminanceMeasurementAttributeMinMeasuredValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeMinMeasuredValueID")
     = 0x00000001,
-    MTRClusterIlluminanceMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeMaxMeasuredValueID")
+    MTRClusterIlluminanceMeasurementAttributeMaxMeasuredValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeMaxMeasuredValueID")
     = 0x00000002,
-    MTRClusterIlluminanceMeasurementAttributeToleranceID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeToleranceID")
+    MTRClusterIlluminanceMeasurementAttributeToleranceID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeToleranceID")
     = 0x00000003,
-    MTRClusterIlluminanceMeasurementAttributeLightSensorTypeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeLightSensorTypeID")
+    MTRClusterIlluminanceMeasurementAttributeLightSensorTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeLightSensorTypeID")
     = 0x00000004,
-    MTRClusterIlluminanceMeasurementAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeGeneratedCommandListID")
+    MTRClusterIlluminanceMeasurementAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterIlluminanceMeasurementAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeAcceptedCommandListID")
+    MTRClusterIlluminanceMeasurementAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterIlluminanceMeasurementAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeAttributeListID")
+    MTRClusterIlluminanceMeasurementAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterIlluminanceMeasurementAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeFeatureMapID")
+    MTRClusterIlluminanceMeasurementAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterIlluminanceMeasurementAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeClusterRevisionID")
+    MTRClusterIlluminanceMeasurementAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterIlluminanceMeasurementAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster IlluminanceMeasurement attributes
@@ -3614,32 +3851,32 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster TemperatureMeasurement deprecated attribute names
-    MTRClusterTemperatureMeasurementAttributeMeasuredValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMeasuredValueID")
+    MTRClusterTemperatureMeasurementAttributeMeasuredValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMeasuredValueID")
     = 0x00000000,
-    MTRClusterTemperatureMeasurementAttributeMinMeasuredValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMinMeasuredValueID")
+    MTRClusterTemperatureMeasurementAttributeMinMeasuredValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMinMeasuredValueID")
     = 0x00000001,
-    MTRClusterTemperatureMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMaxMeasuredValueID")
+    MTRClusterTemperatureMeasurementAttributeMaxMeasuredValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMaxMeasuredValueID")
     = 0x00000002,
-    MTRClusterTemperatureMeasurementAttributeToleranceID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTemperatureMeasurementAttributeToleranceID")
+    MTRClusterTemperatureMeasurementAttributeToleranceID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTemperatureMeasurementAttributeToleranceID")
     = 0x00000003,
-    MTRClusterTemperatureMeasurementAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTemperatureMeasurementAttributeGeneratedCommandListID")
+    MTRClusterTemperatureMeasurementAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTemperatureMeasurementAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterTemperatureMeasurementAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTemperatureMeasurementAttributeAcceptedCommandListID")
+    MTRClusterTemperatureMeasurementAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTemperatureMeasurementAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterTemperatureMeasurementAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTemperatureMeasurementAttributeAttributeListID")
+    MTRClusterTemperatureMeasurementAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTemperatureMeasurementAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterTemperatureMeasurementAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTemperatureMeasurementAttributeFeatureMapID")
+    MTRClusterTemperatureMeasurementAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTemperatureMeasurementAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterTemperatureMeasurementAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTemperatureMeasurementAttributeClusterRevisionID")
+    MTRClusterTemperatureMeasurementAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTemperatureMeasurementAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster TemperatureMeasurement attributes
@@ -3659,47 +3896,47 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster PressureMeasurement deprecated attribute names
-    MTRClusterPressureMeasurementAttributeMeasuredValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeMeasuredValueID")
+    MTRClusterPressureMeasurementAttributeMeasuredValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeMeasuredValueID")
     = 0x00000000,
-    MTRClusterPressureMeasurementAttributeMinMeasuredValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeMinMeasuredValueID")
+    MTRClusterPressureMeasurementAttributeMinMeasuredValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeMinMeasuredValueID")
     = 0x00000001,
-    MTRClusterPressureMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeMaxMeasuredValueID")
+    MTRClusterPressureMeasurementAttributeMaxMeasuredValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeMaxMeasuredValueID")
     = 0x00000002,
-    MTRClusterPressureMeasurementAttributeToleranceID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeToleranceID")
+    MTRClusterPressureMeasurementAttributeToleranceID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeToleranceID")
     = 0x00000003,
-    MTRClusterPressureMeasurementAttributeScaledValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeScaledValueID")
+    MTRClusterPressureMeasurementAttributeScaledValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeScaledValueID")
     = 0x00000010,
-    MTRClusterPressureMeasurementAttributeMinScaledValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeMinScaledValueID")
+    MTRClusterPressureMeasurementAttributeMinScaledValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeMinScaledValueID")
     = 0x00000011,
-    MTRClusterPressureMeasurementAttributeMaxScaledValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeMaxScaledValueID")
+    MTRClusterPressureMeasurementAttributeMaxScaledValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeMaxScaledValueID")
     = 0x00000012,
-    MTRClusterPressureMeasurementAttributeScaledToleranceID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeScaledToleranceID")
+    MTRClusterPressureMeasurementAttributeScaledToleranceID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeScaledToleranceID")
     = 0x00000013,
-    MTRClusterPressureMeasurementAttributeScaleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeScaleID")
+    MTRClusterPressureMeasurementAttributeScaleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeScaleID")
     = 0x00000014,
-    MTRClusterPressureMeasurementAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeGeneratedCommandListID")
+    MTRClusterPressureMeasurementAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterPressureMeasurementAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeAcceptedCommandListID")
+    MTRClusterPressureMeasurementAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterPressureMeasurementAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeAttributeListID")
+    MTRClusterPressureMeasurementAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterPressureMeasurementAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeFeatureMapID")
+    MTRClusterPressureMeasurementAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterPressureMeasurementAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeClusterRevisionID")
+    MTRClusterPressureMeasurementAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterPressureMeasurementAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster PressureMeasurement attributes
@@ -3724,32 +3961,32 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster FlowMeasurement deprecated attribute names
-    MTRClusterFlowMeasurementAttributeMeasuredValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFlowMeasurementAttributeMeasuredValueID")
+    MTRClusterFlowMeasurementAttributeMeasuredValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFlowMeasurementAttributeMeasuredValueID")
     = 0x00000000,
-    MTRClusterFlowMeasurementAttributeMinMeasuredValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFlowMeasurementAttributeMinMeasuredValueID")
+    MTRClusterFlowMeasurementAttributeMinMeasuredValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFlowMeasurementAttributeMinMeasuredValueID")
     = 0x00000001,
-    MTRClusterFlowMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFlowMeasurementAttributeMaxMeasuredValueID")
+    MTRClusterFlowMeasurementAttributeMaxMeasuredValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFlowMeasurementAttributeMaxMeasuredValueID")
     = 0x00000002,
-    MTRClusterFlowMeasurementAttributeToleranceID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFlowMeasurementAttributeToleranceID")
+    MTRClusterFlowMeasurementAttributeToleranceID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFlowMeasurementAttributeToleranceID")
     = 0x00000003,
-    MTRClusterFlowMeasurementAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFlowMeasurementAttributeGeneratedCommandListID")
+    MTRClusterFlowMeasurementAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFlowMeasurementAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterFlowMeasurementAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFlowMeasurementAttributeAcceptedCommandListID")
+    MTRClusterFlowMeasurementAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFlowMeasurementAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterFlowMeasurementAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFlowMeasurementAttributeAttributeListID")
+    MTRClusterFlowMeasurementAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFlowMeasurementAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterFlowMeasurementAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFlowMeasurementAttributeFeatureMapID")
+    MTRClusterFlowMeasurementAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFlowMeasurementAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterFlowMeasurementAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFlowMeasurementAttributeClusterRevisionID")
+    MTRClusterFlowMeasurementAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFlowMeasurementAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster FlowMeasurement attributes
@@ -3769,32 +4006,34 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster RelativeHumidityMeasurement deprecated attribute names
-    MTRClusterRelativeHumidityMeasurementAttributeMeasuredValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeMeasuredValueID")
+    MTRClusterRelativeHumidityMeasurementAttributeMeasuredValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeMeasuredValueID")
     = 0x00000000,
-    MTRClusterRelativeHumidityMeasurementAttributeMinMeasuredValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeMinMeasuredValueID")
+    MTRClusterRelativeHumidityMeasurementAttributeMinMeasuredValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeMinMeasuredValueID")
     = 0x00000001,
-    MTRClusterRelativeHumidityMeasurementAttributeMaxMeasuredValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeMaxMeasuredValueID")
+    MTRClusterRelativeHumidityMeasurementAttributeMaxMeasuredValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeMaxMeasuredValueID")
     = 0x00000002,
-    MTRClusterRelativeHumidityMeasurementAttributeToleranceID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeToleranceID")
+    MTRClusterRelativeHumidityMeasurementAttributeToleranceID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeToleranceID")
     = 0x00000003,
-    MTRClusterRelativeHumidityMeasurementAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeGeneratedCommandListID")
+    MTRClusterRelativeHumidityMeasurementAttributeGeneratedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterRelativeHumidityMeasurementAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeAcceptedCommandListID")
+    MTRClusterRelativeHumidityMeasurementAttributeAcceptedCommandListID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterRelativeHumidityMeasurementAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeAttributeListID")
+    MTRClusterRelativeHumidityMeasurementAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterRelativeHumidityMeasurementAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeFeatureMapID")
+    MTRClusterRelativeHumidityMeasurementAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterRelativeHumidityMeasurementAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeClusterRevisionID")
+    MTRClusterRelativeHumidityMeasurementAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterRelativeHumidityMeasurementAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster RelativeHumidityMeasurement attributes
@@ -3814,56 +4053,69 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster OccupancySensing deprecated attribute names
-    MTRClusterOccupancySensingAttributeOccupancyID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancyID")
+    MTRClusterOccupancySensingAttributeOccupancyID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancyID")
     = 0x00000000,
-    MTRClusterOccupancySensingAttributeOccupancySensorTypeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancySensorTypeID")
+    MTRClusterOccupancySensingAttributeOccupancySensorTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancySensorTypeID")
     = 0x00000001,
-    MTRClusterOccupancySensingAttributeOccupancySensorTypeBitmapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancySensorTypeBitmapID")
+    MTRClusterOccupancySensingAttributeOccupancySensorTypeBitmapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributeOccupancySensorTypeBitmapID")
     = 0x00000002,
-    MTRClusterOccupancySensingAttributePirOccupiedToUnoccupiedDelayID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOccupancySensingAttributePirOccupiedToUnoccupiedDelayID")
+    MTRClusterOccupancySensingAttributePirOccupiedToUnoccupiedDelayID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributePirOccupiedToUnoccupiedDelayID")
     = 0x00000010,
-    MTRClusterOccupancySensingAttributePirUnoccupiedToOccupiedDelayID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedDelayID")
+    MTRClusterOccupancySensingAttributePirUnoccupiedToOccupiedDelayID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedDelayID")
     = 0x00000011,
-    MTRClusterOccupancySensingAttributePirUnoccupiedToOccupiedThresholdID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedThresholdID")
+    MTRClusterOccupancySensingAttributePirUnoccupiedToOccupiedThresholdID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributePirUnoccupiedToOccupiedThresholdID")
     = 0x00000012,
-    MTRClusterOccupancySensingAttributeUltrasonicOccupiedToUnoccupiedDelayID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicOccupiedToUnoccupiedDelayID")
+    MTRClusterOccupancySensingAttributeUltrasonicOccupiedToUnoccupiedDelayID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicOccupiedToUnoccupiedDelayID")
     = 0x00000020,
-    MTRClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedDelayID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedDelayID")
+    MTRClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedDelayID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedDelayID")
     = 0x00000021,
-    MTRClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedThresholdID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedThresholdID")
+    MTRClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedThresholdID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterOccupancySensingAttributeUltrasonicUnoccupiedToOccupiedThresholdID")
     = 0x00000022,
-    MTRClusterOccupancySensingAttributePhysicalContactOccupiedToUnoccupiedDelayID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOccupancySensingAttributePhysicalContactOccupiedToUnoccupiedDelayID")
+    MTRClusterOccupancySensingAttributePhysicalContactOccupiedToUnoccupiedDelayID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterOccupancySensingAttributePhysicalContactOccupiedToUnoccupiedDelayID")
     = 0x00000030,
-    MTRClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedDelayID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedDelayID")
+    MTRClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedDelayID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedDelayID")
     = 0x00000031,
-    MTRClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedThresholdID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedThresholdID")
+    MTRClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedThresholdID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterOccupancySensingAttributePhysicalContactUnoccupiedToOccupiedThresholdID")
     = 0x00000032,
-    MTRClusterOccupancySensingAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOccupancySensingAttributeGeneratedCommandListID")
+    MTRClusterOccupancySensingAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterOccupancySensingAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOccupancySensingAttributeAcceptedCommandListID")
+    MTRClusterOccupancySensingAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterOccupancySensingAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOccupancySensingAttributeAttributeListID")
+    MTRClusterOccupancySensingAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterOccupancySensingAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOccupancySensingAttributeFeatureMapID")
+    MTRClusterOccupancySensingAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterOccupancySensingAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterOccupancySensingAttributeClusterRevisionID")
+    MTRClusterOccupancySensingAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOccupancySensingAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster OccupancySensing attributes
@@ -3892,23 +4144,23 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster WakeOnLan deprecated attribute names
-    MTRClusterWakeOnLanAttributeMACAddressID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWakeOnLanAttributeMACAddressID")
+    MTRClusterWakeOnLanAttributeMACAddressID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLanAttributeMACAddressID")
     = 0x00000000,
-    MTRClusterWakeOnLanAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWakeOnLanAttributeGeneratedCommandListID")
+    MTRClusterWakeOnLanAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLanAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterWakeOnLanAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWakeOnLanAttributeAcceptedCommandListID")
+    MTRClusterWakeOnLanAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLanAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterWakeOnLanAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWakeOnLanAttributeAttributeListID")
+    MTRClusterWakeOnLanAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLanAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterWakeOnLanAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWakeOnLanAttributeFeatureMapID")
+    MTRClusterWakeOnLanAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLanAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterWakeOnLanAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterWakeOnLanAttributeClusterRevisionID")
+    MTRClusterWakeOnLanAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWakeOnLanAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster WakeOnLAN attributes
@@ -3924,27 +4176,29 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster Channel deprecated attribute names
-    MTRClusterChannelAttributeChannelListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterChannelAttributeChannelListID")
+    MTRClusterChannelAttributeChannelListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterChannelAttributeChannelListID")
     = 0x00000000,
-    MTRClusterChannelAttributeLineupID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterChannelAttributeLineupID")
+    MTRClusterChannelAttributeLineupID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterChannelAttributeLineupID")
     = 0x00000001,
-    MTRClusterChannelAttributeCurrentChannelID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterChannelAttributeCurrentChannelID")
+    MTRClusterChannelAttributeCurrentChannelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterChannelAttributeCurrentChannelID")
     = 0x00000002,
-    MTRClusterChannelAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterChannelAttributeGeneratedCommandListID")
+    MTRClusterChannelAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterChannelAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterChannelAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterChannelAttributeAcceptedCommandListID")
+    MTRClusterChannelAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterChannelAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterChannelAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterChannelAttributeAttributeListID")
+    MTRClusterChannelAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterChannelAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterChannelAttributeFeatureMapID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterChannelAttributeFeatureMapID")
+    MTRClusterChannelAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterChannelAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterChannelAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterChannelAttributeClusterRevisionID")
+    MTRClusterChannelAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterChannelAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster Channel attributes
@@ -3961,26 +4215,26 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster TargetNavigator deprecated attribute names
-    MTRClusterTargetNavigatorAttributeTargetListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTargetNavigatorAttributeTargetListID")
+    MTRClusterTargetNavigatorAttributeTargetListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTargetNavigatorAttributeTargetListID")
     = 0x00000000,
-    MTRClusterTargetNavigatorAttributeCurrentTargetID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTargetNavigatorAttributeCurrentTargetID")
+    MTRClusterTargetNavigatorAttributeCurrentTargetID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTargetNavigatorAttributeCurrentTargetID")
     = 0x00000001,
-    MTRClusterTargetNavigatorAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTargetNavigatorAttributeGeneratedCommandListID")
+    MTRClusterTargetNavigatorAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTargetNavigatorAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterTargetNavigatorAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTargetNavigatorAttributeAcceptedCommandListID")
+    MTRClusterTargetNavigatorAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTargetNavigatorAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterTargetNavigatorAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTargetNavigatorAttributeAttributeListID")
+    MTRClusterTargetNavigatorAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTargetNavigatorAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterTargetNavigatorAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTargetNavigatorAttributeFeatureMapID")
+    MTRClusterTargetNavigatorAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTargetNavigatorAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterTargetNavigatorAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTargetNavigatorAttributeClusterRevisionID")
+    MTRClusterTargetNavigatorAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterTargetNavigatorAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster TargetNavigator attributes
@@ -3998,41 +4252,41 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster MediaPlayback deprecated attribute names
-    MTRClusterMediaPlaybackAttributeCurrentStateID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeCurrentStateID")
+    MTRClusterMediaPlaybackAttributeCurrentStateID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeCurrentStateID")
     = 0x00000000,
-    MTRClusterMediaPlaybackAttributeStartTimeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeStartTimeID")
+    MTRClusterMediaPlaybackAttributeStartTimeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeStartTimeID")
     = 0x00000001,
-    MTRClusterMediaPlaybackAttributeDurationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeDurationID")
+    MTRClusterMediaPlaybackAttributeDurationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeDurationID")
     = 0x00000002,
-    MTRClusterMediaPlaybackAttributeSampledPositionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeSampledPositionID")
+    MTRClusterMediaPlaybackAttributeSampledPositionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeSampledPositionID")
     = 0x00000003,
-    MTRClusterMediaPlaybackAttributePlaybackSpeedID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaPlaybackAttributePlaybackSpeedID")
+    MTRClusterMediaPlaybackAttributePlaybackSpeedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaPlaybackAttributePlaybackSpeedID")
     = 0x00000004,
-    MTRClusterMediaPlaybackAttributeSeekRangeEndID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeSeekRangeEndID")
+    MTRClusterMediaPlaybackAttributeSeekRangeEndID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeSeekRangeEndID")
     = 0x00000005,
-    MTRClusterMediaPlaybackAttributeSeekRangeStartID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeSeekRangeStartID")
+    MTRClusterMediaPlaybackAttributeSeekRangeStartID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeSeekRangeStartID")
     = 0x00000006,
-    MTRClusterMediaPlaybackAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeGeneratedCommandListID")
+    MTRClusterMediaPlaybackAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterMediaPlaybackAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeAcceptedCommandListID")
+    MTRClusterMediaPlaybackAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterMediaPlaybackAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeAttributeListID")
+    MTRClusterMediaPlaybackAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterMediaPlaybackAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeFeatureMapID")
+    MTRClusterMediaPlaybackAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterMediaPlaybackAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeClusterRevisionID")
+    MTRClusterMediaPlaybackAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaPlaybackAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster MediaPlayback attributes
@@ -4054,26 +4308,26 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster MediaInput deprecated attribute names
-    MTRClusterMediaInputAttributeInputListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaInputAttributeInputListID")
+    MTRClusterMediaInputAttributeInputListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaInputAttributeInputListID")
     = 0x00000000,
-    MTRClusterMediaInputAttributeCurrentInputID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaInputAttributeCurrentInputID")
+    MTRClusterMediaInputAttributeCurrentInputID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaInputAttributeCurrentInputID")
     = 0x00000001,
-    MTRClusterMediaInputAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaInputAttributeGeneratedCommandListID")
+    MTRClusterMediaInputAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaInputAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterMediaInputAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaInputAttributeAcceptedCommandListID")
+    MTRClusterMediaInputAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaInputAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterMediaInputAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaInputAttributeAttributeListID")
+    MTRClusterMediaInputAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaInputAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterMediaInputAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaInputAttributeFeatureMapID")
+    MTRClusterMediaInputAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaInputAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterMediaInputAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterMediaInputAttributeClusterRevisionID")
+    MTRClusterMediaInputAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterMediaInputAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster MediaInput attributes
@@ -4090,20 +4344,20 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster LowPower deprecated attribute names
-    MTRClusterLowPowerAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLowPowerAttributeGeneratedCommandListID")
+    MTRClusterLowPowerAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLowPowerAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterLowPowerAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLowPowerAttributeAcceptedCommandListID")
+    MTRClusterLowPowerAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLowPowerAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterLowPowerAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLowPowerAttributeAttributeListID")
+    MTRClusterLowPowerAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLowPowerAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterLowPowerAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLowPowerAttributeFeatureMapID")
+    MTRClusterLowPowerAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLowPowerAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterLowPowerAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterLowPowerAttributeClusterRevisionID")
+    MTRClusterLowPowerAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterLowPowerAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster LowPower attributes
@@ -4118,20 +4372,20 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster KeypadInput deprecated attribute names
-    MTRClusterKeypadInputAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterKeypadInputAttributeGeneratedCommandListID")
+    MTRClusterKeypadInputAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterKeypadInputAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterKeypadInputAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterKeypadInputAttributeAcceptedCommandListID")
+    MTRClusterKeypadInputAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterKeypadInputAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterKeypadInputAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterKeypadInputAttributeAttributeListID")
+    MTRClusterKeypadInputAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterKeypadInputAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterKeypadInputAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterKeypadInputAttributeFeatureMapID")
+    MTRClusterKeypadInputAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterKeypadInputAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterKeypadInputAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterKeypadInputAttributeClusterRevisionID")
+    MTRClusterKeypadInputAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterKeypadInputAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster KeypadInput attributes
@@ -4146,26 +4400,26 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ContentLauncher deprecated attribute names
-    MTRClusterContentLauncherAttributeAcceptHeaderID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterContentLauncherAttributeAcceptHeaderID")
+    MTRClusterContentLauncherAttributeAcceptHeaderID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterContentLauncherAttributeAcceptHeaderID")
     = 0x00000000,
-    MTRClusterContentLauncherAttributeSupportedStreamingProtocolsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterContentLauncherAttributeSupportedStreamingProtocolsID")
+    MTRClusterContentLauncherAttributeSupportedStreamingProtocolsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterContentLauncherAttributeSupportedStreamingProtocolsID")
     = 0x00000001,
-    MTRClusterContentLauncherAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterContentLauncherAttributeGeneratedCommandListID")
+    MTRClusterContentLauncherAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterContentLauncherAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterContentLauncherAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterContentLauncherAttributeAcceptedCommandListID")
+    MTRClusterContentLauncherAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterContentLauncherAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterContentLauncherAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterContentLauncherAttributeAttributeListID")
+    MTRClusterContentLauncherAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterContentLauncherAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterContentLauncherAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterContentLauncherAttributeFeatureMapID")
+    MTRClusterContentLauncherAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterContentLauncherAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterContentLauncherAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterContentLauncherAttributeClusterRevisionID")
+    MTRClusterContentLauncherAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterContentLauncherAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster ContentLauncher attributes
@@ -4183,26 +4437,26 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster AudioOutput deprecated attribute names
-    MTRClusterAudioOutputAttributeOutputListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAudioOutputAttributeOutputListID")
+    MTRClusterAudioOutputAttributeOutputListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAudioOutputAttributeOutputListID")
     = 0x00000000,
-    MTRClusterAudioOutputAttributeCurrentOutputID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAudioOutputAttributeCurrentOutputID")
+    MTRClusterAudioOutputAttributeCurrentOutputID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAudioOutputAttributeCurrentOutputID")
     = 0x00000001,
-    MTRClusterAudioOutputAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAudioOutputAttributeGeneratedCommandListID")
+    MTRClusterAudioOutputAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAudioOutputAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterAudioOutputAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAudioOutputAttributeAcceptedCommandListID")
+    MTRClusterAudioOutputAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAudioOutputAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterAudioOutputAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAudioOutputAttributeAttributeListID")
+    MTRClusterAudioOutputAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAudioOutputAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterAudioOutputAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAudioOutputAttributeFeatureMapID")
+    MTRClusterAudioOutputAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAudioOutputAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterAudioOutputAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAudioOutputAttributeClusterRevisionID")
+    MTRClusterAudioOutputAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAudioOutputAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster AudioOutput attributes
@@ -4219,26 +4473,26 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ApplicationLauncher deprecated attribute names
-    MTRClusterApplicationLauncherAttributeCatalogListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationLauncherAttributeCatalogListID")
+    MTRClusterApplicationLauncherAttributeCatalogListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationLauncherAttributeCatalogListID")
     = 0x00000000,
-    MTRClusterApplicationLauncherAttributeCurrentAppID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationLauncherAttributeCurrentAppID")
+    MTRClusterApplicationLauncherAttributeCurrentAppID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationLauncherAttributeCurrentAppID")
     = 0x00000001,
-    MTRClusterApplicationLauncherAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationLauncherAttributeGeneratedCommandListID")
+    MTRClusterApplicationLauncherAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationLauncherAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterApplicationLauncherAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationLauncherAttributeAcceptedCommandListID")
+    MTRClusterApplicationLauncherAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationLauncherAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterApplicationLauncherAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationLauncherAttributeAttributeListID")
+    MTRClusterApplicationLauncherAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationLauncherAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterApplicationLauncherAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationLauncherAttributeFeatureMapID")
+    MTRClusterApplicationLauncherAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationLauncherAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterApplicationLauncherAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationLauncherAttributeClusterRevisionID")
+    MTRClusterApplicationLauncherAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationLauncherAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster ApplicationLauncher attributes
@@ -4256,44 +4510,44 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ApplicationBasic deprecated attribute names
-    MTRClusterApplicationBasicAttributeVendorNameID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationBasicAttributeVendorNameID")
+    MTRClusterApplicationBasicAttributeVendorNameID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationBasicAttributeVendorNameID")
     = 0x00000000,
-    MTRClusterApplicationBasicAttributeVendorIDID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationBasicAttributeVendorIDID")
+    MTRClusterApplicationBasicAttributeVendorIDID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationBasicAttributeVendorIDID")
     = 0x00000001,
-    MTRClusterApplicationBasicAttributeApplicationNameID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationBasicAttributeApplicationNameID")
+    MTRClusterApplicationBasicAttributeApplicationNameID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationBasicAttributeApplicationNameID")
     = 0x00000002,
-    MTRClusterApplicationBasicAttributeProductIDID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationBasicAttributeProductIDID")
+    MTRClusterApplicationBasicAttributeProductIDID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationBasicAttributeProductIDID")
     = 0x00000003,
-    MTRClusterApplicationBasicAttributeApplicationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationBasicAttributeApplicationID")
+    MTRClusterApplicationBasicAttributeApplicationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationBasicAttributeApplicationID")
     = 0x00000004,
-    MTRClusterApplicationBasicAttributeStatusID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationBasicAttributeStatusID")
+    MTRClusterApplicationBasicAttributeStatusID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationBasicAttributeStatusID")
     = 0x00000005,
-    MTRClusterApplicationBasicAttributeApplicationVersionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationBasicAttributeApplicationVersionID")
+    MTRClusterApplicationBasicAttributeApplicationVersionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationBasicAttributeApplicationVersionID")
     = 0x00000006,
-    MTRClusterApplicationBasicAttributeAllowedVendorListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationBasicAttributeAllowedVendorListID")
+    MTRClusterApplicationBasicAttributeAllowedVendorListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationBasicAttributeAllowedVendorListID")
     = 0x00000007,
-    MTRClusterApplicationBasicAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationBasicAttributeGeneratedCommandListID")
+    MTRClusterApplicationBasicAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationBasicAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterApplicationBasicAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationBasicAttributeAcceptedCommandListID")
+    MTRClusterApplicationBasicAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationBasicAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterApplicationBasicAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationBasicAttributeAttributeListID")
+    MTRClusterApplicationBasicAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationBasicAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterApplicationBasicAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationBasicAttributeFeatureMapID")
+    MTRClusterApplicationBasicAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationBasicAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterApplicationBasicAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterApplicationBasicAttributeClusterRevisionID")
+    MTRClusterApplicationBasicAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterApplicationBasicAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster ApplicationBasic attributes
@@ -4317,20 +4571,20 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster AccountLogin deprecated attribute names
-    MTRClusterAccountLoginAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAccountLoginAttributeGeneratedCommandListID")
+    MTRClusterAccountLoginAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccountLoginAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterAccountLoginAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAccountLoginAttributeAcceptedCommandListID")
+    MTRClusterAccountLoginAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccountLoginAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterAccountLoginAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAccountLoginAttributeAttributeListID")
+    MTRClusterAccountLoginAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccountLoginAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterAccountLoginAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAccountLoginAttributeFeatureMapID")
+    MTRClusterAccountLoginAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccountLoginAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterAccountLoginAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterAccountLoginAttributeClusterRevisionID")
+    MTRClusterAccountLoginAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterAccountLoginAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster AccountLogin attributes
@@ -4345,404 +4599,451 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ElectricalMeasurement deprecated attribute names
-    MTRClusterElectricalMeasurementAttributeMeasurementTypeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasurementTypeID")
+    MTRClusterElectricalMeasurementAttributeMeasurementTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasurementTypeID")
     = 0x00000000,
-    MTRClusterElectricalMeasurementAttributeDcVoltageID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageID")
+    MTRClusterElectricalMeasurementAttributeDcVoltageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageID")
     = 0x00000100,
-    MTRClusterElectricalMeasurementAttributeDcVoltageMinID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMinID")
+    MTRClusterElectricalMeasurementAttributeDcVoltageMinID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMinID")
     = 0x00000101,
-    MTRClusterElectricalMeasurementAttributeDcVoltageMaxID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMaxID")
+    MTRClusterElectricalMeasurementAttributeDcVoltageMaxID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMaxID")
     = 0x00000102,
-    MTRClusterElectricalMeasurementAttributeDcCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentID")
+    MTRClusterElectricalMeasurementAttributeDcCurrentID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentID")
     = 0x00000103,
-    MTRClusterElectricalMeasurementAttributeDcCurrentMinID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMinID")
+    MTRClusterElectricalMeasurementAttributeDcCurrentMinID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMinID")
     = 0x00000104,
-    MTRClusterElectricalMeasurementAttributeDcCurrentMaxID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMaxID")
+    MTRClusterElectricalMeasurementAttributeDcCurrentMaxID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMaxID")
     = 0x00000105,
-    MTRClusterElectricalMeasurementAttributeDcPowerID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerID")
+    MTRClusterElectricalMeasurementAttributeDcPowerID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerID")
     = 0x00000106,
-    MTRClusterElectricalMeasurementAttributeDcPowerMinID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMinID")
+    MTRClusterElectricalMeasurementAttributeDcPowerMinID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMinID")
     = 0x00000107,
-    MTRClusterElectricalMeasurementAttributeDcPowerMaxID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMaxID")
+    MTRClusterElectricalMeasurementAttributeDcPowerMaxID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMaxID")
     = 0x00000108,
-    MTRClusterElectricalMeasurementAttributeDcVoltageMultiplierID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMultiplierID")
+    MTRClusterElectricalMeasurementAttributeDcVoltageMultiplierID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMultiplierID")
     = 0x00000200,
-    MTRClusterElectricalMeasurementAttributeDcVoltageDivisorID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageDivisorID")
+    MTRClusterElectricalMeasurementAttributeDcVoltageDivisorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageDivisorID")
     = 0x00000201,
-    MTRClusterElectricalMeasurementAttributeDcCurrentMultiplierID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMultiplierID")
+    MTRClusterElectricalMeasurementAttributeDcCurrentMultiplierID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMultiplierID")
     = 0x00000202,
-    MTRClusterElectricalMeasurementAttributeDcCurrentDivisorID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentDivisorID")
+    MTRClusterElectricalMeasurementAttributeDcCurrentDivisorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentDivisorID")
     = 0x00000203,
-    MTRClusterElectricalMeasurementAttributeDcPowerMultiplierID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMultiplierID")
+    MTRClusterElectricalMeasurementAttributeDcPowerMultiplierID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMultiplierID")
     = 0x00000204,
-    MTRClusterElectricalMeasurementAttributeDcPowerDivisorID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerDivisorID")
+    MTRClusterElectricalMeasurementAttributeDcPowerDivisorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerDivisorID")
     = 0x00000205,
-    MTRClusterElectricalMeasurementAttributeAcFrequencyID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyID")
+    MTRClusterElectricalMeasurementAttributeAcFrequencyID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyID")
     = 0x00000300,
-    MTRClusterElectricalMeasurementAttributeAcFrequencyMinID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMinID")
+    MTRClusterElectricalMeasurementAttributeAcFrequencyMinID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMinID")
     = 0x00000301,
-    MTRClusterElectricalMeasurementAttributeAcFrequencyMaxID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMaxID")
+    MTRClusterElectricalMeasurementAttributeAcFrequencyMaxID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMaxID")
     = 0x00000302,
-    MTRClusterElectricalMeasurementAttributeNeutralCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeNeutralCurrentID")
+    MTRClusterElectricalMeasurementAttributeNeutralCurrentID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeNeutralCurrentID")
     = 0x00000303,
-    MTRClusterElectricalMeasurementAttributeTotalActivePowerID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalActivePowerID")
+    MTRClusterElectricalMeasurementAttributeTotalActivePowerID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalActivePowerID")
     = 0x00000304,
-    MTRClusterElectricalMeasurementAttributeTotalReactivePowerID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalReactivePowerID")
+    MTRClusterElectricalMeasurementAttributeTotalReactivePowerID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalReactivePowerID")
     = 0x00000305,
-    MTRClusterElectricalMeasurementAttributeTotalApparentPowerID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalApparentPowerID")
+    MTRClusterElectricalMeasurementAttributeTotalApparentPowerID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalApparentPowerID")
     = 0x00000306,
-    MTRClusterElectricalMeasurementAttributeMeasured1stHarmonicCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured1stHarmonicCurrentID")
+    MTRClusterElectricalMeasurementAttributeMeasured1stHarmonicCurrentID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured1stHarmonicCurrentID")
     = 0x00000307,
-    MTRClusterElectricalMeasurementAttributeMeasured3rdHarmonicCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured3rdHarmonicCurrentID")
+    MTRClusterElectricalMeasurementAttributeMeasured3rdHarmonicCurrentID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured3rdHarmonicCurrentID")
     = 0x00000308,
-    MTRClusterElectricalMeasurementAttributeMeasured5thHarmonicCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured5thHarmonicCurrentID")
+    MTRClusterElectricalMeasurementAttributeMeasured5thHarmonicCurrentID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured5thHarmonicCurrentID")
     = 0x00000309,
-    MTRClusterElectricalMeasurementAttributeMeasured7thHarmonicCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured7thHarmonicCurrentID")
+    MTRClusterElectricalMeasurementAttributeMeasured7thHarmonicCurrentID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured7thHarmonicCurrentID")
     = 0x0000030A,
-    MTRClusterElectricalMeasurementAttributeMeasured9thHarmonicCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured9thHarmonicCurrentID")
+    MTRClusterElectricalMeasurementAttributeMeasured9thHarmonicCurrentID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured9thHarmonicCurrentID")
     = 0x0000030B,
-    MTRClusterElectricalMeasurementAttributeMeasured11thHarmonicCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured11thHarmonicCurrentID")
+    MTRClusterElectricalMeasurementAttributeMeasured11thHarmonicCurrentID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured11thHarmonicCurrentID")
     = 0x0000030C,
-    MTRClusterElectricalMeasurementAttributeMeasuredPhase1stHarmonicCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase1stHarmonicCurrentID")
+    MTRClusterElectricalMeasurementAttributeMeasuredPhase1stHarmonicCurrentID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase1stHarmonicCurrentID")
     = 0x0000030D,
-    MTRClusterElectricalMeasurementAttributeMeasuredPhase3rdHarmonicCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase3rdHarmonicCurrentID")
+    MTRClusterElectricalMeasurementAttributeMeasuredPhase3rdHarmonicCurrentID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase3rdHarmonicCurrentID")
     = 0x0000030E,
-    MTRClusterElectricalMeasurementAttributeMeasuredPhase5thHarmonicCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase5thHarmonicCurrentID")
+    MTRClusterElectricalMeasurementAttributeMeasuredPhase5thHarmonicCurrentID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase5thHarmonicCurrentID")
     = 0x0000030F,
-    MTRClusterElectricalMeasurementAttributeMeasuredPhase7thHarmonicCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase7thHarmonicCurrentID")
+    MTRClusterElectricalMeasurementAttributeMeasuredPhase7thHarmonicCurrentID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase7thHarmonicCurrentID")
     = 0x00000310,
-    MTRClusterElectricalMeasurementAttributeMeasuredPhase9thHarmonicCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase9thHarmonicCurrentID")
+    MTRClusterElectricalMeasurementAttributeMeasuredPhase9thHarmonicCurrentID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase9thHarmonicCurrentID")
     = 0x00000311,
-    MTRClusterElectricalMeasurementAttributeMeasuredPhase11thHarmonicCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase11thHarmonicCurrentID")
+    MTRClusterElectricalMeasurementAttributeMeasuredPhase11thHarmonicCurrentID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase11thHarmonicCurrentID")
     = 0x00000312,
-    MTRClusterElectricalMeasurementAttributeAcFrequencyMultiplierID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMultiplierID")
+    MTRClusterElectricalMeasurementAttributeAcFrequencyMultiplierID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMultiplierID")
     = 0x00000400,
-    MTRClusterElectricalMeasurementAttributeAcFrequencyDivisorID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyDivisorID")
+    MTRClusterElectricalMeasurementAttributeAcFrequencyDivisorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyDivisorID")
     = 0x00000401,
-    MTRClusterElectricalMeasurementAttributePowerMultiplierID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerMultiplierID")
+    MTRClusterElectricalMeasurementAttributePowerMultiplierID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerMultiplierID")
     = 0x00000402,
-    MTRClusterElectricalMeasurementAttributePowerDivisorID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerDivisorID")
+    MTRClusterElectricalMeasurementAttributePowerDivisorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerDivisorID")
     = 0x00000403,
-    MTRClusterElectricalMeasurementAttributeHarmonicCurrentMultiplierID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeHarmonicCurrentMultiplierID")
+    MTRClusterElectricalMeasurementAttributeHarmonicCurrentMultiplierID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeHarmonicCurrentMultiplierID")
     = 0x00000404,
-    MTRClusterElectricalMeasurementAttributePhaseHarmonicCurrentMultiplierID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributePhaseHarmonicCurrentMultiplierID")
+    MTRClusterElectricalMeasurementAttributePhaseHarmonicCurrentMultiplierID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributePhaseHarmonicCurrentMultiplierID")
     = 0x00000405,
-    MTRClusterElectricalMeasurementAttributeInstantaneousVoltageID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousVoltageID")
+    MTRClusterElectricalMeasurementAttributeInstantaneousVoltageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousVoltageID")
     = 0x00000500,
-    MTRClusterElectricalMeasurementAttributeInstantaneousLineCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousLineCurrentID")
+    MTRClusterElectricalMeasurementAttributeInstantaneousLineCurrentID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousLineCurrentID")
     = 0x00000501,
-    MTRClusterElectricalMeasurementAttributeInstantaneousActiveCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousActiveCurrentID")
+    MTRClusterElectricalMeasurementAttributeInstantaneousActiveCurrentID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousActiveCurrentID")
     = 0x00000502,
-    MTRClusterElectricalMeasurementAttributeInstantaneousReactiveCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousReactiveCurrentID")
+    MTRClusterElectricalMeasurementAttributeInstantaneousReactiveCurrentID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousReactiveCurrentID")
     = 0x00000503,
-    MTRClusterElectricalMeasurementAttributeInstantaneousPowerID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousPowerID")
+    MTRClusterElectricalMeasurementAttributeInstantaneousPowerID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousPowerID")
     = 0x00000504,
-    MTRClusterElectricalMeasurementAttributeRmsVoltageID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageID")
+    MTRClusterElectricalMeasurementAttributeRmsVoltageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageID")
     = 0x00000505,
-    MTRClusterElectricalMeasurementAttributeRmsVoltageMinID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinID")
+    MTRClusterElectricalMeasurementAttributeRmsVoltageMinID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinID")
     = 0x00000506,
-    MTRClusterElectricalMeasurementAttributeRmsVoltageMaxID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxID")
+    MTRClusterElectricalMeasurementAttributeRmsVoltageMaxID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxID")
     = 0x00000507,
-    MTRClusterElectricalMeasurementAttributeRmsCurrentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentID")
+    MTRClusterElectricalMeasurementAttributeRmsCurrentID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentID")
     = 0x00000508,
-    MTRClusterElectricalMeasurementAttributeRmsCurrentMinID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinID")
+    MTRClusterElectricalMeasurementAttributeRmsCurrentMinID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinID")
     = 0x00000509,
-    MTRClusterElectricalMeasurementAttributeRmsCurrentMaxID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxID")
+    MTRClusterElectricalMeasurementAttributeRmsCurrentMaxID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxID")
     = 0x0000050A,
-    MTRClusterElectricalMeasurementAttributeActivePowerID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerID")
+    MTRClusterElectricalMeasurementAttributeActivePowerID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerID")
     = 0x0000050B,
-    MTRClusterElectricalMeasurementAttributeActivePowerMinID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinID")
+    MTRClusterElectricalMeasurementAttributeActivePowerMinID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinID")
     = 0x0000050C,
-    MTRClusterElectricalMeasurementAttributeActivePowerMaxID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxID")
+    MTRClusterElectricalMeasurementAttributeActivePowerMaxID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxID")
     = 0x0000050D,
-    MTRClusterElectricalMeasurementAttributeReactivePowerID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerID")
+    MTRClusterElectricalMeasurementAttributeReactivePowerID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerID")
     = 0x0000050E,
-    MTRClusterElectricalMeasurementAttributeApparentPowerID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerID")
+    MTRClusterElectricalMeasurementAttributeApparentPowerID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerID")
     = 0x0000050F,
-    MTRClusterElectricalMeasurementAttributePowerFactorID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorID")
+    MTRClusterElectricalMeasurementAttributePowerFactorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorID")
     = 0x00000510,
-    MTRClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodID")
+    MTRClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodID")
     = 0x00000511,
-    MTRClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterID")
+    MTRClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterID")
     = 0x00000513,
-    MTRClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodID")
+    MTRClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodID")
     = 0x00000514,
-    MTRClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodID")
+    MTRClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodID")
     = 0x00000515,
-    MTRClusterElectricalMeasurementAttributeRmsVoltageSagPeriodID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodID")
+    MTRClusterElectricalMeasurementAttributeRmsVoltageSagPeriodID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodID")
     = 0x00000516,
-    MTRClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodID")
+    MTRClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodID")
     = 0x00000517,
-    MTRClusterElectricalMeasurementAttributeAcVoltageMultiplierID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageMultiplierID")
+    MTRClusterElectricalMeasurementAttributeAcVoltageMultiplierID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageMultiplierID")
     = 0x00000600,
-    MTRClusterElectricalMeasurementAttributeAcVoltageDivisorID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageDivisorID")
+    MTRClusterElectricalMeasurementAttributeAcVoltageDivisorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageDivisorID")
     = 0x00000601,
-    MTRClusterElectricalMeasurementAttributeAcCurrentMultiplierID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentMultiplierID")
+    MTRClusterElectricalMeasurementAttributeAcCurrentMultiplierID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentMultiplierID")
     = 0x00000602,
-    MTRClusterElectricalMeasurementAttributeAcCurrentDivisorID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentDivisorID")
+    MTRClusterElectricalMeasurementAttributeAcCurrentDivisorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentDivisorID")
     = 0x00000603,
-    MTRClusterElectricalMeasurementAttributeAcPowerMultiplierID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcPowerMultiplierID")
+    MTRClusterElectricalMeasurementAttributeAcPowerMultiplierID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcPowerMultiplierID")
     = 0x00000604,
-    MTRClusterElectricalMeasurementAttributeAcPowerDivisorID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcPowerDivisorID")
+    MTRClusterElectricalMeasurementAttributeAcPowerDivisorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcPowerDivisorID")
     = 0x00000605,
-    MTRClusterElectricalMeasurementAttributeOverloadAlarmsMaskID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeOverloadAlarmsMaskID")
+    MTRClusterElectricalMeasurementAttributeOverloadAlarmsMaskID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeOverloadAlarmsMaskID")
     = 0x00000700,
-    MTRClusterElectricalMeasurementAttributeVoltageOverloadID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeVoltageOverloadID")
+    MTRClusterElectricalMeasurementAttributeVoltageOverloadID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeVoltageOverloadID")
     = 0x00000701,
-    MTRClusterElectricalMeasurementAttributeCurrentOverloadID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeCurrentOverloadID")
+    MTRClusterElectricalMeasurementAttributeCurrentOverloadID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeCurrentOverloadID")
     = 0x00000702,
-    MTRClusterElectricalMeasurementAttributeAcOverloadAlarmsMaskID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcOverloadAlarmsMaskID")
+    MTRClusterElectricalMeasurementAttributeAcOverloadAlarmsMaskID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcOverloadAlarmsMaskID")
     = 0x00000800,
-    MTRClusterElectricalMeasurementAttributeAcVoltageOverloadID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageOverloadID")
+    MTRClusterElectricalMeasurementAttributeAcVoltageOverloadID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageOverloadID")
     = 0x00000801,
-    MTRClusterElectricalMeasurementAttributeAcCurrentOverloadID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentOverloadID")
+    MTRClusterElectricalMeasurementAttributeAcCurrentOverloadID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentOverloadID")
     = 0x00000802,
-    MTRClusterElectricalMeasurementAttributeAcActivePowerOverloadID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcActivePowerOverloadID")
+    MTRClusterElectricalMeasurementAttributeAcActivePowerOverloadID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcActivePowerOverloadID")
     = 0x00000803,
-    MTRClusterElectricalMeasurementAttributeAcReactivePowerOverloadID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcReactivePowerOverloadID")
+    MTRClusterElectricalMeasurementAttributeAcReactivePowerOverloadID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcReactivePowerOverloadID")
     = 0x00000804,
-    MTRClusterElectricalMeasurementAttributeAverageRmsOverVoltageID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageID")
+    MTRClusterElectricalMeasurementAttributeAverageRmsOverVoltageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageID")
     = 0x00000805,
-    MTRClusterElectricalMeasurementAttributeAverageRmsUnderVoltageID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageID")
+    MTRClusterElectricalMeasurementAttributeAverageRmsUnderVoltageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageID")
     = 0x00000806,
-    MTRClusterElectricalMeasurementAttributeRmsExtremeOverVoltageID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltageID")
+    MTRClusterElectricalMeasurementAttributeRmsExtremeOverVoltageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltageID")
     = 0x00000807,
-    MTRClusterElectricalMeasurementAttributeRmsExtremeUnderVoltageID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltageID")
+    MTRClusterElectricalMeasurementAttributeRmsExtremeUnderVoltageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltageID")
     = 0x00000808,
-    MTRClusterElectricalMeasurementAttributeRmsVoltageSagID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagID")
+    MTRClusterElectricalMeasurementAttributeRmsVoltageSagID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagID")
     = 0x00000809,
-    MTRClusterElectricalMeasurementAttributeRmsVoltageSwellID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellID")
+    MTRClusterElectricalMeasurementAttributeRmsVoltageSwellID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellID")
     = 0x0000080A,
-    MTRClusterElectricalMeasurementAttributeLineCurrentPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeLineCurrentPhaseBID")
+    MTRClusterElectricalMeasurementAttributeLineCurrentPhaseBID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeLineCurrentPhaseBID")
     = 0x00000901,
-    MTRClusterElectricalMeasurementAttributeActiveCurrentPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActiveCurrentPhaseBID")
+    MTRClusterElectricalMeasurementAttributeActiveCurrentPhaseBID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActiveCurrentPhaseBID")
     = 0x00000902,
-    MTRClusterElectricalMeasurementAttributeReactiveCurrentPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactiveCurrentPhaseBID")
+    MTRClusterElectricalMeasurementAttributeReactiveCurrentPhaseBID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactiveCurrentPhaseBID")
     = 0x00000903,
-    MTRClusterElectricalMeasurementAttributeRmsVoltagePhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltagePhaseBID")
+    MTRClusterElectricalMeasurementAttributeRmsVoltagePhaseBID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltagePhaseBID")
     = 0x00000905,
-    MTRClusterElectricalMeasurementAttributeRmsVoltageMinPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinPhaseBID")
+    MTRClusterElectricalMeasurementAttributeRmsVoltageMinPhaseBID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinPhaseBID")
     = 0x00000906,
-    MTRClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseBID")
+    MTRClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseBID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseBID")
     = 0x00000907,
-    MTRClusterElectricalMeasurementAttributeRmsCurrentPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentPhaseBID")
+    MTRClusterElectricalMeasurementAttributeRmsCurrentPhaseBID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentPhaseBID")
     = 0x00000908,
-    MTRClusterElectricalMeasurementAttributeRmsCurrentMinPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinPhaseBID")
+    MTRClusterElectricalMeasurementAttributeRmsCurrentMinPhaseBID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinPhaseBID")
     = 0x00000909,
-    MTRClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseBID")
+    MTRClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseBID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseBID")
     = 0x0000090A,
-    MTRClusterElectricalMeasurementAttributeActivePowerPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerPhaseBID")
+    MTRClusterElectricalMeasurementAttributeActivePowerPhaseBID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerPhaseBID")
     = 0x0000090B,
-    MTRClusterElectricalMeasurementAttributeActivePowerMinPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinPhaseBID")
+    MTRClusterElectricalMeasurementAttributeActivePowerMinPhaseBID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinPhaseBID")
     = 0x0000090C,
-    MTRClusterElectricalMeasurementAttributeActivePowerMaxPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxPhaseBID")
+    MTRClusterElectricalMeasurementAttributeActivePowerMaxPhaseBID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxPhaseBID")
     = 0x0000090D,
-    MTRClusterElectricalMeasurementAttributeReactivePowerPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerPhaseBID")
+    MTRClusterElectricalMeasurementAttributeReactivePowerPhaseBID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerPhaseBID")
     = 0x0000090E,
-    MTRClusterElectricalMeasurementAttributeApparentPowerPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerPhaseBID")
+    MTRClusterElectricalMeasurementAttributeApparentPowerPhaseBID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerPhaseBID")
     = 0x0000090F,
-    MTRClusterElectricalMeasurementAttributePowerFactorPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorPhaseBID")
+    MTRClusterElectricalMeasurementAttributePowerFactorPhaseBID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorPhaseBID")
     = 0x00000910,
-    MTRClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseBID")
+    MTRClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseBID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseBID")
     = 0x00000911,
-    MTRClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseBID")
+    MTRClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseBID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseBID")
     = 0x00000912,
-    MTRClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseBID")
+    MTRClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseBID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseBID")
     = 0x00000913,
-    MTRClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseBID")
+    MTRClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseBID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseBID")
     = 0x00000914,
-    MTRClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseBID")
+    MTRClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseBID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseBID")
     = 0x00000915,
-    MTRClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseBID")
+    MTRClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseBID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseBID")
     = 0x00000916,
-    MTRClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseBID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseBID")
+    MTRClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseBID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseBID")
     = 0x00000917,
-    MTRClusterElectricalMeasurementAttributeLineCurrentPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeLineCurrentPhaseCID")
+    MTRClusterElectricalMeasurementAttributeLineCurrentPhaseCID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeLineCurrentPhaseCID")
     = 0x00000A01,
-    MTRClusterElectricalMeasurementAttributeActiveCurrentPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActiveCurrentPhaseCID")
+    MTRClusterElectricalMeasurementAttributeActiveCurrentPhaseCID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActiveCurrentPhaseCID")
     = 0x00000A02,
-    MTRClusterElectricalMeasurementAttributeReactiveCurrentPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactiveCurrentPhaseCID")
+    MTRClusterElectricalMeasurementAttributeReactiveCurrentPhaseCID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactiveCurrentPhaseCID")
     = 0x00000A03,
-    MTRClusterElectricalMeasurementAttributeRmsVoltagePhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltagePhaseCID")
+    MTRClusterElectricalMeasurementAttributeRmsVoltagePhaseCID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltagePhaseCID")
     = 0x00000A05,
-    MTRClusterElectricalMeasurementAttributeRmsVoltageMinPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinPhaseCID")
+    MTRClusterElectricalMeasurementAttributeRmsVoltageMinPhaseCID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinPhaseCID")
     = 0x00000A06,
-    MTRClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseCID")
+    MTRClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseCID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseCID")
     = 0x00000A07,
-    MTRClusterElectricalMeasurementAttributeRmsCurrentPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentPhaseCID")
+    MTRClusterElectricalMeasurementAttributeRmsCurrentPhaseCID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentPhaseCID")
     = 0x00000A08,
-    MTRClusterElectricalMeasurementAttributeRmsCurrentMinPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinPhaseCID")
+    MTRClusterElectricalMeasurementAttributeRmsCurrentMinPhaseCID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinPhaseCID")
     = 0x00000A09,
-    MTRClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseCID")
+    MTRClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseCID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseCID")
     = 0x00000A0A,
-    MTRClusterElectricalMeasurementAttributeActivePowerPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerPhaseCID")
+    MTRClusterElectricalMeasurementAttributeActivePowerPhaseCID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerPhaseCID")
     = 0x00000A0B,
-    MTRClusterElectricalMeasurementAttributeActivePowerMinPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinPhaseCID")
+    MTRClusterElectricalMeasurementAttributeActivePowerMinPhaseCID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinPhaseCID")
     = 0x00000A0C,
-    MTRClusterElectricalMeasurementAttributeActivePowerMaxPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxPhaseCID")
+    MTRClusterElectricalMeasurementAttributeActivePowerMaxPhaseCID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxPhaseCID")
     = 0x00000A0D,
-    MTRClusterElectricalMeasurementAttributeReactivePowerPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerPhaseCID")
+    MTRClusterElectricalMeasurementAttributeReactivePowerPhaseCID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerPhaseCID")
     = 0x00000A0E,
-    MTRClusterElectricalMeasurementAttributeApparentPowerPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerPhaseCID")
+    MTRClusterElectricalMeasurementAttributeApparentPowerPhaseCID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerPhaseCID")
     = 0x00000A0F,
-    MTRClusterElectricalMeasurementAttributePowerFactorPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorPhaseCID")
+    MTRClusterElectricalMeasurementAttributePowerFactorPhaseCID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorPhaseCID")
     = 0x00000A10,
-    MTRClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseCID")
+    MTRClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseCID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseCID")
     = 0x00000A11,
-    MTRClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseCID")
+    MTRClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseCID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseCID")
     = 0x00000A12,
-    MTRClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseCID")
+    MTRClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseCID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseCID")
     = 0x00000A13,
-    MTRClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseCID")
+    MTRClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseCID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseCID")
     = 0x00000A14,
-    MTRClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseCID")
+    MTRClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseCID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED(
+            "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseCID")
     = 0x00000A15,
-    MTRClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseCID")
+    MTRClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseCID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseCID")
     = 0x00000A16,
-    MTRClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseCID")
+    MTRClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseCID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseCID")
     = 0x00000A17,
-    MTRClusterElectricalMeasurementAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeGeneratedCommandListID")
+    MTRClusterElectricalMeasurementAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterElectricalMeasurementAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcceptedCommandListID")
+    MTRClusterElectricalMeasurementAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterElectricalMeasurementAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAttributeListID")
+    MTRClusterElectricalMeasurementAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterElectricalMeasurementAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeFeatureMapID")
+    MTRClusterElectricalMeasurementAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterElectricalMeasurementAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeClusterRevisionID")
+    MTRClusterElectricalMeasurementAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster ElectricalMeasurement attributes
@@ -4904,247 +5205,266 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster TestCluster deprecated attribute names
-    MTRClusterTestClusterAttributeBooleanID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeBooleanID")
+    MTRClusterTestClusterAttributeBooleanID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeBooleanID")
     = 0x00000000,
-    MTRClusterTestClusterAttributeBitmap8ID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeBitmap8ID")
+    MTRClusterTestClusterAttributeBitmap8ID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeBitmap8ID")
     = 0x00000001,
-    MTRClusterTestClusterAttributeBitmap16ID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeBitmap16ID")
+    MTRClusterTestClusterAttributeBitmap16ID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeBitmap16ID")
     = 0x00000002,
-    MTRClusterTestClusterAttributeBitmap32ID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeBitmap32ID")
+    MTRClusterTestClusterAttributeBitmap32ID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeBitmap32ID")
     = 0x00000003,
-    MTRClusterTestClusterAttributeBitmap64ID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeBitmap64ID")
+    MTRClusterTestClusterAttributeBitmap64ID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeBitmap64ID")
     = 0x00000004,
-    MTRClusterTestClusterAttributeInt8uID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt8uID")
+    MTRClusterTestClusterAttributeInt8uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt8uID")
     = 0x00000005,
-    MTRClusterTestClusterAttributeInt16uID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt16uID")
+    MTRClusterTestClusterAttributeInt16uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt16uID")
     = 0x00000006,
-    MTRClusterTestClusterAttributeInt24uID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt24uID")
+    MTRClusterTestClusterAttributeInt24uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt24uID")
     = 0x00000007,
-    MTRClusterTestClusterAttributeInt32uID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt32uID")
+    MTRClusterTestClusterAttributeInt32uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt32uID")
     = 0x00000008,
-    MTRClusterTestClusterAttributeInt40uID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt40uID")
+    MTRClusterTestClusterAttributeInt40uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt40uID")
     = 0x00000009,
-    MTRClusterTestClusterAttributeInt48uID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt48uID")
+    MTRClusterTestClusterAttributeInt48uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt48uID")
     = 0x0000000A,
-    MTRClusterTestClusterAttributeInt56uID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt56uID")
+    MTRClusterTestClusterAttributeInt56uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt56uID")
     = 0x0000000B,
-    MTRClusterTestClusterAttributeInt64uID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt64uID")
+    MTRClusterTestClusterAttributeInt64uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt64uID")
     = 0x0000000C,
-    MTRClusterTestClusterAttributeInt8sID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt8sID")
+    MTRClusterTestClusterAttributeInt8sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt8sID")
     = 0x0000000D,
-    MTRClusterTestClusterAttributeInt16sID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt16sID")
+    MTRClusterTestClusterAttributeInt16sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt16sID")
     = 0x0000000E,
-    MTRClusterTestClusterAttributeInt24sID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt24sID")
+    MTRClusterTestClusterAttributeInt24sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt24sID")
     = 0x0000000F,
-    MTRClusterTestClusterAttributeInt32sID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt32sID")
+    MTRClusterTestClusterAttributeInt32sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt32sID")
     = 0x00000010,
-    MTRClusterTestClusterAttributeInt40sID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt40sID")
+    MTRClusterTestClusterAttributeInt40sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt40sID")
     = 0x00000011,
-    MTRClusterTestClusterAttributeInt48sID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt48sID")
+    MTRClusterTestClusterAttributeInt48sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt48sID")
     = 0x00000012,
-    MTRClusterTestClusterAttributeInt56sID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt56sID")
+    MTRClusterTestClusterAttributeInt56sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt56sID")
     = 0x00000013,
-    MTRClusterTestClusterAttributeInt64sID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt64sID")
+    MTRClusterTestClusterAttributeInt64sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeInt64sID")
     = 0x00000014,
-    MTRClusterTestClusterAttributeEnum8ID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeEnum8ID")
+    MTRClusterTestClusterAttributeEnum8ID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeEnum8ID")
     = 0x00000015,
-    MTRClusterTestClusterAttributeEnum16ID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeEnum16ID")
+    MTRClusterTestClusterAttributeEnum16ID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeEnum16ID")
     = 0x00000016,
-    MTRClusterTestClusterAttributeFloatSingleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeFloatSingleID")
+    MTRClusterTestClusterAttributeFloatSingleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeFloatSingleID")
     = 0x00000017,
-    MTRClusterTestClusterAttributeFloatDoubleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeFloatDoubleID")
+    MTRClusterTestClusterAttributeFloatDoubleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeFloatDoubleID")
     = 0x00000018,
-    MTRClusterTestClusterAttributeOctetStringID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeOctetStringID")
+    MTRClusterTestClusterAttributeOctetStringID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeOctetStringID")
     = 0x00000019,
-    MTRClusterTestClusterAttributeListInt8uID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeListInt8uID")
+    MTRClusterTestClusterAttributeListInt8uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeListInt8uID")
     = 0x0000001A,
-    MTRClusterTestClusterAttributeListOctetStringID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeListOctetStringID")
+    MTRClusterTestClusterAttributeListOctetStringID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeListOctetStringID")
     = 0x0000001B,
-    MTRClusterTestClusterAttributeListStructOctetStringID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeListStructOctetStringID")
+    MTRClusterTestClusterAttributeListStructOctetStringID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeListStructOctetStringID")
     = 0x0000001C,
-    MTRClusterTestClusterAttributeLongOctetStringID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeLongOctetStringID")
+    MTRClusterTestClusterAttributeLongOctetStringID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeLongOctetStringID")
     = 0x0000001D,
-    MTRClusterTestClusterAttributeCharStringID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeCharStringID")
+    MTRClusterTestClusterAttributeCharStringID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeCharStringID")
     = 0x0000001E,
-    MTRClusterTestClusterAttributeLongCharStringID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeLongCharStringID")
+    MTRClusterTestClusterAttributeLongCharStringID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeLongCharStringID")
     = 0x0000001F,
-    MTRClusterTestClusterAttributeEpochUsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeEpochUsID")
+    MTRClusterTestClusterAttributeEpochUsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeEpochUsID")
     = 0x00000020,
-    MTRClusterTestClusterAttributeEpochSID MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeEpochSID")
+    MTRClusterTestClusterAttributeEpochSID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeEpochSID")
     = 0x00000021,
-    MTRClusterTestClusterAttributeVendorIdID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeVendorIdID")
+    MTRClusterTestClusterAttributeVendorIdID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeVendorIdID")
     = 0x00000022,
-    MTRClusterTestClusterAttributeListNullablesAndOptionalsStructID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeListNullablesAndOptionalsStructID")
+    MTRClusterTestClusterAttributeListNullablesAndOptionalsStructID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeListNullablesAndOptionalsStructID")
     = 0x00000023,
-    MTRClusterTestClusterAttributeEnumAttrID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeEnumAttrID")
+    MTRClusterTestClusterAttributeEnumAttrID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeEnumAttrID")
     = 0x00000024,
-    MTRClusterTestClusterAttributeStructAttrID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeStructAttrID")
+    MTRClusterTestClusterAttributeStructAttrID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeStructAttrID")
     = 0x00000025,
-    MTRClusterTestClusterAttributeRangeRestrictedInt8uID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeRangeRestrictedInt8uID")
+    MTRClusterTestClusterAttributeRangeRestrictedInt8uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeRangeRestrictedInt8uID")
     = 0x00000026,
-    MTRClusterTestClusterAttributeRangeRestrictedInt8sID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeRangeRestrictedInt8sID")
+    MTRClusterTestClusterAttributeRangeRestrictedInt8sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeRangeRestrictedInt8sID")
     = 0x00000027,
-    MTRClusterTestClusterAttributeRangeRestrictedInt16uID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeRangeRestrictedInt16uID")
+    MTRClusterTestClusterAttributeRangeRestrictedInt16uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeRangeRestrictedInt16uID")
     = 0x00000028,
-    MTRClusterTestClusterAttributeRangeRestrictedInt16sID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeRangeRestrictedInt16sID")
+    MTRClusterTestClusterAttributeRangeRestrictedInt16sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeRangeRestrictedInt16sID")
     = 0x00000029,
-    MTRClusterTestClusterAttributeListLongOctetStringID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeListLongOctetStringID")
+    MTRClusterTestClusterAttributeListLongOctetStringID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeListLongOctetStringID")
     = 0x0000002A,
-    MTRClusterTestClusterAttributeListFabricScopedID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeListFabricScopedID")
+    MTRClusterTestClusterAttributeListFabricScopedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeListFabricScopedID")
     = 0x0000002B,
-    MTRClusterTestClusterAttributeTimedWriteBooleanID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeTimedWriteBooleanID")
+    MTRClusterTestClusterAttributeTimedWriteBooleanID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeTimedWriteBooleanID")
     = 0x00000030,
-    MTRClusterTestClusterAttributeGeneralErrorBooleanID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeGeneralErrorBooleanID")
+    MTRClusterTestClusterAttributeGeneralErrorBooleanID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeGeneralErrorBooleanID")
     = 0x00000031,
-    MTRClusterTestClusterAttributeClusterErrorBooleanID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeClusterErrorBooleanID")
+    MTRClusterTestClusterAttributeClusterErrorBooleanID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeClusterErrorBooleanID")
     = 0x00000032,
-    MTRClusterTestClusterAttributeUnsupportedID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeUnsupportedID")
+    MTRClusterTestClusterAttributeUnsupportedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeUnsupportedID")
     = 0x000000FF,
-    MTRClusterTestClusterAttributeNullableBooleanID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableBooleanID")
+    MTRClusterTestClusterAttributeNullableBooleanID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableBooleanID")
     = 0x00004000,
-    MTRClusterTestClusterAttributeNullableBitmap8ID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableBitmap8ID")
+    MTRClusterTestClusterAttributeNullableBitmap8ID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableBitmap8ID")
     = 0x00004001,
-    MTRClusterTestClusterAttributeNullableBitmap16ID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableBitmap16ID")
+    MTRClusterTestClusterAttributeNullableBitmap16ID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableBitmap16ID")
     = 0x00004002,
-    MTRClusterTestClusterAttributeNullableBitmap32ID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableBitmap32ID")
+    MTRClusterTestClusterAttributeNullableBitmap32ID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableBitmap32ID")
     = 0x00004003,
-    MTRClusterTestClusterAttributeNullableBitmap64ID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableBitmap64ID")
+    MTRClusterTestClusterAttributeNullableBitmap64ID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableBitmap64ID")
     = 0x00004004,
-    MTRClusterTestClusterAttributeNullableInt8uID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt8uID")
+    MTRClusterTestClusterAttributeNullableInt8uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt8uID")
     = 0x00004005,
-    MTRClusterTestClusterAttributeNullableInt16uID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt16uID")
+    MTRClusterTestClusterAttributeNullableInt16uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt16uID")
     = 0x00004006,
-    MTRClusterTestClusterAttributeNullableInt24uID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt24uID")
+    MTRClusterTestClusterAttributeNullableInt24uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt24uID")
     = 0x00004007,
-    MTRClusterTestClusterAttributeNullableInt32uID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt32uID")
+    MTRClusterTestClusterAttributeNullableInt32uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt32uID")
     = 0x00004008,
-    MTRClusterTestClusterAttributeNullableInt40uID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt40uID")
+    MTRClusterTestClusterAttributeNullableInt40uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt40uID")
     = 0x00004009,
-    MTRClusterTestClusterAttributeNullableInt48uID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt48uID")
+    MTRClusterTestClusterAttributeNullableInt48uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt48uID")
     = 0x0000400A,
-    MTRClusterTestClusterAttributeNullableInt56uID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt56uID")
+    MTRClusterTestClusterAttributeNullableInt56uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt56uID")
     = 0x0000400B,
-    MTRClusterTestClusterAttributeNullableInt64uID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt64uID")
+    MTRClusterTestClusterAttributeNullableInt64uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt64uID")
     = 0x0000400C,
-    MTRClusterTestClusterAttributeNullableInt8sID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt8sID")
+    MTRClusterTestClusterAttributeNullableInt8sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt8sID")
     = 0x0000400D,
-    MTRClusterTestClusterAttributeNullableInt16sID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt16sID")
+    MTRClusterTestClusterAttributeNullableInt16sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt16sID")
     = 0x0000400E,
-    MTRClusterTestClusterAttributeNullableInt24sID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt24sID")
+    MTRClusterTestClusterAttributeNullableInt24sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt24sID")
     = 0x0000400F,
-    MTRClusterTestClusterAttributeNullableInt32sID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt32sID")
+    MTRClusterTestClusterAttributeNullableInt32sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt32sID")
     = 0x00004010,
-    MTRClusterTestClusterAttributeNullableInt40sID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt40sID")
+    MTRClusterTestClusterAttributeNullableInt40sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt40sID")
     = 0x00004011,
-    MTRClusterTestClusterAttributeNullableInt48sID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt48sID")
+    MTRClusterTestClusterAttributeNullableInt48sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt48sID")
     = 0x00004012,
-    MTRClusterTestClusterAttributeNullableInt56sID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt56sID")
+    MTRClusterTestClusterAttributeNullableInt56sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt56sID")
     = 0x00004013,
-    MTRClusterTestClusterAttributeNullableInt64sID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt64sID")
+    MTRClusterTestClusterAttributeNullableInt64sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableInt64sID")
     = 0x00004014,
-    MTRClusterTestClusterAttributeNullableEnum8ID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableEnum8ID")
+    MTRClusterTestClusterAttributeNullableEnum8ID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableEnum8ID")
     = 0x00004015,
-    MTRClusterTestClusterAttributeNullableEnum16ID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableEnum16ID")
+    MTRClusterTestClusterAttributeNullableEnum16ID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableEnum16ID")
     = 0x00004016,
-    MTRClusterTestClusterAttributeNullableFloatSingleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableFloatSingleID")
+    MTRClusterTestClusterAttributeNullableFloatSingleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableFloatSingleID")
     = 0x00004017,
-    MTRClusterTestClusterAttributeNullableFloatDoubleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableFloatDoubleID")
+    MTRClusterTestClusterAttributeNullableFloatDoubleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableFloatDoubleID")
     = 0x00004018,
-    MTRClusterTestClusterAttributeNullableOctetStringID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableOctetStringID")
+    MTRClusterTestClusterAttributeNullableOctetStringID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableOctetStringID")
     = 0x00004019,
-    MTRClusterTestClusterAttributeNullableCharStringID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableCharStringID")
+    MTRClusterTestClusterAttributeNullableCharStringID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableCharStringID")
     = 0x0000401E,
-    MTRClusterTestClusterAttributeNullableEnumAttrID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableEnumAttrID")
+    MTRClusterTestClusterAttributeNullableEnumAttrID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableEnumAttrID")
     = 0x00004024,
-    MTRClusterTestClusterAttributeNullableStructID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableStructID")
+    MTRClusterTestClusterAttributeNullableStructID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableStructID")
     = 0x00004025,
-    MTRClusterTestClusterAttributeNullableRangeRestrictedInt8uID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableRangeRestrictedInt8uID")
+    MTRClusterTestClusterAttributeNullableRangeRestrictedInt8uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableRangeRestrictedInt8uID")
     = 0x00004026,
-    MTRClusterTestClusterAttributeNullableRangeRestrictedInt8sID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableRangeRestrictedInt8sID")
+    MTRClusterTestClusterAttributeNullableRangeRestrictedInt8sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableRangeRestrictedInt8sID")
     = 0x00004027,
-    MTRClusterTestClusterAttributeNullableRangeRestrictedInt16uID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableRangeRestrictedInt16uID")
+    MTRClusterTestClusterAttributeNullableRangeRestrictedInt16uID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableRangeRestrictedInt16uID")
     = 0x00004028,
-    MTRClusterTestClusterAttributeNullableRangeRestrictedInt16sID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableRangeRestrictedInt16sID")
+    MTRClusterTestClusterAttributeNullableRangeRestrictedInt16sID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeNullableRangeRestrictedInt16sID")
     = 0x00004029,
     MTRClusterTestClusterAttributeWriteOnlyInt8uID API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeWriteOnlyInt8uID")
     = 0x0000402A,
-    MTRClusterTestClusterAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeGeneratedCommandListID")
+    MTRClusterTestClusterAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterTestClusterAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeAcceptedCommandListID")
+    MTRClusterTestClusterAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterTestClusterAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeAttributeListID")
+    MTRClusterTestClusterAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterTestClusterAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeFeatureMapID")
+    MTRClusterTestClusterAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterTestClusterAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterUnitTestingAttributeClusterRevisionID")
+    MTRClusterTestClusterAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster UnitTesting attributes
@@ -5241,20 +5561,20 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster FaultInjection deprecated attribute names
-    MTRClusterFaultInjectionAttributeGeneratedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFaultInjectionAttributeGeneratedCommandListID")
+    MTRClusterFaultInjectionAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFaultInjectionAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterFaultInjectionAttributeAcceptedCommandListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFaultInjectionAttributeAcceptedCommandListID")
+    MTRClusterFaultInjectionAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFaultInjectionAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterFaultInjectionAttributeAttributeListID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFaultInjectionAttributeAttributeListID")
+    MTRClusterFaultInjectionAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFaultInjectionAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterFaultInjectionAttributeFeatureMapID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFaultInjectionAttributeFeatureMapID")
+    MTRClusterFaultInjectionAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFaultInjectionAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterFaultInjectionAttributeClusterRevisionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterFaultInjectionAttributeClusterRevisionID")
+    MTRClusterFaultInjectionAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterFaultInjectionAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster FaultInjection attributes
@@ -5276,10 +5596,11 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 typedef NS_ENUM(uint32_t, MTRCommandIDType) {
 
     // Cluster Identify deprecated command id names
-    MTRClusterIdentifyCommandIdentifyID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterIdentifyCommandIdentifyID")
+    MTRClusterIdentifyCommandIdentifyID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterIdentifyCommandIdentifyID")
     = 0x00000000,
-    MTRClusterIdentifyCommandTriggerEffectID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterIdentifyCommandTriggerEffectID")
+    MTRClusterIdentifyCommandTriggerEffectID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterIdentifyCommandTriggerEffectID")
     = 0x00000040,
 
     // Cluster Identify commands
@@ -5287,32 +5608,35 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterIdentifyCommandTriggerEffectID MTR_NEWLY_AVAILABLE = 0x00000040,
 
     // Cluster Groups deprecated command id names
-    MTRClusterGroupsCommandAddGroupID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupsCommandAddGroupID")
+    MTRClusterGroupsCommandAddGroupID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupsCommandAddGroupID")
     = 0x00000000,
-    MTRClusterGroupsCommandAddGroupResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGroupsCommandAddGroupResponseID")
+    MTRClusterGroupsCommandAddGroupResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupsCommandAddGroupResponseID")
     = 0x00000000,
-    MTRClusterGroupsCommandViewGroupID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupsCommandViewGroupID")
+    MTRClusterGroupsCommandViewGroupID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupsCommandViewGroupID")
     = 0x00000001,
-    MTRClusterGroupsCommandViewGroupResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGroupsCommandViewGroupResponseID")
+    MTRClusterGroupsCommandViewGroupResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupsCommandViewGroupResponseID")
     = 0x00000001,
-    MTRClusterGroupsCommandGetGroupMembershipID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGroupsCommandGetGroupMembershipID")
+    MTRClusterGroupsCommandGetGroupMembershipID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupsCommandGetGroupMembershipID")
     = 0x00000002,
-    MTRClusterGroupsCommandGetGroupMembershipResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGroupsCommandGetGroupMembershipResponseID")
+    MTRClusterGroupsCommandGetGroupMembershipResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupsCommandGetGroupMembershipResponseID")
     = 0x00000002,
-    MTRClusterGroupsCommandRemoveGroupID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupsCommandRemoveGroupID")
+    MTRClusterGroupsCommandRemoveGroupID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupsCommandRemoveGroupID")
     = 0x00000003,
-    MTRClusterGroupsCommandRemoveGroupResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGroupsCommandRemoveGroupResponseID")
+    MTRClusterGroupsCommandRemoveGroupResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupsCommandRemoveGroupResponseID")
     = 0x00000003,
-    MTRClusterGroupsCommandRemoveAllGroupsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGroupsCommandRemoveAllGroupsID")
+    MTRClusterGroupsCommandRemoveAllGroupsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupsCommandRemoveAllGroupsID")
     = 0x00000004,
-    MTRClusterGroupsCommandAddGroupIfIdentifyingID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGroupsCommandAddGroupIfIdentifyingID")
+    MTRClusterGroupsCommandAddGroupIfIdentifyingID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupsCommandAddGroupIfIdentifyingID")
     = 0x00000005,
 
     // Cluster Groups commands
@@ -5328,56 +5652,62 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterGroupsCommandAddGroupIfIdentifyingID MTR_NEWLY_AVAILABLE = 0x00000005,
 
     // Cluster Scenes deprecated command id names
-    MTRClusterScenesCommandAddSceneID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandAddSceneID")
+    MTRClusterScenesCommandAddSceneID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandAddSceneID")
     = 0x00000000,
-    MTRClusterScenesCommandAddSceneResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterScenesCommandAddSceneResponseID")
+    MTRClusterScenesCommandAddSceneResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandAddSceneResponseID")
     = 0x00000000,
-    MTRClusterScenesCommandViewSceneID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandViewSceneID")
+    MTRClusterScenesCommandViewSceneID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandViewSceneID")
     = 0x00000001,
-    MTRClusterScenesCommandViewSceneResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterScenesCommandViewSceneResponseID")
+    MTRClusterScenesCommandViewSceneResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandViewSceneResponseID")
     = 0x00000001,
-    MTRClusterScenesCommandRemoveSceneID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandRemoveSceneID")
+    MTRClusterScenesCommandRemoveSceneID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandRemoveSceneID")
     = 0x00000002,
-    MTRClusterScenesCommandRemoveSceneResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterScenesCommandRemoveSceneResponseID")
+    MTRClusterScenesCommandRemoveSceneResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandRemoveSceneResponseID")
     = 0x00000002,
-    MTRClusterScenesCommandRemoveAllScenesID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterScenesCommandRemoveAllScenesID")
+    MTRClusterScenesCommandRemoveAllScenesID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandRemoveAllScenesID")
     = 0x00000003,
-    MTRClusterScenesCommandRemoveAllScenesResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterScenesCommandRemoveAllScenesResponseID")
+    MTRClusterScenesCommandRemoveAllScenesResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandRemoveAllScenesResponseID")
     = 0x00000003,
-    MTRClusterScenesCommandStoreSceneID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandStoreSceneID")
+    MTRClusterScenesCommandStoreSceneID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandStoreSceneID")
     = 0x00000004,
-    MTRClusterScenesCommandStoreSceneResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterScenesCommandStoreSceneResponseID")
+    MTRClusterScenesCommandStoreSceneResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandStoreSceneResponseID")
     = 0x00000004,
-    MTRClusterScenesCommandRecallSceneID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandRecallSceneID")
+    MTRClusterScenesCommandRecallSceneID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandRecallSceneID")
     = 0x00000005,
-    MTRClusterScenesCommandGetSceneMembershipID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterScenesCommandGetSceneMembershipID")
+    MTRClusterScenesCommandGetSceneMembershipID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandGetSceneMembershipID")
     = 0x00000006,
-    MTRClusterScenesCommandGetSceneMembershipResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterScenesCommandGetSceneMembershipResponseID")
+    MTRClusterScenesCommandGetSceneMembershipResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandGetSceneMembershipResponseID")
     = 0x00000006,
-    MTRClusterScenesCommandEnhancedAddSceneID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterScenesCommandEnhancedAddSceneID")
+    MTRClusterScenesCommandEnhancedAddSceneID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandEnhancedAddSceneID")
     = 0x00000040,
-    MTRClusterScenesCommandEnhancedAddSceneResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterScenesCommandEnhancedAddSceneResponseID")
+    MTRClusterScenesCommandEnhancedAddSceneResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandEnhancedAddSceneResponseID")
     = 0x00000040,
-    MTRClusterScenesCommandEnhancedViewSceneID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterScenesCommandEnhancedViewSceneID")
+    MTRClusterScenesCommandEnhancedViewSceneID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandEnhancedViewSceneID")
     = 0x00000041,
-    MTRClusterScenesCommandEnhancedViewSceneResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterScenesCommandEnhancedViewSceneResponseID")
+    MTRClusterScenesCommandEnhancedViewSceneResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandEnhancedViewSceneResponseID")
     = 0x00000041,
-    MTRClusterScenesCommandCopySceneID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandCopySceneID")
+    MTRClusterScenesCommandCopySceneID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandCopySceneID")
     = 0x00000042,
-    MTRClusterScenesCommandCopySceneResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterScenesCommandCopySceneResponseID")
+    MTRClusterScenesCommandCopySceneResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandCopySceneResponseID")
     = 0x00000042,
 
     // Cluster Scenes commands
@@ -5402,15 +5732,23 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterScenesCommandCopySceneResponseID MTR_NEWLY_AVAILABLE = 0x00000042,
 
     // Cluster OnOff deprecated command id names
-    MTRClusterOnOffCommandOffID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOnOffCommandOffID") = 0x00000000,
-    MTRClusterOnOffCommandOnID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOnOffCommandOnID") = 0x00000001,
-    MTRClusterOnOffCommandToggleID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOnOffCommandToggleID") = 0x00000002,
-    MTRClusterOnOffCommandOffWithEffectID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOnOffCommandOffWithEffectID")
+    MTRClusterOnOffCommandOffID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOnOffCommandOffID")
+    = 0x00000000,
+    MTRClusterOnOffCommandOnID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOnOffCommandOnID")
+    = 0x00000001,
+    MTRClusterOnOffCommandToggleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOnOffCommandToggleID")
+    = 0x00000002,
+    MTRClusterOnOffCommandOffWithEffectID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOnOffCommandOffWithEffectID")
     = 0x00000040,
-    MTRClusterOnOffCommandOnWithRecallGlobalSceneID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOnOffCommandOnWithRecallGlobalSceneID")
+    MTRClusterOnOffCommandOnWithRecallGlobalSceneID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOnOffCommandOnWithRecallGlobalSceneID")
     = 0x00000041,
-    MTRClusterOnOffCommandOnWithTimedOffID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOnOffCommandOnWithTimedOffID")
+    MTRClusterOnOffCommandOnWithTimedOffID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOnOffCommandOnWithTimedOffID")
     = 0x00000042,
 
     // Cluster OnOff commands
@@ -5422,29 +5760,32 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterOnOffCommandOnWithTimedOffID MTR_NEWLY_AVAILABLE = 0x00000042,
 
     // Cluster LevelControl deprecated command id names
-    MTRClusterLevelControlCommandMoveToLevelID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterLevelControlCommandMoveToLevelID")
+    MTRClusterLevelControlCommandMoveToLevelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterLevelControlCommandMoveToLevelID")
     = 0x00000000,
-    MTRClusterLevelControlCommandMoveID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterLevelControlCommandMoveID")
+    MTRClusterLevelControlCommandMoveID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterLevelControlCommandMoveID")
     = 0x00000001,
-    MTRClusterLevelControlCommandStepID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterLevelControlCommandStepID")
+    MTRClusterLevelControlCommandStepID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterLevelControlCommandStepID")
     = 0x00000002,
-    MTRClusterLevelControlCommandStopID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterLevelControlCommandStopID")
+    MTRClusterLevelControlCommandStopID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterLevelControlCommandStopID")
     = 0x00000003,
-    MTRClusterLevelControlCommandMoveToLevelWithOnOffID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterLevelControlCommandMoveToLevelWithOnOffID")
+    MTRClusterLevelControlCommandMoveToLevelWithOnOffID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterLevelControlCommandMoveToLevelWithOnOffID")
     = 0x00000004,
-    MTRClusterLevelControlCommandMoveWithOnOffID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterLevelControlCommandMoveWithOnOffID")
+    MTRClusterLevelControlCommandMoveWithOnOffID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterLevelControlCommandMoveWithOnOffID")
     = 0x00000005,
-    MTRClusterLevelControlCommandStepWithOnOffID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterLevelControlCommandStepWithOnOffID")
+    MTRClusterLevelControlCommandStepWithOnOffID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterLevelControlCommandStepWithOnOffID")
     = 0x00000006,
-    MTRClusterLevelControlCommandStopWithOnOffID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterLevelControlCommandStopWithOnOffID")
+    MTRClusterLevelControlCommandStopWithOnOffID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterLevelControlCommandStopWithOnOffID")
     = 0x00000007,
-    MTRClusterLevelControlCommandMoveToClosestFrequencyID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterLevelControlCommandMoveToClosestFrequencyID")
+    MTRClusterLevelControlCommandMoveToClosestFrequencyID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterLevelControlCommandMoveToClosestFrequencyID")
     = 0x00000008,
 
     // Cluster LevelControl commands
@@ -5459,34 +5800,41 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterLevelControlCommandMoveToClosestFrequencyID MTR_NEWLY_AVAILABLE = 0x00000008,
 
     // Cluster Actions deprecated command id names
-    MTRClusterActionsCommandInstantActionID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandInstantActionID")
+    MTRClusterActionsCommandInstantActionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandInstantActionID")
     = 0x00000000,
-    MTRClusterActionsCommandInstantActionWithTransitionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterActionsCommandInstantActionWithTransitionID")
+    MTRClusterActionsCommandInstantActionWithTransitionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandInstantActionWithTransitionID")
     = 0x00000001,
-    MTRClusterActionsCommandStartActionID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandStartActionID")
+    MTRClusterActionsCommandStartActionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandStartActionID")
     = 0x00000002,
-    MTRClusterActionsCommandStartActionWithDurationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterActionsCommandStartActionWithDurationID")
+    MTRClusterActionsCommandStartActionWithDurationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandStartActionWithDurationID")
     = 0x00000003,
-    MTRClusterActionsCommandStopActionID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandStopActionID")
+    MTRClusterActionsCommandStopActionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandStopActionID")
     = 0x00000004,
-    MTRClusterActionsCommandPauseActionID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandPauseActionID")
+    MTRClusterActionsCommandPauseActionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandPauseActionID")
     = 0x00000005,
-    MTRClusterActionsCommandPauseActionWithDurationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterActionsCommandPauseActionWithDurationID")
+    MTRClusterActionsCommandPauseActionWithDurationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandPauseActionWithDurationID")
     = 0x00000006,
-    MTRClusterActionsCommandResumeActionID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandResumeActionID")
+    MTRClusterActionsCommandResumeActionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandResumeActionID")
     = 0x00000007,
-    MTRClusterActionsCommandEnableActionID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandEnableActionID")
+    MTRClusterActionsCommandEnableActionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandEnableActionID")
     = 0x00000008,
-    MTRClusterActionsCommandEnableActionWithDurationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterActionsCommandEnableActionWithDurationID")
+    MTRClusterActionsCommandEnableActionWithDurationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandEnableActionWithDurationID")
     = 0x00000009,
-    MTRClusterActionsCommandDisableActionID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandDisableActionID")
+    MTRClusterActionsCommandDisableActionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandDisableActionID")
     = 0x0000000A,
-    MTRClusterActionsCommandDisableActionWithDurationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterActionsCommandDisableActionWithDurationID")
+    MTRClusterActionsCommandDisableActionWithDurationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterActionsCommandDisableActionWithDurationID")
     = 0x0000000B,
 
     // Cluster Actions commands
@@ -5504,27 +5852,28 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterActionsCommandDisableActionWithDurationID MTR_NEWLY_AVAILABLE = 0x0000000B,
 
     // Cluster Basic deprecated command id names
-    MTRClusterBasicCommandMfgSpecificPingID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterBasicCommandMfgSpecificPingID")
+    MTRClusterBasicCommandMfgSpecificPingID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterBasicCommandMfgSpecificPingID")
     = 0x10020000,
 
     // Cluster Basic commands
     MTRCommandIDTypeClusterBasicCommandMfgSpecificPingID MTR_NEWLY_AVAILABLE = 0x10020000,
 
     // Cluster OtaSoftwareUpdateProvider deprecated command id names
-    MTRClusterOtaSoftwareUpdateProviderCommandQueryImageID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandQueryImageID")
+    MTRClusterOtaSoftwareUpdateProviderCommandQueryImageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandQueryImageID")
     = 0x00000000,
-    MTRClusterOtaSoftwareUpdateProviderCommandQueryImageResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandQueryImageResponseID")
+    MTRClusterOtaSoftwareUpdateProviderCommandQueryImageResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandQueryImageResponseID")
     = 0x00000001,
-    MTRClusterOtaSoftwareUpdateProviderCommandApplyUpdateRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandApplyUpdateRequestID")
+    MTRClusterOtaSoftwareUpdateProviderCommandApplyUpdateRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandApplyUpdateRequestID")
     = 0x00000002,
-    MTRClusterOtaSoftwareUpdateProviderCommandApplyUpdateResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandApplyUpdateResponseID")
+    MTRClusterOtaSoftwareUpdateProviderCommandApplyUpdateResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandApplyUpdateResponseID")
     = 0x00000003,
-    MTRClusterOtaSoftwareUpdateProviderCommandNotifyUpdateAppliedID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandNotifyUpdateAppliedID")
+    MTRClusterOtaSoftwareUpdateProviderCommandNotifyUpdateAppliedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOtaSoftwareUpdateProviderCommandNotifyUpdateAppliedID")
     = 0x00000004,
 
     // Cluster OTASoftwareUpdateProvider commands
@@ -5535,31 +5884,33 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandNotifyUpdateAppliedID MTR_NEWLY_AVAILABLE = 0x00000004,
 
     // Cluster OtaSoftwareUpdateRequestor deprecated command id names
-    MTRClusterOtaSoftwareUpdateRequestorCommandAnnounceOtaProviderID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOtaSoftwareUpdateRequestorCommandAnnounceOtaProviderID")
+    MTRClusterOtaSoftwareUpdateRequestorCommandAnnounceOtaProviderID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOtaSoftwareUpdateRequestorCommandAnnounceOtaProviderID")
     = 0x00000000,
 
     // Cluster OTASoftwareUpdateRequestor commands
     MTRCommandIDTypeClusterOTASoftwareUpdateRequestorCommandAnnounceOtaProviderID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster GeneralCommissioning deprecated command id names
-    MTRClusterGeneralCommissioningCommandArmFailSafeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGeneralCommissioningCommandArmFailSafeID")
+    MTRClusterGeneralCommissioningCommandArmFailSafeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGeneralCommissioningCommandArmFailSafeID")
     = 0x00000000,
-    MTRClusterGeneralCommissioningCommandArmFailSafeResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGeneralCommissioningCommandArmFailSafeResponseID")
+    MTRClusterGeneralCommissioningCommandArmFailSafeResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGeneralCommissioningCommandArmFailSafeResponseID")
     = 0x00000001,
-    MTRClusterGeneralCommissioningCommandSetRegulatoryConfigID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGeneralCommissioningCommandSetRegulatoryConfigID")
+    MTRClusterGeneralCommissioningCommandSetRegulatoryConfigID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGeneralCommissioningCommandSetRegulatoryConfigID")
     = 0x00000002,
-    MTRClusterGeneralCommissioningCommandSetRegulatoryConfigResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGeneralCommissioningCommandSetRegulatoryConfigResponseID")
+    MTRClusterGeneralCommissioningCommandSetRegulatoryConfigResponseID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGeneralCommissioningCommandSetRegulatoryConfigResponseID")
     = 0x00000003,
-    MTRClusterGeneralCommissioningCommandCommissioningCompleteID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGeneralCommissioningCommandCommissioningCompleteID")
+    MTRClusterGeneralCommissioningCommandCommissioningCompleteID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGeneralCommissioningCommandCommissioningCompleteID")
     = 0x00000004,
-    MTRClusterGeneralCommissioningCommandCommissioningCompleteResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGeneralCommissioningCommandCommissioningCompleteResponseID")
+    MTRClusterGeneralCommissioningCommandCommissioningCompleteResponseID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGeneralCommissioningCommandCommissioningCompleteResponseID")
     = 0x00000005,
 
     // Cluster GeneralCommissioning commands
@@ -5571,32 +5922,32 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterGeneralCommissioningCommandCommissioningCompleteResponseID MTR_NEWLY_AVAILABLE = 0x00000005,
 
     // Cluster NetworkCommissioning deprecated command id names
-    MTRClusterNetworkCommissioningCommandScanNetworksID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterNetworkCommissioningCommandScanNetworksID")
+    MTRClusterNetworkCommissioningCommandScanNetworksID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterNetworkCommissioningCommandScanNetworksID")
     = 0x00000000,
-    MTRClusterNetworkCommissioningCommandScanNetworksResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterNetworkCommissioningCommandScanNetworksResponseID")
+    MTRClusterNetworkCommissioningCommandScanNetworksResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterNetworkCommissioningCommandScanNetworksResponseID")
     = 0x00000001,
-    MTRClusterNetworkCommissioningCommandAddOrUpdateWiFiNetworkID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterNetworkCommissioningCommandAddOrUpdateWiFiNetworkID")
+    MTRClusterNetworkCommissioningCommandAddOrUpdateWiFiNetworkID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterNetworkCommissioningCommandAddOrUpdateWiFiNetworkID")
     = 0x00000002,
-    MTRClusterNetworkCommissioningCommandAddOrUpdateThreadNetworkID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterNetworkCommissioningCommandAddOrUpdateThreadNetworkID")
+    MTRClusterNetworkCommissioningCommandAddOrUpdateThreadNetworkID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterNetworkCommissioningCommandAddOrUpdateThreadNetworkID")
     = 0x00000003,
-    MTRClusterNetworkCommissioningCommandRemoveNetworkID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterNetworkCommissioningCommandRemoveNetworkID")
+    MTRClusterNetworkCommissioningCommandRemoveNetworkID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterNetworkCommissioningCommandRemoveNetworkID")
     = 0x00000004,
-    MTRClusterNetworkCommissioningCommandNetworkConfigResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterNetworkCommissioningCommandNetworkConfigResponseID")
+    MTRClusterNetworkCommissioningCommandNetworkConfigResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterNetworkCommissioningCommandNetworkConfigResponseID")
     = 0x00000005,
-    MTRClusterNetworkCommissioningCommandConnectNetworkID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterNetworkCommissioningCommandConnectNetworkID")
+    MTRClusterNetworkCommissioningCommandConnectNetworkID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterNetworkCommissioningCommandConnectNetworkID")
     = 0x00000006,
-    MTRClusterNetworkCommissioningCommandConnectNetworkResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterNetworkCommissioningCommandConnectNetworkResponseID")
+    MTRClusterNetworkCommissioningCommandConnectNetworkResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterNetworkCommissioningCommandConnectNetworkResponseID")
     = 0x00000007,
-    MTRClusterNetworkCommissioningCommandReorderNetworkID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterNetworkCommissioningCommandReorderNetworkID")
+    MTRClusterNetworkCommissioningCommandReorderNetworkID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterNetworkCommissioningCommandReorderNetworkID")
     = 0x00000008,
 
     // Cluster NetworkCommissioning commands
@@ -5611,11 +5962,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterNetworkCommissioningCommandReorderNetworkID MTR_NEWLY_AVAILABLE = 0x00000008,
 
     // Cluster DiagnosticLogs deprecated command id names
-    MTRClusterDiagnosticLogsCommandRetrieveLogsRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDiagnosticLogsCommandRetrieveLogsRequestID")
+    MTRClusterDiagnosticLogsCommandRetrieveLogsRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDiagnosticLogsCommandRetrieveLogsRequestID")
     = 0x00000000,
-    MTRClusterDiagnosticLogsCommandRetrieveLogsResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDiagnosticLogsCommandRetrieveLogsResponseID")
+    MTRClusterDiagnosticLogsCommandRetrieveLogsResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDiagnosticLogsCommandRetrieveLogsResponseID")
     = 0x00000001,
 
     // Cluster DiagnosticLogs commands
@@ -5623,62 +5974,64 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterDiagnosticLogsCommandRetrieveLogsResponseID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster GeneralDiagnostics deprecated command id names
-    MTRClusterGeneralDiagnosticsCommandTestEventTriggerID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGeneralDiagnosticsCommandTestEventTriggerID")
+    MTRClusterGeneralDiagnosticsCommandTestEventTriggerID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGeneralDiagnosticsCommandTestEventTriggerID")
     = 0x00000000,
 
     // Cluster GeneralDiagnostics commands
     MTRCommandIDTypeClusterGeneralDiagnosticsCommandTestEventTriggerID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster SoftwareDiagnostics deprecated command id names
-    MTRClusterSoftwareDiagnosticsCommandResetWatermarksID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterSoftwareDiagnosticsCommandResetWatermarksID")
+    MTRClusterSoftwareDiagnosticsCommandResetWatermarksID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterSoftwareDiagnosticsCommandResetWatermarksID")
     = 0x00000000,
 
     // Cluster SoftwareDiagnostics commands
     MTRCommandIDTypeClusterSoftwareDiagnosticsCommandResetWatermarksID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster ThreadNetworkDiagnostics deprecated command id names
-    MTRClusterThreadNetworkDiagnosticsCommandResetCountsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterThreadNetworkDiagnosticsCommandResetCountsID")
+    MTRClusterThreadNetworkDiagnosticsCommandResetCountsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterThreadNetworkDiagnosticsCommandResetCountsID")
     = 0x00000000,
 
     // Cluster ThreadNetworkDiagnostics commands
     MTRCommandIDTypeClusterThreadNetworkDiagnosticsCommandResetCountsID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster WiFiNetworkDiagnostics deprecated command id names
-    MTRClusterWiFiNetworkDiagnosticsCommandResetCountsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterWiFiNetworkDiagnosticsCommandResetCountsID")
+    MTRClusterWiFiNetworkDiagnosticsCommandResetCountsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterWiFiNetworkDiagnosticsCommandResetCountsID")
     = 0x00000000,
 
     // Cluster WiFiNetworkDiagnostics commands
     MTRCommandIDTypeClusterWiFiNetworkDiagnosticsCommandResetCountsID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster EthernetNetworkDiagnostics deprecated command id names
-    MTRClusterEthernetNetworkDiagnosticsCommandResetCountsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterEthernetNetworkDiagnosticsCommandResetCountsID")
+    MTRClusterEthernetNetworkDiagnosticsCommandResetCountsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterEthernetNetworkDiagnosticsCommandResetCountsID")
     = 0x00000000,
 
     // Cluster EthernetNetworkDiagnostics commands
     MTRCommandIDTypeClusterEthernetNetworkDiagnosticsCommandResetCountsID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster TimeSynchronization deprecated command id names
-    MTRClusterTimeSynchronizationCommandSetUtcTimeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterTimeSynchronizationCommandSetUtcTimeID")
+    MTRClusterTimeSynchronizationCommandSetUtcTimeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterTimeSynchronizationCommandSetUtcTimeID")
     = 0x00000000,
 
     // Cluster TimeSynchronization commands
     MTRCommandIDTypeClusterTimeSynchronizationCommandSetUtcTimeID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster AdministratorCommissioning deprecated command id names
-    MTRClusterAdministratorCommissioningCommandOpenCommissioningWindowID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterAdministratorCommissioningCommandOpenCommissioningWindowID")
+    MTRClusterAdministratorCommissioningCommandOpenCommissioningWindowID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterAdministratorCommissioningCommandOpenCommissioningWindowID")
     = 0x00000000,
-    MTRClusterAdministratorCommissioningCommandOpenBasicCommissioningWindowID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterAdministratorCommissioningCommandOpenBasicCommissioningWindowID")
+    MTRClusterAdministratorCommissioningCommandOpenBasicCommissioningWindowID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterAdministratorCommissioningCommandOpenBasicCommissioningWindowID")
     = 0x00000001,
-    MTRClusterAdministratorCommissioningCommandRevokeCommissioningID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterAdministratorCommissioningCommandRevokeCommissioningID")
+    MTRClusterAdministratorCommissioningCommandRevokeCommissioningID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterAdministratorCommissioningCommandRevokeCommissioningID")
     = 0x00000002,
 
     // Cluster AdministratorCommissioning commands
@@ -5687,41 +6040,43 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterAdministratorCommissioningCommandRevokeCommissioningID MTR_NEWLY_AVAILABLE = 0x00000002,
 
     // Cluster OperationalCredentials deprecated command id names
-    MTRClusterOperationalCredentialsCommandAttestationRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID")
+    MTRClusterOperationalCredentialsCommandAttestationRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID")
     = 0x00000000,
-    MTRClusterOperationalCredentialsCommandAttestationResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationResponseID")
+    MTRClusterOperationalCredentialsCommandAttestationResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationResponseID")
     = 0x00000001,
-    MTRClusterOperationalCredentialsCommandCertificateChainRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOperationalCredentialsCommandCertificateChainRequestID")
+    MTRClusterOperationalCredentialsCommandCertificateChainRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOperationalCredentialsCommandCertificateChainRequestID")
     = 0x00000002,
-    MTRClusterOperationalCredentialsCommandCertificateChainResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOperationalCredentialsCommandCertificateChainResponseID")
+    MTRClusterOperationalCredentialsCommandCertificateChainResponseID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOperationalCredentialsCommandCertificateChainResponseID")
     = 0x00000003,
-    MTRClusterOperationalCredentialsCommandCSRRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOperationalCredentialsCommandCSRRequestID")
+    MTRClusterOperationalCredentialsCommandCSRRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOperationalCredentialsCommandCSRRequestID")
     = 0x00000004,
-    MTRClusterOperationalCredentialsCommandCSRResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOperationalCredentialsCommandCSRResponseID")
+    MTRClusterOperationalCredentialsCommandCSRResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOperationalCredentialsCommandCSRResponseID")
     = 0x00000005,
-    MTRClusterOperationalCredentialsCommandAddNOCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOperationalCredentialsCommandAddNOCID")
+    MTRClusterOperationalCredentialsCommandAddNOCID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOperationalCredentialsCommandAddNOCID")
     = 0x00000006,
-    MTRClusterOperationalCredentialsCommandUpdateNOCID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateNOCID")
+    MTRClusterOperationalCredentialsCommandUpdateNOCID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateNOCID")
     = 0x00000007,
-    MTRClusterOperationalCredentialsCommandNOCResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOperationalCredentialsCommandNOCResponseID")
+    MTRClusterOperationalCredentialsCommandNOCResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOperationalCredentialsCommandNOCResponseID")
     = 0x00000008,
-    MTRClusterOperationalCredentialsCommandUpdateFabricLabelID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateFabricLabelID")
+    MTRClusterOperationalCredentialsCommandUpdateFabricLabelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateFabricLabelID")
     = 0x00000009,
-    MTRClusterOperationalCredentialsCommandRemoveFabricID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOperationalCredentialsCommandRemoveFabricID")
+    MTRClusterOperationalCredentialsCommandRemoveFabricID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOperationalCredentialsCommandRemoveFabricID")
     = 0x0000000A,
-    MTRClusterOperationalCredentialsCommandAddTrustedRootCertificateID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterOperationalCredentialsCommandAddTrustedRootCertificateID")
+    MTRClusterOperationalCredentialsCommandAddTrustedRootCertificateID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOperationalCredentialsCommandAddTrustedRootCertificateID")
     = 0x0000000B,
 
     // Cluster OperationalCredentials commands
@@ -5739,23 +6094,24 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterOperationalCredentialsCommandAddTrustedRootCertificateID MTR_NEWLY_AVAILABLE = 0x0000000B,
 
     // Cluster GroupKeyManagement deprecated command id names
-    MTRClusterGroupKeyManagementCommandKeySetWriteID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetWriteID")
+    MTRClusterGroupKeyManagementCommandKeySetWriteID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetWriteID")
     = 0x00000000,
-    MTRClusterGroupKeyManagementCommandKeySetReadID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadID")
+    MTRClusterGroupKeyManagementCommandKeySetReadID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadID")
     = 0x00000001,
-    MTRClusterGroupKeyManagementCommandKeySetReadResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadResponseID")
+    MTRClusterGroupKeyManagementCommandKeySetReadResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadResponseID")
     = 0x00000002,
-    MTRClusterGroupKeyManagementCommandKeySetRemoveID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetRemoveID")
+    MTRClusterGroupKeyManagementCommandKeySetRemoveID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetRemoveID")
     = 0x00000003,
-    MTRClusterGroupKeyManagementCommandKeySetReadAllIndicesID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadAllIndicesID")
+    MTRClusterGroupKeyManagementCommandKeySetReadAllIndicesID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadAllIndicesID")
     = 0x00000004,
-    MTRClusterGroupKeyManagementCommandKeySetReadAllIndicesResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadAllIndicesResponseID")
+    MTRClusterGroupKeyManagementCommandKeySetReadAllIndicesResponseID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadAllIndicesResponseID")
     = 0x00000005,
 
     // Cluster GroupKeyManagement commands
@@ -5767,80 +6123,85 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadAllIndicesResponseID MTR_NEWLY_AVAILABLE = 0x00000005,
 
     // Cluster ModeSelect deprecated command id names
-    MTRClusterModeSelectCommandChangeToModeID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterModeSelectCommandChangeToModeID")
+    MTRClusterModeSelectCommandChangeToModeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterModeSelectCommandChangeToModeID")
     = 0x00000000,
 
     // Cluster ModeSelect commands
     MTRCommandIDTypeClusterModeSelectCommandChangeToModeID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster DoorLock deprecated command id names
-    MTRClusterDoorLockCommandLockDoorID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandLockDoorID")
+    MTRClusterDoorLockCommandLockDoorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandLockDoorID")
     = 0x00000000,
-    MTRClusterDoorLockCommandUnlockDoorID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandUnlockDoorID")
+    MTRClusterDoorLockCommandUnlockDoorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandUnlockDoorID")
     = 0x00000001,
-    MTRClusterDoorLockCommandUnlockWithTimeoutID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandUnlockWithTimeoutID")
+    MTRClusterDoorLockCommandUnlockWithTimeoutID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandUnlockWithTimeoutID")
     = 0x00000003,
-    MTRClusterDoorLockCommandSetWeekDayScheduleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandSetWeekDayScheduleID")
+    MTRClusterDoorLockCommandSetWeekDayScheduleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandSetWeekDayScheduleID")
     = 0x0000000B,
-    MTRClusterDoorLockCommandGetWeekDayScheduleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandGetWeekDayScheduleID")
+    MTRClusterDoorLockCommandGetWeekDayScheduleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandGetWeekDayScheduleID")
     = 0x0000000C,
-    MTRClusterDoorLockCommandGetWeekDayScheduleResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandGetWeekDayScheduleResponseID")
+    MTRClusterDoorLockCommandGetWeekDayScheduleResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandGetWeekDayScheduleResponseID")
     = 0x0000000C,
-    MTRClusterDoorLockCommandClearWeekDayScheduleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandClearWeekDayScheduleID")
+    MTRClusterDoorLockCommandClearWeekDayScheduleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandClearWeekDayScheduleID")
     = 0x0000000D,
-    MTRClusterDoorLockCommandSetYearDayScheduleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandSetYearDayScheduleID")
+    MTRClusterDoorLockCommandSetYearDayScheduleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandSetYearDayScheduleID")
     = 0x0000000E,
-    MTRClusterDoorLockCommandGetYearDayScheduleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandGetYearDayScheduleID")
+    MTRClusterDoorLockCommandGetYearDayScheduleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandGetYearDayScheduleID")
     = 0x0000000F,
-    MTRClusterDoorLockCommandGetYearDayScheduleResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandGetYearDayScheduleResponseID")
+    MTRClusterDoorLockCommandGetYearDayScheduleResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandGetYearDayScheduleResponseID")
     = 0x0000000F,
-    MTRClusterDoorLockCommandClearYearDayScheduleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandClearYearDayScheduleID")
+    MTRClusterDoorLockCommandClearYearDayScheduleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandClearYearDayScheduleID")
     = 0x00000010,
-    MTRClusterDoorLockCommandSetHolidayScheduleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandSetHolidayScheduleID")
+    MTRClusterDoorLockCommandSetHolidayScheduleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandSetHolidayScheduleID")
     = 0x00000011,
-    MTRClusterDoorLockCommandGetHolidayScheduleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandGetHolidayScheduleID")
+    MTRClusterDoorLockCommandGetHolidayScheduleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandGetHolidayScheduleID")
     = 0x00000012,
-    MTRClusterDoorLockCommandGetHolidayScheduleResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandGetHolidayScheduleResponseID")
+    MTRClusterDoorLockCommandGetHolidayScheduleResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandGetHolidayScheduleResponseID")
     = 0x00000012,
-    MTRClusterDoorLockCommandClearHolidayScheduleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandClearHolidayScheduleID")
+    MTRClusterDoorLockCommandClearHolidayScheduleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandClearHolidayScheduleID")
     = 0x00000013,
-    MTRClusterDoorLockCommandSetUserID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandSetUserID")
+    MTRClusterDoorLockCommandSetUserID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandSetUserID")
     = 0x0000001A,
-    MTRClusterDoorLockCommandGetUserID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandGetUserID")
+    MTRClusterDoorLockCommandGetUserID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandGetUserID")
     = 0x0000001B,
-    MTRClusterDoorLockCommandGetUserResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandGetUserResponseID")
+    MTRClusterDoorLockCommandGetUserResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandGetUserResponseID")
     = 0x0000001C,
-    MTRClusterDoorLockCommandClearUserID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandClearUserID")
+    MTRClusterDoorLockCommandClearUserID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandClearUserID")
     = 0x0000001D,
-    MTRClusterDoorLockCommandSetCredentialID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandSetCredentialID")
+    MTRClusterDoorLockCommandSetCredentialID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandSetCredentialID")
     = 0x00000022,
-    MTRClusterDoorLockCommandSetCredentialResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandSetCredentialResponseID")
+    MTRClusterDoorLockCommandSetCredentialResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandSetCredentialResponseID")
     = 0x00000023,
-    MTRClusterDoorLockCommandGetCredentialStatusID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandGetCredentialStatusID")
+    MTRClusterDoorLockCommandGetCredentialStatusID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandGetCredentialStatusID")
     = 0x00000024,
-    MTRClusterDoorLockCommandGetCredentialStatusResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandGetCredentialStatusResponseID")
+    MTRClusterDoorLockCommandGetCredentialStatusResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandGetCredentialStatusResponseID")
     = 0x00000025,
-    MTRClusterDoorLockCommandClearCredentialID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterDoorLockCommandClearCredentialID")
+    MTRClusterDoorLockCommandClearCredentialID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterDoorLockCommandClearCredentialID")
     = 0x00000026,
 
     // Cluster DoorLock commands
@@ -5870,26 +6231,26 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterDoorLockCommandClearCredentialID MTR_NEWLY_AVAILABLE = 0x00000026,
 
     // Cluster WindowCovering deprecated command id names
-    MTRClusterWindowCoveringCommandUpOrOpenID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterWindowCoveringCommandUpOrOpenID")
+    MTRClusterWindowCoveringCommandUpOrOpenID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterWindowCoveringCommandUpOrOpenID")
     = 0x00000000,
-    MTRClusterWindowCoveringCommandDownOrCloseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterWindowCoveringCommandDownOrCloseID")
+    MTRClusterWindowCoveringCommandDownOrCloseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterWindowCoveringCommandDownOrCloseID")
     = 0x00000001,
-    MTRClusterWindowCoveringCommandStopMotionID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterWindowCoveringCommandStopMotionID")
+    MTRClusterWindowCoveringCommandStopMotionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterWindowCoveringCommandStopMotionID")
     = 0x00000002,
-    MTRClusterWindowCoveringCommandGoToLiftValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterWindowCoveringCommandGoToLiftValueID")
+    MTRClusterWindowCoveringCommandGoToLiftValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterWindowCoveringCommandGoToLiftValueID")
     = 0x00000004,
-    MTRClusterWindowCoveringCommandGoToLiftPercentageID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterWindowCoveringCommandGoToLiftPercentageID")
+    MTRClusterWindowCoveringCommandGoToLiftPercentageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterWindowCoveringCommandGoToLiftPercentageID")
     = 0x00000005,
-    MTRClusterWindowCoveringCommandGoToTiltValueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltValueID")
+    MTRClusterWindowCoveringCommandGoToTiltValueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltValueID")
     = 0x00000007,
-    MTRClusterWindowCoveringCommandGoToTiltPercentageID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltPercentageID")
+    MTRClusterWindowCoveringCommandGoToTiltPercentageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltPercentageID")
     = 0x00000008,
 
     // Cluster WindowCovering commands
@@ -5902,11 +6263,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltPercentageID MTR_NEWLY_AVAILABLE = 0x00000008,
 
     // Cluster BarrierControl deprecated command id names
-    MTRClusterBarrierControlCommandBarrierControlGoToPercentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterBarrierControlCommandBarrierControlGoToPercentID")
+    MTRClusterBarrierControlCommandBarrierControlGoToPercentID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterBarrierControlCommandBarrierControlGoToPercentID")
     = 0x00000000,
-    MTRClusterBarrierControlCommandBarrierControlStopID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterBarrierControlCommandBarrierControlStopID")
+    MTRClusterBarrierControlCommandBarrierControlStopID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterBarrierControlCommandBarrierControlStopID")
     = 0x00000001,
 
     // Cluster BarrierControl commands
@@ -5914,20 +6275,20 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterBarrierControlCommandBarrierControlStopID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster Thermostat deprecated command id names
-    MTRClusterThermostatCommandSetpointRaiseLowerID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterThermostatCommandSetpointRaiseLowerID")
+    MTRClusterThermostatCommandSetpointRaiseLowerID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterThermostatCommandSetpointRaiseLowerID")
     = 0x00000000,
-    MTRClusterThermostatCommandGetWeeklyScheduleResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterThermostatCommandGetWeeklyScheduleResponseID")
+    MTRClusterThermostatCommandGetWeeklyScheduleResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterThermostatCommandGetWeeklyScheduleResponseID")
     = 0x00000000,
-    MTRClusterThermostatCommandSetWeeklyScheduleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterThermostatCommandSetWeeklyScheduleID")
+    MTRClusterThermostatCommandSetWeeklyScheduleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterThermostatCommandSetWeeklyScheduleID")
     = 0x00000001,
-    MTRClusterThermostatCommandGetWeeklyScheduleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterThermostatCommandGetWeeklyScheduleID")
+    MTRClusterThermostatCommandGetWeeklyScheduleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterThermostatCommandGetWeeklyScheduleID")
     = 0x00000002,
-    MTRClusterThermostatCommandClearWeeklyScheduleID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterThermostatCommandClearWeeklyScheduleID")
+    MTRClusterThermostatCommandClearWeeklyScheduleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterThermostatCommandClearWeeklyScheduleID")
     = 0x00000003,
 
     // Cluster Thermostat commands
@@ -5938,60 +6299,62 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterThermostatCommandClearWeeklyScheduleID MTR_NEWLY_AVAILABLE = 0x00000003,
 
     // Cluster ColorControl deprecated command id names
-    MTRClusterColorControlCommandMoveToHueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterColorControlCommandMoveToHueID")
+    MTRClusterColorControlCommandMoveToHueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandMoveToHueID")
     = 0x00000000,
-    MTRClusterColorControlCommandMoveHueID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandMoveHueID")
+    MTRClusterColorControlCommandMoveHueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandMoveHueID")
     = 0x00000001,
-    MTRClusterColorControlCommandStepHueID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandStepHueID")
+    MTRClusterColorControlCommandStepHueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandStepHueID")
     = 0x00000002,
-    MTRClusterColorControlCommandMoveToSaturationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterColorControlCommandMoveToSaturationID")
+    MTRClusterColorControlCommandMoveToSaturationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandMoveToSaturationID")
     = 0x00000003,
-    MTRClusterColorControlCommandMoveSaturationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterColorControlCommandMoveSaturationID")
+    MTRClusterColorControlCommandMoveSaturationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandMoveSaturationID")
     = 0x00000004,
-    MTRClusterColorControlCommandStepSaturationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterColorControlCommandStepSaturationID")
+    MTRClusterColorControlCommandStepSaturationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandStepSaturationID")
     = 0x00000005,
-    MTRClusterColorControlCommandMoveToHueAndSaturationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterColorControlCommandMoveToHueAndSaturationID")
+    MTRClusterColorControlCommandMoveToHueAndSaturationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandMoveToHueAndSaturationID")
     = 0x00000006,
-    MTRClusterColorControlCommandMoveToColorID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterColorControlCommandMoveToColorID")
+    MTRClusterColorControlCommandMoveToColorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandMoveToColorID")
     = 0x00000007,
-    MTRClusterColorControlCommandMoveColorID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterColorControlCommandMoveColorID")
+    MTRClusterColorControlCommandMoveColorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandMoveColorID")
     = 0x00000008,
-    MTRClusterColorControlCommandStepColorID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterColorControlCommandStepColorID")
+    MTRClusterColorControlCommandStepColorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandStepColorID")
     = 0x00000009,
-    MTRClusterColorControlCommandMoveToColorTemperatureID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterColorControlCommandMoveToColorTemperatureID")
+    MTRClusterColorControlCommandMoveToColorTemperatureID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandMoveToColorTemperatureID")
     = 0x0000000A,
-    MTRClusterColorControlCommandEnhancedMoveToHueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterColorControlCommandEnhancedMoveToHueID")
+    MTRClusterColorControlCommandEnhancedMoveToHueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandEnhancedMoveToHueID")
     = 0x00000040,
-    MTRClusterColorControlCommandEnhancedMoveHueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterColorControlCommandEnhancedMoveHueID")
+    MTRClusterColorControlCommandEnhancedMoveHueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandEnhancedMoveHueID")
     = 0x00000041,
-    MTRClusterColorControlCommandEnhancedStepHueID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterColorControlCommandEnhancedStepHueID")
+    MTRClusterColorControlCommandEnhancedStepHueID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandEnhancedStepHueID")
     = 0x00000042,
-    MTRClusterColorControlCommandEnhancedMoveToHueAndSaturationID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterColorControlCommandEnhancedMoveToHueAndSaturationID")
+    MTRClusterColorControlCommandEnhancedMoveToHueAndSaturationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandEnhancedMoveToHueAndSaturationID")
     = 0x00000043,
-    MTRClusterColorControlCommandColorLoopSetID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterColorControlCommandColorLoopSetID")
+    MTRClusterColorControlCommandColorLoopSetID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandColorLoopSetID")
     = 0x00000044,
-    MTRClusterColorControlCommandStopMoveStepID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterColorControlCommandStopMoveStepID")
+    MTRClusterColorControlCommandStopMoveStepID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandStopMoveStepID")
     = 0x00000047,
-    MTRClusterColorControlCommandMoveColorTemperatureID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterColorControlCommandMoveColorTemperatureID")
+    MTRClusterColorControlCommandMoveColorTemperatureID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandMoveColorTemperatureID")
     = 0x0000004B,
-    MTRClusterColorControlCommandStepColorTemperatureID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterColorControlCommandStepColorTemperatureID")
+    MTRClusterColorControlCommandStepColorTemperatureID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterColorControlCommandStepColorTemperatureID")
     = 0x0000004C,
 
     // Cluster ColorControl commands
@@ -6016,15 +6379,17 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterColorControlCommandStepColorTemperatureID MTR_NEWLY_AVAILABLE = 0x0000004C,
 
     // Cluster Channel deprecated command id names
-    MTRClusterChannelCommandChangeChannelID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterChannelCommandChangeChannelID")
+    MTRClusterChannelCommandChangeChannelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterChannelCommandChangeChannelID")
     = 0x00000000,
-    MTRClusterChannelCommandChangeChannelResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterChannelCommandChangeChannelResponseID")
+    MTRClusterChannelCommandChangeChannelResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterChannelCommandChangeChannelResponseID")
     = 0x00000001,
-    MTRClusterChannelCommandChangeChannelByNumberID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterChannelCommandChangeChannelByNumberID")
+    MTRClusterChannelCommandChangeChannelByNumberID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterChannelCommandChangeChannelByNumberID")
     = 0x00000002,
-    MTRClusterChannelCommandSkipChannelID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterChannelCommandSkipChannelID")
+    MTRClusterChannelCommandSkipChannelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterChannelCommandSkipChannelID")
     = 0x00000003,
 
     // Cluster Channel commands
@@ -6034,11 +6399,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterChannelCommandSkipChannelID MTR_NEWLY_AVAILABLE = 0x00000003,
 
     // Cluster TargetNavigator deprecated command id names
-    MTRClusterTargetNavigatorCommandNavigateTargetID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterTargetNavigatorCommandNavigateTargetID")
+    MTRClusterTargetNavigatorCommandNavigateTargetID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterTargetNavigatorCommandNavigateTargetID")
     = 0x00000000,
-    MTRClusterTargetNavigatorCommandNavigateTargetResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterTargetNavigatorCommandNavigateTargetResponseID")
+    MTRClusterTargetNavigatorCommandNavigateTargetResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterTargetNavigatorCommandNavigateTargetResponseID")
     = 0x00000001,
 
     // Cluster TargetNavigator commands
@@ -6046,36 +6411,41 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterTargetNavigatorCommandNavigateTargetResponseID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster MediaPlayback deprecated command id names
-    MTRClusterMediaPlaybackCommandPlayID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandPlayID")
+    MTRClusterMediaPlaybackCommandPlayID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandPlayID")
     = 0x00000000,
-    MTRClusterMediaPlaybackCommandPauseID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandPauseID")
+    MTRClusterMediaPlaybackCommandPauseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandPauseID")
     = 0x00000001,
-    MTRClusterMediaPlaybackCommandStopPlaybackID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterMediaPlaybackCommandStopPlaybackID")
+    MTRClusterMediaPlaybackCommandStopPlaybackID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandStopPlaybackID")
     = 0x00000002,
-    MTRClusterMediaPlaybackCommandStartOverID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterMediaPlaybackCommandStartOverID")
+    MTRClusterMediaPlaybackCommandStartOverID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandStartOverID")
     = 0x00000003,
-    MTRClusterMediaPlaybackCommandPreviousID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterMediaPlaybackCommandPreviousID")
+    MTRClusterMediaPlaybackCommandPreviousID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandPreviousID")
     = 0x00000004,
-    MTRClusterMediaPlaybackCommandNextID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandNextID")
+    MTRClusterMediaPlaybackCommandNextID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandNextID")
     = 0x00000005,
-    MTRClusterMediaPlaybackCommandRewindID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandRewindID")
+    MTRClusterMediaPlaybackCommandRewindID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandRewindID")
     = 0x00000006,
-    MTRClusterMediaPlaybackCommandFastForwardID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterMediaPlaybackCommandFastForwardID")
+    MTRClusterMediaPlaybackCommandFastForwardID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandFastForwardID")
     = 0x00000007,
-    MTRClusterMediaPlaybackCommandSkipForwardID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterMediaPlaybackCommandSkipForwardID")
+    MTRClusterMediaPlaybackCommandSkipForwardID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandSkipForwardID")
     = 0x00000008,
-    MTRClusterMediaPlaybackCommandSkipBackwardID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterMediaPlaybackCommandSkipBackwardID")
+    MTRClusterMediaPlaybackCommandSkipBackwardID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandSkipBackwardID")
     = 0x00000009,
-    MTRClusterMediaPlaybackCommandPlaybackResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterMediaPlaybackCommandPlaybackResponseID")
+    MTRClusterMediaPlaybackCommandPlaybackResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandPlaybackResponseID")
     = 0x0000000A,
-    MTRClusterMediaPlaybackCommandSeekID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandSeekID")
+    MTRClusterMediaPlaybackCommandSeekID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaPlaybackCommandSeekID")
     = 0x0000000B,
 
     // Cluster MediaPlayback commands
@@ -6093,17 +6463,17 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterMediaPlaybackCommandSeekID MTR_NEWLY_AVAILABLE = 0x0000000B,
 
     // Cluster MediaInput deprecated command id names
-    MTRClusterMediaInputCommandSelectInputID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterMediaInputCommandSelectInputID")
+    MTRClusterMediaInputCommandSelectInputID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaInputCommandSelectInputID")
     = 0x00000000,
-    MTRClusterMediaInputCommandShowInputStatusID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterMediaInputCommandShowInputStatusID")
+    MTRClusterMediaInputCommandShowInputStatusID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaInputCommandShowInputStatusID")
     = 0x00000001,
-    MTRClusterMediaInputCommandHideInputStatusID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterMediaInputCommandHideInputStatusID")
+    MTRClusterMediaInputCommandHideInputStatusID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaInputCommandHideInputStatusID")
     = 0x00000002,
-    MTRClusterMediaInputCommandRenameInputID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterMediaInputCommandRenameInputID")
+    MTRClusterMediaInputCommandRenameInputID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterMediaInputCommandRenameInputID")
     = 0x00000003,
 
     // Cluster MediaInput commands
@@ -6113,16 +6483,19 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterMediaInputCommandRenameInputID MTR_NEWLY_AVAILABLE = 0x00000003,
 
     // Cluster LowPower deprecated command id names
-    MTRClusterLowPowerCommandSleepID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterLowPowerCommandSleepID") = 0x00000000,
+    MTRClusterLowPowerCommandSleepID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterLowPowerCommandSleepID")
+    = 0x00000000,
 
     // Cluster LowPower commands
     MTRCommandIDTypeClusterLowPowerCommandSleepID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster KeypadInput deprecated command id names
-    MTRClusterKeypadInputCommandSendKeyID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterKeypadInputCommandSendKeyID")
+    MTRClusterKeypadInputCommandSendKeyID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterKeypadInputCommandSendKeyID")
     = 0x00000000,
-    MTRClusterKeypadInputCommandSendKeyResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterKeypadInputCommandSendKeyResponseID")
+    MTRClusterKeypadInputCommandSendKeyResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterKeypadInputCommandSendKeyResponseID")
     = 0x00000001,
 
     // Cluster KeypadInput commands
@@ -6130,14 +6503,14 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterKeypadInputCommandSendKeyResponseID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster ContentLauncher deprecated command id names
-    MTRClusterContentLauncherCommandLaunchContentID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterContentLauncherCommandLaunchContentID")
+    MTRClusterContentLauncherCommandLaunchContentID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterContentLauncherCommandLaunchContentID")
     = 0x00000000,
-    MTRClusterContentLauncherCommandLaunchURLID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterContentLauncherCommandLaunchURLID")
+    MTRClusterContentLauncherCommandLaunchURLID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterContentLauncherCommandLaunchURLID")
     = 0x00000001,
-    MTRClusterContentLauncherCommandLaunchResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterContentLauncherCommandLaunchResponseID")
+    MTRClusterContentLauncherCommandLaunchResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterContentLauncherCommandLaunchResponseID")
     = 0x00000002,
 
     // Cluster ContentLauncher commands
@@ -6146,11 +6519,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterContentLauncherCommandLaunchResponseID MTR_NEWLY_AVAILABLE = 0x00000002,
 
     // Cluster AudioOutput deprecated command id names
-    MTRClusterAudioOutputCommandSelectOutputID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterAudioOutputCommandSelectOutputID")
+    MTRClusterAudioOutputCommandSelectOutputID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterAudioOutputCommandSelectOutputID")
     = 0x00000000,
-    MTRClusterAudioOutputCommandRenameOutputID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterAudioOutputCommandRenameOutputID")
+    MTRClusterAudioOutputCommandRenameOutputID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterAudioOutputCommandRenameOutputID")
     = 0x00000001,
 
     // Cluster AudioOutput commands
@@ -6158,17 +6531,17 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterAudioOutputCommandRenameOutputID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster ApplicationLauncher deprecated command id names
-    MTRClusterApplicationLauncherCommandLaunchAppID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterApplicationLauncherCommandLaunchAppID")
+    MTRClusterApplicationLauncherCommandLaunchAppID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterApplicationLauncherCommandLaunchAppID")
     = 0x00000000,
-    MTRClusterApplicationLauncherCommandStopAppID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterApplicationLauncherCommandStopAppID")
+    MTRClusterApplicationLauncherCommandStopAppID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterApplicationLauncherCommandStopAppID")
     = 0x00000001,
-    MTRClusterApplicationLauncherCommandHideAppID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterApplicationLauncherCommandHideAppID")
+    MTRClusterApplicationLauncherCommandHideAppID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterApplicationLauncherCommandHideAppID")
     = 0x00000002,
-    MTRClusterApplicationLauncherCommandLauncherResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterApplicationLauncherCommandLauncherResponseID")
+    MTRClusterApplicationLauncherCommandLauncherResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterApplicationLauncherCommandLauncherResponseID")
     = 0x00000003,
 
     // Cluster ApplicationLauncher commands
@@ -6178,15 +6551,17 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterApplicationLauncherCommandLauncherResponseID MTR_NEWLY_AVAILABLE = 0x00000003,
 
     // Cluster AccountLogin deprecated command id names
-    MTRClusterAccountLoginCommandGetSetupPINID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterAccountLoginCommandGetSetupPINID")
+    MTRClusterAccountLoginCommandGetSetupPINID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterAccountLoginCommandGetSetupPINID")
     = 0x00000000,
-    MTRClusterAccountLoginCommandGetSetupPINResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterAccountLoginCommandGetSetupPINResponseID")
+    MTRClusterAccountLoginCommandGetSetupPINResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterAccountLoginCommandGetSetupPINResponseID")
     = 0x00000001,
-    MTRClusterAccountLoginCommandLoginID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterAccountLoginCommandLoginID")
+    MTRClusterAccountLoginCommandLoginID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterAccountLoginCommandLoginID")
     = 0x00000002,
-    MTRClusterAccountLoginCommandLogoutID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterAccountLoginCommandLogoutID")
+    MTRClusterAccountLoginCommandLogoutID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterAccountLoginCommandLogoutID")
     = 0x00000003,
 
     // Cluster AccountLogin commands
@@ -6196,17 +6571,20 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterAccountLoginCommandLogoutID MTR_NEWLY_AVAILABLE = 0x00000003,
 
     // Cluster ElectricalMeasurement deprecated command id names
-    MTRClusterElectricalMeasurementCommandGetProfileInfoResponseCommandID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterElectricalMeasurementCommandGetProfileInfoResponseCommandID")
+    MTRClusterElectricalMeasurementCommandGetProfileInfoResponseCommandID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterElectricalMeasurementCommandGetProfileInfoResponseCommandID")
     = 0x00000000,
-    MTRClusterElectricalMeasurementCommandGetProfileInfoCommandID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterElectricalMeasurementCommandGetProfileInfoCommandID")
+    MTRClusterElectricalMeasurementCommandGetProfileInfoCommandID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterElectricalMeasurementCommandGetProfileInfoCommandID")
     = 0x00000000,
-    MTRClusterElectricalMeasurementCommandGetMeasurementProfileResponseCommandID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileResponseCommandID")
+    MTRClusterElectricalMeasurementCommandGetMeasurementProfileResponseCommandID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileResponseCommandID")
     = 0x00000001,
-    MTRClusterElectricalMeasurementCommandGetMeasurementProfileCommandID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileCommandID")
+    MTRClusterElectricalMeasurementCommandGetMeasurementProfileCommandID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileCommandID")
     = 0x00000001,
 
     // Cluster ElectricalMeasurement commands
@@ -6220,106 +6598,112 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterClientMonitoringCommandStayAwakeRequestID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster TestCluster deprecated command id names
-    MTRClusterTestClusterCommandTestID MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestID")
+    MTRClusterTestClusterCommandTestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestID")
     = 0x00000000,
-    MTRClusterTestClusterCommandTestSpecificResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestSpecificResponseID")
+    MTRClusterTestClusterCommandTestSpecificResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestSpecificResponseID")
     = 0x00000000,
-    MTRClusterTestClusterCommandTestNotHandledID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestNotHandledID")
+    MTRClusterTestClusterCommandTestNotHandledID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestNotHandledID")
     = 0x00000001,
-    MTRClusterTestClusterCommandTestAddArgumentsResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestAddArgumentsResponseID")
+    MTRClusterTestClusterCommandTestAddArgumentsResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestAddArgumentsResponseID")
     = 0x00000001,
-    MTRClusterTestClusterCommandTestSpecificID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestSpecificID")
+    MTRClusterTestClusterCommandTestSpecificID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestSpecificID")
     = 0x00000002,
-    MTRClusterTestClusterCommandTestSimpleArgumentResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestSimpleArgumentResponseID")
+    MTRClusterTestClusterCommandTestSimpleArgumentResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestSimpleArgumentResponseID")
     = 0x00000002,
-    MTRClusterTestClusterCommandTestUnknownCommandID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestUnknownCommandID")
+    MTRClusterTestClusterCommandTestUnknownCommandID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestUnknownCommandID")
     = 0x00000003,
-    MTRClusterTestClusterCommandTestStructArrayArgumentResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestStructArrayArgumentResponseID")
+    MTRClusterTestClusterCommandTestStructArrayArgumentResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestStructArrayArgumentResponseID")
     = 0x00000003,
-    MTRClusterTestClusterCommandTestAddArgumentsID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestAddArgumentsID")
+    MTRClusterTestClusterCommandTestAddArgumentsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestAddArgumentsID")
     = 0x00000004,
-    MTRClusterTestClusterCommandTestListInt8UReverseResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestListInt8UReverseResponseID")
+    MTRClusterTestClusterCommandTestListInt8UReverseResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestListInt8UReverseResponseID")
     = 0x00000004,
-    MTRClusterTestClusterCommandTestSimpleArgumentRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestSimpleArgumentRequestID")
+    MTRClusterTestClusterCommandTestSimpleArgumentRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestSimpleArgumentRequestID")
     = 0x00000005,
-    MTRClusterTestClusterCommandTestEnumsResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestEnumsResponseID")
+    MTRClusterTestClusterCommandTestEnumsResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestEnumsResponseID")
     = 0x00000005,
-    MTRClusterTestClusterCommandTestStructArrayArgumentRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestStructArrayArgumentRequestID")
+    MTRClusterTestClusterCommandTestStructArrayArgumentRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestStructArrayArgumentRequestID")
     = 0x00000006,
-    MTRClusterTestClusterCommandTestNullableOptionalResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestNullableOptionalResponseID")
+    MTRClusterTestClusterCommandTestNullableOptionalResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestNullableOptionalResponseID")
     = 0x00000006,
-    MTRClusterTestClusterCommandTestStructArgumentRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestStructArgumentRequestID")
+    MTRClusterTestClusterCommandTestStructArgumentRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestStructArgumentRequestID")
     = 0x00000007,
-    MTRClusterTestClusterCommandTestComplexNullableOptionalResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestComplexNullableOptionalResponseID")
+    MTRClusterTestClusterCommandTestComplexNullableOptionalResponseID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestComplexNullableOptionalResponseID")
     = 0x00000007,
-    MTRClusterTestClusterCommandTestNestedStructArgumentRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestNestedStructArgumentRequestID")
+    MTRClusterTestClusterCommandTestNestedStructArgumentRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestNestedStructArgumentRequestID")
     = 0x00000008,
-    MTRClusterTestClusterCommandBooleanResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandBooleanResponseID")
+    MTRClusterTestClusterCommandBooleanResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandBooleanResponseID")
     = 0x00000008,
-    MTRClusterTestClusterCommandTestListStructArgumentRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestListStructArgumentRequestID")
+    MTRClusterTestClusterCommandTestListStructArgumentRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestListStructArgumentRequestID")
     = 0x00000009,
-    MTRClusterTestClusterCommandSimpleStructResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandSimpleStructResponseID")
+    MTRClusterTestClusterCommandSimpleStructResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandSimpleStructResponseID")
     = 0x00000009,
-    MTRClusterTestClusterCommandTestListInt8UArgumentRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestListInt8UArgumentRequestID")
+    MTRClusterTestClusterCommandTestListInt8UArgumentRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestListInt8UArgumentRequestID")
     = 0x0000000A,
-    MTRClusterTestClusterCommandTestEmitTestEventResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestEventResponseID")
+    MTRClusterTestClusterCommandTestEmitTestEventResponseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestEventResponseID")
     = 0x0000000A,
-    MTRClusterTestClusterCommandTestNestedStructListArgumentRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestNestedStructListArgumentRequestID")
+    MTRClusterTestClusterCommandTestNestedStructListArgumentRequestID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestNestedStructListArgumentRequestID")
     = 0x0000000B,
-    MTRClusterTestClusterCommandTestEmitTestFabricScopedEventResponseID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestFabricScopedEventResponseID")
+    MTRClusterTestClusterCommandTestEmitTestFabricScopedEventResponseID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestFabricScopedEventResponseID")
     = 0x0000000B,
-    MTRClusterTestClusterCommandTestListNestedStructListArgumentRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestListNestedStructListArgumentRequestID")
+    MTRClusterTestClusterCommandTestListNestedStructListArgumentRequestID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestListNestedStructListArgumentRequestID")
     = 0x0000000C,
-    MTRClusterTestClusterCommandTestListInt8UReverseRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestListInt8UReverseRequestID")
+    MTRClusterTestClusterCommandTestListInt8UReverseRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestListInt8UReverseRequestID")
     = 0x0000000D,
-    MTRClusterTestClusterCommandTestEnumsRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestEnumsRequestID")
+    MTRClusterTestClusterCommandTestEnumsRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestEnumsRequestID")
     = 0x0000000E,
-    MTRClusterTestClusterCommandTestNullableOptionalRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestNullableOptionalRequestID")
+    MTRClusterTestClusterCommandTestNullableOptionalRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestNullableOptionalRequestID")
     = 0x0000000F,
-    MTRClusterTestClusterCommandTestComplexNullableOptionalRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestComplexNullableOptionalRequestID")
+    MTRClusterTestClusterCommandTestComplexNullableOptionalRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestComplexNullableOptionalRequestID")
     = 0x00000010,
-    MTRClusterTestClusterCommandSimpleStructEchoRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandSimpleStructEchoRequestID")
+    MTRClusterTestClusterCommandSimpleStructEchoRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandSimpleStructEchoRequestID")
     = 0x00000011,
-    MTRClusterTestClusterCommandTimedInvokeRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTimedInvokeRequestID")
+    MTRClusterTestClusterCommandTimedInvokeRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTimedInvokeRequestID")
     = 0x00000012,
-    MTRClusterTestClusterCommandTestSimpleOptionalArgumentRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestSimpleOptionalArgumentRequestID")
+    MTRClusterTestClusterCommandTestSimpleOptionalArgumentRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestSimpleOptionalArgumentRequestID")
     = 0x00000013,
-    MTRClusterTestClusterCommandTestEmitTestEventRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestEventRequestID")
+    MTRClusterTestClusterCommandTestEmitTestEventRequestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestEventRequestID")
     = 0x00000014,
-    MTRClusterTestClusterCommandTestEmitTestFabricScopedEventRequestID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestFabricScopedEventRequestID")
+    MTRClusterTestClusterCommandTestEmitTestFabricScopedEventRequestID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestFabricScopedEventRequestID")
     = 0x00000015,
 
     // Cluster UnitTesting commands
@@ -6359,11 +6743,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestFabricScopedEventRequestID MTR_NEWLY_AVAILABLE = 0x00000015,
 
     // Cluster FaultInjection deprecated command id names
-    MTRClusterFaultInjectionCommandFailAtFaultID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterFaultInjectionCommandFailAtFaultID")
+    MTRClusterFaultInjectionCommandFailAtFaultID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterFaultInjectionCommandFailAtFaultID")
     = 0x00000000,
-    MTRClusterFaultInjectionCommandFailRandomlyAtFaultID MTR_NEWLY_DEPRECATED(
-        "Please use MTRCommandIDTypeClusterFaultInjectionCommandFailRandomlyAtFaultID")
+    MTRClusterFaultInjectionCommandFailRandomlyAtFaultID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterFaultInjectionCommandFailRandomlyAtFaultID")
     = 0x00000001,
 
     // Cluster FaultInjection commands
@@ -6377,11 +6761,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
 typedef NS_ENUM(uint32_t, MTREventIDType) {
 
     // Cluster AccessControl deprecated event names
-    MTRClusterAccessControlEventAccessControlEntryChangedID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterAccessControlEventAccessControlEntryChangedID")
+    MTRClusterAccessControlEventAccessControlEntryChangedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterAccessControlEventAccessControlEntryChangedID")
     = 0x00000000,
-    MTRClusterAccessControlEventAccessControlExtensionChangedID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterAccessControlEventAccessControlExtensionChangedID")
+    MTRClusterAccessControlEventAccessControlExtensionChangedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterAccessControlEventAccessControlExtensionChangedID")
     = 0x00000001,
 
     // Cluster AccessControl events
@@ -6389,9 +6773,11 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterAccessControlEventAccessControlExtensionChangedID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster Actions deprecated event names
-    MTRClusterActionsEventStateChangedID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterActionsEventStateChangedID")
+    MTRClusterActionsEventStateChangedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterActionsEventStateChangedID")
     = 0x00000000,
-    MTRClusterActionsEventActionFailedID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterActionsEventActionFailedID")
+    MTRClusterActionsEventActionFailedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterActionsEventActionFailedID")
     = 0x00000001,
 
     // Cluster Actions events
@@ -6399,10 +6785,17 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterActionsEventActionFailedID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster Basic deprecated event names
-    MTRClusterBasicEventStartUpID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBasicEventStartUpID") = 0x00000000,
-    MTRClusterBasicEventShutDownID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBasicEventShutDownID") = 0x00000001,
-    MTRClusterBasicEventLeaveID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBasicEventLeaveID") = 0x00000002,
-    MTRClusterBasicEventReachableChangedID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBasicEventReachableChangedID")
+    MTRClusterBasicEventStartUpID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBasicEventStartUpID")
+    = 0x00000000,
+    MTRClusterBasicEventShutDownID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBasicEventShutDownID")
+    = 0x00000001,
+    MTRClusterBasicEventLeaveID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBasicEventLeaveID")
+    = 0x00000002,
+    MTRClusterBasicEventReachableChangedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBasicEventReachableChangedID")
     = 0x00000003,
 
     // Cluster Basic events
@@ -6412,14 +6805,14 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterBasicEventReachableChangedID MTR_NEWLY_AVAILABLE = 0x00000003,
 
     // Cluster OtaSoftwareUpdateRequestor deprecated event names
-    MTRClusterOtaSoftwareUpdateRequestorEventStateTransitionID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterOtaSoftwareUpdateRequestorEventStateTransitionID")
+    MTRClusterOtaSoftwareUpdateRequestorEventStateTransitionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterOtaSoftwareUpdateRequestorEventStateTransitionID")
     = 0x00000000,
-    MTRClusterOtaSoftwareUpdateRequestorEventVersionAppliedID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterOtaSoftwareUpdateRequestorEventVersionAppliedID")
+    MTRClusterOtaSoftwareUpdateRequestorEventVersionAppliedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterOtaSoftwareUpdateRequestorEventVersionAppliedID")
     = 0x00000001,
-    MTRClusterOtaSoftwareUpdateRequestorEventDownloadErrorID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterOtaSoftwareUpdateRequestorEventDownloadErrorID")
+    MTRClusterOtaSoftwareUpdateRequestorEventDownloadErrorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterOtaSoftwareUpdateRequestorEventDownloadErrorID")
     = 0x00000002,
 
     // Cluster OTASoftwareUpdateRequestor events
@@ -6428,17 +6821,17 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterOTASoftwareUpdateRequestorEventDownloadErrorID MTR_NEWLY_AVAILABLE = 0x00000002,
 
     // Cluster GeneralDiagnostics deprecated event names
-    MTRClusterGeneralDiagnosticsEventHardwareFaultChangeID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterGeneralDiagnosticsEventHardwareFaultChangeID")
+    MTRClusterGeneralDiagnosticsEventHardwareFaultChangeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterGeneralDiagnosticsEventHardwareFaultChangeID")
     = 0x00000000,
-    MTRClusterGeneralDiagnosticsEventRadioFaultChangeID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterGeneralDiagnosticsEventRadioFaultChangeID")
+    MTRClusterGeneralDiagnosticsEventRadioFaultChangeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterGeneralDiagnosticsEventRadioFaultChangeID")
     = 0x00000001,
-    MTRClusterGeneralDiagnosticsEventNetworkFaultChangeID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterGeneralDiagnosticsEventNetworkFaultChangeID")
+    MTRClusterGeneralDiagnosticsEventNetworkFaultChangeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterGeneralDiagnosticsEventNetworkFaultChangeID")
     = 0x00000002,
-    MTRClusterGeneralDiagnosticsEventBootReasonID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterGeneralDiagnosticsEventBootReasonID")
+    MTRClusterGeneralDiagnosticsEventBootReasonID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterGeneralDiagnosticsEventBootReasonID")
     = 0x00000003,
 
     // Cluster GeneralDiagnostics events
@@ -6448,19 +6841,19 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterGeneralDiagnosticsEventBootReasonID MTR_NEWLY_AVAILABLE = 0x00000003,
 
     // Cluster SoftwareDiagnostics deprecated event names
-    MTRClusterSoftwareDiagnosticsEventSoftwareFaultID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterSoftwareDiagnosticsEventSoftwareFaultID")
+    MTRClusterSoftwareDiagnosticsEventSoftwareFaultID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterSoftwareDiagnosticsEventSoftwareFaultID")
     = 0x00000000,
 
     // Cluster SoftwareDiagnostics events
     MTREventIDTypeClusterSoftwareDiagnosticsEventSoftwareFaultID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster ThreadNetworkDiagnostics deprecated event names
-    MTRClusterThreadNetworkDiagnosticsEventConnectionStatusID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterThreadNetworkDiagnosticsEventConnectionStatusID")
+    MTRClusterThreadNetworkDiagnosticsEventConnectionStatusID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterThreadNetworkDiagnosticsEventConnectionStatusID")
     = 0x00000000,
-    MTRClusterThreadNetworkDiagnosticsEventNetworkFaultChangeID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterThreadNetworkDiagnosticsEventNetworkFaultChangeID")
+    MTRClusterThreadNetworkDiagnosticsEventNetworkFaultChangeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterThreadNetworkDiagnosticsEventNetworkFaultChangeID")
     = 0x00000001,
 
     // Cluster ThreadNetworkDiagnostics events
@@ -6468,14 +6861,14 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterThreadNetworkDiagnosticsEventNetworkFaultChangeID MTR_NEWLY_AVAILABLE = 0x00000001,
 
     // Cluster WiFiNetworkDiagnostics deprecated event names
-    MTRClusterWiFiNetworkDiagnosticsEventDisconnectionID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterWiFiNetworkDiagnosticsEventDisconnectionID")
+    MTRClusterWiFiNetworkDiagnosticsEventDisconnectionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterWiFiNetworkDiagnosticsEventDisconnectionID")
     = 0x00000000,
-    MTRClusterWiFiNetworkDiagnosticsEventAssociationFailureID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterWiFiNetworkDiagnosticsEventAssociationFailureID")
+    MTRClusterWiFiNetworkDiagnosticsEventAssociationFailureID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterWiFiNetworkDiagnosticsEventAssociationFailureID")
     = 0x00000001,
-    MTRClusterWiFiNetworkDiagnosticsEventConnectionStatusID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterWiFiNetworkDiagnosticsEventConnectionStatusID")
+    MTRClusterWiFiNetworkDiagnosticsEventConnectionStatusID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterWiFiNetworkDiagnosticsEventConnectionStatusID")
     = 0x00000002,
 
     // Cluster WiFiNetworkDiagnostics events
@@ -6484,16 +6877,17 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterWiFiNetworkDiagnosticsEventConnectionStatusID MTR_NEWLY_AVAILABLE = 0x00000002,
 
     // Cluster BridgedDeviceBasic deprecated event names
-    MTRClusterBridgedDeviceBasicEventStartUpID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterBridgedDeviceBasicEventStartUpID")
+    MTRClusterBridgedDeviceBasicEventStartUpID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBridgedDeviceBasicEventStartUpID")
     = 0x00000000,
-    MTRClusterBridgedDeviceBasicEventShutDownID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterBridgedDeviceBasicEventShutDownID")
+    MTRClusterBridgedDeviceBasicEventShutDownID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBridgedDeviceBasicEventShutDownID")
     = 0x00000001,
-    MTRClusterBridgedDeviceBasicEventLeaveID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBridgedDeviceBasicEventLeaveID")
+    MTRClusterBridgedDeviceBasicEventLeaveID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBridgedDeviceBasicEventLeaveID")
     = 0x00000002,
-    MTRClusterBridgedDeviceBasicEventReachableChangedID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterBridgedDeviceBasicEventReachableChangedID")
+    MTRClusterBridgedDeviceBasicEventReachableChangedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBridgedDeviceBasicEventReachableChangedID")
     = 0x00000003,
 
     // Cluster BridgedDeviceBasic events
@@ -6503,19 +6897,26 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterBridgedDeviceBasicEventReachableChangedID MTR_NEWLY_AVAILABLE = 0x00000003,
 
     // Cluster Switch deprecated event names
-    MTRClusterSwitchEventSwitchLatchedID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterSwitchEventSwitchLatchedID")
+    MTRClusterSwitchEventSwitchLatchedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterSwitchEventSwitchLatchedID")
     = 0x00000000,
-    MTRClusterSwitchEventInitialPressID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterSwitchEventInitialPressID")
+    MTRClusterSwitchEventInitialPressID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterSwitchEventInitialPressID")
     = 0x00000001,
-    MTRClusterSwitchEventLongPressID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterSwitchEventLongPressID") = 0x00000002,
-    MTRClusterSwitchEventShortReleaseID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterSwitchEventShortReleaseID")
+    MTRClusterSwitchEventLongPressID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterSwitchEventLongPressID")
+    = 0x00000002,
+    MTRClusterSwitchEventShortReleaseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterSwitchEventShortReleaseID")
     = 0x00000003,
-    MTRClusterSwitchEventLongReleaseID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterSwitchEventLongReleaseID")
+    MTRClusterSwitchEventLongReleaseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterSwitchEventLongReleaseID")
     = 0x00000004,
-    MTRClusterSwitchEventMultiPressOngoingID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterSwitchEventMultiPressOngoingID")
+    MTRClusterSwitchEventMultiPressOngoingID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterSwitchEventMultiPressOngoingID")
     = 0x00000005,
-    MTRClusterSwitchEventMultiPressCompleteID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterSwitchEventMultiPressCompleteID")
+    MTRClusterSwitchEventMultiPressCompleteID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterSwitchEventMultiPressCompleteID")
     = 0x00000006,
 
     // Cluster Switch events
@@ -6528,23 +6929,28 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterSwitchEventMultiPressCompleteID MTR_NEWLY_AVAILABLE = 0x00000006,
 
     // Cluster BooleanState deprecated event names
-    MTRClusterBooleanStateEventStateChangeID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBooleanStateEventStateChangeID")
+    MTRClusterBooleanStateEventStateChangeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBooleanStateEventStateChangeID")
     = 0x00000000,
 
     // Cluster BooleanState events
     MTREventIDTypeClusterBooleanStateEventStateChangeID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster DoorLock deprecated event names
-    MTRClusterDoorLockEventDoorLockAlarmID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterDoorLockEventDoorLockAlarmID")
+    MTRClusterDoorLockEventDoorLockAlarmID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterDoorLockEventDoorLockAlarmID")
     = 0x00000000,
-    MTRClusterDoorLockEventDoorStateChangeID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterDoorLockEventDoorStateChangeID")
+    MTRClusterDoorLockEventDoorStateChangeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterDoorLockEventDoorStateChangeID")
     = 0x00000001,
-    MTRClusterDoorLockEventLockOperationID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterDoorLockEventLockOperationID")
+    MTRClusterDoorLockEventLockOperationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterDoorLockEventLockOperationID")
     = 0x00000002,
-    MTRClusterDoorLockEventLockOperationErrorID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterDoorLockEventLockOperationErrorID")
+    MTRClusterDoorLockEventLockOperationErrorID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterDoorLockEventLockOperationErrorID")
     = 0x00000003,
-    MTRClusterDoorLockEventLockUserChangeID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterDoorLockEventLockUserChangeID")
+    MTRClusterDoorLockEventLockUserChangeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterDoorLockEventLockUserChangeID")
     = 0x00000004,
 
     // Cluster DoorLock events
@@ -6555,56 +6961,58 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterDoorLockEventLockUserChangeID MTR_NEWLY_AVAILABLE = 0x00000004,
 
     // Cluster PumpConfigurationAndControl deprecated event names
-    MTRClusterPumpConfigurationAndControlEventSupplyVoltageLowID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterPumpConfigurationAndControlEventSupplyVoltageLowID")
+    MTRClusterPumpConfigurationAndControlEventSupplyVoltageLowID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterPumpConfigurationAndControlEventSupplyVoltageLowID")
     = 0x00000000,
-    MTRClusterPumpConfigurationAndControlEventSupplyVoltageHighID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterPumpConfigurationAndControlEventSupplyVoltageHighID")
+    MTRClusterPumpConfigurationAndControlEventSupplyVoltageHighID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterPumpConfigurationAndControlEventSupplyVoltageHighID")
     = 0x00000001,
-    MTRClusterPumpConfigurationAndControlEventPowerMissingPhaseID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterPumpConfigurationAndControlEventPowerMissingPhaseID")
+    MTRClusterPumpConfigurationAndControlEventPowerMissingPhaseID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterPumpConfigurationAndControlEventPowerMissingPhaseID")
     = 0x00000002,
-    MTRClusterPumpConfigurationAndControlEventSystemPressureLowID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterPumpConfigurationAndControlEventSystemPressureLowID")
+    MTRClusterPumpConfigurationAndControlEventSystemPressureLowID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterPumpConfigurationAndControlEventSystemPressureLowID")
     = 0x00000003,
-    MTRClusterPumpConfigurationAndControlEventSystemPressureHighID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterPumpConfigurationAndControlEventSystemPressureHighID")
+    MTRClusterPumpConfigurationAndControlEventSystemPressureHighID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterPumpConfigurationAndControlEventSystemPressureHighID")
     = 0x00000004,
-    MTRClusterPumpConfigurationAndControlEventDryRunningID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterPumpConfigurationAndControlEventDryRunningID")
+    MTRClusterPumpConfigurationAndControlEventDryRunningID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterPumpConfigurationAndControlEventDryRunningID")
     = 0x00000005,
-    MTRClusterPumpConfigurationAndControlEventMotorTemperatureHighID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterPumpConfigurationAndControlEventMotorTemperatureHighID")
+    MTRClusterPumpConfigurationAndControlEventMotorTemperatureHighID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterPumpConfigurationAndControlEventMotorTemperatureHighID")
     = 0x00000006,
-    MTRClusterPumpConfigurationAndControlEventPumpMotorFatalFailureID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterPumpConfigurationAndControlEventPumpMotorFatalFailureID")
+    MTRClusterPumpConfigurationAndControlEventPumpMotorFatalFailureID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+        tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterPumpConfigurationAndControlEventPumpMotorFatalFailureID")
     = 0x00000007,
-    MTRClusterPumpConfigurationAndControlEventElectronicTemperatureHighID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterPumpConfigurationAndControlEventElectronicTemperatureHighID")
+    MTRClusterPumpConfigurationAndControlEventElectronicTemperatureHighID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterPumpConfigurationAndControlEventElectronicTemperatureHighID")
     = 0x00000008,
-    MTRClusterPumpConfigurationAndControlEventPumpBlockedID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterPumpConfigurationAndControlEventPumpBlockedID")
+    MTRClusterPumpConfigurationAndControlEventPumpBlockedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterPumpConfigurationAndControlEventPumpBlockedID")
     = 0x00000009,
-    MTRClusterPumpConfigurationAndControlEventSensorFailureID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterPumpConfigurationAndControlEventSensorFailureID")
+    MTRClusterPumpConfigurationAndControlEventSensorFailureID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterPumpConfigurationAndControlEventSensorFailureID")
     = 0x0000000A,
-    MTRClusterPumpConfigurationAndControlEventElectronicNonFatalFailureID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterPumpConfigurationAndControlEventElectronicNonFatalFailureID")
+    MTRClusterPumpConfigurationAndControlEventElectronicNonFatalFailureID API_AVAILABLE(
+        ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterPumpConfigurationAndControlEventElectronicNonFatalFailureID")
     = 0x0000000B,
-    MTRClusterPumpConfigurationAndControlEventElectronicFatalFailureID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterPumpConfigurationAndControlEventElectronicFatalFailureID")
+    MTRClusterPumpConfigurationAndControlEventElectronicFatalFailureID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+        tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterPumpConfigurationAndControlEventElectronicFatalFailureID")
     = 0x0000000C,
-    MTRClusterPumpConfigurationAndControlEventGeneralFaultID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterPumpConfigurationAndControlEventGeneralFaultID")
+    MTRClusterPumpConfigurationAndControlEventGeneralFaultID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterPumpConfigurationAndControlEventGeneralFaultID")
     = 0x0000000D,
-    MTRClusterPumpConfigurationAndControlEventLeakageID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterPumpConfigurationAndControlEventLeakageID")
+    MTRClusterPumpConfigurationAndControlEventLeakageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterPumpConfigurationAndControlEventLeakageID")
     = 0x0000000E,
-    MTRClusterPumpConfigurationAndControlEventAirDetectionID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterPumpConfigurationAndControlEventAirDetectionID")
+    MTRClusterPumpConfigurationAndControlEventAirDetectionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterPumpConfigurationAndControlEventAirDetectionID")
     = 0x0000000F,
-    MTRClusterPumpConfigurationAndControlEventTurbineOperationID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterPumpConfigurationAndControlEventTurbineOperationID")
+    MTRClusterPumpConfigurationAndControlEventTurbineOperationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterPumpConfigurationAndControlEventTurbineOperationID")
     = 0x00000010,
 
     // Cluster PumpConfigurationAndControl events
@@ -6627,10 +7035,11 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterPumpConfigurationAndControlEventTurbineOperationID MTR_NEWLY_AVAILABLE = 0x00000010,
 
     // Cluster TestCluster deprecated event names
-    MTRClusterTestClusterEventTestEventID MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterUnitTestingEventTestEventID")
+    MTRClusterTestClusterEventTestEventID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterUnitTestingEventTestEventID")
     = 0x00000001,
-    MTRClusterTestClusterEventTestFabricScopedEventID MTR_NEWLY_DEPRECATED(
-        "Please use MTREventIDTypeClusterUnitTestingEventTestFabricScopedEventID")
+    MTRClusterTestClusterEventTestFabricScopedEventID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterUnitTestingEventTestFabricScopedEventID")
     = 0x00000002,
 
     // Cluster UnitTesting events

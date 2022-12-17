@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * {{description}}
  */
-{{availability (asUpperCamelCase name preserveAcronyms=true)~}}
+{{availability (asUpperCamelCase name preserveAcronyms=true)}}
 @interface MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
