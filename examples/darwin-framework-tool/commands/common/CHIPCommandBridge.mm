@@ -41,7 +41,8 @@ CHIP_ERROR CHIPCommandBridge::Run()
     ReturnErrorOnFailure(MaybeSetUpStack());
     SetIdentity(mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha);
     ReturnLogErrorOnFailure(RunCommand());
-    ReturnLogErrorOnFailure(StartWaiting(GetWaitDuration()));
+
+    auto err = StartWaiting(GetWaitDuration());
 
     bool deferCleanup = (IsInteractive() && DeferInteractiveCleanup());
 
@@ -54,7 +55,7 @@ CHIP_ERROR CHIPCommandBridge::Run()
     }
     MaybeTearDownStack();
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR CHIPCommandBridge::GetPAACertsFromFolder(NSArray<NSData *> * __autoreleasing * paaCertsResult)
