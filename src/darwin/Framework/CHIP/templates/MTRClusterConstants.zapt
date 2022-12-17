@@ -8,7 +8,7 @@
 typedef NS_ENUM(uint32_t, MTRClusterIDType) {
 {{#zcl_clusters}}
 {{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping name) isForIds=true)}}
-MTRCluster{{compatClusterNameRemapping label}}ID {{availability (compatClusterNameRemapping name) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use MTRClusterIDType" (asUpperCamelCase label preserveAcronyms=false) "ID") isForIds=true}} = {{asMEI manufacturerCode code}},
+MTRCluster{{compatClusterNameRemapping label}}ID {{availability (compatClusterNameRemapping name) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use MTRClusterIDType" (asUpperCamelCase label preserveAcronyms=true) "ID") isForIds=true}} = {{asMEI manufacturerCode code}},
 {{/if}}
 {{/zcl_clusters}}
 {{#zcl_clusters}}
@@ -59,7 +59,7 @@ MTRClusterDescriptorAttributeDeviceTypeListID
 {{/if}}
 {{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping ../clusterName) attribute=(compatAttributeNameRemapping ../clusterName label) isForIds=true)}}
 MTRCluster{{compatClusterNameRemapping ../clusterName}}Attribute{{compatAttributeNameRemapping ../clusterName label}}ID
-{{availability (compatClusterNameRemapping ../clusterName) attribute=(compatAttributeNameRemapping ../clusterName label) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use MTRAttributeIDTypeCluster" (asUpperCamelCase ../clusterName preserveAcronyms=false) "Attribute" (asUpperCamelCase label preserveAcronyms=false) "ID") isForIds=true}} =
+{{availability (compatClusterNameRemapping ../clusterName) attribute=(compatAttributeNameRemapping ../clusterName label) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use MTRAttributeIDTypeCluster" (asUpperCamelCase ../clusterName preserveAcronyms=true) "Attribute" (asUpperCamelCase label preserveAcronyms=true) "ID") isForIds=true}} =
 {{#if clusterRef}}
 {{asMEI manufacturerCode code}},
 {{else}}
@@ -105,7 +105,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
 {{/first}}
 {{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping ../clusterName) command=(asUpperCamelCase label) isForIds=true)}}
 MTRCluster{{compatClusterNameRemapping ../clusterName}}Command{{asUpperCamelCase label}}ID
-{{availability (compatClusterNameRemapping ../clusterName) command=(asUpperCamelCase label) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use MTRCommandIDTypeCluster" (asUpperCamelCase ../clusterName preserveAcronyms=false) "Command" (asUpperCamelCase label preserveAcronyms=true) "ID") isForIds=true}}
+{{availability (compatClusterNameRemapping ../clusterName) command=(asUpperCamelCase label) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use MTRCommandIDTypeCluster" (asUpperCamelCase ../clusterName preserveAcronyms=true) "Command" (asUpperCamelCase label preserveAcronyms=true) "ID") isForIds=true}}
 = {{asMEI manufacturerCode code}},
 {{/if}}
 {{#last}}
@@ -142,7 +142,7 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
 {{/first}}
 {{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping ../clusterName) event=(asUpperCamelCase name) isForIds=true)}}
 MTRCluster{{compatClusterNameRemapping ../clusterName}}Event{{asUpperCamelCase name}}ID
-{{availability (compatClusterNameRemapping ../clusterName) event=(asUpperCamelCase name) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use MTREventIDTypeCluster" (asUpperCamelCase ../clusterName preserveAcronyms=false) "Event" (asUpperCamelCase name preserveAcronyms=true) "ID") isForIds=true}}
+{{availability (compatClusterNameRemapping ../clusterName) event=(asUpperCamelCase name) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use MTREventIDTypeCluster" (asUpperCamelCase ../clusterName preserveAcronyms=true) "Event" (asUpperCamelCase name preserveAcronyms=true) "ID") isForIds=true}}
 = {{asMEI manufacturerCode code}},
 {{/if}}
 {{#last}}
