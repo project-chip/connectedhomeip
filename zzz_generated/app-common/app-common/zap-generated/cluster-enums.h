@@ -335,8 +335,8 @@ enum class CommandBits : uint16_t
 };
 } // namespace Actions
 
-namespace Basic {
-} // namespace Basic
+namespace BasicInformation {
+} // namespace BasicInformation
 
 namespace OtaSoftwareUpdateProvider {
 

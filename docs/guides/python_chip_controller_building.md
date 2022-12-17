@@ -287,24 +287,25 @@ chip-device-ctrl > zcl LevelControl MoveToLevel 1234 1 0 level=50
 
 ### Step 7: Read basic information out of the accessory.
 
-Every Matter accessory device supports a Basic Cluster, which maintains
-collection of attributes that a controller can obtain from a device, such as the
-vendor name, the product name, or software version. Use `zclread` command to
-read those values from the device:
+Every Matter accessory device supports a Basic Information Cluster, which
+maintains collection of attributes that a controller can obtain from a device,
+such as the vendor name, the product name, or software version. Use `zclread`
+command to read those values from the device:
 
 ```
-chip-device-ctrl > zclread Basic VendorName 1234 1 0
-chip-device-ctrl > zclread Basic ProductName 1234 1 0
-chip-device-ctrl > zclread Basic SoftwareVersion 1234 1 0
+chip-device-ctrl > zclread BasicInformation VendorName 1234 1 0
+chip-device-ctrl > zclread BasicInformation ProductName 1234 1 0
+chip-device-ctrl > zclread BasicInformation SoftwareVersion 1234 1 0
 ```
 
 **REPL Command:**
-`await devCtrl.ReadAttribute(1234, [(1, Clusters.Basic.Attributes.VendorName)])`
+`await devCtrl.ReadAttribute(1234, [(1, Clusters.BasicInformation.Attributes.VendorName)])`
 
-> Use the `zcl ? Basic` command to list all available commands for Basic
-> Cluster.
+> Use the `zcl ? BasicInformation` command to list all available commands for
+> Basic Information Cluster.
 >
-> In REPL, you can type `Clusters.Basic.Attributes.` and then use the TAB key.
+> In REPL, you can type `Clusters.BasicInformation.Attributes.` and then use the
+> TAB key.
 
 <hr>
 
@@ -524,7 +525,7 @@ ApplicationBasic
 ApplicationLauncher
 AudioOutput
 BarrierControl
-Basic
+BasicInformation
 Binding
 BridgedDeviceBasic
 ColorControl
@@ -567,10 +568,11 @@ Type `Clusters.` and hit TAB
 
 ### `zcl ? <Cluster>`
 
-List available commands in cluster. For example, for _Basic_ cluster:
+List available commands in cluster. For example, for _Basic Information_
+cluster:
 
 ```
-chip-device-ctrl > zcl ? Basic
+chip-device-ctrl > zcl ? BasicInformation
 DataModelRevision
 VendorName
 VendorID
@@ -600,7 +602,7 @@ Type `Clusters.(cluster name).Commands.` and hit TAB
 Read the value of ZCL attribute. For example:
 
 ```
-chip-device-ctrl > zclread Basic VendorName 1234 1 0
+chip-device-ctrl > zclread BasicInformation VendorName 1234 1 0
 ```
 
 **REPL Commands**
@@ -608,7 +610,7 @@ chip-device-ctrl > zclread Basic VendorName 1234 1 0
 ```python
 # devCtrl.ReadAttribute(<nodeid>, [(<endpoint id>, Clusters.<cluster>.Attributes.<attribute>)])
 # e.g.
-await devCtrl.ReadAttribute(1234, [(1, Clusters.Basic.Attributes.VendorName)])
+await devCtrl.ReadAttribute(1234, [(1, Clusters.BasicInformation.Attributes.VendorName)])
 ```
 
 ### `zclwrite <cluster> <attribute> <nodeid> <endpoint> <groupid> <value>`

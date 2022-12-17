@@ -132,31 +132,54 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nonnull error API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
-API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBasicClusterCapabilityMinimaStruct : NSObject <NSCopying>
-@property (nonatomic, copy)
-    NSNumber * _Nonnull caseSessionsPerFabric API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy)
-    NSNumber * _Nonnull subscriptionsPerFabric API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_AVAILABLE
+@interface MTRBasicInformationClusterCapabilityMinimaStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull caseSessionsPerFabric MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull subscriptionsPerFabric MTR_NEWLY_AVAILABLE;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBasicClusterStartUpEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_DEPRECATED("Please use MTRBasicInformationClusterCapabilityMinimaStruct")
+@interface MTRBasicClusterCapabilityMinimaStruct : MTRBasicInformationClusterCapabilityMinimaStruct
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRBasicInformationClusterStartUpEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion MTR_NEWLY_AVAILABLE;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBasicClusterShutDownEvent : NSObject <NSCopying>
+MTR_NEWLY_DEPRECATED("Please use MTRBasicInformationClusterStartUpEvent")
+@interface MTRBasicClusterStartUpEvent : MTRBasicInformationClusterStartUpEvent
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRBasicInformationClusterShutDownEvent : NSObject <NSCopying>
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBasicClusterLeaveEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_DEPRECATED("Please use MTRBasicInformationClusterShutDownEvent")
+@interface MTRBasicClusterShutDownEvent : MTRBasicInformationClusterShutDownEvent
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRBasicInformationClusterLeaveEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_NEWLY_AVAILABLE;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBasicClusterReachableChangedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull reachableNewValue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_DEPRECATED("Please use MTRBasicInformationClusterLeaveEvent")
+@interface MTRBasicClusterLeaveEvent : MTRBasicInformationClusterLeaveEvent
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRBasicInformationClusterReachableChangedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull reachableNewValue MTR_NEWLY_AVAILABLE;
+@end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRBasicInformationClusterReachableChangedEvent")
+@interface MTRBasicClusterReachableChangedEvent : MTRBasicInformationClusterReachableChangedEvent
 @end
 
 MTR_NEWLY_AVAILABLE

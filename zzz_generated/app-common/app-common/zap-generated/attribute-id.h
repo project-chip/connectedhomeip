@@ -153,7 +153,7 @@
 #define ZCL_ENDPOINT_LIST_ATTRIBUTE_ID (0x0001)
 #define ZCL_SETUP_URL_ATTRIBUTE_ID (0x0002)
 
-// Attribute ids for cluster: Basic
+// Attribute ids for cluster: Basic Information
 
 // Client attributes
 

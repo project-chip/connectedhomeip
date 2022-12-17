@@ -1954,14 +1954,14 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 /**
- * Cluster Basic
+ * Cluster Basic Information
  *
  * This cluster provides attributes and events for determining basic information about Nodes, which supports both
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location.
  */
-API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBaseClusterBasic : MTRCluster
+MTR_NEWLY_AVAILABLE
+@interface MTRBaseClusterBasicInformation : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -1972,7 +1972,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  *
  */
-- (void)mfgSpecificPingWithParams:(MTRBasicClusterMfgSpecificPingParams * _Nullable)params
+- (void)mfgSpecificPingWithParams:(MTRBasicInformationClusterMfgSpecificPingParams * _Nullable)params
                        completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)mfgSpecificPingWithCompletion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
@@ -2217,17 +2217,18 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                         completion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeCapabilityMinimaWithCompletion:(void (^)(MTRBasicClusterCapabilityMinimaStruct * _Nullable value,
+- (void)readAttributeCapabilityMinimaWithCompletion:(void (^)(MTRBasicInformationClusterCapabilityMinimaStruct * _Nullable value,
                                                         NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 - (void)subscribeAttributeCapabilityMinimaWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                       reportHandler:(void (^)(MTRBasicClusterCapabilityMinimaStruct * _Nullable value,
+                                       reportHandler:(void (^)(MTRBasicInformationClusterCapabilityMinimaStruct * _Nullable value,
                                                          NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
 + (void)readAttributeCapabilityMinimaWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                                   endpoint:(NSNumber *)endpoint
                                                      queue:(dispatch_queue_t)queue
-                                                completion:(void (^)(MTRBasicClusterCapabilityMinimaStruct * _Nullable value,
-                                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+                                                completion:
+                                                    (void (^)(MTRBasicInformationClusterCapabilityMinimaStruct * _Nullable value,
+                                                        NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
@@ -17017,6 +17018,11 @@ MTR_NEWLY_AVAILABLE
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
+@end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRBaseClusterBasicInformation")
+@interface MTRBaseClusterBasic : MTRBaseClusterBasicInformation
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))

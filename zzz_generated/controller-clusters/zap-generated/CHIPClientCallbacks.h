@@ -121,12 +121,12 @@ typedef void (*ActionsAcceptedCommandListListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ActionsAttributeListListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BasicGeneratedCommandListListAttributeCallback)(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BasicAcceptedCommandListListAttributeCallback)(void * context,
-                                                              const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BasicAttributeListListAttributeCallback)(void * context,
-                                                        const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*BasicInformationGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BasicInformationAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BasicInformationAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*OtaSoftwareUpdateProviderAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*OtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback)(

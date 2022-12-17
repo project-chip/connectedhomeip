@@ -45,7 +45,7 @@
 | Binding                                                             | 0x001E |
 | AccessControl                                                       | 0x001F |
 | Actions                                                             | 0x0025 |
-| Basic                                                               | 0x0028 |
+| BasicInformation                                                    | 0x0028 |
 | OtaSoftwareUpdateProvider                                           | 0x0029 |
 | OtaSoftwareUpdateRequestor                                          | 0x002A |
 | LocalizationConfiguration                                           | 0x002B |
@@ -1815,7 +1815,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster Basic                                                       | 0x0028 |
+| Cluster BasicInformation                                            | 0x0028 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * MfgSpecificPing                                                   |   0x00 |
@@ -1857,10 +1857,11 @@ private:
 /*
  * Command MfgSpecificPing
  */
-class BasicMfgSpecificPing : public ClusterCommand
+class BasicInformationMfgSpecificPing : public ClusterCommand
 {
 public:
-    BasicMfgSpecificPing(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("mfg-specific-ping", credsIssuerConfig)
+    BasicInformationMfgSpecificPing(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("mfg-specific-ping", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
@@ -1880,7 +1881,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::Basic::Commands::MfgSpecificPing::Type mRequest;
+    chip::app::Clusters::BasicInformation::Commands::MfgSpecificPing::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -8952,18 +8953,18 @@ void registerClusterActions(Commands & commands, CredentialIssuerCommands * cred
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterBasic(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterBasicInformation(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::Basic;
+    using namespace chip::app::Clusters::BasicInformation;
 
-    const char * clusterName = "Basic";
+    const char * clusterName = "BasicInformation";
 
     commands_list clusterCommands = {
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),   //
-        make_unique<BasicMfgSpecificPing>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),              //
+        make_unique<BasicInformationMfgSpecificPing>(credsIssuerConfig), //
         //
         // Attributes
         //
@@ -13500,7 +13501,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterBinding(commands, credsIssuerConfig);
     registerClusterAccessControl(commands, credsIssuerConfig);
     registerClusterActions(commands, credsIssuerConfig);
-    registerClusterBasic(commands, credsIssuerConfig);
+    registerClusterBasicInformation(commands, credsIssuerConfig);
     registerClusterOtaSoftwareUpdateProvider(commands, credsIssuerConfig);
     registerClusterOtaSoftwareUpdateRequestor(commands, credsIssuerConfig);
     registerClusterLocalizationConfiguration(commands, credsIssuerConfig);

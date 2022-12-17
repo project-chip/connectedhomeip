@@ -1,7 +1,7 @@
 #pragma once
 void MatterAccessControlPluginServerInitCallback();
 void MatterAdministratorCommissioningPluginServerInitCallback();
-void MatterBasicPluginServerInitCallback();
+void MatterBasicInformationPluginServerInitCallback();
 void MatterColorControlPluginServerInitCallback();
 void MatterDescriptorPluginServerInitCallback();
 void MatterDiagnosticLogsPluginServerInitCallback();
@@ -29,7 +29,7 @@ void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
 #define MATTER_PLUGINS_INIT \
     MatterAccessControlPluginServerInitCallback(); \
     MatterAdministratorCommissioningPluginServerInitCallback(); \
-    MatterBasicPluginServerInitCallback(); \
+    MatterBasicInformationPluginServerInitCallback(); \
     MatterColorControlPluginServerInitCallback(); \
     MatterDescriptorPluginServerInitCallback(); \
     MatterDiagnosticLogsPluginServerInitCallback(); \

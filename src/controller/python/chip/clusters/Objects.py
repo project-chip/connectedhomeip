@@ -3708,7 +3708,7 @@ class Actions(Cluster):
 
 
 @dataclass
-class Basic(Cluster):
+class BasicInformation(Cluster):
     id: typing.ClassVar[int] = 0x0028
 
     @ChipUtility.classproperty
@@ -3734,7 +3734,7 @@ class Basic(Cluster):
                 ClusterObjectFieldDescriptor(Label="localConfigDisabled", Tag=0x00000010, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="reachable", Tag=0x00000011, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="uniqueID", Tag=0x00000012, Type=typing.Optional[str]),
-                ClusterObjectFieldDescriptor(Label="capabilityMinima", Tag=0x00000013, Type=Basic.Structs.CapabilityMinimaStruct),
+                ClusterObjectFieldDescriptor(Label="capabilityMinima", Tag=0x00000013, Type=BasicInformation.Structs.CapabilityMinimaStruct),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -3761,7 +3761,7 @@ class Basic(Cluster):
     localConfigDisabled: 'typing.Optional[bool]' = None
     reachable: 'typing.Optional[bool]' = None
     uniqueID: 'typing.Optional[str]' = None
-    capabilityMinima: 'Basic.Structs.CapabilityMinimaStruct' = None
+    capabilityMinima: 'BasicInformation.Structs.CapabilityMinimaStruct' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -4118,9 +4118,9 @@ class Basic(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=Basic.Structs.CapabilityMinimaStruct)
+                return ClusterObjectFieldDescriptor(Type=BasicInformation.Structs.CapabilityMinimaStruct)
 
-            value: 'Basic.Structs.CapabilityMinimaStruct' = field(default_factory=lambda: Basic.Structs.CapabilityMinimaStruct())
+            value: 'BasicInformation.Structs.CapabilityMinimaStruct' = field(default_factory=lambda: BasicInformation.Structs.CapabilityMinimaStruct())
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
