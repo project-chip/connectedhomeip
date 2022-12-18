@@ -523,7 +523,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBasicClusterCapabilityMinimaStruct
+@implementation MTRBasicInformationClusterCapabilityMinimaStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -537,7 +537,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBasicClusterCapabilityMinimaStruct alloc] init];
+    auto other = [[MTRBasicInformationClusterCapabilityMinimaStruct alloc] init];
 
     other.caseSessionsPerFabric = self.caseSessionsPerFabric;
     other.subscriptionsPerFabric = self.subscriptionsPerFabric;
@@ -554,7 +554,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBasicClusterStartUpEvent
+@implementation MTRBasicClusterCapabilityMinimaStruct : MTRBasicInformationClusterCapabilityMinimaStruct
+@end
+
+@implementation MTRBasicInformationClusterStartUpEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -566,7 +569,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBasicClusterStartUpEvent alloc] init];
+    auto other = [[MTRBasicInformationClusterStartUpEvent alloc] init];
 
     other.softwareVersion = self.softwareVersion;
 
@@ -582,7 +585,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBasicClusterShutDownEvent
+@implementation MTRBasicClusterStartUpEvent : MTRBasicInformationClusterStartUpEvent
+@end
+
+@implementation MTRBasicInformationClusterShutDownEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -592,7 +598,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBasicClusterShutDownEvent alloc] init];
+    auto other = [[MTRBasicInformationClusterShutDownEvent alloc] init];
 
     return other;
 }
@@ -605,7 +611,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBasicClusterLeaveEvent
+@implementation MTRBasicClusterShutDownEvent : MTRBasicInformationClusterShutDownEvent
+@end
+
+@implementation MTRBasicInformationClusterLeaveEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -617,7 +626,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBasicClusterLeaveEvent alloc] init];
+    auto other = [[MTRBasicInformationClusterLeaveEvent alloc] init];
 
     other.fabricIndex = self.fabricIndex;
 
@@ -633,7 +642,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBasicClusterReachableChangedEvent
+@implementation MTRBasicClusterLeaveEvent : MTRBasicInformationClusterLeaveEvent
+@end
+
+@implementation MTRBasicInformationClusterReachableChangedEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -645,7 +657,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBasicClusterReachableChangedEvent alloc] init];
+    auto other = [[MTRBasicInformationClusterReachableChangedEvent alloc] init];
 
     other.reachableNewValue = self.reachableNewValue;
 
@@ -659,6 +671,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRBasicClusterReachableChangedEvent : MTRBasicInformationClusterReachableChangedEvent
 @end
 
 @implementation MTROTASoftwareUpdateRequestorClusterProviderLocation

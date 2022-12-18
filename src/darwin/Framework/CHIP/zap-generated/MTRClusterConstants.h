@@ -58,7 +58,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
         MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeActionsID")
     = 0x00000025,
     MTRClusterBasicID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBasicID")
+        MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeBasicInformationID")
     = 0x00000028,
     MTRClusterOtaSoftwareUpdateProviderID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRClusterIDTypeOTASoftwareUpdateProviderID")
@@ -246,7 +246,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeBindingID MTR_NEWLY_AVAILABLE = 0x0000001E,
     MTRClusterIDTypeAccessControlID MTR_NEWLY_AVAILABLE = 0x0000001F,
     MTRClusterIDTypeActionsID MTR_NEWLY_AVAILABLE = 0x00000025,
-    MTRClusterIDTypeBasicID MTR_NEWLY_AVAILABLE = 0x00000028,
+    MTRClusterIDTypeBasicInformationID MTR_NEWLY_AVAILABLE = 0x00000028,
     MTRClusterIDTypeOTASoftwareUpdateProviderID MTR_NEWLY_AVAILABLE = 0x00000029,
     MTRClusterIDTypeOTASoftwareUpdateRequestorID MTR_NEWLY_AVAILABLE = 0x0000002A,
     MTRClusterIDTypeLocalizationConfigurationID MTR_NEWLY_AVAILABLE = 0x0000002B,
@@ -883,109 +883,111 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 
     // Cluster Basic deprecated attribute names
     MTRClusterBasicAttributeDataModelRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeDataModelRevisionID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeDataModelRevisionID")
     = 0x00000000,
     MTRClusterBasicAttributeVendorNameID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeVendorNameID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeVendorNameID")
     = 0x00000001,
     MTRClusterBasicAttributeVendorIDID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeVendorIDID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeVendorIDID")
     = 0x00000002,
     MTRClusterBasicAttributeProductNameID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeProductNameID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeProductNameID")
     = 0x00000003,
     MTRClusterBasicAttributeProductIDID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeProductIDID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeProductIDID")
     = 0x00000004,
     MTRClusterBasicAttributeNodeLabelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeNodeLabelID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeNodeLabelID")
     = 0x00000005,
     MTRClusterBasicAttributeLocationID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeLocationID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeLocationID")
     = 0x00000006,
     MTRClusterBasicAttributeHardwareVersionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeHardwareVersionID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeHardwareVersionID")
     = 0x00000007,
     MTRClusterBasicAttributeHardwareVersionStringID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeHardwareVersionStringID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeHardwareVersionStringID")
     = 0x00000008,
     MTRClusterBasicAttributeSoftwareVersionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeSoftwareVersionID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeSoftwareVersionID")
     = 0x00000009,
     MTRClusterBasicAttributeSoftwareVersionStringID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeSoftwareVersionStringID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeSoftwareVersionStringID")
     = 0x0000000A,
     MTRClusterBasicAttributeManufacturingDateID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeManufacturingDateID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeManufacturingDateID")
     = 0x0000000B,
     MTRClusterBasicAttributePartNumberID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributePartNumberID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributePartNumberID")
     = 0x0000000C,
     MTRClusterBasicAttributeProductURLID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeProductURLID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeProductURLID")
     = 0x0000000D,
     MTRClusterBasicAttributeProductLabelID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeProductLabelID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeProductLabelID")
     = 0x0000000E,
     MTRClusterBasicAttributeSerialNumberID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeSerialNumberID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeSerialNumberID")
     = 0x0000000F,
     MTRClusterBasicAttributeLocalConfigDisabledID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeLocalConfigDisabledID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeLocalConfigDisabledID")
     = 0x00000010,
     MTRClusterBasicAttributeReachableID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeReachableID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeReachableID")
     = 0x00000011,
     MTRClusterBasicAttributeUniqueIDID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeUniqueIDID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeUniqueIDID")
     = 0x00000012,
     MTRClusterBasicAttributeCapabilityMinimaID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeCapabilityMinimaID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeCapabilityMinimaID")
     = 0x00000013,
     MTRClusterBasicAttributeGeneratedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeGeneratedCommandListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeGeneratedCommandListID")
     = MTRClusterGlobalAttributeGeneratedCommandListID,
     MTRClusterBasicAttributeAcceptedCommandListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeAcceptedCommandListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeAcceptedCommandListID")
     = MTRClusterGlobalAttributeAcceptedCommandListID,
     MTRClusterBasicAttributeAttributeListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeAttributeListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeAttributeListID")
     = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterBasicAttributeFeatureMapID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeFeatureMapID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeFeatureMapID")
     = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterBasicAttributeClusterRevisionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicAttributeClusterRevisionID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterBasicInformationAttributeClusterRevisionID")
     = MTRClusterGlobalAttributeClusterRevisionID,
 
-    // Cluster Basic attributes
-    MTRAttributeIDTypeClusterBasicAttributeDataModelRevisionID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterBasicAttributeVendorNameID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterBasicAttributeVendorIDID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterBasicAttributeProductNameID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterBasicAttributeProductIDID MTR_NEWLY_AVAILABLE = 0x00000004,
-    MTRAttributeIDTypeClusterBasicAttributeNodeLabelID MTR_NEWLY_AVAILABLE = 0x00000005,
-    MTRAttributeIDTypeClusterBasicAttributeLocationID MTR_NEWLY_AVAILABLE = 0x00000006,
-    MTRAttributeIDTypeClusterBasicAttributeHardwareVersionID MTR_NEWLY_AVAILABLE = 0x00000007,
-    MTRAttributeIDTypeClusterBasicAttributeHardwareVersionStringID MTR_NEWLY_AVAILABLE = 0x00000008,
-    MTRAttributeIDTypeClusterBasicAttributeSoftwareVersionID MTR_NEWLY_AVAILABLE = 0x00000009,
-    MTRAttributeIDTypeClusterBasicAttributeSoftwareVersionStringID MTR_NEWLY_AVAILABLE = 0x0000000A,
-    MTRAttributeIDTypeClusterBasicAttributeManufacturingDateID MTR_NEWLY_AVAILABLE = 0x0000000B,
-    MTRAttributeIDTypeClusterBasicAttributePartNumberID MTR_NEWLY_AVAILABLE = 0x0000000C,
-    MTRAttributeIDTypeClusterBasicAttributeProductURLID MTR_NEWLY_AVAILABLE = 0x0000000D,
-    MTRAttributeIDTypeClusterBasicAttributeProductLabelID MTR_NEWLY_AVAILABLE = 0x0000000E,
-    MTRAttributeIDTypeClusterBasicAttributeSerialNumberID MTR_NEWLY_AVAILABLE = 0x0000000F,
-    MTRAttributeIDTypeClusterBasicAttributeLocalConfigDisabledID MTR_NEWLY_AVAILABLE = 0x00000010,
-    MTRAttributeIDTypeClusterBasicAttributeReachableID MTR_NEWLY_AVAILABLE = 0x00000011,
-    MTRAttributeIDTypeClusterBasicAttributeUniqueIDID MTR_NEWLY_AVAILABLE = 0x00000012,
-    MTRAttributeIDTypeClusterBasicAttributeCapabilityMinimaID MTR_NEWLY_AVAILABLE = 0x00000013,
-    MTRAttributeIDTypeClusterBasicAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
+    // Cluster BasicInformation attributes
+    MTRAttributeIDTypeClusterBasicInformationAttributeDataModelRevisionID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterBasicInformationAttributeVendorNameID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterBasicInformationAttributeVendorIDID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterBasicInformationAttributeProductNameID MTR_NEWLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterBasicInformationAttributeProductIDID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterBasicInformationAttributeNodeLabelID MTR_NEWLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterBasicInformationAttributeLocationID MTR_NEWLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterBasicInformationAttributeHardwareVersionID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterBasicInformationAttributeHardwareVersionStringID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterBasicInformationAttributeSoftwareVersionID MTR_NEWLY_AVAILABLE = 0x00000009,
+    MTRAttributeIDTypeClusterBasicInformationAttributeSoftwareVersionStringID MTR_NEWLY_AVAILABLE = 0x0000000A,
+    MTRAttributeIDTypeClusterBasicInformationAttributeManufacturingDateID MTR_NEWLY_AVAILABLE = 0x0000000B,
+    MTRAttributeIDTypeClusterBasicInformationAttributePartNumberID MTR_NEWLY_AVAILABLE = 0x0000000C,
+    MTRAttributeIDTypeClusterBasicInformationAttributeProductURLID MTR_NEWLY_AVAILABLE = 0x0000000D,
+    MTRAttributeIDTypeClusterBasicInformationAttributeProductLabelID MTR_NEWLY_AVAILABLE = 0x0000000E,
+    MTRAttributeIDTypeClusterBasicInformationAttributeSerialNumberID MTR_NEWLY_AVAILABLE = 0x0000000F,
+    MTRAttributeIDTypeClusterBasicInformationAttributeLocalConfigDisabledID MTR_NEWLY_AVAILABLE = 0x00000010,
+    MTRAttributeIDTypeClusterBasicInformationAttributeReachableID MTR_NEWLY_AVAILABLE = 0x00000011,
+    MTRAttributeIDTypeClusterBasicInformationAttributeUniqueIDID MTR_NEWLY_AVAILABLE = 0x00000012,
+    MTRAttributeIDTypeClusterBasicInformationAttributeCapabilityMinimaID MTR_NEWLY_AVAILABLE = 0x00000013,
+    MTRAttributeIDTypeClusterBasicInformationAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterBasicAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
+    MTRAttributeIDTypeClusterBasicInformationAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterBasicAttributeAttributeListID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterBasicAttributeFeatureMapID MTR_NEWLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterBasicAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
+    MTRAttributeIDTypeClusterBasicInformationAttributeAttributeListID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterBasicInformationAttributeFeatureMapID MTR_NEWLY_AVAILABLE
+    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterBasicInformationAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster OtaSoftwareUpdateProvider deprecated attribute names
@@ -5853,11 +5855,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
 
     // Cluster Basic deprecated command id names
     MTRClusterBasicCommandMfgSpecificPingID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterBasicCommandMfgSpecificPingID")
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterBasicInformationCommandMfgSpecificPingID")
     = 0x10020000,
 
-    // Cluster Basic commands
-    MTRCommandIDTypeClusterBasicCommandMfgSpecificPingID MTR_NEWLY_AVAILABLE = 0x10020000,
+    // Cluster BasicInformation commands
+    MTRCommandIDTypeClusterBasicInformationCommandMfgSpecificPingID MTR_NEWLY_AVAILABLE = 0x10020000,
 
     // Cluster OtaSoftwareUpdateProvider deprecated command id names
     MTRClusterOtaSoftwareUpdateProviderCommandQueryImageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -6786,23 +6788,23 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
 
     // Cluster Basic deprecated event names
     MTRClusterBasicEventStartUpID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBasicEventStartUpID")
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBasicInformationEventStartUpID")
     = 0x00000000,
     MTRClusterBasicEventShutDownID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBasicEventShutDownID")
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBasicInformationEventShutDownID")
     = 0x00000001,
     MTRClusterBasicEventLeaveID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBasicEventLeaveID")
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBasicInformationEventLeaveID")
     = 0x00000002,
     MTRClusterBasicEventReachableChangedID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBasicEventReachableChangedID")
+        MTR_NEWLY_DEPRECATED("Please use MTREventIDTypeClusterBasicInformationEventReachableChangedID")
     = 0x00000003,
 
-    // Cluster Basic events
-    MTREventIDTypeClusterBasicEventStartUpID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTREventIDTypeClusterBasicEventShutDownID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTREventIDTypeClusterBasicEventLeaveID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTREventIDTypeClusterBasicEventReachableChangedID MTR_NEWLY_AVAILABLE = 0x00000003,
+    // Cluster BasicInformation events
+    MTREventIDTypeClusterBasicInformationEventStartUpID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterBasicInformationEventShutDownID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTREventIDTypeClusterBasicInformationEventLeaveID MTR_NEWLY_AVAILABLE = 0x00000002,
+    MTREventIDTypeClusterBasicInformationEventReachableChangedID MTR_NEWLY_AVAILABLE = 0x00000003,
 
     // Cluster OtaSoftwareUpdateRequestor deprecated event names
     MTRClusterOtaSoftwareUpdateRequestorEventStateTransitionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))

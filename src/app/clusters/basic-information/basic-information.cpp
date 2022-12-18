@@ -16,7 +16,7 @@
  *
  */
 
-#include "basic.h"
+#include "basic-information.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -35,8 +35,8 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::Basic;
-using namespace chip::app::Clusters::Basic::Attributes;
+using namespace chip::app::Clusters::BasicInformation;
+using namespace chip::app::Clusters::BasicInformation::Attributes;
 using namespace chip::DeviceLayer;
 
 namespace {
@@ -49,7 +49,7 @@ class BasicAttrAccess : public AttributeAccessInterface
 {
 public:
     // Register for the Basic cluster on all endpoints.
-    BasicAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Basic::Id) {}
+    BasicAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), BasicInformation::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
@@ -70,7 +70,7 @@ CHIP_ERROR EncodeStringOnSuccess(CHIP_ERROR status, AttributeValueEncoder & enco
 
 CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    if (aPath.mClusterId != Basic::Id)
+    if (aPath.mClusterId != BasicInformation::Id)
     {
         // We shouldn't have been called at all.
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -269,7 +269,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     }
 
     case CapabilityMinima::Id: {
-        Basic::Structs::CapabilityMinimaStruct::Type capabilityMinima;
+        BasicInformation::Structs::CapabilityMinimaStruct::Type capabilityMinima;
 
         // TODO: These values must be set from something based on the SDK impl, but there are no such constants today.
         constexpr uint16_t kMinCaseSessionsPerFabricMandatedBySpec = 3;
@@ -315,7 +315,7 @@ CHIP_ERROR BasicAttrAccess::ReadLocation(AttributeValueEncoder & aEncoder)
 
 CHIP_ERROR BasicAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-    VerifyOrDie(aPath.mClusterId == Basic::Id);
+    VerifyOrDie(aPath.mClusterId == BasicInformation::Id);
 
     switch (aPath.mAttributeId)
     {
@@ -350,7 +350,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
         // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
         ChipLogDetail(Zcl, "Emitting StartUp event");
 
-        for (auto endpoint : EnabledEndpointsWithServerCluster(Basic::Id))
+        for (auto endpoint : EnabledEndpointsWithServerCluster(BasicInformation::Id))
         {
             // If Basic cluster is implemented on this endpoint
             Events::StartUp::Type event{ softwareVersion };
@@ -369,7 +369,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
         // The ShutDown event SHOULD be emitted on a best-effort basis by a Node prior to any orderly shutdown sequence.
         ChipLogDetail(Zcl, "Emitting ShutDown event");
 
-        for (auto endpoint : EnabledEndpointsWithServerCluster(Basic::Id))
+        for (auto endpoint : EnabledEndpointsWithServerCluster(BasicInformation::Id))
         {
             // If Basic cluster is implemented on this endpoint
             Events::ShutDown::Type event;
@@ -394,21 +394,21 @@ PlatformMgrDelegate gPlatformMgrDelegate;
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace Basic {
+namespace BasicInformation {
 bool IsLocalConfigDisabled()
 {
     bool disabled        = false;
     EmberAfStatus status = LocalConfigDisabled::Get(0, &disabled);
     return status == EMBER_ZCL_STATUS_SUCCESS && disabled;
 }
-} // namespace Basic
+} // namespace BasicInformation
 } // namespace Clusters
 } // namespace app
 } // namespace chip
 
 void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint) {}
 
-void MatterBasicPluginServerInitCallback()
+void MatterBasicInformationPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
     PlatformMgr().SetDelegate(&gPlatformMgrDelegate);

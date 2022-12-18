@@ -4542,6 +4542,7 @@
           - UnitTesting
           - WakeOnLAN
           - ClientMonitoring
+          - BasicInformation
       attributes:
           Descriptor:
               # We really only started treating DeviceTypeList as DeviceTypeList in the API revamp,
@@ -4674,6 +4675,32 @@
               - AttributeList
               - FeatureMap
               - ClusterRevision
+          BasicInformation:
+              - DataModelRevision
+              - VendorName
+              - VendorID
+              - ProductName
+              - ProductID
+              - NodeLabel
+              - Location
+              - HardwareVersion
+              - HardwareVersionString
+              - SoftwareVersion
+              - SoftwareVersionString
+              - ManufacturingDate
+              - PartNumber
+              - ProductURL
+              - ProductLabel
+              - SerialNumber
+              - LocalConfigDisabled
+              - Reachable
+              - UniqueID
+              - CapabilityMinima
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
       commands:
           OTASoftwareUpdateProvider:
               - QueryImage
@@ -4721,6 +4748,9 @@
           ClientMonitoring:
               - RegisterClientMonitoring
               - StayAwakeRequest
+          BasicInformation:
+              # TODO: Can we avoid generating this??
+              - MfgSpecificPing
       command fields:
           UnitTesting:
               TestSpecificResponse:
@@ -4889,6 +4919,8 @@
               - TestListStructOctet
           ClientMonitoring:
               - MonitoringRegistration
+          BasicInformation:
+              - CapabilityMinimaStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -4949,6 +4981,10 @@
                   - clientNodeId
                   - iCid
                   - fabricIndex
+          BasicInformation:
+              CapabilityMinimaStruct:
+                  - caseSessionsPerFabric
+                  - subscriptionsPerFabric
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -4957,6 +4993,11 @@
           UnitTesting:
               - TestEvent
               - TestFabricScopedEvent
+          BasicInformation:
+              - StartUp
+              - ShutDown
+              - Leave
+              - ReachableChanged
       event fields:
           Switch:
               MultiPressComplete:
@@ -4985,6 +5026,13 @@
                   - bytesDownloaded
                   - progressPercent
                   - platformCode
+          BasicInformation:
+              StartUp:
+                  - softwareVersion
+              Leave:
+                  - fabricIndex
+              ReachableChanged:
+                  - reachableNewValue
       enums:
           OTASoftwareUpdateProvider:
               - OTAApplyUpdateAction
@@ -5084,6 +5132,7 @@
           - OtaSoftwareUpdateRequestor
           - TestCluster
           - WakeOnLan
+          - Basic
       attributes:
           Descriptor:
               - DeviceList
@@ -5106,6 +5155,7 @@
   renames:
       clusters:
           UnitTesting: TestCluster
+          BasicInformation: Basic
       attributes:
           Descriptor:
               DeviceTypeList: DeviceList

@@ -30,9 +30,9 @@
 // Parallel array data (*cluster*, attribute, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
-    /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
-    /* Cluster: Basic, Attribute: Location, Privilege: view */ \
-    /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     49, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -60,9 +60,9 @@
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
-    /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
-    /* Cluster: Basic, Attribute: Location, Privilege: view */ \
-    /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     1, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -90,9 +90,9 @@
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
     /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: view */ \
-    /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
-    /* Cluster: Basic, Attribute: Location, Privilege: view */ \
-    /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -122,9 +122,9 @@
 // Parallel array data (*cluster*, attribute, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
     6, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
-    40, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
-    40, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
-    40, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    40, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
+    40, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
+    40, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     258, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
@@ -147,9 +147,9 @@
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
     16387, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
-    5, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
-    6, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
-    16, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    5, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
+    6, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
+    16, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     23, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
@@ -172,9 +172,9 @@
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
     kMatterAccessPrivilegeManage, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
