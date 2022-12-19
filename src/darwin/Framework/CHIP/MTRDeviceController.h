@@ -156,6 +156,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * MTRDeviceControllerFactory, to avoid leaking the controller.
  */
 - (void)shutdown;
+
 @end
 
 @interface MTRDeviceController (Deprecated)
