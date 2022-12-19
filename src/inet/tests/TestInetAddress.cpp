@@ -1009,7 +1009,7 @@ void CheckToIPv6(nlTestSuite * inSuite, void * inContext)
         SetupIPAddress(test_addr, lCurrent);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-        ip6_addr_t ip_addr_1, ip_addr_2;
+        ip6_addr_t ip_addr_1 = { 0 }, ip_addr_2 = { 0 };
         memcpy(ip_addr_1.addr, addr, sizeof(addr));
 #if LWIP_IPV6_SCOPES
         ip_addr_1.zone = 0;
@@ -1143,7 +1143,7 @@ void CheckToIPv4(nlTestSuite * inSuite, void * inContext)
         SetupIPAddress(test_addr, lCurrent);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-        ip4_addr_t ip_addr_1, ip_addr_2;
+        ip4_addr_t ip_addr_1 = { 0 }, ip_addr_2 = { 0 };
 
         ip_addr_1.addr = htonl(lCurrent->mAddr.mAddrQuartets[3]);
 #else
