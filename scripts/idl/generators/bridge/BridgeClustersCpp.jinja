@@ -59,7 +59,7 @@ struct {{cluster.name}}Cluster : public GeneratedCluster
     });
   }
 
-  {%- if cluster.commands | length > 0 %}
+{%- if cluster.commands | length > 0 %}
   chip::CommandId incomingCommandList[{{cluster.commands | length + 1}}] = {
   {%- for command in cluster.commands %}
     {{command.code}},
@@ -71,7 +71,7 @@ struct {{cluster.name}}Cluster : public GeneratedCluster
   {
     return incomingCommandList;
   }
-  {%- endif %}
+{%- endif %}
 
 {%  for attr in cluster.attributes %}
   {{"List" if attr.definition.is_list}}Attribute<{{attr | getType(cluster, idl)}}> m{{attr.definition.name | capitalcase}};
