@@ -79,9 +79,10 @@ def discover_device(devCtrl, setupPayload):
     return res[0]
 
 
-def connect_device(setupPayload, commissionableDevice, nodeId=None):
+def connect_device(devCtrl, setupPayload, commissionableDevice, nodeId=None):
     """
     Connect to Matter discovered device on network
+    :param devCtrl: device controller instance
     :param setupPayload: device setup payload
     :param commissionableDevice: CommissionableNode object with discovered device
     :param nodeId: device node ID
@@ -92,9 +93,13 @@ def connect_device(setupPayload, commissionableDevice, nodeId=None):
 
     pincode = int(setupPayload.attributes['SetUpPINCode'])
     try:
-        commissionableDevice.Commission(nodeId, pincode)
+        res = devCtrl.CommissionOnNetwork(
+            nodeId, pincode, filterType=discovery.FilterType.INSTANCE_NAME, filter=commissionableDevice.instanceName)
     except exceptions.ChipStackError as ex:
         log.error("Commission discovered device failed {}".format(str(ex)))
+        return None
+    if not res:
+        log.info("Commission discovered device failed")
         return None
     return nodeId
 

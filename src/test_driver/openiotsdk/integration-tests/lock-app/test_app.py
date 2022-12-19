@@ -57,11 +57,11 @@ def test_commissioning(device, controller):
     assert commissionable_device.productId == int(setupPayload.attributes['ProductID'])
     assert commissionable_device.addresses[0] != None
 
-    nodeId = connect_device(setupPayload, commissionable_device)
+    nodeId = connect_device(devCtrl, setupPayload, commissionable_device)
     assert nodeId != None
     log.info("Device {} connected".format(commissionable_device.addresses[0]))
 
-    ret = device.wait_for_output("Commissioning completed successfully", timeout=30)
+    ret = device.wait_for_output("Commissioning completed successfully")
     assert ret != None and len(ret) > 0
 
     assert disconnect_device(devCtrl, nodeId)
@@ -85,10 +85,10 @@ def test_lock_ctrl(device, controller):
     commissionable_device = discover_device(devCtrl, setupPayload)
     assert commissionable_device != None
 
-    nodeId = connect_device(setupPayload, commissionable_device)
+    nodeId = connect_device(devCtrl, setupPayload, commissionable_device)
     assert nodeId != None
 
-    ret = device.wait_for_output("Commissioning completed successfully", timeout=30)
+    ret = device.wait_for_output("Commissioning completed successfully")
     assert ret != None and len(ret) > 0
 
     err, res = send_zcl_command(
