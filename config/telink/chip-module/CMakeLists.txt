@@ -300,13 +300,6 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
         west build -b tlsr9518adk80d -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr -- -DCONFIG_BOOT_SWAP_USING_MOVE=y
     )
 
-    add_custom_target(west_sign ALL
-        COMMAND
-        west sign -t imgtool -p ${ZEPHYR_BASE}/../bootloader/mcuboot/scripts/imgtool.py -d ${PROJECT_BINARY_DIR}/.. -- --key ${ZEPHYR_BASE}/../bootloader/mcuboot/root-rsa-2048.pem
-        BYPRODUCTS
-        ${PROJECT_BINARY_DIR}/zephyr.signed.bin
-    )
-
     add_custom_target(merge_mcuboot ALL
         COMMAND
         dd if=${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin of=${PROJECT_BINARY_DIR}/zephyr.bin
@@ -319,9 +312,8 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
         OUTPUT_FILE ${PROJECT_BINARY_DIR}/zephyr-ota.bin
     )
 
-    add_dependencies(west_sign ${ZEPHYR_FINAL_EXECUTABLE})
-    add_dependencies(merge_mcuboot west_sign)
-    add_dependencies(chip-ota-image west_sign)
+    add_dependencies(merge_mcuboot ${ZEPHYR_FINAL_EXECUTABLE})
+    add_dependencies(chip-ota-image ${ZEPHYR_FINAL_EXECUTABLE})
 endif()
 
 if (CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)
