@@ -17,12 +17,4 @@
 
 import setuptools  # type: ignore
 
-setuptools.setup(
-    name='idl',
-    version='0.0.1',
-    author='Project CHIP Authors',
-    description='Parse matter idl files',
-    packages=setuptools.find_packages(),
-    package_data={'idl': ['py.typed']},
-    zip_safe=False,
-)
+setuptools.setup()  # Package definition in idl_setup.cfg

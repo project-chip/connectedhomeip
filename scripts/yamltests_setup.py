@@ -13,16 +13,8 @@
 # limitations under the License.
 
 
-"""The yamltest package."""
+"""The yamltests package."""
 
 import setuptools  # type: ignore
 
-setuptools.setup(
-    name='yamltests',
-    version='0.0.1',
-    author='Project CHIP Authors',
-    description='Parse matter yaml test files',
-    packages=setuptools.find_packages(),
-    package_data={'yamltest': ['py.typed']},
-    zip_safe=False,
-)
+setuptools.setup()  # Package definition in yamltests_setup.cfg

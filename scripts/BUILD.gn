@@ -12,6 +12,96 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/pigweed.gni")
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
 
+import("//build_overrides/pigweed.gni")
 import("$dir_pw_build/python.gni")
+
+import("${chip_root}/scripts/idl/files.gni")
+
+pw_python_package("idl") {
+  setup = [
+    "setup.py",
+    "setup.cfg",
+    "pyproject.toml",
+  ]
+  inputs = matter_idl_generator_templates
+  inputs += [
+    # Dependency grammar
+    "idl/matter_grammar.lark",
+
+    # Unit test data
+    "idl/tests/available_tests.yaml",
+    "idl/tests/inputs/cluster_struct_attribute.matter",
+    "idl/tests/inputs/global_struct_attribute.matter",
+    "idl/tests/inputs/optional_argument.matter",
+    "idl/tests/inputs/several_clusters.matter",
+    "idl/tests/inputs/simple_attribute.matter",
+    "idl/tests/outputs/cluster_struct_attribute/bridge/BridgeClustersImpl.h",
+    "idl/tests/outputs/cluster_struct_attribute/bridge/BridgeGlobalStructs.h",
+    "idl/tests/outputs/cluster_struct_attribute/bridge/DemoClusterServer.h",
+    "idl/tests/outputs/cluster_struct_attribute/jni/DemoClusterClient-ReadImpl.cpp",
+    "idl/tests/outputs/cluster_struct_attribute/jni/DemoClusterClient-InvokeSubscribeImpl.cpp",
+    "idl/tests/outputs/global_struct_attribute/bridge/BridgeClustersImpl.h",
+    "idl/tests/outputs/global_struct_attribute/bridge/BridgeGlobalStructs.h",
+    "idl/tests/outputs/global_struct_attribute/bridge/DemoClusterServer.h",
+    "idl/tests/outputs/global_struct_attribute/jni/DemoClusterClient-ReadImpl.cpp",
+    "idl/tests/outputs/global_struct_attribute/jni/DemoClusterClient-InvokeSubscribeImpl.cpp",
+    "idl/tests/outputs/optional_argument/jni/MyClusterClient-ReadImpl.cpp",
+    "idl/tests/outputs/optional_argument/jni/MyClusterClient-InvokeSubscribeImpl.cpp",
+    "idl/tests/outputs/several_clusters/bridge/BridgeClustersImpl.h",
+    "idl/tests/outputs/several_clusters/bridge/BridgeGlobalStructs.h",
+    "idl/tests/outputs/several_clusters/bridge/FirstServer.h",
+    "idl/tests/outputs/several_clusters/bridge/SecondServer.h",
+    "idl/tests/outputs/several_clusters/bridge/Third.h",
+    "idl/tests/outputs/several_clusters/bridge/ThirdServer.h",
+    "idl/tests/outputs/several_clusters/jni/FirstClient-ReadImpl.cpp",
+    "idl/tests/outputs/several_clusters/jni/SecondClient-ReadImpl.cpp",
+    "idl/tests/outputs/several_clusters/jni/ThirdClient-ReadImpl.cpp",
+    "idl/tests/outputs/several_clusters/jni/FirstClient-InvokeSubscribeImpl.cpp",
+    "idl/tests/outputs/several_clusters/jni/SecondClient-InvokeSubscribeImpl.cpp",
+    "idl/tests/outputs/several_clusters/jni/ThirdClient-InvokeSubscribeImpl.cpp",
+    "idl/tests/outputs/simple_attribute/bridge/BridgeClustersImpl.h",
+    "idl/tests/outputs/simple_attribute/bridge/BridgeGlobalStructs.h",
+    "idl/tests/outputs/simple_attribute/bridge/MyClusterServer.h",
+    "idl/tests/outputs/simple_attribute/jni/MyClusterClient-ReadImpl.cpp",
+    "idl/tests/outputs/simple_attribute/jni/MyClusterClient-InvokeSubscribeImpl.cpp",
+  ]
+
+  sources = matter_idl_generator_sources
+
+  tests = [
+    "idl/test_matter_idl_parser.py",
+    "idl/test_generators.py",
+    "idl/test_xml_parser.py",
+  ]
+
+  # TODO: at a future time consider enabling all (* or missing) here to get
+  #       pylint checking these files
+  static_analysis = []
+}
+
+pw_python_package("yamltests") {
+  setup = [
+    "yamltests_setup.py",
+    "yamltests_setup.cfg",
+    "yamltests_pyproject.toml",
+  ]
+
+  sources = [
+    "yamltests/__init__.py",
+    "yamltests/constraints.py",
+    "yamltests/definitions.py",
+    "yamltests/fixes.py",
+    "yamltests/parser.py",
+  ]
+
+  python_deps = [ ":idl" ]
+
+  tests = [ "test_spec_definitions.py" ]
+
+  # TODO: at a future time consider enabling all (* or missing) here to get
+  #       pylint checking these files
+  static_analysis = []
+}
