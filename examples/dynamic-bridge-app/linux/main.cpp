@@ -99,7 +99,9 @@ CommonCluster * CommonAttributeAccessInterface::FindCluster(const chip::app::Con
         for (auto c : dev->clusters())
         {
             if (c->GetClusterId() == path.mClusterId)
+            {
                 return static_cast<CommonCluster *>(c);
+            }
         }
     }
     return nullptr;
@@ -110,10 +112,14 @@ CHIP_ERROR CommonAttributeAccessInterface::Read(const chip::app::ConcreteReadAtt
 {
     CommonCluster * c = FindCluster(aPath);
     if (!c)
+    {
         return CHIP_ERROR_NOT_FOUND;
+    }
     AttributeInterface * a = c->FindAttribute(aPath.mAttributeId);
     if (!a)
+    {
         return CHIP_ERROR_NOT_FOUND;
+    }
     return a->Read(aPath, aEncoder);
 }
 
@@ -122,7 +128,9 @@ CHIP_ERROR CommonAttributeAccessInterface::Write(const chip::app::ConcreteDataAt
 {
     CommonCluster * c = FindCluster(aPath);
     if (!c)
+    {
         return CHIP_ERROR_NOT_FOUND;
+    }
     return c->ForwardWriteToBridge(aPath, aDecoder);
 }
 
@@ -130,10 +138,14 @@ CHIP_ERROR CommonAttributeAccessInterface::Read(const chip::app::ConcreteReadAtt
 {
     CommonCluster * c = FindCluster(aPath);
     if (!c)
+    {
         return CHIP_ERROR_NOT_FOUND;
+    }
     AttributeInterface * a = c->FindAttribute(aPath.mAttributeId);
     if (!a)
+    {
         return CHIP_ERROR_NOT_FOUND;
+    }
     return a->Read(aPath, writer);
 }
 
@@ -144,7 +156,9 @@ void CommonAttributeAccessInterface::OnListWriteBegin(const chip::app::ConcreteA
     {
         AttributeInterface * a = c->FindAttribute(aPath.mAttributeId);
         if (a)
+        {
             a->ListWriteBegin(aPath);
+        }
     }
 }
 
@@ -155,7 +169,9 @@ void CommonAttributeAccessInterface::OnListWriteEnd(const chip::app::ConcreteAtt
     {
         AttributeInterface * a = c->FindAttribute(aPath.mAttributeId);
         if (a)
+        {
             a->ListWriteEnd(aPath, aWriteWasSuccessful);
+        }
     }
 }
 
@@ -455,7 +471,9 @@ Device * FindDeviceEndpoint(chip::EndpointId id)
     for (auto dev : gDevices)
     {
         if (dev && dev->GetEndpointId() == id)
+        {
             return dev;
+        }
     }
     return nullptr;
 }
@@ -527,7 +545,9 @@ Room * FindRoom(const std::string & name)
     for (auto & room : gRooms)
     {
         if (room.GetName() == name)
+        {
             return &room;
+        }
     }
     return nullptr;
 }
