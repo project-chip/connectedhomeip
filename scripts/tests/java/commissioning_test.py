@@ -17,7 +17,6 @@
 #    limitations under the License.
 #
 
-# Commissioning test.
 import logging
 import os
 import sys
@@ -59,7 +58,7 @@ class CommissioningTest:
 
         logging.basicConfig(level=logging.INFO)
 
-    def TestOnnetworkLong(self, nodeid, setuppin, discriminator, timeout):
+    def TestCmdOnnetworkLong(self, nodeid, setuppin, discriminator, timeout):
         java_command = self.command + ['pairing', 'onnetwork-long', nodeid, setuppin, discriminator, timeout]
         logging.info(f"Execute: {java_command}")
         java_process = subprocess.Popen(
@@ -70,10 +69,8 @@ class CommissioningTest:
     def RunTest(self):
         logging.info("Testing onnetwork-long pairing")
         if self.command_name == 'onnetwork-long':
-            java_exit_code = self.TestOnnetworkLong(self.nodeid, self.setup_payload, self.discriminator, self.timeout)
-            if java_exit_code != 0:
-                logging.error("Testing onnetwork-long pairing failed with error %r" % java_exit_code)
-                return java_exit_code
-
-        # Testing complete without errors
-        return 0
+            code = self.TestCmdOnnetworkLong(self.nodeid, self.setup_payload, self.discriminator, self.timeout)
+            if code != 0:
+                raise Exception(f"Testing onnetwork-long pairing failed with error {code}")
+        else:
+            raise Exception(f"Unsupported command {self.command_name}")

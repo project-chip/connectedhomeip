@@ -149,7 +149,7 @@
 
 #define EMBER_AF_PRINT_NAMES                                                                                                       \
     {                                                                                                                              \
-        "Basic", "Power Configuration", "Device Temperature Configuration", "Identify", "Groups", "Scenes", "On/off",              \
+        "Basic Information", "Power Configuration", "Device Temperature Configuration", "Identify", "Groups", "Scenes", "On/off",  \
             "On/off Switch Configuration", "Level Control", "Alarms", "Time", "RSSI Location", "Binary Input (Basic)",             \
             "Commissioning", "Partition", "Over the Air Bootloading", "Power Profile", "Appliance Control", "Poll Control",        \
             "Green Power", "Keep-Alive", "Shade Configuration", "Door Lock", "Window Covering", "Barrier Control",                 \

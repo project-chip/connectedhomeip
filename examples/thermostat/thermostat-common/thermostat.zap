@@ -1,5 +1,5 @@
 {
-  "featureLevel": 87,
+  "featureLevel": 89,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -18,17 +18,17 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../src/app/zap-templates/app-templates.json",
-      "type": "gen-templates-json",
-      "version": "chip-v1"
-    },
-    {
-      "pathRelativity": "relativeToZap",
       "path": "../../../src/app/zap-templates/zcl/zcl.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
       "description": "Matter SDK ZCL data"
+    },
+    {
+      "pathRelativity": "relativeToZap",
+      "path": "../../../src/app/zap-templates/app-templates.json",
+      "type": "gen-templates-json",
+      "version": "chip-v1"
     }
   ],
   "endpointTypes": [
@@ -1115,10 +1115,10 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
-          "define": "BASIC_CLUSTER",
+          "define": "BASIC_INFORMATION_CLUSTER",
           "side": "client",
           "enabled": 0,
           "attributes": [
@@ -1141,10 +1141,10 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
-          "define": "BASIC_CLUSTER",
+          "define": "BASIC_INFORMATION_CLUSTER",
           "side": "server",
           "enabled": 1,
           "attributes": [
@@ -5015,6 +5015,40 @@
           "define": "GROUP_KEY_MANAGEMENT_CLUSTER",
           "side": "client",
           "enabled": 0,
+          "commands": [
+            {
+              "name": "KeySetWrite",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "KeySetRead",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "KeySetRemove",
+              "code": 3,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "KeySetReadAllIndices",
+              "code": 4,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            }
+          ],
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -5041,6 +5075,24 @@
           "define": "GROUP_KEY_MANAGEMENT_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "commands": [
+            {
+              "name": "KeySetReadResponse",
+              "code": 2,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "KeySetReadAllIndicesResponse",
+              "code": 5,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            }
+          ],
           "attributes": [
             {
               "name": "GroupKeyMap",
@@ -5072,6 +5124,38 @@
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "MaxGroupsPerFabric",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "MaxGroupKeysPerFabric",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
@@ -8761,10 +8845,10 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
-          "define": "BASIC_CLUSTER",
+          "define": "BASIC_INFORMATION_CLUSTER",
           "side": "client",
           "enabled": 0,
           "attributes": [
@@ -8787,10 +8871,10 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
-          "define": "BASIC_CLUSTER",
+          "define": "BASIC_INFORMATION_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -14550,6 +14634,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 769
     }
-  ],
-  "log": []
+  ]
 }

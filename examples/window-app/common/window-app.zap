@@ -1,5 +1,5 @@
 {
-  "featureLevel": 81,
+  "featureLevel": 89,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -1149,10 +1149,10 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
-          "define": "BASIC_CLUSTER",
+          "define": "BASIC_INFORMATION_CLUSTER",
           "side": "client",
           "enabled": 0,
           "attributes": [
@@ -1191,10 +1191,10 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
-          "define": "BASIC_CLUSTER",
+          "define": "BASIC_INFORMATION_CLUSTER",
           "side": "server",
           "enabled": 1,
           "attributes": [
@@ -7650,7 +7650,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x0017",
+              "defaultValue": "0x001F",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,

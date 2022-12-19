@@ -39,7 +39,10 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
 #define OPENTHREAD_CONFIG_PARENT_SEARCH_ENABLE 0
 // In seconds
-#define OPENTHREAD_CONFIG_MLE_CHILD_TIMEOUT_DEFAULT (SL_SLEEP_TIME_MS / 1000)
+#define SL_MLE_TIMEOUT_seconds (SL_SLEEP_TIME_MS / 1000)
+
+// Timeout after 2 missed checkin or 4 mins if sleep interval is too short.
+#define OPENTHREAD_CONFIG_MLE_CHILD_TIMEOUT_DEFAULT ((SL_MLE_TIMEOUT_seconds < 120) ? 240 : ((SL_MLE_TIMEOUT_seconds * 2) + 1))
 #endif
 
 /****Uncomment below section for OpenThread Debug logs*/

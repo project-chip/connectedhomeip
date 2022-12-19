@@ -37,6 +37,10 @@ public:
         ChipLogError(Discovery, "Failed to resolve node ID: dnssd resolving not available");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+    void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override
+    {
+        ChipLogError(Discovery, "Failed to stop resolving node ID: dnssd resolving not available");
+    }
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -67,6 +71,8 @@ CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
+
+void ResolverProxy::NodeIdResolutionNoLongerNeeded(const PeerId & peerId) {}
 
 CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)
 {

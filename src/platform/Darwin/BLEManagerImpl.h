@@ -42,6 +42,7 @@ class BLEManagerImpl final : public BLEManager, private BleLayer
 
 public:
     CHIP_ERROR ConfigureBle(uint32_t aNodeId, bool aIsCentral) { return CHIP_NO_ERROR; }
+    CHIP_ERROR PrepareConnection();
 
 private:
     // ===== Members that implement the BLEManager internal interface.

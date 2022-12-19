@@ -36,7 +36,8 @@ class OperationalSessionSetupPoolDelegate;
 
 struct CASESessionManagerConfig
 {
-    DeviceProxyInitParams sessionInitParams;
+    CASEClientInitParams sessionInitParams;
+    CASEClientPoolDelegate * clientPool                    = nullptr;
     OperationalSessionSetupPoolDelegate * sessionSetupPool = nullptr;
 };
 

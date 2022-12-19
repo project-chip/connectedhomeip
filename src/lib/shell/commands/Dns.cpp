@@ -37,12 +37,14 @@ namespace {
 
 Shell::Engine sShellDnsBrowseSubcommands;
 Shell::Engine sShellDnsSubcommands;
+Dnssd::ResolverProxy sResolverProxy;
 
 class DnsShellResolverDelegate : public Dnssd::OperationalResolveDelegate, public Dnssd::CommissioningResolveDelegate
 {
 public:
     void OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeData) override
     {
+        sResolverProxy.NodeIdResolutionNoLongerNeeded(nodeData.operationalData.peerId);
         streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\r\n",
                         ChipLogValueX64(nodeData.operationalData.peerId.GetCompressedFabricId()),
                         ChipLogValueX64(nodeData.operationalData.peerId.GetNodeId()));
@@ -66,7 +68,10 @@ public:
         streamer_printf(streamer_get(), "   Supports TCP: %s\r\n", nodeData.resolutionData.supportsTcp ? "yes" : "no");
     }
 
-    void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override {}
+    void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override
+    {
+        sResolverProxy.NodeIdResolutionNoLongerNeeded(peerId);
+    }
 
     void OnNodeDiscovered(const Dnssd::DiscoveredNodeData & nodeData) override
     {
@@ -116,7 +121,6 @@ private:
 };
 
 DnsShellResolverDelegate sDnsShellResolverDelegate;
-Dnssd::ResolverProxy sResolverProxy;
 
 CHIP_ERROR ResolveHandler(int argc, char ** argv)
 {

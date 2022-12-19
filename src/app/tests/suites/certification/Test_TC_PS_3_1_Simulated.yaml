@@ -1,0 +1,149 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 62.3.1. [TC-PS-3.1] Attributes with client as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Power Source"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the device to be commissioned"
+      cluster: "DelayCommands"
+      command: "WaitForCommissioning"
+
+    - label: "Read attribute: Status"
+      wait: "readAttribute"
+      attribute: "Status"
+
+    - label: "Read attribute: Order"
+      wait: "readAttribute"
+      attribute: "Order"
+
+    - label: "Read attribute: Description"
+      wait: "readAttribute"
+      attribute: "Description"
+
+    - label: "Read attribute: WiredAssessedInputVoltage"
+      wait: "readAttribute"
+      attribute: "WiredAssessedInputVoltage"
+
+    - label: "Read attribute: WiredAssessedInputFrequency"
+      wait: "readAttribute"
+      attribute: "WiredAssessedInputFrequency"
+
+    - label: "Read attribute: WiredCurrentType"
+      wait: "readAttribute"
+      attribute: "WiredCurrentType"
+
+    - label: "Read attribute: WiredAssessedCurrent"
+      wait: "readAttribute"
+      attribute: "WiredAssessedCurrent"
+
+    - label: "Read attribute: WiredNominalVoltage"
+      wait: "readAttribute"
+      attribute: "WiredNominalVoltage"
+
+    - label: "Read attribute: WiredPresent"
+      wait: "readAttribute"
+      attribute: "WiredPresent"
+
+    - label: "Read attribute: WiredMaximumCurrent"
+      wait: "readAttribute"
+      attribute: "WiredMaximumCurrent"
+
+    - label: "Read attribute: ActiveWiredFaults"
+      wait: "readAttribute"
+      attribute: "ActiveWiredFaults"
+
+    - label: "Read attribute: BatVoltage"
+      wait: "readAttribute"
+      attribute: "BatVoltage"
+
+    - label: "Read attribute: BatPercentRemaining"
+      wait: "readAttribute"
+      attribute: "BatPercentRemaining"
+
+    - label: "Read attribute: BatTimeRemaining"
+      wait: "readAttribute"
+      attribute: "BatTimeRemaining"
+
+    - label: "Read attribute: BatChargeLevel"
+      wait: "readAttribute"
+      attribute: "BatChargeLevel"
+
+    - label: "Read attribute: BatReplacementNeeded"
+      wait: "readAttribute"
+      attribute: "BatReplacementNeeded"
+
+    - label: "Read attribute: BatReplaceability"
+      wait: "readAttribute"
+      attribute: "BatReplaceability"
+
+    - label: "Read attribute: BatPresent"
+      wait: "readAttribute"
+      attribute: "BatPresent"
+
+    - label: "Read attribute: ActiveBatFaults"
+      wait: "readAttribute"
+      attribute: "ActiveBatFaults"
+
+    - label: "Read attribute: BatReplacementDescription"
+      wait: "readAttribute"
+      attribute: "BatReplacementDescription"
+
+    - label: "Read attribute: BatCommonDesignation"
+      wait: "readAttribute"
+      attribute: "BatCommonDesignation"
+
+    - label: "Read attribute: BatANSIDesignation"
+      wait: "readAttribute"
+      attribute: "BatANSIDesignation"
+
+    - label: "Read attribute: BatIECDesignation"
+      wait: "readAttribute"
+      attribute: "BatIECDesignation"
+
+    - label: "Read attribute: BatApprovedChemistry"
+      wait: "readAttribute"
+      attribute: "BatApprovedChemistry"
+
+    - label: "Read attribute: BatCapacity"
+      wait: "readAttribute"
+      attribute: "BatCapacity"
+
+    - label: "Read attribute: BatQuantity"
+      wait: "readAttribute"
+      attribute: "BatQuantity"
+
+    - label: "Read attribute: BatChargeState"
+      wait: "readAttribute"
+      attribute: "BatChargeState"
+
+    - label: "Read attribute: BatTimeToFullCharge"
+      wait: "readAttribute"
+      attribute: "BatTimeToFullCharge"
+
+    - label: "Read attribute: BatFunctionalWhileCharging"
+      wait: "readAttribute"
+      attribute: "BatFunctionalWhileCharging"
+
+    - label: "Read attribute: BatChargingCurrent"
+      wait: "readAttribute"
+      attribute: "BatChargingCurrent"
+
+    - label: "Read attribute: ActiveBatChargeFaults"
+      wait: "readAttribute"
+      attribute: "ActiveBatChargeFaults"

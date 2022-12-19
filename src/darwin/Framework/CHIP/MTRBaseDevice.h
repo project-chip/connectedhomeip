@@ -122,6 +122,13 @@ extern NSString * const MTRArrayValueType;
 @class MTRReadParams;
 @class MTRSubscribeParams;
 
+typedef NS_ENUM(uint8_t, MTRTransportType) {
+    MTRTransportTypeUndefined = 0,
+    MTRTransportTypeUDP,
+    MTRTransportTypeBLE,
+    MTRTransportTypeTCP,
+} MTR_NEWLY_AVAILABLE;
+
 @interface MTRBaseDevice : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -134,6 +141,12 @@ extern NSString * const MTRArrayValueType;
  * (asynchronously) in that case.
  */
 + (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller MTR_NEWLY_AVAILABLE;
+
+/**
+ * The transport used by the current session with this device, or
+ * `MTRTransportTypeUndefined` if no session is currently active.
+ */
+@property (readonly) MTRTransportType sessionTransportType MTR_NEWLY_AVAILABLE;
 
 /**
  * Subscribe to receive attribute reports for everything (all endpoints, all
