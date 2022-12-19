@@ -103,7 +103,7 @@ bool retryInProgress             = false;
 bool is_disconnection_event = false;
 
 /* Declare a variable to hold connection time intervals */
-static uint32_t retryInterval = WLAN_MIN_RETRY_TIMER_MS;
+uint32_t retryInterval = WLAN_MIN_RETRY_TIMER_MS;
 
 #ifdef SL_WFX_CONFIG_SCAN
 static struct scan_result_holder
@@ -543,34 +543,7 @@ static void wfx_events_task(void * p_arg)
             if (!retryInProgress)
             {
                 retryInProgress = true;
-                if (!is_disconnection_event)
-                {
-                    /* After the reboot or a commissioning time device failed to connect with AP.
-                     * Device will retry to connect with AP upto WFX_RSI_CONFIG_MAX_JOIN retries.
-                     */
-                    SILABS_LOG("%s: Next attempt after %d sec", __func__, CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
-                    if (retryJoin < MAX_JOIN_RETRIES_COUNT)
-                        vTaskDelay(WLAN_RETRY_TIMER_MS);
-                }
-                else
-                {
-                    /* After disconnection
-                     * At the telescopic time interval device try to reconnect with AP, upto WLAN_MAX_RETRY_TIMER_MS
-                     * intervals are telescopic. If interval exceed WLAN_MAX_RETRY_TIMER_MS then it will try to
-                     * reconnect at WLAN_MAX_RETRY_TIMER_MS intervals.
-                     */
-                    if (retryInterval > WLAN_MAX_RETRY_TIMER_MS)
-                    {
-                        retryInterval = WLAN_MAX_RETRY_TIMER_MS;
-                        SILABS_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(WLAN_MAX_RETRY_TIMER_MS));
-                    }
-                    else
-                    {
-                        SILABS_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(retryInterval));
-                    }
-                    vTaskDelay(pdMS_TO_TICKS(retryInterval));
-                    retryInterval += retryInterval;
-                }
+                wfx_retry_int erval_handler(is_disconnection_event, retryJoin);
                 SILABS_LOG("WFX sending the connect command");
                 wfx_connect_to_ap();
             }
