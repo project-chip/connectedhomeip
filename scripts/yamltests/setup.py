@@ -17,4 +17,4 @@
 
 import setuptools  # type: ignore
 
-setuptools.setup()  # Package definition in yamltests_setup.cfg
+setuptools.setup()  # Package definition in setup.cfg

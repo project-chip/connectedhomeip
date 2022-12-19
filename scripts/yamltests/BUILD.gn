@@ -19,14 +19,18 @@ import("//build_overrides/pigweed.gni")
 import("$dir_pw_build/python.gni")
 
 pw_python_package("yamltests") {
-  setup = [ "setup.py" ]
+  setup = [
+    "setup.py",
+    "setup.cfg",
+    "pyproject.toml",
+  ]
 
   sources = [
-    "__init__.py",
-    "constraints.py",
-    "definitions.py",
-    "fixes.py",
-    "parser.py",
+    "yamltests/__init__.py",
+    "yamltests/constraints.py",
+    "yamltests/definitions.py",
+    "yamltests/fixes.py",
+    "yamltests/parser.py",
   ]
 
   python_deps = [ "${chip_root}/scripts/idl" ]
