@@ -169,7 +169,7 @@ tests:
       PICS: BINFO.S.A0005
       identity: "beta"
       command: "writeAttribute"
-      cluster: "Basic"
+      cluster: "Basic Information"
       attribute: "NodeLabel"
       arguments:
           value: "chiptest"

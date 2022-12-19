@@ -22,14 +22,14 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace Basic {
+namespace BasicInformation {
 /**
  * Check whether LocalConfigDisabled is set (on endpoint 0, which is the only
  * place the Basic Information cluster exists and can have the attribute be
  * set).
  */
 bool IsLocalConfigDisabled();
-} // namespace Basic
+} // namespace BasicInformation
 } // namespace Clusters
 } // namespace app
 } // namespace chip

@@ -1069,8 +1069,8 @@ class ChipClusters:
                 },
             },
     }
-    _BASIC_CLUSTER_INFO = {
-            "clusterName": "Basic",
+    _BASIC_INFORMATION_CLUSTER_INFO = {
+            "clusterName": "BasicInformation",
             "clusterId": 0x00000028,
             "commands": {
             },
@@ -7515,7 +7515,7 @@ class ChipClusters:
     0x0000001E: _BINDING_CLUSTER_INFO,
     0x0000001F: _ACCESS_CONTROL_CLUSTER_INFO,
     0x00000025: _ACTIONS_CLUSTER_INFO,
-    0x00000028: _BASIC_CLUSTER_INFO,
+    0x00000028: _BASIC_INFORMATION_CLUSTER_INFO,
     0x00000029: _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
     0x0000002A: _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
     0x0000002B: _LOCALIZATION_CONFIGURATION_CLUSTER_INFO,
@@ -7583,7 +7583,7 @@ class ChipClusters:
         "Binding": _BINDING_CLUSTER_INFO,
         "AccessControl": _ACCESS_CONTROL_CLUSTER_INFO,
         "Actions": _ACTIONS_CLUSTER_INFO,
-        "Basic": _BASIC_CLUSTER_INFO,
+        "BasicInformation": _BASIC_INFORMATION_CLUSTER_INFO,
         "OtaSoftwareUpdateProvider": _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
         "OtaSoftwareUpdateRequestor": _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
         "LocalizationConfiguration": _LOCALIZATION_CONFIGURATION_CLUSTER_INFO,

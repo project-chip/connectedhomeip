@@ -102,7 +102,7 @@
 #define ZCL_DISABLE_ACTION_COMMAND_ID (0x0A)
 #define ZCL_DISABLE_ACTION_WITH_DURATION_COMMAND_ID (0x0B)
 
-// Commands for cluster: Basic
+// Commands for cluster: Basic Information
 #define ZCL_MFG_SPECIFIC_PING_COMMAND_ID (0x00)
 
 // Commands for cluster: OTA Software Update Provider

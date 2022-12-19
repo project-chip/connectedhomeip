@@ -176,17 +176,17 @@ public class ChipEventStructs {
     }
   }
 
-  public static class BasicClusterStartUpEvent {
+  public static class BasicInformationClusterStartUpEvent {
     public Long softwareVersion;
 
-    public BasicClusterStartUpEvent(Long softwareVersion) {
+    public BasicInformationClusterStartUpEvent(Long softwareVersion) {
       this.softwareVersion = softwareVersion;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("BasicClusterStartUpEvent {\n");
+      output.append("BasicInformationClusterStartUpEvent {\n");
       output.append("\tsoftwareVersion: ");
       output.append(softwareVersion);
       output.append("\n");
@@ -195,30 +195,30 @@ public class ChipEventStructs {
     }
   }
 
-  public static class BasicClusterShutDownEvent {
+  public static class BasicInformationClusterShutDownEvent {
 
-    public BasicClusterShutDownEvent() {}
+    public BasicInformationClusterShutDownEvent() {}
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("BasicClusterShutDownEvent {\n");
+      output.append("BasicInformationClusterShutDownEvent {\n");
       output.append("}\n");
       return output.toString();
     }
   }
 
-  public static class BasicClusterLeaveEvent {
+  public static class BasicInformationClusterLeaveEvent {
     public Integer fabricIndex;
 
-    public BasicClusterLeaveEvent(Integer fabricIndex) {
+    public BasicInformationClusterLeaveEvent(Integer fabricIndex) {
       this.fabricIndex = fabricIndex;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("BasicClusterLeaveEvent {\n");
+      output.append("BasicInformationClusterLeaveEvent {\n");
       output.append("\tfabricIndex: ");
       output.append(fabricIndex);
       output.append("\n");
@@ -227,17 +227,17 @@ public class ChipEventStructs {
     }
   }
 
-  public static class BasicClusterReachableChangedEvent {
+  public static class BasicInformationClusterReachableChangedEvent {
     public Boolean reachableNewValue;
 
-    public BasicClusterReachableChangedEvent(Boolean reachableNewValue) {
+    public BasicInformationClusterReachableChangedEvent(Boolean reachableNewValue) {
       this.reachableNewValue = reachableNewValue;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("BasicClusterReachableChangedEvent {\n");
+      output.append("BasicInformationClusterReachableChangedEvent {\n");
       output.append("\treachableNewValue: ");
       output.append(reachableNewValue);
       output.append("\n");

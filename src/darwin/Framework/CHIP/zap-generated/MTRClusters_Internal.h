@@ -78,7 +78,7 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
-@interface MTRClusterBasic ()
+@interface MTRClusterBasicInformation ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice * device;
 @end

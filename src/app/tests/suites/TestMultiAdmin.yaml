@@ -166,7 +166,7 @@ tests:
 
     - label: "read the mandatory attribute: NodeLabel from alpha"
       identity: "alpha"
-      cluster: "Basic"
+      cluster: "Basic Information"
       command: "readAttribute"
       attribute: "NodeLabel"
       response:
@@ -175,7 +175,7 @@ tests:
 
     - label: "write the mandatory attribute NodeLabel from beta"
       identity: "beta"
-      cluster: "Basic"
+      cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "NodeLabel"
       arguments:
@@ -183,7 +183,7 @@ tests:
 
     - label: "read the mandatory attribute: NodeLabel from gamma"
       identity: "gamma"
-      cluster: "Basic"
+      cluster: "Basic Information"
       command: "readAttribute"
       attribute: "NodeLabel"
       response:
@@ -192,7 +192,7 @@ tests:
 
     - label: "write the mandatory attribute NodeLabel back to default"
       identity: "alpha"
-      cluster: "Basic"
+      cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "NodeLabel"
       arguments:

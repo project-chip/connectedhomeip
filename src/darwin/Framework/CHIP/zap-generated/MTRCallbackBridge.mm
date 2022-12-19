@@ -2435,17 +2435,17 @@ void MTRActionsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRBasicCapabilityMinimaStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType & value)
+void MTRBasicInformationCapabilityMinimaStructAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::BasicInformation::Structs::CapabilityMinimaStruct::DecodableType & value)
 {
-    MTRBasicClusterCapabilityMinimaStruct * _Nonnull objCValue;
-    objCValue = [MTRBasicClusterCapabilityMinimaStruct new];
+    MTRBasicInformationClusterCapabilityMinimaStruct * _Nonnull objCValue;
+    objCValue = [MTRBasicInformationClusterCapabilityMinimaStruct new];
     objCValue.caseSessionsPerFabric = [NSNumber numberWithUnsignedShort:value.caseSessionsPerFabric];
     objCValue.subscriptionsPerFabric = [NSNumber numberWithUnsignedShort:value.subscriptionsPerFabric];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBasicInformationCapabilityMinimaStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -2460,7 +2460,7 @@ void MTRBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRBasicGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRBasicInformationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -2483,7 +2483,7 @@ void MTRBasicGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBasicInformationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -2498,7 +2498,7 @@ void MTRBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRBasicAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRBasicInformationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -2521,7 +2521,7 @@ void MTRBasicAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBasicInformationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -2536,7 +2536,7 @@ void MTRBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
+void MTRBasicInformationAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -2559,7 +2559,7 @@ void MTRBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBasicInformationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

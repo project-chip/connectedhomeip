@@ -10,33 +10,25 @@ NS_ASSUME_NONNULL_BEGIN
 {{! Override the getter name because some of our properties start with things
     like "new" or "init" }}
 {{#zcl_struct_items}}
-@property (nonatomic, copy{{#unless (isStrEqual (asGetterName label) (asStructPropertyName label))}}, getter={{asGetterName label}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName label}};
+@property (nonatomic, copy{{#unless (isStrEqual (asGetterName label) (asStructPropertyName label))}}, getter={{asGetterName label}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName label}} {{availability (asUpperCamelCase ../../name preserveAcronyms=true) struct=../struct structField=(asStructPropertyName label) deprecationMessage=(concat "Please use MTR" (asUpperCamelCase ../../name preserveAcronyms=true) "Cluster" (asUpperCamelCase ../name preserveAcronyms=true))}};
 {{/zcl_struct_items}}
 {{/inline}}
-{{! TODO: We need a better setup for the API_AVALABLE annotations here; this does not scale at all sanely. }}
-{{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}
-{{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeStruct")}}
-API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
-{{/if}}
-{{else}}
-{{#unless (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name))}}
-MTR_NEWLY_AVAILABLE
-{{/unless}}
-{{/if}}
+{{availability (asUpperCamelCase parent.name preserveAcronyms=true) struct=(asUpperCamelCase name preserveAcronyms=true)}}
 @interface MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}} : NSObject <NSCopying>
-{{> interfaceDecl}}
+{{> interfaceDecl struct=(asUpperCamelCase name preserveAcronyms=true)}}
 @end
 
 {{!Backwards compat for now: Add a DeviceType thing that is API-compatible with DeviceTypeStruct. }}
 {{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}
 {{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeStruct")}}
+{{availability (asUpperCamelCase parent.name preserveAcronyms=true) struct="DeviceType" deprecationMessage="Please use MTRDescriptorClusterDeviceTypeStruct"}}
 @interface MTRDescriptorClusterDeviceType : NSObject <NSCopying>
-{{> interfaceDecl}}
+{{> interfaceDecl struct="DeviceType"}}
 @end
 {{/if}}
 {{else}}
 {{#unless (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name))}}
-MTR_NEWLY_DEPRECATED("Please use MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}")
+{{availability (compatClusterNameRemapping parent.name) struct=(asUpperCamelCase name) deprecationMessage=(concat "Please use MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true))}}
 @interface MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase name}} : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name}}
 @end
 {{/unless}}
@@ -44,27 +36,23 @@ MTR_NEWLY_DEPRECATED("Please use MTR{{asUpperCamelCase parent.name preserveAcron
 {{/zcl_structs}}
 
 {{#zcl_events}}
-{{#unless (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name))}}
-MTR_NEWLY_AVAILABLE
-{{/unless}}
+{{availability (asUpperCamelCase parent.name preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true)}}
 @interface MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event : NSObject <NSCopying>
 {{#zcl_event_fields}}
-@property (nonatomic, copy{{#unless (isStrEqual (asGetterName name) (asStructPropertyName name))}}, getter={{asGetterName name}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName name}}
+@property (nonatomic, copy{{#unless (isStrEqual (asGetterName name) (asStructPropertyName name))}}, getter={{asGetterName name}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName name}} {{availability (asUpperCamelCase ../../name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(asStructPropertyName name)}};
 {{#if (isStrEqual (asUpperCamelCase ../parent.name preserveAcronyms=true) "Switch")}}
 {{#if (isStrEqual (asUpperCamelCase ../name preserveAcronyms=true) "MultiPressComplete")}}
 {{#if (isStrEqual (asStructPropertyName name) "previousPosition")}}
 {{! Workaround for the name being mis-spelled in XML previously }}
-MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull newPosition MTR_NEWLY_DEPRECATED("Please use previousPosition")
+@property (nonatomic, copy) NSNumber * _Nonnull newPosition {{availability (asUpperCamelCase ../../name preserveAcronyms=true) event=(asUpperCamelCase ../name) eventField="newPosition" deprecationMessage="Please use previousPosition"}};
 {{/if}}
 {{/if}}
 {{/if}}
-;
 {{/zcl_event_fields}}
 @end
 {{#unless (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name))}}
 
-MTR_NEWLY_DEPRECATED("Please use MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event")
+{{availability (compatClusterNameRemapping parent.name) event=(asUpperCamelCase name) deprecationMessage=(concat "Please use MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true) "Event")}}
 @interface MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase name}}Event : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event
 @end
 {{/unless}}
