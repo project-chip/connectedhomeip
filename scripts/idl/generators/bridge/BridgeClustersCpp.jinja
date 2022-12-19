@@ -70,20 +70,18 @@ struct {{cluster.name}}Cluster : public GeneratedCluster
     return mIncomingCommandList;
   }
 {%- endif %}
-
 };
 
-
+{%- if cluster.commands | length > 0 %}
 #ifndef {{cluster.name | constcase}}_CLUSTER_INCOMING_COMMANDS
 #define {{cluster.name | constcase}}_CLUSTER_INCOMING_COMMANDS
-{%- if cluster.commands | length > 0 %}
-  const chip::CommandId {{cluster.name}}Cluster::mIncomingCommandList[] = {
-  {%- for command in cluster.commands %}
-    {{command.code}},
-  {%- endfor %}
-    chip::kInvalidCommandId
-  };
-{%- endif %}
+const chip::CommandId {{cluster.name}}Cluster::mIncomingCommandList[] = {
+{%- for command in cluster.commands %}
+  {{command.code}},
+{%- endfor %}
+  chip::kInvalidCommandId
+};
 #endif
+{%- endif %}
 
 }
