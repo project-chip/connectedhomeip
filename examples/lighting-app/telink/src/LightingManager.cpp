@@ -115,7 +115,7 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint8_t s
 
 void LightingManager::SetLevel(uint8_t aLevel)
 {
-    LOG_INF("Setting brightness level to %u", aLevel);
+    LOG_DBG("Setting brightness level to %u", aLevel);
     mLevel = aLevel;
     UpdateLight();
 }
