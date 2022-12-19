@@ -26,6 +26,7 @@ pw_python_distribution("yamltests_distribution") {
   packages = [ "${chip_root}/scripts/yamltests:yamltests" ]
   generate_setup_cfg = {
     common_config_file = "common_setup.cfg"
+    include_default_pyproject_file = true
     append_date_to_version = true
   }
 }
