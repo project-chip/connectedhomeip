@@ -64,8 +64,8 @@ struct {{cluster.name}}Cluster : public GeneratedCluster
 {%-  endfor  %}
 
 {%- if cluster.commands | length > 0 %}
-  static chip::CommandId incomingCommandList[];
-  chip::CommandId * GetIncomingCommandList() override
+  static const chip::CommandId incomingCommandList[];
+  const chip::CommandId * GetIncomingCommandList() override
   {
     return incomingCommandList;
   }
@@ -77,7 +77,7 @@ struct {{cluster.name}}Cluster : public GeneratedCluster
 #ifndef {{cluster.name | constcase}}_CLUSTER_INCOMING_COMMANDS
 #define {{cluster.name | constcase}}_CLUSTER_INCOMING_COMMANDS
 {%- if cluster.commands | length > 0 %}
-  chip::CommandId {{cluster.name}}Cluster::incomingCommandList[] = {
+  const chip::CommandId {{cluster.name}}Cluster::incomingCommandList[] = {
   {%- for command in cluster.commands %}
     {{command.code}},
   {%- endfor %}
