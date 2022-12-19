@@ -205,7 +205,7 @@
       .generatedCommandList = nullptr ,\
     },\
   { \
-      /* Endpoint: 1, Cluster: Basic (client) */ \
+      /* Endpoint: 1, Cluster: Basic Information (client) */ \
       .clusterId = 0x00000028,  \
       .attributes = ZAP_ATTRIBUTE_INDEX(0), \
       .attributeCount = 0, \

@@ -11,9 +11,7 @@
         "darwin/Framework/CHIP/templates/helper.js"
     ],
     "resources": {
-        "pics-metafile": "../../../../app/tests/suites/certification/PICS.yaml",
-        "certification-metadir": "../../../../app/tests/suites/certification",
-        "test-metadir": "../../../../app/tests/suites"
+        "availability-data": "availability.yaml"
     },
     "override": "../../../../../src/app/zap-templates/common/override.js",
     "partials": [

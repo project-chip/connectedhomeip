@@ -369,8 +369,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
         }
         break;
     }
-    case Clusters::Basic::Id: {
-        using namespace Clusters::Basic;
+    case Clusters::BasicInformation::Id: {
+        using namespace Clusters::BasicInformation;
         switch (aPath.mEventId) {
 
         case Events::StartUp::Id: {
@@ -380,7 +380,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBasicClusterStartUpEvent new];
+            __auto_type * value = [MTRBasicInformationClusterStartUpEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -398,7 +398,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBasicClusterShutDownEvent new];
+            __auto_type * value = [MTRBasicInformationClusterShutDownEvent new];
 
             return value;
         }
@@ -410,7 +410,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBasicClusterLeaveEvent new];
+            __auto_type * value = [MTRBasicInformationClusterLeaveEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -428,7 +428,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBasicClusterReachableChangedEvent new];
+            __auto_type * value = [MTRBasicInformationClusterReachableChangedEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
