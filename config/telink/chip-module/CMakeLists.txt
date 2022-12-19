@@ -297,7 +297,7 @@ add_dependencies(chip chip-gn)
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     add_custom_target(build_mcuboot ALL
         COMMAND
-        west build -b tlsr9518adk80d -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
+        west build -b tlsr9518adk80d -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr -- -DCONFIG_BOOT_SWAP_USING_MOVE=y
     )
 
     add_custom_target(west_sign ALL
@@ -311,7 +311,7 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
         COMMAND
         dd if=${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin of=${PROJECT_BINARY_DIR}/zephyr.bin
         COMMAND
-        dd if=${PROJECT_BINARY_DIR}/zephyr.signed.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=96
+        dd if=${PROJECT_BINARY_DIR}/zephyr.signed.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=76
     )
 
     chip_ota_image(chip-ota-image
@@ -327,7 +327,7 @@ endif()
 if (CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)
     add_custom_target(merge_factory_data ALL
         COMMAND
-        dd if=${PROJECT_BINARY_DIR}/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=2000
+        dd if=${PROJECT_BINARY_DIR}/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=1040
     )
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     add_dependencies(merge_factory_data merge_mcuboot)
