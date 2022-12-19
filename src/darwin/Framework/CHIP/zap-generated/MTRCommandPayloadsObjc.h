@@ -20,9 +20,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRIdentifyClusterIdentifyParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull identifyTime;
+@property (nonatomic, copy) NSNumber * _Nonnull identifyTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -38,15 +39,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRIdentifyClusterTriggerEffectParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull effectIdentifier;
+@property (nonatomic, copy) NSNumber * _Nonnull effectIdentifier API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull effectVariant;
+@property (nonatomic, copy) NSNumber * _Nonnull effectVariant API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -62,15 +62,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGroupsClusterAddGroupParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nonnull groupName;
+@property (nonatomic, copy) NSString * _Nonnull groupName API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -86,15 +85,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGroupsClusterAddGroupResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -109,15 +107,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGroupsClusterViewGroupParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -133,17 +130,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGroupsClusterViewGroupResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nonnull groupName;
+@property (nonatomic, copy) NSString * _Nonnull groupName API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -158,15 +154,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGroupsClusterGetGroupMembershipParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull groupList;
+@property (nonatomic, copy) NSArray * _Nonnull groupList API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -182,15 +177,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGroupsClusterGetGroupMembershipResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nullable capacity;
+@property (nonatomic, copy) NSNumber * _Nullable capacity API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSArray * _Nonnull groupList;
+@property (nonatomic, copy) NSArray * _Nonnull groupList API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -205,15 +199,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGroupsClusterRemoveGroupParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -229,15 +222,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGroupsClusterRemoveGroupResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -252,12 +244,11 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGroupsClusterRemoveAllGroupsParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -274,15 +265,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGroupsClusterAddGroupIfIdentifyingParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nonnull groupName;
+@property (nonatomic, copy) NSString * _Nonnull groupName API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -298,21 +288,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterAddSceneParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nonnull sceneName;
+@property (nonatomic, copy) NSString * _Nonnull sceneName API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSArray * _Nonnull extensionFieldSets;
+@property (nonatomic, copy) NSArray * _Nonnull extensionFieldSets API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -328,17 +317,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterAddSceneResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -353,17 +341,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterViewSceneParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -379,23 +366,22 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterViewSceneResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable transitionTime;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nullable sceneName;
+@property (nonatomic, copy) NSString * _Nullable sceneName API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSArray * _Nullable extensionFieldSets;
+@property (nonatomic, copy) NSArray * _Nullable extensionFieldSets API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -410,17 +396,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterRemoveSceneParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -436,17 +421,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterRemoveSceneResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -461,15 +445,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterRemoveAllScenesParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -485,15 +468,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterRemoveAllScenesResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -508,17 +490,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterStoreSceneParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -534,17 +515,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterStoreSceneResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -559,19 +539,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterRecallSceneParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable transitionTime;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -587,13 +566,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterGetSceneMembershipParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -609,19 +587,18 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterGetSceneMembershipResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable capacity;
+@property (nonatomic, copy) NSNumber * _Nullable capacity API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSArray * _Nullable sceneList;
+@property (nonatomic, copy) NSArray * _Nullable sceneList API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -636,23 +613,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterEnhancedAddSceneParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nonnull sceneName;
+@property (nonatomic, copy) NSString * _Nonnull sceneName API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSArray * _Nonnull extensionFieldSets;
+@property (nonatomic, copy) NSArray * _Nonnull extensionFieldSets API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -668,17 +644,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterEnhancedAddSceneResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -693,17 +668,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterEnhancedViewSceneParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -719,23 +693,22 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterEnhancedViewSceneResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId;
+@property (nonatomic, copy) NSNumber * _Nonnull groupId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable transitionTime;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nullable sceneName;
+@property (nonatomic, copy) NSString * _Nullable sceneName API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSArray * _Nullable extensionFieldSets;
+@property (nonatomic, copy) NSArray * _Nullable extensionFieldSets API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -750,23 +723,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterCopySceneParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull mode;
+@property (nonatomic, copy) NSNumber * _Nonnull mode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupIdFrom;
+@property (nonatomic, copy) NSNumber * _Nonnull groupIdFrom API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneIdFrom;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneIdFrom API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupIdTo;
+@property (nonatomic, copy) NSNumber * _Nonnull groupIdTo API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneIdTo;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneIdTo API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -782,17 +754,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRScenesClusterCopySceneResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupIdFrom;
+@property (nonatomic, copy) NSNumber * _Nonnull groupIdFrom API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneIdFrom;
+@property (nonatomic, copy) NSNumber * _Nonnull sceneIdFrom API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -807,12 +778,11 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROnOffClusterOffParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -829,10 +799,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROnOffClusterOnParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -849,10 +818,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROnOffClusterToggleParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -869,15 +837,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROnOffClusterOffWithEffectParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull effectId;
+@property (nonatomic, copy) NSNumber * _Nonnull effectId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull effectVariant;
+@property (nonatomic, copy) NSNumber * _Nonnull effectVariant API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -893,10 +860,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROnOffClusterOnWithRecallGlobalSceneParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -913,17 +879,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROnOffClusterOnWithTimedOffParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull onOffControl;
+@property (nonatomic, copy) NSNumber * _Nonnull onOffControl API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull onTime;
+@property (nonatomic, copy) NSNumber * _Nonnull onTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull offWaitTime;
+@property (nonatomic, copy) NSNumber * _Nonnull offWaitTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -939,19 +904,18 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRLevelControlClusterMoveToLevelParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull level;
+@property (nonatomic, copy) NSNumber * _Nonnull level API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable transitionTime;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -967,19 +931,18 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRLevelControlClusterMoveParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull moveMode;
+@property (nonatomic, copy) NSNumber * _Nonnull moveMode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable rate;
+@property (nonatomic, copy) NSNumber * _Nullable rate API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -995,21 +958,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRLevelControlClusterStepParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull stepMode;
+@property (nonatomic, copy) NSNumber * _Nonnull stepMode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull stepSize;
+@property (nonatomic, copy) NSNumber * _Nonnull stepSize API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable transitionTime;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1025,15 +987,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRLevelControlClusterStopParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1049,19 +1010,18 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRLevelControlClusterMoveToLevelWithOnOffParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull level;
+@property (nonatomic, copy) NSNumber * _Nonnull level API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable transitionTime;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1077,19 +1037,18 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRLevelControlClusterMoveWithOnOffParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull moveMode;
+@property (nonatomic, copy) NSNumber * _Nonnull moveMode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable rate;
+@property (nonatomic, copy) NSNumber * _Nullable rate API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1105,21 +1064,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRLevelControlClusterStepWithOnOffParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull stepMode;
+@property (nonatomic, copy) NSNumber * _Nonnull stepMode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull stepSize;
+@property (nonatomic, copy) NSNumber * _Nonnull stepSize API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable transitionTime;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1135,15 +1093,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRLevelControlClusterStopWithOnOffParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1159,13 +1116,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRLevelControlClusterMoveToClosestFrequencyParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull frequency;
+@property (nonatomic, copy) NSNumber * _Nonnull frequency API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1181,15 +1137,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRActionsClusterInstantActionParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1205,17 +1160,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRActionsClusterInstantActionWithTransitionParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1231,15 +1185,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRActionsClusterStartActionParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1255,17 +1208,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRActionsClusterStartActionWithDurationParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull duration;
+@property (nonatomic, copy) NSNumber * _Nonnull duration API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1281,15 +1233,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRActionsClusterStopActionParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1305,15 +1256,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRActionsClusterPauseActionParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1329,17 +1279,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRActionsClusterPauseActionWithDurationParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull duration;
+@property (nonatomic, copy) NSNumber * _Nonnull duration API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1355,15 +1304,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRActionsClusterResumeActionParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1379,15 +1327,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRActionsClusterEnableActionParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1403,17 +1350,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRActionsClusterEnableActionWithDurationParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull duration;
+@property (nonatomic, copy) NSNumber * _Nonnull duration API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1429,15 +1375,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRActionsClusterDisableActionParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1453,17 +1398,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRActionsClusterDisableActionWithDurationParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull actionID;
+@property (nonatomic, copy) NSNumber * _Nonnull actionID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable invokeID;
+@property (nonatomic, copy) NSNumber * _Nullable invokeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull duration;
+@property (nonatomic, copy) NSNumber * _Nonnull duration API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1479,11 +1423,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTRBasicClusterMfgSpecificPingParams : NSObject <NSCopying>
+
+MTR_NEWLY_AVAILABLE
+@interface MTRBasicInformationClusterMfgSpecificPingParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1499,27 +1442,31 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTROtaSoftwareUpdateProviderClusterQueryImageParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull vendorId;
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTRBasicInformationClusterMfgSpecificPingParams")
+@interface MTRBasicClusterMfgSpecificPingParams : MTRBasicInformationClusterMfgSpecificPingParams
+@end
 
-@property (nonatomic, copy) NSNumber * _Nonnull productId;
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateProviderClusterQueryImageParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
+@property (nonatomic, copy) NSNumber * _Nonnull vendorId MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nonnull protocolsSupported;
+@property (nonatomic, copy) NSNumber * _Nonnull productId MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable hardwareVersion;
+@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable location;
+@property (nonatomic, copy) NSArray * _Nonnull protocolsSupported MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable requestorCanConsent;
+@property (nonatomic, copy) NSNumber * _Nullable hardwareVersion MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSData * _Nullable metadataForProvider;
+@property (nonatomic, copy) NSString * _Nullable location MTR_NEWLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable requestorCanConsent MTR_NEWLY_AVAILABLE;
+
+@property (nonatomic, copy) NSData * _Nullable metadataForProvider MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1535,27 +1482,31 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImageParams")
+@interface MTROtaSoftwareUpdateProviderClusterQueryImageParams : MTROTASoftwareUpdateProviderClusterQueryImageParams
+@end
 
-@property (nonatomic, copy) NSNumber * _Nullable delayedActionTime;
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateProviderClusterQueryImageResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSString * _Nullable imageURI;
+@property (nonatomic, copy) NSNumber * _Nonnull status MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable softwareVersion;
+@property (nonatomic, copy) NSNumber * _Nullable delayedActionTime MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable softwareVersionString;
+@property (nonatomic, copy) NSString * _Nullable imageURI MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSData * _Nullable updateToken;
+@property (nonatomic, copy) NSNumber * _Nullable softwareVersion MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable userConsentNeeded;
+@property (nonatomic, copy) NSString * _Nullable softwareVersionString MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSData * _Nullable metadataForRequestor;
+@property (nonatomic, copy) NSData * _Nullable updateToken MTR_NEWLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nullable userConsentNeeded MTR_NEWLY_AVAILABLE;
+
+@property (nonatomic, copy) NSData * _Nullable metadataForRequestor MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1570,66 +1521,21 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
-@interface MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull updateToken;
-
-@property (nonatomic, copy, getter=getNewVersion) NSNumber * _Nonnull newVersion;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImageResponseParams")
+@interface MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams : MTROTASoftwareUpdateProviderClusterQueryImageResponseParams
 @end
-@interface MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull action;
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull delayedActionTime;
-/**
- * Controls whether the command is a timed command (using Timed Invoke).
- *
- * If nil (the default value), a regular invoke is done for commands that do
- * not require a timed invoke and a timed invoke with some default timed request
- * timeout is done for commands that require a timed invoke.
- *
- * If not nil, a timed invoke is done, with the provided value used as the timed
- * request timeout.  The value should be chosen small enough to provide the
- * desired security properties but large enough that it will allow a round-trip
- * from the sever to the client (for the status response and actual invoke
- * request) within the timeout window.
- *
- */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
+@property (nonatomic, copy) NSData * _Nonnull updateToken MTR_NEWLY_AVAILABLE;
 
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-@end
-@interface MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams : NSObject <NSCopying>
-
-@property (nonatomic, copy) NSData * _Nonnull updateToken;
-
-@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion;
+@property (nonatomic, copy, getter=getNewVersion) NSNumber * _Nonnull newVersion MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1645,21 +1551,49 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
-@interface MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull providerNodeId;
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams")
+@interface MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams : MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams
+@end
 
-@property (nonatomic, copy) NSNumber * _Nonnull vendorId;
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull announcementReason;
+@property (nonatomic, copy) NSNumber * _Nonnull action MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSData * _Nullable metadataForNode;
+@property (nonatomic, copy) NSNumber * _Nonnull delayedActionTime MTR_NEWLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
+@end
 
-@property (nonatomic, copy) NSNumber * _Nonnull endpoint;
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams")
+@interface MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams
+    : MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSData * _Nonnull updateToken MTR_NEWLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull softwareVersion MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1675,15 +1609,55 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams")
+@interface MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
+    : MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull providerNodeId MTR_NEWLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull vendorId MTR_NEWLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull announcementReason MTR_NEWLY_AVAILABLE;
+
+@property (nonatomic, copy) NSData * _Nullable metadataForNode MTR_NEWLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull endpoint MTR_NEWLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams")
+@interface MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams
+    : MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams
+@end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGeneralCommissioningClusterArmFailSafeParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull expiryLengthSeconds;
+@property (nonatomic, copy) NSNumber * _Nonnull expiryLengthSeconds API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull breadcrumb;
+@property (nonatomic, copy) NSNumber * _Nonnull breadcrumb API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1699,15 +1673,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGeneralCommissioningClusterArmFailSafeResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull errorCode;
+@property (nonatomic, copy) NSNumber * _Nonnull errorCode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nonnull debugText;
+@property (nonatomic, copy) NSString * _Nonnull debugText API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1722,19 +1695,19 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGeneralCommissioningClusterSetRegulatoryConfigParams : NSObject <NSCopying>
 
-@property (nonatomic, copy, getter=getNewRegulatoryConfig) NSNumber * _Nonnull newRegulatoryConfig;
+@property (nonatomic, copy, getter=getNewRegulatoryConfig)
+    NSNumber * _Nonnull newRegulatoryConfig API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nonnull countryCode;
+@property (nonatomic, copy) NSString * _Nonnull countryCode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull breadcrumb;
+@property (nonatomic, copy) NSNumber * _Nonnull breadcrumb API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1750,15 +1723,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull errorCode;
+@property (nonatomic, copy) NSNumber * _Nonnull errorCode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nonnull debugText;
+@property (nonatomic, copy) NSString * _Nonnull debugText API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1773,12 +1745,11 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGeneralCommissioningClusterCommissioningCompleteParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -1795,15 +1766,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGeneralCommissioningClusterCommissioningCompleteResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull errorCode;
+@property (nonatomic, copy) NSNumber * _Nonnull errorCode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nonnull debugText;
+@property (nonatomic, copy) NSString * _Nonnull debugText API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1818,17 +1788,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRNetworkCommissioningClusterScanNetworksParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nullable ssid;
+@property (nonatomic, copy) NSData * _Nullable ssid API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable breadcrumb;
+@property (nonatomic, copy) NSNumber * _Nullable breadcrumb API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1844,19 +1813,18 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRNetworkCommissioningClusterScanNetworksResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull networkingStatus;
+@property (nonatomic, copy) NSNumber * _Nonnull networkingStatus API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nullable debugText;
+@property (nonatomic, copy) NSString * _Nullable debugText API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSArray * _Nullable wiFiScanResults;
+@property (nonatomic, copy) NSArray * _Nullable wiFiScanResults API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSArray * _Nullable threadScanResults;
+@property (nonatomic, copy) NSArray * _Nullable threadScanResults API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1871,19 +1839,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull ssid;
+@property (nonatomic, copy) NSData * _Nonnull ssid API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSData * _Nonnull credentials;
+@property (nonatomic, copy) NSData * _Nonnull credentials API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable breadcrumb;
+@property (nonatomic, copy) NSNumber * _Nullable breadcrumb API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1899,15 +1866,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull operationalDataset;
+@property (nonatomic, copy) NSData * _Nonnull operationalDataset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable breadcrumb;
+@property (nonatomic, copy) NSNumber * _Nullable breadcrumb API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1923,15 +1889,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRNetworkCommissioningClusterRemoveNetworkParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull networkID;
+@property (nonatomic, copy) NSData * _Nonnull networkID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable breadcrumb;
+@property (nonatomic, copy) NSNumber * _Nullable breadcrumb API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1947,17 +1912,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRNetworkCommissioningClusterNetworkConfigResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull networkingStatus;
+@property (nonatomic, copy) NSNumber * _Nonnull networkingStatus API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nullable debugText;
+@property (nonatomic, copy) NSString * _Nullable debugText API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable networkIndex;
+@property (nonatomic, copy) NSNumber * _Nullable networkIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1972,17 +1936,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRNetworkCommissioningClusterConnectNetworkParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull networkID;
+@property (nonatomic, copy) NSData * _Nonnull networkID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable breadcrumb;
+@property (nonatomic, copy) NSNumber * _Nullable breadcrumb API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1998,17 +1961,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRNetworkCommissioningClusterConnectNetworkResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull networkingStatus;
+@property (nonatomic, copy) NSNumber * _Nonnull networkingStatus API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nullable debugText;
+@property (nonatomic, copy) NSString * _Nullable debugText API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable errorValue;
+@property (nonatomic, copy) NSNumber * _Nullable errorValue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2023,19 +1985,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRNetworkCommissioningClusterReorderNetworkParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull networkID;
+@property (nonatomic, copy) NSData * _Nonnull networkID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull networkIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull networkIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable breadcrumb;
+@property (nonatomic, copy) NSNumber * _Nullable breadcrumb API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2051,17 +2012,17 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDiagnosticLogsClusterRetrieveLogsRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull intent;
+@property (nonatomic, copy) NSNumber * _Nonnull intent API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull requestedProtocol;
+@property (nonatomic, copy) NSNumber * _Nonnull requestedProtocol API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSData * _Nonnull transferFileDesignator;
+@property (nonatomic, copy) NSData * _Nonnull transferFileDesignator API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    ;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2077,19 +2038,18 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDiagnosticLogsClusterRetrieveLogsResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSData * _Nonnull content;
+@property (nonatomic, copy) NSData * _Nonnull content API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull timeStamp;
+@property (nonatomic, copy) NSNumber * _Nonnull timeStamp API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull timeSinceBoot;
+@property (nonatomic, copy) NSNumber * _Nonnull timeSinceBoot API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2104,17 +2064,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGeneralDiagnosticsClusterTestEventTriggerParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull enableKey;
+@property (nonatomic, copy) NSData * _Nonnull enableKey API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull eventTrigger;
+@property (nonatomic, copy) NSNumber * _Nonnull eventTrigger API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2130,10 +2089,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRSoftwareDiagnosticsClusterResetWatermarksParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -2150,10 +2108,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRThreadNetworkDiagnosticsClusterResetCountsParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -2170,10 +2127,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRWiFiNetworkDiagnosticsClusterResetCountsParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -2190,10 +2146,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTREthernetNetworkDiagnosticsClusterResetCountsParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -2210,17 +2165,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRTimeSynchronizationClusterSetUtcTimeParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull utcTime;
+@property (nonatomic, copy) NSNumber * _Nonnull utcTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull granularity;
+@property (nonatomic, copy) NSNumber * _Nonnull granularity API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable timeSource;
+@property (nonatomic, copy) NSNumber * _Nullable timeSource API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2236,21 +2190,21 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRAdministratorCommissioningClusterOpenCommissioningWindowParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull commissioningTimeout;
+@property (nonatomic, copy) NSNumber * _Nonnull commissioningTimeout API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    ;
 
-@property (nonatomic, copy) NSData * _Nonnull pakeVerifier;
+@property (nonatomic, copy) NSData * _Nonnull pakeVerifier API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull discriminator;
+@property (nonatomic, copy) NSNumber * _Nonnull discriminator API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull iterations;
+@property (nonatomic, copy) NSNumber * _Nonnull iterations API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSData * _Nonnull salt;
+@property (nonatomic, copy) NSData * _Nonnull salt API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2266,13 +2220,13 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull commissioningTimeout;
+@property (nonatomic, copy) NSNumber * _Nonnull commissioningTimeout API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    ;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2288,10 +2242,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRAdministratorCommissioningClusterRevokeCommissioningParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -2308,13 +2261,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROperationalCredentialsClusterAttestationRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull attestationNonce;
+@property (nonatomic, copy) NSData * _Nonnull attestationNonce API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2330,15 +2282,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROperationalCredentialsClusterAttestationResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull attestationElements;
+@property (nonatomic, copy) NSData * _Nonnull attestationElements API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSData * _Nonnull signature;
+@property (nonatomic, copy) NSData * _Nonnull signature API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2353,15 +2304,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROperationalCredentialsClusterCertificateChainRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull certificateType;
+@property (nonatomic, copy) NSNumber * _Nonnull certificateType API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2377,13 +2327,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROperationalCredentialsClusterCertificateChainResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull certificate;
+@property (nonatomic, copy) NSData * _Nonnull certificate API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2398,17 +2347,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROperationalCredentialsClusterCSRRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull csrNonce;
+@property (nonatomic, copy) NSData * _Nonnull csrNonce API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable isForUpdateNOC;
+@property (nonatomic, copy) NSNumber * _Nullable isForUpdateNOC API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2424,15 +2372,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROperationalCredentialsClusterCSRResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull nocsrElements;
+@property (nonatomic, copy) NSData * _Nonnull nocsrElements API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSData * _Nonnull attestationSignature;
+@property (nonatomic, copy) NSData * _Nonnull attestationSignature API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2447,23 +2394,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROperationalCredentialsClusterAddNOCParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull nocValue;
+@property (nonatomic, copy) NSData * _Nonnull nocValue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSData * _Nullable icacValue;
+@property (nonatomic, copy) NSData * _Nullable icacValue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSData * _Nonnull ipkValue;
+@property (nonatomic, copy) NSData * _Nonnull ipkValue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull caseAdminSubject;
+@property (nonatomic, copy) NSNumber * _Nonnull caseAdminSubject API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull adminVendorId;
+@property (nonatomic, copy) NSNumber * _Nonnull adminVendorId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2479,15 +2425,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROperationalCredentialsClusterUpdateNOCParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull nocValue;
+@property (nonatomic, copy) NSData * _Nonnull nocValue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSData * _Nullable icacValue;
+@property (nonatomic, copy) NSData * _Nullable icacValue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2503,17 +2448,16 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROperationalCredentialsClusterNOCResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull statusCode;
+@property (nonatomic, copy) NSNumber * _Nonnull statusCode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable fabricIndex;
+@property (nonatomic, copy) NSNumber * _Nullable fabricIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nullable debugText;
+@property (nonatomic, copy) NSString * _Nullable debugText API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2528,15 +2472,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROperationalCredentialsClusterUpdateFabricLabelParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSString * _Nonnull label;
+@property (nonatomic, copy) NSString * _Nonnull label API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2552,13 +2495,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROperationalCredentialsClusterRemoveFabricParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2574,13 +2516,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROperationalCredentialsClusterAddTrustedRootCertificateParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nonnull rootCertificate;
+@property (nonatomic, copy) NSData * _Nonnull rootCertificate API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2596,13 +2537,13 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGroupKeyManagementClusterKeySetWriteParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRGroupKeyManagementClusterGroupKeySetStruct * _Nonnull groupKeySet;
+@property (nonatomic, copy) MTRGroupKeyManagementClusterGroupKeySetStruct * _Nonnull groupKeySet API_AVAILABLE(
+    ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2618,13 +2559,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGroupKeyManagementClusterKeySetReadParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupKeySetID;
+@property (nonatomic, copy) NSNumber * _Nonnull groupKeySetID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2640,13 +2580,13 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGroupKeyManagementClusterKeySetReadResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRGroupKeyManagementClusterGroupKeySetStruct * _Nonnull groupKeySet;
+@property (nonatomic, copy) MTRGroupKeyManagementClusterGroupKeySetStruct * _Nonnull groupKeySet API_AVAILABLE(
+    ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2661,15 +2601,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGroupKeyManagementClusterKeySetRemoveParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupKeySetID;
+@property (nonatomic, copy) NSNumber * _Nonnull groupKeySetID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2685,13 +2624,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGroupKeyManagementClusterKeySetReadAllIndicesParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull groupKeySetIDs;
+@property (nonatomic, copy) NSArray * _Nonnull groupKeySetIDs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2707,13 +2645,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull groupKeySetIDs;
+@property (nonatomic, copy) NSArray * _Nonnull groupKeySetIDs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2728,15 +2665,15 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRModeSelectClusterChangeToModeParams : NSObject <NSCopying>
 
-@property (nonatomic, copy, getter=getNewMode) NSNumber * _Nonnull newMode;
+@property (nonatomic, copy, getter=getNewMode)
+    NSNumber * _Nonnull newMode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2752,13 +2689,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterLockDoorParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nullable pinCode;
+@property (nonatomic, copy) NSData * _Nullable pinCode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2774,13 +2710,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterUnlockDoorParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSData * _Nullable pinCode;
+@property (nonatomic, copy) NSData * _Nullable pinCode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2796,15 +2731,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterUnlockWithTimeoutParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull timeout;
+@property (nonatomic, copy) NSNumber * _Nonnull timeout API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSData * _Nullable pinCode;
+@property (nonatomic, copy) NSData * _Nullable pinCode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2820,25 +2754,24 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterSetWeekDayScheduleParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull weekDayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull weekDayIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull daysMask;
+@property (nonatomic, copy) NSNumber * _Nonnull daysMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull startHour;
+@property (nonatomic, copy) NSNumber * _Nonnull startHour API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull startMinute;
+@property (nonatomic, copy) NSNumber * _Nonnull startMinute API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull endHour;
+@property (nonatomic, copy) NSNumber * _Nonnull endHour API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull endMinute;
+@property (nonatomic, copy) NSNumber * _Nonnull endMinute API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2854,15 +2787,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterGetWeekDayScheduleParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull weekDayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull weekDayIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2878,27 +2810,26 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterGetWeekDayScheduleResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull weekDayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull weekDayIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable daysMask;
+@property (nonatomic, copy) NSNumber * _Nullable daysMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable startHour;
+@property (nonatomic, copy) NSNumber * _Nullable startHour API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable startMinute;
+@property (nonatomic, copy) NSNumber * _Nullable startMinute API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable endHour;
+@property (nonatomic, copy) NSNumber * _Nullable endHour API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable endMinute;
+@property (nonatomic, copy) NSNumber * _Nullable endMinute API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2913,17 +2844,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterClearWeekDayScheduleParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull weekDayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull weekDayIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2939,19 +2869,18 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterSetYearDayScheduleParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull yearDayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull yearDayIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull localStartTime;
+@property (nonatomic, copy) NSNumber * _Nonnull localStartTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull localEndTime;
+@property (nonatomic, copy) NSNumber * _Nonnull localEndTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2967,15 +2896,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterGetYearDayScheduleParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull yearDayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull yearDayIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -2991,21 +2919,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterGetYearDayScheduleResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull yearDayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull yearDayIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable localStartTime;
+@property (nonatomic, copy) NSNumber * _Nullable localStartTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable localEndTime;
+@property (nonatomic, copy) NSNumber * _Nullable localEndTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3020,17 +2947,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterClearYearDayScheduleParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull yearDayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull yearDayIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3046,19 +2972,18 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterSetHolidayScheduleParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull holidayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull holidayIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull localStartTime;
+@property (nonatomic, copy) NSNumber * _Nonnull localStartTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull localEndTime;
+@property (nonatomic, copy) NSNumber * _Nonnull localEndTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull operatingMode;
+@property (nonatomic, copy) NSNumber * _Nonnull operatingMode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3074,13 +2999,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterGetHolidayScheduleParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull holidayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull holidayIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3096,21 +3020,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterGetHolidayScheduleResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull holidayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull holidayIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable localStartTime;
+@property (nonatomic, copy) NSNumber * _Nullable localStartTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable localEndTime;
+@property (nonatomic, copy) NSNumber * _Nullable localEndTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable operatingMode;
+@property (nonatomic, copy) NSNumber * _Nullable operatingMode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3125,15 +3048,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterClearHolidayScheduleParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull holidayIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull holidayIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3149,25 +3071,24 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterSetUserParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull operationType;
+@property (nonatomic, copy) NSNumber * _Nonnull operationType API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nullable userName;
+@property (nonatomic, copy) NSString * _Nullable userName API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable userUniqueId;
+@property (nonatomic, copy) NSNumber * _Nullable userUniqueId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable userStatus;
+@property (nonatomic, copy) NSNumber * _Nullable userStatus API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable userType;
+@property (nonatomic, copy) NSNumber * _Nullable userType API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable credentialRule;
+@property (nonatomic, copy) NSNumber * _Nullable credentialRule API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3183,13 +3104,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterGetUserParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3205,31 +3125,31 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterGetUserResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nullable userName;
+@property (nonatomic, copy) NSString * _Nullable userName API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable userUniqueId;
+@property (nonatomic, copy) NSNumber * _Nullable userUniqueId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable userStatus;
+@property (nonatomic, copy) NSNumber * _Nullable userStatus API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable userType;
+@property (nonatomic, copy) NSNumber * _Nullable userType API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable credentialRule;
+@property (nonatomic, copy) NSNumber * _Nullable credentialRule API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSArray * _Nullable credentials;
+@property (nonatomic, copy) NSArray * _Nullable credentials API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable creatorFabricIndex;
+@property (nonatomic, copy) NSNumber * _Nullable creatorFabricIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable lastModifiedFabricIndex;
+@property (nonatomic, copy)
+    NSNumber * _Nullable lastModifiedFabricIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable nextUserIndex;
+@property (nonatomic, copy) NSNumber * _Nullable nextUserIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3244,15 +3164,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterClearUserParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull userIndex;
+@property (nonatomic, copy) NSNumber * _Nonnull userIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3268,23 +3187,23 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterSetCredentialParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull operationType;
+@property (nonatomic, copy) NSNumber * _Nonnull operationType API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) MTRDoorLockClusterDlCredential * _Nonnull credential;
+@property (nonatomic, copy)
+    MTRDoorLockClusterDlCredential * _Nonnull credential API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSData * _Nonnull credentialData;
+@property (nonatomic, copy) NSData * _Nonnull credentialData API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable userIndex;
+@property (nonatomic, copy) NSNumber * _Nullable userIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable userStatus;
+@property (nonatomic, copy) NSNumber * _Nullable userStatus API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable userType;
+@property (nonatomic, copy) NSNumber * _Nullable userType API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3300,17 +3219,17 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterSetCredentialResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable userIndex;
+@property (nonatomic, copy) NSNumber * _Nullable userIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable nextCredentialIndex;
+@property (nonatomic, copy) NSNumber * _Nullable nextCredentialIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    ;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3325,15 +3244,15 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterGetCredentialStatusParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRDoorLockClusterDlCredential * _Nonnull credential;
+@property (nonatomic, copy)
+    MTRDoorLockClusterDlCredential * _Nonnull credential API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3349,21 +3268,22 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterGetCredentialStatusResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull credentialExists;
+@property (nonatomic, copy) NSNumber * _Nonnull credentialExists API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable userIndex;
+@property (nonatomic, copy) NSNumber * _Nullable userIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable creatorFabricIndex;
+@property (nonatomic, copy) NSNumber * _Nullable creatorFabricIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable lastModifiedFabricIndex;
+@property (nonatomic, copy)
+    NSNumber * _Nullable lastModifiedFabricIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nullable nextCredentialIndex;
+@property (nonatomic, copy) NSNumber * _Nullable nextCredentialIndex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    ;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3378,15 +3298,15 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDoorLockClusterClearCredentialParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRDoorLockClusterDlCredential * _Nullable credential;
+@property (nonatomic, copy)
+    MTRDoorLockClusterDlCredential * _Nullable credential API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3402,10 +3322,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRWindowCoveringClusterUpOrOpenParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -3422,10 +3341,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRWindowCoveringClusterDownOrCloseParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -3442,10 +3360,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRWindowCoveringClusterStopMotionParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -3462,13 +3379,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRWindowCoveringClusterGoToLiftValueParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull liftValue;
+@property (nonatomic, copy) NSNumber * _Nonnull liftValue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3484,13 +3400,13 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRWindowCoveringClusterGoToLiftPercentageParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull liftPercent100thsValue;
+@property (nonatomic, copy)
+    NSNumber * _Nonnull liftPercent100thsValue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3506,13 +3422,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRWindowCoveringClusterGoToTiltValueParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull tiltValue;
+@property (nonatomic, copy) NSNumber * _Nonnull tiltValue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3528,13 +3443,13 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRWindowCoveringClusterGoToTiltPercentageParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull tiltPercent100thsValue;
+@property (nonatomic, copy)
+    NSNumber * _Nonnull tiltPercent100thsValue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3550,13 +3465,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRBarrierControlClusterBarrierControlGoToPercentParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull percentOpen;
+@property (nonatomic, copy) NSNumber * _Nonnull percentOpen API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3572,10 +3486,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRBarrierControlClusterBarrierControlStopParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -3592,15 +3505,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRThermostatClusterSetpointRaiseLowerParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull mode;
+@property (nonatomic, copy) NSNumber * _Nonnull mode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull amount;
+@property (nonatomic, copy) NSNumber * _Nonnull amount API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3616,19 +3528,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRThermostatClusterGetWeeklyScheduleResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull numberOfTransitionsForSequence;
+@property (nonatomic, copy)
+    NSNumber * _Nonnull numberOfTransitionsForSequence API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull dayOfWeekForSequence;
+@property (nonatomic, copy) NSNumber * _Nonnull dayOfWeekForSequence API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    ;
 
-@property (nonatomic, copy) NSNumber * _Nonnull modeForSequence;
+@property (nonatomic, copy) NSNumber * _Nonnull modeForSequence API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSArray * _Nonnull transitions;
+@property (nonatomic, copy) NSArray * _Nonnull transitions API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3643,21 +3556,22 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRThermostatClusterSetWeeklyScheduleParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull numberOfTransitionsForSequence;
+@property (nonatomic, copy)
+    NSNumber * _Nonnull numberOfTransitionsForSequence API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull dayOfWeekForSequence;
+@property (nonatomic, copy) NSNumber * _Nonnull dayOfWeekForSequence API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    ;
 
-@property (nonatomic, copy) NSNumber * _Nonnull modeForSequence;
+@property (nonatomic, copy) NSNumber * _Nonnull modeForSequence API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSArray * _Nonnull transitions;
+@property (nonatomic, copy) NSArray * _Nonnull transitions API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3673,15 +3587,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRThermostatClusterGetWeeklyScheduleParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull daysToReturn;
+@property (nonatomic, copy) NSNumber * _Nonnull daysToReturn API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull modeToReturn;
+@property (nonatomic, copy) NSNumber * _Nonnull modeToReturn API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3697,10 +3610,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRThermostatClusterClearWeeklyScheduleParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -3717,21 +3629,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterMoveToHueParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull hue;
+@property (nonatomic, copy) NSNumber * _Nonnull hue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull direction;
+@property (nonatomic, copy) NSNumber * _Nonnull direction API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3747,19 +3658,18 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterMoveHueParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull moveMode;
+@property (nonatomic, copy) NSNumber * _Nonnull moveMode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull rate;
+@property (nonatomic, copy) NSNumber * _Nonnull rate API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3775,21 +3685,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterStepHueParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull stepMode;
+@property (nonatomic, copy) NSNumber * _Nonnull stepMode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull stepSize;
+@property (nonatomic, copy) NSNumber * _Nonnull stepSize API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3805,19 +3714,18 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterMoveToSaturationParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull saturation;
+@property (nonatomic, copy) NSNumber * _Nonnull saturation API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3833,19 +3741,18 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterMoveSaturationParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull moveMode;
+@property (nonatomic, copy) NSNumber * _Nonnull moveMode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull rate;
+@property (nonatomic, copy) NSNumber * _Nonnull rate API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3861,21 +3768,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterStepSaturationParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull stepMode;
+@property (nonatomic, copy) NSNumber * _Nonnull stepMode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull stepSize;
+@property (nonatomic, copy) NSNumber * _Nonnull stepSize API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3891,21 +3797,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterMoveToHueAndSaturationParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull hue;
+@property (nonatomic, copy) NSNumber * _Nonnull hue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull saturation;
+@property (nonatomic, copy) NSNumber * _Nonnull saturation API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3921,21 +3826,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterMoveToColorParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull colorX;
+@property (nonatomic, copy) NSNumber * _Nonnull colorX API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull colorY;
+@property (nonatomic, copy) NSNumber * _Nonnull colorY API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3951,19 +3855,18 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterMoveColorParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull rateX;
+@property (nonatomic, copy) NSNumber * _Nonnull rateX API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull rateY;
+@property (nonatomic, copy) NSNumber * _Nonnull rateY API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -3979,21 +3882,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterStepColorParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull stepX;
+@property (nonatomic, copy) NSNumber * _Nonnull stepX API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull stepY;
+@property (nonatomic, copy) NSNumber * _Nonnull stepY API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4009,19 +3911,18 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterMoveToColorTemperatureParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull colorTemperature;
+@property (nonatomic, copy) NSNumber * _Nonnull colorTemperature API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4037,21 +3938,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterEnhancedMoveToHueParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull enhancedHue;
+@property (nonatomic, copy) NSNumber * _Nonnull enhancedHue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull direction;
+@property (nonatomic, copy) NSNumber * _Nonnull direction API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4067,19 +3967,18 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterEnhancedMoveHueParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull moveMode;
+@property (nonatomic, copy) NSNumber * _Nonnull moveMode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull rate;
+@property (nonatomic, copy) NSNumber * _Nonnull rate API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4095,21 +3994,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterEnhancedStepHueParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull stepMode;
+@property (nonatomic, copy) NSNumber * _Nonnull stepMode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull stepSize;
+@property (nonatomic, copy) NSNumber * _Nonnull stepSize API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4125,21 +4023,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterEnhancedMoveToHueAndSaturationParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull enhancedHue;
+@property (nonatomic, copy) NSNumber * _Nonnull enhancedHue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull saturation;
+@property (nonatomic, copy) NSNumber * _Nonnull saturation API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4155,25 +4052,24 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterColorLoopSetParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull updateFlags;
+@property (nonatomic, copy) NSNumber * _Nonnull updateFlags API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull action;
+@property (nonatomic, copy) NSNumber * _Nonnull action API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull direction;
+@property (nonatomic, copy) NSNumber * _Nonnull direction API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull time;
+@property (nonatomic, copy) NSNumber * _Nonnull time API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull startHue;
+@property (nonatomic, copy) NSNumber * _Nonnull startHue API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4189,15 +4085,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterStopMoveStepParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4213,23 +4108,24 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterMoveColorTemperatureParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull moveMode;
+@property (nonatomic, copy) NSNumber * _Nonnull moveMode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull rate;
+@property (nonatomic, copy) NSNumber * _Nonnull rate API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull colorTemperatureMinimumMireds;
+@property (nonatomic, copy)
+    NSNumber * _Nonnull colorTemperatureMinimumMireds API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull colorTemperatureMaximumMireds;
+@property (nonatomic, copy)
+    NSNumber * _Nonnull colorTemperatureMaximumMireds API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4245,25 +4141,26 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRColorControlClusterStepColorTemperatureParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull stepMode;
+@property (nonatomic, copy) NSNumber * _Nonnull stepMode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull stepSize;
+@property (nonatomic, copy) NSNumber * _Nonnull stepSize API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull colorTemperatureMinimumMireds;
+@property (nonatomic, copy)
+    NSNumber * _Nonnull colorTemperatureMinimumMireds API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull colorTemperatureMaximumMireds;
+@property (nonatomic, copy)
+    NSNumber * _Nonnull colorTemperatureMaximumMireds API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsMask;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsMask API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride;
+@property (nonatomic, copy) NSNumber * _Nonnull optionsOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4279,13 +4176,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRChannelClusterChangeChannelParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSString * _Nonnull match;
+@property (nonatomic, copy) NSString * _Nonnull match API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4301,15 +4197,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRChannelClusterChangeChannelResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nullable data;
+@property (nonatomic, copy) NSString * _Nullable data API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4324,17 +4219,16 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRChannelClusterChangeChannelByNumberParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull majorNumber;
+@property (nonatomic, copy) NSNumber * _Nonnull majorNumber API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull minorNumber;
+@property (nonatomic, copy) NSNumber * _Nonnull minorNumber API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4350,13 +4244,13 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRChannelClusterSkipChannelParams : NSObject <NSCopying>
 
-@property (nonatomic, copy, getter=getCount) NSNumber * _Nonnull count;
+@property (nonatomic, copy, getter=getCount)
+    NSNumber * _Nonnull count API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4372,15 +4266,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRTargetNavigatorClusterNavigateTargetParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull target;
+@property (nonatomic, copy) NSNumber * _Nonnull target API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nullable data;
+@property (nonatomic, copy) NSString * _Nullable data API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4396,15 +4289,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRTargetNavigatorClusterNavigateTargetResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nullable data;
+@property (nonatomic, copy) NSString * _Nullable data API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4419,12 +4311,11 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRMediaPlaybackClusterPlayParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -4441,10 +4332,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRMediaPlaybackClusterPauseParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -4461,10 +4351,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRMediaPlaybackClusterStopPlaybackParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -4481,10 +4370,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRMediaPlaybackClusterStartOverParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -4501,10 +4389,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRMediaPlaybackClusterPreviousParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -4521,10 +4408,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRMediaPlaybackClusterNextParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -4541,10 +4427,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRMediaPlaybackClusterRewindParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -4561,10 +4446,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRMediaPlaybackClusterFastForwardParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -4581,13 +4465,13 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRMediaPlaybackClusterSkipForwardParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull deltaPositionMilliseconds;
+@property (nonatomic, copy)
+    NSNumber * _Nonnull deltaPositionMilliseconds API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4603,13 +4487,13 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRMediaPlaybackClusterSkipBackwardParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull deltaPositionMilliseconds;
+@property (nonatomic, copy)
+    NSNumber * _Nonnull deltaPositionMilliseconds API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4625,15 +4509,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRMediaPlaybackClusterPlaybackResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nullable data;
+@property (nonatomic, copy) NSString * _Nullable data API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4648,15 +4531,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRMediaPlaybackClusterSeekParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull position;
+@property (nonatomic, copy) NSNumber * _Nonnull position API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4672,13 +4554,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRMediaInputClusterSelectInputParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull index;
+@property (nonatomic, copy) NSNumber * _Nonnull index API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4694,10 +4575,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRMediaInputClusterShowInputStatusParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -4714,10 +4594,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRMediaInputClusterHideInputStatusParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -4734,15 +4613,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRMediaInputClusterRenameInputParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull index;
+@property (nonatomic, copy) NSNumber * _Nonnull index API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nonnull name;
+@property (nonatomic, copy) NSString * _Nonnull name API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4758,10 +4636,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRLowPowerClusterSleepParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -4778,13 +4655,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRKeypadInputClusterSendKeyParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull keyCode;
+@property (nonatomic, copy) NSNumber * _Nonnull keyCode API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4800,13 +4676,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRKeypadInputClusterSendKeyResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4821,19 +4696,19 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRContentLauncherClusterLaunchContentParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRContentLauncherClusterContentSearch * _Nonnull search;
+@property (nonatomic, copy)
+    MTRContentLauncherClusterContentSearch * _Nonnull search API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull autoPlay;
+@property (nonatomic, copy) NSNumber * _Nonnull autoPlay API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nullable data;
+@property (nonatomic, copy) NSString * _Nullable data API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4849,17 +4724,17 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRContentLauncherClusterLaunchURLParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSString * _Nonnull contentURL;
+@property (nonatomic, copy) NSString * _Nonnull contentURL API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nullable displayString;
+@property (nonatomic, copy) NSString * _Nullable displayString API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) MTRContentLauncherClusterBrandingInformation * _Nullable brandingInformation;
+@property (nonatomic, copy) MTRContentLauncherClusterBrandingInformation * _Nullable brandingInformation API_AVAILABLE(
+    ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4875,15 +4750,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRContentLauncherClusterLaunchResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nullable data;
+@property (nonatomic, copy) NSString * _Nullable data API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4898,15 +4772,14 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRAudioOutputClusterSelectOutputParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull index;
+@property (nonatomic, copy) NSNumber * _Nonnull index API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4922,15 +4795,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRAudioOutputClusterRenameOutputParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull index;
+@property (nonatomic, copy) NSNumber * _Nonnull index API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nonnull name;
+@property (nonatomic, copy) NSString * _Nonnull name API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4946,15 +4818,15 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRApplicationLauncherClusterLaunchAppParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRApplicationLauncherClusterApplication * _Nonnull application;
+@property (nonatomic, copy)
+    MTRApplicationLauncherClusterApplication * _Nonnull application API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSData * _Nullable data;
+@property (nonatomic, copy) NSData * _Nullable data API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4970,13 +4842,13 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRApplicationLauncherClusterStopAppParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRApplicationLauncherClusterApplication * _Nonnull application;
+@property (nonatomic, copy)
+    MTRApplicationLauncherClusterApplication * _Nonnull application API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -4992,13 +4864,13 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRApplicationLauncherClusterHideAppParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRApplicationLauncherClusterApplication * _Nonnull application;
+@property (nonatomic, copy)
+    MTRApplicationLauncherClusterApplication * _Nonnull application API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5014,15 +4886,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRApplicationLauncherClusterLauncherResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSData * _Nonnull data;
+@property (nonatomic, copy) NSData * _Nonnull data API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5037,15 +4908,15 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRAccountLoginClusterGetSetupPINParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSString * _Nonnull tempAccountIdentifier;
+@property (nonatomic, copy)
+    NSString * _Nonnull tempAccountIdentifier API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5061,13 +4932,12 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRAccountLoginClusterGetSetupPINResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSString * _Nonnull setupPIN;
+@property (nonatomic, copy) NSString * _Nonnull setupPIN API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5082,17 +4952,17 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRAccountLoginClusterLoginParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSString * _Nonnull tempAccountIdentifier;
+@property (nonatomic, copy)
+    NSString * _Nonnull tempAccountIdentifier API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSString * _Nonnull setupPIN;
+@property (nonatomic, copy) NSString * _Nonnull setupPIN API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5108,10 +4978,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRAccountLoginClusterLogoutParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -5128,19 +4997,20 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull profileCount;
+@property (nonatomic, copy) NSNumber * _Nonnull profileCount API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull profileIntervalPeriod;
+@property (nonatomic, copy)
+    NSNumber * _Nonnull profileIntervalPeriod API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull maxNumberOfIntervals;
+@property (nonatomic, copy) NSNumber * _Nonnull maxNumberOfIntervals API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    ;
 
-@property (nonatomic, copy) NSArray * _Nonnull listOfAttributes;
+@property (nonatomic, copy) NSArray * _Nonnull listOfAttributes API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5155,12 +5025,11 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRElectricalMeasurementClusterGetProfileInfoCommandParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -5177,23 +5046,24 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull startTime;
+@property (nonatomic, copy) NSNumber * _Nonnull startTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull status;
+@property (nonatomic, copy) NSNumber * _Nonnull status API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull profileIntervalPeriod;
+@property (nonatomic, copy)
+    NSNumber * _Nonnull profileIntervalPeriod API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull numberOfIntervalsDelivered;
+@property (nonatomic, copy)
+    NSNumber * _Nonnull numberOfIntervalsDelivered API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull attributeId;
+@property (nonatomic, copy) NSNumber * _Nonnull attributeId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSArray * _Nonnull intervals;
+@property (nonatomic, copy) NSArray * _Nonnull intervals API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5208,19 +5078,18 @@ NS_ASSUME_NONNULL_BEGIN
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull attributeId;
+@property (nonatomic, copy) NSNumber * _Nonnull attributeId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull startTime;
+@property (nonatomic, copy) NSNumber * _Nonnull startTime API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull numberOfIntervals;
+@property (nonatomic, copy) NSNumber * _Nonnull numberOfIntervals API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5236,10 +5105,50 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRClientMonitoringClusterRegisterClientMonitoringParams : NSObject <NSCopying>
+
+@property (nonatomic, copy) NSNumber * _Nonnull clientNodeId MTR_NEWLY_AVAILABLE;
+
+@property (nonatomic, copy) NSNumber * _Nonnull iCid MTR_NEWLY_AVAILABLE;
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRClientMonitoringClusterStayAwakeRequestParams : NSObject <NSCopying>
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@end
+
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestParams : NSObject <NSCopying>
 /**
@@ -5257,11 +5166,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestParams")
 @interface MTRTestClusterClusterTestParams : MTRUnitTestingClusterTestParams
 @end
@@ -5269,7 +5176,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestParams")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestSpecificResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull returnValue;
+@property (nonatomic, copy) NSNumber * _Nonnull returnValue MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5284,13 +5191,11 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSpecificResponseParams")
 @interface MTRTestClusterClusterTestSpecificResponseParams : MTRUnitTestingClusterTestSpecificResponseParams
 @end
@@ -5312,11 +5217,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNotHandledParams")
 @interface MTRTestClusterClusterTestNotHandledParams : MTRUnitTestingClusterTestNotHandledParams
 @end
@@ -5324,7 +5227,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNotHandledParams")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestAddArgumentsResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull returnValue;
+@property (nonatomic, copy) NSNumber * _Nonnull returnValue MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5339,13 +5242,11 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestAddArgumentsResponseParams")
 @interface MTRTestClusterClusterTestAddArgumentsResponseParams : MTRUnitTestingClusterTestAddArgumentsResponseParams
 @end
@@ -5367,11 +5268,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSpecificParams")
 @interface MTRTestClusterClusterTestSpecificParams : MTRUnitTestingClusterTestSpecificParams
 @end
@@ -5379,7 +5278,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSpecificParams")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestSimpleArgumentResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull returnValue;
+@property (nonatomic, copy) NSNumber * _Nonnull returnValue MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5394,13 +5293,11 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleArgumentResponseParams")
 @interface MTRTestClusterClusterTestSimpleArgumentResponseParams : MTRUnitTestingClusterTestSimpleArgumentResponseParams
 @end
@@ -5422,11 +5319,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestUnknownCommandParams")
 @interface MTRTestClusterClusterTestUnknownCommandParams : MTRUnitTestingClusterTestUnknownCommandParams
 @end
@@ -5434,17 +5329,17 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestUnknownCommandParams")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestStructArrayArgumentResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nonnull arg2;
+@property (nonatomic, copy) NSArray * _Nonnull arg2 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nonnull arg3;
+@property (nonatomic, copy) NSArray * _Nonnull arg3 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nonnull arg4;
+@property (nonatomic, copy) NSArray * _Nonnull arg4 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg5;
+@property (nonatomic, copy) NSNumber * _Nonnull arg5 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg6;
+@property (nonatomic, copy) NSNumber * _Nonnull arg6 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5459,13 +5354,11 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentResponseParams")
 @interface MTRTestClusterClusterTestStructArrayArgumentResponseParams : MTRUnitTestingClusterTestStructArrayArgumentResponseParams
 @end
@@ -5473,9 +5366,9 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentRes
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestAddArgumentsParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg1;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg2;
+@property (nonatomic, copy) NSNumber * _Nonnull arg2 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5491,11 +5384,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestAddArgumentsParams")
 @interface MTRTestClusterClusterTestAddArgumentsParams : MTRUnitTestingClusterTestAddArgumentsParams
 @end
@@ -5503,7 +5394,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestAddArgumentsParams")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestListInt8UReverseResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5518,13 +5409,11 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseResponseParams")
 @interface MTRTestClusterClusterTestListInt8UReverseResponseParams : MTRUnitTestingClusterTestListInt8UReverseResponseParams
 @end
@@ -5532,7 +5421,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseRespon
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestSimpleArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg1;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5548,11 +5437,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleArgumentRequestParams")
 @interface MTRTestClusterClusterTestSimpleArgumentRequestParams : MTRUnitTestingClusterTestSimpleArgumentRequestParams
 @end
@@ -5560,9 +5447,9 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleArgumentRequestP
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEnumsResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg1;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg2;
+@property (nonatomic, copy) NSNumber * _Nonnull arg2 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5577,13 +5464,11 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsResponseParams")
 @interface MTRTestClusterClusterTestEnumsResponseParams : MTRUnitTestingClusterTestEnumsResponseParams
 @end
@@ -5591,17 +5476,17 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsResponseParams")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestStructArrayArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nonnull arg2;
+@property (nonatomic, copy) NSArray * _Nonnull arg2 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nonnull arg3;
+@property (nonatomic, copy) NSArray * _Nonnull arg3 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nonnull arg4;
+@property (nonatomic, copy) NSArray * _Nonnull arg4 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg5;
+@property (nonatomic, copy) NSNumber * _Nonnull arg5 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg6;
+@property (nonatomic, copy) NSNumber * _Nonnull arg6 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5617,11 +5502,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentRequestParams")
 @interface MTRTestClusterClusterTestStructArrayArgumentRequestParams : MTRUnitTestingClusterTestStructArrayArgumentRequestParams
 @end
@@ -5629,13 +5512,13 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentReq
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestNullableOptionalResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull wasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull wasPresent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable wasNull;
+@property (nonatomic, copy) NSNumber * _Nullable wasNull MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable value;
+@property (nonatomic, copy) NSNumber * _Nullable value MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable originalValue;
+@property (nonatomic, copy) NSNumber * _Nullable originalValue MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5650,13 +5533,11 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalResponseParams")
 @interface MTRTestClusterClusterTestNullableOptionalResponseParams : MTRUnitTestingClusterTestNullableOptionalResponseParams
 @end
@@ -5664,7 +5545,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalRespon
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestStructArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg1;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5680,11 +5561,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestStructArgumentRequestParams")
 @interface MTRTestClusterClusterTestStructArgumentRequestParams : MTRUnitTestingClusterTestStructArgumentRequestParams
 @end
@@ -5692,61 +5571,61 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestStructArgumentRequestP
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestComplexNullableOptionalResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull nullableIntWasNull;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableIntWasNull MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable nullableIntValue;
+@property (nonatomic, copy) NSNumber * _Nullable nullableIntValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionalIntWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull optionalIntWasPresent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable optionalIntValue;
+@property (nonatomic, copy) NSNumber * _Nullable optionalIntValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalIntWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalIntWasPresent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalIntWasNull;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalIntWasNull MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalIntValue;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalIntValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull nullableStringWasNull;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableStringWasNull MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable nullableStringValue;
+@property (nonatomic, copy) NSString * _Nullable nullableStringValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionalStringWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull optionalStringWasPresent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable optionalStringValue;
+@property (nonatomic, copy) NSString * _Nullable optionalStringValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalStringWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalStringWasPresent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalStringWasNull;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalStringWasNull MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable nullableOptionalStringValue;
+@property (nonatomic, copy) NSString * _Nullable nullableOptionalStringValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull nullableStructWasNull;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableStructWasNull MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableStructValue;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableStructValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionalStructWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull optionalStructWasPresent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable optionalStructValue;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable optionalStructValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalStructWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalStructWasPresent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalStructWasNull;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalStructWasNull MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableOptionalStructValue;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableOptionalStructValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull nullableListWasNull;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableListWasNull MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nullable nullableListValue;
+@property (nonatomic, copy) NSArray * _Nullable nullableListValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull optionalListWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull optionalListWasPresent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nullable optionalListValue;
+@property (nonatomic, copy) NSArray * _Nullable optionalListValue MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalListWasPresent;
+@property (nonatomic, copy) NSNumber * _Nonnull nullableOptionalListWasPresent MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalListWasNull;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalListWasNull MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nullable nullableOptionalListValue;
+@property (nonatomic, copy) NSArray * _Nullable nullableOptionalListValue MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5761,13 +5640,11 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptionalResponseParams")
 @interface MTRTestClusterClusterTestComplexNullableOptionalResponseParams
     : MTRUnitTestingClusterTestComplexNullableOptionalResponseParams
@@ -5776,7 +5653,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptiona
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestNestedStructArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRUnitTestingClusterNestedStruct * _Nonnull arg1;
+@property (nonatomic, copy) MTRUnitTestingClusterNestedStruct * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5792,11 +5669,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructArgumentRequestParams")
 @interface MTRTestClusterClusterTestNestedStructArgumentRequestParams : MTRUnitTestingClusterTestNestedStructArgumentRequestParams
 @end
@@ -5804,7 +5679,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructArgumentRe
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterBooleanResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull value;
+@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5819,13 +5694,11 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterBooleanResponseParams")
 @interface MTRTestClusterClusterBooleanResponseParams : MTRUnitTestingClusterBooleanResponseParams
 @end
@@ -5833,7 +5706,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterBooleanResponseParams")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestListStructArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5849,11 +5722,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListStructArgumentRequestParams")
 @interface MTRTestClusterClusterTestListStructArgumentRequestParams : MTRUnitTestingClusterTestListStructArgumentRequestParams
 @end
@@ -5861,7 +5732,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListStructArgumentRequ
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterSimpleStructResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg1;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5876,13 +5747,11 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterSimpleStructResponseParams")
 @interface MTRTestClusterClusterSimpleStructResponseParams : MTRUnitTestingClusterSimpleStructResponseParams
 @end
@@ -5890,7 +5759,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterSimpleStructResponseParams
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestListInt8UArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5906,11 +5775,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UArgumentRequestParams")
 @interface MTRTestClusterClusterTestListInt8UArgumentRequestParams : MTRUnitTestingClusterTestListInt8UArgumentRequestParams
 @end
@@ -5918,7 +5785,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UArgumentReque
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEmitTestEventResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull value;
+@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5933,13 +5800,11 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventResponseParams")
 @interface MTRTestClusterClusterTestEmitTestEventResponseParams : MTRUnitTestingClusterTestEmitTestEventResponseParams
 @end
@@ -5947,7 +5812,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventResponseP
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestNestedStructListArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRUnitTestingClusterNestedStructList * _Nonnull arg1;
+@property (nonatomic, copy) MTRUnitTestingClusterNestedStructList * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5963,11 +5828,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructListArgumentRequestParams")
 @interface MTRTestClusterClusterTestNestedStructListArgumentRequestParams
     : MTRUnitTestingClusterTestNestedStructListArgumentRequestParams
@@ -5976,7 +5839,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructListArgume
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull value;
+@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5991,13 +5854,11 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
+    tvos(16.1)) MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands");
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams")
 @interface MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams
     : MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams
@@ -6006,7 +5867,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEv
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -6022,11 +5883,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams")
 @interface MTRTestClusterClusterTestListNestedStructListArgumentRequestParams
     : MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams
@@ -6035,7 +5894,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListNestedStructListAr
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestListInt8UReverseRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSArray * _Nonnull arg1;
+@property (nonatomic, copy) NSArray * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -6051,11 +5910,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseRequestParams")
 @interface MTRTestClusterClusterTestListInt8UReverseRequestParams : MTRUnitTestingClusterTestListInt8UReverseRequestParams
 @end
@@ -6063,9 +5920,9 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseReques
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEnumsRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg1;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg2;
+@property (nonatomic, copy) NSNumber * _Nonnull arg2 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -6081,11 +5938,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsRequestParams")
 @interface MTRTestClusterClusterTestEnumsRequestParams : MTRUnitTestingClusterTestEnumsRequestParams
 @end
@@ -6093,7 +5948,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsRequestParams")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestNullableOptionalRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nullable arg1;
+@property (nonatomic, copy) NSNumber * _Nullable arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -6109,11 +5964,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalRequestParams")
 @interface MTRTestClusterClusterTestNullableOptionalRequestParams : MTRUnitTestingClusterTestNullableOptionalRequestParams
 @end
@@ -6121,29 +5974,29 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalReques
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestComplexNullableOptionalRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nullable nullableInt;
+@property (nonatomic, copy) NSNumber * _Nullable nullableInt MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable optionalInt;
+@property (nonatomic, copy) NSNumber * _Nullable optionalInt MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalInt;
+@property (nonatomic, copy) NSNumber * _Nullable nullableOptionalInt MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable nullableString;
+@property (nonatomic, copy) NSString * _Nullable nullableString MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable optionalString;
+@property (nonatomic, copy) NSString * _Nullable optionalString MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSString * _Nullable nullableOptionalString;
+@property (nonatomic, copy) NSString * _Nullable nullableOptionalString MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableStruct;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableStruct MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable optionalStruct;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable optionalStruct MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableOptionalStruct;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nullable nullableOptionalStruct MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nullable nullableList;
+@property (nonatomic, copy) NSArray * _Nullable nullableList MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nullable optionalList;
+@property (nonatomic, copy) NSArray * _Nullable optionalList MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nullable nullableOptionalList;
+@property (nonatomic, copy) NSArray * _Nullable nullableOptionalList MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -6159,11 +6012,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptionalRequestParams")
 @interface MTRTestClusterClusterTestComplexNullableOptionalRequestParams
     : MTRUnitTestingClusterTestComplexNullableOptionalRequestParams
@@ -6172,7 +6023,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptiona
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterSimpleStructEchoRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg1;
+@property (nonatomic, copy) MTRUnitTestingClusterSimpleStruct * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -6188,11 +6039,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterSimpleStructEchoRequestParams")
 @interface MTRTestClusterClusterSimpleStructEchoRequestParams : MTRUnitTestingClusterSimpleStructEchoRequestParams
 @end
@@ -6214,11 +6063,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTimedInvokeRequestParams")
 @interface MTRTestClusterClusterTimedInvokeRequestParams : MTRUnitTestingClusterTimedInvokeRequestParams
 @end
@@ -6226,7 +6073,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTimedInvokeRequestParams")
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nullable arg1;
+@property (nonatomic, copy) NSNumber * _Nullable arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -6242,11 +6089,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams")
 @interface MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams
     : MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams
@@ -6255,11 +6100,11 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleOptionalArgument
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEmitTestEventRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg1;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg2;
+@property (nonatomic, copy) NSNumber * _Nonnull arg2 MTR_NEWLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg3;
+@property (nonatomic, copy) NSNumber * _Nonnull arg3 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -6275,11 +6120,9 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventRequestParams")
 @interface MTRTestClusterClusterTestEmitTestEventRequestParams : MTRUnitTestingClusterTestEmitTestEventRequestParams
 @end
@@ -6287,7 +6130,7 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventRequestPa
 MTR_NEWLY_AVAILABLE
 @interface MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull arg1;
+@property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_NEWLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -6303,27 +6146,26 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams")
 @interface MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams
     : MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams
 @end
 
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRFaultInjectionClusterFailAtFaultParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull type;
+@property (nonatomic, copy) NSNumber * _Nonnull type API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull id;
+@property (nonatomic, copy) NSNumber * _Nonnull id API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull numCallsToSkip;
+@property (nonatomic, copy) NSNumber * _Nonnull numCallsToSkip API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull numCallsToFail;
+@property (nonatomic, copy) NSNumber * _Nonnull numCallsToFail API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull takeMutex;
+@property (nonatomic, copy) NSNumber * _Nonnull takeMutex API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -6339,17 +6181,16 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEv
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRFaultInjectionClusterFailRandomlyAtFaultParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull type;
+@property (nonatomic, copy) NSNumber * _Nonnull type API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull id;
+@property (nonatomic, copy) NSNumber * _Nonnull id API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-@property (nonatomic, copy) NSNumber * _Nonnull percentage;
+@property (nonatomic, copy) NSNumber * _Nonnull percentage API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -6365,9 +6206,6 @@ MTR_NEWLY_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEv
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-
-- (instancetype)init;
-- (id)copyWithZone:(NSZone * _Nullable)zone;
 @end
 
 NS_ASSUME_NONNULL_END

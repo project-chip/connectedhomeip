@@ -2435,8 +2435,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         }
         break;
     }
-    case app::Clusters::Basic::Id: {
-        using namespace app::Clusters::Basic;
+    case app::Clusters::BasicInformation::Id: {
+        using namespace app::Clusters::BasicInformation;
         switch (aPath.mAttributeId)
         {
         case Attributes::DataModelRevision::Id: {
@@ -2712,17 +2712,18 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
             jclass capabilityMinimaStructStructClass_0;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipStructs$BasicClusterCapabilityMinimaStruct", capabilityMinimaStructStructClass_0);
+                env, "chip/devicecontroller/ChipStructs$BasicInformationClusterCapabilityMinimaStruct",
+                capabilityMinimaStructStructClass_0);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipStructs$BasicClusterCapabilityMinimaStruct");
+                ChipLogError(Zcl, "Could not find class ChipStructs$BasicInformationClusterCapabilityMinimaStruct");
                 return nullptr;
             }
             jmethodID capabilityMinimaStructStructCtor_0 =
                 env->GetMethodID(capabilityMinimaStructStructClass_0, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
             if (capabilityMinimaStructStructCtor_0 == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipStructs$BasicClusterCapabilityMinimaStruct constructor");
+                ChipLogError(Zcl, "Could not find ChipStructs$BasicInformationClusterCapabilityMinimaStruct constructor");
                 return nullptr;
             }
 

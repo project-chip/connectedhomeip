@@ -424,6 +424,35 @@
                 "/tmp/ota-image.bin"
             ],
             "cwd": "${workspaceFolder}"
+        },
+
+        {
+            "name": "Debug Open IoT SDK example application",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/${input:openiotsdkApp}/openiotsdk",
+            "executable": "./build/chip-openiotsdk-${input:openiotsdkApp}-example.elf",
+            "armToolchainPath": "${env:ARM_GCC_TOOLCHAIN_PATH}/bin",
+            "servertype": "external",
+            "gdbTarget": "${input:openiotsdkRemoteHost}:31627", //GDBserver port on FVP
+            "overrideLaunchCommands": ["-enable-pretty-printing"],
+            "runToEntryPoint": "main",
+            "preLaunchTask": "Debug Open IoT SDK example",
+            "showDevDebugOutput": "parsed"
+        },
+        {
+            "name": "Debug Open IoT SDK unit-tests application",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/src/test_driver/openiotsdk/unit-tests",
+            "executable": "./build/${input:openiotsdkUnittest}.elf",
+            "armToolchainPath": "${env:ARM_GCC_TOOLCHAIN_PATH}/bin",
+            "servertype": "external",
+            "gdbTarget": ":31627", //GDBserver port on FVP
+            "overrideLaunchCommands": ["-enable-pretty-printing"],
+            "runToEntryPoint": "main",
+            "preLaunchTask": "Debug Open IoT SDK unit-tests",
+            "showDevDebugOutput": "parsed"
         }
     ],
     "inputs": [
@@ -479,6 +508,52 @@
             "description": "What mbed target do you want to use?",
             "options": ["CY8CPROTO_062_4343W"],
             "default": "CY8CPROTO_062_4343W"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkApp",
+            "description": "What Open IoT SDK example do you want to use?",
+            "options": ["shell", "lock-app"],
+            "default": "shell"
+        },
+        {
+            "type": "promptString",
+            "id": "openiotsdkRemoteHost",
+            "description": "Type the hostname/IP address of external GDB target that you want to connect to. Leave blank for internal GDB server",
+            "default": ""
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkUnittest",
+            "description": "What Open IoT SDK unit test do you want to use?",
+            "options": [
+                "accesstest",
+                "AppTests",
+                "ASN1Tests",
+                "BDXTests",
+                "ChipCryptoTests",
+                "ControllerTests",
+                "CoreTests",
+                "CredentialsTest",
+                "DataModelTests",
+                "InetLayerTests",
+                "MdnsTests",
+                "MessagingLayerTests",
+                "MinimalMdnsCoreTests",
+                "MinimalMdnsRecordsTests",
+                "MinimalMdnsRespondersTests",
+                "PlatformTests",
+                "RawTransportTests",
+                "RetransmitTests",
+                "SecureChannelTests",
+                "SetupPayloadTests",
+                "SupportTests",
+                "SystemLayerTests",
+                "TestShell",
+                "TransportLayerTests",
+                "UserDirectedCommissioningTests"
+            ],
+            "default": "accesstest"
         }
     ]
 }

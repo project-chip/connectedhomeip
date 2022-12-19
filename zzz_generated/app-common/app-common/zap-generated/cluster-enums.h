@@ -335,8 +335,8 @@ enum class CommandBits : uint16_t
 };
 } // namespace Actions
 
-namespace Basic {
-} // namespace Basic
+namespace BasicInformation {
+} // namespace BasicInformation
 
 namespace OtaSoftwareUpdateProvider {
 
@@ -2272,6 +2272,9 @@ namespace AccountLogin {
 
 namespace ElectricalMeasurement {
 } // namespace ElectricalMeasurement
+
+namespace ClientMonitoring {
+} // namespace ClientMonitoring
 
 namespace UnitTesting {
 

@@ -46,11 +46,12 @@ fi
   Build and (optionally tag as latest, push) a docker image from Dockerfile in CWD
 
   Options:
-   --no-cache passed as a docker build argument
-   --latest   update latest to the current built version (\"$VERSION\")
-   --push     push image(s) to docker.io (requires docker login for \"$ORG\")
-   --help     get this message
-   --squash   squash docker layers before push them to docker.io (requires docker-squash python module)
+   --no-cache   passed as a docker build argument
+   --latest     update latest to the current built version (\"$VERSION\")
+   --push       push image(s) to docker.io (requires docker login for \"$ORG\")
+   --skip-build skip the build/prune step
+   --help       get this message
+   --squash     squash docker layers before push them to docker.io (requires docker-squash python module)
 
 "
     exit 0
@@ -80,8 +81,10 @@ if [[ ${*/--no-cache//} != "${*}" ]]; then
     BUILD_ARGS+=(--no-cache)
 fi
 
-docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
-docker image prune --force
+[[ ${*/--skip-build//} != "${*}" ]] || {
+    docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
+    docker image prune --force
+}
 
 [[ ${*/--latest//} != "${*}" ]] && {
     docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest

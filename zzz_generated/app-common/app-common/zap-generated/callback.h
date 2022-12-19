@@ -130,13 +130,13 @@ void emberAfAccessControlClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfActionsClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Basic Cluster Init
+/** @brief Basic Information Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBasicClusterInitCallback(chip::EndpointId endpoint);
+void emberAfBasicInformationClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief OTA Software Update Provider Cluster Init
  *
@@ -585,6 +585,14 @@ void emberAfAccountLoginClusterInitCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfElectricalMeasurementClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Client Monitoring Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfClientMonitoringClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Unit Testing Cluster Init
  *
@@ -1761,34 +1769,34 @@ void emberAfActionsClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfActionsClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Basic Cluster
+// Basic Information Cluster
 //
 
-/** @brief Basic Cluster Server Init
+/** @brief Basic Information Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfBasicInformationClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief Basic Cluster Client Init
+/** @brief Basic Information Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBasicClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfBasicInformationClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief Basic Cluster Server Attribute Changed
+/** @brief Basic Information Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-void MatterBasicClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterBasicInformationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief Basic Cluster Server Message Sent
+/** @brief Basic Information Cluster Server Message Sent
  *
  * Server Message Sent
  *
@@ -1798,10 +1806,11 @@ void MatterBasicClusterServerAttributeChangedCallback(const chip::app::ConcreteA
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfBasicClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                  uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfBasicInformationClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                             EmberStatus status);
 
-/** @brief Basic Cluster Client Message Sent
+/** @brief Basic Information Cluster Client Message Sent
  *
  * Client Message Sent
  *
@@ -1811,10 +1820,11 @@ void emberAfBasicClusterServerMessageSentCallback(const chip::MessageSendDestina
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfBasicClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                  uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfBasicInformationClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                             EmberStatus status);
 
-/** @brief Basic Cluster Server Pre Attribute Changed
+/** @brief Basic Information Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -1824,10 +1834,10 @@ void emberAfBasicClusterClientMessageSentCallback(const chip::MessageSendDestina
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterBasicClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                    EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+MatterBasicInformationClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Basic Cluster Client Pre Attribute Changed
+/** @brief Basic Information Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -1837,24 +1847,24 @@ MatterBasicClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAtt
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterBasicClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                    EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+MatterBasicInformationClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Basic Cluster Server Tick
+/** @brief Basic Information Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfBasicClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfBasicInformationClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief Basic Cluster Client Tick
+/** @brief Basic Information Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfBasicClusterClientTickCallback(chip::EndpointId endpoint);
+void emberAfBasicInformationClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // OTA Software Update Provider Cluster
@@ -7256,6 +7266,104 @@ void emberAfElectricalMeasurementClusterServerTickCallback(chip::EndpointId endp
 void emberAfElectricalMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
+// Client Monitoring Cluster
+//
+
+/** @brief Client Monitoring Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfClientMonitoringClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Client Monitoring Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfClientMonitoringClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Client Monitoring Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterClientMonitoringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Client Monitoring Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfClientMonitoringClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                             EmberStatus status);
+
+/** @brief Client Monitoring Cluster Client Message Sent
+ *
+ * Client Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfClientMonitoringClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                             EmberStatus status);
+
+/** @brief Client Monitoring Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterClientMonitoringClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Client Monitoring Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterClientMonitoringClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Client Monitoring Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfClientMonitoringClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Client Monitoring Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfClientMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
 // Unit Testing Cluster
 //
 
@@ -7789,11 +7897,11 @@ bool emberAfActionsClusterDisableActionWithDurationCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Actions::Commands::DisableActionWithDuration::DecodableType & commandData);
 /**
- * @brief Basic Cluster MfgSpecificPing Command callback (from client)
+ * @brief Basic Information Cluster MfgSpecificPing Command callback (from client)
  */
-bool emberAfBasicClusterMfgSpecificPingCallback(
+bool emberAfBasicInformationClusterMfgSpecificPingCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Basic::Commands::MfgSpecificPing::DecodableType & commandData);
+    const chip::app::Clusters::BasicInformation::Commands::MfgSpecificPing::DecodableType & commandData);
 /**
  * @brief OTA Software Update Provider Cluster QueryImage Command callback (from client)
  */
@@ -8695,6 +8803,18 @@ bool emberAfElectricalMeasurementClusterGetMeasurementProfileResponseCommandCall
 bool emberAfElectricalMeasurementClusterGetMeasurementProfileCommandCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileCommand::DecodableType & commandData);
+/**
+ * @brief Client Monitoring Cluster RegisterClientMonitoring Command callback (from client)
+ */
+bool emberAfClientMonitoringClusterRegisterClientMonitoringCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ClientMonitoring::Commands::RegisterClientMonitoring::DecodableType & commandData);
+/**
+ * @brief Client Monitoring Cluster StayAwakeRequest Command callback (from client)
+ */
+bool emberAfClientMonitoringClusterStayAwakeRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ClientMonitoring::Commands::StayAwakeRequest::DecodableType & commandData);
 /**
  * @brief Unit Testing Cluster Test Command callback (from client)
  */

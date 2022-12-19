@@ -198,7 +198,7 @@ server cluster AccessControl = 31 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-server cluster Basic = 40 {
+server cluster BasicInformation = 40 {
   critical event StartUp = 0 {
     INT32U softwareVersion = 0;
   }
@@ -794,7 +794,7 @@ server cluster Switch = 59 {
   }
 
   info event MultiPressComplete = 6 {
-    INT8U newPosition = 0;
+    INT8U previousPosition = 0;
     INT8U totalNumberOfPressesCounted = 1;
   }
 
@@ -1421,7 +1421,7 @@ server cluster DoorLock = 257 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22;
+  device type rootdevice = 22, version 1;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Groups {
@@ -1447,7 +1447,7 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster Basic {
+  server cluster BasicInformation {
     callback attribute dataModelRevision default = 10;
     callback attribute vendorName;
     callback attribute vendorID;
@@ -1584,7 +1584,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 10;
+  device type anonymousEndpointType = 10, version 1;
   binding cluster Binding;
 
   server cluster Identify {

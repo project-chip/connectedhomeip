@@ -193,6 +193,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  */
 - (void)device:(MTRDevice *)device receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
 
+@optional
+/**
+ * deviceStartedCommunicating:
+ *
+ * Notifies delegate the device is currently communicating
+ */
+- (void)didReceiveCommunicationFromDevice:(MTRDevice *)device;
+
 @end
 
 @interface MTRDevice (Deprecated)

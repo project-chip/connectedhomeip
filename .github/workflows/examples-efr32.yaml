@@ -22,6 +22,9 @@ concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
   cancel-in-progress: true
 
+env:
+  CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
   efr32:
     name: EFR32
@@ -35,7 +38,7 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: connectedhomeip/chip-build-efr32:0.6.06
+      image: connectedhomeip/chip-build-efr32:0.6.18
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:
@@ -110,7 +113,7 @@ jobs:
       - name: Build example EFR32+WF200 WiFi Lock app for BRD4161A
         timeout-minutes: 15
         run: |
-          scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/ out/lock_app_wifi_wf200 BRD4161A is_debug=false --wifi wf200
+          scripts/examples/gn_efr32_example.sh examples/lock-app/silabs/efr32/ out/lock_app_wifi_wf200 BRD4161A is_debug=false chip_logging=false --wifi wf200
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+wf200 lock-app \
             out/lock_app_wifi_wf200/BRD4161A/chip-efr32-lock-example.out /tmp/bloat_reports/
       - name: Clean out build output

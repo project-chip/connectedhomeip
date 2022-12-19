@@ -45,7 +45,7 @@
 | Binding                                                             | 0x001E |
 | AccessControl                                                       | 0x001F |
 | Actions                                                             | 0x0025 |
-| Basic                                                               | 0x0028 |
+| BasicInformation                                                    | 0x0028 |
 | OtaSoftwareUpdateProvider                                           | 0x0029 |
 | OtaSoftwareUpdateRequestor                                          | 0x002A |
 | LocalizationConfiguration                                           | 0x002B |
@@ -102,6 +102,7 @@
 | ApplicationBasic                                                    | 0x050D |
 | AccountLogin                                                        | 0x050E |
 | ElectricalMeasurement                                               | 0x0B04 |
+| ClientMonitoring                                                    | 0x1046 |
 | UnitTesting                                                         | 0xFFF1FC05|
 | FaultInjection                                                      | 0xFFF1FC06|
 \*----------------------------------------------------------------------------*/
@@ -1814,7 +1815,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster Basic                                                       | 0x0028 |
+| Cluster BasicInformation                                            | 0x0028 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * MfgSpecificPing                                                   |   0x00 |
@@ -1856,10 +1857,11 @@ private:
 /*
  * Command MfgSpecificPing
  */
-class BasicMfgSpecificPing : public ClusterCommand
+class BasicInformationMfgSpecificPing : public ClusterCommand
 {
 public:
-    BasicMfgSpecificPing(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("mfg-specific-ping", credsIssuerConfig)
+    BasicInformationMfgSpecificPing(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("mfg-specific-ping", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
@@ -1879,7 +1881,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::Basic::Commands::MfgSpecificPing::Type mRequest;
+    chip::app::Clusters::BasicInformation::Commands::MfgSpecificPing::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -7297,6 +7299,89 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster ClientMonitoring                                            | 0x1046 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * RegisterClientMonitoring                                          |   0x00 |
+| * StayAwakeRequest                                                  |   0x01 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * IdleModeInterval                                                  | 0x0000 |
+| * ActiveModeInterval                                                | 0x0001 |
+| * ActiveModeThreshold                                               | 0x0002 |
+| * ExpectedClients                                                   | 0x0003 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command RegisterClientMonitoring
+ */
+class ClientMonitoringRegisterClientMonitoring : public ClusterCommand
+{
+public:
+    ClientMonitoringRegisterClientMonitoring(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("register-client-monitoring", credsIssuerConfig)
+    {
+        AddArgument("ClientNodeId", 0, UINT64_MAX, &mRequest.clientNodeId);
+        AddArgument("ICid", 0, UINT64_MAX, &mRequest.ICid);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000000) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00001046, 0x00000000, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000000) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00001046, 0x00000000, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ClientMonitoring::Commands::RegisterClientMonitoring::Type mRequest;
+};
+
+/*
+ * Command StayAwakeRequest
+ */
+class ClientMonitoringStayAwakeRequest : public ClusterCommand
+{
+public:
+    ClientMonitoringStayAwakeRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("stay-awake-request", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000001) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00001046, 0x00000001, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000001) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00001046, 0x00000001, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ClientMonitoring::Commands::StayAwakeRequest::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster UnitTesting                                                 | 0xFFF1FC05|
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -8868,18 +8953,18 @@ void registerClusterActions(Commands & commands, CredentialIssuerCommands * cred
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterBasic(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterBasicInformation(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::Basic;
+    using namespace chip::app::Clusters::BasicInformation;
 
-    const char * clusterName = "Basic";
+    const char * clusterName = "BasicInformation";
 
     commands_list clusterCommands = {
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),   //
-        make_unique<BasicMfgSpecificPing>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),              //
+        make_unique<BasicInformationMfgSpecificPing>(credsIssuerConfig), //
         //
         // Attributes
         //
@@ -12909,6 +12994,52 @@ void registerClusterElectricalMeasurement(Commands & commands, CredentialIssuerC
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterClientMonitoring(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::ClientMonitoring;
+
+    const char * clusterName = "ClientMonitoring";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                       //
+        make_unique<ClientMonitoringRegisterClientMonitoring>(credsIssuerConfig), //
+        make_unique<ClientMonitoringStayAwakeRequest>(credsIssuerConfig),         //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                      //
+        make_unique<ReadAttribute>(Id, "idle-mode-interval", Attributes::IdleModeInterval::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "active-mode-interval", Attributes::ActiveModeInterval::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "active-mode-threshold", Attributes::ActiveModeThreshold::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "expected-clients", Attributes::ExpectedClients::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                 //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                   //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "idle-mode-interval", Attributes::IdleModeInterval::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "active-mode-interval", Attributes::ActiveModeInterval::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "active-mode-threshold", Attributes::ActiveModeThreshold::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "expected-clients", Attributes::ExpectedClients::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::UnitTesting;
@@ -13370,7 +13501,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterBinding(commands, credsIssuerConfig);
     registerClusterAccessControl(commands, credsIssuerConfig);
     registerClusterActions(commands, credsIssuerConfig);
-    registerClusterBasic(commands, credsIssuerConfig);
+    registerClusterBasicInformation(commands, credsIssuerConfig);
     registerClusterOtaSoftwareUpdateProvider(commands, credsIssuerConfig);
     registerClusterOtaSoftwareUpdateRequestor(commands, credsIssuerConfig);
     registerClusterLocalizationConfiguration(commands, credsIssuerConfig);
@@ -13427,6 +13558,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterApplicationBasic(commands, credsIssuerConfig);
     registerClusterAccountLogin(commands, credsIssuerConfig);
     registerClusterElectricalMeasurement(commands, credsIssuerConfig);
+    registerClusterClientMonitoring(commands, credsIssuerConfig);
     registerClusterUnitTesting(commands, credsIssuerConfig);
     registerClusterFaultInjection(commands, credsIssuerConfig);
     registerClusterSubscriptions(commands, credsIssuerConfig);

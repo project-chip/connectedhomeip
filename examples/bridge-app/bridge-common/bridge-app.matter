@@ -451,7 +451,7 @@ server cluster Actions = 37 {
   command InstantAction(InstantActionRequest): DefaultSuccess = 0;
 }
 
-server cluster Basic = 40 {
+server cluster BasicInformation = 40 {
   struct CapabilityMinimaStruct {
     int16u caseSessionsPerFabric = 0;
     int16u subscriptionsPerFabric = 1;
@@ -1201,7 +1201,7 @@ server cluster Switch = 59 {
   }
 
   info event MultiPressComplete = 6 {
-    INT8U newPosition = 0;
+    INT8U previousPosition = 0;
     INT8U totalNumberOfPressesCounted = 1;
   }
 
@@ -1453,7 +1453,7 @@ server cluster TemperatureMeasurement = 1026 {
 }
 
 endpoint 0 {
-  device type bridge = 22;
+  device type bridge = 22, version 1;
   binding cluster AccessControl;
 
   server cluster Descriptor {
@@ -1481,7 +1481,7 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster Basic {
+  server cluster BasicInformation {
     callback attribute dataModelRevision default = 10;
     callback attribute vendorName;
     callback attribute vendorID;
@@ -1743,7 +1743,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 14;
+  device type anonymousEndpointType = 14, version 1;
   binding cluster Binding;
 
   server cluster Identify {
@@ -1780,7 +1780,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type dimmablelight = 257;
+  device type dimmablelight = 257, version 1;
 
   server cluster OnOff {
     ram      attribute onOff;

@@ -1,5 +1,5 @@
 {
-  "featureLevel": 81,
+  "featureLevel": 89,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -1383,7 +1383,7 @@
               "code": 15,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "LevelControlOptions",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -2603,10 +2603,10 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
-          "define": "BASIC_CLUSTER",
+          "define": "BASIC_INFORMATION_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -2629,10 +2629,10 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
-          "define": "BASIC_CLUSTER",
+          "define": "BASIC_INFORMATION_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
@@ -17766,7 +17766,7 @@
           "name": "Unit Testing",
           "code": 4294048773,
           "mfgCode": null,
-          "define": "TEST_CLUSTER",
+          "define": "UNIT_TESTING_CLUSTER",
           "side": "client",
           "enabled": 1,
           "commands": [
@@ -17954,7 +17954,7 @@
           "name": "Unit Testing",
           "code": 4294048773,
           "mfgCode": null,
-          "define": "TEST_CLUSTER",
+          "define": "UNIT_TESTING_CLUSTER",
           "side": "server",
           "enabled": 0,
           "commands": [

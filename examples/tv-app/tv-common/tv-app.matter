@@ -260,7 +260,7 @@ server cluster AccessControl = 31 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-server cluster Basic = 40 {
+server cluster BasicInformation = 40 {
   struct CapabilityMinimaStruct {
     int16u caseSessionsPerFabric = 0;
     int16u subscriptionsPerFabric = 1;
@@ -2131,7 +2131,7 @@ server cluster AccountLogin = 1294 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22;
+  device type rootdevice = 22, version 1;
   binding cluster Binding;
   binding cluster GeneralCommissioning;
   binding cluster NetworkCommissioning;
@@ -2163,7 +2163,7 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster Basic {
+  server cluster BasicInformation {
     callback attribute dataModelRevision default = 10;
     callback attribute vendorName;
     callback attribute vendorID;
@@ -2414,7 +2414,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type videoplayer = 35;
+  device type videoplayer = 35, version 1;
 
   server cluster OnOff {
     ram      attribute onOff;
@@ -2509,7 +2509,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type speaker = 34;
+  device type speaker = 34, version 1;
 
   server cluster OnOff {
     ram      attribute onOff;
@@ -2546,7 +2546,7 @@ endpoint 2 {
   }
 }
 endpoint 3 {
-  device type contentapplication = 36;
+  device type contentapplication = 36, version 1;
 
   server cluster Descriptor {
     callback attribute deviceTypeList;

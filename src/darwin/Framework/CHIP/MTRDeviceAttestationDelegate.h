@@ -30,9 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * The protocol definition for the MTRDeviceAttestationDelegate
- *
- * All delegate methods will be called on the callers queue.
+ * The protocol definition for the MTRDeviceAttestationDelegate.
  */
 @protocol MTRDeviceAttestationDelegate <NSObject>
 @optional

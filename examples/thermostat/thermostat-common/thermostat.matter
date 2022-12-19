@@ -338,7 +338,7 @@ server cluster AccessControl = 31 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-server cluster Basic = 40 {
+server cluster BasicInformation = 40 {
   struct CapabilityMinimaStruct {
     int16u caseSessionsPerFabric = 0;
     int16u subscriptionsPerFabric = 1;
@@ -1327,10 +1327,52 @@ server cluster GroupKeyManagement = 63 {
     fabric_idx fabricIndex = 254;
   }
 
+  struct GroupKeySetStruct {
+    int16u groupKeySetID = 0;
+    GroupKeySecurityPolicy groupKeySecurityPolicy = 1;
+    nullable octet_string<16> epochKey0 = 2;
+    nullable epoch_us epochStartTime0 = 3;
+    nullable octet_string<16> epochKey1 = 4;
+    nullable epoch_us epochStartTime1 = 5;
+    nullable octet_string<16> epochKey2 = 6;
+    nullable epoch_us epochStartTime2 = 7;
+  }
+
   attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
   readonly attribute GroupInfoMapStruct groupTable[] = 1;
+  readonly attribute int16u maxGroupsPerFabric = 2;
+  readonly attribute int16u maxGroupKeysPerFabric = 3;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct KeySetWriteRequest {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  request struct KeySetReadRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetRemoveRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetReadAllIndicesRequest {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  response struct KeySetReadResponse = 2 {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  response struct KeySetReadAllIndicesResponse = 5 {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  fabric command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
+  fabric command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
+  fabric command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
 }
 
 server cluster FixedLabel = 64 {
@@ -1447,7 +1489,7 @@ server cluster ThermostatUserInterfaceConfiguration = 516 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22;
+  device type rootdevice = 22, version 1;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Identify {
@@ -1482,7 +1524,7 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster Basic {
+  server cluster BasicInformation {
     callback attribute dataModelRevision default = 10;
     callback attribute vendorName;
     callback attribute vendorID;
@@ -1710,6 +1752,8 @@ endpoint 0 {
   server cluster GroupKeyManagement {
     callback attribute groupKeyMap;
     callback attribute groupTable;
+    callback attribute maxGroupsPerFabric;
+    callback attribute maxGroupKeysPerFabric;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
@@ -1727,7 +1771,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type thermostat = 769;
+  device type thermostat = 769, version 1;
   binding cluster Identify;
 
   server cluster Identify {

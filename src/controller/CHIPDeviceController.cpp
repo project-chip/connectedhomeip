@@ -1782,24 +1782,27 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
     // Try to parse as much as we can here before returning, even if this is an error.
     return_err = err == CHIP_NO_ERROR ? return_err : err;
 
-    err = mAttributeCache->ForEachAttribute(app::Clusters::Basic::Id, [this, &info](const app::ConcreteAttributePath & path) {
-        if (path.mAttributeId != app::Clusters::Basic::Attributes::VendorID::Id &&
-            path.mAttributeId != app::Clusters::Basic::Attributes::ProductID::Id)
-        {
-            // Continue on
-            return CHIP_NO_ERROR;
-        }
+    err = mAttributeCache->ForEachAttribute(
+        app::Clusters::BasicInformation::Id, [this, &info](const app::ConcreteAttributePath & path) {
+            if (path.mAttributeId != app::Clusters::BasicInformation::Attributes::VendorID::Id &&
+                path.mAttributeId != app::Clusters::BasicInformation::Attributes::ProductID::Id)
+            {
+                // Continue on
+                return CHIP_NO_ERROR;
+            }
 
-        switch (path.mAttributeId)
-        {
-        case app::Clusters::Basic::Attributes::VendorID::Id:
-            return this->mAttributeCache->Get<app::Clusters::Basic::Attributes::VendorID::TypeInfo>(path, info.basic.vendorId);
-        case app::Clusters::Basic::Attributes::ProductID::Id:
-            return this->mAttributeCache->Get<app::Clusters::Basic::Attributes::ProductID::TypeInfo>(path, info.basic.productId);
-        default:
-            return CHIP_NO_ERROR;
-        }
-    });
+            switch (path.mAttributeId)
+            {
+            case app::Clusters::BasicInformation::Attributes::VendorID::Id:
+                return this->mAttributeCache->Get<app::Clusters::BasicInformation::Attributes::VendorID::TypeInfo>(
+                    path, info.basic.vendorId);
+            case app::Clusters::BasicInformation::Attributes::ProductID::Id:
+                return this->mAttributeCache->Get<app::Clusters::BasicInformation::Attributes::ProductID::TypeInfo>(
+                    path, info.basic.productId);
+            default:
+                return CHIP_NO_ERROR;
+            }
+        });
 
     // Try to parse as much as we can here before returning, even if this is an error.
     return_err = (err == CHIP_NO_ERROR) ? return_err : err;
@@ -2136,9 +2139,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         readPaths[4] = app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
                                                 app::Clusters::GeneralCommissioning::Attributes::LocationCapability::Id);
         // Read attributes from the basic info cluster (vendor id / product id / software version)
-        readPaths[5] = app::AttributePathParams(endpoint, app::Clusters::Basic::Id, app::Clusters::Basic::Attributes::VendorID::Id);
-        readPaths[6] =
-            app::AttributePathParams(endpoint, app::Clusters::Basic::Id, app::Clusters::Basic::Attributes::ProductID::Id);
+        readPaths[5] = app::AttributePathParams(endpoint, app::Clusters::BasicInformation::Id,
+                                                app::Clusters::BasicInformation::Attributes::VendorID::Id);
+        readPaths[6] = app::AttributePathParams(endpoint, app::Clusters::BasicInformation::Id,
+                                                app::Clusters::BasicInformation::Attributes::ProductID::Id);
         // Read the requested minimum connection times from all network commissioning clusters
         readPaths[7] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
                                                 app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::Id);

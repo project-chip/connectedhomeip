@@ -15,6 +15,8 @@ import com.matter.tv.app.api.IMatterAppAgent;
 import com.matter.tv.app.api.MatterIntentConstants;
 import com.matter.tv.server.model.ContentApp;
 import com.matter.tv.server.receivers.ContentAppDiscoveryService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class ContentAppAgentService extends Service {
@@ -38,6 +40,8 @@ public class ContentAppAgentService extends Service {
   private static final int ATTRIBUTE_TIMEOUT = 2; // seconds
 
   private static ResponseRegistry responseRegistry = new ResponseRegistry();
+  private static ExecutorService executorService =
+      Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
   private final IBinder appAgentBinder =
       new IMatterAppAgent.Stub() {
@@ -76,8 +80,14 @@ public class ContentAppAgentService extends Service {
           ContentApp contentApp =
               ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApp(pkg);
           if (contentApp != null && contentApp.getEndpointId() != ContentApp.INVALID_ENDPOINTID) {
-            AppPlatformService.get()
-                .reportAttributeChange(contentApp.getEndpointId(), clusterId, attributeId);
+            // Make this call async so that even if the content apps make this call during command
+            // processing and synchronously, the command processing thread will not block for the
+            // chip stack lock.
+            executorService.execute(
+                () -> {
+                  AppPlatformService.get()
+                      .reportAttributeChange(contentApp.getEndpointId(), clusterId, attributeId);
+                });
             return true;
           }
           Log.e(TAG, "No matter content app found for package " + pkg);

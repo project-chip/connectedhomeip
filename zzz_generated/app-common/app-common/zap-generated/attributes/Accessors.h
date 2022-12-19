@@ -459,7 +459,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace Actions
 
-namespace Basic {
+namespace BasicInformation {
 namespace Attributes {
 
 namespace DataModelRevision {
@@ -568,7 +568,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace Basic
+} // namespace BasicInformation
 
 namespace OtaSoftwareUpdateProvider {
 namespace Attributes {
@@ -2780,7 +2780,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace SetpointChangeAmount
 
 namespace SetpointChangeSourceTimestamp {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // utc
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // epoch_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace SetpointChangeSourceTimestamp
 
@@ -4651,6 +4651,37 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 } // namespace Attributes
 } // namespace ElectricalMeasurement
+
+namespace ClientMonitoring {
+namespace Attributes {
+
+namespace IdleModeInterval {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace IdleModeInterval
+
+namespace ActiveModeInterval {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace ActiveModeInterval
+
+namespace ActiveModeThreshold {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ActiveModeThreshold
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ClientMonitoring
 
 namespace UnitTesting {
 namespace Attributes {

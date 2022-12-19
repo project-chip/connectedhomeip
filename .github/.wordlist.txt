@@ -125,6 +125,7 @@ backtrace
 BallastConfiguration
 BarrierControl
 BasicCHIPRegression
+BasicInformation
 baudrate
 BD
 BDX
@@ -292,8 +293,8 @@ connstring
 conntype
 const
 ContentApp
-ContentAppPlatform
 ContentApp's
+ContentAppPlatform
 ContentLaunch
 ContentLauncher
 continuousHinting
@@ -301,6 +302,7 @@ contrib
 controllee
 conv
 CopperConcentrationMeasurement
+Corstone
 cortexa
 cp
 cpio
@@ -676,7 +678,6 @@ instantiation
 integrations
 IntelliSense
 InteractionModelVersion
-Interation
 Interoperable
 introvideos
 InvokeCommandRequests
@@ -886,6 +887,7 @@ MyPASSWORD
 MySSID
 NAMESERVER
 NAMESPACE
+namespaces
 namespacing
 nano
 natively
@@ -1119,8 +1121,8 @@ REPL
 repo
 req
 Requestor
-RequestorCanConsent
 Requestor's
+RequestorCanConsent
 Requestors
 responder
 RestrictedEvent
@@ -1144,11 +1146,13 @@ rsn
 RSSI
 RST
 rsync
+RTC
 rtd
 RTL
 rtld
 RTOS
 RTT
+RTX
 RUNAS
 RunMain
 runtime
@@ -1167,8 +1171,8 @@ SDB
 SDC
 SDHC
 SDK
-sdkconfig
 SDK's
+sdkconfig
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1196,6 +1200,7 @@ sexualized
 sfv
 SHA
 ShadeConfiguration
+SHAs
 showDocumentation
 shubhamdp
 SIGINT
@@ -1254,6 +1259,7 @@ subdirectory
 subfolder
 submodule
 submodules
+subnet
 subprocess
 SubscribeResponse
 SubscriptionId
@@ -1319,11 +1325,13 @@ ths
 Thunderboard
 timedInteractionTimeoutMs
 TimeFormatLocalization
+timeframe
 timeoutMs
 TimeSynchronization
 tinycrypt
 Tizen
 TKIP
+TLS
 tlsr
 TLV
 tmp

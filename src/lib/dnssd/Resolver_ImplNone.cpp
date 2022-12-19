@@ -32,10 +32,14 @@ public:
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override {}
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override {}
 
-    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override
+    CHIP_ERROR ResolveNodeId(const PeerId & peerId) override
     {
         ChipLogError(Discovery, "Failed to resolve node ID: dnssd resolving not available");
         return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override
+    {
+        ChipLogError(Discovery, "Failed to stop resolving node ID: dnssd resolving not available");
     }
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override
     {
@@ -63,10 +67,12 @@ ResolverProxy::~ResolverProxy()
     Shutdown();
 }
 
-CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
+CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
+
+void ResolverProxy::NodeIdResolutionNoLongerNeeded(const PeerId & peerId) {}
 
 CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)
 {

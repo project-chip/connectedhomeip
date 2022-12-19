@@ -21,12 +21,20 @@
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^MTRQueryImageCompletionHandler)(
-    MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error);
+    MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error);
 
 typedef void (^MTRApplyUpdateRequestCompletionHandler)(
-    MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error);
+    MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error);
 
 typedef void (^MTRBDXQueryCompletionHandler)(NSData * _Nullable data, BOOL isEOF);
+
+MTR_NEWLY_DEPRECATED("Please use MTRQueryImageCompletionHandler")
+typedef void (^MTRQueryImageCompletionHandlerDeprecated)(
+    MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error);
+
+MTR_NEWLY_DEPRECATED("Plase Use MTRApplyUpdateRequestCompletionHandler")
+typedef void (^MTRApplyUpdateRequestCompletionHandlerDeprecated)(
+    MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error);
 
 /**
  * The protocol definition for the MTROTAProviderDelegate
@@ -52,12 +60,12 @@ typedef void (^MTRBDXQueryCompletionHandler)(NSData * _Nullable data, BOOL isEOF
  */
 - (void)handleQueryImageForNodeID:(NSNumber *)nodeID
                        controller:(MTRDeviceController *)controller
-                           params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
+                           params:(MTROTASoftwareUpdateProviderClusterQueryImageParams *)params
                        completion:(MTRQueryImageCompletionHandler)completion MTR_NEWLY_AVAILABLE;
 - (void)handleQueryImageForNodeID:(NSNumber *)nodeID
                        controller:(MTRDeviceController *)controller
                            params:(MTROtaSoftwareUpdateProviderClusterQueryImageParams *)params
-                completionHandler:(MTRQueryImageCompletionHandler)completionHandler
+                completionHandler:(MTRQueryImageCompletionHandlerDeprecated)completionHandler
     MTR_NEWLY_DEPRECATED("Please use the selector ending in completion:");
 
 /**
@@ -71,12 +79,12 @@ typedef void (^MTRBDXQueryCompletionHandler)(NSData * _Nullable data, BOOL isEOF
  */
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
                                controller:(MTRDeviceController *)controller
-                                   params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
+                                   params:(MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
                                completion:(MTRApplyUpdateRequestCompletionHandler)completion MTR_NEWLY_AVAILABLE;
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
                                controller:(MTRDeviceController *)controller
                                    params:(MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
-                        completionHandler:(MTRApplyUpdateRequestCompletionHandler)completionHandler
+                        completionHandler:(MTRApplyUpdateRequestCompletionHandlerDeprecated)completionHandler
     MTR_NEWLY_DEPRECATED("Please use the selector ending in completion:");
 
 /**
@@ -89,7 +97,7 @@ typedef void (^MTRBDXQueryCompletionHandler)(NSData * _Nullable data, BOOL isEOF
  */
 - (void)handleNotifyUpdateAppliedForNodeID:(NSNumber *)nodeID
                                 controller:(MTRDeviceController *)controller
-                                    params:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
+                                    params:(MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
                                 completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 - (void)handleNotifyUpdateAppliedForNodeID:(NSNumber *)nodeID
                                 controller:(MTRDeviceController *)controller

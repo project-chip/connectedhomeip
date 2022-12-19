@@ -22,7 +22,8 @@ import("crypto.gni")
 
 if (chip_crypto == "") {
   if (current_os == "android" || current_os == "freertos" ||
-      current_os == "zephyr" || current_os == "mbed" || current_os == "webos") {
+      current_os == "zephyr" || current_os == "mbed" || current_os == "webos" ||
+      current_os == "cmsis-rtos") {
     chip_crypto = "mbedtls"
   } else {
     chip_crypto = "openssl"
@@ -115,7 +116,12 @@ if (chip_crypto == "openssl") {
   import("//build_overrides/mbedtls.gni")
 
   source_set("cryptopal_psa") {
-    sources = [ "CHIPCryptoPALPSA.cpp" ]
+    sources = [
+      "CHIPCryptoPALPSA.cpp",
+      "CHIPCryptoPALPSA.h",
+      "PSAOperationalKeystore.cpp",
+      "PSAOperationalKeystore.h",
+    ]
     public_deps = [ ":public_headers" ]
 
     external_mbedtls = current_os == "zephyr"

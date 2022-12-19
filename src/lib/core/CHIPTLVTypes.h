@@ -204,7 +204,7 @@ inline uint8_t TLVFieldSizeToBytes(TLVFieldSize fieldSize)
 {
     // We would like to assert fieldSize < 7, but that gives us fatal
     // -Wtautological-constant-out-of-range-compare warnings...
-    return (fieldSize != kTLVFieldSize_0Byte) ? static_cast<uint8_t>(1 << fieldSize) : 0;
+    return static_cast<uint8_t>((fieldSize != kTLVFieldSize_0Byte) ? (1 << fieldSize) : 0);
 }
 
 } // namespace TLV

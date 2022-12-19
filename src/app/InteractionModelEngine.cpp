@@ -630,19 +630,37 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
     VerifyOrReturnError(report.GetSubscriptionId(&subscriptionId) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(report.ExitContainer() == CHIP_NO_ERROR, Status::InvalidAction);
 
+    ReadClient * foundSubscription = nullptr;
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
+        auto peer = apExchangeContext->GetSessionHandle()->GetPeer();
+        if (readClient->GetFabricIndex() != peer.GetFabricIndex() || readClient->GetPeerNodeId() != peer.GetNodeId())
+        {
+            continue;
+        }
+
+        // Notify Subscriptions about incoming communication from node
+        readClient->OnUnsolicitedMessageFromPublisher();
+
         if (!readClient->IsSubscriptionActive())
         {
             continue;
         }
-        auto peer = apExchangeContext->GetSessionHandle()->GetPeer();
-        if (readClient->GetFabricIndex() != peer.GetFabricIndex() || readClient->GetPeerNodeId() != peer.GetNodeId() ||
-            !readClient->IsMatchingSubscriptionId(subscriptionId))
+
+        if (!readClient->IsMatchingSubscriptionId(subscriptionId))
         {
             continue;
         }
-        readClient->OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
+
+        if (!foundSubscription)
+        {
+            foundSubscription = readClient;
+        }
+    }
+
+    if (foundSubscription)
+    {
+        foundSubscription->OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
         return Status::Success;
     }
 

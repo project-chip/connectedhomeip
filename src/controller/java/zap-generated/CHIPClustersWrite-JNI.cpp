@@ -1234,12 +1234,12 @@ JNI_METHOD(void, AccessControlCluster, writeExtensionAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, BasicCluster, writeNodeLabelAttribute)
+JNI_METHOD(void, BasicInformationCluster, writeNodeLabelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Basic::Attributes::NodeLabel::TypeInfo;
+    using TypeInfo = chip::app::Clusters::BasicInformation::Attributes::NodeLabel::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -1260,8 +1260,8 @@ JNI_METHOD(void, BasicCluster, writeNodeLabelAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err            = CHIP_NO_ERROR;
-    BasicCluster * cppCluster = reinterpret_cast<BasicCluster *>(clusterPtr);
+    CHIP_ERROR err                       = CHIP_NO_ERROR;
+    BasicInformationCluster * cppCluster = reinterpret_cast<BasicInformationCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -1286,12 +1286,12 @@ JNI_METHOD(void, BasicCluster, writeNodeLabelAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, BasicCluster, writeLocationAttribute)
+JNI_METHOD(void, BasicInformationCluster, writeLocationAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Basic::Attributes::Location::TypeInfo;
+    using TypeInfo = chip::app::Clusters::BasicInformation::Attributes::Location::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -1312,8 +1312,8 @@ JNI_METHOD(void, BasicCluster, writeLocationAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err            = CHIP_NO_ERROR;
-    BasicCluster * cppCluster = reinterpret_cast<BasicCluster *>(clusterPtr);
+    CHIP_ERROR err                       = CHIP_NO_ERROR;
+    BasicInformationCluster * cppCluster = reinterpret_cast<BasicInformationCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
@@ -1338,12 +1338,12 @@ JNI_METHOD(void, BasicCluster, writeLocationAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, BasicCluster, writeLocalConfigDisabledAttribute)
+JNI_METHOD(void, BasicInformationCluster, writeLocalConfigDisabledAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::Basic::Attributes::LocalConfigDisabled::TypeInfo;
+    using TypeInfo = chip::app::Clusters::BasicInformation::Attributes::LocalConfigDisabled::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -1364,8 +1364,8 @@ JNI_METHOD(void, BasicCluster, writeLocalConfigDisabledAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err            = CHIP_NO_ERROR;
-    BasicCluster * cppCluster = reinterpret_cast<BasicCluster *>(clusterPtr);
+    CHIP_ERROR err                       = CHIP_NO_ERROR;
+    BasicInformationCluster * cppCluster = reinterpret_cast<BasicInformationCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));

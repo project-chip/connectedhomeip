@@ -17,86 +17,7 @@
 
 #pragma once
 
-#ifdef WF200_WIFI
-#include "FreeRTOS.h"
-#include "event_groups.h"
-#include "semphr.h"
-#include "task.h"
-#include "timers.h"
-
-#include "sl_wfx_cmd_api.h"
-#include "sl_wfx_constants.h"
-
-typedef struct __attribute__((__packed__)) sl_wfx_get_counters_cnf_body_s
-{
-    uint32_t status;
-    uint16_t mib_id;
-    uint16_t length;
-    uint32_t rcpi;
-    uint32_t count_plcp_errors;
-    uint32_t count_fcs_errors;
-    uint32_t count_tx_packets;
-    uint32_t count_rx_packets;
-    uint32_t count_rx_packet_errors;
-    uint32_t count_rx_decryption_failures;
-    uint32_t count_rx_mic_failures;
-    uint32_t count_rx_no_key_failures;
-    uint32_t count_tx_multicast_frames;
-    uint32_t count_tx_frames_success;
-    uint32_t count_tx_frame_failures;
-    uint32_t count_tx_frames_retried;
-    uint32_t count_tx_frames_multi_retried;
-    uint32_t count_rx_frame_duplicates;
-    uint32_t count_rts_success;
-    uint32_t count_rts_failures;
-    uint32_t count_ack_failures;
-    uint32_t count_rx_multicast_frames;
-    uint32_t count_rx_frames_success;
-    uint32_t count_rx_cmacicv_errors;
-    uint32_t count_rx_cmac_replays;
-    uint32_t count_rx_mgmt_ccmp_replays;
-    uint32_t count_rx_bipmic_errors;
-    uint32_t count_rx_beacon;
-    uint32_t count_miss_beacon;
-    uint32_t reserved[15];
-} sl_wfx_get_counters_cnf_body_t;
-
-typedef struct __attribute__((__packed__)) sl_wfx_get_counters_cnf_s
-{
-    /** Common message header. */
-    sl_wfx_header_t header;
-    /** Confirmation message body. */
-    sl_wfx_get_counters_cnf_body_t body;
-} sl_wfx_get_counters_cnf_t;
-
-typedef struct __attribute__((__packed__)) sl_wfx_mib_req_body_s
-{
-    uint16_t mib_id; ///< ID of the MIB to be read.
-    uint16_t reserved;
-} sl_wfx_mib_req_body_t;
-
-typedef struct __attribute__((__packed__)) sl_wfx_header_mib_s
-{
-    uint16_t length; ///< Message length in bytes including this uint16_t.
-                     ///< Maximum value is 8188 but maximum Request size is FW dependent and reported in the
-                     ///< ::sl_wfx_startup_ind_body_t::size_inp_ch_buf.
-    uint8_t id;      ///< Contains the message Id indexed by sl_wfx_general_commands_ids_t or sl_wfx_message_ids_t.
-    uint8_t reserved : 1;
-    uint8_t interface : 2;
-    uint8_t seqnum : 3;
-    uint8_t encrypted : 2;
-} sl_wfx_header_mib_t;
-
-typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
-{
-    /** Common message header. */
-    sl_wfx_header_mib_t header;
-    /** Request message body. */
-    sl_wfx_mib_req_body_t body;
-} sl_wfx_mib_req_t;
-
-#else /* End WF200 else RS911x */
-
+#include "stdbool.h"
 #include "wfx_msgs.h"
 
 /* Wi-Fi events*/
@@ -105,8 +26,6 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #define SL_WFX_DISCONNECT_IND_ID 3
 #define SL_WFX_SCAN_COMPLETE_ID 4
 #define WFX_RSI_SSID_SIZE 64
-
-#endif /* WF200 */
 
 #ifndef RS911X_SOCKETS
 /* LwIP includes. */
@@ -129,17 +48,10 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 
 #include "sl_status.h"
 
-#ifdef RS911X_WIFI
 #define WLAN_TASK_STACK_SIZE 1024
-#define WLAN_TASK_PRIORITY 1
-#define WLAN_DRIVER_TASK_PRIORITY 1
+#define WLAN_TASK_PRIORITY 3
+#define WLAN_DRIVER_TASK_PRIORITY 2
 #define MAX_JOIN_RETRIES_COUNT 5
-
-#else /* WF200 */
-#define WLAN_TASK_STACK_SIZE 1024
-#define WLAN_TASK_PRIORITY 1
-#define MAX_JOIN_RETRIES_COUNT 5
-#endif
 
 // WLAN related Macros
 #define ETH_FRAME 0
@@ -322,6 +234,7 @@ bool wfx_is_sta_mode_enabled(void);
 int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap);
 int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_reset_counts();
+int32_t wfx_rsi_platform();
 
 void wfx_clear_wifi_provision(void);
 sl_status_t wfx_connect_to_ap(void);
@@ -364,12 +277,6 @@ void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off);
 int32_t wfx_rsi_send_data(void * p, uint16_t len);
 #endif /* RS911X_WIFI */
 
-#ifdef WF200_WIFI
-void wfx_bus_start(void);
-sl_status_t get_all_counters(void);
-void sl_wfx_host_gpio_init(void);
-sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload);
-#endif
 #ifdef __cplusplus
 }
 #endif

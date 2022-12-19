@@ -32,7 +32,6 @@
 #include "esp_log.h"
 #include "route_hook/esp_route_hook.h"
 #include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app/server/Dnssd.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>

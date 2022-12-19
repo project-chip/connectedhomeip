@@ -16,6 +16,7 @@
  */
 
 #include "ias-zone-client.h"
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
 
@@ -280,7 +281,7 @@ bool emberAfIasZoneClusterZoneEnrollRequestCallback(app::CommandHandler * comman
         zoneId       = serverIndex;
         setServerZoneId(serverIndex, zoneId);
     }
-    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), ZCL_IAS_ZONE_CLUSTER_ID,
+    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), app::Clusters::IasZone::Id,
                               ZCL_ZONE_ENROLL_RESPONSE_COMMAND_ID, "uu", responseCode, zoneId);
     // Need to send this command with our source EUI because the server will
     // check our EUI64 against his CIE Address to see if we're his CIE.
@@ -355,7 +356,7 @@ static void setCieAddress(EmberNodeId destAddress)
         0, // ieee (filled in later)
     };
     emberAfGetEui64(&writeAttributes[3]);
-    emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), ZCL_IAS_ZONE_CLUSTER_ID,
+    emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), app::Clusters::IasZone::Id,
                               ZCL_WRITE_ATTRIBUTES_COMMAND_ID, "b", writeAttributes, sizeof(writeAttributes));
     emberAfIasZoneClusterPrintln("Writing CIE Address to IAS Zone Server");
     if (EMBER_SUCCESS == sendCommand(destAddress))
@@ -404,7 +405,7 @@ static void checkForIasZoneServer(EmberNodeId emberNodeId, uint8_t * ieeeAddress
         return;
     }
 
-    EmberStatus status = emberAfFindDevicesByCluster(emberNodeId, ZCL_IAS_ZONE_CLUSTER_ID,
+    EmberStatus status = emberAfFindDevicesByCluster(emberNodeId, app::Clusters::IasZone::Id,
                                                      true, // server cluster?
                                                      iasZoneClientServiceDiscoveryCallback);
 
@@ -434,7 +435,7 @@ void readIasZoneServerAttributes(EmberNodeId nodeId)
 
         EMBER_LOW_BYTE(ZCL_ZONE_STATUS_ATTRIBUTE_ID), EMBER_HIGH_BYTE(ZCL_ZONE_STATUS_ATTRIBUTE_ID),
     };
-    emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), ZCL_IAS_ZONE_CLUSTER_ID,
+    emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), app::Clusters::IasZone::Id,
                               ZCL_READ_ATTRIBUTES_COMMAND_ID, "b", iasZoneAttributeIds, sizeof(iasZoneAttributeIds));
     if (EMBER_SUCCESS == sendCommand(nodeId))
     {
@@ -448,7 +449,7 @@ void readIasZoneServerCieAddress(EmberNodeId nodeId)
         EMBER_LOW_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
         EMBER_HIGH_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
     };
-    emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), ZCL_IAS_ZONE_CLUSTER_ID,
+    emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), app::Clusters::IasZone::Id,
                               ZCL_READ_ATTRIBUTES_COMMAND_ID, "b", iasZoneAttributeIds, sizeof(iasZoneAttributeIds));
     if (EMBER_SUCCESS == sendCommand(nodeId))
     {
@@ -458,7 +459,7 @@ void readIasZoneServerCieAddress(EmberNodeId nodeId)
 
 void emberAfPluginIasZoneClientWriteAttributesResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
-    if (clusterId == ZCL_IAS_ZONE_CLUSTER_ID && iasZoneClientState == IAS_ZONE_CLIENT_STATE_SET_CIE_ADDRESS &&
+    if (clusterId == app::Clusters::IasZone::Id && iasZoneClientState == IAS_ZONE_CLIENT_STATE_SET_CIE_ADDRESS &&
         buffer[0] == EMBER_ZCL_STATUS_SUCCESS)
     {
         readIasZoneServerCieAddress(emberAfCurrentCommand()->source);
@@ -470,7 +471,7 @@ void emberAfPluginIasZoneClientWriteAttributesResponseCallback(ClusterId cluster
 void emberAfPluginIasZoneClientReadAttributesResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
     uint8_t zoneStatus, zoneType, zoneState;
-    if (clusterId == ZCL_IAS_ZONE_CLUSTER_ID &&
+    if (clusterId == app::Clusters::IasZone::Id &&
         (iasZoneClientState == IAS_ZONE_CLIENT_STATE_READ_ATTRIBUTES ||
          iasZoneClientState == IAS_ZONE_CLIENT_STATE_READ_CIE_ADDRESS))
     {

@@ -10,7 +10,7 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipClusters
-import chip.devicecontroller.ChipClusters.BasicCluster
+import chip.devicecontroller.ChipClusters.BasicInformationCluster
 import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
@@ -179,7 +179,7 @@ class BasicClientFragment : Fragment() {
   }
 
   private suspend fun sendReadVendorIDAttribute() {
-    getBasicClusterForDevice().readVendorIDAttribute(object : ChipClusters.BasicCluster.VendorIDAttributeCallback {
+    getBasicClusterForDevice().readVendorIDAttribute(object : ChipClusters.BasicInformationCluster.VendorIDAttributeCallback {
       override fun onSuccess(value: Int) {
         Log.i(TAG,"[Read Success] VendorID: $value")
         showMessage("[Read Success] VendorID: $value")
@@ -461,8 +461,8 @@ class BasicClientFragment : Fragment() {
     }
   }
 
-  private suspend fun getBasicClusterForDevice(): BasicCluster {
-    return BasicCluster(
+  private suspend fun getBasicClusterForDevice(): BasicInformationCluster {
+    return BasicInformationCluster(
       ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId), ENDPOINT
     )
   }

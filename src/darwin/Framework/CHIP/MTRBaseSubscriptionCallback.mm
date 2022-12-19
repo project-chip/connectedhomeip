@@ -16,6 +16,7 @@
 
 #import "MTRBaseSubscriptionCallback.h"
 #import "MTRError_Internal.h"
+#import "MTRLogging_Internal.h"
 
 #include <platform/PlatformManager.h>
 
@@ -109,6 +110,14 @@ CHIP_ERROR MTRBaseSubscriptionCallback::OnResubscriptionNeeded(ReadClient * apRe
         callback(error, delayMs);
     }
     return CHIP_NO_ERROR;
+}
+
+void MTRBaseSubscriptionCallback::OnUnsolicitedMessageFromPublisher(ReadClient *)
+{
+    if (mUnsolicitedMessageFromPublisherHandler) {
+        auto unsolicitedMessageFromPublisherHandler = mUnsolicitedMessageFromPublisherHandler;
+        unsolicitedMessageFromPublisherHandler();
+    }
 }
 
 void MTRBaseSubscriptionCallback::ReportError(CHIP_ERROR aError, bool aCancelSubscription)

@@ -523,7 +523,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBasicClusterCapabilityMinimaStruct
+@implementation MTRBasicInformationClusterCapabilityMinimaStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -537,7 +537,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBasicClusterCapabilityMinimaStruct alloc] init];
+    auto other = [[MTRBasicInformationClusterCapabilityMinimaStruct alloc] init];
 
     other.caseSessionsPerFabric = self.caseSessionsPerFabric;
     other.subscriptionsPerFabric = self.subscriptionsPerFabric;
@@ -554,7 +554,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBasicClusterStartUpEvent
+@implementation MTRBasicClusterCapabilityMinimaStruct : MTRBasicInformationClusterCapabilityMinimaStruct
+@end
+
+@implementation MTRBasicInformationClusterStartUpEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -566,7 +569,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBasicClusterStartUpEvent alloc] init];
+    auto other = [[MTRBasicInformationClusterStartUpEvent alloc] init];
 
     other.softwareVersion = self.softwareVersion;
 
@@ -582,7 +585,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBasicClusterShutDownEvent
+@implementation MTRBasicClusterStartUpEvent : MTRBasicInformationClusterStartUpEvent
+@end
+
+@implementation MTRBasicInformationClusterShutDownEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -592,7 +598,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBasicClusterShutDownEvent alloc] init];
+    auto other = [[MTRBasicInformationClusterShutDownEvent alloc] init];
 
     return other;
 }
@@ -605,7 +611,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBasicClusterLeaveEvent
+@implementation MTRBasicClusterShutDownEvent : MTRBasicInformationClusterShutDownEvent
+@end
+
+@implementation MTRBasicInformationClusterLeaveEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -617,7 +626,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBasicClusterLeaveEvent alloc] init];
+    auto other = [[MTRBasicInformationClusterLeaveEvent alloc] init];
 
     other.fabricIndex = self.fabricIndex;
 
@@ -633,7 +642,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBasicClusterReachableChangedEvent
+@implementation MTRBasicClusterLeaveEvent : MTRBasicInformationClusterLeaveEvent
+@end
+
+@implementation MTRBasicInformationClusterReachableChangedEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -645,7 +657,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBasicClusterReachableChangedEvent alloc] init];
+    auto other = [[MTRBasicInformationClusterReachableChangedEvent alloc] init];
 
     other.reachableNewValue = self.reachableNewValue;
 
@@ -661,7 +673,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROtaSoftwareUpdateRequestorClusterProviderLocation
+@implementation MTRBasicClusterReachableChangedEvent : MTRBasicInformationClusterReachableChangedEvent
+@end
+
+@implementation MTROTASoftwareUpdateRequestorClusterProviderLocation
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -677,7 +692,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTROtaSoftwareUpdateRequestorClusterProviderLocation alloc] init];
+    auto other = [[MTROTASoftwareUpdateRequestorClusterProviderLocation alloc] init];
 
     other.providerNodeID = self.providerNodeID;
     other.endpoint = self.endpoint;
@@ -695,7 +710,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent
+@implementation MTROtaSoftwareUpdateRequestorClusterProviderLocation : MTROTASoftwareUpdateRequestorClusterProviderLocation
+@end
+
+@implementation MTROTASoftwareUpdateRequestorClusterStateTransitionEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -713,7 +731,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent alloc] init];
+    auto other = [[MTROTASoftwareUpdateRequestorClusterStateTransitionEvent alloc] init];
 
     other.previousState = self.previousState;
     other.newState = self.newState;
@@ -733,7 +751,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent
+@implementation MTROtaSoftwareUpdateRequestorClusterStateTransitionEvent : MTROTASoftwareUpdateRequestorClusterStateTransitionEvent
+@end
+
+@implementation MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -747,7 +768,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent alloc] init];
+    auto other = [[MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent alloc] init];
 
     other.softwareVersion = self.softwareVersion;
     other.productID = self.productID;
@@ -764,7 +785,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent
+@implementation MTROtaSoftwareUpdateRequestorClusterVersionAppliedEvent : MTROTASoftwareUpdateRequestorClusterVersionAppliedEvent
+@end
+
+@implementation MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -782,7 +806,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent alloc] init];
+    auto other = [[MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent alloc] init];
 
     other.softwareVersion = self.softwareVersion;
     other.bytesDownloaded = self.bytesDownloaded;
@@ -800,6 +824,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTROtaSoftwareUpdateRequestorClusterDownloadErrorEvent : MTROTASoftwareUpdateRequestorClusterDownloadErrorEvent
 @end
 
 @implementation MTRPowerSourceClusterBatChargeFaultChangeType
@@ -2023,7 +2050,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _newPosition = @(0);
+        _previousPosition = @(0);
 
         _totalNumberOfPressesCounted = @(0);
     }
@@ -2034,7 +2061,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRSwitchClusterMultiPressCompleteEvent alloc] init];
 
-    other.newPosition = self.newPosition;
+    other.previousPosition = self.previousPosition;
     other.totalNumberOfPressesCounted = self.totalNumberOfPressesCounted;
 
     return other;
@@ -2042,9 +2069,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newPosition:%@; totalNumberOfPressesCounted:%@; >",
-                                             NSStringFromClass([self class]), _newPosition, _totalNumberOfPressesCounted];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: previousPosition:%@; totalNumberOfPressesCounted:%@; >",
+                                             NSStringFromClass([self class]), _previousPosition, _totalNumberOfPressesCounted];
     return descriptionString;
+}
+
+- (void)setNewPosition:(NSNumber * _Nonnull)newPosition
+{
+    self.previousPosition = newPosition;
+}
+
+- (NSNumber * _Nonnull)newPosition
+{
+    return self.previousPosition;
 }
 
 @end
@@ -3564,6 +3601,40 @@ NS_ASSUME_NONNULL_BEGIN
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: catalogVendorId:%@; applicationId:%@; >",
                                              NSStringFromClass([self class]), _catalogVendorId, _applicationId];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRClientMonitoringClusterMonitoringRegistration
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clientNodeId = @(0);
+
+        _iCid = @(0);
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRClientMonitoringClusterMonitoringRegistration alloc] init];
+
+    other.clientNodeId = self.clientNodeId;
+    other.iCid = self.iCid;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientNodeId:%@; iCid:%@; fabricIndex:%@; >",
+                                             NSStringFromClass([self class]), _clientNodeId, _iCid, _fabricIndex];
     return descriptionString;
 }
 

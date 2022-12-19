@@ -21,7 +21,7 @@
 #include "nvs_flash.h"
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/reporting/reporting.h>
@@ -136,10 +136,9 @@ constexpr CommandId onOffIncomingCommands[] = {
 };
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedLightClusters)
-DECLARE_DYNAMIC_CLUSTER(ZCL_ON_OFF_CLUSTER_ID, onOffAttrs, onOffIncomingCommands, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, bridgedDeviceBasicAttrs, nullptr,
-                            nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(OnOff::Id, onOffAttrs, onOffIncomingCommands, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasic::Id, bridgedDeviceBasicAttrs, nullptr, nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
@@ -278,11 +277,11 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     {
         Device * dev = gDevices[endpointIndex];
 
-        if (clusterId == ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID)
+        if (clusterId == BridgedDeviceBasic::Id)
         {
             return HandleReadBridgedDeviceBasicAttribute(dev, attributeMetadata->attributeId, buffer, maxReadLength);
         }
-        else if (clusterId == ZCL_ON_OFF_CLUSTER_ID)
+        else if (clusterId == OnOff::Id)
         {
             return HandleReadOnOffAttribute(dev, attributeMetadata->attributeId, buffer, maxReadLength);
         }
@@ -300,7 +299,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
     {
         Device * dev = gDevices[endpointIndex];
 
-        if ((dev->IsReachable()) && (clusterId == ZCL_ON_OFF_CLUSTER_ID))
+        if ((dev->IsReachable()) && (clusterId == OnOff::Id))
         {
             return HandleWriteOnOffAttribute(dev, attributeMetadata->attributeId, buffer);
         }

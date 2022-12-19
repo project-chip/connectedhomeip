@@ -112,6 +112,12 @@ tests:
           constraints:
               hasMasksSet: [0x01, 0x04] # [MaskVal1, MaskVal3]
 
+    - label: "Write attribute BITMAP32 Back to Default Value"
+      command: "writeAttribute"
+      attribute: "bitmap32"
+      arguments:
+          value: 0
+
     # Tests for INT32U attribute
 
     - label: "Write attribute INT32U Value"

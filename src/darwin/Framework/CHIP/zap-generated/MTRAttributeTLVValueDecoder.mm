@@ -2082,8 +2082,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
         }
         break;
     }
-    case Clusters::Basic::Id: {
-        using namespace Clusters::Basic;
+    case Clusters::BasicInformation::Id: {
+        using namespace Clusters::BasicInformation;
         switch (aPath.mAttributeId) {
         case Attributes::DataModelRevision::Id: {
             using TypeInfo = Attributes::DataModelRevision::TypeInfo;
@@ -2301,8 +2301,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            MTRBasicClusterCapabilityMinimaStruct * _Nonnull value;
-            value = [MTRBasicClusterCapabilityMinimaStruct new];
+            MTRBasicInformationClusterCapabilityMinimaStruct * _Nonnull value;
+            value = [MTRBasicInformationClusterCapabilityMinimaStruct new];
             value.caseSessionsPerFabric = [NSNumber numberWithUnsignedShort:cppValue.caseSessionsPerFabric];
             value.subscriptionsPerFabric = [NSNumber numberWithUnsignedShort:cppValue.subscriptionsPerFabric];
             return value;
@@ -2538,8 +2538,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTROtaSoftwareUpdateRequestorClusterProviderLocation * newElement_0;
-                    newElement_0 = [MTROtaSoftwareUpdateRequestorClusterProviderLocation new];
+                    MTROTASoftwareUpdateRequestorClusterProviderLocation * newElement_0;
+                    newElement_0 = [MTROTASoftwareUpdateRequestorClusterProviderLocation new];
                     newElement_0.providerNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.providerNodeID];
                     newElement_0.endpoint = [NSNumber numberWithUnsignedShort:entry_0.endpoint];
                     newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];

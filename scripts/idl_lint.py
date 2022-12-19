@@ -86,4 +86,4 @@ def main(log_level, rules, idl_path):
 
 
 if __name__ == "__main__":
-    main()
+    main(auto_envvar_prefix='CHIP')

@@ -21,7 +21,7 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/ClusterIds.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
@@ -263,7 +263,7 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
         LED_setOff(gLedRedHandle);
         state = 0;
     }
-    emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &state, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    emberAfWriteAttribute(1, app::Clusters::OnOff::Id, ZCL_ON_OFF_ATTRIBUTE_ID, &state, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 void AppTask::DispatchEvent(AppEvent * aEvent)

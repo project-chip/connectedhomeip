@@ -25,6 +25,9 @@ concurrency:
         'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     test_suites_linux:
         name: Test Suites - Linux
@@ -44,7 +47,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.06
+            image: connectedhomeip/chip-build:0.6.18
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -86,7 +89,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
-            - name: Validate that xml are parseable
+            - name: Validate that xml are parsable
               timeout-minutes: 10
               # The sub-items being run here are the same as the input XMLs listed
               # at src/app/zap-templates/zcl/zcl.json
@@ -96,9 +99,9 @@ jobs:
               # unit tests)
               #
               # Also note ordering: global attributes are parsed first because other XML files may
-              # reference these. 
+              # reference these.
               #
-              # TODO: some multipass/postprocess may be more appropriate to allow any ordering of 
+              # TODO: some multipass/postprocess may be more appropriate to allow any ordering of
               #       things.
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -225,6 +228,7 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+
     test_suites_darwin:
         name: Test Suites - Darwin
         timeout-minutes: 150
@@ -283,7 +287,7 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Build Apps
-              timeout-minutes: 60
+              timeout-minutes: 75
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -336,6 +340,7 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+
     repl_tests_linux:
         name: REPL Tests - Linux
         timeout-minutes: 130
@@ -347,7 +352,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.06
+            image: connectedhomeip/chip-build:0.6.18
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -408,6 +413,7 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+
     java_tests_linux:
         name: Java Tests - Linux
         timeout-minutes: 130
@@ -420,7 +426,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.06
+            image: connectedhomeip/chip-build:0.6.18
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -456,6 +462,30 @@ jobs:
                       --target linux-x64-java-matter-controller \
                       build \
                    "
+            - name: Run Discover Tests
+              timeout-minutes: 65
+              run: |
+                  scripts/run_in_build_env.sh \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "discover" \
+                     --tool-args "commissionables" \
+                     --factoryreset \
+                  '
+            - name: Run Pairing Tests
+              timeout-minutes: 65
+              run: |
+                  scripts/run_in_build_env.sh \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "pairing" \
+                     --tool-args "onnetwork-long --nodeid 1 --setup-payload 20202021 --discriminator 3840 -t 1000" \
+                     --factoryreset \
+                  '
             - name: Uploading core files
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
