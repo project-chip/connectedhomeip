@@ -137,7 +137,7 @@ static CHIP_ERROR AppendAttributeValueToArray(
     }
 
     [self.baseDevice.deviceController
-        asyncDispatchToMatterQueue:^(Controller::DeviceCommissioner *) {
+        asyncDispatchToMatterQueue:^() {
             if (endpointID == nil && clusterID == nil) {
                 MTR_LOG_ERROR(
                     "Error: currently read from attribute cache does not support wildcards for both endpoint and cluster");

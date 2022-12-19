@@ -40,7 +40,6 @@
         "TestGroupDemoConfig",
         "Test_TC_G_2_2",
         "Test_TC_G_2_3",
-        "Test_TC_G_3_1",
         "Test_TC_G_3_2"
     ],
     "BulkDataExchangeProtocol": [
@@ -99,15 +98,14 @@
         "Test_TC_DLOG_2_2",
         "Test_TC_DLOG_3_1"
     ],
-    "Descriptor": ["Test_TC_DESC_2_1", "Test_TC_DESC_2_2"],
-    "EthernetNetworkDiagnostics": ["Test_TC_DGETH_3_1", "Test_TC_DGETH_3_2"],
+    "Descriptor": ["Test_TC_DESC_2_1"],
     "GeneralCommissioning": ["Test_TC_CGEN_2_2", "Test_TC_CGEN_2_4"],
     "GeneralDiagnostics": [
         "Test_TC_DGGEN_2_2",
         "Test_TC_DGGEN_2_3",
         "Test_TC_DGGEN_3_1"
     ],
-    "Identify": ["Test_TC_I_3_1", "Test_TC_I_3_2"],
+    "Identify": ["Test_TC_I_3_2"],
     "IlluminanceMeasurement": ["Test_TC_ILL_3_1"],
     "InteractionDataModel": [
         "Test_TC_IDM_1_1",
@@ -206,7 +204,7 @@
         "Test_TC_SU_4_1",
         "Test_TC_SU_4_2"
     ],
-    "PowerSourceConfiguration": ["Test_TC_PSCFG_2_2", "Test_TC_PSCFG_3_1"],
+    "PowerSourceConfiguration": ["Test_TC_PSCFG_2_2"],
     "SecureChannel": [
         "Test_TC_SC_1_1",
         "Test_TC_SC_1_2",
@@ -239,26 +237,19 @@
     "SoftwareDiagnostics": [
         "Test_TC_DGSW_2_1",
         "Test_TC_DGSW_2_2",
-        "Test_TC_DGSW_2_3",
-        "Test_TC_DGSW_3_1",
-        "Test_TC_DGSW_3_2"
+        "Test_TC_DGSW_2_3"
     ],
-    "WiFiNetworkDiagnostics": [
-        "Test_TC_DGWIFI_2_2",
-        "Test_TC_DGWIFI_3_1",
-        "Test_TC_DGWIFI_3_2"
-    ],
+    "WiFiNetworkDiagnostics": ["Test_TC_DGWIFI_2_2"],
     "WindowCovering": ["Test_TC_WNCV_6_1", "Test_TC_WNCV_7_1"],
-    "FlowMeasurement": ["Test_TC_FLW_2_2", "Test_TC_FLW_3_1"],
+    "FlowMeasurement": ["Test_TC_FLW_2_2"],
     "OccupancySensing": [
         "Test_TC_OCC_2_2",
         "Test_TC_OCC_2_3",
         "Test_TC_OCC_2_4",
         "Test_TC_OCC_3_1"
     ],
-    "PressureMeasurement": ["Test_TC_PRS_3_1"],
-    "PowerSource": ["Test_TC_PS_2_2", "Test_TC_PS_3_1"],
-    "BooleanState": ["Test_TC_BOOL_2_2", "Test_TC_BOOL_3_1"],
+    "PowerSource": ["Test_TC_PS_2_2"],
+    "BooleanState": ["Test_TC_BOOL_2_2"],
     "ColorControl": [
         "Test_TC_CC_2_2",
         "Test_TC_CC_3_4",
@@ -284,8 +275,8 @@
     "LocalizationConfiguration": ["Test_TC_LCFG_2_1", "Test_TC_LCFG_3_1"],
     "LevelControl": ["Test_TC_LVL_2_3", "Test_TC_LVL_7_1", "Test_TC_LVL_8_1"],
     "OnOff": ["Test_TC_OO_2_3", "Test_TC_OO_3_1", "Test_TC_OO_3_2"],
-    "RelativeHumidityMeasurement": ["Test_TC_RH_2_2", "Test_TC_RH_3_1"],
-    "Switch": ["Test_TC_SWTCH_2_2", "Test_TC_SWTCH_3_1", "Test_TC_SWTCH_3_2"],
+    "RelativeHumidityMeasurement": ["Test_TC_RH_2_2"],
+    "Switch": ["Test_TC_SWTCH_2_2", "Test_TC_SWTCH_3_2"],
     "TemperatureMeasurement": ["Test_TC_TMP_2_2", "Test_TC_TMP_3_1"],
     "Thermostat": ["Test_TC_TSTAT_3_1", "Test_TC_TSTAT_3_2"],
     "ThermostatUserConfiguration": ["Test_TC_TSUIC_3_1"],
@@ -297,12 +288,7 @@
         "Test_TC_DGTHREAD_3_4",
         "Test_TC_DGTHREAD_3_5"
     ],
-    "Actions": [
-        "Test_TC_ACT_2_1",
-        "Test_TC_ACT_2_2",
-        "Test_TC_ACT_3_1",
-        "Test_TC_ACT_3_2"
-    ],
+    "Actions": ["Test_TC_ACT_2_1", "Test_TC_ACT_2_2", "Test_TC_ACT_3_2"],
     "TimeFormatLocalization": [
         "Test_TC_LTIME_1_1",
         "Test_TC_LTIME_2_1",
@@ -313,7 +299,6 @@
         "Test_TC_LUNIT_2_1",
         "Test_TC_LUNIT_3_1"
     ],
-    "FixedLabel": ["Test_TC_FLABEL_3_1"],
     "Binding": ["Test_TC_BIND_2_1", "Test_TC_BIND_2_2", "Test_TC_BIND_2_3"],
     "Scenes": [
         "Test_TC_S_1_1",
@@ -347,7 +332,6 @@
         "DeviceManagement",
         "DiagnosticsLogs",
         "Descriptor",
-        "EthernetNetworkDiagnostics",
         "GeneralCommissioning",
         "GeneralDiagnostics",
         "Identify",
@@ -364,7 +348,6 @@
         "WindowCovering",
         "FlowMeasurement",
         "OccupancySensing",
-        "PressureMeasurement",
         "PowerSource",
         "BooleanState",
         "ColorControl",
@@ -381,7 +364,6 @@
         "Actions",
         "TimeFormatLocalization",
         "UnitLocalization",
-        "FixedLabel",
         "Binding",
         "Scenes",
         "PumpConfigurationControl",

@@ -108,7 +108,7 @@ tests:
           attribute of DUT_CE"
       command: "writeAttribute"
       PICS: BINFO.S.A0005
-      cluster: "Basic"
+      cluster: "Basic Information"
       attribute: "NodeLabel"
       arguments:
           value: "chiptest"
@@ -118,7 +118,7 @@ tests:
           attribute of DUT_CE"
       command: "readAttribute"
       PICS: BINFO.S.A0005
-      cluster: "Basic"
+      cluster: "Basic Information"
       attribute: "NodeLabel"
       response:
           value: "chiptest"
@@ -207,7 +207,7 @@ tests:
           "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
           attribute of DUT_CE"
       command: "writeAttribute"
-      cluster: "Basic"
+      cluster: "Basic Information"
       PICS: OPCREDS.S.A0001
       attribute: "NodeLabel"
       arguments:
@@ -217,7 +217,7 @@ tests:
           "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
           attribute of DUT_CE"
       command: "readAttribute"
-      cluster: "Basic"
+      cluster: "Basic Information"
       PICS: OPCREDS.S.A0001
       attribute: "NodeLabel"
       response:
@@ -231,7 +231,7 @@ tests:
           attribute of DUT_CE"
       identity: "beta"
       command: "writeAttribute"
-      cluster: "Basic"
+      cluster: "Basic Information"
       PICS: OPCREDS.S.A0001
       attribute: "NodeLabel"
       arguments:
@@ -242,7 +242,7 @@ tests:
           attribute of DUT_CE"
       identity: "beta"
       command: "readAttribute"
-      cluster: "Basic"
+      cluster: "Basic Information"
       PICS: OPCREDS.S.A0001
       attribute: "NodeLabel"
       response:

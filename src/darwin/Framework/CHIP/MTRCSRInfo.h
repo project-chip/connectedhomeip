@@ -17,12 +17,50 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Matter/MTRDefines.h>
+
+typedef NSData * MTRCSRDERBytes;
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * Represents information relating to NOC CSR.
- *
+ * Represents information relating to a certificate signing request for a Matter
+ * operational certificate.
  */
+MTR_NEWLY_AVAILABLE
+@interface MTROperationalCSRInfo : NSObject
+
+/**
+ * DER-encoded certificate signing request.
+ */
+@property (nonatomic, copy, readonly) MTRCSRDERBytes csr;
+/**
+ * The nonce provided in the original CSRRequest command hat led to this CSR
+ * being created.
+ */
+@property (nonatomic, copy, readonly) NSData * csrNonce;
+/**
+ * TLV-encoded nocsr-elements structure.  This includes the "csr" and "csrNonce"
+ * fields, and can include additional vendor-specific information.
+ */
+@property (nonatomic, copy, readonly) MTRTLVBytes csrElementsTLV;
+/**
+ * A signature, using the device attestation private key of the device that
+ * created the CSR, over the concatenation of csrElementsTLV and the attestation
+ * challenge from the secure session.
+ *
+ * The attestation challenge is available in MTRAttestionInfo.
+ */
+@property (nonatomic, copy, readonly) NSData * attestationSignature;
+
+- (instancetype)initWithCSR:(MTRCSRDERBytes)csr
+                   csrNonce:(NSData *)csrNonce
+             csrElementsTLV:(MTRTLVBytes)csrElementsTLV
+       attestationSignature:(NSData *)attestationSignature;
+
+@end
+
+MTR_NEWLY_DEPRECATED("Please use MTROperationalCSRInfo")
 @interface CSRInfo : NSObject
 
 @property (nonatomic, copy) NSData * nonce;

@@ -63,6 +63,12 @@ declare_args() {
 
   # Argument to force enable WPA3 security on rs91x
   rs91x_wpa3_only = false
+
+  #default WiFi SSID
+  chip_default_wifi_ssid = ""
+
+  #default Wifi Password
+  chip_default_wifi_psk = ""
 }
 
 declare_args() {
@@ -90,12 +96,25 @@ if (silabs_board == "BRD4166A" || silabs_board == "BRD2601B" ||
   disable_lcd = true
 }
 
+defines = []
+
 # WiFi settings
 if (chip_enable_wifi) {
   # disabling LCD for MG24 for wifi
   if (silabs_board == "BRD4186A" || silabs_board == "BRD4187A") {
     show_qr_code = false
     disable_lcd = true
+  }
+  if (chip_default_wifi_ssid != "") {
+    defines += [
+      "CHIP_ONNETWORK_PAIRING=1",
+      "CHIP_WIFI_SSID=\"${chip_default_wifi_ssid}\"",
+    ]
+  }
+  if (chip_default_wifi_psk != "") {
+    assert(chip_default_wifi_ssid != "",
+           "ssid can't be null if psk is provided")
+    defines += [ "CHIP_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
   }
   wifi_sdk_dir = "${chip_root}/src/platform/silabs/EFR32/wifi"
   efr32_lwip_defs = [ "LWIP_NETIF_API=1" ]
@@ -145,7 +164,7 @@ efr32_sdk("sdk") {
     "${examples_common_plat_dir}",
   ]
 
-  defines = [
+  defines += [
     "BOARD_ID=${silabs_board}",
     "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
   ]

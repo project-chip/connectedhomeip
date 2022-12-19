@@ -16,7 +16,7 @@
  */
 
 #import "MTRBaseDevice.h"
-#import "MTRCluster_internal.h"
+#import "MTRCluster_Internal.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 

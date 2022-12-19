@@ -27,6 +27,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
+{
+    static_assert(MTRTransportTypeUndefined == (uint8_t) chip::Transport::Type::kUndefined, "MTRTransportType != Transport::Type");
+    static_assert(MTRTransportTypeUDP == (uint8_t) chip::Transport::Type::kUdp, "MTRTransportType != Transport::Type");
+    static_assert(MTRTransportTypeBLE == (uint8_t) chip::Transport::Type::kBle, "MTRTransportType != Transport::Type");
+    static_assert(MTRTransportTypeTCP == (uint8_t) chip::Transport::Type::kTcp, "MTRTransportType != Transport::Type");
+    return static_cast<MTRTransportType>(type);
+}
+
 @interface MTRBaseDevice ()
 
 - (instancetype)initWithPASEDevice:(chip::DeviceProxy *)device controller:(MTRDeviceController *)controller;
@@ -54,9 +63,6 @@ NS_ASSUME_NONNULL_BEGIN
  * session, this is set to the device id of the PASE device.
  */
 @property (nonatomic, assign, readonly) chip::NodeId nodeID;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
 
 /**
  * Initialize the device object as a CASE device with the given node id and

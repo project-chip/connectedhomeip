@@ -254,7 +254,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     if (ConnectivityMgr().IsThreadProvisioned())
     {
-        ChipLogProgress(DeviceLayer, "Thread provisioned. Start advertisement not possible");
+        ChipLogProgress(DeviceLayer, "Thread provisioned, can't StartAdvertising");
 
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -266,7 +266,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         /* Block IEEE802154 */
         /* @todo: move to RadioSwitch module*/
         const struct device * radio_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_ieee802154));
-        __ASSERT(radio_dev != NULL, "Fail to get radio device");
+        __ASSERT(radio_dev != NULL, "Get radio_dev fail");
         b91_deinit(radio_dev);
 
         /* Init BLE stack */
@@ -351,7 +351,7 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
     if (ConnectivityMgr().IsThreadProvisioned())
     {
-        ChipLogProgress(DeviceLayer, "Thread provisioned. Advertisement already stopped at this stage");
+        ChipLogProgress(DeviceLayer, "Thread provisioned, StopAdvertising done");
 
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -891,7 +891,7 @@ void BLEManagerImpl::BLEConnDisconnect(System::Layer * layer, void * param)
     int error = bt_conn_disconnect(BLEMgrImpl().mconId, BT_HCI_ERR_LOCALHOST_TERM_CONN);
     if (error)
     {
-        ChipLogError(DeviceLayer, "Failed to close BLE connection, error: %d", error);
+        ChipLogError(DeviceLayer, "Close BLEConn err: %d", error);
     }
 }
 
@@ -919,8 +919,7 @@ CHIP_ERROR BLEManagerImpl::HandleThreadStateChange(const ChipDeviceEvent * event
         attachEvent.ThreadConnectivityChange.Result = kConnectivity_Established;
 
         error = PlatformMgr().PostEvent(&attachEvent);
-        VerifyOrExit(error == CHIP_NO_ERROR,
-                     ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, error.Format()));
+        VerifyOrExit(error == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "PostEvent err: %" CHIP_ERROR_FORMAT, error.Format()));
 
         ChipLogDetail(DeviceLayer, "Thread Connectivity Ready");
         ThreadConnectivityReady = true;
@@ -946,7 +945,7 @@ void BLEManagerImpl::SwitchToIeee802154(void)
 {
     int result = 0;
 
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::Switch to IEEE802154");
+    ChipLogProgress(DeviceLayer, "SwitchToIeee802154");
 
     /* Stop BLE */
     StopAdvertising();
@@ -957,11 +956,11 @@ void BLEManagerImpl::SwitchToIeee802154(void)
     BLERadioInitialized = false;
 
     const struct device * radio_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_ieee802154));
-    __ASSERT(radio_dev != NULL, "Fail to get radio device");
+    __ASSERT(radio_dev != NULL, "Get radio_dev fail");
 
     /* Init IEEE802154 */
     result = b91_init(radio_dev);
-    __ASSERT(result == 0, "Fail to init IEEE802154 radio. Error: %d", result);
+    __ASSERT(result == 0, "Init IEEE802154 err: %d", result);
 }
 
 } // namespace Internal

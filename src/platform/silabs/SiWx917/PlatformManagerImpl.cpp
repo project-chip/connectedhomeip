@@ -30,6 +30,9 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/silabs/DiagnosticDataProviderImpl.h>
+#if defined(TINYCRYPT_PRIMITIVES)
+#include "tinycrypt/ecc.h"
+#endif
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
@@ -42,6 +45,22 @@ namespace chip {
 namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
+#if defined(TINYCRYPT_PRIMITIVES)
+sys_mutex_t PlatformManagerImpl::rngMutexHandle = NULL;
+#endif
+
+#if defined(TINYCRYPT_PRIMITIVES)
+int PlatformManagerImpl::uECC_RNG_Function(uint8_t * dest, unsigned int size)
+{
+    int res;
+
+    sys_mutex_lock(&rngMutexHandle);
+    res = (chip::Crypto::DRBG_get_bytes(dest, size) == CHIP_NO_ERROR) ? size : 0;
+    sys_mutex_unlock(&rngMutexHandle);
+
+    return res;
+}
+#endif
 
 static void app_get_random(uint8_t * aOutput, size_t aLen)
 {
@@ -78,6 +97,14 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     // 16 : Threshold value
     ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16));
+
+#if defined(TINYCRYPT_PRIMITIVES)
+    /* Set RNG function for tinycrypt operations. */
+    err_t ret;
+    ret = sys_mutex_new(&rngMutexHandle);
+    VerifyOrExit((ERR_OK == ret), err = CHIP_ERROR_NO_MEMORY);
+    uECC_set_rng(PlatformManagerImpl::uECC_RNG_Function);
+#endif
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.

@@ -3,13 +3,12 @@
 #import <Foundation/Foundation.h>
 
 #import "MTRAsyncCallbackWorkQueue.h"
-#import "MTRBaseDevice_internal.h"
+#import "MTRBaseDevice_Internal.h"
 #import "MTRClusterConstants.h"
-#import "MTRClusters_internal.h"
-#import "MTRDevice.h"
+#import "MTRClusters_Internal.h"
 #import "MTRDevice_Internal.h"
-#import "MTRCallbackBridge_internal.h"
-#import "MTRCluster_internal.h"
+#import "MTRCallbackBridge.h"
+#import "MTRCluster_Internal.h"
 #import "MTRStructsObjc.h"
 #import "MTRCommandPayloadsObjc.h"
 #import "MTRLogging_Internal.h"

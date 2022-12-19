@@ -20,7 +20,7 @@ name: Basic Group Messaging Tests
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
     nodeId2:
         type: node_id

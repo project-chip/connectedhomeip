@@ -55,6 +55,7 @@ public:
         mResolverProxy.SetCommissioningDelegate(delegate);
     }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
+    void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR StopDiscovery() override;

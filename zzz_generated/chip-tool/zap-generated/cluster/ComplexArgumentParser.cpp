@@ -377,7 +377,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ContentLauncher::Struc
     ComplexArgumentParser::Finalize(request.waterMark);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::Type & request,
+                                        chip::app::Clusters::BasicInformation::Structs::CapabilityMinimaStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -399,7 +399,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::BasicInformation::Structs::CapabilityMinimaStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.caseSessionsPerFabric);
     ComplexArgumentParser::Finalize(request.subscriptionsPerFabric);

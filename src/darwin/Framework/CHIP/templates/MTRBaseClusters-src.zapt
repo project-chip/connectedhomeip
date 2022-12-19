@@ -2,15 +2,14 @@
 
 #import <Foundation/Foundation.h>
 
-#import "MTRClusterStateCacheContainer_Internal.h"
-#import "MTRBaseClusters_internal.h"
-#import "MTRBaseDevice.h"
+#import "MTRBaseClusters_Internal.h"
+#import "MTRBaseClusterUtils.h"
 #import "MTRBaseDevice_Internal.h"
-#import "MTRCallbackBridge_internal.h"
-#import "MTRCluster_internal.h"
-#import "MTRStructsObjc.h"
+#import "MTRCallbackBridge.h"
+#import "MTRCluster_Internal.h"
+#import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRCommandPayloadsObjc.h"
-#import "MTRBaseClustersCpp_Internal.h"
+#import "MTRStructsObjc.h"
 
 #include <lib/support/CHIPListUtils.h>
 #include <platform/CHIPDeviceLayer.h>

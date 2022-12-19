@@ -10,6 +10,7 @@ Checks: >
   readability-redundant-control-flow,
   readability-redundant-string-cstr,
   readability-redundant-string-init,
+  -bugprone-assignment-in-if-condition,  
   -bugprone-branch-clone,
   -bugprone-copy-constructor-init,
   -bugprone-easily-swappable-parameters,

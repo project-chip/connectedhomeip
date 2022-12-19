@@ -82,7 +82,7 @@ template("efr32_sdk") {
     # Treat these includes as system includes, so warnings in them are not fatal.
     _include_dirs = [
       "${sdk_support_root}/platform/emdrv/nvm3/inc",
-
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/inc",
       "${chip_root}/third_party/mbedtls/repo/include",
 
       ### CCP includes ###
@@ -138,6 +138,8 @@ template("efr32_sdk") {
       "RSI_BLE_ENABLE=1",
       "BRD4325A",
       "CHIP_9117",
+      "TINYCRYPT_PRIMITIVES",
+      "OPTIMIZE_TINYCRYPT_ASM",
       "RS91X_BLE_ENABLE=1",
     ]
 
@@ -311,17 +313,23 @@ template("efr32_sdk") {
       "${chip_root}/third_party/mbedtls/repo/library/hkdf.c",
       "${chip_root}/third_party/mbedtls/repo/library/hmac_drbg.c",
       "${chip_root}/third_party/mbedtls/repo/library/md.c",
-      "${chip_root}/third_party/mbedtls/repo/library/oid.c",
-      "${chip_root}/third_party/mbedtls/repo/library/pk.c",
-      "${chip_root}/third_party/mbedtls/repo/library/pk_wrap.c",
       "${chip_root}/third_party/mbedtls/repo/library/pkcs5.c",
-      "${chip_root}/third_party/mbedtls/repo/library/pkwrite.c",
       "${chip_root}/third_party/mbedtls/repo/library/platform.c",
-      "${chip_root}/third_party/mbedtls/repo/library/platform_util.c",
       "${chip_root}/third_party/mbedtls/repo/library/sha256.c",
       "${chip_root}/third_party/mbedtls/repo/library/sha512.c",
       "${chip_root}/third_party/mbedtls/repo/library/x509_create.c",
-      "${chip_root}/third_party/mbedtls/repo/library/x509write_csr.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dh.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dsa.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/error.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/oid.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pk.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pk_wrap.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pkparse.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pkwrite.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/platform_util.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509_crt.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509write_csr.c",
     ]
 
     public_deps = [
