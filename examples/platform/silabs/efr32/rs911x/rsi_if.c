@@ -502,7 +502,8 @@ static void wfx_rsi_do_join(void)
             }
             else
             {
-                WFX_RSI_LOG("%s: starting JOIN to %s after %d tries\n", __func__, (char *) &wfx_rsi.sec.ssid[0], wfx_rsi.join_retries);
+                WFX_RSI_LOG("%s: starting JOIN to %s after %d tries\n", __func__, (char *) &wfx_rsi.sec.ssid[0],
+                            wfx_rsi.join_retries);
                 break; // exit while loop
             }
         }
