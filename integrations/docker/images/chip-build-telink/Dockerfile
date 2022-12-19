@@ -23,7 +23,7 @@ RUN set -x \
     && : # last line
 
 # Setup Zephyr
-ARG ZEPHYR_REVISION=7e93d9eeb7d2796d678a069558c251cf94dd0c2e
+ARG ZEPHYR_REVISION=2d36d3b0db7adeba226cc95e98cde324afb3f804
 WORKDIR /opt/telink/zephyrproject
 RUN set -x \
     && python3 -m pip install -U --no-cache-dir \
