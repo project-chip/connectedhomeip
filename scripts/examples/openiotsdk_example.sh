@@ -102,6 +102,8 @@ function build_with_cmake() {
     BUILD_OPTIONS=(-DCMAKE_SYSTEM_PROCESSOR=cortex-m55)
     if "$DEBUG"; then
         BUILD_OPTIONS+=(-DCMAKE_BUILD_TYPE=Debug)
+    else
+        BUILD_OPTIONS+=(-DCMAKE_BUILD_TYPE=Release)
     fi
 
     # Remove old artifacts to force linking
