@@ -5156,6 +5156,15 @@
       clusters:
           UnitTesting: TestCluster
           BasicInformation: Basic
+          OTASoftwareUpdateProvider: OtaSoftwareUpdateProvider
+          OTASoftwareUpdateRequestor: OtaSoftwareUpdateRequestor
+          WakeOnLAN: WakeOnLan
       attributes:
           Descriptor:
               DeviceTypeList: DeviceList
+          AccessControl:
+              ACL: Acl
+          OccupancySensing:
+              PIROccupiedToUnoccupiedDelay: PirOccupiedToUnoccupiedDelay
+              PIRUnoccupiedToOccupiedDelay: PirUnoccupiedToOccupiedDelay
+              PIRUnoccupiedToOccupiedThreshold: PirUnoccupiedToOccupiedThreshold
