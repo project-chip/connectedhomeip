@@ -29,7 +29,6 @@
 #include <ti/drivers/Board.h>
 #include <ti/drivers/GPIO.h>
 #include <ti/drivers/NVS.h>
-#include <ti/drivers/UART.h>
 
 #include <ti/drivers/AESECB.h>
 #include <ti/drivers/ECDH.h>
@@ -71,8 +70,6 @@ int main(void)
     GPIO_init();
 
     NVS_init();
-
-    UART_init();
 
     ECDH_init();
 

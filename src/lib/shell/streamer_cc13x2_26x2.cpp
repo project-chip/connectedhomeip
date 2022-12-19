@@ -28,14 +28,14 @@
 
 #include "ti_drivers_config.h"
 
-#include <ti/drivers/UART.h>
+#include <ti/drivers/UART2.h>
 
 namespace chip {
 namespace Shell {
 
 #ifndef SHELL_STREAMER_APP_SPECIFIC
 
-UART_Handle sStreamUartHandle = NULL;
+UART2_Handle sStreamUartHandle = NULL;
 
 #if !MATTER_CC13X2_26X2_PLATFORM_LOG_ENABLED
 extern "C" int cc13x2_26x2LogInit(void)
@@ -58,7 +58,7 @@ extern "C" void cc13x2_26x2VLog(const char * msg, va_list v)
             sDebugUartBuffer[len - 2] = '\r';
             sDebugUartBuffer[len - 1] = '\n';
 
-            UART_write(sStreamUartHandle, sDebugUartBuffer, len);
+            UART2_write(sStreamUartHandle, sDebugUartBuffer, len, NULL);
         }
     }
 }
@@ -66,32 +66,30 @@ extern "C" void cc13x2_26x2VLog(const char * msg, va_list v)
 
 int streamer_cc13x2_26x2_init(streamer_t * streamer)
 {
-    UART_Params uartParams;
+    UART2_Params uartParams;
 
-    UART_init();
-
-    UART_Params_init(&uartParams);
+    UART2_Params_init(&uartParams);
     // Most params can be default because we only send data, we don't receive
     uartParams.baudRate = 115200;
-    // unclear why the UART driver sticks in writing sometimes
-    uartParams.writeTimeout = 10000; // ticks
-    // Immediate return from the read function
-    // uartParams.readTimeout = 0; // ticks
 
-    sStreamUartHandle = UART_open(CONFIG_UART_STREAMER, &uartParams);
+    sStreamUartHandle = UART2_open(CONFIG_UART_STREAMER, &uartParams);
     return 0;
 }
 
 ssize_t streamer_cc13x2_26x2_read(streamer_t * streamer, char * buf, size_t len)
 {
     (void) streamer;
-    return UART_read(sStreamUartHandle, buf, len);
+    size_t ret;
+
+    UART2_read(sStreamUartHandle, buf, len, &ret);
+
+    return ret;
 }
 
 ssize_t streamer_cc13x2_26x2_write(streamer_t * streamer, const char * buf, size_t len)
 {
     (void) streamer;
-    return UART_write(sStreamUartHandle, buf, len);
+    return UART2_write(sStreamUartHandle, buf, len, NULL);
 }
 
 static streamer_t streamer_cc13x2_26x2 = {

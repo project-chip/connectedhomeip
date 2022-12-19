@@ -78,7 +78,6 @@ class ThreadStackManagerImpl final : public ThreadStackManager,
         procQueueCmd_radio,
         procQueueCmd_tasklets,
         procQueueCmd_uart,
-        procQueueCmd_random,
         procQueueCmd_alarmu,
     };
 

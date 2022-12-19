@@ -33,6 +33,8 @@ declare_args() {
       ti_simplelink_device_family == "cc13x2x7_26x2x7") {
     ti_simplelink_sdk_root =
         "${chip_root}/third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx"
+    ot_cc13x2_cc26x2 =
+        "${chip_root}/third_party/ti_simplelink_sdk/repo_ot-cc13x2_cc26x2"
   } else if (ti_simplelink_device_family == "cc32xx") {
     ti_simplelink_sdk_root =
         "${chip_root}/third_party/ti_simplelink_sdk/repo_cc32xx"
@@ -68,10 +70,18 @@ template("ti_sysconfig") {
     }
 
     if (ti_simplelink_device_family == "cc13x2_26x2") {
-      ldflags += [ "-nostartfiles" ]
+      ldflags += [
+        "-nostartfiles",
+        "-fno-exceptions",
+        "-fno-unwind-tables",
+      ]
       defines += [ "DeviceFamily_CC13X2_CC26X2" ]
     } else if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
-      ldflags += [ "-nostartfiles" ]
+      ldflags += [
+        "-nostartfiles",
+        "-fno-exceptions",
+        "-fno-unwind-tables",
+      ]
       defines += [ "DeviceFamily_CC26X2X7" ]
     } else if (ti_simplelink_device_family == "cc32xx") {
       ldflags += [ "-nostartfiles" ]
@@ -283,34 +293,8 @@ template("ti_simplelink_sdk") {
 
   if (ti_simplelink_device_family == "cc13x2_26x2" ||
       ti_simplelink_device_family == "cc13x2x7_26x2x7") {
-    if (chip_openthread_ftd) {
-      openthread_example = "cli_ftd"
-    } else {
-      openthread_example = "cli_mtd"
-    }
-
-    config("${sdk_target_name}_openthread_platform_config") {
+    source_set("${sdk_target_name}_nvocmp") {
       defines = [ "NVOCMP_POSIX_MUTEX" ]
-      include_dirs = [
-        "${chip_root}/third_party/openthread/repo/examples/platforms",
-        "${chip_root}/third_party/openthread/repo/src/core",
-        "${ti_simplelink_sdk_root}/source/ti/devices/${ti_simplelink_device_family}",
-      ]
-
-      if (ti_simplelink_device_family == "cc13x2_26x2") {
-        include_dirs += [
-          "${ti_simplelink_sdk_root}/source/ti/devices/cc13x2_cc26x2",
-          "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}",
-        ]
-      } else if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
-        include_dirs += [
-          "${ti_simplelink_sdk_root}/source/ti/devices/cc13x2x7_cc26x2x7",
-          "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}",
-        ]
-      }
-    }
-
-    source_set("${sdk_target_name}_openthread_platform") {
       cflags = [
         "-Wno-int-conversion",
         "-Wno-address-of-packed-member",
@@ -322,28 +306,17 @@ template("ti_simplelink_sdk") {
         "${chip_root}/third_party/ti_simplelink_sdk:freertos",
         "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
         "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
-        "${openthread_root}/src/core:libopenthread_core_headers",
       ]
 
       configs -= [ "${build_root}/config/compiler:std_default" ]
       configs += [ ":${sdk_target_name}_posix_config" ]
       sources = [
-        "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/alarm.c",
-        "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/alarm_micro.c",
-        "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/diag.c",
-        "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/entropy.c",
-        "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/misc.c",
-        "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/nv/crc.c",
-        "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/nv/nvocmp.c",
-        "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/radio.c",
-        "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/settings.c",
-        "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/${openthread_example}/platform/system.c",
+        "${ti_simplelink_sdk_root}/source/ti/common/nv/crc.c",
+        "${ti_simplelink_sdk_root}/source/ti/common/nv/nvocmp.c",
       ]
 
       public_configs = [
         ":${sdk_target_name}_config",
-        ":${sdk_target_name}_openthread_platform_config",
-        "${chip_root}/third_party/openthread/repo:openthread_config",
       ]
 
       if (chip_openthread_ftd) {
@@ -411,7 +384,6 @@ template("ti_simplelink_sdk") {
       "INCLUDE_BGET_STATS",
       "USE_DMM",
       "FLASH_ROM_BUILD",
-      "NVOCMP_FREERTOS_MUTEX=1",
       "USEOT",
       "ONE_BLE_LIB_SIZE_OPTIMIZATION",
       "ICALL_EVENTS",
@@ -517,7 +489,7 @@ template("ti_simplelink_sdk") {
         ti_simplelink_device_family == "cc13x2x7_26x2x7") {
       public_deps += [
         ":${sdk_target_name}_dmm",
-        ":${sdk_target_name}_openthread_platform",
+        ":${sdk_target_name}_nvocmp",
       ]
     }
     if (defined(invoker.public_configs)) {
@@ -525,3 +497,68 @@ template("ti_simplelink_sdk") {
     }
   }
 }
+
+#       "${openthread_root}/src/core:libopenthread_core_headers",
+
+#   config("${sdk_target_name}_openthread_platform_config") {
+#     include_dirs = [
+#       "${chip_root}/third_party/openthread/repo/examples/platforms",
+#       "${chip_root}/third_party/openthread/repo/src/core",
+#       "${ti_simplelink_sdk_root}/source/ti/devices/${ti_simplelink_device_family}",
+#     ]
+
+#     if (ti_simplelink_device_family == "cc13x2_26x2") {
+#       include_dirs += [
+#         "${ti_simplelink_sdk_root}/source/ti/devices/cc13x2_cc26x2",
+#         "${ot_cc13x2_cc26x2}/src/cc13x2_cc26x2",
+#       ]
+#     } else if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
+#       include_dirs += [
+#         "${ti_simplelink_sdk_root}/source/ti/devices/cc13x2x7_cc26x2x7",
+#         "${ot_cc13x2_cc26x2}/src/cc13x2_cc26x2",
+#       ]
+#     }
+#   }
+
+#   source_set("${sdk_target_name}_openthread_platform") {
+#     cflags = [
+#       "-Wno-int-conversion",
+#       "-Wno-address-of-packed-member",
+#       "-Wno-implicit-fallthrough",
+#       "-Wno-unused-label",
+#     ]
+#     public_deps = [
+#       ":${sdk_target_name}_freertos",
+#       "${chip_root}/third_party/ti_simplelink_sdk:freertos",
+#       "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
+#       "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
+#       "${openthread_root}/src/core:libopenthread_core_headers",
+#     ]
+
+#     configs -= [ "${build_root}/config/compiler:std_default" ]
+#     configs += [ ":${sdk_target_name}_posix_config" ]
+#     sources = [
+#       "${ot_cc13x2_cc26x2}/src/cc13x2_cc26x2/alarm.c",
+#       "${ot_cc13x2_cc26x2}/src/cc13x2_cc26x2/alarm_micro.c",
+#       "${ot_cc13x2_cc26x2}/src/cc13x2_cc26x2/diag.c",
+#       "${ot_cc13x2_cc26x2}/src/cc13x2_cc26x2/entropy.c",
+#       "${ot_cc13x2_cc26x2}/src/cc13x2_cc26x2/misc.c",
+#       "${ot_cc13x2_cc26x2}/src/cc13x2_cc26x2/radio.c",
+#       "${ot_cc13x2_cc26x2}/src/cc13x2_cc26x2/settings.c",
+#       #"${ot_cc13x2_cc26x2}/src/cc13x2_cc26x2/system.c",
+#     ]
+
+#     public_configs = [
+#       ":${sdk_target_name}_config",
+#       ":${sdk_target_name}_openthread_platform_config",
+#       "${chip_root}/third_party/openthread/repo:openthread_config",
+#     ]
+
+#     if (chip_openthread_ftd) {
+#       public_configs +=
+#           [ "${chip_root}/third_party/openthread/repo:openthread_ftd_config" ]
+#     } else {
+#       public_configs +=
+#           [ "${chip_root}/third_party/openthread/repo:openthread_mtd_config" ]
+#     }
+#   }

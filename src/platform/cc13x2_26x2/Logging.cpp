@@ -11,27 +11,23 @@
 
 #include "ti_drivers_config.h"
 
-#include <ti/drivers/UART.h>
+#include <ti/drivers/UART2.h>
 
 #include <stdio.h>
 
-UART_Handle sDebugUartHandle;
+UART2_Handle sDebugUartHandle;
 char sDebugUartBuffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
 #if MATTER_CC13X2_26X2_PLATFORM_LOG_ENABLED
 extern "C" int cc13x2_26x2LogInit(void)
 {
-    UART_Params uartParams;
+    UART2_Params uartParams;
 
-    UART_init();
-
-    UART_Params_init(&uartParams);
+    UART2_Params_init(&uartParams);
     // Most params can be default because we only send data, we don't receive
     uartParams.baudRate = 115200;
-    // unclear why the UART driver sticks in writing sometimes
-    uartParams.writeTimeout = 10000; // ticks
 
-    sDebugUartHandle = UART_open(CONFIG_UART_DEBUG, &uartParams);
+    sDebugUartHandle = UART2_open(CONFIG_UART2_DEBUG, &uartParams);
     return 0;
 }
 
@@ -47,7 +43,7 @@ extern "C" void cc13x2_26x2VLog(const char * msg, va_list v)
         sDebugUartBuffer[len - 2] = '\r';
         sDebugUartBuffer[len - 1] = '\n';
 
-        UART_write(sDebugUartHandle, sDebugUartBuffer, len);
+        UART2_write(sDebugUartHandle, sDebugUartBuffer, len, NULL);
     }
 }
 

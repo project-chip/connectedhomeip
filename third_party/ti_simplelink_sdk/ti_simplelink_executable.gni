@@ -143,7 +143,7 @@ template("ti_simplelink_executable") {
       if (defined(invoker.bim_hex)) {
         bim_hex = invoker.bim_hex
       } else {
-        bim_hex = "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/ble5stack/hexfiles/bim_offchip/Release/${ti_simplelink_bim_name}_bim_offchip.hex"
+        bim_hex = "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/ble5stack/hexfiles/bim_offchip/Release/bim_offchip.hex"
       }
 
       args = [

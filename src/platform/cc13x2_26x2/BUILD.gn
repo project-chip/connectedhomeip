@@ -83,6 +83,7 @@ static_library("cc13x2_26x2") {
       "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
       "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sdk",
       "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
+      "${chip_root}/third_party/openthread/platforms/cc13x2_26x2:libopenthread-cc13x2_cc26x2",
     ]
 
     if (chip_openthread_ftd) {

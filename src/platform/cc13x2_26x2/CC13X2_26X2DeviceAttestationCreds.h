@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,8 +14,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#pragma once
 
-#include "Globals.h"
+#include <credentials/DeviceAttestationCredsProvider.h>
 
-LED_Handle sAppRedHandle;
-LED_Handle sAppGreenHandle;
+namespace chip {
+namespace Credentials {
+namespace CC13X2_26X2 {
+
+/**
+ * @brief Get implementation of a sample DAC provider to validate device
+ *        attestation procedure.
+ *
+ * @returns a singleton DeviceAttestationCredentialsProvider that relies on no
+ *          storage abstractions.
+ */
+DeviceAttestationCredentialsProvider * GetCC13X2_26X2DacProvider();
+
+} // namespace CC13X2_26X2
+} // namespace Credentials
+} // namespace chip

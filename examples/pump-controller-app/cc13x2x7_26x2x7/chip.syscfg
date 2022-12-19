@@ -46,14 +46,13 @@ const NVS         = scripting.addModule("/ti/drivers/NVS");
 const NVS1        = NVS.addInstance();
 const NVS2        = NVS.addInstance();
 const RF          = scripting.addModule("/ti/drivers/RF");
-const RTOS        = scripting.addModule("/ti/drivers/RTOS");
 const SHA2        = scripting.addModule("/ti/drivers/SHA2");
 const SHA21       = SHA2.addInstance();
 const TRNG        = scripting.addModule("/ti/drivers/TRNG");
 const TRNG1       = TRNG.addInstance();
 const TRNG2       = TRNG.addInstance();
 const TRNG3       = TRNG.addInstance();
-const UART        = scripting.addModule("/ti/drivers/UART");
+const UART        = scripting.addModule("/ti/drivers/UART2");
 const UART1       = UART.addInstance();
 const UART2       = UART.addInstance();
 const Button      = scripting.addModule("/ti/drivers/apps/Button");
@@ -148,17 +147,15 @@ NVS2.$name                                 = "CONFIG_NVSEXTERNAL";
 NVS2.nvsType                               = "External"; // NVS Region Type
 NVS2.$hardware                             = system.deviceData.board.components.MX25R8035F;
 
-RTOS.name = "FreeRTOS";
-
 SHA21.$name = "CONFIG_SHA2_0";
 
 TRNG1.$name = "CONFIG_TRNG_0";
 
-TRNG2.$name = "CONFIG_TRNG_1";
+TRNG2.$name = "CONFIG_TRNG_THREAD";
 
 TRNG3.$name = "CONFIG_TRNG_APP";
 
-UART1.$name               = "CONFIG_UART_DEBUG";
+UART1.$name               = "CONFIG_UART2_DEBUG";
 UART1.uart.$assign        = "UART1";
 UART1.uart.txPin.$assign  = "boosterpack.4";
 UART1.uart.rxPin.$assign  = "boosterpack.3";

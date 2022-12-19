@@ -29,4 +29,6 @@ else:
 proc_call += sys.argv[2:]
 
 # exec
-subprocess.call(proc_call)
+ret = subprocess.call(proc_call)
+
+sys.exit(ret)

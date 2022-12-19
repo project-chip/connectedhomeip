@@ -36,7 +36,7 @@
 #include <platform/ThreadStackManager.h>
 
 // platform folder in the TI SDK example application
-#include <platform/system.h>
+#include <system.h>
 
 // DMM Includes
 #ifdef USE_DMM
@@ -88,7 +88,10 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
 #endif /* OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE != 0 */
 
     // Initialize the OpenThread platform layer
-    otSysInit(0, NULL);
+    platformAlarmInit();
+    platformAlarmMicroInit();
+    platformRandomInit();
+    platformRadioInit();
 
 #ifdef USE_DMM
     // DMM Init
@@ -119,6 +122,17 @@ void ThreadStackManagerImpl::_SendProcMessage(ThreadStackManagerImpl::procQueueM
     SignalThreadActivityPendingFromISR();
 }
 
+extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
+{
+    return chip::Platform::MemoryCalloc(aNum, aSize);
+}
+
+extern "C" void otPlatFree(void * aPtr)
+{
+    chip::Platform::MemoryFree(aPtr);
+}
+
+
 void ThreadStackManagerImpl::_ProcMessage(otInstance * aInstance)
 {
     procQueueMsg procMsg;
@@ -138,11 +152,6 @@ void ThreadStackManagerImpl::_ProcMessage(otInstance * aInstance)
 
         case procQueueCmd_tasklets: {
             otTaskletsProcess(aInstance);
-            break;
-        }
-
-        case procQueueCmd_random: {
-            platformRandomProcess();
             break;
         }
 

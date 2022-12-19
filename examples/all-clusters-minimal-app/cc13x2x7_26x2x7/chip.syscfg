@@ -26,11 +26,10 @@ var LED         = scripting.addModule("/ti/drivers/apps/LED");
 var NVS         = scripting.addModule("/ti/drivers/NVS");
 var RF          = scripting.addModule("/ti/drivers/RF");
 var RFDesign    = scripting.addModule("ti/devices/radioconfig/rfdesign");
-var RTOS        = scripting.addModule("/ti/drivers/RTOS");
 var TRNG        = scripting.addModule("/ti/drivers/TRNG");
 var Thread      = scripting.addModule("/ti/thread/thread");
 var SHA2        = scripting.addModule("/ti/drivers/SHA2");
-var UART        = scripting.addModule("/ti/drivers/UART");
+var UART2       = scripting.addModule("/ti/drivers/UART2");
 var ble         = scripting.addModule("/ti/ble5stack/ble");
 var dmm         = scripting.addModule("/ti/dmm/dmm");
 var AESCTRDRBG  = scripting.addModule("/ti/drivers/AESCTRDRBG");
@@ -50,7 +49,7 @@ var LED2        = LED.addInstance();
 var TRNG1       = TRNG.addInstance();
 var TRNG2       = TRNG.addInstance();
 var TRNG3       = TRNG.addInstance();
-var UART1       = UART.addInstance();
+var UART2      = UART2.addInstance();
 var AESCTRDRBG1 = AESCTRDRBG.addInstance();
 var ECDH1       = ECDH.addInstance();
 
@@ -63,9 +62,6 @@ AESECB1.$name = "CONFIG_AESECB0";
 AESECB2.$name = "CONFIG_AESECB_1";
 
 ECDH1.$name = "CONFIG_ECDH0";
-
-/* RTOS */
-RTOS.name = "FreeRTOS";
 
 /* Left Button */
 Button1.$name                       = "CONFIG_BTN_LEFT";
@@ -128,15 +124,13 @@ LED2.gpioPin.mode               = "Output";
 LED2.gpioPin.callbackFunction   = "";
 
 /* Debug UART  */
-UART1.$hardware     = system.deviceData.board.components.XDS110UART;
-UART1.$name         = "CONFIG_UART_DEBUG";
+UART2.$hardware     = system.deviceData.board.components.XDS110UART;
+UART2.$name         = "CONFIG_UART2_DEBUG";
 
 /* TRNG */
 TRNG1.$name     = "CONFIG_TRNG_0";
-TRNG2.$name     = "CONFIG_TRNG_1";
+TRNG2.$name     = "CONFIG_TRNG_THREAD";
 TRNG3.$name     = "CONFIG_TRNG_APP";
-
-RTOS.name = "FreeRTOS";
 
 /* BLE */
 ble.addressMode                                           = "ADDRMODE_RP_WITH_PUBLIC_ID";

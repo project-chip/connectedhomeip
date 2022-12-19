@@ -568,7 +568,6 @@ def cc13x2x7_26x2x7Targets():
     yield target.Extend('lock-mtd', app=cc13x2x7_26x2x7App.LOCK, openthread_ftd=False)
     yield target.Extend('pump', app=cc13x2x7_26x2x7App.PUMP)
     yield target.Extend('pump-controller', app=cc13x2x7_26x2x7App.PUMP_CONTROLLER)
-    yield target.Extend('all-clusters', app=cc13x2x7_26x2x7App.ALL_CLUSTERS)
     yield target.Extend('all-clusters-minimal', app=cc13x2x7_26x2x7App.ALL_CLUSTERS_MINIMAL)
     yield target.Extend('shell', app=cc13x2x7_26x2x7App.SHELL)
 

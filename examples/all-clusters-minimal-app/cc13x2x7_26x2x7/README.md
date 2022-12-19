@@ -68,9 +68,9 @@ guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
     ```
     $ cd ~
-    $ wget https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.11.0_2225-setup.run
-    $ chmod +x sysconfig-1.11.0_2225-setup.run
-    $ ./sysconfig-1.11.0_2225-setup.run
+    $ wget https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.14.0.2667/sysconfig-1.14.0_2667-setup.run
+    $ chmod +x sysconfig-1.14.0_2667-setup.run
+    $ ./sysconfig-1.14.0_2667-setup.run
     ```
 
 -   Run the bootstrap script to setup the build environment.
@@ -97,13 +97,13 @@ Ninja to build the executable.
 -   Run the build to produce a default executable. By default on Linux both the
     TI SimpleLink SDK and Sysconfig are located in a `ti` folder in the user's
     home directory, and you must provide the absolute path to them. For example
-    `/home/username/ti/sysconfig_1.11.0`. On Windows the default directory is
+    `/home/username/ti/sysconfig_1.14.0`. On Windows the default directory is
     `C:\ti`. Take note of this install path, as it will be used in the next
     step.
 
     ```
     $ cd ~/connectedhomeip/examples/all-clusters-minimal-app/cc13x2x7_26x2x7
-    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.11.0\""
+    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.14.0\""
     $ ninja -C out/debug
 
     ```
@@ -236,7 +236,7 @@ Additionally, we welcome any feedback.
     https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum/1082428/faq-cc2652r7-matter----getting-started-guide
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
 [sysconfig_recommended]:
-    https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.11.0_2225-setup.run
+    https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.14.0.2667/sysconfig-1.14.0_2667-setup.run
 [ti_thread_dnd]:
     https://www.ti.com/wireless-connectivity/thread/design-development.html
 [ot_border_router_setup]: https://openthread.io/guides/border-router/build
