@@ -20,6 +20,7 @@ import("${bl602_sdk_build_root}/bl602_executable.gni")
 import("${bl602_sdk_build_root}/bl602_sdk.gni")
 import("${build_root}/config/defaults.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/platform/device.gni")
 
 if (chip_enable_pw_rpc) {
   import("//build_overrides/pigweed.gni")
@@ -28,7 +29,9 @@ if (chip_enable_pw_rpc) {
 
 assert(current_os == "freertos")
 
-bl602_project_dir = "${chip_root}/examples/lighting-app/bouffalolab/bl602"
+example_common_dir = "${chip_root}/examples/lighting-app/bouffalolab/common"
+example_dir = "${chip_root}/examples/lighting-app/bouffalolab/bl602"
+examples_plat_common_dir = "${chip_root}/examples/platform/bouffalolab/common"
 examples_plat_dir = "${chip_root}/examples/platform/bouffalolab/bl602"
 
 declare_args() {
@@ -43,58 +46,69 @@ declare_args() {
 
   # OTA periodic query timeout in seconds
   ota_periodic_query_timeout = 86400
-}
 
-show_qr_code = false
+  board = "BL602-IoT-Matter-V1"
 
-# BL-HWC-G1 (No LCD)
-if (bl602_board == "BL-HWC-G1" || bl602_board == "IOT_DVK_3S") {
-  show_qr_code = false
+  baudrate = 2000000
 }
 
 bl602_sdk("sdk") {
-  sources = [
-    "${bl602_project_dir}/include/CHIPProjectConfig.h",
-    "${bl602_project_dir}/include/FreeRTOSConfig.h",
-  ]
-
   include_dirs = [
     "${chip_root}/src/platform/bouffalolab/BL602",
-    "${bl602_project_dir}/include",
-    "${examples_plat_dir}",
+    "${example_dir}",
+    "${example_dir}/include",
   ]
+
+  freertos_config = "${examples_plat_dir}/FreeRTOSConfig.h"
 
   defines = [
-    "CONFIG_PSM_EASYFLASH_SIZE=16384",
+    "INCLUDE_xSemaphoreGetMutexHolder=1",
+    "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
     "OTA_PERIODIC_QUERY_TIMEOUT=${ota_periodic_query_timeout}",
+    "CHIP_UART_BAUDRATE=${baudrate}",
   ]
-
   if (chip_enable_pw_rpc) {
-    defines += [ "PW_RPC_ENABLED" ]
+    include_dirs += [ "${examples_plat_common_dir}/rpc" ]
+    defines += [ "PW_RPC_ENABLED=1" ]
+    defines += [ "DISABLE_PRINT=1" ]
+  } else if (chip_build_libshell) {
+    include_dirs += [ "${examples_plat_common_dir}/plat" ]
   }
 }
 
 bl602_executable("lighting_app") {
   output_name = "chip-bl602-lighting-example.out"
 
-  sources = [
-    #"${bl602_project_dir}/include/CHIPProjectConfig.h",
-    "${examples_plat_dir}/InitPlatform.cpp",
-    "${examples_plat_dir}/route_hook/bl_route_hook.c",
-    "${examples_plat_dir}/route_hook/bl_route_table.c",
-    "include/CHIPProjectConfig.h",
-    "src/AppTask.cpp",
-    "src/CHIPDeviceManager.cpp",
-    "src/DeviceCallbacks.cpp",
-    "src/LEDWidget.cpp",
-    "src/LightingManager.cpp",
-    "src/main.cpp",
+  defines = [
+    "APP_TASK_STACK_SIZE=2044",
+    "CHIP_UART_BAUDRATE=${baudrate}",
+    "BL602_ENABLE",
+    "START_ENTRY=bfl_main",
   ]
 
-  if (chip_enable_pw_rpc) {
-    sources += [ "${examples_plat_dir}/uart.c" ]
+  sources = [
+    "${examples_plat_dir}/route_hook/bl_route_hook.c",
+    "${examples_plat_dir}/route_hook/bl_route_table.c",
+  ]
+
+  if ("BL602-IoT-Matter-V1" == board) {
+    defines += [ "BL602_IoT_Matter_V1" ]
+  } else if ("BL602-NIGHT-LIGHT" == board) {
+    defines += [ "BL602_NIGHT_LIGHT" ]
+  } else if ("BL602-IOT-DVK-3S" == board) {
+    defines += [ "BL602_IOT_DVK_3S" ]
   }
+
+  sources += [
+    "${example_common_dir}/AppTask.cpp",
+    "${example_common_dir}/ZclCallbacks.cpp",
+    "${examples_plat_common_dir}/plat/LEDWidget.cpp",
+    "${examples_plat_common_dir}/plat/aos_task.c",
+    "${examples_plat_common_dir}/plat/demo_pwm.c",
+    "${examples_plat_common_dir}/plat/main.cpp",
+    "${examples_plat_common_dir}/plat/uart.c",
+  ]
 
   deps = [
     ":sdk",
@@ -105,19 +119,12 @@ bl602_executable("lighting_app") {
     "${chip_root}/src/setup_payload",
   ]
 
-  include_dirs = [ "include" ]
-
-  if (bl602_board == "IOT_DVK_3S") {
-    defines = [ "BOARD_ID=0" ]
-  } else {
-    defines = [ "BOARD_ID=1" ]
-  }
-
-  if (show_qr_code) {
-    sources += [ "${examples_plat_dir}/display/lcd.c" ]
-
-    defines += [ "DISPLAY_ENABLED" ]
-  }
+  include_dirs = [
+    "${chip_root}/src/platform/bouffalolab/BL602",
+    "${example_common_dir}",
+    "${examples_plat_common_dir}/plat",
+    "${examples_plat_dir}",
+  ]
 
   if (chip_enable_pw_rpc) {
     defines += [
@@ -128,51 +135,67 @@ bl602_executable("lighting_app") {
       "PW_RPC_DEVICE_SERVICE=1",
       "PW_RPC_LIGHTING_SERVICE=1",
 
-      #"PW_RPC_OTCLI_SERVICE=1",
-      #"PW_RPC_THREAD_SERVICE=1",
       #"PW_RPC_TRACING_SERVICE=1",
     ]
 
     sources += [
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
-      "${chip_root}/examples/common/pigweed/bouffalolab/bl602/PigweedLoggerMutex.cpp",
-      "${examples_plat_dir}/PigweedLogger.cpp",
-      "${examples_plat_dir}/Rpc.cpp",
+      "${chip_root}/examples/common/pigweed/bouffalolab/PigweedLoggerMutex.cpp",
+      "${examples_plat_common_dir}/rpc/PigweedLogger.cpp",
+      "${examples_plat_common_dir}/rpc/Rpc.cpp",
     ]
 
     deps += [
       "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_kvs:crc16",
+      "$dir_pw_log",
       "$dir_pw_stream:sys_io_stream",
 
       #"$dir_pw_trace",
       #"$dir_pw_trace_tokenized",
       #"$dir_pw_trace_tokenized:trace_rpc_service",
-      "${chip_root}/config/bouffalolab/bl602/lib/pw_rpc:pw_rpc",
+      "${chip_root}/config/bouffalolab/common/lib/pw_rpc:pw_rpc",
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
+      "${examples_plat_common_dir}/rpc/pw_sys_io:pw_sys_io",
+    ]
 
-      #"${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
-      #"${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
-      "${examples_plat_dir}/pw_sys_io:pw_sys_io_bl602",
+    public_deps = [
+      "$dir_pw_checksum",
+      "$dir_pw_kvs",
     ]
 
     deps += pw_build_LINK_DEPS
 
     include_dirs += [
       "${chip_root}/examples/common",
-      "${chip_root}/examples/common/pigweed/bouffalolab/bl602",
-      "${examples_plat_dir}/route_hook",
+      "${chip_root}/examples/common/pigweed/bouffalolab",
+    ]
+  } else if (chip_build_libshell) {
+    defines += [ "CONFIG_ENABLE_CHIP_SHELL=1" ]
+
+    deps += [ "${chip_root}/examples/shell/shell_common:shell_common" ]
+
+    include_dirs += [
+      "${chip_root}/src/lib/shell",
+      "${chip_root}/examples/shell/shell_common/include",
     ]
   }
 
   if (enable_heap_monitoring) {
-    defines += [ "HEAP_MONITORING" ]
-    sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]
+    sources += [ "${examples_plat_common_dir}/plat/MemMonitoring.cpp" ]
+    defines += [ "HEAP_MONITORING=1" ]
   }
 
+  if (chip_enable_ota_requestor) {
+    defines += [ "OTA_ENABLED" ]
+    sources += [ "${examples_plat_common_dir}/plat/OTAConfig.cpp" ]
+  }
+
+  print(defines)
   ldscript = "${examples_plat_dir}/ldscripts/flash_rom.ld"
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]

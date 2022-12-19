@@ -415,7 +415,22 @@ void GenericConfigurationManagerImpl<ImplClass>::NotifyOfAdvertisementStart()
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRegulatoryLocation(uint8_t & location)
 {
-    return GetLocationCapability(location);
+    uint32_t value;
+    if (CHIP_NO_ERROR != ReadConfigValue(ConfigClass::kConfigKey_RegulatoryLocation, value))
+    {
+        ReturnErrorOnFailure(GetLocationCapability(location));
+
+        if (CHIP_NO_ERROR != StoreRegulatoryLocation(location))
+        {
+            ChipLogError(DeviceLayer, "Failed to store RegulatoryLocation");
+        }
+    }
+    else
+    {
+        location = static_cast<uint8_t>(value);
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 template <class ConfigClass>

@@ -12,30 +12,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Build example - Bouffalolab BL702
+name: Build example - BouffaloLab
 
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
   cancel-in-progress: true
 
+env:
+  CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
-  bl702:
-    name: BL702
+  bouffalolab:
+    name: Bouffalo Lab
     timeout-minutes: 90
 
     runs-on: ubuntu-latest
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: connectedhomeip/chip-build:latest
+      image: connectedhomeip/chip-build-bouffalolab:0.6.17
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:
-      - uses: Wandalen/wretry.action@v1.0.15
+      - uses: Wandalen/wretry.action@v1.0.36
         name: Checkout
         with:
           action: actions/checkout@v3
@@ -44,34 +48,75 @@ jobs:
           attempt_limit: 3
           attempt_delay: 2000
       - name: Checkout submodules
-        run: scripts/checkout_submodules.py --shallow --platform bouffalolab
+        run: scripts/checkout_submodules.py --shallow --platform bouffalolab --recursive
 
       - name: Set up environment for size reports
         if: ${{ !env.ACT }}
         env:
           GH_CONTEXT: ${{ toJson(github) }}
         run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
+      
+      - name: Bootstrap
+        timeout-minutes: 25
+        run: scripts/build/gn_bootstrap.sh
+      - name: Uploading bootstrap logs
+        uses: actions/upload-artifact@v3
+        if: ${{ always() && !env.ACT }}
+        with:
+          name: bootstrap-logs
+          path: |
+            .environment/gn_out/.ninja_log
+            .environment/pigweed-venv/*.log
+      - name: Build example BL602 Lighting App
+        timeout-minutes: 30
+        run: |
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py \
+              --target bouffalolab-bl602-iot-matter-v1-light \
+              --target bouffalolab-bl602-iot-matter-v1-light-rpc \
+              build \
+              --copy-artifacts-to out/artifacts \
+            "
+      - name: Prepare some bloat report from the previous builds
+        run: |
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl602 bl602 lighting-app \
+              out/artifacts/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-lighting-example.out \
+              /tmp/bloat_reports/
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl602 bl602+rpc lighting-app \
+              out/artifacts/bouffalolab-bl602-iot-matter-v1-light-rpc/chip-bl602-lighting-example.out \
+              /tmp/bloat_reports/
+      - name: Clean out build output
+        run: rm -rf ./out
 
       - name: Build example BL702 Lighting App
         timeout-minutes: 30
         run: |
           ./scripts/run_in_build_env.sh \
-            "./scripts/build/build_examples.py --target bouffalolab-BL706-IoT-DVK-light build"
-          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py bl702 bl702 lighting-app \
-            out/bouffalolab-BL706-IoT-DVK-light/chip-bl702-lighting-example.out /tmp/bloat_reports/
-
-      - name: Build example BL702 Lighting App with RPCs
-        timeout-minutes: 30
+            "./scripts/build/build_examples.py \
+              --target bouffalolab-xt-zb6-devkit-light \
+              --target bouffalolab-xt-zb6-devkit-light-rpc \
+              build \
+              --copy-artifacts-to out/artifacts \
+            "
+      - name: Prepare some bloat report from the previous builds
         run: |
-          ./scripts/run_in_build_env.sh \
-            "./scripts/build/build_examples.py --target bouffalolab-BL706-IoT-DVK-light-rpc build"
-          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py bl702 bl702+rpc lighting-app \
-            out/bouffalolab-BL706-IoT-DVK-light-rpc/chip-bl702-lighting-example.out /tmp/bloat_reports/
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl702 bl702 lighting-app \
+              out/artifacts/bouffalolab-xt-zb6-devkit-light/chip-bl702-lighting-example.out \
+              /tmp/bloat_reports/
+          .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+              bl702 bl702+rpc lighting-app \
+              out/artifacts/bouffalolab-xt-zb6-devkit-light-rpc/chip-bl702-lighting-example.out \
+              /tmp/bloat_reports/
+      - name: Clean out build output
+        run: rm -rf ./out
 
       - name: Uploading Size Reports
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: ${{ !env.ACT }}
         with:
-          name: Size,BL702-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
+          name: Size,BouffaloLab-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
           path: |
             /tmp/bloat_reports/

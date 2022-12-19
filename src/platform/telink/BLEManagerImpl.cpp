@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@
 /*Includes for ieee802154 switchings */
 #define DT_DRV_COMPAT telink_b91_zb
 #include <drivers/ieee802154/b91.h>
-#include <net/ieee802154_radio.h>
+#include <zephyr/net/ieee802154_radio.h>
 
 /* Telink headers */
 #include "drivers.h"
@@ -167,28 +167,72 @@ K_THREAD_DEFINE(chipBleThread, CHIP_BLE_THREAD_STACK_SIZE, BLEManagerImpl::BleEn
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     ThreadConnectivityReady = false;
 
-    /* Initialize the CHIP BleLayer. */
-    err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
-    SuccessOrExit(err);
+    mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
+    mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
+    mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+    mGAPConns = 0;
 
-    /* Set number of connections to zero */
-    mNumConnections = 0;
-
-    /* Unsubscribe all connections */
     memset(mSubscribedConns, 0, sizeof(mSubscribedConns));
 
-    /* Enable CHIP over BLE service */
-    mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
+    // Initialize the CHIP BleLayer.
+    ReturnErrorOnFailure(BleLayer::Init(this, this, &DeviceLayer::SystemLayer()));
 
-    /* Suspend BLE Task */
+    // Suspend BLE Task
     k_thread_suspend(chipBleThread);
 
+    return CHIP_NO_ERROR;
+}
+
+void BLEManagerImpl::DriveBLEState(intptr_t arg)
+{
+    BLEMgrImpl().DriveBLEState();
+}
+
+void BLEManagerImpl::DriveBLEState()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // Perform any initialization actions that must occur after the CHIP task is running.
+    if (!mFlags.Has(Flags::kAsyncInitCompleted))
+    {
+        mFlags.Set(Flags::kAsyncInitCompleted);
+    }
+
+    // If the application has enabled CHIPoBLE and BLE advertising...
+    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled &&
+        mFlags.Has(Flags::kAdvertisingEnabled)
+#if CHIP_DEVICE_CONFIG_CHIPOBLE_SINGLE_CONNECTION
+        // and no connections are active...
+        && (NumConnections() == 0)
+#endif
+    )
+    {
+        // Start/re-start advertising if not already advertising, or if the
+        // advertising state needs to be refreshed.
+        if (!mFlags.Has(Flags::kAdvertising) || mFlags.Has(Flags::kAdvertisingRefreshNeeded))
+        {
+            mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
+            err = StartAdvertising();
+            SuccessOrExit(err);
+        }
+    }
+    else
+    {
+        if (mFlags.Has(Flags::kAdvertising))
+        {
+            err = StopAdvertising();
+            SuccessOrExit(err);
+        }
+    }
+
 exit:
-    return err;
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
+        mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
+    }
 }
 
 int BLEManagerImpl::RxWriteCallback(uint16_t connHandle, void * p)
@@ -319,11 +363,11 @@ CHIP_ERROR BLEManagerImpl::_InitStack(void)
     SuccessOrExit(err);
 
     /* Resetup stimer interrupt to handle BLE stack */
-    ret = irq_connect_dynamic(STIMER_IRQ_NUM, 2, stimer_irq_handler, NULL, 0);
+    ret = irq_connect_dynamic(STIMER_IRQ_NUM + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, stimer_irq_handler, NULL, 0);
     ChipLogDetail(DeviceLayer, "Stimer IRQ assigned vector %d", ret);
 
     /* Resetup rf interrupt to handle BLE stack */
-    ret = irq_connect_dynamic(RF_IRQ_NUM, 2, rf_irq_handler, NULL, 0);
+    ret = irq_connect_dynamic(RF_IRQ_NUM + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, rf_irq_handler, NULL, 0);
     ChipLogDetail(DeviceLayer, "RF IRQ assigned vector %d", ret);
 
 exit:
@@ -543,13 +587,15 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (val)
+    VerifyOrReturnError(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported,
+                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
-        err = StartAdvertising();
-    }
-    else
-    {
-        err = StopAdvertising();
+        ChipLogDetail(DeviceLayer, "CHIPoBLE advertising set to %s", val ? "on" : "off");
+
+        mFlags.Set(Flags::kAdvertisingEnabled, val);
+        PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
     return err;
@@ -577,7 +623,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     /* @todo: move to RadioSwitch module*/
     const struct device * radio_dev = device_get_binding(CONFIG_NET_CONFIG_IEEE802154_DEV_NAME);
     __ASSERT(radio_dev != NULL, "Fail to get radio device");
-    b91_ieee802154_deinit(radio_dev);
+    b91_deinit(radio_dev);
 
     /* It is time to init BLE stack */
     err = _InitStack();
@@ -616,7 +662,29 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    mFlags.Set(Flags::kAdvertising);
+    // Transition to the Advertising state...
+    if (!mFlags.Has(Flags::kAdvertising))
+    {
+        ChipLogProgress(DeviceLayer, "CHIPoBLE advertising started");
+
+        mFlags.Set(Flags::kAdvertising);
+
+        // Post a CHIPoBLEAdvertisingChange(Started) event.
+        {
+            ChipDeviceEvent advChange;
+            advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+            advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
+            ReturnErrorOnFailure(PlatformMgr().PostEvent(&advChange));
+        }
+
+        if (mFlags.Has(Flags::kFastAdvertisingEnabled))
+        {
+            // Start timer to change advertising interval.
+            DeviceLayer::SystemLayer().StartTimer(
+                System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME),
+                HandleBLEAdvertisementIntervalChange, this);
+        }
+    }
 
     /* Start BLE Task */
     k_thread_resume(chipBleThread);
@@ -632,7 +700,7 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
     {
         ChipLogProgress(DeviceLayer, "Thread provisioned. Advertisement already stopped at this stage");
 
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 
     /* Disable advertisement */
@@ -644,14 +712,44 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    mFlags.Clear(Flags::kAdvertising);
+    // Transition to the not Advertising state...
+    if (mFlags.Has(Flags::kAdvertising))
+    {
+        mFlags.Clear(Flags::kAdvertising);
+        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+
+        ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
+
+        // Post a CHIPoBLEAdvertisingChange(Stopped) event.
+        {
+            ChipDeviceEvent advChange;
+            advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+            advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
+            ReturnErrorOnFailure(PlatformMgr().PostEvent(&advChange));
+        }
+
+        // Cancel timer event changing CHIPoBLE advertisement interval
+        DeviceLayer::SystemLayer().CancelTimer(HandleBLEAdvertisementIntervalChange, this);
+    }
 
     return CHIP_NO_ERROR;
 }
 
-/// @todo: implementation
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
 {
+    switch (mode)
+    {
+    case BLEAdvertisingMode::kFastAdvertising:
+        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+        break;
+    case BLEAdvertisingMode::kSlowAdvertising:
+        mFlags.Set(Flags::kFastAdvertisingEnabled, false);
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    mFlags.Set(Flags::kAdvertisingRefreshNeeded);
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
     return CHIP_NO_ERROR;
 }
 
@@ -696,6 +794,12 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * devName)
     ChipLogProgress(DeviceLayer, "Setting device name to : \"%s\"", devName);
 
     return CHIP_NO_ERROR;
+}
+
+void BLEManagerImpl::HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param)
+{
+    BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+    ChipLogProgress(DeviceLayer, "CHIPoBLE advertising mode changed to slow");
 }
 
 void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
@@ -747,6 +851,8 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Fail to handle 0x%04x event. Error: %s", event->Type, ErrorStr(err));
+        mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
+        PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 }
 
@@ -822,7 +928,7 @@ void BLEManagerImpl::SwitchToIeee802154(void)
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::Switch to IEEE802154");
 
     /* Stop BLE */
-    StopAdvertising();
+    _SetAdvertisingEnabled(false);
 
     /* Stop BLE task */
     k_thread_suspend(chipBleThread);
@@ -837,7 +943,7 @@ void BLEManagerImpl::SwitchToIeee802154(void)
     __ASSERT(radio_dev != NULL, "Fail to get radio device");
 
     /* Init IEEE802154 */
-    result = b91_ieee802154_init(radio_dev);
+    result = b91_init(radio_dev);
     __ASSERT(result == 0, "Fail to init IEEE802154 radio. Error: %d", result);
 }
 
@@ -845,7 +951,7 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) {}
 
 uint16_t BLEManagerImpl::_NumConnections(void)
 {
-    return mNumConnections;
+    return mGAPConns;
 }
 
 /// @todo implement multicinnection subscription
@@ -876,11 +982,12 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(const ChipDeviceEvent * event)
 {
     const BleConnEventType * connEvent = &event->Platform.BleConnEvent;
 
-    /* Increase number of connections */
-    mNumConnections++;
-
     ChipLogProgress(DeviceLayer, "BLE connection established (ConnId: 0x%02x)", connEvent->connHandle);
+    mGAPConns++;
     ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", NumConnections(), kMaxConnections);
+
+    mFlags.Set(Flags::kAdvertisingRefreshNeeded);
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return CHIP_NO_ERROR;
 }
@@ -888,23 +995,27 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(const ChipDeviceEvent * event)
 CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
 {
     const BleConnEventType * connEvent = &event->Platform.BleConnEvent;
-    ChipDeviceEvent disconnectEvent;
-
-    /* Decrease number of connections */
-    mNumConnections--;
 
     ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02x)", connEvent->HciResult);
+
+    mGAPConns--;
+
     ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", NumConnections(), kMaxConnections);
 
-    /* Unsubscribe */
+    // Unsubscribe
     if (UnsetSubscribed(connEvent->connHandle))
     {
         HandleUnsubscribeReceived(connEvent->connHandle, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
     }
 
-    /* Send Connection close event */
+    ChipDeviceEvent disconnectEvent;
     disconnectEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
     ReturnErrorOnFailure(PlatformMgr().PostEvent(&disconnectEvent));
+
+    // Force a reconfiguration of advertising in case we switched to non-connectable mode when
+    // the BLE connection was established.
+    mFlags.Set(Flags::kAdvertisingRefreshNeeded);
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return CHIP_NO_ERROR;
 }
@@ -925,6 +1036,11 @@ CHIP_ERROR BLEManagerImpl::HandleDisconnectRequest(const ChipDeviceEvent * event
 
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
+    // Force a reconfiguration of advertising in case we switched to non-connectable mode when
+    // the BLE connection was established.
+    mFlags.Set(Flags::kAdvertisingRefreshNeeded);
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return CHIP_NO_ERROR;
 }

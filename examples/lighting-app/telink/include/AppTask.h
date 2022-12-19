@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,10 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#if CONFIG_CHIP_FACTORY_DATA
+#include <platform/telink/FactoryDataProvider.h>
+#endif
+
 #include <cstdint>
 
 struct k_timer;
@@ -38,7 +42,6 @@ public:
 
 private:
     friend AppTask & GetAppTask(void);
-
     CHIP_ERROR Init();
 
     static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
@@ -64,6 +67,11 @@ private:
     static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     static AppTask sAppTask;
+
+#if CONFIG_CHIP_FACTORY_DATA
+    // chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;
+    chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::ExternalFlashFactoryData> mFactoryDataProvider;
+#endif
 };
 
 inline AppTask & GetAppTask(void)

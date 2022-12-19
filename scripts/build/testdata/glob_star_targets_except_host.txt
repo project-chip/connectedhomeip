@@ -17,10 +17,14 @@ android-x64-chip-tool
 android-x64-tv-server
 android-x86-chip-tool
 android-x86-tv-server
-bl602-light
-bouffalolab-BL706-IoT-DVK-light
-bouffalolab-BL706-IoT-DVK-light-rpc
-bouffalolab-BL706-NIGHT-LIGHT-light
+bouffalolab-bl602-iot-matter-v1-light
+bouffalolab-bl602-iot-matter-v1-light-115200
+bouffalolab-bl602-iot-matter-v1-light-rpc
+bouffalolab-bl602-night-light-light
+bouffalolab-bl706-night-light-light
+bouffalolab-xt-zb6-devkit-light
+bouffalolab-xt-zb6-devkit-light-115200
+bouffalolab-xt-zb6-devkit-light-rpc
 cc13x2x7_26x2x7-all-clusters
 cc13x2x7_26x2x7-all-clusters-minimal
 cc13x2x7_26x2x7-lock-ftd
@@ -81,6 +85,7 @@ infineon-psoc6-all-clusters
 infineon-psoc6-all-clusters-minimal
 infineon-psoc6-light
 infineon-psoc6-lock
+k32w-contact-release
 k32w-light-release-no-ota
 k32w-lock-release
 k32w-shell-release
@@ -113,6 +118,8 @@ qpg-light
 qpg-lock
 qpg-persistent-storage
 qpg-shell
+telink-tlsr9518adk80d-all-clusters
+telink-tlsr9518adk80d-all-clusters-minimal
 telink-tlsr9518adk80d-light
 telink-tlsr9518adk80d-light-switch
 telink-tlsr9518adk80d-ota-requestor

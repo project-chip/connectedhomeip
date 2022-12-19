@@ -11,10 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import("//args.gni")
 import("//build_overrides/bouffalolab_iot_sdk.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/mbedtls.gni")
+import("${chip_root}/src/lib/lib.gni")
 
 import("bl602_board.gni")
 
@@ -44,6 +45,13 @@ template("bl602_sdk") {
     libs = []
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
+    }
+
+    if (defined(invoker.freertos_config)) {
+      cflags_c = [
+        "-include",
+        rebase_path("${invoker.freertos_config}", root_build_dir),
+      ]
     }
 
     # Treat these includes as system includes, so warnings in them are not fatal.
@@ -121,6 +129,7 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/include",
       "${bl602_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver",
       "${bl602_sdk_root}/components/network/dns_server/include",
+      "${bl602_sdk_root}/components/network/rfparam_adapter_tmp/rftlv",
 
       "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Inc",
       "${bl602_sdk_root}/components/security/blcrypto_suite/inc/blcrypto_suite",
@@ -251,23 +260,12 @@ template("bl602_sdk") {
       #include defines
       "OS_USING_FREERTOS",
       "BL602_MATTER_SUPPORT",
+      "PBUF_POOL_SIZE=20",
       "TD_DIAGNOSIS_STA",
       "CONFIG_ENABLE_IPV6_ADDR_CALLBACK",
       "CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT",
       "CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT",
     ]
-
-    if (bl602_board == "BL-HWC-G1") {
-      defines += [
-        "BL602_UART0_TX_GPIO=16",
-        "BL602_UART0_RX_GPIO=7",
-      ]
-    } else if (bl602_board == "3R-HWC-G1") {
-      defines += [
-        "BL602_UART0_TX_GPIO=2",
-        "BL602_UART0_RX_GPIO=1",
-      ]
-    }
 
     defines += board_defines
 
@@ -283,11 +281,6 @@ template("bl602_sdk") {
           root_build_dir),
     ]
 
-    #cflags = ["-include", rebase_path("${bl602_sdk_root}/components/network/ble/blestack/src/common/include/errno.h", root_build_dir), ]
-    # for src/platform/bouffalolab/BL602/BLEManagerImpl.cpp
-    # TODO: 3R
-    #cflags += [ "-fpermissive" ]
-
     cflags += [
       "-Wno-maybe-uninitialized",
       "-Wno-shadow",
@@ -297,8 +290,6 @@ template("bl602_sdk") {
     ]
 
     cflags_cc = [ "-fpermissive" ]
-    cflags_cc += [ "-std=c++17" ]
-    cflags_cc += [ "-D _GNU_SOURCE" ]
 
     foreach(include_dir, _include_dirs) {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
@@ -317,6 +308,7 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_boot2.c",
       "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_flash.c",
       "${bl602_sdk_root}/components/platform/hosal/bl602_hal/bl_wdt.c",
+      "${bl602_sdk_root}/components/platform/hosal/bl602_hal/hosal_gpio.c",
       "${bl602_sdk_root}/components/platform/hosal/bl602_hal/hosal_ota.c",
       "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_mfg_flash.c",
       "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_sf_cfg_ext.c",
@@ -330,6 +322,7 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/stage/easyflash4/src/ef_utils.c",
       "${bl602_sdk_root}/components/sys/blmtd/bl_mtd.c",
       "${bl602_sdk_root}/components/sys/blota/bl_sys_ota_cli.c",
+      "${bl602_sdk_root}/components/utils/src/utils_hex.c",
       "${bl602_sdk_root}/components/utils/src/utils_hexdump.c",
       "${bl602_sdk_root}/components/utils/src/utils_sha256.c",
       "${chip_root}/third_party/mbedtls/repo/library/aes.c",
@@ -500,6 +493,7 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/platform/hosal/bl602_hal/hosal_uart.c",
       "${bl602_sdk_root}/components/platform/hosal/sec_common/bl_sec_sha.c",
       "${bl602_sdk_root}/components/platform/soc/bl602/bl602/evb/src/boot/gcc/start.S",
+      "${bl602_sdk_root}/components/platform/soc/bl602/bl602/evb/src/debug.c",
       "${bl602_sdk_root}/components/platform/soc/bl602/bl602/evb/src/strntoumax.c",
       "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/Common/platform_print/platform_device.c",
       "${bl602_sdk_root}/components/platform/soc/bl602/bl602_std/bl602_std/StdDriver/Src/bl602_dma.c",
@@ -557,6 +551,7 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/utils/src/utils_rbtree.c",
 
       #rebase add
+      "${bl602_sdk_root}/components/network/rfparam_adapter_tmp/rftlv/phy_rftlv.c",
       "${bl602_sdk_root}/components/network/wifi_hosal/port/wifi_hosal_bl602.c",
       "${bl602_sdk_root}/components/network/wifi_hosal/wifi_hosal.c",
       "${bl602_sdk_root}/components/os/bl_os_adapter/bl_os_adapter/bl_os_hal.c",
@@ -568,10 +563,10 @@ template("bl602_sdk") {
       "${bl602_sdk_root}/components/utils/src/utils_tlv_bl.c",
 
       #bl602 portable
-      "${chip_root}/third_party/bouffalolab/bl602/portable/async_log.c",
-      "${chip_root}/third_party/bouffalolab/bl602/portable/bfl_main.c",
-      "${chip_root}/third_party/bouffalolab/bl602/portable/debug.c",
-      "${chip_root}/third_party/bouffalolab/bl602/portable/wifi_mgmr_portable.c",
+      # "${chip_root}/third_party/bouffalolab/bl602/portable/async_log.c",
+      # "${chip_root}/third_party/bouffalolab/bl602/portable/bfl_main.c",
+      # "${chip_root}/third_party/bouffalolab/bl602/portable/debug.c",
+      # "${chip_root}/third_party/bouffalolab/bl602/portable/wifi_mgmr_portable.c",
 
       #wap_supplicant
       "${bl602_sdk_root}/components/security/wpa_supplicant/port/os_bl.c",

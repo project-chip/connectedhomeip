@@ -20,7 +20,7 @@
 
 #include "AppEvent.h"
 
-#include <drivers/gpio.h>
+#include <zephyr/drivers/gpio.h>
 
 #include <platform/CHIPDeviceLayer.h>
 

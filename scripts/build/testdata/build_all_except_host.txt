@@ -148,17 +148,29 @@ gn gen --check --fail-on-unused-args {out}/android-x86-tv-server '--args=target_
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
-# Generating bl602-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" bl602_board="BL-HWC-G1"' {out}/bl602-light
+# Generating bouffalolab-bl602-iot-matter-v1-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL602-IoT-Matter-V1" baudrate="2000000" bouffalolab_sdk_root="TEST_BOUFFALOLAB_SDK_ROOT"' {out}/bouffalolab-bl602-iot-matter-v1-light
 
-# Generating bouffalolab-BL706-IoT-DVK-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL706-IoT-DVK" module_type="BL706C-22"' {out}/bouffalolab-BL706-IoT-DVK-light
+# Generating bouffalolab-bl602-iot-matter-v1-light-115200
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL602-IoT-Matter-V1" baudrate="115200" bouffalolab_sdk_root="TEST_BOUFFALOLAB_SDK_ROOT"' {out}/bouffalolab-bl602-iot-matter-v1-light-115200
 
-# Generating bouffalolab-BL706-IoT-DVK-light-rpc
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL706-IoT-DVK" module_type="BL706C-22" import("//with_pw_rpc.gni")' {out}/bouffalolab-BL706-IoT-DVK-light-rpc
+# Generating bouffalolab-bl602-iot-matter-v1-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL602-IoT-Matter-V1" baudrate="115200" import("//with_pw_rpc.gni") bouffalolab_sdk_root="TEST_BOUFFALOLAB_SDK_ROOT"' {out}/bouffalolab-bl602-iot-matter-v1-light-rpc
 
-# Generating bouffalolab-BL706-NIGHT-LIGHT-light
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL706-NIGHT-LIGHT" module_type="BL702"' {out}/bouffalolab-BL706-NIGHT-LIGHT-light
+# Generating bouffalolab-bl602-night-light-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl602 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL602-NIGHT-LIGHT" baudrate="2000000" bouffalolab_sdk_root="TEST_BOUFFALOLAB_SDK_ROOT"' {out}/bouffalolab-bl602-night-light-light
+
+# Generating bouffalolab-bl706-night-light-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="BL706-NIGHT-LIGHT" baudrate="2000000" module_type="BL702" bouffalolab_sdk_root="TEST_BOUFFALOLAB_SDK_ROOT"' {out}/bouffalolab-bl706-night-light-light
+
+# Generating bouffalolab-xt-zb6-devkit-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="XT-ZB6-DevKit" baudrate="2000000" module_type="BL706C-22" bouffalolab_sdk_root="TEST_BOUFFALOLAB_SDK_ROOT"' {out}/bouffalolab-xt-zb6-devkit-light
+
+# Generating bouffalolab-xt-zb6-devkit-light-115200
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="XT-ZB6-DevKit" baudrate="115200" module_type="BL706C-22" bouffalolab_sdk_root="TEST_BOUFFALOLAB_SDK_ROOT"' {out}/bouffalolab-xt-zb6-devkit-light-115200
+
+# Generating bouffalolab-xt-zb6-devkit-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="XT-ZB6-DevKit" baudrate="115200" module_type="BL706C-22" import("//with_pw_rpc.gni") bouffalolab_sdk_root="TEST_BOUFFALOLAB_SDK_ROOT"' {out}/bouffalolab-xt-zb6-devkit-light-rpc
 
 # Generating cc13x2x7_26x2x7-all-clusters
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-all-clusters
@@ -916,6 +928,16 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 {root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 
+# Generating k32w-contact-low-power-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/contact-sensor-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W0_SDK_ROOT" chip_with_low_power=1 chip_pw_tokenizer_logging=true is_debug=false chip_logging=false chip_crypto="tinycrypt" mbedtls_repo="//third_party/connectedhomeip/third_party/nxp/libs/mbedtls"' {out}/k32w-contact-low-power-release
+
+{root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
+
+# Generating k32w-contact-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/contact-sensor-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W0_SDK_ROOT" chip_with_low_power=0 chip_pw_tokenizer_logging=true is_debug=false chip_crypto="tinycrypt" mbedtls_repo="//third_party/connectedhomeip/third_party/nxp/libs/mbedtls"' {out}/k32w-contact-release
+
+{root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
+
 # Generating k32w-light-ota-se
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W0_SDK_ROOT" chip_with_low_power=0 is_debug=false chip_enable_ble=false chip_with_se05x=true' {out}/k32w-light-ota-se
 
@@ -1161,6 +1183,20 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Generating qpg-shell
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/qpg '--args=qpg_target_ic="qpg6105"' {out}/qpg-shell
+
+# Generating telink-tlsr9518adk80d-all-clusters
+bash -c 'export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
+export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
+source "$ZEPHYR_BASE/zephyr-env.sh";
+west build --cmake-only -d {out}/telink-tlsr9518adk80d-all-clusters -b tlsr9518adk80d {root}/examples/all-clusters-app/telink'
+
+# Generating telink-tlsr9518adk80d-all-clusters-minimal
+bash -c 'export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
+export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
+source "$ZEPHYR_BASE/zephyr-env.sh";
+west build --cmake-only -d {out}/telink-tlsr9518adk80d-all-clusters-minimal -b tlsr9518adk80d {root}/examples/all-clusters-minimal-app/telink'
 
 # Generating telink-tlsr9518adk80d-light
 bash -c 'export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
@@ -1550,17 +1586,29 @@ cp {out}/android-x86-tv-server/lib/TvApp.jar {root}/examples/tv-app/android/App/
 # Building Example android-x86-tv-server, module content-app
 {root}/examples/tv-app/android/App/gradlew -p {root}/examples/tv-app/android/App/ -PmatterBuildSrcDir={out}/android-x86-tv-server -PmatterSdkSourceBuild=false -PbuildDir={out}/android-x86-tv-server/content-app :content-app:assembleDebug
 
-# Building bl602-light
-ninja -C {out}/bl602-light
+# Building bouffalolab-bl602-iot-matter-v1-light
+ninja -C {out}/bouffalolab-bl602-iot-matter-v1-light
 
-# Building bouffalolab-BL706-IoT-DVK-light
-ninja -C {out}/bouffalolab-BL706-IoT-DVK-light
+# Building bouffalolab-bl602-iot-matter-v1-light-115200
+ninja -C {out}/bouffalolab-bl602-iot-matter-v1-light-115200
 
-# Building bouffalolab-BL706-IoT-DVK-light-rpc
-ninja -C {out}/bouffalolab-BL706-IoT-DVK-light-rpc
+# Building bouffalolab-bl602-iot-matter-v1-light-rpc
+ninja -C {out}/bouffalolab-bl602-iot-matter-v1-light-rpc
 
-# Building bouffalolab-BL706-NIGHT-LIGHT-light
-ninja -C {out}/bouffalolab-BL706-NIGHT-LIGHT-light
+# Building bouffalolab-bl602-night-light-light
+ninja -C {out}/bouffalolab-bl602-night-light-light
+
+# Building bouffalolab-bl706-night-light-light
+ninja -C {out}/bouffalolab-bl706-night-light-light
+
+# Building bouffalolab-xt-zb6-devkit-light
+ninja -C {out}/bouffalolab-xt-zb6-devkit-light
+
+# Building bouffalolab-xt-zb6-devkit-light-115200
+ninja -C {out}/bouffalolab-xt-zb6-devkit-light-115200
+
+# Building bouffalolab-xt-zb6-devkit-light-rpc
+ninja -C {out}/bouffalolab-xt-zb6-devkit-light-rpc
 
 # Building cc13x2x7_26x2x7-all-clusters
 ninja -C {out}/cc13x2x7_26x2x7-all-clusters
@@ -2200,6 +2248,12 @@ ninja -C {out}/infineon-psoc6-lock-ota-updateimage
 # Building infineon-psoc6-lock-updateimage
 ninja -C {out}/infineon-psoc6-lock-updateimage
 
+# Building k32w-contact-low-power-release
+ninja -C {out}/k32w-contact-low-power-release
+
+# Building k32w-contact-release
+ninja -C {out}/k32w-contact-release
+
 # Building k32w-light-ota-se
 ninja -C {out}/k32w-light-ota-se
 
@@ -2400,6 +2454,18 @@ ninja -C {out}/qpg-persistent-storage
 
 # Building qpg-shell
 ninja -C {out}/qpg-shell
+
+# Building telink-tlsr9518adk80d-all-clusters
+bash -c 'export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
+export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
+ninja -C {out}/telink-tlsr9518adk80d-all-clusters'
+
+# Building telink-tlsr9518adk80d-all-clusters-minimal
+bash -c 'export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
+export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
+ninja -C {out}/telink-tlsr9518adk80d-all-clusters-minimal'
 
 # Building telink-tlsr9518adk80d-light
 bash -c 'export ZEPHYR_TOOLCHAIN_VARIANT=zephyr

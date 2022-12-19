@@ -57,6 +57,7 @@ public:
     CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize);
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override;
+    CHIP_ERROR GetLocationCapability(uint8_t & location) override;
     static ConfigurationManagerImpl & GetDefaultInstance();
 
 private:
