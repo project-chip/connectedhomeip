@@ -25,8 +25,6 @@ declare_args() {
   bl_iot_sdk_root = "${chip_root}/third_party/bouffalolab/repo"
 
   enable_cdc_module = false
-
-  thread_port_1_3 = false
 }
 
 assert(bl_iot_sdk_root != "", "bl_iot_sdk_root must be specified")
@@ -599,9 +597,6 @@ template("bl_iot_sdk") {
 
   config("${sdk_target_name}_config_openthread_port") {
     defines = [ "OT_FREERTOS_ENABLE=1" ]
-    if (thread_port_1_3) {
-      defines += [ "OT_THREAD_PORT_1_3" ]
-    }
 
     include_dirs = [
       "${chip_root}/platform/bl702",
@@ -610,12 +605,10 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/include",
     ]
 
-    if (thread_port_1_3) {
-      include_dirs += [ "${bl_iot_sdk_root}/components/network/thread/openthread_utils/include" ]
-    }
+    include_dirs += [ "${bl_iot_sdk_root}/components/network/thread/openthread_utils/include" ]
   }
 
-  source_set("${sdk_target_name}_openthread") {
+  source_set("${sdk_target_name}_openthread_port") {
     import("//build_overrides/openthread.gni")
 
     include_dirs = [
@@ -633,16 +626,13 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_misc.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_radio.c",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_settings.c",
+      "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_linkmetric.c",
     ]
 
-    libs = [ "${bl_iot_sdk_root}/components/network/lmac154/lib/liblmac154.a" ]
-
-    if (thread_port_1_3) {
-      sources += [
-        "${bl_iot_sdk_root}/components/network/thread/openthread_port/ot_linkmetric.c",
-      ]
-      libs += [ "${bl_iot_sdk_root}/components/network/thread/openthread_utils/lib/libopenthread_utils.a" ]
-    }
+    libs = [ 
+      "${bl_iot_sdk_root}/components/network/lmac154/lib/liblmac154.a", 
+      "${bl_iot_sdk_root}/components/network/thread/openthread_utils/lib/libopenthread_utils.a"
+    ]
 
     configs += [
       ":${sdk_target_name}_config_BSP_Driver",
@@ -837,7 +827,7 @@ template("bl_iot_sdk") {
     ]
 
     if (chip_enable_openthread) {
-      public_deps += [ ":${sdk_target_name}_openthread" ]
+      public_deps += [ ":${sdk_target_name}_openthread_port" ]
     }
 
     if (chip_enable_wifi) {

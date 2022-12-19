@@ -264,6 +264,7 @@ template("bl_iot_sdk") {
       "-Wno-old-style-declaration",
       "-Wno-stringop-overflow",
       "-Wno-format-truncation",
+      "-Wno-unused-variable",
     ]
     configs += [ 
       ":${sdk_target_name}_config_wifi",
@@ -631,6 +632,7 @@ template("bl_iot_sdk") {
       "-Wno-unused-function",
       "-Wno-incompatible-pointer-types",
       "-Wno-discarded-qualifiers",
+      "-Wno-unused-variable",
     ]
   }
 
@@ -678,6 +680,7 @@ template("bl_iot_sdk") {
       "BL_CHIP_NAME=\"BL602\"",
       "TD_DIAGNOSIS_STA",
       "OS_USING_FREERTOS",
+      "CFG_VIRT_DEV_MAX=2",
     ]
     include_dirs = [
       "${bl_iot_sdk_root}/components/os/bl_os_adapter/bl_os_adapter/include",
@@ -932,6 +935,10 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/lwip_dhcpd/dhcp_server_raw.c",
     ]
 
+    cflags_c = [
+      "-Wno-incompatible-pointer-types",
+      "-Wno-sign-compare"
+    ]
     configs += [
       ":${sdk_target_name}_config_freertos",
     ]
