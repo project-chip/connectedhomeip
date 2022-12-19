@@ -132,7 +132,6 @@ extern "C" void otPlatFree(void * aPtr)
     chip::Platform::MemoryFree(aPtr);
 }
 
-
 void ThreadStackManagerImpl::_ProcMessage(otInstance * aInstance)
 {
     procQueueMsg procMsg;

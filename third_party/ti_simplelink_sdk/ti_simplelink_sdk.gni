@@ -315,9 +315,7 @@ template("ti_simplelink_sdk") {
         "${ti_simplelink_sdk_root}/source/ti/common/nv/nvocmp.c",
       ]
 
-      public_configs = [
-        ":${sdk_target_name}_config",
-      ]
+      public_configs = [ ":${sdk_target_name}_config" ]
 
       if (chip_openthread_ftd) {
         public_configs +=

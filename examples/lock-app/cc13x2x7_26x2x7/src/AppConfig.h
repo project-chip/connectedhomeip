@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
@@ -17,13 +16,21 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Overrides to default OpenThread configuration.
- *
- */
+#ifndef APP_CONFIG_H
+#define APP_CONFIG_H
 
-#pragma once
+// Logging
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-// Use the TI-supplied default platform configuration for remainder
-#include "openthread-core-cc13x2_26x2-config.h"
+int cc13x2_26x2LogInit(void);
+void cc13x2_26x2Log(const char * aFormat, ...);
+#define PLAT_LOG(...) cc13x2_26x2Log(__VA_ARGS__);
+
+#define ACTUATOR_MOVEMENT_PERIOD_MS 1000
+
+#ifdef __cplusplus
+}
+#endif
+#endif // APP_CONFIG_H

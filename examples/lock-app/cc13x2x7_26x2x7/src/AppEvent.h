@@ -30,6 +30,8 @@ struct AppEvent
         kEventType_ButtonLeft,
         kEventType_ButtonRight,
         kEventType_AppEvent,
+        kEventType_IdentifyStart,
+        kEventType_IdentifyStop,
     };
 
     enum AppEventButtonType
@@ -52,6 +54,12 @@ struct AppEvent
         {
             void * Context;
         } BoltLockEvent;
+
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+        } LockEvent;
     };
 
     EventHandler Handler;

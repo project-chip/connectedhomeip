@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/ti_simplelink_sdk.gni")
 import("//build_overrides/openthread.gni")
+import("//build_overrides/ti_simplelink_sdk.gni")
 
 import("${ti_simplelink_sdk_build_root}/ti_simplelink_board.gni")
 import("${ti_simplelink_sdk_build_root}/ti_simplelink_sdk.gni")
@@ -36,16 +36,23 @@ source_set("libopenthread-cc13x2_cc26x2") {
     "-Wno-unused-label",
   ]
   public_deps = [
-    "${ti_simplelink_sdk_build_root}:ti_simplelink_sysconfig",
-    "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk",
     "${openthread_root}/src/core:libopenthread_core_headers",
+    "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk",
+    "${ti_simplelink_sdk_build_root}:ti_simplelink_sysconfig",
   ]
 
   configs -= [ "${build_root}/config/compiler:std_default" ]
   configs += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_posix_config" ]
+
   #configs += [ ":${sdk_target_name}_posix_config" ]
   #configs += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk_posix_config" ]
   sources = [
+    #"${openthread_ti_root}/src/system.c",
+    "${openthread_root}/examples/platforms/utils/code_utils.h",
+    "${openthread_root}/examples/platforms/utils/link_metrics.cpp",
+    "${openthread_root}/examples/platforms/utils/link_metrics.h",
+    "${openthread_root}/examples/platforms/utils/mac_frame.cpp",
+    "${openthread_root}/examples/platforms/utils/mac_frame.h",
     "${openthread_ti_root}/src/alarm.c",
     "${openthread_ti_root}/src/alarm_micro.c",
     "${openthread_ti_root}/src/diag.c",
@@ -53,12 +60,6 @@ source_set("libopenthread-cc13x2_cc26x2") {
     "${openthread_ti_root}/src/misc.c",
     "${openthread_ti_root}/src/radio.c",
     "${openthread_ti_root}/src/settings.c",
-    #"${openthread_ti_root}/src/system.c",
-    "${openthread_root}/examples/platforms/utils/code_utils.h",
-    "${openthread_root}/examples/platforms/utils/mac_frame.cpp",
-    "${openthread_root}/examples/platforms/utils/mac_frame.h",
-    "${openthread_root}/examples/platforms/utils/link_metrics.h",
-    "${openthread_root}/examples/platforms/utils/link_metrics.cpp",
   ]
 
   public_configs = [
@@ -66,10 +67,8 @@ source_set("libopenthread-cc13x2_cc26x2") {
     "${openthread_root}:openthread_config",
   ]
   if (chip_openthread_ftd) {
-    public_configs +=
-        [ "${openthread_root}:openthread_ftd_config" ]
+    public_configs += [ "${openthread_root}:openthread_ftd_config" ]
   } else {
-    public_configs +=
-        [ "${openthread_root}:openthread_mtd_config" ]
+    public_configs += [ "${openthread_root}:openthread_mtd_config" ]
   }
 }

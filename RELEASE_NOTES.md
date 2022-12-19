@@ -21,5 +21,4 @@ www.ti.com/simplelink.
 
 ## What's new
 
-* Matter 1.0 support for CC2652R7
-
+-   Matter 1.0 support for CC2652R7

@@ -106,6 +106,14 @@ Ninja to build the executable.
 
     ```
 
+    If you would like to define arguments on the command line you may add them
+    to the GN call.
+
+
+    ```
+    gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.14.0\" target_defines=[\"CC13X2_26X2_ATTESTATION_CREDENTIALS=1\"]"
+    ```
+
 ## Programming
 
 Loading the built image onto a LaunchPad is supported through two methods;

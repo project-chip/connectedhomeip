@@ -172,14 +172,8 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating bouffalolab-xt-zb6-devkit-light-rpc
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/bouffalolab/bl702 '--args=custom_toolchain="{root}/../../examples/platform/bouffalolab/common/toolchain:riscv_gcc" board="XT-ZB6-DevKit" baudrate="115200" module_type="BL706C-22" import("//with_pw_rpc.gni") bouffalolab_sdk_root="TEST_BOUFFALOLAB_SDK_ROOT"' {out}/bouffalolab-xt-zb6-devkit-light-rpc
 
-# Generating cc13x2x7_26x2x7-all-clusters
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-all-clusters
-
 # Generating cc13x2x7_26x2x7-all-clusters-minimal
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-all-clusters-minimal
-
-# Generating cc13x2x7_26x2x7-lock-ftd
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT" chip_openthread_ftd=true chip_progress_logging=false' {out}/cc13x2x7_26x2x7-lock-ftd
 
 # Generating cc13x2x7_26x2x7-lock-mtd
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT" chip_openthread_ftd=false' {out}/cc13x2x7_26x2x7-lock-mtd
@@ -189,9 +183,6 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Generating cc13x2x7_26x2x7-pump-controller
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/pump-controller-app/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-pump-controller
-
-# Generating cc13x2x7_26x2x7-shell
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/cc13x2x7_26x2x7 '--args=ti_sysconfig_root="TEST_TI_SYSCONFIG_ROOT"' {out}/cc13x2x7_26x2x7-shell
 
 # Generating cyw30739-cyw930739m2evb_01-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/infineon/cyw30739 {out}/cyw30739-cyw930739m2evb_01-light
@@ -548,7 +539,7 @@ cp examples/all-clusters-app/esp32/sdkconfig_c3devkit.defaults {out}/esp32-c3dev
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-c3devkit-all-clusters/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-c3devkit-all-clusters reconfigure'
 
@@ -559,7 +550,7 @@ cp examples/all-clusters-minimal-app/esp32/sdkconfig_c3devkit.defaults {out}/esp
 
 rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-c3devkit-all-clusters-minimal/sdkconfig.defaults
 idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-c3devkit-all-clusters-minimal reconfigure'
 
@@ -570,7 +561,7 @@ cp examples/all-clusters-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-all-cl
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters reconfigure'
 
@@ -583,7 +574,7 @@ rm -f examples/all-clusters-app/esp32/sdkconfig
 
 bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults'
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters-ipv6only reconfigure'
 
@@ -594,7 +585,7 @@ cp examples/all-clusters-minimal-app/esp32/sdkconfig.defaults {out}/esp32-devkit
 
 rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-minimal/sdkconfig.defaults
 idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-devkitc-all-clusters-minimal reconfigure'
 
@@ -607,7 +598,7 @@ rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
 
 bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-devkitc-all-clusters-minimal-ipv6only/sdkconfig.defaults'
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-minimal-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-devkitc-all-clusters-minimal-ipv6only reconfigure'
 
@@ -618,7 +609,7 @@ cp examples/bridge-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-bridge/sdkco
 
 rm -f examples/bridge-app/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-bridge/sdkconfig.defaults
 idf.py -C examples/bridge-app/esp32 -B {out}/esp32-devkitc-bridge reconfigure'
 
@@ -629,7 +620,7 @@ cp examples/lighting-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-light/sdkc
 
 rm -f examples/lighting-app/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light/sdkconfig.defaults
 idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light reconfigure'
 
@@ -640,7 +631,7 @@ cp examples/lighting-app/esp32/sdkconfig_rpc.defaults {out}/esp32-devkitc-light-
 
 rm -f examples/lighting-app/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light-rpc/sdkconfig.defaults
 idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light-rpc reconfigure'
 
@@ -651,7 +642,7 @@ cp examples/lock-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-lock/sdkconfig
 
 rm -f examples/lock-app/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-lock/sdkconfig.defaults
 idf.py -C examples/lock-app/esp32 -B {out}/esp32-devkitc-lock reconfigure'
 
@@ -662,7 +653,7 @@ cp examples/ota-requestor-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-ota-r
 
 rm -f examples/ota-requestor-app/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-ota-requestor/sdkconfig.defaults
 idf.py -C examples/ota-requestor-app/esp32 -B {out}/esp32-devkitc-ota-requestor reconfigure'
 
@@ -673,7 +664,7 @@ cp examples/ota-requestor-app/esp32/sdkconfig_rpc.defaults {out}/esp32-devkitc-o
 
 rm -f examples/ota-requestor-app/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-ota-requestor-rpc/sdkconfig.defaults
 idf.py -C examples/ota-requestor-app/esp32 -B {out}/esp32-devkitc-ota-requestor-rpc reconfigure'
 
@@ -684,7 +675,7 @@ cp examples/shell/esp32/sdkconfig.defaults {out}/esp32-devkitc-shell/sdkconfig.d
 
 rm -f examples/shell/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-shell/sdkconfig.defaults
 idf.py -C examples/shell/esp32 -B {out}/esp32-devkitc-shell reconfigure'
 
@@ -695,7 +686,7 @@ cp examples/temperature-measurement-app/esp32/sdkconfig.defaults {out}/esp32-dev
 
 rm -f examples/temperature-measurement-app/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement/sdkconfig.defaults
 idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement reconfigure'
 
@@ -706,7 +697,7 @@ cp examples/temperature-measurement-app/esp32/sdkconfig_rpc.defaults {out}/esp32
 
 rm -f examples/temperature-measurement-app/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement-rpc/sdkconfig.defaults
 idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement-rpc reconfigure'
 
@@ -717,7 +708,7 @@ cp examples/all-clusters-app/esp32/sdkconfig_m5stack.defaults {out}/esp32-m5stac
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters reconfigure'
 
@@ -730,7 +721,7 @@ rm -f examples/all-clusters-app/esp32/sdkconfig
 
 bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults'
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-ipv6only reconfigure'
 
@@ -741,7 +732,7 @@ cp examples/all-clusters-minimal-app/esp32/sdkconfig_m5stack.defaults {out}/esp3
 
 rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-minimal/sdkconfig.defaults
 idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-m5stack-all-clusters-minimal reconfigure'
 
@@ -754,7 +745,7 @@ rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
 
 bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-m5stack-all-clusters-minimal-ipv6only/sdkconfig.defaults'
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-minimal-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-m5stack-all-clusters-minimal-ipv6only reconfigure'
 
@@ -765,7 +756,7 @@ cp examples/all-clusters-minimal-app/esp32/sdkconfig_m5stack_rpc.defaults {out}/
 
 rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-minimal-rpc/sdkconfig.defaults
 idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-m5stack-all-clusters-minimal-rpc reconfigure'
 
@@ -778,7 +769,7 @@ rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
 
 bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-m5stack-all-clusters-minimal-rpc-ipv6only/sdkconfig.defaults'
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-minimal-rpc-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-m5stack-all-clusters-minimal-rpc-ipv6only reconfigure'
 
@@ -789,7 +780,7 @@ cp examples/all-clusters-app/esp32/sdkconfig_m5stack_rpc.defaults {out}/esp32-m5
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc reconfigure'
 
@@ -802,7 +793,7 @@ rm -f examples/all-clusters-app/esp32/sdkconfig
 
 bash -c 'echo -e "\nCONFIG_DISABLE_IPV4=y\n" >>{out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults'
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc-ipv6only reconfigure'
 
@@ -813,7 +804,7 @@ cp examples/ota-requestor-app/esp32/sdkconfig_m5stack.defaults {out}/esp32-m5sta
 
 rm -f examples/ota-requestor-app/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-ota-requestor/sdkconfig.defaults
 idf.py -C examples/ota-requestor-app/esp32 -B {out}/esp32-m5stack-ota-requestor reconfigure'
 
@@ -824,7 +815,7 @@ cp examples/ota-requestor-app/esp32/sdkconfig_m5stack_rpc.defaults {out}/esp32-m
 
 rm -f examples/ota-requestor-app/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-ota-requestor-rpc/sdkconfig.defaults
 idf.py -C examples/ota-requestor-app/esp32 -B {out}/esp32-m5stack-ota-requestor-rpc reconfigure'
 
@@ -835,7 +826,7 @@ cp src/test_driver/esp32/sdkconfig_qemu.defaults {out}/esp32-qemu-tests/sdkconfi
 
 rm -f src/test_driver/esp32/sdkconfig
 
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-qemu-tests/sdkconfig.defaults
 idf.py -C src/test_driver/esp32 -B {out}/esp32-qemu-tests reconfigure'
 
@@ -1982,182 +1973,182 @@ ninja -C {out}/efr32-brd4304a-window-covering-with-ota-requestor
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
 # Building esp32-c3devkit-all-clusters
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-c3devkit-all-clusters/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-c3devkit-all-clusters build'
 
 rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
 
 # Building esp32-c3devkit-all-clusters-minimal
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-c3devkit-all-clusters-minimal/sdkconfig.defaults
 idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-c3devkit-all-clusters-minimal build'
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
 # Building esp32-devkitc-all-clusters
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters build'
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
 # Building esp32-devkitc-all-clusters-ipv6only
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all-clusters-ipv6only build'
 
 rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
 
 # Building esp32-devkitc-all-clusters-minimal
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-minimal/sdkconfig.defaults
 idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-devkitc-all-clusters-minimal build'
 
 rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
 
 # Building esp32-devkitc-all-clusters-minimal-ipv6only
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-all-clusters-minimal-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-devkitc-all-clusters-minimal-ipv6only build'
 
 rm -f examples/bridge-app/esp32/sdkconfig
 
 # Building esp32-devkitc-bridge
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-bridge/sdkconfig.defaults
 idf.py -C examples/bridge-app/esp32 -B {out}/esp32-devkitc-bridge build'
 
 rm -f examples/lighting-app/esp32/sdkconfig
 
 # Building esp32-devkitc-light
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light/sdkconfig.defaults
 idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light build'
 
 rm -f examples/lighting-app/esp32/sdkconfig
 
 # Building esp32-devkitc-light-rpc
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light-rpc/sdkconfig.defaults
 idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light-rpc build'
 
 rm -f examples/lock-app/esp32/sdkconfig
 
 # Building esp32-devkitc-lock
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-lock/sdkconfig.defaults
 idf.py -C examples/lock-app/esp32 -B {out}/esp32-devkitc-lock build'
 
 rm -f examples/ota-requestor-app/esp32/sdkconfig
 
 # Building esp32-devkitc-ota-requestor
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-ota-requestor/sdkconfig.defaults
 idf.py -C examples/ota-requestor-app/esp32 -B {out}/esp32-devkitc-ota-requestor build'
 
 rm -f examples/ota-requestor-app/esp32/sdkconfig
 
 # Building esp32-devkitc-ota-requestor-rpc
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-ota-requestor-rpc/sdkconfig.defaults
 idf.py -C examples/ota-requestor-app/esp32 -B {out}/esp32-devkitc-ota-requestor-rpc build'
 
 rm -f examples/shell/esp32/sdkconfig
 
 # Building esp32-devkitc-shell
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-shell/sdkconfig.defaults
 idf.py -C examples/shell/esp32 -B {out}/esp32-devkitc-shell build'
 
 rm -f examples/temperature-measurement-app/esp32/sdkconfig
 
 # Building esp32-devkitc-temperature-measurement
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement/sdkconfig.defaults
 idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement build'
 
 rm -f examples/temperature-measurement-app/esp32/sdkconfig
 
 # Building esp32-devkitc-temperature-measurement-rpc
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-temperature-measurement-rpc/sdkconfig.defaults
 idf.py -C examples/temperature-measurement-app/esp32 -B {out}/esp32-devkitc-temperature-measurement-rpc build'
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
 # Building esp32-m5stack-all-clusters
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters build'
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
 # Building esp32-m5stack-all-clusters-ipv6only
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-ipv6only build'
 
 rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
 
 # Building esp32-m5stack-all-clusters-minimal
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-minimal/sdkconfig.defaults
 idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-m5stack-all-clusters-minimal build'
 
 rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
 
 # Building esp32-m5stack-all-clusters-minimal-ipv6only
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-minimal-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-m5stack-all-clusters-minimal-ipv6only build'
 
 rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
 
 # Building esp32-m5stack-all-clusters-minimal-rpc
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-minimal-rpc/sdkconfig.defaults
 idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-m5stack-all-clusters-minimal-rpc build'
 
 rm -f examples/all-clusters-minimal-app/esp32/sdkconfig
 
 # Building esp32-m5stack-all-clusters-minimal-rpc-ipv6only
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-minimal-rpc-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-minimal-app/esp32 -B {out}/esp32-m5stack-all-clusters-minimal-rpc-ipv6only build'
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
 # Building esp32-m5stack-all-clusters-rpc
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc build'
 
 rm -f examples/all-clusters-app/esp32/sdkconfig
 
 # Building esp32-m5stack-all-clusters-rpc-ipv6only
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc-ipv6only build'
 
 rm -f examples/ota-requestor-app/esp32/sdkconfig
 
 # Building esp32-m5stack-ota-requestor
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-ota-requestor/sdkconfig.defaults
 idf.py -C examples/ota-requestor-app/esp32 -B {out}/esp32-m5stack-ota-requestor build'
 
 rm -f examples/ota-requestor-app/esp32/sdkconfig
 
 # Building esp32-m5stack-ota-requestor-rpc
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-ota-requestor-rpc/sdkconfig.defaults
 idf.py -C examples/ota-requestor-app/esp32 -B {out}/esp32-m5stack-ota-requestor-rpc build'
 
 rm -f src/test_driver/esp32/sdkconfig
 
 # Building esp32-qemu-tests
-bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-qemu-tests/sdkconfig.defaults
 idf.py -C src/test_driver/esp32 -B {out}/esp32-qemu-tests build'
 
