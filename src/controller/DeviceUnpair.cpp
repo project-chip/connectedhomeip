@@ -144,9 +144,8 @@ void DeviceUnpair::OnDeviceConnectionFailureFn(void * context, const ScopedNodeI
 
 void DeviceUnpair::OnDone(app::ReadClient * apReadClient)
 {
-    FabricIndex fabricIndex;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = mAttributeCache->ForEachAttribute(
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
+    CHIP_ERROR err          = mAttributeCache->ForEachAttribute(
         OperationalCredentials::Id, [this, &fabricIndex](const app::ConcreteAttributePath & path) {
             if (path.mAttributeId != OperationalCredentials::Attributes::CurrentFabricIndex::Id)
             {
@@ -164,7 +163,7 @@ void DeviceUnpair::OnDone(app::ReadClient * apReadClient)
             }
         });
     mFabricIndex = fabricIndex;
-    PerformDeviceUnpairStep(mProxy, UnpairDeviceStage::kSendRemoveFabric, CHIP_NO_ERROR);
+    PerformDeviceUnpairStep(mProxy, UnpairDeviceStage::kSendRemoveFabric, err);
 }
 
 void DeviceUnpair::OnRemoveFabric(void * context, const OperationalCredentials::Commands::NOCResponse::DecodableType & data)
