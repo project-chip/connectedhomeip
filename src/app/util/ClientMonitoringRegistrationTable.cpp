@@ -48,7 +48,7 @@ CHIP_ERROR ClientMonitoringRegistrationTable::LoadFromStorage(FabricIndex fabric
 
 CHIP_ERROR ClientMonitoringRegistrationTable::SaveToStorage()
 {
-    ReturnErrorOnFailure(IsRegisteredClientValid());
+    VerifyOrReturnError(mRegisteredClient.isValid(), CHIP_ERROR_INVALID_ARGUMENT);
 
     uint8_t buffer[kRegStorageSize] = { 0 };
     TLV::TLVWriter writer;
@@ -61,46 +61,9 @@ CHIP_ERROR ClientMonitoringRegistrationTable::SaveToStorage()
                                     buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
-NodeId ClientMonitoringRegistrationTable::getClientNodeId()
-{
-    return mRegisteredClient.clientNodeId;
-}
-
-uint64_t ClientMonitoringRegistrationTable::getICid()
-{
-    return mRegisteredClient.ICid;
-}
-
-FabricIndex ClientMonitoringRegistrationTable::getFaricIndex()
-{
-    return mRegisteredClient.fabricIndex;
-}
-
-app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::Type ClientMonitoringRegistrationTable::getRegisteredClient()
+ClientMonitoringRegistrationTable::ClientRegistrationEntry & ClientMonitoringRegistrationTable::getClientRegistrationEntry()
 {
     return mRegisteredClient;
-}
-
-void ClientMonitoringRegistrationTable::setClientNodeId(NodeId clientNodeId)
-{
-    mRegisteredClient.clientNodeId = clientNodeId;
-}
-
-void ClientMonitoringRegistrationTable::setICid(uint64_t ICid)
-{
-    mRegisteredClient.ICid = ICid;
-}
-
-void ClientMonitoringRegistrationTable::setFabricIndex(FabricIndex fabric)
-{
-    mRegisteredClient.fabricIndex = fabric;
-}
-
-CHIP_ERROR ClientMonitoringRegistrationTable::IsRegisteredClientValid()
-{
-    return (mRegisteredClient.clientNodeId != 0 && mRegisteredClient.ICid != 0 && mRegisteredClient.fabricIndex != 0)
-        ? CHIP_NO_ERROR
-        : CHIP_ERROR_INVALID_ARGUMENT;
 }
 
 } // namespace chip

@@ -28,28 +28,23 @@ class ClientMonitoringRegistrationTable
 public:
     using MonitoringRegistrationStruct = chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::Type;
 
+    struct ClientRegistrationEntry : MonitoringRegistrationStruct
+    {
+        bool isValid() { return clientNodeId != 0 && ICid != 0 && fabricIndex != 0; }
+    };
+
     ClientMonitoringRegistrationTable(PersistentStorageDelegate & storage);
     ~ClientMonitoringRegistrationTable(){};
 
     CHIP_ERROR SaveToStorage();
     CHIP_ERROR LoadFromStorage(FabricIndex fabricIndex);
 
-    // Getter
-    NodeId getClientNodeId();
-    uint64_t getICid();
-    FabricIndex getFaricIndex();
-    MonitoringRegistrationStruct getRegisteredClient();
-
-    // Setter
-    void setClientNodeId(NodeId clientNodeId);
-    void setICid(uint64_t ICid);
-    void setFabricIndex(FabricIndex fabric);
+    ClientRegistrationEntry & getClientRegistrationEntry();
 
 private:
-    static constexpr uint8_t kRegStorageSize = TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(uint64_t), sizeof(FabricIndex));
+    static constexpr uint8_t kRegStorageSize = TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(uint64_t));
 
-    CHIP_ERROR IsRegisteredClientValid();
-    MonitoringRegistrationStruct mRegisteredClient;
+    ClientRegistrationEntry mRegisteredClient;
     PersistentStorageDelegate & mStorage;
 };
 
