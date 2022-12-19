@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <app/OperationalSessionSetup.h>
 #include <app/ClusterStateCache.h>
+#include <app/OperationalSessionSetup.h>
 #include <lib/core/CHIPCallback.h>
 
 namespace chip {
@@ -36,20 +36,21 @@ enum UnpairDeviceStage : uint8_t
 class DLL_EXPORT DeviceUnpair : public app::ClusterStateCache::Callback
 {
 public:
-    class Callback {
+    class Callback
+    {
     public:
-        virtual ~Callback() {};
-        virtual void OnDeviceUnpair(NodeId remoteDeviceId, CHIP_ERROR err) {};
+        virtual ~Callback(){};
+        virtual void OnDeviceUnpair(NodeId remoteDeviceId, CHIP_ERROR err){};
     };
 
     DeviceUnpair();
     ~DeviceUnpair() {}
 
-    void RegisterCallback(Callback *callback);
-    void UnpairDevice(DeviceProxy *proxy, NodeId remoteDeviceId);
+    void RegisterCallback(Callback * callback);
+    void UnpairDevice(DeviceProxy * proxy, NodeId remoteDeviceId);
 
 private:
-    Callback *mCallback = nullptr;
+    Callback * mCallback = nullptr;
 
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
@@ -57,32 +58,35 @@ private:
     Platform::UniquePtr<app::ClusterStateCache> mAttributeCache;
     Platform::UniquePtr<app::ReadClient> mReadClient;
 
-    DeviceProxy *mProxy = nullptr;
+    DeviceProxy * mProxy = nullptr;
     Platform::SharedPtr<OperationalDeviceProxy> mOperationalDeviceProxy;
     NodeId mRemoteDeviceId;
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
     UnpairDeviceStage mStage = UnpairDeviceStage::kUnpairError;
 
-    void PerformDeviceUnpairStep(DeviceProxy *proxy, UnpairDeviceStage stage, CHIP_ERROR err);
+    void PerformDeviceUnpairStep(DeviceProxy * proxy, UnpairDeviceStage stage, CHIP_ERROR err);
 
-    void ReadCurrentFabricIndex(DeviceProxy *proxy);
-    void SendRemoveFabricIndex(DeviceProxy *proxy, FabricIndex fabricIndex);
+    void ReadCurrentFabricIndex(DeviceProxy * proxy);
+    void SendRemoveFabricIndex(DeviceProxy * proxy, FabricIndex fabricIndex);
     void FinishUnpairDevice(CHIP_ERROR err);
 
     void OnDone(app::ReadClient * apReadClient);
 
-    static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                             SessionHandle & sessionHandle);
+    static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     static void OnRemoveFabric(void * context,
-                                       const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data);
+                               const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data);
 
     static void OnCommandFailure(void * context, CHIP_ERROR error);
+
 public:
     chip::Callback::Callback<OnDeviceConnected> & GetConnectedCallback() { return mOnDeviceConnectedCallback; }
-    chip::Callback::Callback<OnDeviceConnectionFailure> & GetConnectionFailureCallback() { return mOnDeviceConnectionFailureCallback; }
+    chip::Callback::Callback<OnDeviceConnectionFailure> & GetConnectionFailureCallback()
+    {
+        return mOnDeviceConnectionFailureCallback;
+    }
 };
 
-}
-}
+} // namespace Controller
+} // namespace chip

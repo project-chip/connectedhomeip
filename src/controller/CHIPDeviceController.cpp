@@ -900,10 +900,14 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
     Platform::UniquePtr<DeviceUnpair> deviceUnpair(new DeviceUnpair());
     deviceUnpair->RegisterCallback(this);
     CommissioneeDeviceProxy * commissioneeDeviceProxy = nullptr;
-    if (CHIP_NO_ERROR == GetDeviceBeingCommissioned(remoteDeviceId, &commissioneeDeviceProxy)) {
+    if (CHIP_NO_ERROR == GetDeviceBeingCommissioned(remoteDeviceId, &commissioneeDeviceProxy))
+    {
         deviceUnpair->UnpairDevice(commissioneeDeviceProxy, remoteDeviceId);
-    } else {
-        err = GetConnectedDevice(remoteDeviceId, &deviceUnpair->GetConnectedCallback(), &deviceUnpair->GetConnectionFailureCallback());
+    }
+    else
+    {
+        err = GetConnectedDevice(remoteDeviceId, &deviceUnpair->GetConnectedCallback(),
+                                 &deviceUnpair->GetConnectionFailureCallback());
     }
 
     mDeviceUnpair = std::move(deviceUnpair);
