@@ -543,7 +543,7 @@ static void wfx_events_task(void * p_arg)
             if (!retryInProgress)
             {
                 retryInProgress = true;
-                wfx_retry_int erval_handler(is_disconnection_event, retryJoin);
+                wfx_retry_interval_handler(is_disconnection_event, retryJoin);
                 SILABS_LOG("WFX sending the connect command");
                 wfx_connect_to_ap();
             }
