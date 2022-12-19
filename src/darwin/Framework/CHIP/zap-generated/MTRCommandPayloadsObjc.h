@@ -1425,8 +1425,9 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
 @end
 
-MTR_NEWLY_AVAILABLE
-@interface MTRBasicInformationClusterMfgSpecificPingParams : NSObject <NSCopying>
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("This command has been removed")
+@interface MTRBasicClusterMfgSpecificPingParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1442,11 +1443,6 @@ MTR_NEWLY_AVAILABLE
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
-@end
-
-API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-MTR_NEWLY_DEPRECATED("Please use MTRBasicInformationClusterMfgSpecificPingParams")
-@interface MTRBasicClusterMfgSpecificPingParams : MTRBasicInformationClusterMfgSpecificPingParams
 @end
 
 MTR_NEWLY_AVAILABLE
