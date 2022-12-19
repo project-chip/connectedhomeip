@@ -680,7 +680,7 @@ template("bl_iot_sdk") {
       "BL_CHIP_NAME=\"BL602\"",
       "TD_DIAGNOSIS_STA",
       "OS_USING_FREERTOS",
-      "CFG_VIRT_DEV_MAX=2",
+      "CFG_VIRT_DEV_MAX=1",
     ]
     include_dirs = [
       "${bl_iot_sdk_root}/components/os/bl_os_adapter/bl_os_adapter/include",

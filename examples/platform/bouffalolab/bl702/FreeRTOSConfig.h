@@ -131,10 +131,11 @@
 #define configMAX_CO_ROUTINE_PRIORITIES (2)
 
 /* Software timer definitions. */
-#define configUSE_TIMERS 1
-#define configTIMER_TASK_PRIORITY (configMAX_PRIORITIES - 1)
-#define configTIMER_QUEUE_LENGTH 4
-#define configTIMER_TASK_STACK_DEPTH (400)
+#define configUSE_TIMERS                             1
+#define configTIMER_TASK_PRIORITY                    (configMAX_PRIORITIES - 1)
+#define configTIMER_QUEUE_LENGTH                     4
+#define configTIMER_TASK_STACK_DEPTH                 ( configMINIMAL_STACK_SIZE * 4 )
+
 
 /* Task priorities.  Allow these to be overridden. */
 #ifndef uartPRIMARY_PRIORITY
