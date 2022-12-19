@@ -59,10 +59,10 @@ namespace Platform {
 // Names align with chip::Logging::LogCategory
 enum OSLogCategory
 {
-    kOSLogCategory_Error      = OS_LOG_TYPE_ERROR,
-    kOSLogCategory_Progress   = OS_LOG_TYPE_DEFAULT,
-    kOSLogCategory_Detail     = OS_LOG_TYPE_INFO,
-    kOSLogCategory_Automation = OS_LOG_TYPE_DEFAULT,
+    kOSLogCategory_ERROR      = OS_LOG_TYPE_ERROR,
+    kOSLogCategory_PROGRESS   = OS_LOG_TYPE_DEFAULT,
+    kOSLogCategory_DETAIL     = OS_LOG_TYPE_INFO,
+    kOSLogCategory_AUTOMATION = OS_LOG_TYPE_DEFAULT,
 };
 
 DLL_LOCAL os_log_t LoggerForModule(chip::Logging::LogModule moduleId, char const * moduleName);
