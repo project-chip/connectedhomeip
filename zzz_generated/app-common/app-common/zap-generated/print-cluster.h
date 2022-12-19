@@ -99,10 +99,10 @@
 #define CHIP_PRINTCLUSTER_ACTIONS_CLUSTER
 #endif
 
-#if defined(ZCL_USING_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BASIC_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_BASIC_CLUSTER { chip::app::Clusters::Basic::Id, "Basic" },
+#if defined(ZCL_USING_BASIC_INFORMATION_CLUSTER_SERVER) || defined(ZCL_USING_BASIC_INFORMATION_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_BASIC_INFORMATION_CLUSTER { chip::app::Clusters::BasicInformation::Id, "Basic Information" },
 #else
-#define CHIP_PRINTCLUSTER_BASIC_CLUSTER
+#define CHIP_PRINTCLUSTER_BASIC_INFORMATION_CLUSTER
 #endif
 
 #if defined(ZCL_USING_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER) || defined(ZCL_USING_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_CLIENT)
@@ -492,7 +492,7 @@
     CHIP_PRINTCLUSTER_BINDING_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_ACCESS_CONTROL_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_ACTIONS_CLUSTER                                                                                              \
-    CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \
+    CHIP_PRINTCLUSTER_BASIC_INFORMATION_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER                                                                         \
     CHIP_PRINTCLUSTER_OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER                                                                        \
     CHIP_PRINTCLUSTER_LOCALIZATION_CONFIGURATION_CLUSTER                                                                           \

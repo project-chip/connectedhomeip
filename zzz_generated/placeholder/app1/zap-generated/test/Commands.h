@@ -92,79 +92,79 @@ private:
         }
         case 2: {
             LogStep(2, "Query Data Model Revision");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::DataModelRevision::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::DataModelRevision::Id);
         }
         case 3: {
             LogStep(3, "Query Vendor Name");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::VendorName::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::VendorName::Id);
         }
         case 4: {
             LogStep(4, "Query VendorID");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::VendorID::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::VendorID::Id);
         }
         case 5: {
             LogStep(5, "Query Product Name");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::ProductName::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ProductName::Id);
         }
         case 6: {
             LogStep(6, "Query ProductID");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::ProductID::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ProductID::Id);
         }
         case 7: {
             LogStep(7, "Query Node Label");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::NodeLabel::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::NodeLabel::Id);
         }
         case 8: {
             LogStep(8, "Query User Location");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::Location::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::Location::Id);
         }
         case 9: {
             LogStep(9, "Query HardwareVersion");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::HardwareVersion::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::HardwareVersion::Id);
         }
         case 10: {
             LogStep(10, "Query HardwareVersionString");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::HardwareVersionString::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::HardwareVersionString::Id);
         }
         case 11: {
             LogStep(11, "Query SoftwareVersion");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::SoftwareVersion::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::SoftwareVersion::Id);
         }
         case 12: {
             LogStep(12, "Query SoftwareVersionString");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::SoftwareVersionString::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::SoftwareVersionString::Id);
         }
         case 13: {
             LogStep(13, "Query ManufacturingDate");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::ManufacturingDate::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ManufacturingDate::Id);
         }
         case 14: {
             LogStep(14, "Query PartNumber");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::PartNumber::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::PartNumber::Id);
         }
         case 15: {
             LogStep(15, "Query ProductURL");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::ProductURL::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ProductURL::Id);
         }
         case 16: {
             LogStep(16, "Query ProductLabel");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::ProductLabel::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ProductLabel::Id);
         }
         case 17: {
             LogStep(17, "Query SerialNumber");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::SerialNumber::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::SerialNumber::Id);
         }
         case 18: {
             LogStep(18, "Query LocalConfigDisabled");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::LocalConfigDisabled::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::LocalConfigDisabled::Id);
         }
         case 19: {
             LogStep(19, "Query Reachable");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::Reachable::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::Reachable::Id);
         }
         case 20: {
             LogStep(20, "Query UniqueID");
-            return WaitAttribute(GetEndpoint(0), Basic::Id, Basic::Attributes::UniqueID::Id);
+            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::UniqueID::Id);
         }
         }
         return CHIP_NO_ERROR;

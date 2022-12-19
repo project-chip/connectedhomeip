@@ -17,7 +17,7 @@ name: 19.1.2. [TC-SC-5.2] Receiving a group message - TH to DUT
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:

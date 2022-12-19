@@ -626,14 +626,14 @@ typedef void (*ActionsAcceptedCommandListListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ActionsAttributeListListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BasicCapabilityMinimaStructAttributeCallback)(
-    void *, const chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType &);
-typedef void (*BasicGeneratedCommandListListAttributeCallback)(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BasicAcceptedCommandListListAttributeCallback)(void * context,
-                                                              const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BasicAttributeListListAttributeCallback)(void * context,
-                                                        const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*BasicInformationCapabilityMinimaStructAttributeCallback)(
+    void *, const chip::app::Clusters::BasicInformation::Structs::CapabilityMinimaStruct::DecodableType &);
+typedef void (*BasicInformationGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BasicInformationAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BasicInformationAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*OTASoftwareUpdateProviderGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OTASoftwareUpdateProviderAcceptedCommandListListAttributeCallback)(
@@ -3334,128 +3334,134 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBasicCapabilityMinimaStructAttributeCallbackBridge : public MTRCallbackBridge<BasicCapabilityMinimaStructAttributeCallback>
+class MTRBasicInformationCapabilityMinimaStructAttributeCallbackBridge
+    : public MTRCallbackBridge<BasicInformationCapabilityMinimaStructAttributeCallback>
 {
 public:
-    MTRBasicCapabilityMinimaStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<BasicCapabilityMinimaStructAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRBasicInformationCapabilityMinimaStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BasicInformationCapabilityMinimaStructAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRBasicCapabilityMinimaStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<BasicCapabilityMinimaStructAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRBasicInformationCapabilityMinimaStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<BasicInformationCapabilityMinimaStructAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType & value);
+                            const chip::app::Clusters::BasicInformation::Structs::CapabilityMinimaStruct::DecodableType & value);
 };
 
-class MTRBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge
-    : public MTRBasicCapabilityMinimaStructAttributeCallbackBridge
+class MTRBasicInformationCapabilityMinimaStructAttributeCallbackSubscriptionBridge
+    : public MTRBasicInformationCapabilityMinimaStructAttributeCallbackBridge
 {
 public:
-    MTRBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      MTRActionBlock action,
-                                                                      MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRBasicCapabilityMinimaStructAttributeCallbackBridge(queue, handler, action),
+    MTRBasicInformationCapabilityMinimaStructAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBasicInformationCapabilityMinimaStructAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRBasicCapabilityMinimaStructAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRBasicCapabilityMinimaStructAttributeCallbackBridge::OnDone;
+    using MTRBasicInformationCapabilityMinimaStructAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBasicInformationCapabilityMinimaStructAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBasicGeneratedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BasicGeneratedCommandListListAttributeCallback>
+class MTRBasicInformationGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BasicInformationGeneratedCommandListListAttributeCallback>
 {
 public:
-    MTRBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<BasicGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRBasicInformationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BasicInformationGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRBasicGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                            MTRActionBlock action) :
-        MTRCallbackBridge<BasicGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRBasicInformationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<BasicInformationGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class MTRBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRBasicGeneratedCommandListListAttributeCallbackBridge
+class MTRBasicInformationGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRBasicInformationGeneratedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        MTRActionBlock action,
-                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRBasicGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+    MTRBasicInformationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBasicInformationGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRBasicGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRBasicGeneratedCommandListListAttributeCallbackBridge::OnDone;
+    using MTRBasicInformationGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBasicInformationGeneratedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBasicAcceptedCommandListListAttributeCallbackBridge
-    : public MTRCallbackBridge<BasicAcceptedCommandListListAttributeCallback>
+class MTRBasicInformationAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BasicInformationAcceptedCommandListListAttributeCallback>
 {
 public:
-    MTRBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<BasicAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRBasicInformationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BasicInformationAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRBasicAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<BasicAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRBasicInformationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<BasicInformationAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
 };
 
-class MTRBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge
-    : public MTRBasicAcceptedCommandListListAttributeCallbackBridge
+class MTRBasicInformationAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRBasicInformationAcceptedCommandListListAttributeCallbackBridge
 {
 public:
-    MTRBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       MTRActionBlock action,
-                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRBasicAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+    MTRBasicInformationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBasicInformationAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRBasicAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRBasicAcceptedCommandListListAttributeCallbackBridge::OnDone;
+    using MTRBasicInformationAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBasicInformationAcceptedCommandListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRBasicAttributeListListAttributeCallbackBridge : public MTRCallbackBridge<BasicAttributeListListAttributeCallback>
+class MTRBasicInformationAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BasicInformationAttributeListListAttributeCallback>
 {
 public:
-    MTRBasicAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<BasicAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRBasicInformationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BasicInformationAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRBasicAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<BasicAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRBasicInformationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action) :
+        MTRCallbackBridge<BasicInformationAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-class MTRBasicAttributeListListAttributeCallbackSubscriptionBridge : public MTRBasicAttributeListListAttributeCallbackBridge
+class MTRBasicInformationAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRBasicInformationAttributeListListAttributeCallbackBridge
 {
 public:
-    MTRBasicAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 MTRActionBlock action,
-                                                                 MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRBasicAttributeListListAttributeCallbackBridge(queue, handler, action),
+    MTRBasicInformationAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action,
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBasicInformationAttributeListListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRBasicAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRBasicAttributeListListAttributeCallbackBridge::OnDone;
+    using MTRBasicInformationAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBasicInformationAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
