@@ -59,23 +59,31 @@ struct {{cluster.name}}Cluster : public GeneratedCluster
     });
   }
 
-{%- if cluster.commands | length > 0 %}
-  chip::CommandId incomingCommandList[{{cluster.commands | length + 1}}] = {
-  {%- for command in cluster.commands %}
-    {{command.code}},
-  {%- endfor %}
-    chip::kInvalidCommandId
-  };
+{%  for attr in cluster.attributes %}
+  {{"List" if attr.definition.is_list}}Attribute<{{attr | getType(cluster, idl)}}> m{{attr.definition.name | capitalcase}};
+{%-  endfor  %}
 
+{%- if cluster.commands | length > 0 %}
+  static chip::CommandId incomingCommandList[];
   chip::CommandId * GetIncomingCommandList() override
   {
     return incomingCommandList;
   }
 {%- endif %}
 
-{%  for attr in cluster.attributes %}
-  {{"List" if attr.definition.is_list}}Attribute<{{attr | getType(cluster, idl)}}> m{{attr.definition.name | capitalcase}};
-{%-  endfor  %}
 };
+
+
+#ifndef {{cluster.name | constcase}}_CLUSTER_INCOMING_COMMANDS
+#define {{cluster.name | constcase}}_CLUSTER_INCOMING_COMMANDS
+{%- if cluster.commands | length > 0 %}
+  chip::CommandId {{cluster.name}}Cluster::incomingCommandList[] = {
+  {%- for command in cluster.commands %}
+    {{command.code}},
+  {%- endfor %}
+    chip::kInvalidCommandId
+  };
+{%- endif %}
+#endif
 
 }
