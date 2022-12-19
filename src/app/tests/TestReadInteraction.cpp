@@ -4173,12 +4173,11 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession(nlTestSuite *
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
-    readPrepareParams.mpAttributePathParamsList    = new chip::app::AttributePathParams[1];
-    readPrepareParams.mAttributePathParamsListSize = 1;
-
     AttributePathParams subscribePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(4));
-    readPrepareParams.mpAttributePathParamsList[0] = subscribePath;
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    readPrepareParams.mpAttributePathParamsList    = &subscribePath;
+    readPrepareParams.mAttributePathParamsListSize = 1;
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
     readPrepareParams.mMaxIntervalCeilingSeconds = 0;
