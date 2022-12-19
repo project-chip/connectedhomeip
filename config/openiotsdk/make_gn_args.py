@@ -50,16 +50,25 @@ def write_gn_args(args):
         sys.stdout.write('{} = "{}"\n'.format(key, value))
 
     for key, value in args.arg_cflags:
-        # Remove empty include paths - fix generator expressions issue
-        filtered_value = [x for x in value.split(",") if x != '"-isystem"']
-        sys.stdout.write('{} = [{}]\n'.format(
-            key, ",".join(filtered_value)))
+        filtered_value = value.split(",")
+        # Remove empty include paths and defines
+        filtered_value = filter(lambda v: v != "'-D'", filtered_value)
+        filtered_value = filter(lambda v: v != "'-isystem'", filtered_value)
+        # Fix " and '
+        filtered_value = map(lambda v: v.replace('"', '\\"'), filtered_value)
+        filtered_value = map(lambda v: v.replace("'", '"'), filtered_value)
+        # Remove duplicates and sort
+        filtered_value = list(set(filtered_value))
+        filtered_value = sorted(filtered_value)
 
-    cflag_excludes = ', '.join(['"{}"'.format(exclude)
+        sys.stdout.write('{} = [\n    {}\n]\n'.format(
+            key, ",\n    ".join(filtered_value)))
+
+    cflag_excludes = ',\n    '.join(['"{}"'.format(exclude)
                                for exclude in GN_CFLAG_EXCLUDES])
 
     for key, value in args.arg_cflags_lang:
-        sys.stdout.write('{} = filter_exclude(string_split("{}"), [{}])\n'.format(
+        sys.stdout.write('{} = filter_exclude(string_split(\n    "{}"\n), [\n    {}\n]\n)\n'.format(
             key, value, cflag_excludes))
 
 

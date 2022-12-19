@@ -61,13 +61,11 @@ endfunction()
 # [Args]:
 #   target - target name
 #   output - output variable name
+# Note: Includes are returned as a generator expression which must be evalued 
+# at build time. 
 function(get_include_directories target output)
   get_property(flags TARGET ${target} PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
-  list(APPEND CFLAG_LIST)
-  foreach(flag ${flags})
-    list(APPEND CFLAG_LIST "\"-isystem${flag}\"")
-  endforeach()
-  set(${output} ${CFLAG_LIST} PARENT_SCOPE)
+  set(${output} "'-isystem$<JOIN:$<TARGET_PROPERTY:${target},INTERFACE_INCLUDE_DIRECTORIES>,'$<COMMA>'-isystem>'" PARENT_SCOPE)
 endfunction()
 
 # Get compile definitions of target build
@@ -76,16 +74,11 @@ endfunction()
 # [Args]:
 #   target - target name
 #   output - output variable name
+# Note: Definitions are returned as a generator expression which must be evalued 
+# at build time. 
 function(get_compile_definitions target output)
   get_property(flags TARGET ${target} PROPERTY INTERFACE_COMPILE_DEFINITIONS)
-
-  list(APPEND CFLAG_LIST)
-  foreach(flag ${flags})
-    # Replace each quote with a '\"' - format required for the GN arguments
-    string(REPLACE "\""  "\\\\\""  output_flag ${flag})
-    list(APPEND CFLAG_LIST "\"-D${output_flag}\"")
-  endforeach()
-  set(${output} ${CFLAG_LIST} PARENT_SCOPE)
+  set(${output} "'-D$<JOIN:$<TARGET_PROPERTY:${target},INTERFACE_COMPILE_DEFINITIONS>,'$<COMMA>'-D>'" PARENT_SCOPE)
 endfunction()
 
 # Get compile options of build for specific language

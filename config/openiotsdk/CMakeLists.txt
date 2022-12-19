@@ -31,7 +31,7 @@ include(util.cmake)
 # Declare configuration variables and define constants
 # ==============================================================================
 # C/C++ compiler flags passed to CHIP build system
-list(APPEND CHIP_CFLAGS \"-Wno-unused-function\")
+list(APPEND CHIP_CFLAGS "'-Wno-unused-function'")
 
 # C compiler flags passed to CHIP build system
 list(APPEND CHIP_CFLAGS_C ${CMAKE_C_FLAGS})
@@ -111,6 +111,7 @@ list(FILTER ALL_SDK_TARGETS EXCLUDE REGEX "^.*linker.*|.*example.*|.*apps.*|.*do
 foreach(target ${ALL_SDK_TARGETS})
     get_target_common_compile_flags(SDK_TARGET_CFLAGS ${target})
     list(APPEND CHIP_CFLAGS ${SDK_TARGET_CFLAGS})
+    set(SDK_TARGET_CFLAGS "") # Reset SDK_TARGET_CFLAGS between update
 endforeach()
 
 # Remove duplicated flags
@@ -216,17 +217,28 @@ ExternalProject_Add(
     PREFIX                  ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR              ${CHIP_ROOT}
     BINARY_DIR              ${CMAKE_CURRENT_BINARY_DIR}
-    CONFIGURE_COMMAND       ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/make_gn_args.py
-                                @args.tmp > args.gn &&
-                            ${GN_EXECUTABLE}
+    CONFIGURE_COMMAND       ""
+    CONFIGURE_HANDLED_BY_BUILD TRUE
+    BUILD_COMMAND           ${CMAKE_COMMAND} -E echo "Starting Matter library build in ${CMAKE_CURRENT_BINARY_DIR}"
+    COMMAND                 ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/make_gn_args.py @args.tmp > args.gn.tmp
+    # Replace the config if it has changed
+    COMMAND                 bash -c "(! diff -q args.gn.tmp args.gn && mv args.gn.tmp args.gn) || true" 
+    COMMAND                 ${GN_EXECUTABLE}
                                 --root=${CHIP_ROOT}
                                 --root-target=${GN_ROOT_TARGET}
                                 --dotfile=${GN_ROOT_TARGET}/.gn
                                 --script-executable=${Python3_EXECUTABLE}
                                 gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
-    BUILD_COMMAND           ninja
+    COMMAND                 ninja
+    COMMAND                 ${CMAKE_COMMAND} -E echo "Matter library build complete"
     INSTALL_COMMAND         ""
-    BUILD_BYPRODUCTS        ${CHIP_LIBRARIES}
+    # Byproducts are removed by the clean target removing config and .ninja_deps
+    # allows a rebuild of the external project after the clean target has been run. 
+    BUILD_BYPRODUCTS        ${CMAKE_CURRENT_BINARY_DIR}/args.gn
+                            ${CMAKE_CURRENT_BINARY_DIR}/build.ninja
+                            ${CMAKE_CURRENT_BINARY_DIR}/.ninja_deps
+                            ${CMAKE_CURRENT_BINARY_DIR}/build.ninja.stamp
+                            ${CHIP_LIBRARIES}
     BUILD_ALWAYS            TRUE
     USES_TERMINAL_CONFIGURE TRUE
     USES_TERMINAL_BUILD     TRUE
@@ -260,7 +272,6 @@ target_link_libraries(openiotsdk-chip INTERFACE
     $<$<TARGET_EXISTS:iotsdk-ip-network-api>:iotsdk-ip-network-api>
     $<$<TARGET_EXISTS:iotsdk-tdbstore>:iotsdk-tdbstore>
     $<$<TARGET_EXISTS:iotsdk-blockdevice>:iotsdk-blockdevice>
-    $<$<TARGET_EXISTS:iotsdk-serial-retarget>:$<TARGET_OBJECTS:iotsdk-serial-retarget>>
 )
 add_dependencies(openiotsdk-chip chip-gn)
 
@@ -285,10 +296,6 @@ if(TFM_SUPPORT)
         TFM_SUPPORT
     )
 endif()
-
-target_include_directories(openiotsdk-chip INTERFACE
-    ${CHIP_ROOT}/config/openiotsdk/mbedtls
-)
 
 if (NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     target_compile_definitions(openiotsdk-chip INTERFACE
