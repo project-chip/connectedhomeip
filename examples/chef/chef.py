@@ -25,10 +25,9 @@ import tarfile
 import textwrap
 from typing import Any, Dict, Sequence
 
-import yaml
-
 import constants
 import stateful_shell
+import yaml
 from sample_app_util import zap_file_parser
 
 TermColors = constants.TermColors

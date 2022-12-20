@@ -30,7 +30,6 @@ import zipfile
 
 import coloredlogs
 import github
-
 import github_fetch_artifacts
 
 LOG_KEEP_DAYS = 3

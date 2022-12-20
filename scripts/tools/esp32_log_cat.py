@@ -30,7 +30,6 @@ import argparse
 import logging
 
 import coloredlogs
-
 import serial
 
 

@@ -17,7 +17,6 @@ import logging
 from time import sleep
 
 import pytest
-
 from button_service import button_service_pb2
 from chip import ChipDeviceCtrl
 from common.pigweed_client import PigweedClient

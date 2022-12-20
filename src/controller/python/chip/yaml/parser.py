@@ -21,11 +21,10 @@ import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 
-import yaml
-
 import chip.interaction_model
 import chip.yaml.format_converter as Converter
 import stringcase
+import yaml
 from chip import ChipDeviceCtrl
 from chip.tlv import float32
 from chip.yaml.errors import ParsingError, UnexpectedParsingError

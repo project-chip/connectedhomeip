@@ -21,10 +21,9 @@ import pathlib
 import shutil
 from time import sleep
 
-import pytest
-
 import chip.CertificateAuthority
 import chip.native
+import pytest
 from chip import ChipDeviceCtrl, exceptions
 from chip.ChipStack import *
 

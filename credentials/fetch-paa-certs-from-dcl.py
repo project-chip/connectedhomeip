@@ -30,10 +30,9 @@ from contextlib import nullcontext
 
 import click
 import requests
+from click_option_group import RequiredMutuallyExclusiveOptionGroup, optgroup
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
-
-from click_option_group import RequiredMutuallyExclusiveOptionGroup, optgroup
 
 PRODUCTION_NODE_URL = "https://on.dcl.csa-iot.org:26657"
 PRODUCTION_NODE_URL_REST = "https://on.dcl.csa-iot.org"

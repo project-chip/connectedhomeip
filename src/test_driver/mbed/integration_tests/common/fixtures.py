@@ -17,9 +17,8 @@ import logging
 from time import sleep
 from typing import Any, List, Mapping, Optional
 
-import pytest
-
 import mbed_lstools
+import pytest
 
 from .device import Device
 from .serial_connection import SerialConnection

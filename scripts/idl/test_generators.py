@@ -21,7 +21,6 @@ from dataclasses import dataclass, field
 from typing import List
 
 import yaml
-
 from idl.generators import GeneratorStorage
 from idl.generators.bridge import BridgeGenerator
 from idl.generators.cpp.application import CppApplicationGenerator

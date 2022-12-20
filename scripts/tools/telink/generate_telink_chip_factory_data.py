@@ -26,10 +26,9 @@ import sys
 from collections import namedtuple
 from os.path import exists
 
+import jsonschema
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import load_der_private_key
-
-import jsonschema
 
 # A user can not change the factory data version and must be coherent with
 # the factory data version set in the Telink platform Kconfig file (CHIP_FACTORY_DATA_VERSION).

@@ -28,7 +28,6 @@ import sys
 import click
 import coloredlogs
 from colorama import Fore, Style
-
 from java.base import DumpProgramOutputToQueue
 from java.commissioning_test import CommissioningTest
 from java.discover_test import DiscoverTest

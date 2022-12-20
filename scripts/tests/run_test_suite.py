@@ -22,10 +22,9 @@ import typing
 from dataclasses import dataclass
 from pathlib import Path
 
+import chiptest
 import click
 import coloredlogs
-
-import chiptest
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 

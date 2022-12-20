@@ -19,7 +19,6 @@ import logging
 from time import sleep
 
 import pytest
-
 from chip.clusters.Objects import DoorLock
 from common.utils import *
 

@@ -17,13 +17,12 @@ import logging
 import re
 from time import sleep
 
-import pytest
-from packaging import version
-
 import chip.native
+import pytest
 from chip import exceptions
 from chip.setup_payload import SetupPayload
 from common.utils import *
+from packaging import version
 
 log = logging.getLogger(__name__)
 

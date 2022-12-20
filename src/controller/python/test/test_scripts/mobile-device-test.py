@@ -22,11 +22,10 @@
 import asyncio
 import os
 
-import click
-import coloredlogs
-
 import base
 import chip.logging
+import click
+import coloredlogs
 from base import BaseTestHelper, FailIfNot, SetTestSet, TestFail, TestTimeout, logger
 from cluster_objects import ClusterObjectTests
 from network_commissioning import NetworkCommissioningTests

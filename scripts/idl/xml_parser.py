@@ -35,9 +35,10 @@ except:
 if __name__ == '__main__':
     # This Parser is generally not intended to be run as a stand-alone binary.
     # The ability to run is for debug and to print out the parsed AST.
+    import pprint
+
     import click
     import coloredlogs
-    import pprint
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants

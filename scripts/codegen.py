@@ -18,7 +18,6 @@ import logging
 import sys
 
 import click
-
 from idl.generators import FileSystemGeneratorStorage, GeneratorStorage
 from idl.generators.registry import GENERATORS, CodeGenerator
 

@@ -16,7 +16,6 @@
 import binascii
 import re
 
-
 '''Fixes certain value formats known to exist in YAML tests
 
 Some of the YAML test files contains some values that has been crafted to avoid some limitations

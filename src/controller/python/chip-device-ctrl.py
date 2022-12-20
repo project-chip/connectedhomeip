@@ -42,11 +42,9 @@ import warnings
 from cmd import Cmd
 from optparse import OptionParser, OptionValueError
 
-import coloredlogs
-
 import chip.logging
-from chip import ChipCommissionableNodeCtrl, ChipStack, FabricAdmin
-from chip import exceptions, native
+import coloredlogs
+from chip import ChipCommissionableNodeCtrl, ChipStack, FabricAdmin, exceptions, native
 from chip.setup_payload import SetupPayload
 from rich import pretty, print
 

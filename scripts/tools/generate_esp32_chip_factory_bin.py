@@ -27,7 +27,6 @@ import sys
 from types import SimpleNamespace
 
 import cryptography.x509
-
 from bitarray import bitarray
 from bitarray.util import ba2int
 from spake2p import generate_verifier  # noqa: E402

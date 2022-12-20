@@ -21,7 +21,6 @@ from typing import List, Optional
 
 import click
 import coloredlogs
-
 import idl.lint
 
 try:

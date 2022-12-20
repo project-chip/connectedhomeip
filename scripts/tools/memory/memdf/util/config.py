@@ -22,7 +22,6 @@ import re
 from typing import Any, Dict, List, Mapping, MutableMapping, Optional, Pattern, Sequence, Tuple, Union
 
 import humanfriendly  # type: ignore
-
 import memdf.util.nd as nd
 import memdf.util.pretty
 

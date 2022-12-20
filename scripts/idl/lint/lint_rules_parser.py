@@ -12,12 +12,14 @@ from lark import Lark
 from lark.visitors import Discard, Transformer, v_args
 
 try:
-    from .types import RequiredAttributesRule, AttributeRequirement, ClusterRequirement, RequiredCommandsRule, ClusterCommandRequirement
+    from .types import (AttributeRequirement, ClusterCommandRequirement, ClusterRequirement, RequiredAttributesRule,
+                        RequiredCommandsRule)
 except:
     import sys
 
     sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", ".."))
-    from idl.lint.types import RequiredAttributesRule, AttributeRequirement, ClusterRequirement, RequiredCommandsRule, ClusterCommandRequirement
+    from idl.lint.types import (AttributeRequirement, ClusterCommandRequirement, ClusterRequirement, RequiredAttributesRule,
+                                RequiredCommandsRule)
 
 
 def parseNumberString(n):

@@ -28,7 +28,6 @@ import threading
 import typing
 
 from colorama import Fore, Style
-
 from java.base import DumpProgramOutputToQueue
 
 

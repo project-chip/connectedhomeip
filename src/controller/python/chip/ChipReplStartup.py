@@ -3,13 +3,12 @@ import atexit
 import builtins
 import logging
 
-import coloredlogs
-
 import chip.CertificateAuthority
 import chip.discovery
 import chip.FabricAdmin
 import chip.logging
 import chip.native
+import coloredlogs
 from chip.ChipStack import *
 from rich import inspect, pretty
 from rich.console import Console

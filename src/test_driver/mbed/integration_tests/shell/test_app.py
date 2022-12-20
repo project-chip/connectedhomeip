@@ -18,11 +18,10 @@ import re
 from time import sleep
 
 import pytest
-from packaging import version
-
 from chip import ChipDeviceCtrl, exceptions
 from chip.setup_payload import SetupPayload
 from common.utils import *
+from packaging import version
 
 log = logging.getLogger(__name__)
 

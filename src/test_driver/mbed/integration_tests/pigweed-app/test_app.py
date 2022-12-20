@@ -14,7 +14,6 @@
 # limitations under the License.
 
 import pytest
-
 from common.pigweed_client import PigweedClient
 from echo_service import echo_pb2
 
