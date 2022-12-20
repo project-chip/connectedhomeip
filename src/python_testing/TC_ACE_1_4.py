@@ -27,11 +27,15 @@ import sys
 # run with
 # --int-arg PIXIT.ACE.ENDPOINT:<endpoint> PIXIT.ACE.APPDEVTYPE:<device_type_id>
 # --string-arg PIXIT.ACE.APPCLUSTER:<cluster_name> PIXIT.ACE.APPATTRIBUTE:<attribute_name>
+
+
 def str_to_cluster(str):
     return getattr(sys.modules["chip.clusters.Objects"], str)
 
+
 def str_to_attribute(cluster, str):
     return getattr(cluster.Attributes, str)
+
 
 class TC_ACE_1_4(MatterBaseTest):
 
@@ -41,12 +45,12 @@ class TC_ACE_1_4(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
         print(result)
 
-    async def read_descriptor_expect_success(self, endpoint:int) -> None:
+    async def read_descriptor_expect_success(self, endpoint: int) -> None:
         cluster = Clusters.Objects.Descriptor
         attribute = Clusters.Descriptor.Attributes.DeviceTypeList
         await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
-    async def read_descriptor_expect_unsupported_access(self, endpoint:int) -> None:
+    async def read_descriptor_expect_unsupported_access(self, endpoint: int) -> None:
         cluster = Clusters.Objects.Descriptor
         attribute = Clusters.Descriptor.Attributes.DeviceTypeList
         await self.read_single_attribute_expect_error(endpoint=endpoint, cluster=cluster, attribute=attribute, error=Status.UnsupportedAccess)
@@ -60,7 +64,7 @@ class TC_ACE_1_4(MatterBaseTest):
     async def read_wildcard_endpoint(self, attribute: object) -> object:
         return await self.default_controller.ReadAttribute(self.dut_node_id, [(attribute)])
 
-    def check_read_success(self, results: object, endpoint:int, cluster:object, attribute:object) -> None:
+    def check_read_success(self, results: object, endpoint: int, cluster: object, attribute: object) -> None:
         err_msg = "Results not returned for ep {}".format(str(endpoint))
         asserts.assert_true(endpoint in results, err_msg)
         err_msg = "Results not returned for cluster {} on ep {}".format(str(cluster), str(endpoint))
@@ -156,7 +160,6 @@ class TC_ACE_1_4(MatterBaseTest):
         self.print_step(13, "TH1 reads PIXIT.ACE.APPENDPOINT PIXIT.ACE.APPCLUSTER - expect SUCCESS")
         await self.read_appcluster_expect_success()
 
-
         self.print_step(14, "TH1 writes ACL descriptor view on PIXIT.ACE.APPENDPOINT")
         descriptor_appendpoint_view = Clusters.AccessControl.Structs.AccessControlEntry(
             privilege=Clusters.AccessControl.Enums.Privilege.kView,
@@ -214,7 +217,6 @@ class TC_ACE_1_4(MatterBaseTest):
         self.print_step(25, "TH1 reads PIXIT.ACE.APPENDPOINT PIXIT.ACE.APPCLUSTER - expect SUCCESS")
         await self.read_appcluster_expect_success()
 
-
         self.print_step(26, "TH1 writes ACL rootnode device type view on all endpoints")
         rootnode_view = Clusters.AccessControl.Structs.AccessControlEntry(
             privilege=Clusters.AccessControl.Enums.Privilege.kView,
@@ -234,7 +236,6 @@ class TC_ACE_1_4(MatterBaseTest):
         self.print_step(29, "TH1 reads PIXIT.ACE.APPENDPOINT PIXIT.ACE.APPCLUSTER - expect UNSUPPORTED_ACCESS")
         await self.read_appcluster_expect_unsupported_access()
 
-
         self.print_step(30, "TH1 writes ACL PIXIT.ACE.APPDEVTYPE view on all endpoints")
         appdevtype_view = Clusters.AccessControl.Structs.AccessControlEntry(
             privilege=Clusters.AccessControl.Enums.Privilege.kView,
@@ -253,7 +254,6 @@ class TC_ACE_1_4(MatterBaseTest):
 
         self.print_step(33, "TH1 reads PIXIT.ACE.APPENDPOINT PIXIT.ACE.APPCLUSTER - expect SUCCESS")
         await self.read_appcluster_expect_success()
-
 
         self.print_step(34, "TH1 writes ACL descriptor cluster on appdevtype on all endpoints")
         descriptor_appdevtype_view = Clusters.AccessControl.Structs.AccessControlEntry(
@@ -292,7 +292,6 @@ class TC_ACE_1_4(MatterBaseTest):
 
         self.print_step(41, "TH1 reads PIXIT.ACE.APPENDPOINT PIXIT.ACE.APPCLUSTER - expect SUCCESS")
         await self.read_appcluster_expect_success()
-
 
         self.print_step(42, "TH1 writes ACL multi-target view")
         multitarget_view = Clusters.AccessControl.Structs.AccessControlEntry(
