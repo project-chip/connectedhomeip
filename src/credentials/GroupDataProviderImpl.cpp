@@ -496,7 +496,7 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
         return false;
     }
 
-    // returns index if the find_idx is found, otherwise std::numeric_limits<size_t>::max
+    // returns index if the find_id is found, otherwise std::numeric_limits<size_t>::max
     size_t Find(PersistentStorageDelegate * storage, const FabricData & fabric, const KeysetId find_id)
     {
         fabric_index = fabric.fabric_index;
