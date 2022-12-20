@@ -27,7 +27,7 @@ get_filename_component(OPEN_IOT_SDK_STORAGE_SOURCE ${CHIP_ROOT}/third_party/open
 # List of binary directories to Open IoT SDK sources
 list(APPEND SDK_SOURCES_BINARY_DIRS)
 
-# Additional Open IoT SDK build configuration 
+# Additional Open IoT SDK build configuration
 set(TFM_SUPPORT NO CACHE BOOL "Add Trusted Firmware-M (TF-M) support to application")
 set(TFM_NS_APP_VERSION "0.0.0" CACHE STRING "TF-M non-secure application version (in the x.x.x format)")
 
@@ -59,6 +59,16 @@ if(TFM_SUPPORT)
     endif()
     set(LINKER_SCRIPT ${OPEN_IOT_SDK_CONFIG}/ld/cs300_gcc_tfm.ld)
 endif()
+
+# Add a Matter specific version of Mbedtls
+FetchContent_Declare(
+
+    mbedtls
+    GIT_REPOSITORY https://github.com/ARMmbed/mbedtls
+    GIT_TAG        v3.2.1
+    GIT_SHALLOW    ON
+    GIT_PROGRESS   ON
+)
 
 # Add Open IoT SDK source
 add_subdirectory(${OPEN_IOT_SDK_SOURCE} ./sdk_build)
@@ -134,14 +144,14 @@ if(TARGET mbedtls-config)
             ${OPEN_IOT_SDK_CONFIG}/mbedtls
     )
 
-    target_sources(mbedtls-config 
+    target_sources(mbedtls-config
         INTERFACE
             ${OPEN_IOT_SDK_CONFIG}/mbedtls/platform_alt.cpp
     )
 
     target_compile_definitions(mbedtls-config
         INTERFACE
-            MBEDTLS_CONFIG_FILE="mbedtls_config.h"
+            MBEDTLS_CONFIG_FILE="${OPEN_IOT_SDK_CONFIG}/mbedtls/mbedtls_config.h"
     )
 
     target_link_libraries(mbedtls-config
@@ -159,7 +169,7 @@ if(TARGET freertos-kernel)
             freertos-cmsis-rtos
             freertos-kernel-heap-3
     )
-    target_include_directories(cmsis-rtos-implementation 
+    target_include_directories(cmsis-rtos-implementation
         INTERFACE
             ${CMAKE_CURRENT_SOURCE_DIR}/freertos-config
     )
@@ -213,9 +223,9 @@ if(TFM_SUPPORT)
                 $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_NAME}.elf
         COMMAND rm
         ARGS -Rf
-            $<TARGET_FILE_DIR:${APP_TARGET}>/tfm_s_signed.bin 
+            $<TARGET_FILE_DIR:${APP_TARGET}>/tfm_s_signed.bin
             $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.bin
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}_signed.bin 
+            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}_signed.bin
             $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}_merged.hex
             $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}_merged.elf
         VERBATIM
