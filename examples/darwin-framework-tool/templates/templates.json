@@ -13,7 +13,8 @@
     "resources": {
         "pics-metafile": "../../../src/app/tests/suites/certification/PICS.yaml",
         "certification-metadir": "../../../src/app/tests/suites/certification",
-        "test-metadir": "../../../src/app/tests/suites"
+        "test-metadir": "../../../src/app/tests/suites",
+        "availability-data": "../../../src/darwin/Framework/CHIP/templates/availability.yaml"
     },
     "override": "../../../src/app/zap-templates/common/override.js",
     "partials": [
