@@ -144,9 +144,6 @@ void PlatformManagerImpl::PlatformInit(void)
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("MatterLight");
 
 #if CHIP_ENABLE_OPENTHREAD
-#if CONFIG_ENABLE_CHIP_SHELL
-    cmd_otcli_init();
-#endif
 
     ChipLogProgress(NotSpecified, "Initializing OpenThread stack");
     ret = ThreadStackMgr().InitThreadStack();
@@ -166,6 +163,11 @@ void PlatformManagerImpl::PlatformInit(void)
         ChipLogError(NotSpecified, "ConnectivityMgr().SetThreadDeviceType() failed");
         appError(ret);
     }
+
+#if CONFIG_ENABLE_CHIP_SHELL
+    cmd_otcli_init();
+#endif
+
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     ret = sWiFiNetworkCommissioningInstance.Init();

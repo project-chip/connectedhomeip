@@ -225,13 +225,19 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoin
 
     while (it->Next(&interfaceId, &addressType))
     {
+        ChipLogError(DeviceLayer, "while (it->Next(&interfaceId, &addressType))");
+
         chip::Inet::UDPEndPoint * listenUdp;
         ReturnErrorOnFailure(udpEndPointManager->NewEndPoint(&listenUdp));
         std::unique_ptr<chip::Inet::UDPEndPoint, EndpointInfo::EndPointDeletor> endPointHolder(listenUdp, {});
 
+        ChipLogError(DeviceLayer, "ReturnErrorOnFailure(udpEndPointManager->NewEndPoint(&listenUdp));");
+
         ReturnErrorOnFailure(listenUdp->Bind(addressType, chip::Inet::IPAddress::Any, port, interfaceId));
+        ChipLogError(DeviceLayer, "ReturnErrorOnFailure(listenUdp->Bind(addressType, chip::Inet::IPAddress::Any, port, interfaceId));");
 
         ReturnErrorOnFailure(listenUdp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
+        ChipLogError(DeviceLayer, "ReturnErrorOnFailure(listenUdp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));");
 
         CHIP_ERROR err = JoinMulticastGroup(interfaceId, listenUdp, addressType);
         if (err != CHIP_NO_ERROR)

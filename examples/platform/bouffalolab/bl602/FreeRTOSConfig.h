@@ -198,7 +198,11 @@ Like all task stack sizes, the value is the number of words, not bytes. */
 #define genqGENERIC_QUEUE_TEST_TASK_STACK_SIZE 100
 #define recmuRECURSIVE_MUTEX_TEST_TASK_STACK_SIZE 90
 
+#ifdef __cplusplus
+extern "C" void vAssertCalled(void);
+#else
 extern void vAssertCalled(void);
+#endif
 /* Stop if an assertion fails. */
 #define configASSERT(x)                                                                                                            \
     if ((x) == 0)                                                                                                                  \
@@ -206,7 +210,11 @@ extern void vAssertCalled(void);
 
 #if ( configUSE_TICKLESS_IDLE != 0 )
 #include "portmacro.h"
+#ifdef __cplusplus
+extern "C" void vApplicationSleep(TickType_t xExpectedIdleTime);
+#else
 extern void vApplicationSleep(TickType_t xExpectedIdleTime);
+#endif
 #define portSUPPRESS_TICKS_AND_SLEEP(xExpectedIdleTime)    vApplicationSleep(xExpectedIdleTime)
 #endif
 

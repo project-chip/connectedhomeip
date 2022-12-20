@@ -143,11 +143,7 @@ SECTIONS
     *(.ble_rsvd_mem)
 
     KEEP(*AppTask.cpp.o(.bss.*appStack*))
-    KEEP(*main.cpp.o(.bss.*IdleTaskStack*))
     KEEP(*main.cpp.o(.bss.*TimerTaskStack*))
-    
-    /*KEEP(*MemMonitoring.cpp.o(.bss.*monitoringStack*))*/
-    /*KEEP(*out.uart.c.o(.bss.chipUart_var*))*/
     
   } >hbnram
 

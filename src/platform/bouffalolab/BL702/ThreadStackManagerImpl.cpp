@@ -50,7 +50,7 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     otRadio_opt_t opt;
     
     opt.byte = 0;
-    opt.bf.isLinkMetricEnable = true;
+    opt.bf.isCoexEnable = true;
 
     ot_alarmInit();
     ot_radioInit(opt);

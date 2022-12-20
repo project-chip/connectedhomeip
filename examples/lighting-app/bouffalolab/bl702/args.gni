@@ -29,4 +29,4 @@ chip_enable_wifi = false
 lwip_platform = "bl702"
 
 chip_enable_ota_requestor = true
-chip_detail_logging = false
+chip_detail_logging = false 

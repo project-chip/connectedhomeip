@@ -173,10 +173,10 @@ extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBu
 extern "C" void vApplicationTickHook(void) {}
 #endif
 
-extern "C" void vApplicationSleep(TickType_t xExpectedIdleTime) {}
+void vApplicationSleep(TickType_t xExpectedIdleTime) {}
 
 extern "C" void user_vAssertCalled(void) __attribute__((weak, alias("vAssertCalled")));
-extern "C" void vAssertCalled(void)
+void vAssertCalled(void)
 {
     void * ra = (void *) __builtin_return_address(0);
 

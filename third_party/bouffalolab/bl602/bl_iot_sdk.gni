@@ -55,12 +55,14 @@ template("bl_iot_sdk") {
       defines += invoker.defines
     }
 
-    if (defined(invoker.freertos_config)) {
-      cflags_c = [
-        "-include",
-        rebase_path("${invoker.freertos_config}", root_build_dir),
-      ]
-    }
+    cflags_c = [
+      "-include",
+      rebase_path("${invoker.freertos_config}", root_build_dir),
+    ]
+    cflags_cc = [
+      "-include",
+      rebase_path("${invoker.freertos_config}", root_build_dir),
+    ]
   }
 
   source_set("${sdk_target_name}_soc") {
