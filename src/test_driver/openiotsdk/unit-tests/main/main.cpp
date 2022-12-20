@@ -36,6 +36,8 @@ static void test_thread(void * argument)
     int status;
     CHIP_ERROR err;
 
+    ChipLogAutomation("Open IoT SDK unit-tests start");
+
     if (openiotsdk_network_init(true))
     {
         ChipLogAutomation("ERROR: Network initialization failed");
@@ -59,8 +61,6 @@ exit:
 
 int main()
 {
-    ChipLogAutomation("Open IoT SDK unit-tests start");
-
     if (openiotsdk_platform_init())
     {
         ChipLogAutomation("ERROR: Open IoT SDK platform initialization failed");

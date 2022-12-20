@@ -33,6 +33,8 @@ static void app_thread(void * argument)
 {
     int ret;
 
+    ChipLogProgress(Shell, "Open IoT SDK shell example application start");
+
     if (openiotsdk_network_init(true))
     {
         ChipLogError(Shell, "Network initialization failed");
@@ -59,8 +61,6 @@ exit:
 
 int main()
 {
-    ChipLogProgress(Shell, "Open IoT SDK shell example application start");
-
     if (openiotsdk_platform_init())
     {
         ChipLogError(Shell, "Open IoT SDK platform initialization failed");
