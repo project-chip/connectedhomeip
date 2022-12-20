@@ -14,27 +14,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import os
 import unittest
 from dataclasses import dataclass, field
 from typing import List
 
 import yaml
-from idl.generators import GeneratorStorage
-from idl.generators.bridge import BridgeGenerator
-from idl.generators.cpp.application import CppApplicationGenerator
-from idl.generators.java import JavaGenerator
-from idl.matter_idl_types import Idl
 
 try:
     from idl.matter_idl_parser import CreateParser
-except:
+except ImportError:
     import sys
 
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
     from idl.matter_idl_parser import CreateParser
+
+# isort: off
+from idl.generators import GeneratorStorage
+from idl.generators.bridge import BridgeGenerator
+from idl.generators.cpp.application import CppApplicationGenerator
+from idl.generators.java import JavaGenerator
+from idl.matter_idl_types import Idl
 
 
 TESTS_DIR = os.path.join(os.path.dirname(__file__), "tests")

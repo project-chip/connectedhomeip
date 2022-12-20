@@ -48,17 +48,8 @@ from inspect import cleandoc
 from typing import Any, BinaryIO, Callable, Collection
 
 import pw_cli.log
-# Protos
-from attributes_service import attributes_service_pb2
-from button_service import button_service_pb2
 from chip_rpc.plugins.device_toolbar import DeviceToolbar
 from chip_rpc.plugins.helper_scripts import HelperScripts
-from descriptor_service import descriptor_service_pb2
-from device_service import device_service_pb2
-from echo_service import echo_pb2
-from lighting_service import lighting_service_pb2
-from locking_service import locking_service_pb2
-from ot_cli_service import ot_cli_service_pb2
 from pw_console import PwConsoleEmbed
 from pw_console.__main__ import create_temp_log_file
 from pw_console.pyserial_wrapper import SerialWithLogging
@@ -67,7 +58,18 @@ from pw_rpc import callback_client
 from pw_rpc.console_tools.console import ClientInfo, flattened_rpc_completions
 from pw_tokenizer import tokens
 from pw_tokenizer.database import LoadTokenDatabases
-from pw_tokenizer.detokenize import Detokenizer, detokenize_base64
+from pw_tokenizer.detokenize import Detokenizer
+
+# Protos
+# isort: off
+from attributes_service import attributes_service_pb2
+from button_service import button_service_pb2
+from descriptor_service import descriptor_service_pb2
+from device_service import device_service_pb2
+from echo_service import echo_pb2
+from lighting_service import lighting_service_pb2
+from locking_service import locking_service_pb2
+from ot_cli_service import ot_cli_service_pb2
 from thread_service import thread_service_pb2
 from wifi_service import wifi_service_pb2
 

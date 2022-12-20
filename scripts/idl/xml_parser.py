@@ -14,22 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import enum
 import logging
 import os
-import xml.sax
-import xml.sax.handler
-
-from idl.zapxml import ParseSource, ParseXmls
 
 try:
-    from idl.matter_idl_types import Idl
-except:
+    from idl.zapxml import ParseSource, ParseXmls
+except ImportError:
     import sys
 
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from idl.matter_idl_types import Idl
+    from idl.zapxml import ParseSource, ParseXmls
 
 
 if __name__ == '__main__':
