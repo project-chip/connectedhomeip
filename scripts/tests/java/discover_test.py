@@ -17,16 +17,18 @@
 #    limitations under the License.
 #
 
+import argparse
+import asyncio
 import logging
 import os
-import sys
-import asyncio
 import queue
 import subprocess
+import sys
 import threading
 import typing
-import argparse
+
 from colorama import Fore, Style
+
 from java.base import DumpProgramOutputToQueue
 
 

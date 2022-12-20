@@ -18,13 +18,12 @@
 import itertools
 import logging
 import os
-
 from typing import Iterable, Mapping, Optional
 
 import dateutil  # type: ignore
 import dateutil.parser  # type: ignore
-import ghapi.all  # type: ignore
 
+import ghapi.all  # type: ignore
 from memdf import Config, ConfigDescription
 
 

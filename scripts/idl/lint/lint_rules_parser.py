@@ -2,14 +2,14 @@
 
 import logging
 import os
-import xml.etree.ElementTree
-
-from dataclasses import dataclass, field
-from typing import List, Optional, Mapping
-from lark import Lark
-from lark.visitors import Transformer, v_args, Discard
-import stringcase
 import traceback
+import xml.etree.ElementTree
+from dataclasses import dataclass, field
+from typing import List, Mapping, Optional
+
+import stringcase
+from lark import Lark
+from lark.visitors import Discard, Transformer, v_args
 
 try:
     from .types import RequiredAttributesRule, AttributeRequirement, ClusterRequirement, RequiredCommandsRule, ClusterCommandRequirement

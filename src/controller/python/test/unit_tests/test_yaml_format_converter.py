@@ -15,9 +15,10 @@
 #    limitations under the License.
 #
 
-from chip.yaml.format_converter import convert_yaml_octet_string_to_bytes, substitute_in_config_variables
-from binascii import unhexlify
 import unittest
+from binascii import unhexlify
+
+from chip.yaml.format_converter import convert_yaml_octet_string_to_bytes, substitute_in_config_variables
 
 
 class TestOctetStringYamlDecode(unittest.TestCase):

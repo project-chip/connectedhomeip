@@ -1,8 +1,9 @@
 import argparse
-import sys
 import os
-import serial
+import sys
+
 import pw_tokenizer
+import serial
 
 
 def parse_args():

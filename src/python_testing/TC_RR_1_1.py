@@ -15,22 +15,22 @@
 #    limitations under the License.
 #
 
-from matter_testing_support import MatterBaseTest, default_matter_test_main, async_test_body
-import chip.clusters as Clusters
-import chip.FabricAdmin
-import chip.CertificateAuthority
-import logging
-from mobly import asserts
-from chip.utils import CommissioningBuildingBlocks
-from chip.clusters.Attribute import TypedAttributePath, SubscriptionTransaction, AttributeStatus
-from chip.interaction_model import Status as StatusEnum
-import queue
 import asyncio
+import logging
+import queue
+import random
+import time
 from binascii import hexlify
 from threading import Event
-import time
-import random
 
+import chip.CertificateAuthority
+import chip.clusters as Clusters
+import chip.FabricAdmin
+from chip.clusters.Attribute import AttributeStatus, SubscriptionTransaction, TypedAttributePath
+from chip.interaction_model import Status as StatusEnum
+from chip.utils import CommissioningBuildingBlocks
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator, ResubscriptionCatcher
 
 # TODO: Overall, we need to add validation that session IDs have not changed throughout to be agnostic

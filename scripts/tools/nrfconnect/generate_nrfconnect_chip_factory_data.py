@@ -15,16 +15,17 @@
 #    limitations under the License.
 #
 
-from os.path import exists
-import os
-import sys
-import json
-import secrets
 import argparse
-import subprocess
-import logging as log
 import base64
+import json
+import logging as log
+import os
+import secrets
+import subprocess
+import sys
 from collections import namedtuple
+from os.path import exists
+
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import load_der_private_key
 

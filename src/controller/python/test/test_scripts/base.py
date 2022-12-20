@@ -16,32 +16,30 @@
 #
 
 import asyncio
+import copy
+import ctypes
+import faulthandler
+import inspect
+import logging
+import os
+import secrets
+import sys
+import threading
+import time
 from dataclasses import dataclass
 from inspect import Attribute
-import inspect
 from typing import Any
-import typing
-from chip import ChipDeviceCtrl
-from chip import ChipCommissionableNodeCtrl
-import chip.interaction_model as IM
-import threading
-import os
-import sys
-import logging
-import time
-import ctypes
+
+import chip.CertificateAuthority
 import chip.clusters as Clusters
 import chip.clusters.Attribute as Attribute
-from chip.utils import CommissioningBuildingBlocks
-from chip.ChipStack import *
-import chip.native
-import chip.FabricAdmin
-import chip.CertificateAuthority
 import chip.discovery
-import copy
-import secrets
-import faulthandler
-import ipdb
+import chip.FabricAdmin
+import chip.interaction_model as IM
+import chip.native
+from chip import ChipDeviceCtrl
+from chip.ChipStack import *
+from chip.utils import CommissioningBuildingBlocks
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)

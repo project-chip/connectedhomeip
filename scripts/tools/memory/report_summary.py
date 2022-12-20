@@ -33,7 +33,6 @@ import numpy  # type: ignore
 import memdf.collect
 import memdf.report
 import memdf.select
-
 from memdf import Config, DFs, SymbolDF
 
 

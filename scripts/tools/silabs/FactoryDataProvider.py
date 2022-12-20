@@ -14,13 +14,13 @@
 #   limitations under the License.
 #
 
-import subprocess
-import sys
 import argparse
-import struct
 import base64
 import datetime
 import os
+import struct
+import subprocess
+import sys
 
 
 class FactoryDataWriter:

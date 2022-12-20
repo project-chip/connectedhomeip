@@ -15,12 +15,13 @@
 #    limitations under the License.
 #
 
-import typing
-from chip.clusters.Types import Nullable, NullValue
-from chip.tlv import uint, float32
-import enum
-from chip.yaml.errors import ValidationError
 import binascii
+import enum
+import typing
+
+from chip.clusters.Types import Nullable, NullValue
+from chip.tlv import float32, uint
+from chip.yaml.errors import ValidationError
 
 
 def substitute_in_config_variables(field_value, config_values: dict):

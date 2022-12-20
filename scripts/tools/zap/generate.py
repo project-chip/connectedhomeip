@@ -18,12 +18,12 @@
 import argparse
 import json
 import os
-from pathlib import Path
-import tempfile
 import subprocess
 import sys
+import tempfile
 import urllib.request
 from dataclasses import dataclass
+from pathlib import Path
 
 
 @dataclass

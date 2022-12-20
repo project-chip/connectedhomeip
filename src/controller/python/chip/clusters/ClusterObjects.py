@@ -15,11 +15,12 @@
 #    limitations under the License.
 #
 
-from dataclasses import dataclass, asdict, field, make_dataclass
-from typing import ClassVar, List, Dict, Any, Mapping, Type, Union, ClassVar
 import enum
 import typing
-from chip import tlv, ChipUtility
+from dataclasses import asdict, dataclass, field, make_dataclass
+from typing import Any, ClassVar, Dict, List, Mapping, Union
+
+from chip import ChipUtility, tlv
 from chip.clusters.Types import Nullable, NullValue
 from dacite import from_dict
 

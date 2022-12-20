@@ -15,18 +15,16 @@
 #    limitations under the License.
 #
 
-import asyncio
 import logging
 import os
+import typing
 
 import chip.clusters as Clusters
-import chip.tlv
-from chip.clusters import OperationalCredentials as opCreds
-from chip.clusters import GeneralCommissioning as generalCommissioning
-from chip.FabricAdmin import FabricAdmin as FabricAdmin
-import typing
 from chip.ChipDeviceCtrl import ChipDeviceController as ChipDeviceController
+from chip.clusters import GeneralCommissioning as generalCommissioning
+from chip.clusters import OperationalCredentials as opCreds
 from chip.clusters.Types import *
+from chip.FabricAdmin import FabricAdmin as FabricAdmin
 
 _UINT16_MAX = 65535
 

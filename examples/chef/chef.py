@@ -18,6 +18,7 @@ import hashlib
 import json
 import optparse
 import os
+import re
 import shutil
 import sys
 import tarfile
@@ -25,7 +26,6 @@ import textwrap
 from typing import Any, Dict, Sequence
 
 import yaml
-import re
 
 import constants
 import stateful_shell

@@ -15,11 +15,10 @@
 #    limitations under the License.
 #
 
-
-from chip.tlv import TLVWriter, TLVReader
-from chip.tlv import uint as tlvUint
-
 import unittest
+
+from chip.tlv import TLVReader, TLVWriter
+from chip.tlv import uint as tlvUint
 
 
 class TestTLVWriter(unittest.TestCase):

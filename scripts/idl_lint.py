@@ -13,14 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
-import coloredlogs
 import enum
 import logging
 import os
 import sys
-
 from typing import List, Optional
+
+import click
+import coloredlogs
+
+import idl.lint
 
 try:
     from idl import matter_idl_parser
@@ -28,7 +30,6 @@ except:
     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
     from idl import matter_idl_parser
 
-import idl.lint
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants

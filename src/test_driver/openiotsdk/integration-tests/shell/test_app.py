@@ -13,18 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
+import logging
 import re
-from packaging import version
 from time import sleep
 
-from chip.setup_payload import SetupPayload
-from chip import exceptions
-import chip.native
+import pytest
+from packaging import version
 
+import chip.native
+from chip import exceptions
+from chip.setup_payload import SetupPayload
 from common.utils import *
 
-import logging
 log = logging.getLogger(__name__)
 
 

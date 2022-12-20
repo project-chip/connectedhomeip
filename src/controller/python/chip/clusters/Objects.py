@@ -22,15 +22,17 @@
 # This file contains generated struct, enum, command definition.
 # Users are not expected to import this file, instead, users can use import chip.clusters, which will import all symbols from this file and can get a readable, pretty naming like clusters.OnOff.commands.OnCommand
 
-from dataclasses import dataclass, field
 import typing
+from dataclasses import dataclass, field
 from enum import IntEnum
+
 from chip import ChipUtility
+from chip.tlv import float32, uint
 
-from chip.tlv import uint, float32
-
-from .ClusterObjects import ClusterObject, ClusterObjectDescriptor, ClusterObjectFieldDescriptor, ClusterCommand, ClusterAttributeDescriptor, Cluster, ClusterEvent
+from .ClusterObjects import (Cluster, ClusterAttributeDescriptor, ClusterCommand, ClusterEvent, ClusterObject,
+                             ClusterObjectDescriptor, ClusterObjectFieldDescriptor)
 from .Types import Nullable, NullValue
+
 
 @dataclass
 class Identify(Cluster):
@@ -29632,6 +29634,3 @@ class FaultInjection(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: 'uint' = 0
-
-
-

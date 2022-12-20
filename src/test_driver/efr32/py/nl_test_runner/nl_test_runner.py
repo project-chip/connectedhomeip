@@ -17,16 +17,16 @@
 
 import argparse
 import logging
-from pw_hdlc.rpc import HdlcRpcClient, default_channels, write_to_file
-from pw_status import Status
-import serial  # type: ignore
 import subprocess
 import sys
 import time
 from typing import Any
 
+import serial  # type: ignore
 # RPC Protos
 from nl_test_service import nl_test_pb2
+from pw_hdlc.rpc import HdlcRpcClient, default_channels, write_to_file
+from pw_status import Status
 
 PW_LOG = logging.getLogger(__name__)
 

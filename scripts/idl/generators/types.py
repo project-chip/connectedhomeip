@@ -12,14 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import enum
-
-from idl.matter_idl_types import DataType
-from idl import matter_idl_types  # to explicitly say 'Enum'
-
-from typing import Union, List, Optional
+import logging
 from dataclasses import dataclass
+from typing import List, Optional, Union
+
+from idl import matter_idl_types  # to explicitly say 'Enum'
+from idl.matter_idl_types import DataType
 
 
 def ToPowerOfTwo(bits: int) -> int:

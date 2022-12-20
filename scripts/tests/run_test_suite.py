@@ -29,7 +29,6 @@ import chiptest
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 
-
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
 

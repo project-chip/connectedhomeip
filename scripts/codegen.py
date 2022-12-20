@@ -13,10 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
-import logging
 import enum
+import logging
 import sys
+
+import click
+
+from idl.generators import FileSystemGeneratorStorage, GeneratorStorage
+from idl.generators.registry import GENERATORS, CodeGenerator
 
 try:
     import coloredlogs
@@ -31,8 +35,6 @@ except:
     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
     from idl.matter_idl_parser import CreateParser
 
-from idl.generators import FileSystemGeneratorStorage, GeneratorStorage
-from idl.generators.registry import CodeGenerator, GENERATORS
 
 
 class ListGeneratedFilesStorage(GeneratorStorage):

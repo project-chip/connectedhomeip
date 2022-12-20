@@ -14,12 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
 import unittest
-import yaml
-import logging
-from typing import List
 from dataclasses import dataclass, field
+from typing import List
+
+import yaml
+
+from idl.generators import GeneratorStorage
+from idl.generators.bridge import BridgeGenerator
+from idl.generators.cpp.application import CppApplicationGenerator
+from idl.generators.java import JavaGenerator
+from idl.matter_idl_types import Idl
 
 try:
     from idl.matter_idl_parser import CreateParser
@@ -30,11 +37,6 @@ except:
         os.path.join(os.path.dirname(__file__), '..')))
     from idl.matter_idl_parser import CreateParser
 
-from idl.matter_idl_types import Idl
-from idl.generators.java import JavaGenerator
-from idl.generators.bridge import BridgeGenerator
-from idl.generators.cpp.application import CppApplicationGenerator
-from idl.generators import GeneratorStorage
 
 
 TESTS_DIR = os.path.join(os.path.dirname(__file__), "tests")

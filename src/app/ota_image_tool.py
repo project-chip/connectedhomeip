@@ -36,9 +36,10 @@ import struct
 import sys
 from enum import IntEnum
 
+from chip.tlv import TLVReader, TLVWriter, uint  # noqa: E402
+
 sys.path.insert(0, os.path.join(
     os.path.dirname(__file__), '../controller/python'))
-from chip.tlv import TLVReader, TLVWriter, uint  # noqa: E402
 
 HEADER_MAGIC = 0x1BEEF11E
 FIXED_HEADER_FORMAT = '<IQI'

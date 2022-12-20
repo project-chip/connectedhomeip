@@ -15,14 +15,14 @@
 #    limitations under the License.
 #
 
-import pytest
+import logging
 from time import sleep
 
-from common.utils import *
+import pytest
 
 from chip.clusters.Objects import DoorLock
+from common.utils import *
 
-import logging
 log = logging.getLogger(__name__)
 
 

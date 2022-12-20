@@ -79,7 +79,6 @@ import memdf.collect
 import memdf.report
 import memdf.select
 import memdf.util
-
 from memdf import Config, ConfigDescription, DFs, SectionDF, SegmentDF
 
 PLATFORM_CONFIG_DIR = pathlib.Path('scripts/tools/memory/platform')

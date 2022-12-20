@@ -15,15 +15,14 @@
 #
 """Data frame selection utilities."""
 
+from typing import Mapping, Optional
+
 import numpy as np  # type: ignore
 
 import memdf.name
-import memdf.util.pretty
 import memdf.util.config
-
-from memdf import Config, ConfigDescription, DF
-
-from typing import Mapping, Optional
+import memdf.util.pretty
+from memdf import DF, Config, ConfigDescription
 
 
 def split_size(config: Config, key: str) -> None:

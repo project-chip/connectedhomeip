@@ -14,9 +14,9 @@
 
 import enum
 
-from idl.generators.java import JavaGenerator
 from idl.generators.bridge import BridgeGenerator
 from idl.generators.cpp.application import CppApplicationGenerator
+from idl.generators.java import JavaGenerator
 
 
 class CodeGenerator(enum.Enum):

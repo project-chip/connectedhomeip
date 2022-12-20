@@ -14,10 +14,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from definitions import *
-
-import unittest
 import io
+import unittest
+
+from definitions import *
 
 source_cluster = '''<?xml version="1.0"?>
   <configurator>
