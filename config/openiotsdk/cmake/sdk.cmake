@@ -40,6 +40,16 @@ set(IOTSDK_EXAMPLES OFF)
 set(BUILD_TESTING NO)
 set(VARIANT "FVP")
 
+# Add a Matter specific version of Mbedtls
+FetchContent_Declare(
+
+    mbedtls
+    GIT_REPOSITORY https://github.com/ARMmbed/mbedtls
+    GIT_TAG        v3.2.1
+    GIT_SHALLOW    ON
+    GIT_PROGRESS   ON
+)
+
 # Add Open IoT SDK source
 add_subdirectory(${OPEN_IOT_SDK_SOURCE} ./sdk_build)
 list(APPEND SDK_SOURCES_BINARY_DIRS ${CMAKE_CURRENT_BINARY_DIR}/sdk_build)
@@ -101,14 +111,14 @@ if(TARGET mbedtls-config)
             ${OPEN_IOT_SDK_CONFIG}/mbedtls
     )
 
-    target_sources(mbedtls-config 
+    target_sources(mbedtls-config
         INTERFACE
             ${OPEN_IOT_SDK_CONFIG}/mbedtls/platform_alt.cpp
     )
 
     target_compile_definitions(mbedtls-config
         INTERFACE
-            MBEDTLS_CONFIG_FILE="mbedtls_config.h"
+            MBEDTLS_CONFIG_FILE="${OPEN_IOT_SDK_CONFIG}/mbedtls/mbedtls_config.h"
     )
 
     target_link_libraries(mbedtls-config
@@ -126,7 +136,7 @@ if(TARGET freertos-kernel)
             freertos-cmsis-rtos
             freertos-kernel-heap-3
     )
-    target_include_directories(cmsis-rtos-implementation 
+    target_include_directories(cmsis-rtos-implementation
         INTERFACE
             ${CMAKE_CURRENT_SOURCE_DIR}/freertos-config
     )
