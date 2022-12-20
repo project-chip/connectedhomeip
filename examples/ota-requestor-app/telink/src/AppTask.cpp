@@ -217,7 +217,8 @@ void AppTask::FactoryResetHandler(AppEvent * aEvent)
         k_timer_start(&sFactoryResetTimer, K_MSEC(kFactoryResetTriggerTimeout), K_NO_WAIT);
         sIsFactoryResetTimerActive = true;
     }
-    else {
+    else
+    {
         k_timer_stop(&sFactoryResetTimer);
         sIsFactoryResetTimerActive = false;
     }
@@ -377,8 +378,8 @@ void AppTask::FactoryResetTimerTimeoutCallback(k_timer * timer)
     }
 
     AppEvent event;
-    event.Type               = AppEvent::kEventType_Timer;
-    event.Handler            = FactoryResetTimerEventHandler;
+    event.Type    = AppEvent::kEventType_Timer;
+    event.Handler = FactoryResetTimerEventHandler;
     sAppTask.PostEvent(&event);
 }
 

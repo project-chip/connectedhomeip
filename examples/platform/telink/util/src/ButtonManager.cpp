@@ -92,8 +92,7 @@ void Button::Poll(Button * previous)
     ret = gpio_pin_get(mPort, mInPin);
     assert(ret >= 0);
 
-    if ((mIntBothLevel && ret != mPreviousState)
-            || (!mIntBothLevel && ret == STATE_HIGH && ret != mPreviousState))
+    if ((mIntBothLevel && ret != mPreviousState) || (!mIntBothLevel && ret == STATE_HIGH && ret != mPreviousState))
     {
         if (mCallback != NULL)
         {

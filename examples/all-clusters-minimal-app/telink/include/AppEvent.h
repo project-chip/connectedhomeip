@@ -42,7 +42,7 @@ struct AppEvent
         {
             uint8_t Action;
         } ButtonEvent;
-                struct
+        struct
         {
             void * Context;
         } TimerEvent;

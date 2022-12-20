@@ -19,8 +19,8 @@
 #pragma once
 
 #include "AppEvent.h"
-#include "LightingManager.h"
 #include "LEDWidget.h"
+#include "LightingManager.h"
 #include <platform/CHIPDeviceLayer.h>
 
 #if CONFIG_CHIP_FACTORY_DATA
