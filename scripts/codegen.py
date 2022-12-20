@@ -28,7 +28,7 @@ try:
     from idl.matter_idl_parser import CreateParser
 except:
     import os
-    sys.path.append(os.path.abspath(os.path.dirname(__file__), 'idl'))
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'idl')))
     from idl.matter_idl_parser import CreateParser
 
 from idl.generators import FileSystemGeneratorStorage, GeneratorStorage
