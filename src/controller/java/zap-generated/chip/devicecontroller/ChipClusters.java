@@ -4065,8 +4065,8 @@ public class ChipClusters {
 
     public void queryImage(
         QueryImageResponseCallback callback,
-        Integer vendorId,
-        Integer productId,
+        Integer vendorID,
+        Integer productID,
         Long softwareVersion,
         ArrayList<Integer> protocolsSupported,
         Optional<Integer> hardwareVersion,
@@ -4076,8 +4076,8 @@ public class ChipClusters {
       queryImage(
           chipClusterPtr,
           callback,
-          vendorId,
-          productId,
+          vendorID,
+          productID,
           softwareVersion,
           protocolsSupported,
           hardwareVersion,
@@ -4089,8 +4089,8 @@ public class ChipClusters {
 
     public void queryImage(
         QueryImageResponseCallback callback,
-        Integer vendorId,
-        Integer productId,
+        Integer vendorID,
+        Integer productID,
         Long softwareVersion,
         ArrayList<Integer> protocolsSupported,
         Optional<Integer> hardwareVersion,
@@ -4101,8 +4101,8 @@ public class ChipClusters {
       queryImage(
           chipClusterPtr,
           callback,
-          vendorId,
-          productId,
+          vendorID,
+          productID,
           softwareVersion,
           protocolsSupported,
           hardwareVersion,
@@ -4142,8 +4142,8 @@ public class ChipClusters {
     private native void queryImage(
         long chipClusterPtr,
         QueryImageResponseCallback Callback,
-        Integer vendorId,
-        Integer productId,
+        Integer vendorID,
+        Integer productID,
         Long softwareVersion,
         ArrayList<Integer> protocolsSupported,
         Optional<Integer> hardwareVersion,
@@ -4253,54 +4253,54 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void announceOtaProvider(
+    public void announceOTAProvider(
         DefaultClusterCallback callback,
-        Long providerNodeId,
-        Integer vendorId,
+        Long providerNodeID,
+        Integer vendorID,
         Integer announcementReason,
         Optional<byte[]> metadataForNode,
         Integer endpoint) {
-      announceOtaProvider(
+      announceOTAProvider(
           chipClusterPtr,
           callback,
-          providerNodeId,
-          vendorId,
+          providerNodeID,
+          vendorID,
           announcementReason,
           metadataForNode,
           endpoint,
           null);
     }
 
-    public void announceOtaProvider(
+    public void announceOTAProvider(
         DefaultClusterCallback callback,
-        Long providerNodeId,
-        Integer vendorId,
+        Long providerNodeID,
+        Integer vendorID,
         Integer announcementReason,
         Optional<byte[]> metadataForNode,
         Integer endpoint,
         int timedInvokeTimeoutMs) {
-      announceOtaProvider(
+      announceOTAProvider(
           chipClusterPtr,
           callback,
-          providerNodeId,
-          vendorId,
+          providerNodeID,
+          vendorID,
           announcementReason,
           metadataForNode,
           endpoint,
           timedInvokeTimeoutMs);
     }
 
-    private native void announceOtaProvider(
+    private native void announceOTAProvider(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        Long providerNodeId,
-        Integer vendorId,
+        Long providerNodeID,
+        Integer vendorID,
         Integer announcementReason,
         Optional<byte[]> metadataForNode,
         Integer endpoint,
         @Nullable Integer timedInvokeTimeoutMs);
 
-    public interface DefaultOtaProvidersAttributeCallback {
+    public interface DefaultOTAProvidersAttributeCallback {
       void onSuccess(List<ChipStructs.OtaSoftwareUpdateRequestorClusterProviderLocation> valueList);
 
       void onError(Exception ex);
@@ -4324,26 +4324,26 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readDefaultOtaProvidersAttribute(DefaultOtaProvidersAttributeCallback callback) {
-      readDefaultOtaProvidersAttribute(chipClusterPtr, callback);
+    public void readDefaultOTAProvidersAttribute(DefaultOTAProvidersAttributeCallback callback) {
+      readDefaultOTAProvidersAttribute(chipClusterPtr, callback);
     }
 
-    public void writeDefaultOtaProvidersAttribute(
+    public void writeDefaultOTAProvidersAttribute(
         DefaultClusterCallback callback,
         ArrayList<ChipStructs.OtaSoftwareUpdateRequestorClusterProviderLocation> value) {
-      writeDefaultOtaProvidersAttribute(chipClusterPtr, callback, value, null);
+      writeDefaultOTAProvidersAttribute(chipClusterPtr, callback, value, null);
     }
 
-    public void writeDefaultOtaProvidersAttribute(
+    public void writeDefaultOTAProvidersAttribute(
         DefaultClusterCallback callback,
         ArrayList<ChipStructs.OtaSoftwareUpdateRequestorClusterProviderLocation> value,
         int timedWriteTimeoutMs) {
-      writeDefaultOtaProvidersAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+      writeDefaultOTAProvidersAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
 
-    public void subscribeDefaultOtaProvidersAttribute(
-        DefaultOtaProvidersAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeDefaultOtaProvidersAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeDefaultOTAProvidersAttribute(
+        DefaultOTAProvidersAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeDefaultOTAProvidersAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readUpdatePossibleAttribute(BooleanAttributeCallback callback) {
@@ -4400,18 +4400,18 @@ public class ChipClusters {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    private native void readDefaultOtaProvidersAttribute(
-        long chipClusterPtr, DefaultOtaProvidersAttributeCallback callback);
+    private native void readDefaultOTAProvidersAttribute(
+        long chipClusterPtr, DefaultOTAProvidersAttributeCallback callback);
 
-    private native void writeDefaultOtaProvidersAttribute(
+    private native void writeDefaultOTAProvidersAttribute(
         long chipClusterPtr,
         DefaultClusterCallback callback,
         ArrayList<ChipStructs.OtaSoftwareUpdateRequestorClusterProviderLocation> value,
         @Nullable Integer timedWriteTimeoutMs);
 
-    private native void subscribeDefaultOtaProvidersAttribute(
+    private native void subscribeDefaultOTAProvidersAttribute(
         long chipClusterPtr,
-        DefaultOtaProvidersAttributeCallback callback,
+        DefaultOTAProvidersAttributeCallback callback,
         int minInterval,
         int maxInterval);
 

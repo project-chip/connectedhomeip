@@ -1911,8 +1911,8 @@ public:
     OtaSoftwareUpdateProviderQueryImage(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("query-image", credsIssuerConfig), mComplex_ProtocolsSupported(&mRequest.protocolsSupported)
     {
-        AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId);
-        AddArgument("ProductId", 0, UINT16_MAX, &mRequest.productId);
+        AddArgument("VendorID", 0, UINT16_MAX, &mRequest.vendorID);
+        AddArgument("ProductID", 0, UINT16_MAX, &mRequest.productID);
         AddArgument("SoftwareVersion", 0, UINT32_MAX, &mRequest.softwareVersion);
         AddArgument("ProtocolsSupported", &mComplex_ProtocolsSupported);
         AddArgument("HardwareVersion", 0, UINT16_MAX, &mRequest.hardwareVersion);
@@ -2010,10 +2010,10 @@ private:
 | Cluster OtaSoftwareUpdateRequestor                                  | 0x002A |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * AnnounceOtaProvider                                               |   0x00 |
+| * AnnounceOTAProvider                                               |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * DefaultOtaProviders                                               | 0x0000 |
+| * DefaultOTAProviders                                               | 0x0000 |
 | * UpdatePossible                                                    | 0x0001 |
 | * UpdateState                                                       | 0x0002 |
 | * UpdateStateProgress                                               | 0x0003 |
@@ -2030,16 +2030,16 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command AnnounceOtaProvider
+ * Command AnnounceOTAProvider
  */
-class OtaSoftwareUpdateRequestorAnnounceOtaProvider : public ClusterCommand
+class OtaSoftwareUpdateRequestorAnnounceOTAProvider : public ClusterCommand
 {
 public:
-    OtaSoftwareUpdateRequestorAnnounceOtaProvider(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("announce-ota-provider", credsIssuerConfig)
+    OtaSoftwareUpdateRequestorAnnounceOTAProvider(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("announce-otaprovider", credsIssuerConfig)
     {
-        AddArgument("ProviderNodeId", 0, UINT64_MAX, &mRequest.providerNodeId);
-        AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId);
+        AddArgument("ProviderNodeID", 0, UINT64_MAX, &mRequest.providerNodeID);
+        AddArgument("VendorID", 0, UINT16_MAX, &mRequest.vendorID);
         AddArgument("AnnouncementReason", 0, UINT8_MAX, &mRequest.announcementReason);
         AddArgument("MetadataForNode", &mRequest.metadataForNode);
         AddArgument("Endpoint", 0, UINT16_MAX, &mRequest.endpoint);
@@ -2061,7 +2061,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type mRequest;
+    chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -9092,12 +9092,12 @@ void registerClusterOtaSoftwareUpdateRequestor(Commands & commands, CredentialIs
         // Commands
         //
         make_unique<ClusterCommand>(Id, credsIssuerConfig),                            //
-        make_unique<OtaSoftwareUpdateRequestorAnnounceOtaProvider>(credsIssuerConfig), //
+        make_unique<OtaSoftwareUpdateRequestorAnnounceOTAProvider>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "default-ota-providers", Attributes::DefaultOtaProviders::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "default-otaproviders", Attributes::DefaultOTAProviders::Id, credsIssuerConfig),    //
         make_unique<ReadAttribute>(Id, "update-possible", Attributes::UpdatePossible::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "update-state", Attributes::UpdateState::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "update-state-progress", Attributes::UpdateStateProgress::Id, credsIssuerConfig),   //
@@ -9109,9 +9109,9 @@ void registerClusterOtaSoftwareUpdateRequestor(Commands & commands, CredentialIs
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type>>>(
-            Id, "default-ota-providers", Attributes::DefaultOtaProviders::Id, credsIssuerConfig),                               //
+            Id, "default-otaproviders", Attributes::DefaultOTAProviders::Id, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "default-ota-providers", Attributes::DefaultOtaProviders::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "default-otaproviders", Attributes::DefaultOTAProviders::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "update-possible", Attributes::UpdatePossible::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "update-state", Attributes::UpdateState::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "update-state-progress", Attributes::UpdateStateProgress::Id, credsIssuerConfig),   //
