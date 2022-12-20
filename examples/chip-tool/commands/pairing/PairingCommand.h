@@ -47,7 +47,8 @@ enum class PairingNetworkType
 
 class PairingCommand : public CHIPCommand,
                        public chip::Controller::DevicePairingDelegate,
-                       public chip::Controller::DeviceDiscoveryDelegate
+                       public chip::Controller::DeviceDiscoveryDelegate,
+                       public chip::Credentials::DeviceAttestationDelegate
 {
 public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
@@ -58,6 +59,9 @@ public:
         mFilterType(filterType), mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() }
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
+        AddArgument("bypass-attestation-verifier", 0, 1, &mBypassAttestationVerifier,
+                    "Bypass the attestation verifier. If not provided or 0 (\"false\"), the attestation verifier is not bypassed."
+                    " If 1 (\"true\"), the commissioning will continue in case of attestation verification failure.");
 
         switch (networkType)
         {
@@ -155,6 +159,12 @@ public:
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
     bool IsDiscoverOnce() { return mDiscoverOnce.ValueOr(false); }
+    
+    /////////// DeviceAttestationDelegate /////////
+    chip::Optional<uint16_t> FailSafeExpiryTimeoutSecs() const override;
+    void OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner* deviceCommissioner, chip::DeviceProxy* device,
+                                      const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo& info,
+                                      chip::Credentials::AttestationVerificationResult attestationResult) override;
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
@@ -175,6 +185,7 @@ private:
     chip::Optional<bool> mUseOnlyOnNetworkDiscovery;
     chip::Optional<bool> mPaseOnly;
     chip::Optional<bool> mSkipCommissioningComplete;
+    chip::Optional<bool> mBypassAttestationVerifier;
     uint16_t mRemotePort;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
