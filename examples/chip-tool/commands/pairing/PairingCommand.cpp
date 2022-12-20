@@ -72,7 +72,8 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 {
     auto params = CommissioningParameters();
     params.SetSkipCommissioningComplete(mSkipCommissioningComplete.ValueOr(false));
-    if (mBypassAttestationVerifier.ValueOr(false)) {
+    if (mBypassAttestationVerifier.ValueOr(false))
+    {
         params.SetDeviceAttestationDelegate(this);
     }
 
@@ -269,14 +270,18 @@ void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & 
     }
 }
 
-chip::Optional<uint16_t> PairingCommand::FailSafeExpiryTimeoutSecs() const {
+chip::Optional<uint16_t> PairingCommand::FailSafeExpiryTimeoutSecs() const
+{
     // We don't need to set additional failsafe timeout as we don't ask the final user if he wants to continue
     return chip::Optional<uint16_t>();
 }
 
-void PairingCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner* deviceCommissioner, chip::DeviceProxy* device,
-                                                  const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo& info,
-                                                  chip::Credentials::AttestationVerificationResult attestationResult) {
+void PairingCommand::OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner,
+                                                  chip::DeviceProxy * device,
+                                                  const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
+                                                  chip::Credentials::AttestationVerificationResult attestationResult)
+{
     // Bypass attestation verification, continue with success
-    deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(device, chip::Credentials::AttestationVerificationResult::kSuccess);
+    deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(device,
+                                                                    chip::Credentials::AttestationVerificationResult::kSuccess);
 }
