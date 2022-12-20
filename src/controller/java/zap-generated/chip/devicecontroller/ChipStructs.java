@@ -325,11 +325,11 @@ public class ChipStructs {
     }
   }
 
-  public static class BasicClusterCapabilityMinimaStruct {
+  public static class BasicInformationClusterCapabilityMinimaStruct {
     public Integer caseSessionsPerFabric;
     public Integer subscriptionsPerFabric;
 
-    public BasicClusterCapabilityMinimaStruct(
+    public BasicInformationClusterCapabilityMinimaStruct(
         Integer caseSessionsPerFabric, Integer subscriptionsPerFabric) {
       this.caseSessionsPerFabric = caseSessionsPerFabric;
       this.subscriptionsPerFabric = subscriptionsPerFabric;
@@ -338,7 +338,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("BasicClusterCapabilityMinimaStruct {\n");
+      output.append("BasicInformationClusterCapabilityMinimaStruct {\n");
       output.append("\tcaseSessionsPerFabric: ");
       output.append(caseSessionsPerFabric);
       output.append("\n");

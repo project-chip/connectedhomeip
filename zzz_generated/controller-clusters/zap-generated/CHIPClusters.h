@@ -130,13 +130,13 @@ public:
     ~ActionsCluster() {}
 };
 
-class DLL_EXPORT BasicCluster : public ClusterBase
+class DLL_EXPORT BasicInformationCluster : public ClusterBase
 {
 public:
-    BasicCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::Basic::Id, endpoint)
+    BasicInformationCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::BasicInformation::Id, endpoint)
     {}
-    ~BasicCluster() {}
+    ~BasicInformationCluster() {}
 };
 
 class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase

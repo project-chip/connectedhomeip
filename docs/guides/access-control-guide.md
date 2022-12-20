@@ -395,7 +395,7 @@ Some typical clusters:
 -   Clusters.Descriptor.id
 -   Clusters.Binding.id
 -   Clusters.AccessControl.id
--   Clusters.Basic.id
+-   Clusters.BasicInformation.id
 
 ### Examples
 

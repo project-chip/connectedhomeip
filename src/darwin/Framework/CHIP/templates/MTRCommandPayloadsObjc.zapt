@@ -8,20 +8,15 @@ NS_ASSUME_NONNULL_BEGIN
 {{#zcl_clusters}}
 {{#zcl_commands}}
 
-{{#unless (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name))}}
-MTR_NEWLY_AVAILABLE
-{{else}}
-{{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (asUpperCamelCase name))}}
-MTR_NEWLY_AVAILABLE
-{{/unless}}
-{{/unless}}
+{{availability (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForCommandPayload=true}}
 @interface MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params : NSObject <NSCopying>
 {{#zcl_command_arguments}}
 
 {{! Override the getter name because some of our properties start with things
     like "new" or "init" }}
-@property (nonatomic, copy{{#unless (isStrEqual (asGetterName label) (asStructPropertyName label))}}, getter={{asGetterName label}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName label}};
+@property (nonatomic, copy{{#unless (isStrEqual (asGetterName label) (asStructPropertyName label))}}, getter={{asGetterName label}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName label}} {{availability (asUpperCamelCase ../../name preserveAcronyms=true) command=(asUpperCamelCase ../name preserveAcronyms=true) commandField=(asStructPropertyName label)}};
 {{/zcl_command_arguments}}
+{{#if (isStrEqual source "client")}}
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -36,11 +31,30 @@ MTR_NEWLY_AVAILABLE
  * request) within the timeout window.
  *
  */
-@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs {{#if (isStrEqual source "server")}}MTR_NEWLY_DEPRECATED("Timed invoke does not make sense for server to client commands"){{/if}};
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+{{! This is using the pre-renaming names for the isAvailableBefore test, because the pre-rename things inherit
+    from the post-rename ones and need to have this selector.}}
+{{else if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) command=(asUpperCamelCase name))}}
+/**
+ * Controls whether the command is a timed command (using Timed Invoke).
+ *
+ * If nil (the default value), a regular invoke is done for commands that do
+ * not require a timed invoke and a timed invoke with some default timed request
+ * timeout is done for commands that require a timed invoke.
+ *
+ * If not nil, a timed invoke is done, with the provided value used as the timed
+ * request timeout.  The value should be chosen small enough to provide the
+ * desired security properties but large enough that it will allow a round-trip
+ * from the sever to the client (for the status response and actual invoke
+ * request) within the timeout window.
+ *
+ */
+@property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs {{availability "" api="Timed Invoke for server to client commands" deprecationMessage="Timed invoke does not make sense for server to client commands"}};
+{{/if}}
 @end
 {{#*inline "deprecatedDecl"}}
 
-MTR_NEWLY_DEPRECATED("Please use MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params")
+{{availability (compatClusterNameRemapping parent.name) command=(asUpperCamelCase name) deprecationMessage=(concat "Please use MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true) "Params")}}
 @interface MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase name}}Params : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name}}Params
 @end
 

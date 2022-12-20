@@ -61,9 +61,9 @@ static constexpr ClusterId Id = 0x0000001F;
 namespace Actions {
 static constexpr ClusterId Id = 0x00000025;
 } // namespace Actions
-namespace Basic {
+namespace BasicInformation {
 static constexpr ClusterId Id = 0x00000028;
-} // namespace Basic
+} // namespace BasicInformation
 namespace OtaSoftwareUpdateProvider {
 static constexpr ClusterId Id = 0x00000029;
 } // namespace OtaSoftwareUpdateProvider

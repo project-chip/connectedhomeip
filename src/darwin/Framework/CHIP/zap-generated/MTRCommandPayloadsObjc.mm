@@ -1960,7 +1960,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRBasicClusterMfgSpecificPingParams
+@implementation MTRBasicInformationClusterMfgSpecificPingParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1971,7 +1971,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRBasicClusterMfgSpecificPingParams alloc] init];
+    auto other = [[MTRBasicInformationClusterMfgSpecificPingParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
@@ -1984,6 +1984,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRBasicClusterMfgSpecificPingParams
 @end
 @implementation MTROTASoftwareUpdateProviderClusterQueryImageParams
 - (instancetype)init
