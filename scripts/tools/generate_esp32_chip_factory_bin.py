@@ -29,10 +29,10 @@ from types import SimpleNamespace
 import cryptography.x509
 from bitarray import bitarray
 from bitarray.util import ba2int
-from spake2p import generate_verifier  # noqa: E402
 
 CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('scripts', 'tools'))]
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'scripts', 'tools', 'spake2p'))
+from spake2p import generate_verifier  # noqa: E402 isort:skip
 
 if os.getenv('IDF_PATH'):
     sys.path.insert(0, os.path.join(os.getenv('IDF_PATH'),
