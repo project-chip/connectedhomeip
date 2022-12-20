@@ -34,6 +34,12 @@ NS_ASSUME_NONNULL_BEGIN
   NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_struct_items}}{{asStructPropertyName label}}:%@; {{/zcl_struct_items}}>", NSStringFromClass([self class]){{#zcl_struct_items}},{{#if isArray}}_{{asStructPropertyName label}}{{else if (isOctetString type)}}[_{{asStructPropertyName label}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName label}}{{/if}}{{/zcl_struct_items}}];
   return descriptionString;
 }
+{{#zcl_struct_items}}
+{{#if (hasOldName (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(asStructPropertyName label))}}
+
+{{> renamed_struct_field_impl cluster=../../name type=type newName=label oldName=(oldName (asUpperCamelCase ../../name preserveAcronyms=true) struct=(asUpperCamelCase ../name preserveAcronyms=true) structField=(asStructPropertyName label))}}
+{{/if}}
+{{/zcl_struct_items}}
 
 @end
 {{/inline}}
@@ -83,21 +89,12 @@ NS_ASSUME_NONNULL_BEGIN
   return descriptionString;
 }
 
-{{#if (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) "Switch")}}
-{{#if (isStrEqual (asUpperCamelCase name preserveAcronyms=true) "MultiPressComplete")}}
-{{! Workaround for the name being mis-spelled in XML previously }}
-- (void)setNewPosition:(NSNumber * _Nonnull)newPosition
-{
-  self.previousPosition = newPosition;
-}
+{{#zcl_event_fields}}
+{{#if (hasOldName (asUpperCamelCase ../parent.name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(asStructPropertyName name))}}
 
-- (NSNumber * _Nonnull)newPosition
-{
-  return self.previousPosition;
-}
-
+{{> renamed_struct_field_impl cluster=../parent.name type=type newName=name oldName=(oldName (asUpperCamelCase ../parent.name preserveAcronyms=true) event=(asUpperCamelCase ../name preserveAcronyms=true) eventField=(asStructPropertyName name))}}
 {{/if}}
-{{/if}}
+{{/zcl_event_fields}}
 @end
 {{#unless (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name))}}
 

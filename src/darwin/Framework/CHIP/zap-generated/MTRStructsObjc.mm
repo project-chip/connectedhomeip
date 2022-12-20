@@ -2079,11 +2079,10 @@ NS_ASSUME_NONNULL_BEGIN
     self.previousPosition = newPosition;
 }
 
-- (NSNumber * _Nonnull)newPosition
+- (NSNumber * _Nonnull)getNewPosition
 {
     return self.previousPosition;
 }
-
 @end
 
 @implementation MTROperationalCredentialsClusterFabricDescriptor

@@ -5179,3 +5179,7 @@
               PIROccupiedToUnoccupiedDelay: PirOccupiedToUnoccupiedDelay
               PIRUnoccupiedToOccupiedDelay: PirUnoccupiedToOccupiedDelay
               PIRUnoccupiedToOccupiedThreshold: PirUnoccupiedToOccupiedThreshold
+      event fields:
+          Switch:
+              MultiPressComplete:
+                  previousPosition: newPosition
