@@ -298,6 +298,7 @@ void registerClusterAny(Commands & commands)
         make_unique<WriteAttribute>(),  //
         make_unique<SubscribeAttribute>(), //
         make_unique<SubscribeEvent>(),     //
+        make_unique<ReadEvent>(),     //
     };
 
     commands.Register(clusterName, clusterCommands);
