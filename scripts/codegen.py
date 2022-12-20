@@ -36,7 +36,6 @@ except:
     from idl.matter_idl_parser import CreateParser
 
 
-
 class ListGeneratedFilesStorage(GeneratorStorage):
     """
     A storage that prints out file names that would have content in them.

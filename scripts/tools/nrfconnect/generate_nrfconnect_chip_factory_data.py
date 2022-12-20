@@ -343,7 +343,7 @@ class FactoryDataGenerator:
 
     def _add_entry(self, name: str, value: any):
         """ Add single entry to list of tuples ("key", "value") """
-        if(isinstance(value, bytes) or isinstance(value, bytearray)):
+        if (isinstance(value, bytes) or isinstance(value, bytearray)):
             value = HEX_PREFIX + value.hex()
         if value or (isinstance(value, int) and value == 0):
             log.debug("Adding entry '{}' with size {} and type {}".format(name, sys.getsizeof(value), type(value)))
@@ -488,7 +488,7 @@ def main():
         log.basicConfig(format='[%(levelname)s] %(message)s', level=log.INFO)
 
     # check if json file already exist
-    if(exists(args.output) and not args.overwrite):
+    if (exists(args.output) and not args.overwrite):
         log.error("Output file: {} already exist, to create a new one add argument '--overwrite'. By default overwriting is disabled".format(args.output))
         return
 

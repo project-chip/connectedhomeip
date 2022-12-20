@@ -89,7 +89,7 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
                 break
 
         # Step 3: If there isn't an existing entry to add to, make a new one.
-        if (not(addedPrivilege)):
+        if (not (addedPrivilege)):
             if len(currentAcls) >= 3:
                 raise ValueError(
                     f"Cannot add another ACL entry to grant privilege to existing count of {currentAcls} ACLs -- will exceed minimas!")

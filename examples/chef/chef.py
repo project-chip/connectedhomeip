@@ -876,14 +876,14 @@ def main() -> int:
                 f"python3 -m chip_rpc.console --device {config['esp32']['TTY']}")
         elif (options.build_target == "silabs-thread"):
             if (sys.platform == "linux") or (sys.platform == "linux2"):
-                if(config['silabs-thread']['TTY'] is None):
+                if (config['silabs-thread']['TTY'] is None):
                     flush_print(
                         'The path for the serial enumeration for silabs-thread is not set. Make sure silabs-thread.TTY is set on your config.yaml file')
                     exit(1)
                 shell.run_cmd(
                     f"python3 -m chip_rpc.console --device {config['silabs-thread']['TTY']} -b 115200")
             elif sys.platform == "darwin":
-                if(config['silabs-thread']['CU'] is None):
+                if (config['silabs-thread']['CU'] is None):
                     flush_print(
                         'The path for the serial enumeration for silabs-thread is not set. Make sure silabs-thread.CU is set on your config.yaml file')
                     exit(1)

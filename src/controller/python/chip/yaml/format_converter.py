@@ -158,10 +158,10 @@ def convert_yaml_type(field_value, field_type, inline_cast_dict_to_struct):
         if inline_cast_dict_to_struct:
             return field_type.FromDict(return_field_value)
         return return_field_value
-    elif(type(field_value) is float):
+    elif (type(field_value) is float):
         return float32(field_value)
     # list represents a data model list
-    elif(type(field_value) is list):
+    elif (type(field_value) is list):
         list_element_type = typing.get_args(field_type)[0]
 
         # The field type passed in is the type of the list element and not list[T].

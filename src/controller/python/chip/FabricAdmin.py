@@ -80,7 +80,7 @@ class FabricAdmin:
             useTestCommissioner:    If a test commmisioner is to be created.
             catTags:			    A list of 32-bit CAT tags that will added to the NOC generated for this controller.
         '''
-        if (not(self._isActive)):
+        if (not (self._isActive)):
             raise RuntimeError(
                 f"FabricAdmin object was previously shutdown and is no longer valid!")
 

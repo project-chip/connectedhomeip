@@ -192,7 +192,7 @@ class PersistentStorage:
             raise ValueError("Invalid Key")
 
         if (value is None):
-            del(self._jsonData['repl-config'][key])
+            del (self._jsonData['repl-config'][key])
         else:
             self._jsonData['repl-config'][key] = value
 
@@ -236,7 +236,7 @@ class PersistentStorage:
         '''
         self.logger().info(f"DeleteSdkKey: {key}")
 
-        del(self._jsonData['sdk-config'][key])
+        del (self._jsonData['sdk-config'][key])
         self.Commit()
 
     def Shutdown(self):

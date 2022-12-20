@@ -38,7 +38,6 @@ except:
     from idl.matter_idl_parser import CreateParser
 
 
-
 TESTS_DIR = os.path.join(os.path.dirname(__file__), "tests")
 REGENERATE_GOLDEN_IMAGES = False
 

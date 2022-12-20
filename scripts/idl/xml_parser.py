@@ -32,7 +32,6 @@ except:
     from idl.matter_idl_types import Idl
 
 
-
 if __name__ == '__main__':
     # This Parser is generally not intended to be run as a stand-alone binary.
     # The ability to run is for debug and to print out the parsed AST.

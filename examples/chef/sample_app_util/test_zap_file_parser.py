@@ -18,7 +18,6 @@ except ImportError:
     exit(1)
 
 
-
 _HERE = os.path.abspath(os.path.dirname(__file__))
 _TEST_FILE = os.path.join(_HERE, "test_files", "sample_zap_file.zap")
 _TEST_METADATA = os.path.join(_HERE, "test_files", "sample_zap_file_hashmeta.yaml")
