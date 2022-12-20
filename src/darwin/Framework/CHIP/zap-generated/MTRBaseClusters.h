@@ -1967,15 +1967,6 @@ MTR_NEWLY_AVAILABLE
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
-/**
- * Command MfgSpecificPing
- *
- *
- */
-- (void)mfgSpecificPingWithParams:(MTRBasicInformationClusterMfgSpecificPingParams * _Nullable)params
-                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-- (void)mfgSpecificPingWithCompletion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-
 - (void)readAttributeDataModelRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 - (void)subscribeAttributeDataModelRevisionWithParams:(MTRSubscribeParams *)params
