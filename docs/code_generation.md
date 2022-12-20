@@ -85,8 +85,8 @@ specific codegen.
 
 `*.matter` files are both human and machine readable. Code that can process
 these files is available at `scripts/idl` and `scripts/codegen.py`. You can read
-the [scripts/idl/README.md](../scripts/idl/README.md) for details of how things
-work.
+the [scripts/idl/idl/README.md](../scripts/idl/idl/README.md) for details of
+how things work.
 
 `scripts/codegen.py` can generate various outputs based on an input `*.matter`
 file.
@@ -198,7 +198,7 @@ Code pre-generation can be used:
     generation at build time or to save the code generation time at the expense
     of running code generation for every possible zap/generation type
 -   To check changes in generated code across versions, beyond the comparisons
-    of golden image tests in `scripts/idl/tests`
+    of golden image tests in `scripts/idl/idl/tests`
 
 The script to trigger code pre-generation is `scripts/code_pregenerate.py` and
 requires the pre-generation output directory as an argument
