@@ -1,0 +1,114 @@
+# Copyright (c) 2022 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Arm Virtual Hardware
+
+on:
+    schedule:
+        - cron: '0 * * * *'
+    workflow_dispatch:
+
+concurrency:
+    group: ${{ github.workflow }}
+    cancel-in-progress: false
+
+jobs:
+    arm_crosscompile:
+        name: Linux ARM Cross compile
+        timeout-minutes: 70
+
+        runs-on: ubuntu-latest
+
+        container:
+            image: connectedhomeip/chip-build-crosscompile:0.6.47
+
+        steps:
+            - uses: Wandalen/wretry.action@v1.0.36
+              name: Checkout
+              with:
+                  action: actions/checkout@v3
+                  with: |
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
+
+            - name: Checkout submodules
+              run: scripts/checkout_submodules.py --shallow --platform linux
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
+
+            - name: Bootstrap
+              timeout-minutes: 10
+              run: scripts/build/gn_bootstrap.sh
+
+            - name: Build Samples
+              timeout-minutes: 45
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-arm64-chip-tool-ipv6only-mbedtls-clang-minmdns-verbose \
+                        --target linux-arm64-light-ipv6only-mbedtls-clang-minmdns-verbose \
+                        build \
+                     "
+
+            - name: Upload built samples
+              uses: actions/upload-artifact@v3
+              with:
+                  name: arm_crosscompiled_samples
+                  path: |
+                      out/linux-arm64-chip-tool-ipv6only-mbedtls-clang-minmdns-verbose/chip-tool
+                      out/linux-arm64-light-ipv6only-mbedtls-clang-minmdns-verbose/chip-lighting-app
+
+    arm_e2e_tests:
+        name: Arm Virtual Hardware End to end tests
+        timeout-minutes: 10
+
+        runs-on: ubuntu-latest
+
+        env:
+            AVH_API_TOKEN: ${{ secrets.AVH_API_TOKEN }}
+
+        needs: arm_crosscompile
+
+        steps:
+            - name: Checkout
+              uses: Wandalen/wretry.action@v1.0.36
+              with:
+                  action: actions/checkout@v3
+                  with: |
+                      token: ${{ github.token }}
+                  attempt_limit: 3
+                  attempt_delay: 2000
+
+            - name: Downloads Cross-compiled samples
+              uses: actions/download-artifact@v3
+              with:
+                  name: arm_crosscompiled_samples
+                  path: scripts/tests/avh/out
+
+            - name: Install Python dependencies
+              run: |
+                  pip3 install -r scripts/tests/avh/requirements.txt
+
+            - name: Run end to end test
+              run: |
+                  cd scripts/tests/avh
+                  python3 -u -m unittest test_lighting_app.py
