@@ -678,7 +678,7 @@ client cluster Actions = 37 {
   command DisableActionWithDuration(DisableActionWithDurationRequest): DefaultSuccess = 11;
 }
 
-client cluster Basic = 40 {
+client cluster BasicInformation = 40 {
   struct CapabilityMinimaStruct {
     int16u caseSessionsPerFabric = 0;
     int16u subscriptionsPerFabric = 1;
@@ -4418,7 +4418,7 @@ endpoint 1 {
   binding cluster Binding;
   binding cluster AccessControl;
   binding cluster Actions;
-  binding cluster Basic;
+  binding cluster BasicInformation;
   binding cluster OtaSoftwareUpdateProvider;
   binding cluster OtaSoftwareUpdateRequestor;
   binding cluster LocalizationConfiguration;

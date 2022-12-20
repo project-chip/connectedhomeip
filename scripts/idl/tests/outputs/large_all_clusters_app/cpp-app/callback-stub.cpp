@@ -34,8 +34,8 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::BarrierControl::Id:
         emberAfBarrierControlClusterInitCallback(endpoint);
         break;
-    case app::Clusters::Basic::Id:
-        emberAfBasicClusterInitCallback(endpoint);
+    case app::Clusters::BasicInformation::Id:
+        emberAfBasicInformationClusterInitCallback(endpoint);
         break;
     case app::Clusters::BinaryInputBasic::Id:
         emberAfBinaryInputBasicClusterInitCallback(endpoint);
@@ -247,7 +247,7 @@ void __attribute__((weak)) emberAfBarrierControlClusterInitCallback(EndpointId e
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfBasicClusterInitCallback(EndpointId endpoint)
+void __attribute__((weak)) emberAfBasicInformationClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

@@ -1523,8 +1523,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBasicClusterGeneratedCommandListAttributeCallback
-      implements ChipClusters.BasicCluster.GeneratedCommandListAttributeCallback,
+  public static class DelegatedBasicInformationClusterGeneratedCommandListAttributeCallback
+      implements ChipClusters.BasicInformationCluster.GeneratedCommandListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -1547,8 +1547,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBasicClusterAcceptedCommandListAttributeCallback
-      implements ChipClusters.BasicCluster.AcceptedCommandListAttributeCallback,
+  public static class DelegatedBasicInformationClusterAcceptedCommandListAttributeCallback
+      implements ChipClusters.BasicInformationCluster.AcceptedCommandListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -1571,8 +1571,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBasicClusterAttributeListAttributeCallback
-      implements ChipClusters.BasicCluster.AttributeListAttributeCallback,
+  public static class DelegatedBasicInformationClusterAttributeListAttributeCallback
+      implements ChipClusters.BasicInformationCluster.AttributeListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -7197,10 +7197,11 @@ public class ClusterInfoMapping {
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.ActionsCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("actions", actionsClusterInfo);
-    ClusterInfo basicClusterInfo =
+    ClusterInfo basicInformationClusterInfo =
         new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.BasicCluster(ptr, endpointId), new HashMap<>());
-    clusterMap.put("basic", basicClusterInfo);
+            (ptr, endpointId) -> new ChipClusters.BasicInformationCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("basicInformation", basicInformationClusterInfo);
     ClusterInfo otaSoftwareUpdateProviderClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.OtaSoftwareUpdateProviderCluster(ptr, endpointId),
@@ -7489,7 +7490,7 @@ public class ClusterInfoMapping {
     destination.get("binding").combineCommands(source.get("binding"));
     destination.get("accessControl").combineCommands(source.get("accessControl"));
     destination.get("actions").combineCommands(source.get("actions"));
-    destination.get("basic").combineCommands(source.get("basic"));
+    destination.get("basicInformation").combineCommands(source.get("basicInformation"));
     destination
         .get("otaSoftwareUpdateProvider")
         .combineCommands(source.get("otaSoftwareUpdateProvider"));
@@ -8598,8 +8599,8 @@ public class ClusterInfoMapping {
     actionsClusterInteractionInfoMap.put(
         "disableActionWithDuration", actionsdisableActionWithDurationInteractionInfo);
     commandMap.put("actions", actionsClusterInteractionInfoMap);
-    Map<String, InteractionInfo> basicClusterInteractionInfoMap = new LinkedHashMap<>();
-    commandMap.put("basic", basicClusterInteractionInfoMap);
+    Map<String, InteractionInfo> basicInformationClusterInteractionInfoMap = new LinkedHashMap<>();
+    commandMap.put("basicInformation", basicInformationClusterInteractionInfoMap);
     Map<String, InteractionInfo> otaSoftwareUpdateProviderClusterInteractionInfoMap =
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo> otaSoftwareUpdateProviderqueryImageCommandParams =

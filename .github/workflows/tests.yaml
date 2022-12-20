@@ -287,7 +287,7 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Build Apps
-              timeout-minutes: 60
+              timeout-minutes: 75
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \

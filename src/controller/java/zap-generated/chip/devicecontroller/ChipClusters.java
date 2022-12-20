@@ -3560,10 +3560,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class BasicCluster extends BaseChipCluster {
+  public static class BasicInformationCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 40L;
 
-    public BasicCluster(long devicePtr, int endpointId) {
+    public BasicInformationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 

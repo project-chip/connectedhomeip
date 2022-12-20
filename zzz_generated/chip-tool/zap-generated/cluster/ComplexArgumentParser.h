@@ -68,10 +68,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::BasicInformation::Structs::CapabilityMinimaStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::Type & request);
+static void Finalize(chip::app::Clusters::BasicInformation::Structs::CapabilityMinimaStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::ChannelInfo::Type & request,
                         Json::Value & value);
 

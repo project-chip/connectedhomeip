@@ -1140,7 +1140,7 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
           "define": "BASIC_CLUSTER",
@@ -1167,7 +1167,7 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
           "define": "BASIC_CLUSTER",
@@ -6590,7 +6590,7 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
           "define": "BASIC_CLUSTER",
@@ -6617,7 +6617,7 @@
           ]
         },
         {
-          "name": "Basic",
+          "name": "Basic Information",
           "code": 40,
           "mfgCode": null,
           "define": "BASIC_CLUSTER",

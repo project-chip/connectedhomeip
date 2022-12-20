@@ -125,6 +125,7 @@ backtrace
 BallastConfiguration
 BarrierControl
 BasicCHIPRegression
+BasicInformation
 baudrate
 BD
 BDX

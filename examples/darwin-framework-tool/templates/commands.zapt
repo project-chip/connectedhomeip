@@ -21,6 +21,7 @@
 {{> cluster_header}}
 
 {{#chip_cluster_commands}}
+{{#unless (wasRemoved (asUpperCamelCase clusterName preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
 /*
  * Command {{asUpperCamelCase name}}
  */
@@ -87,6 +88,7 @@ private:
     {{/chip_cluster_command_arguments}}
 };
 
+{{/unless}}
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
@@ -257,7 +259,9 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
     commands_list clusterCommands = {
         make_unique<ClusterCommand>(Id), //
         {{#chip_cluster_commands}}
+        {{#unless (wasRemoved (asUpperCamelCase clusterName preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
         make_unique<{{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}>(), //
+        {{/unless}}
         {{/chip_cluster_commands}}
         {{#chip_server_cluster_attributes}}
         {{#first}}

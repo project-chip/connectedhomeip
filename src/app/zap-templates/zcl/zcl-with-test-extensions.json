@@ -113,7 +113,7 @@
             "AdminFabricIndex",
             "AdminVendorId"
         ],
-        "Basic": [
+        "Basic Information": [
             "DataModelRevision",
             "VendorName",
             "VendorID",
