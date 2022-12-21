@@ -124,6 +124,7 @@ telink-tlsr9518adk80d-light
 telink-tlsr9518adk80d-light-switch
 telink-tlsr9518adk80d-ota-requestor
 telink-tlsr9518adk80d-thermostat
+telink-tlsr9518adk80d-contact-sensor
 tizen-arm-all-clusters
 tizen-arm-all-clusters-minimal
 tizen-arm-chip-tool

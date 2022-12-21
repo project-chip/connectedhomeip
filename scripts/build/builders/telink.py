@@ -27,6 +27,7 @@ class TelinkApp(Enum):
     SWITCH = auto()
     OTA_REQUESTOR = auto()
     THERMOSTAT = auto()
+    CONTACT_SENSOR = auto()
 
     def ExampleName(self):
         if self == TelinkApp.ALL_CLUSTERS:
@@ -41,6 +42,8 @@ class TelinkApp(Enum):
             return 'ota-requestor-app'
         elif self == TelinkApp.THERMOSTAT:
             return 'thermostat'
+        elif self == TelinkApp.CONTACT_SENSOR:
+            return 'contact-sensor-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -57,6 +60,8 @@ class TelinkApp(Enum):
             return 'chip-telink-ota-requestor-example'
         elif self == TelinkApp.THERMOSTAT:
             return 'chip-telink-thermostat-example'
+        elif self == TelinkApp.CONTACT_SENSOR:
+            return 'chip-telink-contact-sensor-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
