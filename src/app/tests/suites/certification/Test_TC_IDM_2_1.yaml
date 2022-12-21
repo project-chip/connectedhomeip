@@ -65,7 +65,7 @@ tests:
 
           [1657881522.001890][2575:2580] CHIP:DMG: }
           [1657881522.002053][2575:2580] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3999381333
-          [1657881522.002133][2575:2580] CHIP:TOO:   identify time: 0
+          [1657881522.002133][2575:2580] CHIP:TOO:   IdentifyTime: 0
           [1657881522.002227][2575:2580] CHIP:EM: Sending Standalone Ack for MessageCounter:54477998 on exchange 6586i
       disabled: true
 
@@ -107,9 +107,9 @@ tests:
           If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response
           [1657881584.166241][2584:2589] CHIP:DMG: }
           [1657881584.166599][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 4079829024
-          [1657881584.166672][2584:2589] CHIP:TOO:   identify time: 0
+          [1657881584.166672][2584:2589] CHIP:TOO:   IdentifyTime: 0
           [1657881584.166734][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 4079829024
-          [1657881584.166761][2584:2589] CHIP:TOO:   identify type: 2
+          [1657881584.166761][2584:2589] CHIP:TOO:   IdentifyType: 2
           [1657881584.166817][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFC DataVersion: 4079829024
           [1657881584.166844][2584:2589] CHIP:TOO:   FeatureMap: 0
           [1657881584.166900][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 4079829024
@@ -210,9 +210,9 @@ tests:
           If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
           [1657881729.900518][2608:2613] CHIP:DMG: }
           [1657881729.901108][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 4079829024
-          [1657881729.901182][2608:2613] CHIP:TOO:   identify time: 0
+          [1657881729.901182][2608:2613] CHIP:TOO:   IdentifyTime: 0
           [1657881729.901245][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 4079829024
-          [1657881729.901273][2608:2613] CHIP:TOO:   identify type: 2
+          [1657881729.901273][2608:2613] CHIP:TOO:   IdentifyType: 2
           [1657881729.901331][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFC DataVersion: 4079829024
           [1657881729.901359][2608:2613] CHIP:TOO:   FeatureMap: 0
           [1657881729.901431][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 4079829024
@@ -233,9 +233,9 @@ tests:
           [1657881729.902426][2608:2613] CHIP:TOO:     [6]: 65532
           [1657881729.902451][2608:2613] CHIP:TOO:     [7]: 65533
           [1657881729.902474][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3999381333
-          [1657881729.902500][2608:2613] CHIP:TOO:   identify time: 0
+          [1657881729.902500][2608:2613] CHIP:TOO:   IdentifyTime: 0
           [1657881729.902556][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3999381333
-          [1657881729.902583][2608:2613] CHIP:TOO:   identify type: 2
+          [1657881729.902583][2608:2613] CHIP:TOO:   IdentifyType: 2
           [1657881729.902640][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFC DataVersion: 3999381333
           [1657881729.902665][2608:2613] CHIP:TOO:   FeatureMap: 0
           [1657881729.902721][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 3999381333
@@ -292,9 +292,9 @@ tests:
           If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
           [1657881792.350417][2616:2621] CHIP:DMG: }
           [1657881792.350641][2616:2621] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 4079829024
-          [1657881792.350742][2616:2621] CHIP:TOO:   identify type: 2
+          [1657881792.350742][2616:2621] CHIP:TOO:   IdentifyType: 2
           [1657881792.350845][2616:2621] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3999381333
-          [1657881792.350891][2616:2621] CHIP:TOO:   identify type: 2
+          [1657881792.350891][2616:2621] CHIP:TOO:   IdentifyType: 2
           [1657881792.351000][2616:2621] CHIP:EM: Sending Standalone Ack for MessageCounter:222990264 on exchange 23721i
       disabled: true
 
@@ -535,7 +535,7 @@ tests:
           If the DUT has to provision to verify the logs, verify that TH all-clusters-app sent success response with attribute values
           [1657882043.053353][2648:2653] CHIP:DMG: }
           [1657882043.053561][2648:2653] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 4079829024
-          [1657882043.053662][2648:2653] CHIP:TOO:   identify type: 2
+          [1657882043.053662][2648:2653] CHIP:TOO:   IdentifyType: 2
           [1657882043.053774][2648:2653] CHIP:EM: Sending Standalone Ack for MessageCounter:228608905 on exchange 11019i
       disabled: true
 
