@@ -23,17 +23,19 @@ from .builder import Builder
 class TelinkApp(Enum):
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
+    CONTACT_SENSOR = auto()
     LIGHT = auto()
     SWITCH = auto()
     OTA_REQUESTOR = auto()
     THERMOSTAT = auto()
-    CONTACT_SENSOR = auto()
 
     def ExampleName(self):
         if self == TelinkApp.ALL_CLUSTERS:
             return 'all-clusters-app'
         elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
+        elif self == TelinkApp.CONTACT_SENSOR:
+            return 'contact-sensor-app'
         elif self == TelinkApp.LIGHT:
             return 'lighting-app'
         elif self == TelinkApp.SWITCH:
@@ -42,8 +44,6 @@ class TelinkApp(Enum):
             return 'ota-requestor-app'
         elif self == TelinkApp.THERMOSTAT:
             return 'thermostat'
-        elif self == TelinkApp.CONTACT_SENSOR:
-            return 'contact-sensor-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -52,6 +52,8 @@ class TelinkApp(Enum):
             return 'chip-telink-all-clusters-example'
         elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'chip-telink-all-clusters-minimal-example'
+        elif self == TelinkApp.CONTACT_SENSOR:
+            return 'chip-telink-contact-sensor-example'
         elif self == TelinkApp.LIGHT:
             return 'chip-telink-lighting-example'
         elif self == TelinkApp.SWITCH:
@@ -60,8 +62,6 @@ class TelinkApp(Enum):
             return 'chip-telink-ota-requestor-example'
         elif self == TelinkApp.THERMOSTAT:
             return 'chip-telink-thermostat-example'
-        elif self == TelinkApp.CONTACT_SENSOR:
-            return 'chip-telink-contact-sensor-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 

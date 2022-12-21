@@ -688,6 +688,8 @@ ALL.append(Target('telink-tlsr9518adk80d-all-clusters', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.ALL_CLUSTERS))
 ALL.append(Target('telink-tlsr9518adk80d-all-clusters-minimal', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.ALL_CLUSTERS_MINIMAL))
+ALL.append(Target('telink-tlsr9518adk80d-contact-sensor', TelinkBuilder,
+                  board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.CONTACT_SENSOR))
 ALL.append(Target('telink-tlsr9518adk80d-light', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.LIGHT))
 ALL.append(Target('telink-tlsr9518adk80d-light-switch', TelinkBuilder,
@@ -696,8 +698,6 @@ ALL.append(Target('telink-tlsr9518adk80d-ota-requestor', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.OTA_REQUESTOR))
 ALL.append(Target('telink-tlsr9518adk80d-thermostat', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.THERMOSTAT))
-ALL.append(Target('telink-tlsr9518adk80d-contact-sensor', TelinkBuilder,
-                  board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.CONTACT_SENSOR))
 
 # have a consistent order overall
 ALL.sort(key=lambda t: t.name)
