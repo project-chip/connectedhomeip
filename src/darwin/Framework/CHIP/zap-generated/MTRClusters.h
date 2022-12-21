@@ -895,14 +895,6 @@ MTR_NEWLY_AVAILABLE
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
-- (void)mfgSpecificPingWithParams:(MTRBasicInformationClusterMfgSpecificPingParams * _Nullable)params
-                   expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
-            expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
-                       completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-- (void)mfgSpecificPingWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
-                    expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-                               completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-
 - (NSDictionary<NSString *, id> *)readAttributeDataModelRevisionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeVendorNameWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
