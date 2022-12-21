@@ -1,1 +1,1 @@
-0.6.25 Version bump reason: Updating ZAP to v2022.12.20-nightly
+0.6.26 Version bump reason: Add flake8 to base image
