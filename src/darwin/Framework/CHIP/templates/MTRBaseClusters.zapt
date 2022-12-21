@@ -25,17 +25,22 @@ NS_ASSUME_NONNULL_BEGIN
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER {{availability (asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
 
 {{#chip_cluster_commands}}
+{{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
+{{#*inline "commandDecl"}}
+{{#unless (wasRemoved cluster command=command)}}
 /**
  * Command {{name}}
  *
  * {{description}}
  */
-{{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline~}}
-{{~#*inline "command"}}{{asUpperCamelCase name preserveAcronyms=true}}{{/inline~}}
-- (void){{asLowerCamelCase name}}WithParams:(MTR{{>cluster}}Cluster{{>command}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completion:({{>command_completion_type command=.}})completion {{availability (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completion:({{>command_completion_type command=.}})completion {{availability cluster command=command minimalRelease="First major API revamp"}};
 {{#unless (hasArguments)}}
-- (void){{asLowerCamelCase name}}WithCompletion:({{>command_completion_type command=.}})completion {{availability (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
+- (void){{asLowerCamelCase name}}WithCompletion:({{>command_completion_type command=.}})completion {{availability cluster command=command minimalRelease="First major API revamp"}};
 {{/unless}}
+{{/unless}}
+{{/inline}}
+{{> commandDecl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
+                command=(asUpperCamelCase name preserveAcronyms=true)}}
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
@@ -117,14 +122,20 @@ typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName labe
                                   queue:(dispatch_queue_t)queue {{availability (compatClusterNameRemapping name) deprecatedRelease="First major API revamp" deprecationMessage="Please use initWithDevice:endpointID:queue:"}};
 
 {{#chip_cluster_commands}}
-{{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) command=(asUpperCamelCase name))}}
-- (void){{asLowerCamelCase name}}WithParams:(MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase name}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=. compatRemapClusterName=true}})completionHandler
-  {{availability (compatClusterNameRemapping parent.name) command=(asUpperCamelCase name) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithParams:completion:")}};
+{{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
+{{#*inline "commandDecl"}}
+{{#if (and (wasIntroducedBeforeRelease "First major API revamp" cluster command=command)
+           (not (wasRemoved cluster command=command)))}}
+- (void){{asLowerCamelCase command}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
+  {{availability cluster command=command deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithParams:completion:")}};
 {{#unless (hasArguments)}}
-- (void){{asLowerCamelCase name}}WithCompletionHandler:({{>command_completion_type command=. compatRemapClusterName=true}})completionHandler
-  {{availability (compatClusterNameRemapping parent.name) command=(asUpperCamelCase name) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithCompletion:")}};
+- (void){{asLowerCamelCase command}}WithCompletionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
+  {{availability cluster command=command deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithCompletion:")}};
 {{/unless}}
 {{/if}}
+{{/inline}}
+{{> commandDecl cluster=(compatClusterNameRemapping parent.name)
+                command=(compatCommandNameRemapping parent.name name)}}
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}

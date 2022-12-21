@@ -5135,14 +5135,13 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
               expectedValueInterval:expectedValueIntervalMs
                          completion:completion];
 }
-- (void)mfgSpecificPingWithParams:(MTRBasicInformationClusterMfgSpecificPingParams * _Nullable)params
+- (void)mfgSpecificPingWithParams:(MTRBasicClusterMfgSpecificPingParams * _Nullable)params
                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                        completion:(MTRStatusCompletion)completion
 {
     NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
-                                     _endpoint, (unsigned int) MTRClusterIDTypeBasicInformationID,
-                                     (unsigned int) MTRCommandIDTypeClusterBasicInformationCommandMfgSpecificPingID];
+                                     _endpoint, (unsigned int) 0x00000028, (unsigned int) 0x10020000];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;

@@ -406,7 +406,7 @@ bool IsLocalConfigDisabled()
 } // namespace app
 } // namespace chip
 
-void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint) {}
+void emberAfBasicInformationClusterServerInitCallback(chip::EndpointId endpoint) {}
 
 void MatterBasicInformationPluginServerInitCallback()
 {

@@ -33,12 +33,3 @@ bool IsLocalConfigDisabled();
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-/** @brief Basic Cluster Server Init
- *
- * This function is called at startup for a given endpoint to initialize
- * attributes of the Basic Cluster.
- *
- * @param endpoint Endpoint that is being initialized  Ver.: always
- */
-void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint);
