@@ -72,7 +72,7 @@ class Device:
             except queue.Empty:
                 return lines
 
-    def wait_for_output(self, search: str, timeout: float = 10, assert_timeout: bool = True) -> [str]:
+    def wait_for_output(self, search: str, timeout: float = 10, assert_timeout: bool = True, verbose: bool = False) -> [str]:
         """
         Wait for expected output response
         :param search: Expected response string
@@ -109,7 +109,7 @@ class Device:
                     else:
                         log.warning(timeout_error_msg)
                         return []
-                if now - last > 1:
+                if verbose and (now - last > 1):
                     log.info('{}: Waiting for "{}" string... Timeout in {:.0f} s'.format(self.name, search,
                                                                                          abs(now - start - timeout)))
 
