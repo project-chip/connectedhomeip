@@ -68,6 +68,7 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/door-lock-server"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/identify-server"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/groups-server"
+    		      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/lock-app/lock-common/door-lock-common"
                      PRIV_REQUIRES bt chip QRCode)
 add_dependencies(${COMPONENT_LIB} app-codegen)
 
@@ -185,6 +186,7 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/door-lock-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/identify-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/groups-server"
+    		      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/lock-app/lock-common/door-lock-common"
                       PRIV_REQUIRES chip QRCode bt)
 
 add_dependencies(${COMPONENT_LIB} app-codegen)
