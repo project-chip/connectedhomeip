@@ -114,6 +114,17 @@ Identify sIdentify = {
 
 AppTask AppTask::sAppTask;
 
+class AppFabricTableDelegate : public FabricTable::Delegate
+{
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+    {
+        if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
+        {
+            chip::Server::GetInstance().ScheduleFactoryReset();
+        }
+    }
+};
+
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err;
@@ -189,9 +200,17 @@ CHIP_ERROR AppTask::Init()
     if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("SetBLEDeviceName fail");
+        return err;
     }
 
-    return err;
+    err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(new AppFabricTableDelegate);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("AppFabricTableDelegate fail");
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AppTask::StartApp()
