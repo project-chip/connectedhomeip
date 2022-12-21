@@ -113,7 +113,9 @@ DLL_EXPORT void Mutex::Lock(void)
 #if CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
 DLL_EXPORT CHIP_ERROR Mutex::Init(Mutex & aThis)
 {
-    aThis.mCmsisRTOSMutex = osMutexNew(NULL);
+    osMutexAttr_t mut_att = { .attr_bits = osMutexRecursive };
+
+    aThis.mCmsisRTOSMutex = osMutexNew(&mut_att);
     if (aThis.mCmsisRTOSMutex == NULL)
     {
         ChipLogError(chipSystemLayer, "osMutexNew failed");

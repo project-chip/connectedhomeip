@@ -201,6 +201,7 @@ chip_gn_arg_bool  ("chip_progress_logging"                CONFIG_CHIP_PROGRESS_L
 chip_gn_arg_bool  ("chip_automation_logging"              CONFIG_CHIP_AUTOMATION_LOGGING)
 chip_gn_arg_bool  ("chip_error_logging"                   CONFIG_CHIP_ERROR_LOGGING)
 chip_gn_arg_bool  ("chip_openiotsdk_use_psa_ps"           CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS)
+chip_gn_arg_bool  ("chip_system_config_use_iot_socket"    CONFIG_CHIP_OPEN_IOT_SDK_USE_IOT_SOCKET)
 if (TARGET cmsis-rtos-api)
     chip_gn_arg_string("target_os"                        "cmsis-rtos")
 endif()
@@ -258,6 +259,8 @@ target_link_libraries(openiotsdk-chip INTERFACE
     $<$<TARGET_EXISTS:mbedtls>:mbedtls>
     $<$<TARGET_EXISTS:lwipcore>:lwipcore>
     $<$<TARGET_EXISTS:iotsdk-ip-network-api>:iotsdk-ip-network-api>
+    $<$<TARGET_EXISTS:cmsis-sockets-api>:cmsis-sockets-api>
+    $<$<TARGET_EXISTS:lwip-sockets>:lwip-sockets>
     $<$<TARGET_EXISTS:iotsdk-tdbstore>:iotsdk-tdbstore>
     $<$<TARGET_EXISTS:iotsdk-blockdevice>:iotsdk-blockdevice>
     $<$<TARGET_EXISTS:iotsdk-serial-retarget>:$<TARGET_OBJECTS:iotsdk-serial-retarget>>

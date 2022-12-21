@@ -41,6 +41,12 @@ static void app_thread(void * argument)
         goto exit;
     }
 
+    if (openiotsdk_chip_init())
+    {
+        ChipLogError(Shell, "Open IoT SDK CHIP stack initialization failed");
+        goto exit;
+    }
+
     // Initialize the default streamer that was linked.
     ret = Engine::Root().Init();
     if (ret)
@@ -64,12 +70,6 @@ int main()
     if (openiotsdk_platform_init())
     {
         ChipLogError(Shell, "Open IoT SDK platform initialization failed");
-        return EXIT_FAILURE;
-    }
-
-    if (openiotsdk_chip_init())
-    {
-        ChipLogError(Shell, "Open IoT SDK CHIP stack initialization failed");
         return EXIT_FAILURE;
     }
 

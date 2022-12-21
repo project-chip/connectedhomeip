@@ -38,6 +38,13 @@ using namespace ::chip::System;
 namespace chip {
 namespace DeviceLayer {
 
+namespace {
+LayerImpl & SystemLayerImpl()
+{
+    return static_cast<LayerImpl &>(DeviceLayer::SystemLayer());
+}
+} // anonymous namespace
+
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     // Members are initialized by the stack
@@ -48,29 +55,27 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     mEventTaskMutex = osMutexNew(nullptr);
     mPlatformFlags  = osEventFlagsNew(nullptr);
     mQueue          = osMessageQueueNew(CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE, sizeof(ChipDeviceEvent), nullptr);
-    mTimer          = osTimerNew(TimerCallback, osTimerOnce, NULL, NULL);
 
-    if (!mChipStackMutex || !mEventTaskMutex || !mPlatformFlags || !mQueue || !mTimer)
+    if (!mChipStackMutex || !mEventTaskMutex || !mPlatformFlags || !mQueue)
     {
         osMutexDelete(mChipStackMutex);
         osMutexDelete(mEventTaskMutex);
         osEventFlagsDelete(mPlatformFlags);
         osMessageQueueDelete(mQueue);
-        osTimerDelete(mTimer);
-        mChipStackMutex = mEventTaskMutex = mPlatformFlags = mQueue = mTimer = nullptr;
+        mChipStackMutex = mEventTaskMutex = mPlatformFlags = mQueue = nullptr;
 
         return CHIP_ERROR_INTERNAL;
     }
+
+    ReturnLogErrorOnFailure(PlatformTimerInit());
 
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
-    CHIP_ERROR err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
-    SuccessOrExit(err);
+    ReturnLogErrorOnFailure(GenericPlatformManagerImpl<ImplClass>::_InitChipStack());
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void PlatformManagerImpl::_LockChipStack()
@@ -98,27 +103,34 @@ void PlatformManagerImpl::_UnlockChipStack()
 CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * eventPtr)
 {
     osStatus_t status = osMessageQueuePut(mQueue, eventPtr, 0, 0);
-    CHIP_ERROR ret    = (status == osOK) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
     osEventFlagsSet(mPlatformFlags, kPostEventFlag);
-    return ret;
+#if CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+    SystemLayerImpl().Signal();
+#endif // CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+    return (status == osOK) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
 void PlatformManagerImpl::HandlePostEvent()
 {
     /* handle an event */
     ChipDeviceEvent event;
-    osStatus_t status = osMessageQueueGet(mQueue, &event, nullptr, 0);
-    if (status == osOK)
+    uint32_t count = osMessageQueueGetCount(mQueue);
+    while (count)
     {
+        if (osMessageQueueGet(mQueue, &event, nullptr, 0) != osOK) {
+            break;
+        }
+
         LockChipStack();
         DispatchEvent(&event);
         UnlockChipStack();
+        count--;
     }
 }
 
 void PlatformManagerImpl::HandleTimerEvent(void)
 {
-    const CHIP_ERROR err = static_cast<System::LayerImplFreeRTOS &>(DeviceLayer::SystemLayer()).HandlePlatformTimer();
+    CHIP_ERROR err = SystemLayerImpl().HandlePlatformTimer();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "HandlePlatformTimer %ld", err.AsInteger());
@@ -128,16 +140,27 @@ void PlatformManagerImpl::HandleTimerEvent(void)
 void PlatformManagerImpl::RunEventLoopInternal()
 {
     uint32_t flags = 0;
+
     while (true)
     {
+#if CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+        if (SystemLayerImpl().WaitForEvents() == CHIP_NO_ERROR)
+        {
+            LockChipStack();
+            SystemLayerImpl().HandleEvents();
+            UnlockChipStack();
+        }
+
+        flags = osEventFlagsGet(mPlatformFlags);
+#else
         flags = osEventFlagsWait(mPlatformFlags, kPostEventFlag | kTimerEventFlag | kTaskStopEventFlag,
                                  osFlagsWaitAny | osFlagsNoClear, ms2tick(1000));
-
         // in case of error we still need to know the value of flags we're not waiting for
         if (flags & osFlagsError)
         {
             flags = osEventFlagsGet(mPlatformFlags);
         }
+#endif // CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
 
         if (flags & kTaskStopEventFlag)
         {
@@ -154,12 +177,8 @@ void PlatformManagerImpl::RunEventLoopInternal()
 
         if (flags & kPostEventFlag)
         {
+            osEventFlagsClear(mPlatformFlags, kPostEventFlag);
             HandlePostEvent();
-
-            if (!osMessageQueueGetCount(mQueue))
-            {
-                osEventFlagsClear(mPlatformFlags, kPostEventFlag);
-            }
         }
 
         if ((flags & kTaskRunningEventFlag) == 0)
@@ -204,11 +223,12 @@ CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
 
         osEventFlagsSet(mPlatformFlags, kTaskRunningEventFlag);
 
-        // this thread is self terminating
-        osThreadId_t mEventTask = osThreadNew(EventLoopTask, NULL, &tread_attr);
+        // these threads are self terminating
+        osThreadId_t event_task = osThreadNew(EventLoopTask, NULL, &tread_attr);
 
-        if (mEventTask == nullptr)
+        if (event_task == nullptr)
         {
+            osEventFlagsSet(mPlatformFlags, kTaskRunningEventFlag);
             osMutexRelease(mEventTaskMutex);
             return CHIP_ERROR_INTERNAL;
         }
@@ -240,6 +260,10 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
 
         osEventFlagsSet(mPlatformFlags, kTaskStopEventFlag);
 
+#if CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+        SystemLayerImpl().Signal();
+#endif // CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+
         osMutexRelease(mEventTaskMutex);
     }
 
@@ -254,10 +278,46 @@ void PlatformManagerImpl::SetEventFlags(uint32_t flags)
 void PlatformManagerImpl::TimerCallback(void * arg)
 {
     PlatformMgrImpl().SetEventFlags(kTimerEventFlag);
+
+#if CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+    SystemLayerImpl().Signal();
+#endif // CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+}
+
+CHIP_ERROR PlatformManagerImpl::PlatformTimerInit()
+{
+    if (mTimer != nullptr)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    mTimer = osTimerNew(TimerCallback, osTimerOnce, NULL, NULL);
+
+    if (!mTimer)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::PlatformTimerDeinit()
+{
+    if (mTimer == nullptr)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    osTimerDelete(mTimer);
+    mTimer = nullptr;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PlatformManagerImpl::_StartChipTimer(System::Clock::Timeout duration)
 {
+    ReturnErrorOnFailure(PlatformTimerInit());
+
     if (duration.count() == 0)
     {
         TimerCallback(0);
@@ -271,6 +331,7 @@ CHIP_ERROR PlatformManagerImpl::_StartChipTimer(System::Clock::Timeout duration)
             return CHIP_ERROR_INTERNAL;
         }
     }
+
     return CHIP_NO_ERROR;
 }
 
@@ -298,12 +359,11 @@ void PlatformManagerImpl::_Shutdown()
     osMutexDelete(mEventTaskMutex);
     osEventFlagsDelete(mPlatformFlags);
     osMessageQueueDelete(mQueue);
-    osTimerDelete(mTimer);
+    PlatformTimerDeinit();
     mChipStackMutex = nullptr;
     mPlatformFlags  = nullptr;
     mEventTaskMutex = nullptr;
     mQueue          = nullptr;
-    mTimer          = nullptr;
 
     GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 }

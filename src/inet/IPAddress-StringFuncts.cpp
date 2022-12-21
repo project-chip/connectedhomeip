@@ -34,6 +34,10 @@
 #include <inet/IPAddress.h>
 #include <lib/support/CodeUtils.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+#include <iot_socket.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #include <arpa/inet.h>
 #endif
@@ -43,7 +47,7 @@ namespace Inet {
 
 char * IPAddress::ToString(char * buf, uint32_t bufSize) const
 {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT && !CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
 #if INET_CONFIG_ENABLE_IPV4
     if (IsIPv4())
     {
@@ -81,6 +85,21 @@ char * IPAddress::ToString(char * buf, uint32_t bufSize) const
 #elif CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     otIp6Address addr = ToIPv6();
     otIp6AddressToString(&addr, buf, static_cast<uint16_t>(bufSize));
+#elif CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+#if INET_CONFIG_ENABLE_IPV4
+    if (IsIPv4())
+    {
+        ip4_addr_t ip4_addr;
+        memcpy(&ip4_addr, &Addr[3], sizeof(ip4_addr));
+        ip4addr_ntoa_r(&ip4_addr, buf, (int) bufSize);
+    }
+    else
+#endif // INET_CONFIG_ENABLE_IPV4
+    {
+        ip6_addr_t ip6_addr;
+        memcpy(&ip6_addr.addr, Addr, sizeof(ip6_addr.addr));
+        ip6addr_ntoa_r(&ip6_addr, buf, (int) bufSize);
+    }
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 
     return buf;

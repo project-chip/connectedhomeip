@@ -37,6 +37,10 @@
 #include <system/SystemError.h>
 #include <system/SystemEvent.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+#include <inet/EndPointStateIoTSocket.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <system/SocketEvents.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -182,6 +186,20 @@ class LayerFreeRTOS : public Layer
 };
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+#if CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+
+class LayerOpenIoTSDK : public Layer
+{
+public:
+    virtual CHIP_ERROR EnableSelectCallback(chip::Inet::EndPointStateIoTSocket * endpoint, bool read, bool write)  = 0;
+    virtual CHIP_ERROR DisableSelectCallback(chip::Inet::EndPointStateIoTSocket * endpoint, bool read, bool write) = 0;
+    virtual void Signal()                                                                                          = 0;
+    virtual CHIP_ERROR WaitForEvents()                                                                             = 0;
+    virtual void HandleEvents()                                                                                    = 0;
+};
+
+#endif // CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 

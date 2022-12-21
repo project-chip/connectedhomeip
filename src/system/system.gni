@@ -34,6 +34,9 @@ declare_args() {
 
   # Use OpenThread TCP/UDP stack directly
   chip_system_config_use_open_thread_inet_endpoints = false
+
+  # Use IoT Socket API.
+  chip_system_config_use_iot_socket = false
 }
 
 declare_args() {
@@ -44,8 +47,10 @@ declare_args() {
 
 declare_args() {
   # Event loop type.
-  if (chip_system_config_use_lwip ||
-      chip_system_config_use_open_thread_inet_endpoints) {
+  if (chip_system_config_use_iot_socket) {
+    chip_system_config_event_loop = "IoTSocket"
+  } else if (chip_system_config_use_lwip ||
+             chip_system_config_use_open_thread_inet_endpoints) {
     chip_system_config_event_loop = "FreeRTOS"
   } else {
     chip_system_config_event_loop = "Select"

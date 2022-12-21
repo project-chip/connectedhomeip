@@ -42,6 +42,10 @@
 
 #include "inet/IANAConstants.h"
 
+#if CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+#include <iot_socket.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 #include <lwip/init.h>
 #include <lwip/ip_addr.h>
@@ -154,12 +158,23 @@ public:
 #endif // INET_CONFIG_ENABLE_IPV4
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    explicit IPAddress(const struct in6_addr & ipv6Addr);
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK || CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+#if CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+    using platform_in6_addr     = iot_in6_addr;
+    using platform_in_addr      = iot_in_addr;
+    using platform_sockaddr_in6 = iot_sockaddr_in6;
+    using platform_sockaddr_in  = iot_sockaddr_in;
+#else
+    using platform_in6_addr     = struct in6_addr;
+    using platform_in_addr      = struct in_addr;
+    using platform_sockaddr_in6 = struct sockaddr_in6;
+    using platform_sockaddr_in  = struct sockaddr_in;
+#endif // CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+    explicit IPAddress(const platform_in6_addr & ipv6Addr);
 #if INET_CONFIG_ENABLE_IPV4
-    explicit IPAddress(const struct in_addr & ipv4Addr);
+    explicit IPAddress(const platform_in_addr & ipv4Addr);
 #endif // INET_CONFIG_ENABLE_IPV4
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK || CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
 
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
     explicit IPAddress(const otIp6Address & ipv6Addr);
@@ -499,7 +514,7 @@ public:
      */
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-
+#if !CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
     /**
      * @fn      ToLwIPAddr() const
      *
@@ -536,17 +551,22 @@ public:
 #if INET_CONFIG_ENABLE_IPV4
     ip4_addr_t ToIPv4(void) const;
 #endif // INET_CONFIG_ENABLE_IPV4
+#endif // !CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-    struct in6_addr ToIPv6() const;
-
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK || CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+    platform_in6_addr ToIPv6() const;
 #if INET_CONFIG_ENABLE_IPV4
-    struct in_addr ToIPv4() const;
+    platform_in_addr ToIPv4() const;
 #endif // INET_CONFIG_ENABLE_IPV4
 
+    static IPAddress FromSockAddr(const platform_sockaddr_in6 & sockaddr) { return IPAddress(sockaddr.sin6_addr); }
+#if INET_CONFIG_ENABLE_IPV4
+    static IPAddress FromSockAddr(const platform_sockaddr_in & sockaddr) { return IPAddress(sockaddr.sin_addr); }
+#endif // INET_CONFIG_ENABLE_IPV4
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK || CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_USE_NETWORK_FRAMEWORK
     /**
      * Get the IP address from a SockAddr.
      */
@@ -555,11 +575,6 @@ public:
     {
         return GetIPAddressFromSockAddr(reinterpret_cast<const SockAddr &>(sockaddr), outIPAddress);
     }
-    static IPAddress FromSockAddr(const sockaddr_in6 & sockaddr) { return IPAddress(sockaddr.sin6_addr); }
-#if INET_CONFIG_ENABLE_IPV4
-    static IPAddress FromSockAddr(const sockaddr_in & sockaddr) { return IPAddress(sockaddr.sin_addr); }
-#endif // INET_CONFIG_ENABLE_IPV4
-
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT

@@ -22,13 +22,16 @@
 #define LWIP_STATS (0)
 #define LWIP_IGMP (1)
 #define LWIP_RAW (1)
+#define LWIP_NETIF_API (1)
 
 #define MEM_LIBC_MALLOC (1)
-#define MEM_USE_POOLS (0)
+#define MEMP_NUM_NETBUF 16
 
-#ifdef LWIP_DEBUG
+#define IP_SOF_BROADCAST (1)
+#define IP_SOF_BROADCAST_RECV (1)
 
 // Debug Options
+#ifdef LWIP_DEBUG
 #define NETIF_DEBUG LWIP_DBG_ON
 #define IP_DEBUG LWIP_DBG_ON
 #define TCP_DEBUG LWIP_DBG_ON
@@ -37,7 +40,7 @@
 
 #define LWIP_DBG_TYPES_ON LWIP_DBG_ON
 #define LWIP_DBG_MIN_LEVEL LWIP_DBG_LEVEL_ALL
-#endif
+#endif // LWIP_DEBUG
 
 #ifndef LWIP_PLATFORM_DIAG
 #define LWIP_PLATFORM_DIAG(x)                                                                                                      \

@@ -41,6 +41,7 @@
 
 #include <nlunit-test.h>
 
+#include <inet/IPAddress.h>
 #include <inet/IPPrefix.h>
 #include <inet/InetError.h>
 
@@ -1008,15 +1009,20 @@ void CheckToIPv6(nlTestSuite * inSuite, void * inContext)
 
         SetupIPAddress(test_addr, lCurrent);
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
         ip6_addr_t ip_addr_1 = { 0 }, ip_addr_2 = { 0 };
         memcpy(ip_addr_1.addr, addr, sizeof(addr));
 #if LWIP_IPV6_SCOPES
         ip_addr_1.zone = 0;
 #endif
 #else
-        struct in6_addr ip_addr_1, ip_addr_2;
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK || CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+        IPAddress::platform_in6_addr ip_addr_1, ip_addr_2;
+        ip_addr_1 = *reinterpret_cast<IPAddress::platform_in6_addr *>(addr);
+#else
+        in6_addr ip_addr_1, ip_addr_2;
         ip_addr_1 = *reinterpret_cast<struct in6_addr *>(addr);
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK || CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
 #endif
         ip_addr_2 = test_addr.ToIPv6();
 
@@ -1142,12 +1148,21 @@ void CheckToIPv4(nlTestSuite * inSuite, void * inContext)
 
         SetupIPAddress(test_addr, lCurrent);
 
+<<<<<<< HEAD
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         ip4_addr_t ip_addr_1 = { 0 }, ip_addr_2 = { 0 };
+=======
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+        ip4_addr_t ip_addr_1, ip_addr_2;
+>>>>>>> bf30da8c6... [OIS] Add IoT Socket support
 
         ip_addr_1.addr = htonl(lCurrent->mAddr.mAddrQuartets[3]);
 #else
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK || CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+        IPAddress::platform_in_addr ip_addr_1, ip_addr_2;
+#else
         struct in_addr ip_addr_1, ip_addr_2;
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK || CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
 
         ip_addr_1.s_addr = htonl(lCurrent->mAddr.mAddrQuartets[3]);
 #endif
@@ -1712,7 +1727,7 @@ void CheckIPPrefix(nlTestSuite * inSuite, void * inContext)
     }
 }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
 
 bool sameLwIPAddress(const ip6_addr_t & a, const ip6_addr_t & b)
 {
@@ -1813,7 +1828,7 @@ void CheckToLwIPAddr(nlTestSuite * inSuite, void * inContext)
         ++lCurrent;
     }
 }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
 
 /**
  *   Test Suite. It lists all the test functions.
@@ -1855,9 +1870,9 @@ const nlTest sTests[] =
     NL_TEST_DEF("Assemble IPv6 Transient Multicast address",   CheckMakeIPv6TransientMulticast),
     NL_TEST_DEF("Assemble IPv6 Prefix Multicast address",      CheckMakeIPv6PrefixMulticast),
     NL_TEST_DEF("IPPrefix test",                               CheckIPPrefix),
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
     NL_TEST_DEF("Convert IPAddress to LwIP address",           CheckToLwIPAddr),
-#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
     NL_TEST_SENTINEL()
 };
 // clang-format on

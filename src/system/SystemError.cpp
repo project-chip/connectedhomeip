@@ -37,6 +37,10 @@
 #include <lwip/err.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+#if CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+#include <iot_socket.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+
 #include <limits>
 #include <stddef.h>
 #include <string.h>
@@ -217,6 +221,43 @@ bool FormatLwIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+#if CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+
+CHIP_ERROR MapErrorIoTSocket(int32_t errorCode)
+{
+    switch (errorCode)
+    {
+    case 0:
+        return CHIP_NO_ERROR;
+    case IOT_SOCKET_EINVAL:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    case IOT_SOCKET_ENOMEM:
+        return CHIP_ERROR_NO_MEMORY;
+    case IOT_SOCKET_EAGAIN:
+        return CHIP_ERROR_BUSY;
+    case IOT_SOCKET_ETIMEDOUT:
+        return CHIP_ERROR_TIMEOUT;
+    case IOT_SOCKET_ENOTCONN:
+        return CHIP_ERROR_NOT_CONNECTED;
+    case IOT_SOCKET_ERROR:
+    case IOT_SOCKET_ESOCK:
+    case IOT_SOCKET_ENOTSUP:
+    case IOT_SOCKET_EINPROGRESS:
+    case IOT_SOCKET_EISCONN:
+    case IOT_SOCKET_ECONNREFUSED:
+    case IOT_SOCKET_ECONNRESET:
+    case IOT_SOCKET_ECONNABORTED:
+    case IOT_SOCKET_EALREADY:
+    case IOT_SOCKET_EADDRINUSE:
+    case IOT_SOCKET_EHOSTNOTFOUND:
+        return CHIP_ERROR_INTERNAL;
+    default:
+        return CHIP_ERROR_INTERNAL;
+    }
+}
+
+#endif // CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
 
 } // namespace System
 } // namespace chip

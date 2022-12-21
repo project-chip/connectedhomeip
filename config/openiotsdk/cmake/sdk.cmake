@@ -31,6 +31,22 @@ list(APPEND SDK_SOURCES_BINARY_DIRS)
 set(TFM_SUPPORT NO CACHE BOOL "Add Trusted Firmware-M (TF-M) support to application")
 set(TFM_NS_APP_VERSION "0.0.0" CACHE STRING "TF-M non-secure application version (in the x.x.x format)")
 
+FetchContent_Declare(
+    lwip
+    GIT_REPOSITORY  https://github.com/lwip-tcpip/lwip.git
+    GIT_TAG         STABLE-2_1_3_RELEASE
+    GIT_PROGRESS    ON
+    PATCH_COMMAND   git apply --ignore-space-change --ignore-whitespace ${CHIP_ROOT}/config/openiotsdk/lwip/lwip.patch || true
+)
+
+FetchContent_Declare(
+    cmsis-sockets-api
+    GIT_REPOSITORY  https://github.com/paul-szczepanek-arm/IoT_Socket.git
+    GIT_TAG         extended-api
+    GIT_SHALLOW     ON
+    GIT_PROGRESS    ON
+)
+
 # Open IoT SDK configuration
 set(IOTSDK_MDH_ARM ON)
 set(MDH_PLATFORM "ARM_AN552_MPS3")

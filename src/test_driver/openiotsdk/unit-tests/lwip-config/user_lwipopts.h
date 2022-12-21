@@ -20,6 +20,15 @@
 #define USER_LWIPOPTS_H
 
 #define LWIP_STATS (0)
+#define LWIP_IGMP (1)
+#define LWIP_RAW (1)
+#define LWIP_NETIF_API (1)
+
+#define MEM_LIBC_MALLOC (1)
 #define PBUF_POOL_SIZE (1001)
+#define MEMP_NUM_NETBUF 1024
+
+#define IP_SOF_BROADCAST (1)
+#define IP_SOF_BROADCAST_RECV (1)
 
 #endif /* USER_LWIPOPTS_H */

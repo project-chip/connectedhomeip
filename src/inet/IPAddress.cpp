@@ -97,6 +97,7 @@ IPAddress::IPAddress(const ip_addr_t & addr)
 
 #endif // INET_CONFIG_ENABLE_IPV4 || LWIP_IPV4
 
+#if !CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
 #if INET_CONFIG_ENABLE_IPV4
 
 ip4_addr_t IPAddress::ToIPv4() const
@@ -200,12 +201,14 @@ ip6_addr_t IPAddress::ToIPv6() const
     return ipAddr;
 }
 
+#endif // !CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
+
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK || CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
 
 #if INET_CONFIG_ENABLE_IPV4
-IPAddress::IPAddress(const struct in_addr & ipv4Addr)
+IPAddress::IPAddress(const platform_in_addr & ipv4Addr)
 {
     Addr[0] = 0;
     Addr[1] = 0;
@@ -214,29 +217,31 @@ IPAddress::IPAddress(const struct in_addr & ipv4Addr)
 }
 #endif // INET_CONFIG_ENABLE_IPV4
 
-IPAddress::IPAddress(const struct in6_addr & ipv6Addr)
+IPAddress::IPAddress(const platform_in6_addr & ipv6Addr)
 {
     static_assert(sizeof(*this) == sizeof(ipv6Addr), "in6_addr size mismatch");
     memcpy(Addr, &ipv6Addr, sizeof(ipv6Addr));
 }
 
 #if INET_CONFIG_ENABLE_IPV4
-struct in_addr IPAddress::ToIPv4() const
+IPAddress::platform_in_addr IPAddress::ToIPv4() const
 {
-    struct in_addr ipv4Addr;
+    platform_in_addr ipv4Addr;
     ipv4Addr.s_addr = Addr[3];
     return ipv4Addr;
 }
 #endif // INET_CONFIG_ENABLE_IPV4
 
-struct in6_addr IPAddress::ToIPv6() const
+IPAddress::platform_in6_addr IPAddress::ToIPv6() const
 {
-    in6_addr ipAddr;
+    platform_in6_addr ipAddr;
     static_assert(sizeof(ipAddr) == sizeof(Addr), "in6_addr size mismatch");
     memcpy(&ipAddr, Addr, sizeof(ipAddr));
     return ipAddr;
 }
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK || CHIP_SYSTEM_CONFIG_USE_IOT_SOCKET
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 CHIP_ERROR IPAddress::GetIPAddressFromSockAddr(const SockAddr & sockaddr, IPAddress & outIPAddress)
 {
 #if INET_CONFIG_ENABLE_IPV4

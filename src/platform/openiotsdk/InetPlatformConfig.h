@@ -28,3 +28,7 @@
 // ==================== Platform Adaptations ====================
 
 // ========== Platform-specific Configuration Overrides =========
+
+#ifndef IPV6_MULTICAST_IMPLEMENTED
+#define IPV6_MULTICAST_IMPLEMENTED
+#endif

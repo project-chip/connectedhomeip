@@ -1,0 +1,67 @@
+diff --git a/src/api/sockets.c b/src/api/sockets.c
+index 78526350..fb6e0796 100644
+--- a/src/api/sockets.c
++++ b/src/api/sockets.c
+@@ -1158,23 +1158,34 @@ lwip_recvfrom_udp_raw(struct lwip_sock *sock, int flags, struct msghdr *msg, u16
+ #if LWIP_NETBUF_RECVINFO
+     /* Check if packet info was recorded */
+     if (buf->flags & NETBUF_FLAG_DESTADDR) {
+-      if (IP_IS_V4(&buf->toaddr)) {
++#if LWIP_IPV4 || LWIP_IPV6
++      if (msg->msg_controllen >= CMSG_SPACE(sizeof(struct in_pktinfo))) {
++        struct cmsghdr *chdr = CMSG_FIRSTHDR(msg); /* This will always return a header!! */
++        chdr->cmsg_level = IPPROTO_IP;
++        chdr->cmsg_type = IP_PKTINFO;
+ #if LWIP_IPV4
+-        if (msg->msg_controllen >= CMSG_SPACE(sizeof(struct in_pktinfo))) {
+-          struct cmsghdr *chdr = CMSG_FIRSTHDR(msg); /* This will always return a header!! */
++        if (IP_IS_V4(&buf->toaddr)) {
+           struct in_pktinfo *pkti = (struct in_pktinfo *)CMSG_DATA(chdr);
+-          chdr->cmsg_level = IPPROTO_IP;
+-          chdr->cmsg_type = IP_PKTINFO;
+           chdr->cmsg_len = CMSG_LEN(sizeof(struct in_pktinfo));
+-          pkti->ipi_ifindex = buf->p->if_idx;
+-          inet_addr_from_ip4addr(&pkti->ipi_addr, ip_2_ip4(netbuf_destaddr(buf)));
+           msg->msg_controllen = CMSG_SPACE(sizeof(struct in_pktinfo));
+-          wrote_msg = 1;
+-        } else {
+-          msg->msg_flags |= MSG_CTRUNC;
++          inet_addr_from_ip4addr(&pkti->ipi_addr, ip_2_ip4(netbuf_destaddr(buf)));
++          pkti->ipi_ifindex = buf->p->if_idx;
+         }
+ #endif /* LWIP_IPV4 */
++#if LWIP_IPV6
++        if (IP_IS_V6(&buf->toaddr)) {
++          struct in6_pktinfo *pkti6 = (struct in6_pktinfo *)CMSG_DATA(chdr);
++          chdr->cmsg_len = CMSG_LEN(sizeof(struct in6_pktinfo));
++          msg->msg_controllen = CMSG_SPACE(sizeof(struct in6_pktinfo));
++          inet6_addr_from_ip6addr(&pkti6->ipi6_addr, ip_2_ip6(netbuf_destaddr(buf)));
++          pkti6->ipi6_ifindex = buf->p->if_idx;
++        }
++#endif /* LWIP_IPV6 */
++        wrote_msg = 1;
++      } else {
++        msg->msg_flags |= MSG_CTRUNC;
+       }
++#endif /* LWIP_IPV4 || LWIP_IPV6 */
+     }
+ #endif /* LWIP_NETBUF_RECVINFO */
+ 
+diff --git a/src/include/lwip/sockets.h b/src/include/lwip/sockets.h
+index d70d36c4..1c225041 100644
+--- a/src/include/lwip/sockets.h
++++ b/src/include/lwip/sockets.h
+@@ -329,6 +329,13 @@ struct in_pktinfo {
+ };
+ #endif /* LWIP_IPV4 */
+ 
++#if LWIP_IPV6
++struct in6_pktinfo {
++  unsigned int    ipi6_ifindex;  /* Interface index */
++  struct in6_addr ipi6_addr;     /* Destination (from header) address */
++};
++#endif /* LWIP_IPV6 */
++
+ #if LWIP_IPV6_MLD
+ /*
+  * Options and types related to IPv6 multicast membership

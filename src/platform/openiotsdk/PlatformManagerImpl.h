@@ -71,6 +71,8 @@ private:
     CHIP_ERROR _StartEventLoopTask();
     CHIP_ERROR _StopEventLoopTask();
 
+    CHIP_ERROR PlatformTimerInit(void);
+    CHIP_ERROR PlatformTimerDeinit(void);
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
     void _Shutdown();
 
