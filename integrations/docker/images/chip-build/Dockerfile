@@ -163,7 +163,7 @@ RUN set -x \
 
 # Install a known ZAP release
 # Only keep the cli version, since `zap` is 143MB and not usable (UI)
-ENV ZAP_VERSION=v2022.12.19-nightly
+ENV ZAP_VERSION=v2022.12.20-nightly
 RUN set -x \
     && mkdir -p /opt/zap-${ZAP_VERSION} \
     && cd /opt/zap-${ZAP_VERSION} \
