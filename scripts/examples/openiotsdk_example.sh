@@ -29,6 +29,7 @@ EXAMPLE_PATH=""
 BUILD_PATH=""
 TOOLCHAIN=arm-none-eabi-gcc
 DEBUG=false
+SOCKET_API="iotsocket"
 EXAMPLE=""
 FVP_BIN=FVP_Corstone_SSE-300_Ethos-U55
 GDB_PLUGIN="$FAST_MODEL_PLUGINS_PATH/GDBRemoteConnection.so"
@@ -49,13 +50,14 @@ Usage: $0 [options] example [test_name]
 Build, run or test the Open IoT SDK examples and unit-tests.
 
 Options:
-    -h,--help                       Show this help
-    -c,--clean                      Clean target build
-    -s,--scratch                    Remove build directory at all before building
-    -C,--command    <command>       Action to execute <build-run | run | test | build - default>
-    -d,--debug      <debug_enable>  Build in debug mode <true | false - default>
-    -p,--path       <build_path>    Build path <build_path - default is example_dir/build>
-    -n,--network    <network_name>  FVP network interface name <network_name - default is "user" which means user network mode>
+    -h,--help                           Show this help
+    -c,--clean                          Clean target build
+    -s,--scratch                        Remove build directory at all before building
+    -C,--command    <command>           Action to execute <build-run | run | test | build - default>
+    -d,--debug      <debug_enable>      Build in debug mode <true | false - default>
+    -S,--socket     <iotsocket|lwip>    Build with IoT Socket API (enabled by default)
+    -p,--path       <build_path>        Build path <build_path - default is example_dir/build>
+    -n,--network    <network_name>      FVP network interface name <network_name - default is "user" which means user network mode>
 
 Examples:
     shell
@@ -102,6 +104,10 @@ function build_with_cmake() {
         BUILD_OPTIONS+=(-DCMAKE_BUILD_TYPE=Debug)
     else
         BUILD_OPTIONS+=(-DCMAKE_BUILD_TYPE=Release)
+    fi
+
+    if [[ $SOCKET_API == "iotsocket" ]]; then
+        BUILD_OPTIONS+=(-DCONFIG_CHIP_OPEN_IOT_SDK_USE_IOT_SOCKET=YES)
     fi
 
     # Remove old artifacts to force linking
@@ -206,51 +212,55 @@ function run_test() {
     fi
 }
 
-SHORT=C:,p:,d:,n:,c,s,h
-LONG=command:,path:,debug:,network:,clean,scratch,help
+SHORT=C:,p:,d:,S:,n:,c,s,h
+LONG=command:,path:,debug:,socket:,network:,clean,scratch,help
 OPTS=$(getopt -n build --options "$SHORT" --longoptions "$LONG" -- "$@")
 
 eval set -- "$OPTS"
 
 while :; do
     case "$1" in
-        -h | --help)
-            show_usage
-            exit 0
-            ;;
-        -c | --clean)
-            CLEAN=1
-            shift
-            ;;
-        -s | --scratch)
-            SCRATCH=1
-            shift
-            ;;
-        -C | --command)
-            COMMAND=$2
-            shift 2
-            ;;
-        -d | --debug)
-            DEBUG=$2
-            shift 2
-            ;;
-        -p | --path)
-            BUILD_PATH=$CHIP_ROOT/$2
-            shift 2
-            ;;
-        -n | --network)
-            FVP_NETWORK=$2
-            shift 2
-            ;;
-        -* | --*)
-            shift
-            break
-            ;;
-        *)
-            echo "Unexpected option: $1"
-            show_usage
-            exit 2
-            ;;
+    -h | --help)
+        show_usage
+        exit 0
+        ;;
+    -c | --clean)
+        CLEAN=1
+        shift
+        ;;
+    -s | --scratch)
+        SCRATCH=1
+        shift
+        ;;
+    -C | --command)
+        COMMAND=$2
+        shift 2
+        ;;
+    -d | --debug)
+        DEBUG=$2
+        shift 2
+        ;;
+    -S | --socket)
+        SOCKET_API=$2
+        shift 2
+        ;;
+    -p | --path)
+        BUILD_PATH=$CHIP_ROOT/$2
+        shift 2
+        ;;
+    -n | --network)
+        FVP_NETWORK=$2
+        shift 2
+        ;;
+    -* | --*)
+        shift
+        break
+        ;;
+    *)
+        echo "Unexpected option: $1"
+        show_usage
+        exit 2
+        ;;
     esac
 done
 
@@ -260,23 +270,23 @@ if [[ $# -lt 1 ]]; then
 fi
 
 case "$1" in
-    shell | unit-tests | lock-app)
-        EXAMPLE=$1
-        ;;
-    *)
-        echo "Wrong example name"
-        show_usage
-        exit 2
-        ;;
+shell | unit-tests | lock-app)
+    EXAMPLE=$1
+    ;;
+*)
+    echo "Wrong example name"
+    show_usage
+    exit 2
+    ;;
 esac
 
 case "$COMMAND" in
-    build | run | test | build-run) ;;
-    *)
-        echo "Wrong command definition"
-        show_usage
-        exit 2
-        ;;
+build | run | test | build-run) ;;
+*)
+    echo "Wrong command definition"
+    show_usage
+    exit 2
+    ;;
 esac
 
 if [[ "$EXAMPLE" == "unit-tests" ]]; then
@@ -299,6 +309,15 @@ if [[ "$EXAMPLE" == "unit-tests" ]]; then
 else
     EXAMPLE_PATH="$CHIP_ROOT/examples/$EXAMPLE/openiotsdk"
 fi
+
+case "$SOCKET_API" in
+lwip | iotsocket) ;;
+*)
+    echo "Wrong socket API definition"
+    show_usage
+    exit 2
+    ;;
+esac
 
 TOOLCHAIN_PATH="toolchains/toolchain-$TOOLCHAIN.cmake"
 
