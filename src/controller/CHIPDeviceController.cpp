@@ -896,6 +896,7 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     MATTER_TRACE_EVENT_SCOPE("UnpairDevice", "DeviceCommissioner");
+    VerifyOrReturnError(mDeviceUnpair == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     Platform::UniquePtr<DeviceUnpair> deviceUnpair(new DeviceUnpair());
     deviceUnpair->RegisterCallback(this);

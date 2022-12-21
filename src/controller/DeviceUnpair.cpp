@@ -19,10 +19,10 @@
 #include <controller/DeviceUnpair.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/InteractionModelEngine.h>
 #include <controller-clusters/zap-generated/CHIPClusters.h>
 
 using namespace chip::app::Clusters;
+
 namespace chip {
 namespace Controller {
 
@@ -37,65 +37,66 @@ void DeviceUnpair::RegisterCallback(Callback * callback)
 void DeviceUnpair::UnpairDevice(DeviceProxy * proxy, NodeId remoteDeviceId)
 {
     mRemoteDeviceId = remoteDeviceId;
-    PerformDeviceUnpairStep(proxy, UnpairDeviceStage::kReadCurrentFabricIndex, CHIP_NO_ERROR);
+    RegisterDeviceProxy(proxy);
+    PerformDeviceUnpairStep(UnpairDeviceStage::kReadCurrentFabricIndex);
 }
 
-void DeviceUnpair::PerformDeviceUnpairStep(DeviceProxy * proxy, UnpairDeviceStage stage, CHIP_ERROR err)
+void DeviceUnpair::PerformDeviceUnpairStep(UnpairDeviceStage stage)
 {
-    mProxy = proxy;
+    if (mProxy == nullptr)
+    {
+        mLastError = CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    if (mLastError != CHIP_NO_ERROR)
+    {
+        stage = UnpairDeviceStage::kUnpairError;
+    }
+
     mStage = stage;
 
     switch (stage)
     {
     case kReadCurrentFabricIndex: {
-        ReadCurrentFabricIndex(proxy);
+        ReadCurrentFabricIndex();
         break;
     }
     case kSendRemoveFabric: {
-        SendRemoveFabricIndex(proxy, mFabricIndex);
+        SendRemoveFabricIndex(mFabricIndex);
         break;
     }
     case kUnpairError:
     case kUnpairCleanUp:
     default: {
-        FinishUnpairDevice(err);
+        FinishUnpairDevice(mLastError);
         break;
     }
     }
 }
 
-void DeviceUnpair::ReadCurrentFabricIndex(DeviceProxy * proxy)
+void DeviceUnpair::ReadCurrentFabricIndex()
 {
-    app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-    app::ReadPrepareParams readParams(proxy->GetSecureSession().Value());
+    using TypeInfo = chip::app::Clusters::OperationalCredentials::Attributes::CurrentFabricIndex::TypeInfo;
+    OperationalCredentialsCluster cluster(*mProxy->GetExchangeManager(), mProxy->GetSecureSession().Value(), 0);
 
-    app::AttributePathParams readPaths[1];
-    readPaths[0] = app::AttributePathParams(OperationalCredentials::Id, OperationalCredentials::Attributes::CurrentFabricIndex::Id);
+    CHIP_ERROR err = cluster.ReadAttribute<TypeInfo>(this, OnSuccessCurrentFabricIndex, OnReadAttributeFailure);
 
-    readParams.mpAttributePathParamsList    = readPaths;
-    readParams.mAttributePathParamsListSize = 1;
-    readParams.mIsFabricFiltered            = false;
-
-    auto attributeCache = Platform::MakeUnique<app::ClusterStateCache>(*this);
-    auto readClient     = Platform::MakeUnique<app::ReadClient>(
-        engine, proxy->GetExchangeManager(), attributeCache->GetBufferedCallback(), app::ReadClient::InteractionType::Read);
-    CHIP_ERROR err = readClient->SendRequest(readParams);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to send read request for networking clusters");
-        PerformDeviceUnpairStep(proxy, UnpairDeviceStage::kUnpairError, err);
+        SetLastError(err);
+        PerformDeviceUnpairStep(UnpairDeviceStage::kUnpairError);
         return;
     }
 
-    mAttributeCache = std::move(attributeCache);
-    mReadClient     = std::move(readClient);
+    return;
 }
 
-void DeviceUnpair::SendRemoveFabricIndex(DeviceProxy * proxy, FabricIndex fabricIndex)
+void DeviceUnpair::SendRemoveFabricIndex(FabricIndex fabricIndex)
 {
     if (fabricIndex == kUndefinedFabricIndex)
     {
-        PerformDeviceUnpairStep(nullptr, UnpairDeviceStage::kUnpairError, CHIP_ERROR_INVALID_FABRIC_INDEX);
+        SetLastError(CHIP_ERROR_INVALID_FABRIC_INDEX);
+        PerformDeviceUnpairStep(UnpairDeviceStage::kUnpairError);
         return;
     }
     ChipLogProgress(Controller, "SendRemoveFabricIndex : %u", fabricIndex);
@@ -103,15 +104,19 @@ void DeviceUnpair::SendRemoveFabricIndex(DeviceProxy * proxy, FabricIndex fabric
     OperationalCredentials::Commands::RemoveFabric::Type request;
     request.fabricIndex = fabricIndex;
 
-    OperationalCredentialsCluster cluster(*proxy->GetExchangeManager(), proxy->GetSecureSession().Value(), 0);
+    OperationalCredentialsCluster cluster(*mProxy->GetExchangeManager(), mProxy->GetSecureSession().Value(), 0);
 
-    cluster.InvokeCommand(request, this, OnRemoveFabric, OnCommandFailure);
+    CHIP_ERROR err = cluster.InvokeCommand(request, this, OnRemoveFabric, OnCommandFailure);
+    if (err != CHIP_NO_ERROR)
+    {
+        SetLastError(err);
+        PerformDeviceUnpairStep(UnpairDeviceStage::kUnpairError);
+        return;
+    }
 }
 
 void DeviceUnpair::FinishUnpairDevice(CHIP_ERROR err)
 {
-    mAttributeCache         = nullptr;
-    mReadClient             = nullptr;
     mProxy                  = nullptr;
     mOperationalDeviceProxy = nullptr;
 
@@ -121,15 +126,20 @@ void DeviceUnpair::FinishUnpairDevice(CHIP_ERROR err)
     }
 }
 
+void DeviceUnpair::GenerateOperationalDeviceProxy(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+{
+    auto proxy              = Platform::MakeShared<OperationalDeviceProxy>(&exchangeMgr, sessionHandle);
+    mOperationalDeviceProxy = std::move(proxy);
+    RegisterDeviceProxy(mOperationalDeviceProxy.get());
+}
+
 void DeviceUnpair::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
 {
     DeviceUnpair * deviceUnpair = static_cast<DeviceUnpair *>(context);
     VerifyOrReturn(deviceUnpair != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
 
-    auto proxy                            = Platform::MakeShared<OperationalDeviceProxy>(&exchangeMgr, sessionHandle);
-    deviceUnpair->mOperationalDeviceProxy = std::move(proxy);
-    deviceUnpair->PerformDeviceUnpairStep(deviceUnpair->mOperationalDeviceProxy.get(), UnpairDeviceStage::kReadCurrentFabricIndex,
-                                          CHIP_NO_ERROR);
+    deviceUnpair->GenerateOperationalDeviceProxy(exchangeMgr, sessionHandle);
+    deviceUnpair->PerformDeviceUnpairStep(UnpairDeviceStage::kReadCurrentFabricIndex);
 }
 
 void DeviceUnpair::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
@@ -139,31 +149,28 @@ void DeviceUnpair::OnDeviceConnectionFailureFn(void * context, const ScopedNodeI
     DeviceUnpair * deviceUnpair = static_cast<DeviceUnpair *>(context);
     VerifyOrReturn(deviceUnpair != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
 
-    deviceUnpair->PerformDeviceUnpairStep(nullptr, UnpairDeviceStage::kUnpairError, err);
+    deviceUnpair->SetLastError(err);
+    deviceUnpair->PerformDeviceUnpairStep(UnpairDeviceStage::kUnpairError);
 }
 
-void DeviceUnpair::OnDone(app::ReadClient * apReadClient)
+void DeviceUnpair::OnSuccessCurrentFabricIndex(void * context, uint8_t fabricIndex)
 {
-    FabricIndex fabricIndex = kUndefinedFabricIndex;
-    CHIP_ERROR err          = mAttributeCache->ForEachAttribute(
-        OperationalCredentials::Id, [this, &fabricIndex](const app::ConcreteAttributePath & path) {
-            if (path.mAttributeId != OperationalCredentials::Attributes::CurrentFabricIndex::Id)
-            {
-                // Continue on
-                return CHIP_NO_ERROR;
-            }
+    DeviceUnpair * deviceUnpair = static_cast<DeviceUnpair *>(context);
+    VerifyOrReturn(deviceUnpair != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
+    deviceUnpair->mFabricIndex = fabricIndex;
 
-            switch (path.mAttributeId)
-            {
-            case OperationalCredentials::Attributes::CurrentFabricIndex::Id:
-                return this->mAttributeCache->Get<OperationalCredentials::Attributes::CurrentFabricIndex::TypeInfo>(path,
-                                                                                                                    fabricIndex);
-            default:
-                return CHIP_NO_ERROR;
-            }
-        });
-    mFabricIndex = fabricIndex;
-    PerformDeviceUnpairStep(mProxy, UnpairDeviceStage::kSendRemoveFabric, err);
+    deviceUnpair->PerformDeviceUnpairStep(UnpairDeviceStage::kSendRemoveFabric);
+}
+
+void DeviceUnpair::OnReadAttributeFailure(void * context, CHIP_ERROR err)
+{
+    ChipLogProgress(Controller, "OnCommandFailure %s", err.AsString());
+
+    DeviceUnpair * deviceUnpair = static_cast<DeviceUnpair *>(context);
+    VerifyOrReturn(deviceUnpair != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
+
+    deviceUnpair->SetLastError(err);
+    deviceUnpair->PerformDeviceUnpairStep(UnpairDeviceStage::kUnpairError);
 }
 
 void DeviceUnpair::OnRemoveFabric(void * context, const OperationalCredentials::Commands::NOCResponse::DecodableType & data)
@@ -171,7 +178,7 @@ void DeviceUnpair::OnRemoveFabric(void * context, const OperationalCredentials::
     DeviceUnpair * deviceUnpair = static_cast<DeviceUnpair *>(context);
     VerifyOrReturn(deviceUnpair != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
 
-    deviceUnpair->PerformDeviceUnpairStep(nullptr, UnpairDeviceStage::kUnpairCleanUp, CHIP_NO_ERROR);
+    deviceUnpair->PerformDeviceUnpairStep(UnpairDeviceStage::kUnpairCleanUp);
 }
 
 void DeviceUnpair::OnCommandFailure(void * context, CHIP_ERROR err)
@@ -181,7 +188,8 @@ void DeviceUnpair::OnCommandFailure(void * context, CHIP_ERROR err)
     DeviceUnpair * deviceUnpair = static_cast<DeviceUnpair *>(context);
     VerifyOrReturn(deviceUnpair != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
 
-    deviceUnpair->PerformDeviceUnpairStep(nullptr, UnpairDeviceStage::kUnpairError, err);
+    deviceUnpair->SetLastError(err);
+    deviceUnpair->PerformDeviceUnpairStep(UnpairDeviceStage::kUnpairError);
 }
 } // namespace Controller
 } // namespace chip

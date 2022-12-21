@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <app/ClusterStateCache.h>
 #include <app/OperationalSessionSetup.h>
 #include <lib/core/CHIPCallback.h>
 
@@ -33,7 +32,7 @@ enum UnpairDeviceStage : uint8_t
     kUnpairCleanUp,
 };
 
-class DLL_EXPORT DeviceUnpair : public app::ClusterStateCache::Callback
+class DLL_EXPORT DeviceUnpair
 {
 public:
     class Callback
@@ -50,13 +49,11 @@ public:
     void UnpairDevice(DeviceProxy * proxy, NodeId remoteDeviceId);
 
 private:
-    Callback * mCallback = nullptr;
+    CHIP_ERROR mLastError = CHIP_NO_ERROR;
+    Callback * mCallback  = nullptr;
 
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
-
-    Platform::UniquePtr<app::ClusterStateCache> mAttributeCache;
-    Platform::UniquePtr<app::ReadClient> mReadClient;
 
     DeviceProxy * mProxy = nullptr;
     Platform::SharedPtr<OperationalDeviceProxy> mOperationalDeviceProxy;
@@ -64,16 +61,22 @@ private:
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
     UnpairDeviceStage mStage = UnpairDeviceStage::kUnpairError;
 
-    void PerformDeviceUnpairStep(DeviceProxy * proxy, UnpairDeviceStage stage, CHIP_ERROR err);
+    void RegisterDeviceProxy(DeviceProxy * proxy) { mProxy = proxy; }
+    void SetLastError(CHIP_ERROR err) { mLastError = err; }
 
-    void ReadCurrentFabricIndex(DeviceProxy * proxy);
-    void SendRemoveFabricIndex(DeviceProxy * proxy, FabricIndex fabricIndex);
+    void GenerateOperationalDeviceProxy(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+
+    void PerformDeviceUnpairStep(UnpairDeviceStage stage);
+
+    void ReadCurrentFabricIndex();
+    void SendRemoveFabricIndex(FabricIndex fabricIndex);
     void FinishUnpairDevice(CHIP_ERROR err);
-
-    void OnDone(app::ReadClient * apReadClient);
 
     static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
+
+    static void OnSuccessCurrentFabricIndex(void * context, uint8_t fabricIndex);
+    static void OnReadAttributeFailure(void * context, CHIP_ERROR error);
 
     static void OnRemoveFabric(void * context,
                                const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data);
