@@ -33,7 +33,15 @@ using GroupEndpoint = GroupDataProvider::GroupEndpoint;
 using EpochKey      = GroupDataProvider::EpochKey;
 using KeySet        = GroupDataProvider::KeySet;
 using GroupSession  = GroupDataProvider::GroupSession;
-using FabricList    = CommonPersistentData::FabricList;
+
+struct FabricList : public CommonPersistentData::FabricList
+{
+    CHIP_ERROR UpdateKey(StorageKeyName & key) override
+    {
+        key = DefaultStorageKeyAllocator::GroupFabricList();
+        return CHIP_NO_ERROR;
+    }
+};
 
 constexpr size_t kPersistentBufferMax = 128;
 
