@@ -97,34 +97,34 @@ limitations under the License.
     <define>GROUPS_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
+    <globalAttribute side="either" code="0xFFFD" value="4"/>
     <attribute side="server" code="0x0000" define="GROUP_NAME_SUPPORT" type="BITMAP8" min="0x00" max="0x80" writable="false" optional="false">NameSupport</attribute>
     <!-- NAME_SUPPORT -->
     <command source="client" code="0x00" name="AddGroup" response="AddGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups add">
       <description>
         Command description for AddGroup
       </description>
-      <arg name="groupId" type="group_id"/>
-      <arg name="groupName" type="CHAR_STRING"/>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="GroupName" type="CHAR_STRING"/>
       <access op="invoke" role="manage"/>
     </command>
     <command source="client" code="0x01" name="ViewGroup" response="ViewGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups view">
       <description>
         Command description for ViewGroup
       </description>
-      <arg name="groupId" type="group_id"/>
+      <arg name="GroupID" type="group_id"/>
     </command>
     <command source="client" code="0x02" name="GetGroupMembership" response="GetGroupMembershipResponse" cliFunctionName="zclGroupsGetCommand" isFabricScoped="true" optional="false" cli="zcl groups get">
       <description>
         Command description for GetGroupMembership
       </description>
-      <arg name="groupList" type="group_id" array="true"/>
+      <arg name="GroupList" type="group_id" array="true"/>
     </command>
     <command source="client" code="0x03" name="RemoveGroup" response="RemoveGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups remove">
       <description>
         Command description for RemoveGroup
       </description>
-      <arg name="groupId" type="group_id"/>
+      <arg name="GroupID" type="group_id"/>
       <access op="invoke" role="manage"/>
     </command>
     <command source="client" code="0x04" name="RemoveAllGroups" isFabricScoped="true" optional="false" cli="zcl groups rmall">
@@ -137,38 +137,38 @@ limitations under the License.
       <description>
         Command description for AddGroupIfIdentifying
       </description>
-      <arg name="groupId" type="group_id"/>
-      <arg name="groupName" type="CHAR_STRING"/>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="GroupName" type="CHAR_STRING"/>
       <access op="invoke" role="manage"/>
     </command>
     <command source="server" code="0x00" name="AddGroupResponse" optional="false" disableDefaultResponse="true">
       <description>
         Command description for AddGroupResponse
       </description>
-      <arg name="status" type="ENUM8"/>
-      <arg name="groupId" type="group_id"/>
+      <arg name="Status" type="ENUM8"/>
+      <arg name="GroupID" type="group_id"/>
     </command>
     <command source="server" code="0x01" name="ViewGroupResponse" optional="false" disableDefaultResponse="true">
       <description>
         Command description for ViewGroupResponse
       </description>
-      <arg name="status" type="ENUM8"/>
-      <arg name="groupId" type="group_id"/>
-      <arg name="groupName" type="CHAR_STRING"/>
+      <arg name="Status" type="ENUM8"/>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="GroupName" type="CHAR_STRING"/>
     </command>
     <command source="server" code="0x02" name="GetGroupMembershipResponse" optional="false" disableDefaultResponse="true">
       <description>
         Command description for GetGroupMembershipResponse
       </description>
-      <arg name="capacity" type="INT8U" isNullable="true"/>
-      <arg name="groupList" type="group_id" array="true"/>
+      <arg name="Capacity" type="INT8U" isNullable="true"/>
+      <arg name="GroupList" type="group_id" array="true"/>
     </command>
     <command source="server" code="0x03" name="RemoveGroupResponse" optional="false" disableDefaultResponse="true">
       <description>
         Command description for RemoveGroupResponse
       </description>
-      <arg name="status" type="ENUM8"/>
-      <arg name="groupId" type="group_id"/>
+      <arg name="Status" type="ENUM8"/>
+      <arg name="GroupID" type="group_id"/>
     </command>
   </cluster>
   <cluster>

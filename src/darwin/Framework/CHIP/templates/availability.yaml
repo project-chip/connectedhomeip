@@ -4917,6 +4917,21 @@
               RegisterClientMonitoring:
                   - clientNodeId
                   - iCid
+          Groups:
+              AddGroup:
+                  - groupID
+              AddGroupIfIdentifying:
+                  - groupID
+              AddGroupResponse:
+                  - groupID
+              RemoveGroup:
+                  - groupID
+              RemoveGroupResponse:
+                  - groupID
+              ViewGroup:
+                  - groupID
+              ViewGroupResponse:
+                  - groupID
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -5153,6 +5168,22 @@
               - PirOccupiedToUnoccupiedDelay
               - PirUnoccupiedToOccupiedDelay
               - PirUnoccupiedToOccupiedThreshold
+      command fields:
+          Groups:
+              AddGroup:
+                  - groupId
+              AddGroupIfIdentifying:
+                  - groupId
+              AddGroupResponse:
+                  - groupId
+              RemoveGroup:
+                  - groupId
+              RemoveGroupResponse:
+                  - groupId
+              ViewGroup:
+                  - groupId
+              ViewGroupResponse:
+                  - groupId
       structs:
           Descriptor:
               - DeviceType
@@ -5187,3 +5218,19 @@
           Switch:
               MultiPressComplete:
                   previousPosition: newPosition
+      command fields:
+          Groups:
+              AddGroup:
+                  groupID: groupId
+              AddGroupIfIdentifying:
+                  groupID: groupId
+              AddGroupResponse:
+                  groupID: groupId
+              RemoveGroup:
+                  groupID: groupId
+              RemoveGroupResponse:
+                  groupID: groupId
+              ViewGroup:
+                  groupID: groupId
+              ViewGroupResponse:
+                  groupID: groupId
