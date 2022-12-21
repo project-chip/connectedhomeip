@@ -5859,7 +5859,6 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     = 0x10020000,
 
     // Cluster BasicInformation commands
-    MTRCommandIDTypeClusterBasicInformationCommandMfgSpecificPingID MTR_NEWLY_AVAILABLE = 0x10020000,
 
     // Cluster OtaSoftwareUpdateProvider deprecated command id names
     MTRClusterOtaSoftwareUpdateProviderCommandQueryImageID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))

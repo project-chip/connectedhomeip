@@ -103,22 +103,34 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
 // Cluster {{compatClusterNameRemapping ../clusterName}} deprecated command id names
 {{/if}}
 {{/first}}
-{{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping ../clusterName) command=(asUpperCamelCase label) isForIds=true)}}
-MTRCluster{{compatClusterNameRemapping ../clusterName}}Command{{asUpperCamelCase label}}ID
-{{availability (compatClusterNameRemapping ../clusterName) command=(asUpperCamelCase label) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use MTRCommandIDTypeCluster" (asUpperCamelCase ../clusterName preserveAcronyms=true) "Command" (asUpperCamelCase label preserveAcronyms=true) "ID") isForIds=true}}
+{{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
+{{#*inline "commandIdDecl"}}
+{{#if (and (wasIntroducedBeforeRelease "First major API revamp" cluster command=command isForIds=true)
+           (not (wasRemoved cluster command=command isForIds=true)))}}
+MTRCluster{{cluster}}Command{{command}}ID
+{{availability cluster command=command deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use MTRCommandIDTypeCluster" (asUpperCamelCase ../clusterName preserveAcronyms=true) "Command" (asUpperCamelCase name preserveAcronyms=true) "ID") isForIds=true}}
 = {{asMEI manufacturerCode code}},
 {{/if}}
+{{/inline}}
+{{> commandIdDecl cluster=(compatClusterNameRemapping ../clusterName)
+                  command=(compatCommandNameRemapping ../clusterName name)}}
 {{#last}}
 
 {{/last}}
 {{/zcl_commands}}
 {{#zcl_commands}}
 {{~#*inline "cluster"}}{{asUpperCamelCase ../clusterName preserveAcronyms=true}}{{/inline~}}
-{{~#*inline "command"}}{{asUpperCamelCase label preserveAcronyms=true}}{{/inline~}}
 {{#first}}
 // Cluster {{>cluster}} commands
 {{/first}}
-MTRCommandIDTypeCluster{{>cluster}}Command{{>command}}ID {{availability (asUpperCamelCase ../clusterName preserveAcronyms=true) command=(asUpperCamelCase label preserveAcronyms=true) minimalRelease="First major API revamp" isForIds=true}} = {{asMEI manufacturerCode code}},
+{{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
+{{#*inline "commandIdDecl"}}
+{{#unless (wasRemoved cluster command=command isForIds=true)}}
+MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID {{availability cluster command=command minimalRelease="First major API revamp" isForIds=true}} = {{asMEI manufacturerCode code}},
+{{/unless}}
+{{/inline}}
+{{> commandIdDecl cluster=(asUpperCamelCase ../clusterName preserveAcronyms=true)
+                  command=(asUpperCamelCase name preserveAcronyms=true)}}
 {{#last}}
 
 {{/last}}
