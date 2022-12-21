@@ -20,6 +20,7 @@
 
 #include "AppEvent.h"
 #include "ContactSensorManager.h"
+#include "LEDWidget.h"
 
 #include <zephyr/drivers/gpio.h>
 
@@ -61,14 +62,19 @@ private:
     static void UpdateDeviceStateInternal(intptr_t arg);
 
     static void UpdateStatusLED(void);
+    static void LEDStateUpdateHandler(LEDWidget * ledWidget);
     static void FactoryResetButtonEventHandler(void);
     static void StartBleAdvButtonEventHandler(void);
     static void ToggleContactStateButtonEventHandler(void);
 
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
+    static void FactoryResetTimerTimeoutCallback(k_timer * timer);
+
+    static void FactoryResetTimerEventHandler(AppEvent * aEvent);
     static void FactoryResetHandler(AppEvent * aEvent);
     static void StartBleAdvHandler(AppEvent * aEvent);
+    static void UpdateLedStateEventHandler(AppEvent * aEvent);
     static void ContactActionEventHandler(AppEvent * aEvent);
 
     static void InitButtons(void);
