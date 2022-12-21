@@ -3602,7 +3602,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("groupId", indent + 1, value.groupId));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -3611,7 +3611,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("groupId", indent + 1, value.groupId));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
     ReturnErrorOnFailure(DataModelLogger::LogValue("groupName", indent + 1, value.groupName));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
@@ -3630,7 +3630,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("groupId", indent + 1, value.groupId));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }

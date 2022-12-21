@@ -304,12 +304,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, Integer groupId) {
+    public void onSuccess(Integer Status, Integer GroupID) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
-      responseValues.put(statusResponseValue, status);
-      CommandResponseInfo groupIdResponseValue = new CommandResponseInfo("groupId", "Integer");
-      responseValues.put(groupIdResponseValue, groupId);
+      CommandResponseInfo StatusResponseValue = new CommandResponseInfo("Status", "Integer");
+      responseValues.put(StatusResponseValue, Status);
+      CommandResponseInfo GroupIDResponseValue = new CommandResponseInfo("GroupID", "Integer");
+      responseValues.put(GroupIDResponseValue, GroupID);
       callback.onSuccess(responseValues);
     }
 
@@ -329,14 +329,14 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, Integer groupId, String groupName) {
+    public void onSuccess(Integer Status, Integer GroupID, String GroupName) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
-      responseValues.put(statusResponseValue, status);
-      CommandResponseInfo groupIdResponseValue = new CommandResponseInfo("groupId", "Integer");
-      responseValues.put(groupIdResponseValue, groupId);
-      CommandResponseInfo groupNameResponseValue = new CommandResponseInfo("groupName", "String");
-      responseValues.put(groupNameResponseValue, groupName);
+      CommandResponseInfo StatusResponseValue = new CommandResponseInfo("Status", "Integer");
+      responseValues.put(StatusResponseValue, Status);
+      CommandResponseInfo GroupIDResponseValue = new CommandResponseInfo("GroupID", "Integer");
+      responseValues.put(GroupIDResponseValue, GroupID);
+      CommandResponseInfo GroupNameResponseValue = new CommandResponseInfo("GroupName", "String");
+      responseValues.put(GroupNameResponseValue, GroupName);
       callback.onSuccess(responseValues);
     }
 
@@ -357,11 +357,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(@Nullable Integer capacity, ArrayList<Integer> groupList) {
+    public void onSuccess(@Nullable Integer Capacity, ArrayList<Integer> GroupList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo capacityResponseValue = new CommandResponseInfo("capacity", "Integer");
-      responseValues.put(capacityResponseValue, capacity);
-      // groupList: /* TYPE WARNING: array array defaults to */ uint8_t *
+      CommandResponseInfo CapacityResponseValue = new CommandResponseInfo("Capacity", "Integer");
+      responseValues.put(CapacityResponseValue, Capacity);
+      // GroupList: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
       callback.onSuccess(responseValues);
     }
@@ -382,12 +382,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, Integer groupId) {
+    public void onSuccess(Integer Status, Integer GroupID) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
-      responseValues.put(statusResponseValue, status);
-      CommandResponseInfo groupIdResponseValue = new CommandResponseInfo("groupId", "Integer");
-      responseValues.put(groupIdResponseValue, groupId);
+      CommandResponseInfo StatusResponseValue = new CommandResponseInfo("Status", "Integer");
+      responseValues.put(StatusResponseValue, Status);
+      CommandResponseInfo GroupIDResponseValue = new CommandResponseInfo("GroupID", "Integer");
+      responseValues.put(GroupIDResponseValue, GroupID);
       callback.onSuccess(responseValues);
     }
 
@@ -7616,9 +7616,9 @@ public class ClusterInfoMapping {
     Map<String, InteractionInfo> groupsClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> groupsaddGroupCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo groupsaddGroupgroupIdCommandParameterInfo =
-        new CommandParameterInfo("groupId", Integer.class, Integer.class);
-    groupsaddGroupCommandParams.put("groupId", groupsaddGroupgroupIdCommandParameterInfo);
+    CommandParameterInfo groupsaddGroupgroupIDCommandParameterInfo =
+        new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    groupsaddGroupCommandParams.put("groupID", groupsaddGroupgroupIDCommandParameterInfo);
 
     CommandParameterInfo groupsaddGroupgroupNameCommandParameterInfo =
         new CommandParameterInfo("groupName", String.class, String.class);
@@ -7630,7 +7630,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.GroupsCluster) cluster)
                   .addGroup(
                       (ChipClusters.GroupsCluster.AddGroupResponseCallback) callback,
-                      (Integer) commandArguments.get("groupId"),
+                      (Integer) commandArguments.get("groupID"),
                       (String) commandArguments.get("groupName"));
             },
             () -> new DelegatedAddGroupResponseCallback(),
@@ -7638,9 +7638,9 @@ public class ClusterInfoMapping {
     groupsClusterInteractionInfoMap.put("addGroup", groupsaddGroupInteractionInfo);
     Map<String, CommandParameterInfo> groupsviewGroupCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo groupsviewGroupgroupIdCommandParameterInfo =
-        new CommandParameterInfo("groupId", Integer.class, Integer.class);
-    groupsviewGroupCommandParams.put("groupId", groupsviewGroupgroupIdCommandParameterInfo);
+    CommandParameterInfo groupsviewGroupgroupIDCommandParameterInfo =
+        new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    groupsviewGroupCommandParams.put("groupID", groupsviewGroupgroupIDCommandParameterInfo);
 
     InteractionInfo groupsviewGroupInteractionInfo =
         new InteractionInfo(
@@ -7648,7 +7648,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.GroupsCluster) cluster)
                   .viewGroup(
                       (ChipClusters.GroupsCluster.ViewGroupResponseCallback) callback,
-                      (Integer) commandArguments.get("groupId"));
+                      (Integer) commandArguments.get("groupID"));
             },
             () -> new DelegatedViewGroupResponseCallback(),
             groupsviewGroupCommandParams);
@@ -7674,9 +7674,9 @@ public class ClusterInfoMapping {
         "getGroupMembership", groupsgetGroupMembershipInteractionInfo);
     Map<String, CommandParameterInfo> groupsremoveGroupCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo groupsremoveGroupgroupIdCommandParameterInfo =
-        new CommandParameterInfo("groupId", Integer.class, Integer.class);
-    groupsremoveGroupCommandParams.put("groupId", groupsremoveGroupgroupIdCommandParameterInfo);
+    CommandParameterInfo groupsremoveGroupgroupIDCommandParameterInfo =
+        new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    groupsremoveGroupCommandParams.put("groupID", groupsremoveGroupgroupIDCommandParameterInfo);
 
     InteractionInfo groupsremoveGroupInteractionInfo =
         new InteractionInfo(
@@ -7684,7 +7684,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.GroupsCluster) cluster)
                   .removeGroup(
                       (ChipClusters.GroupsCluster.RemoveGroupResponseCallback) callback,
-                      (Integer) commandArguments.get("groupId"));
+                      (Integer) commandArguments.get("groupID"));
             },
             () -> new DelegatedRemoveGroupResponseCallback(),
             groupsremoveGroupCommandParams);
@@ -7702,10 +7702,10 @@ public class ClusterInfoMapping {
     groupsClusterInteractionInfoMap.put("removeAllGroups", groupsremoveAllGroupsInteractionInfo);
     Map<String, CommandParameterInfo> groupsaddGroupIfIdentifyingCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo groupsaddGroupIfIdentifyinggroupIdCommandParameterInfo =
-        new CommandParameterInfo("groupId", Integer.class, Integer.class);
+    CommandParameterInfo groupsaddGroupIfIdentifyinggroupIDCommandParameterInfo =
+        new CommandParameterInfo("groupID", Integer.class, Integer.class);
     groupsaddGroupIfIdentifyingCommandParams.put(
-        "groupId", groupsaddGroupIfIdentifyinggroupIdCommandParameterInfo);
+        "groupID", groupsaddGroupIfIdentifyinggroupIDCommandParameterInfo);
 
     CommandParameterInfo groupsaddGroupIfIdentifyinggroupNameCommandParameterInfo =
         new CommandParameterInfo("groupName", String.class, String.class);
@@ -7718,7 +7718,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.GroupsCluster) cluster)
                   .addGroupIfIdentifying(
                       (DefaultClusterCallback) callback,
-                      (Integer) commandArguments.get("groupId"),
+                      (Integer) commandArguments.get("groupID"),
                       (String) commandArguments.get("groupName"));
             },
             () -> new DelegatedDefaultClusterCallback(),

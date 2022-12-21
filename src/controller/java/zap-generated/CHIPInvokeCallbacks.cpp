@@ -81,18 +81,18 @@ void CHIPGroupsClusterAddGroupResponseCallback::CallbackFn(
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject status;
-    std::string statusClassName     = "java/lang/Integer";
-    std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
-                                                                  dataResponse.status, status);
-    jobject groupId;
-    std::string groupIdClassName     = "java/lang/Integer";
-    std::string groupIdCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(groupIdClassName.c_str(), groupIdCtorSignature.c_str(),
-                                                                   dataResponse.groupId, groupId);
+    jobject Status;
+    std::string StatusClassName     = "java/lang/Integer";
+    std::string StatusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(StatusClassName.c_str(), StatusCtorSignature.c_str(),
+                                                                  dataResponse.status, Status);
+    jobject GroupID;
+    std::string GroupIDClassName     = "java/lang/Integer";
+    std::string GroupIDCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(GroupIDClassName.c_str(), GroupIDCtorSignature.c_str(),
+                                                                   dataResponse.groupID, GroupID);
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, status, groupId);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, Status, GroupID);
 }
 CHIPGroupsClusterViewGroupResponseCallback::CHIPGroupsClusterViewGroupResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPGroupsClusterViewGroupResponseCallbackType>(CallbackFn, this)
@@ -146,20 +146,20 @@ void CHIPGroupsClusterViewGroupResponseCallback::CallbackFn(
                                                   "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject status;
-    std::string statusClassName     = "java/lang/Integer";
-    std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
-                                                                  dataResponse.status, status);
-    jobject groupId;
-    std::string groupIdClassName     = "java/lang/Integer";
-    std::string groupIdCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(groupIdClassName.c_str(), groupIdCtorSignature.c_str(),
-                                                                   dataResponse.groupId, groupId);
-    jobject groupName;
-    groupName = env->NewStringUTF(std::string(dataResponse.groupName.data(), dataResponse.groupName.size()).c_str());
+    jobject Status;
+    std::string StatusClassName     = "java/lang/Integer";
+    std::string StatusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(StatusClassName.c_str(), StatusCtorSignature.c_str(),
+                                                                  dataResponse.status, Status);
+    jobject GroupID;
+    std::string GroupIDClassName     = "java/lang/Integer";
+    std::string GroupIDCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(GroupIDClassName.c_str(), GroupIDCtorSignature.c_str(),
+                                                                   dataResponse.groupID, GroupID);
+    jobject GroupName;
+    GroupName = env->NewStringUTF(std::string(dataResponse.groupName.data(), dataResponse.groupName.size()).c_str());
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, status, groupId, groupName);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, Status, GroupID, GroupName);
 }
 CHIPGroupsClusterGetGroupMembershipResponseCallback::CHIPGroupsClusterGetGroupMembershipResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPGroupsClusterGetGroupMembershipResponseCallbackType>(CallbackFn, this)
@@ -214,34 +214,34 @@ void CHIPGroupsClusterGetGroupMembershipResponseCallback::CallbackFn(
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject capacity;
+    jobject Capacity;
     if (dataResponse.capacity.IsNull())
     {
-        capacity = nullptr;
+        Capacity = nullptr;
     }
     else
     {
-        std::string capacityClassName     = "java/lang/Integer";
-        std::string capacityCtorSignature = "(I)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(capacityClassName.c_str(), capacityCtorSignature.c_str(),
-                                                                      dataResponse.capacity.Value(), capacity);
+        std::string CapacityClassName     = "java/lang/Integer";
+        std::string CapacityCtorSignature = "(I)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(CapacityClassName.c_str(), CapacityCtorSignature.c_str(),
+                                                                      dataResponse.capacity.Value(), Capacity);
     }
-    jobject groupList;
-    chip::JniReferences::GetInstance().CreateArrayList(groupList);
+    jobject GroupList;
+    chip::JniReferences::GetInstance().CreateArrayList(GroupList);
 
-    auto iter_groupList_0 = dataResponse.groupList.begin();
-    while (iter_groupList_0.Next())
+    auto iter_GroupList_0 = dataResponse.groupList.begin();
+    while (iter_GroupList_0.Next())
     {
-        auto & entry_0 = iter_groupList_0.GetValue();
+        auto & entry_0 = iter_GroupList_0.GetValue();
         jobject newElement_0;
         std::string newElement_0ClassName     = "java/lang/Integer";
         std::string newElement_0CtorSignature = "(I)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0ClassName.c_str(),
                                                                        newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-        chip::JniReferences::GetInstance().AddToList(groupList, newElement_0);
+        chip::JniReferences::GetInstance().AddToList(GroupList, newElement_0);
     }
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, capacity, groupList);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, Capacity, GroupList);
 }
 CHIPGroupsClusterRemoveGroupResponseCallback::CHIPGroupsClusterRemoveGroupResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPGroupsClusterRemoveGroupResponseCallbackType>(CallbackFn, this)
@@ -295,18 +295,18 @@ void CHIPGroupsClusterRemoveGroupResponseCallback::CallbackFn(
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject status;
-    std::string statusClassName     = "java/lang/Integer";
-    std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
-                                                                  dataResponse.status, status);
-    jobject groupId;
-    std::string groupIdClassName     = "java/lang/Integer";
-    std::string groupIdCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(groupIdClassName.c_str(), groupIdCtorSignature.c_str(),
-                                                                   dataResponse.groupId, groupId);
+    jobject Status;
+    std::string StatusClassName     = "java/lang/Integer";
+    std::string StatusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(StatusClassName.c_str(), StatusCtorSignature.c_str(),
+                                                                  dataResponse.status, Status);
+    jobject GroupID;
+    std::string GroupIDClassName     = "java/lang/Integer";
+    std::string GroupIDCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(GroupIDClassName.c_str(), GroupIDCtorSignature.c_str(),
+                                                                   dataResponse.groupID, GroupID);
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, status, groupId);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, Status, GroupID);
 }
 CHIPScenesClusterAddSceneResponseCallback::CHIPScenesClusterAddSceneResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPScenesClusterAddSceneResponseCallbackType>(CallbackFn, this)

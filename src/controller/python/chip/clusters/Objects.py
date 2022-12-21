@@ -267,11 +267,11 @@ class Groups(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="groupId", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="groupName", Tag=1, Type=str),
                     ])
 
-            groupId: 'uint' = 0
+            groupID: 'uint' = 0
             groupName: 'str' = ""
 
         @dataclass
@@ -286,11 +286,11 @@ class Groups(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="groupId", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="groupID", Tag=1, Type=uint),
                     ])
 
             status: 'uint' = 0
-            groupId: 'uint' = 0
+            groupID: 'uint' = 0
 
         @dataclass
         class ViewGroup(ClusterCommand):
@@ -303,10 +303,10 @@ class Groups(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="groupId", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                     ])
 
-            groupId: 'uint' = 0
+            groupID: 'uint' = 0
 
         @dataclass
         class ViewGroupResponse(ClusterCommand):
@@ -320,12 +320,12 @@ class Groups(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="groupId", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="groupID", Tag=1, Type=uint),
                             ClusterObjectFieldDescriptor(Label="groupName", Tag=2, Type=str),
                     ])
 
             status: 'uint' = 0
-            groupId: 'uint' = 0
+            groupID: 'uint' = 0
             groupName: 'str' = ""
 
         @dataclass
@@ -373,10 +373,10 @@ class Groups(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="groupId", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                     ])
 
-            groupId: 'uint' = 0
+            groupID: 'uint' = 0
 
         @dataclass
         class RemoveGroupResponse(ClusterCommand):
@@ -390,11 +390,11 @@ class Groups(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="groupId", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="groupID", Tag=1, Type=uint),
                     ])
 
             status: 'uint' = 0
-            groupId: 'uint' = 0
+            groupID: 'uint' = 0
 
         @dataclass
         class RemoveAllGroups(ClusterCommand):
@@ -421,11 +421,11 @@ class Groups(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="groupId", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="groupName", Tag=1, Type=str),
                     ])
 
-            groupId: 'uint' = 0
+            groupID: 'uint' = 0
             groupName: 'str' = ""
 
 

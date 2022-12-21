@@ -7580,8 +7580,8 @@ bool emberAfGroupsClusterAddGroupCallback(chip::app::CommandHandler * commandObj
 /**
  * @brief Groups Cluster AddGroupResponse Command callback (from server)
  */
-bool emberAfGroupsClusterAddGroupResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t status,
-                                                  chip::GroupId groupId);
+bool emberAfGroupsClusterAddGroupResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t Status,
+                                                  chip::GroupId GroupID);
 /**
  * @brief Groups Cluster ViewGroup Command callback (from client)
  */
@@ -7591,8 +7591,8 @@ bool emberAfGroupsClusterViewGroupCallback(chip::app::CommandHandler * commandOb
 /**
  * @brief Groups Cluster ViewGroupResponse Command callback (from server)
  */
-bool emberAfGroupsClusterViewGroupResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t status,
-                                                   chip::GroupId groupId, chip::CharSpan groupName);
+bool emberAfGroupsClusterViewGroupResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t Status,
+                                                   chip::GroupId GroupID, chip::CharSpan GroupName);
 /**
  * @brief Groups Cluster GetGroupMembership Command callback (from client)
  */
@@ -7603,8 +7603,8 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(
  * @brief Groups Cluster GetGroupMembershipResponse Command callback (from server)
  */
 bool emberAfGroupsClusterGetGroupMembershipResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                            uint8_t capacity,
-                                                            /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
+                                                            uint8_t Capacity,
+                                                            /* TYPE WARNING: array array defaults to */ uint8_t * GroupList);
 /**
  * @brief Groups Cluster RemoveGroup Command callback (from client)
  */
@@ -7615,7 +7615,7 @@ bool emberAfGroupsClusterRemoveGroupCallback(chip::app::CommandHandler * command
  * @brief Groups Cluster RemoveGroupResponse Command callback (from server)
  */
 bool emberAfGroupsClusterRemoveGroupResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                     uint8_t status, chip::GroupId groupId);
+                                                     uint8_t Status, chip::GroupId GroupID);
 /**
  * @brief Groups Cluster RemoveAllGroups Command callback (from client)
  */

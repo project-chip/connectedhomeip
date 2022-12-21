@@ -101,7 +101,7 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "AddGroup",
                     "args": {
-                        "groupId": "int",
+                        "groupID": "int",
                         "groupName": "str",
                     },
                 },
@@ -109,7 +109,7 @@ class ChipClusters:
                     "commandId": 0x00000001,
                     "commandName": "ViewGroup",
                     "args": {
-                        "groupId": "int",
+                        "groupID": "int",
                     },
                 },
             0x00000002: {
@@ -123,7 +123,7 @@ class ChipClusters:
                     "commandId": 0x00000003,
                     "commandName": "RemoveGroup",
                     "args": {
-                        "groupId": "int",
+                        "groupID": "int",
                     },
                 },
             0x00000004: {
@@ -136,7 +136,7 @@ class ChipClusters:
                     "commandId": 0x00000005,
                     "commandName": "AddGroupIfIdentifying",
                     "args": {
-                        "groupId": "int",
+                        "groupID": "int",
                         "groupName": "str",
                     },
                 },
