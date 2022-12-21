@@ -38,9 +38,19 @@
 #            introduced/deprecated, not the construct itself.
 #   * "global attributes": An array of names of global attributes.
 #   * "apis": An array of API labels that codegen can use.
-#   * "renames": Can contain clusters, attributes, etc as described above, with
-#                the one difference that instead of an array the value is a hash
-#                with new names as keys and old names as values.
+#
+# * "renames": Can contain clusters, attributes, etc as described
+#              above for "introduced" and "deprecated", with the one
+#              difference that instead of an array the value is a hash
+#              with new names as keys and old names as values.
+#
+# * "removed": Can contain clusters, commands, attributes, etc as described
+#              above for "introduced" and "deprecated".  Items can be removed
+#              without ever being introduced, if they are added to the XML but
+#              we have never shipped generated APIs for them.
+#              NOTE: support for "removed" may not be complete in the templates.
+#              Please examine codegen carefully when using "removed" to make
+#              sure all the things that should have been removed have been.
 
 - release: "Initial release"
   versions:
@@ -4748,9 +4758,6 @@
           ClientMonitoring:
               - RegisterClientMonitoring
               - StayAwakeRequest
-          BasicInformation:
-              # TODO: Can we avoid generating this??
-              - MfgSpecificPing
       command fields:
           UnitTesting:
               TestSpecificResponse:
@@ -5152,6 +5159,10 @@
       apis:
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
+  removed:
+      commands:
+          BasicInformation:
+              - MfgSpecificPing
   renames:
       clusters:
           UnitTesting: TestCluster
