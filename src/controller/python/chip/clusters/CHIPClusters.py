@@ -333,7 +333,7 @@ class ChipClusters:
                     "commandId": 0x00000040,
                     "commandName": "OffWithEffect",
                     "args": {
-                        "effectId": "int",
+                        "effectIdentifier": "int",
                         "effectVariant": "int",
                     },
                 },

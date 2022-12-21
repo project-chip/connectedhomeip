@@ -870,7 +870,7 @@ class OnOffOffWithEffect : public ClusterCommand
 public:
     OnOffOffWithEffect(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("off-with-effect", credsIssuerConfig)
     {
-        AddArgument("EffectId", 0, UINT8_MAX, &mRequest.effectId);
+        AddArgument("EffectIdentifier", 0, UINT8_MAX, &mRequest.effectIdentifier);
         AddArgument("EffectVariant", 0, UINT8_MAX, &mRequest.effectVariant);
         ClusterCommand::AddArguments();
     }

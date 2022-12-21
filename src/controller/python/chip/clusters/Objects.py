@@ -1265,11 +1265,11 @@ class OnOff(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="effectId", Tag=0, Type=OnOff.Enums.OnOffEffectIdentifier),
+                            ClusterObjectFieldDescriptor(Label="effectIdentifier", Tag=0, Type=OnOff.Enums.OnOffEffectIdentifier),
                             ClusterObjectFieldDescriptor(Label="effectVariant", Tag=1, Type=OnOff.Enums.OnOffDelayedAllOffEffectVariant),
                     ])
 
-            effectId: 'OnOff.Enums.OnOffEffectIdentifier' = 0
+            effectIdentifier: 'OnOff.Enums.OnOffEffectIdentifier' = 0
             effectVariant: 'OnOff.Enums.OnOffDelayedAllOffEffectVariant' = 0
 
         @dataclass

@@ -7927,9 +7927,10 @@ public class ClusterInfoMapping {
     onOffClusterInteractionInfoMap.put("toggle", onOfftoggleInteractionInfo);
     Map<String, CommandParameterInfo> onOffoffWithEffectCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo onOffoffWithEffecteffectIdCommandParameterInfo =
-        new CommandParameterInfo("effectId", Integer.class, Integer.class);
-    onOffoffWithEffectCommandParams.put("effectId", onOffoffWithEffecteffectIdCommandParameterInfo);
+    CommandParameterInfo onOffoffWithEffecteffectIdentifierCommandParameterInfo =
+        new CommandParameterInfo("effectIdentifier", Integer.class, Integer.class);
+    onOffoffWithEffectCommandParams.put(
+        "effectIdentifier", onOffoffWithEffecteffectIdentifierCommandParameterInfo);
 
     CommandParameterInfo onOffoffWithEffecteffectVariantCommandParameterInfo =
         new CommandParameterInfo("effectVariant", Integer.class, Integer.class);
@@ -7942,7 +7943,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.OnOffCluster) cluster)
                   .offWithEffect(
                       (DefaultClusterCallback) callback,
-                      (Integer) commandArguments.get("effectId"),
+                      (Integer) commandArguments.get("effectIdentifier"),
                       (Integer) commandArguments.get("effectVariant"));
             },
             () -> new DelegatedDefaultClusterCallback(),
