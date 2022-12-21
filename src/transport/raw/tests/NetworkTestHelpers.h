@@ -103,9 +103,16 @@ public:
 
     CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override
     {
-        ReturnErrorOnFailure(mMessageSendError);
+        if (mNumMessagesToAllowBeforeError == 0)
+        {
+            ReturnErrorOnFailure(mMessageSendError);
+        }
         mSentMessageCount++;
         bool dropMessage = false;
+        if (mNumMessagesToAllowBeforeError > 0)
+        {
+            --mNumMessagesToAllowBeforeError;
+        }
         if (mNumMessagesToAllowBeforeDropping > 0)
         {
             --mNumMessagesToAllowBeforeDropping;
@@ -143,6 +150,7 @@ public:
         mDroppedMessageCount              = 0;
         mSentMessageCount                 = 0;
         mNumMessagesToAllowBeforeDropping = 0;
+        mNumMessagesToAllowBeforeError    = 0;
         mMessageSendError                 = CHIP_NO_ERROR;
     }
 
@@ -163,6 +171,7 @@ public:
     uint32_t mDroppedMessageCount              = 0;
     uint32_t mSentMessageCount                 = 0;
     uint32_t mNumMessagesToAllowBeforeDropping = 0;
+    uint32_t mNumMessagesToAllowBeforeError    = 0;
     CHIP_ERROR mMessageSendError               = CHIP_NO_ERROR;
     LoopbackTransportDelegate * mDelegate      = nullptr;
 };
