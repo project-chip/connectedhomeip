@@ -4932,6 +4932,9 @@
                   - groupID
               ViewGroupResponse:
                   - groupID
+          OnOff:
+              OffWithEffect:
+                  - effectIdentifier
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -5184,6 +5187,9 @@
                   - groupId
               ViewGroupResponse:
                   - groupId
+          OnOff:
+              OffWithEffect:
+                  - effectId
       structs:
           Descriptor:
               - DeviceType
@@ -5228,11 +5234,6 @@
               AnnounceOTAProvider:
                   providerNodeID: providerNodeId
                   vendorID: vendorId
-      event fields:
-          Switch:
-              MultiPressComplete:
-                  previousPosition: newPosition
-      command fields:
           Groups:
               AddGroup:
                   groupID: groupId
@@ -5248,3 +5249,10 @@
                   groupID: groupId
               ViewGroupResponse:
                   groupID: groupId
+          OnOff:
+              OffWithEffect:
+                  effectIdentifier: effectId
+      event fields:
+          Switch:
+              MultiPressComplete:
+                  previousPosition: newPosition
