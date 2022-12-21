@@ -5014,6 +5014,9 @@
               CapabilityMinimaStruct:
                   - caseSessionsPerFabric
                   - subscriptionsPerFabric
+          Descriptor:
+              DeviceTypeStruct:
+                  - deviceType
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5193,6 +5196,10 @@
       structs:
           Descriptor:
               - DeviceType
+      struct fields:
+          Descriptor:
+              DeviceTypeStruct:
+                  - type
       event fields:
           Switch:
               MultiPressComplete:
@@ -5256,3 +5263,7 @@
           Switch:
               MultiPressComplete:
                   previousPosition: newPosition
+      struct fields:
+          Descriptor:
+              DeviceTypeStruct:
+                  deviceType: type
