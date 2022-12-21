@@ -19,9 +19,9 @@ executable("chip-lock-app") {
   sources = [
     "main.cpp",
     "src/LockAppCommandDelegate.cpp",
-    "src/LockEndpoint.cpp",
-    "src/LockManager.cpp",
-    "src/ZCLDoorLockCallbacks.cpp",
+    "${chip_root}/examples/lock-app/lock-common/door-lock-common/LockEndpoint.cpp",
+    "${chip_root}/examples/lock-app/lock-common/door-lock-common/LockManager.cpp",
+    "${chip_root}/examples/lock-app/lock-common/door-lock-common/ZCLDoorLockCallbacks.cpp",
   ]
 
   deps = [
@@ -33,6 +33,7 @@ executable("chip-lock-app") {
 
   include_dirs = [
     "${chip_root}/examples/lock-app/lock-common/include",
+    "${chip_root}/examples/lock-app/lock-common/door-lock-common",
     "include",
   ]
 
