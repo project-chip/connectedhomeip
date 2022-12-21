@@ -60,7 +60,7 @@ public:
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
         AddArgument("bypass-attestation-verifier", 0, 1, &mBypassAttestationVerifier,
-                    "Bypass the attestation verifier. If not provided or 0 (\"false\"), the attestation verifier is not bypassed."
+                    "Bypass the attestation verifier. If not provided or false, the attestation verifier is not bypassed."
                     " If 1 (\"true\"), the commissioning will continue in case of attestation verification failure.");
 
         switch (networkType)
