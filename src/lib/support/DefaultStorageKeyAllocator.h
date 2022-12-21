@@ -177,7 +177,10 @@ public:
 
     // Client Monitoring
 
-    static StorageKeyName ClientMonitoringTableEntry(chip::FabricIndex fabric) { return StorageKeyName::FromConst("f/%x/cm"); }
+    static StorageKeyName ClientMonitoringTableEntry(chip::FabricIndex fabric)
+    {
+        return StorageKeyName::Formatted("f/%x/cm", fabric);
+    }
 
     static StorageKeyName OTADefaultProviders() { return StorageKeyName::FromConst("g/o/dp"); }
     static StorageKeyName OTACurrentProvider() { return StorageKeyName::FromConst("g/o/cp"); }

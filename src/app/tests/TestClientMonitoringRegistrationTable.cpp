@@ -31,18 +31,19 @@ constexpr chip::FabricIndex kTestFabricIndex = 1;
 constexpr uint64_t kTestICid                 = 10;
 constexpr chip::NodeId kTestClientNodeId     = 11;
 
-constexpr chip::FabricIndex kTestInvalidFabric  = 0;
-constexpr uint64_t kTestInvalidICid             = 0;
-constexpr chip::NodeId kTestInvalidClientNodeId = 0;
+constexpr chip::FabricIndex kTestFabricIndex_2 = 2;
+constexpr uint64_t kTestICid_2                 = 20;
+constexpr chip::NodeId kTestClientNodeId_2     = 21;
 
 void TestDefaultClientValues(nlTestSuite * aSuite, void * aContext)
 {
     chip::TestPersistentStorageDelegate testStorage;
     ClientMonitoringRegistrationTable registration(testStorage);
 
-    NL_TEST_ASSERT(aSuite, registration.getClientRegistrationEntry().clientNodeId == kTestInvalidFabric);
-    NL_TEST_ASSERT(aSuite, registration.getClientRegistrationEntry().ICid == kTestInvalidClientNodeId);
-    NL_TEST_ASSERT(aSuite, registration.getClientRegistrationEntry().fabricIndex == kTestInvalidICid);
+    NL_TEST_ASSERT(aSuite, !registration.GetClientRegistrationEntry().IsValid());
+    NL_TEST_ASSERT(aSuite, registration.GetClientRegistrationEntry().clientNodeId == chip::kUndefinedFabricIndex);
+    NL_TEST_ASSERT(aSuite, registration.GetClientRegistrationEntry().ICid == chip::kUndefinedNodeId);
+    NL_TEST_ASSERT(aSuite, registration.GetClientRegistrationEntry().fabricIndex == chip::kInvalidIcId);
 }
 
 void TestLoadFromStorageEmptyValue(nlTestSuite * aSuite, void * aContext)
@@ -60,9 +61,9 @@ void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
     ClientMonitoringRegistrationTable savedRegistration(testStorage);
     ClientMonitoringRegistrationTable loadedRegistration(testStorage);
 
-    savedRegistration.getClientRegistrationEntry().clientNodeId = kTestClientNodeId;
-    savedRegistration.getClientRegistrationEntry().ICid         = kTestICid;
-    savedRegistration.getClientRegistrationEntry().fabricIndex  = kTestFabricIndex;
+    savedRegistration.GetClientRegistrationEntry().clientNodeId = kTestClientNodeId;
+    savedRegistration.GetClientRegistrationEntry().ICid         = kTestICid;
+    savedRegistration.GetClientRegistrationEntry().fabricIndex  = kTestFabricIndex;
 
     CHIP_ERROR err = savedRegistration.SaveToStorage();
     NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
@@ -70,9 +71,44 @@ void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
     err = loadedRegistration.LoadFromStorage(kTestFabricIndex);
     NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(aSuite, loadedRegistration.getClientRegistrationEntry().clientNodeId == kTestClientNodeId);
-    NL_TEST_ASSERT(aSuite, loadedRegistration.getClientRegistrationEntry().ICid == kTestICid);
-    NL_TEST_ASSERT(aSuite, loadedRegistration.getClientRegistrationEntry().fabricIndex == kTestFabricIndex);
+    NL_TEST_ASSERT(aSuite, loadedRegistration.GetClientRegistrationEntry().clientNodeId == kTestClientNodeId);
+    NL_TEST_ASSERT(aSuite, loadedRegistration.GetClientRegistrationEntry().ICid == kTestICid);
+    NL_TEST_ASSERT(aSuite, loadedRegistration.GetClientRegistrationEntry().fabricIndex == kTestFabricIndex);
+}
+
+void TestSaveLoadRegistrationValueForMultipleFabrics(nlTestSuite * aSuite, void * aContexT)
+{
+    chip::TestPersistentStorageDelegate testStorage;
+    ClientMonitoringRegistrationTable savedRegistration(testStorage);
+    ClientMonitoringRegistrationTable loadedRegistration(testStorage);
+
+    savedRegistration.GetClientRegistrationEntry().clientNodeId = kTestClientNodeId;
+    savedRegistration.GetClientRegistrationEntry().ICid         = kTestICid;
+    savedRegistration.GetClientRegistrationEntry().fabricIndex  = kTestFabricIndex;
+
+    CHIP_ERROR err = savedRegistration.SaveToStorage();
+    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+    savedRegistration.GetClientRegistrationEntry().clientNodeId = kTestClientNodeId_2;
+    savedRegistration.GetClientRegistrationEntry().ICid         = kTestICid_2;
+    savedRegistration.GetClientRegistrationEntry().fabricIndex  = kTestFabricIndex_2;
+
+    err = savedRegistration.SaveToStorage();
+    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+    err = loadedRegistration.LoadFromStorage(kTestFabricIndex);
+    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(aSuite, loadedRegistration.GetClientRegistrationEntry().clientNodeId == kTestClientNodeId);
+    NL_TEST_ASSERT(aSuite, loadedRegistration.GetClientRegistrationEntry().ICid == kTestICid);
+    NL_TEST_ASSERT(aSuite, loadedRegistration.GetClientRegistrationEntry().fabricIndex == kTestFabricIndex);
+
+    err = loadedRegistration.LoadFromStorage(kTestFabricIndex_2);
+    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(aSuite, loadedRegistration.GetClientRegistrationEntry().clientNodeId == kTestClientNodeId_2);
+    NL_TEST_ASSERT(aSuite, loadedRegistration.GetClientRegistrationEntry().ICid == kTestICid_2);
+    NL_TEST_ASSERT(aSuite, loadedRegistration.GetClientRegistrationEntry().fabricIndex == kTestFabricIndex_2);
 }
 
 void TestSaveAllInvalidRegistrationValues(nlTestSuite * aSuite, void * context)
@@ -92,6 +128,8 @@ int TestClientMonitoringRegistrationTable()
                                NL_TEST_DEF("TestLoadFromStorageEmptyValue", TestLoadFromStorageEmptyValue),
                                NL_TEST_DEF("TestSaveAndLoadRegistrationValue", TestSaveAndLoadRegistrationValue),
                                NL_TEST_DEF("TestSaveAllInvalidRegistrationValues", TestSaveAllInvalidRegistrationValues),
+                               NL_TEST_DEF("TestSaveLoadRegistrationValueForMultipleFabrics",
+                                           TestSaveLoadRegistrationValueForMultipleFabrics),
                                NL_TEST_SENTINEL() };
 
     nlTestSuite cmSuite = { "TestClientMonitoringRegistrationTable", &sTests[0], nullptr, nullptr };

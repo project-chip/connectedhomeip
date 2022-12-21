@@ -20,9 +20,19 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
+
+/**
+ * @brief ClientMonitoringRegistrationTable exists to manage the persistance of entries in the ClientMonitoring Cluster.
+ *        To access persisted data with the ClientMonitoringRegistrationTable class, instantiate an instance of this class
+ *        and call the LoadFromStorage function.
+ *
+ *        This class can only manage one fabric at a time. The flow is load a fabric, execute necessary operations,
+ *        save it if there are any changes and load another fabric.
+ */
 class ClientMonitoringRegistrationTable
 {
 public:
@@ -30,7 +40,7 @@ public:
 
     struct ClientRegistrationEntry : MonitoringRegistrationStruct
     {
-        bool isValid() { return clientNodeId != 0 && ICid != 0 && fabricIndex != 0; }
+        bool IsValid() { return clientNodeId != kUndefinedNodeId && ICid != kInvalidIcId && fabricIndex != kUndefinedFabricIndex; }
     };
 
     ClientMonitoringRegistrationTable(PersistentStorageDelegate & storage);
@@ -39,7 +49,7 @@ public:
     CHIP_ERROR SaveToStorage();
     CHIP_ERROR LoadFromStorage(FabricIndex fabricIndex);
 
-    ClientRegistrationEntry & getClientRegistrationEntry();
+    ClientRegistrationEntry & GetClientRegistrationEntry();
 
 private:
     static constexpr uint8_t kRegStorageSize = TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(uint64_t));
