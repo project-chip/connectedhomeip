@@ -43,15 +43,16 @@ def from_data_model_to_test_definition(test_spec_definition, cluster_name, respo
     Args:
         'test_spec_definition': The spec cluster definition used by the test parser.
         'cluster_name': Used when we need to look up information in 'test_spec_definition'.
-        'response_definition': Type we are converting 'response_value' to.
+        'response_definition': Type we are converting 'response_value' to. This will be one of
+            two types: list[idl.matter_idl_types.Field] or idl.matter_idl_types.Field
         'response_value': Response value that we want to convert to
     '''
     if response_value is None:
         return response_value
 
-    # We first check to see if response_definition is a list since all structures that need to be
-    # further broken down and worked through recursively have a response_definition provided in a
-    # list.
+    # We first check to see if response_definition is list[idl.matter_idl_types.Field]. When we
+    # have list[idl.matter_idl_types.Field] that means we have a structure with multiple fields
+    # that need to be worked through recursively to properly convert the value to the right type.
     if isinstance(response_definition, list):
         rv = {}
         for item in response_definition:
@@ -82,6 +83,8 @@ def from_data_model_to_test_definition(test_spec_definition, cluster_name, respo
 
     response_sub_definition = _get_target_type_fields(test_spec_definition, cluster_name,
                                                       response_definition.data_type.name)
+
+    # Check below is to see if the field itself is an array, for example array of ints.
     if response_definition.is_list:
         return [
             from_data_model_to_test_definition(test_spec_definition, cluster_name,

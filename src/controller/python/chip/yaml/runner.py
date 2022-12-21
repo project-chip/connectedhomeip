@@ -170,9 +170,8 @@ class ReadAttributeAction(BaseAction):
         try:
             raw_resp = asyncio.run(dev_ctrl.ReadAttribute(self._node_id,
                                                           [(self._endpoint, self._request_object)]))
-        except chip.interaction_model.InteractionModelError:
-            # TODO Should we be doing the same thing as InvokeAction on InteractionModelError?
-            raise
+        except chip.interaction_model.InteractionModelError as error:
+            return _ActionResult(status=_ActionStatus.ERROR, response=error)
 
         if self._possibly_unsupported and not raw_resp:
             # We have found an unsupported attribute. TestStep provided did specify that it might be
