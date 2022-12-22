@@ -42,9 +42,9 @@ namespace Internal {
 // *** CAUTION ***: Changing the names or namespaces of these values will *break* existing devices.
 
 // NVS namespaces used to store device configuration information.
-const char AmebaConfig::kConfigNamespace_ChipFactory[]              = "chip-factory";
-const char AmebaConfig::kConfigNamespace_ChipConfig[]               = "chip-config";
-const char AmebaConfig::kConfigNamespace_ChipCounters[]             = "chip-counters";
+const char AmebaConfig::kConfigNamespace_ChipFactory[]  = "chip-factory";
+const char AmebaConfig::kConfigNamespace_ChipConfig[]   = "chip-config";
+const char AmebaConfig::kConfigNamespace_ChipCounters[] = "chip-counters";
 
 // Keys stored in the chip-factory namespace
 const AmebaConfig::Key AmebaConfig::kConfigKey_SerialNum             = { kConfigNamespace_ChipFactory, "serial-num" };
@@ -336,7 +336,7 @@ CHIP_ERROR AmebaConfig::InitNamespace()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AmebaConfig::ClearNamespace(void)
+CHIP_ERROR AmebaConfig::ClearNamespace()
 {
     int32_t success = -1;
 
