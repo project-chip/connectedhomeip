@@ -295,7 +295,7 @@ static constexpr CommandId Id = 0x0000000B;
 } // namespace Commands
 } // namespace Actions
 
-namespace Basic {
+namespace BasicInformation {
 namespace Commands {
 
 namespace MfgSpecificPing {
@@ -303,7 +303,7 @@ static constexpr CommandId Id = 0x10020000;
 } // namespace MfgSpecificPing
 
 } // namespace Commands
-} // namespace Basic
+} // namespace BasicInformation
 
 namespace OtaSoftwareUpdateProvider {
 namespace Commands {

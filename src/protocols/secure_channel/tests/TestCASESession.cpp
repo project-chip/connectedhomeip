@@ -124,15 +124,6 @@ public:
     uint32_t mNumPairingComplete = 0;
 };
 
-class CASEServerForTest : public CASEServer
-{
-public:
-    CASESession & GetSession() override { return mCaseSession; }
-
-private:
-    CASESession mCaseSession;
-};
-
 class TestOperationalKeystore : public chip::Crypto::OperationalKeystore
 {
 public:
@@ -469,7 +460,7 @@ void TestCASESession::SecurePairingHandshakeTest(nlTestSuite * inSuite, void * i
     SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner, delegateCommissioner);
 }
 
-CASEServerForTest gPairingServer;
+CASEServer gPairingServer;
 
 void TestCASESession::SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inContext)
 {

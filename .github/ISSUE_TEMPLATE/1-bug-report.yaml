@@ -11,12 +11,14 @@ body:
       attributes:
           label: Reproduction steps
           description: "How do you trigger this bug? Please walk us through it step by step."
-          value: |
-              1.
-              2.
-              3.
-              ...
-          render: bash
+          placeholder: |
+            Please list reproduction steps step by step.
+            Place shell commands between ```.
+            Attach logs as files instead of pasting them in.
+            1.
+            2.
+            3.
+            ...
       validations:
           required: true
     - type: input

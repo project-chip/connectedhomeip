@@ -182,7 +182,7 @@ tests:
           error: FAILURE
 
     - label: "TH_CR1 writes the mandatory attribute NodeLabel of DUT_CE"
-      cluster: "Basic"
+      cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "NodeLabel"
       PICS: BINFO.S.A0005
@@ -190,7 +190,7 @@ tests:
           value: "chiptest"
 
     - label: "TH_CR1 read the mandatory attribute NodeLabel of DUT_CE"
-      cluster: "Basic"
+      cluster: "Basic Information"
       command: "readAttribute"
       attribute: "NodeLabel"
       PICS: BINFO.S.A0005

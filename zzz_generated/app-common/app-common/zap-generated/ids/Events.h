@@ -53,7 +53,7 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace Actions
 
-namespace Basic {
+namespace BasicInformation {
 namespace Events {
 
 namespace StartUp {
@@ -73,7 +73,7 @@ static constexpr EventId Id = 0x00000003;
 } // namespace ReachableChanged
 
 } // namespace Events
-} // namespace Basic
+} // namespace BasicInformation
 
 namespace OtaSoftwareUpdateRequestor {
 namespace Events {

@@ -56,7 +56,7 @@ tests:
 
     - label: "Reads NodeLabel mandatory attribute of target device"
       command: "readAttribute"
-      cluster: "Basic"
+      cluster: "Basic Information"
       attribute: "NodeLabel"
       response:
           value: ""

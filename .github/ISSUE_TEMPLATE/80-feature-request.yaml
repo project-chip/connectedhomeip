@@ -13,7 +13,6 @@ body:
           description: "What feature are you looking to add? Please walk us through it!"
           value: |
               ...
-          render: bash
       validations:
           required: true
     - type: dropdown
