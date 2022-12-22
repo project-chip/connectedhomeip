@@ -249,7 +249,6 @@ public:
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("event-id", 0, UINT32_MAX, &mEventId);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ModelCommand::AddArguments();
     }
 
@@ -258,7 +257,6 @@ public:
         , mClusterId(clusterId)
     {
         AddArgument("event-id", 0, UINT32_MAX, &mEventId);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ModelCommand::AddArguments();
     }
 
@@ -266,7 +264,6 @@ public:
         : ModelCommand("read-event")
     {
         AddArgument("event-name", eventName);
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         ModelCommand::AddArguments();
     }
 
