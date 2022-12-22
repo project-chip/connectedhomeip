@@ -244,7 +244,7 @@ protected:
 
 class ReadEvent : public ModelCommand {
 public:
-          ReadEvent()
+    ReadEvent()
         : ModelCommand("read-event-by-id")
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
@@ -276,10 +276,9 @@ public:
         if (mFabricFiltered.HasValue()) {
             params.filterByFabric = mFabricFiltered.Value();
         }
-        [device
-            readEventsWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
+        [device readEventsWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
                                clusterID:[NSNumber numberWithUnsignedInteger:mClusterId]
-                             eventID:[NSNumber numberWithUnsignedInteger:mEventId]
+                                 eventID:[NSNumber numberWithUnsignedInteger:mEventId]
                                   params:params
                                    queue:callbackQueue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {

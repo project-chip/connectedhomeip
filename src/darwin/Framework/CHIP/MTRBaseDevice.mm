@@ -1471,24 +1471,23 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 template <typename DecodableEventType> class BufferedReadEventCallback final : public app::ReadClient::Callback {
 public:
-    using OnSuccessCallbackType
-        = std::function<void(const app::ConcreteEventPath & aPath, const DecodableEventType & aData)>;
+    using OnSuccessCallbackType = std::function<void(const app::ConcreteEventPath & aPath, const DecodableEventType & aData)>;
     using OnErrorCallbackType = std::function<void(const app::ConcreteEventPath * aPath, CHIP_ERROR aError)>;
     using OnDoneCallbackType = std::function<void(BufferedReadEventCallback * callback)>;
     using OnSubscriptionEstablishedCallbackType = std::function<void()>;
 
     BufferedReadEventCallback(ClusterId aClusterId, EventId aEventId, OnSuccessCallbackType aOnSuccess,
-         OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
-         OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr)
-         : mClusterId(aClusterId)
-         , mEventId(aEventId)
-         , mOnSuccess(aOnSuccess)
-         , mOnError(aOnError)
-         , mOnDone(aOnDone)
-         , mOnSubscriptionEstablished(aOnSubscriptionEstablished)
-         , mBufferedReadAdapter(*this)
-     {
-     }
+        OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
+        OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr)
+        : mClusterId(aClusterId)
+        , mEventId(aEventId)
+        , mOnSuccess(aOnSuccess)
+        , mOnError(aOnError)
+        , mOnDone(aOnDone)
+        , mOnSubscriptionEstablished(aOnSubscriptionEstablished)
+        , mBufferedReadAdapter(*this)
+    {
+    }
 
     ~BufferedReadEventCallback()
     {
@@ -1545,11 +1544,11 @@ private:
 };
 
 - (void)readEventsWithEndpointID:(NSNumber * _Nullable)endpointID
-                        clusterID:(NSNumber * _Nullable)clusterID
-                        eventID:(NSNumber * _Nullable)eventID
-                            params:(MTRReadParams * _Nullable)params
-                            queue:(dispatch_queue_t)queue
-                        completion:(MTRDeviceResponseHandler)completion
+                       clusterID:(NSNumber * _Nullable)clusterID
+                         eventID:(NSNumber * _Nullable)eventID
+                          params:(MTRReadParams * _Nullable)params
+                           queue:(dispatch_queue_t)queue
+                      completion:(MTRDeviceResponseHandler)completion
 {
     endpointID = (endpointID == nil) ? nil : [endpointID copy];
     clusterID = (clusterID == nil) ? nil : [clusterID copy];
@@ -1561,8 +1560,8 @@ private:
             auto resultArray = [[NSMutableArray alloc] init];
             auto resultSuccess = [[NSMutableArray alloc] init];
             auto resultFailure = [[NSMutableArray alloc] init];
-            auto onSuccessCb = [resultArray, resultSuccess](const app::ConcreteEventPath & eventPath,
-                                const MTRDataValueDictionaryDecodableType & aData) {
+            auto onSuccessCb = [resultArray, resultSuccess](
+                                   const app::ConcreteEventPath & eventPath, const MTRDataValueDictionaryDecodableType & aData) {
                 [resultArray addObject:@ {
                     MTREventPathKey : [[MTREventPath alloc] initWithPath:eventPath],
                     MTRDataKey : aData.GetDecodedObject()
@@ -1602,7 +1601,7 @@ private:
             readParams.mEventPathParamsListSize = 1;
 
             auto onDone = [resultArray, resultSuccess, resultFailure, bridge, successCb, failureCb](
-                            BufferedReadEventCallback<MTRDataValueDictionaryDecodableType> * callback) {
+                              BufferedReadEventCallback<MTRDataValueDictionaryDecodableType> * callback) {
                 if ([resultFailure count] > 0 || [resultSuccess count] == 0) {
                     // Failure
                     if (failureCb) {
