@@ -24,7 +24,9 @@ declare_args() {
   # Location of the efr32 SDK.
   efr32_sdk_root = "${chip_root}/third_party/silabs/gecko_sdk"
   sdk_support_root = "${chip_root}/third_party/silabs/matter_support"
-  wiseconnect_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
+  wiseconnect_sdk_root =
+      "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
+  wisemcu_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
   examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 
   # Build openthread with prebuilt silabs lib
@@ -84,21 +86,22 @@ template("efr32_sdk") {
       "${sdk_support_root}/platform/emdrv/nvm3/inc",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/inc",
       "${chip_root}/third_party/mbedtls/repo/include",
+      "${chip_root}/third_party/mbedtls/repo/library",
 
       ### CCP includes ###
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/inc",
-      "${wiseconnect_sdk_root}/platforms/si91x/core/chip/inc",
-      "${wiseconnect_sdk_root}/platforms/si91x/core/config",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver/config",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/rom_driver/inc",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/inc",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/peripheral_drivers/inc",
+      "${wisemcu_sdk_root}/platforms/si91x/core/chip/inc",
+      "${wisemcu_sdk_root}/platforms/si91x/core/config",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver/config",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/rom_driver/inc",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/inc",
 
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver/CMSIS/Driver/Include",
-      "${wiseconnect_sdk_root}/platforms/si91x/boards/brd4325a/inc",
-      "${wiseconnect_sdk_root}/platforms/si91x/core/cmsis",
-      "${wiseconnect_sdk_root}/third_party/freertos/include",
-      "${wiseconnect_sdk_root}/third_party/freertos/portable/GCC/ARM_CM4F",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver/CMSIS/Driver/Include",
+      "${wisemcu_sdk_root}/platforms/si91x/boards/brd4325a/inc",
+      "${wisemcu_sdk_root}/platforms/si91x/core/cmsis",
+      "${wisemcu_sdk_root}/third_party/freertos/include",
+      "${wisemcu_sdk_root}/third_party/freertos/portable/GCC/ARM_CM4F",
       "${examples_plat_dir}/device/inc",
 
       "${wiseconnect_sdk_root}/sapi/include",
@@ -138,6 +141,7 @@ template("efr32_sdk") {
       "RSI_BLE_ENABLE=1",
       "BRD4325A",
       "CHIP_9117",
+      "RSI_BLE_ENABLE=1",
       "TINYCRYPT_PRIMITIVES",
       "OPTIMIZE_TINYCRYPT_ASM",
       "RS91X_BLE_ENABLE=1",
@@ -254,46 +258,42 @@ template("efr32_sdk") {
       "${sdk_support_root}/platform/emdrv/nvm3/src/nvm3_lock.c",
 
       ######## CCP Platform #########
-      "${wiseconnect_sdk_root}/platforms/si91x/boards/brd4325a/src/rsi_board.c",
+      "${wisemcu_sdk_root}/platforms/si91x/boards/brd4325a/src/rsi_board.c",
 
-      #"${wiseconnect_sdk_root}/platforms/si91x/boards/brd4325a/src/syscalls.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/core/chip/src/rsi_deepsleep_commonflash.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/core/chip/src/rsi_ps_ram_func.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/core/chip/src/rsi_system_config.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/core/chip/src/system_RS1xxxx.c",
-
-      #"${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver/UDMA.c",
-      #"${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver/USART.c",
-
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/clock_update.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_comparator.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_egpio.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_udma.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_udma_wrapper.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_usart.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_ipmu.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_pll.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_power_save.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_processor_sensor.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_rtc.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_temp_sensor.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_time_period.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_ulpss_clk.c",
-      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_wwdt.c",
-      "${wiseconnect_sdk_root}/third_party/freertos/croutine.c",
-      "${wiseconnect_sdk_root}/third_party/freertos/event_groups.c",
-      "${wiseconnect_sdk_root}/third_party/freertos/list.c",
-      "${wiseconnect_sdk_root}/third_party/freertos/portable/GCC/ARM_CM4F/port.c",
-      "${wiseconnect_sdk_root}/third_party/freertos/queue.c",
-      "${wiseconnect_sdk_root}/third_party/freertos/stream_buffer.c",
-      "${wiseconnect_sdk_root}/third_party/freertos/tasks.c",
-      "${wiseconnect_sdk_root}/third_party/freertos/timers.c",
+      #"${wisemcu_sdk_root}/platforms/si91x/boards/brd4325a/src/syscalls.c",
+      "${wisemcu_sdk_root}/platforms/si91x/core/chip/src/rsi_deepsleep_commonflash.c",
+      "${wisemcu_sdk_root}/platforms/si91x/core/chip/src/rsi_ps_ram_func.c",
+      "${wisemcu_sdk_root}/platforms/si91x/core/chip/src/rsi_system_config.c",
+      "${wisemcu_sdk_root}/platforms/si91x/core/chip/src/system_RS1xxxx.c",
 
       # Bluetooth
       "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
       "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
       "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
       "${wiseconnect_sdk_root}/sapi/driver/rsi_bt_ble.c",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/clock_update.c",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_comparator.c",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_egpio.c",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_udma.c",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_udma_wrapper.c",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_usart.c",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_ipmu.c",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_pll.c",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_power_save.c",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_processor_sensor.c",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_rtc.c",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_temp_sensor.c",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_time_period.c",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_ulpss_clk.c",
+      "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_wwdt.c",
+      "${wisemcu_sdk_root}/third_party/freertos/croutine.c",
+      "${wisemcu_sdk_root}/third_party/freertos/event_groups.c",
+      "${wisemcu_sdk_root}/third_party/freertos/list.c",
+      "${wisemcu_sdk_root}/third_party/freertos/portable/GCC/ARM_CM4F/port.c",
+      "${wisemcu_sdk_root}/third_party/freertos/queue.c",
+      "${wisemcu_sdk_root}/third_party/freertos/stream_buffer.c",
+      "${wisemcu_sdk_root}/third_party/freertos/tasks.c",
+      "${wisemcu_sdk_root}/third_party/freertos/timers.c",
 
       # mbedtls
       "${chip_root}/third_party/mbedtls/repo/library/aes.c",

@@ -319,6 +319,7 @@ public:
     static void TestSubscribeRoundtripStatusReportTimeout(nlTestSuite * apSuite, void * apContext);
     static void TestPostSubscribeRoundtripStatusReportTimeout(nlTestSuite * apSuite, void * apContext);
     static void TestReadChunkingStatusReportTimeout(nlTestSuite * apSuite, void * apContext);
+    static void TestReadReportFailure(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeRoundtripChunkStatusReportTimeout(nlTestSuite * apSuite, void * apContext);
     static void TestPostSubscribeRoundtripChunkStatusReportTimeout(nlTestSuite * apSuite, void * apContext);
     static void TestPostSubscribeRoundtripChunkReportTimeout(nlTestSuite * apSuite, void * apContext);
@@ -338,6 +339,7 @@ public:
     static void TestReadHandlerInvalidSubscribeRequest(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeInvalidateFabric(nlTestSuite * apSuite, void * apContext);
     static void TestShutdownSubscription(nlTestSuite * apSuite, void * apContext);
+    static void TestSubscriptionReportWithDefunctSession(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerMalformedSubscribeRequest(nlTestSuite * apSuite, void * apContext);
 
 private:
@@ -2531,6 +2533,57 @@ void TestReadInteraction::TestReadChunkingStatusReportTimeout(nlTestSuite * apSu
     ctx.CreateSessionBobToAlice();
 }
 
+// ReadClient sends the read request, but handler fails to send the one report (SendMessage returns an error).
+// Since this is an un-chunked read, we are not in the AwaitingReportResponse state, so the "reports in flight"
+// counter should not increase.
+void TestReadInteraction::TestReadReportFailure(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+
+    chip::app::AttributePathParams attributePathParams[1];
+    attributePathParams[0].mEndpointId  = Test::kMockEndpoint2;
+    attributePathParams[0].mClusterId   = Test::MockClusterId(3);
+    attributePathParams[0].mAttributeId = Test::MockAttributeId(1);
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    readPrepareParams.mpEventPathParamsList        = nullptr;
+    readPrepareParams.mEventPathParamsListSize     = 0;
+    readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = 1;
+
+    {
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+                                   chip::app::ReadClient::InteractionType::Read);
+
+        ctx.GetLoopback().mNumMessagesToAllowBeforeError = 1;
+        ctx.GetLoopback().mMessageSendError              = CHIP_ERROR_INCORRECT_STATE;
+        err                                              = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().GetNumReportsInFlight() == 0);
+        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 0);
+
+        ctx.GetLoopback().mNumMessagesToAllowBeforeError = 0;
+        ctx.GetLoopback().mMessageSendError              = CHIP_NO_ERROR;
+    }
+
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
 void TestReadInteraction::TestSubscribeRoundtripChunkStatusReportTimeout(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -4096,6 +4149,92 @@ void TestReadInteraction::TestShutdownSubscription(nlTestSuite * apSuite, void *
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+/**
+ * Tests what happens when a subscription tries to deliver reports but the
+ * session it has is defunct.  Makes sure we correctly tear down the ReadHandler
+ * and don't increment the "reports in flight" count.
+ */
+void TestReadInteraction::TestSubscriptionReportWithDefunctSession(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    AttributePathParams subscribePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(4));
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    readPrepareParams.mpAttributePathParamsList    = &subscribePath;
+    readPrepareParams.mAttributePathParamsListSize = 1;
+
+    readPrepareParams.mMinIntervalFloorSeconds   = 0;
+    readPrepareParams.mMaxIntervalCeilingSeconds = 0;
+
+    {
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+                                   chip::app::ReadClient::InteractionType::Subscribe);
+
+        delegate.mGotReport = false;
+
+        err = readClient.SendSubscribeRequest(std::move(readPrepareParams));
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, delegate.mGotReport);
+        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
+        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read) == 0);
+        NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().GetNumReportsInFlight() == 0);
+
+        NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
+        auto * readHandler = engine->ActiveHandlerAt(0);
+
+        // Verify that the session we will reset later is the one we will mess
+        // with now.
+        NL_TEST_ASSERT(apSuite, SessionHandle(*readHandler->GetSession()) == ctx.GetSessionAliceToBob());
+
+        // Test that we send reports as needed.
+        readHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mGotReport = false;
+        engine->GetReportingEngine().SetDirty(subscribePath);
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, delegate.mGotReport);
+        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
+        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read) == 0);
+        NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().GetNumReportsInFlight() == 0);
+
+        // Test that if the session is defunct we don't send reports and clean
+        // up properly.
+        readHandler->GetSession()->MarkAsDefunct();
+        readHandler->mFlags.Set(ReadHandler::ReadHandlerFlags::HoldReport, false);
+        delegate.mGotReport = false;
+        engine->GetReportingEngine().SetDirty(subscribePath);
+
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, !delegate.mGotReport);
+        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 0);
+        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read) == 0);
+        NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().GetNumReportsInFlight() == 0);
+    }
+    engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+    // Get rid of our defunct session.
+    ctx.ExpireSessionAliceToBob();
+    ctx.CreateSessionAliceToBob();
+}
+
 } // namespace app
 } // namespace chip
 
@@ -4155,10 +4294,12 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestSubscribeRoundtripStatusReportTimeout", chip::app::TestReadInteraction::TestSubscribeRoundtripStatusReportTimeout),
     NL_TEST_DEF("TestPostSubscribeRoundtripStatusReportTimeout", chip::app::TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout),
     NL_TEST_DEF("TestReadChunkingStatusReportTimeout", chip::app::TestReadInteraction::TestReadChunkingStatusReportTimeout),
+    NL_TEST_DEF("TestReadReportFailure", chip::app::TestReadInteraction::TestReadReportFailure),
     NL_TEST_DEF("TestSubscribeRoundtripChunkStatusReportTimeout", chip::app::TestReadInteraction::TestSubscribeRoundtripChunkStatusReportTimeout),
     NL_TEST_DEF("TestPostSubscribeRoundtripChunkStatusReportTimeout", chip::app::TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout),
     NL_TEST_DEF("TestPostSubscribeRoundtripChunkReportTimeout", chip::app::TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout),
     NL_TEST_DEF("TestReadShutdown", chip::app::TestReadInteraction::TestReadShutdown),
+    NL_TEST_DEF("TestSubscriptionReportWithDefunctSession", chip::app::TestReadInteraction::TestSubscriptionReportWithDefunctSession),
     NL_TEST_SENTINEL()
 };
 // clang-format on

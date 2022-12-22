@@ -2082,8 +2082,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
         }
         break;
     }
-    case Clusters::Basic::Id: {
-        using namespace Clusters::Basic;
+    case Clusters::BasicInformation::Id: {
+        using namespace Clusters::BasicInformation;
         switch (aPath.mAttributeId) {
         case Attributes::DataModelRevision::Id: {
             using TypeInfo = Attributes::DataModelRevision::TypeInfo;
@@ -2301,8 +2301,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            MTRBasicClusterCapabilityMinimaStruct * _Nonnull value;
-            value = [MTRBasicClusterCapabilityMinimaStruct new];
+            MTRBasicInformationClusterCapabilityMinimaStruct * _Nonnull value;
+            value = [MTRBasicInformationClusterCapabilityMinimaStruct new];
             value.caseSessionsPerFabric = [NSNumber numberWithUnsignedShort:cppValue.caseSessionsPerFabric];
             value.subscriptionsPerFabric = [NSNumber numberWithUnsignedShort:cppValue.subscriptionsPerFabric];
             return value;

@@ -1042,8 +1042,8 @@ class ChipDeviceController():
 
             e.g.
                 ReadAttribute(1, [ 1 ] ) -- case 4 above.
-                ReadAttribute(1, [ Clusters.Basic ] ) -- case 5 above.
-                ReadAttribute(1, [ (1, Clusters.Basic.Attributes.Location ] ) -- case 1 above.
+                ReadAttribute(1, [ Clusters.BasicInformation ] ) -- case 5 above.
+                ReadAttribute(1, [ (1, Clusters.BasicInformation.Attributes.Location ] ) -- case 1 above.
 
         dataVersionFilters: A list of tuples of (endpoint, cluster, data version).
 
@@ -1108,8 +1108,8 @@ class ChipDeviceController():
 
             e.g.
                 ReadAttribute(1, [ 1 ] ) -- case 4 above.
-                ReadAttribute(1, [ Clusters.Basic ] ) -- case 5 above.
-                ReadAttribute(1, [ (1, Clusters.Basic.Attributes.Location ] ) -- case 1 above.
+                ReadAttribute(1, [ Clusters.BasicInformation ] ) -- case 5 above.
+                ReadAttribute(1, [ (1, Clusters.BasicInformation.Attributes.Location ] ) -- case 1 above.
 
         returnClusterObject: This returns the data as consolidated cluster objects, with all attributes for a cluster inside
                              a single cluster-wide cluster object.
@@ -1152,8 +1152,8 @@ class ChipDeviceController():
 
         e.g.
             ReadEvent(1, [ 1 ] ) -- case 4 above.
-            ReadEvent(1, [ Clusters.Basic ] ) -- case 5 above.
-            ReadEvent(1, [ (1, Clusters.Basic.Events.Location ] ) -- case 1 above.
+            ReadEvent(1, [ Clusters.BasicInformation ] ) -- case 5 above.
+            ReadEvent(1, [ (1, Clusters.BasicInformation.Events.Location ] ) -- case 1 above.
 
         eventNumberFilter: Optional minimum event number filter.
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.

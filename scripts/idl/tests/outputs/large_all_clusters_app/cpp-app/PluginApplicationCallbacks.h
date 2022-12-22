@@ -7,7 +7,7 @@ void MatterApplicationBasicPluginServerInitCallback();
 void MatterApplicationLauncherPluginServerInitCallback();
 void MatterAudioOutputPluginServerInitCallback();
 void MatterBarrierControlPluginServerInitCallback();
-void MatterBasicPluginServerInitCallback();
+void MatterBasicInformationPluginServerInitCallback();
 void MatterBinaryInputBasicPluginServerInitCallback();
 void MatterBindingPluginServerInitCallback();
 void MatterBooleanStatePluginServerInitCallback();
@@ -72,7 +72,7 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterApplicationLauncherPluginServerInitCallback(); \
     MatterAudioOutputPluginServerInitCallback(); \
     MatterBarrierControlPluginServerInitCallback(); \
-    MatterBasicPluginServerInitCallback(); \
+    MatterBasicInformationPluginServerInitCallback(); \
     MatterBinaryInputBasicPluginServerInitCallback(); \
     MatterBindingPluginServerInitCallback(); \
     MatterBooleanStatePluginServerInitCallback(); \

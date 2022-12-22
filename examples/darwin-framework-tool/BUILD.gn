@@ -147,6 +147,7 @@ executable("darwin-framework-tool") {
     "commands/provider/OTASoftwareUpdateInteractive.mm",
     "commands/storage/Commands.h",
     "commands/storage/StorageManagementCommand.mm",
+    "logging/logging.mm",
     "main.mm",
   ]
 
