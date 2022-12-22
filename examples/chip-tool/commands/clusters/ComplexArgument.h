@@ -218,6 +218,7 @@ public:
                     return buffer;
                 },
                 &size);
+
             if (err != CHIP_NO_ERROR)
             {
                 if (buffer != nullptr)
