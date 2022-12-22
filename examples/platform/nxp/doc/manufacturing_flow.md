@@ -1,5 +1,3 @@
-<a name="manufacturing"></a>
-
 ## Manufacturing data
 
 By default, the example application is configured to use generic test
