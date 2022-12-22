@@ -102,9 +102,6 @@ public:
     static StorageKeyName FabricMetadata(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/m", fabric); }
     static StorageKeyName FabricOpKey(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/o", fabric); }
 
-    // Fabric List
-    static StorageKeyName FabricList() { return StorageKeyName::FromConst("g/fl"); }
-
     // Fail-safe handling
     static StorageKeyName FailSafeCommitMarkerKey() { return StorageKeyName::FromConst("g/fs/c"); }
     static StorageKeyName FailSafeNetworkConfig() { return StorageKeyName::FromConst("g/fs/n"); }
@@ -147,6 +144,7 @@ public:
     // Group Data Provider
 
     // List of fabric indices that have endpoint-to-group associations defined.
+    static StorageKeyName GroupFabricList() { return StorageKeyName::FromConst("g/gfl"); }
     static StorageKeyName FabricGroups(chip::FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/g", fabric); }
     static StorageKeyName FabricGroup(chip::FabricIndex fabric, chip::GroupId group)
     {

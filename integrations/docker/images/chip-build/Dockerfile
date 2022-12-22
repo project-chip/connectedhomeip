@@ -95,7 +95,22 @@ RUN set -x \
     && : # last line
 
 RUN set -x \
-    && pip3 install attrs coloredlogs PyGithub pygit future portpicker mobly click cxxfilt ghapi pandas tabulate \
+    && pip3 install \
+    attrs \
+    click \
+    coloredlogs \
+    cxxfilt \
+    flake8 \
+    future \
+    ghapi \
+    mobly \
+    pandas \
+    portpicker \
+    pygit \
+    PyGithub \
+    tabulate \
+    # Cleanup
+    && pip3 cache purge \
     && : # last line
 
 # build and install gn
@@ -163,7 +178,7 @@ RUN set -x \
 
 # Install a known ZAP release
 # Only keep the cli version, since `zap` is 143MB and not usable (UI)
-ENV ZAP_VERSION=v2022.12.19-nightly
+ENV ZAP_VERSION=v2022.12.20-nightly
 RUN set -x \
     && mkdir -p /opt/zap-${ZAP_VERSION} \
     && cd /opt/zap-${ZAP_VERSION} \

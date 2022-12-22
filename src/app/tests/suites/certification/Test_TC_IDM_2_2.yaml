@@ -63,7 +63,7 @@ tests:
           [1655727338.262145][5267:5272] CHIP:DMG:         InteractionModelRevision = 1
           [1655727338.262182][5267:5272] CHIP:DMG: }
           [1655727338.262379][5267:5272] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 236949823
-          [1655727338.262475][5267:5272] CHIP:TOO:   identify time: 0
+          [1655727338.262475][5267:5272] CHIP:TOO:   IdentifyTime: 0
           [1655727338.262588][5267:5272] CHIP:EM: Sending Standalone Ack for MessageCounter:9195311 on exchange 32586i
       disabled: true
 
@@ -85,9 +85,9 @@ tests:
           [1655727546.354538][5286:5291] CHIP:DMG:         InteractionModelRevision = 1
           [1655727546.354580][5286:5291] CHIP:DMG: }
           [1655727546.355252][5286:5291] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 1545325355
-          [1655727546.355324][5286:5291] CHIP:TOO:   identify time: 0
+          [1655727546.355324][5286:5291] CHIP:TOO:   IdentifyTime: 0
           [1655727546.355386][5286:5291] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 1545325355
-          [1655727546.355414][5286:5291] CHIP:TOO:   identify type: 2
+          [1655727546.355414][5286:5291] CHIP:TOO:   IdentifyType: 2
           [1655727546.355470][5286:5291] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFC DataVersion: 1545325355
           [1655727546.355524][5286:5291] CHIP:TOO:   FeatureMap: 0
           [1655727546.355606][5286:5291] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 1545325355
@@ -167,9 +167,9 @@ tests:
           [1655727602.119897][5301:5306] CHIP:DMG:         InteractionModelRevision = 1
           [1655727602.119933][5301:5306] CHIP:DMG: }
           [1655727602.120134][5301:5306] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 1545325355
-          [1655727602.120223][5301:5306] CHIP:TOO:   identify time: 0
+          [1655727602.120223][5301:5306] CHIP:TOO:   IdentifyTime: 0
           [1655727602.120315][5301:5306] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 236949823
-          [1655727602.120356][5301:5306] CHIP:TOO:   identify time: 0
+          [1655727602.120356][5301:5306] CHIP:TOO:   IdentifyTime: 0
           [1655727602.120460][5301:5306] CHIP:EM: Sending Standalone Ack for MessageCounter:192238779 on exchange 58891i
       disabled: true
 
@@ -284,9 +284,9 @@ tests:
 
           [1653629930.057852][8778:8783] CHIP:DMG: }
           [1653629930.058739][8778:8783] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 2065044836
-          [1653629930.058788][8778:8783] CHIP:TOO:   identify time: 0
+          [1653629930.058788][8778:8783] CHIP:TOO:   IdentifyTime: 0
           [1653629930.058889][8778:8783] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 2065044836
-          [1653629930.058919][8778:8783] CHIP:TOO:   identify type: 2
+          [1653629930.058919][8778:8783] CHIP:TOO:   IdentifyType: 2
           [1653629930.058980][8778:8783] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 2065044836
           [1653629930.058998][8778:8783] CHIP:TOO:   ClusterRevision: 4
           [1653629930.059191][8778:8783] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 2065044836
@@ -306,9 +306,9 @@ tests:
           [1653629930.060048][8778:8783] CHIP:TOO:     [5]: 65531
           [1653629930.060064][8778:8783] CHIP:TOO:     [6]: 65533
           [1653629930.060077][8778:8783] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435651
-          [1653629930.060095][8778:8783] CHIP:TOO:   identify time: 0
+          [1653629930.060095][8778:8783] CHIP:TOO:   IdentifyTime: 0
           [1653629930.060151][8778:8783] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3620435651
-          [1653629930.060167][8778:8783] CHIP:TOO:   identify type: 2
+          [1653629930.060167][8778:8783] CHIP:TOO:   IdentifyType: 2
           [1653629930.060224][8778:8783] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 3620435651
           [1653629930.060240][8778:8783] CHIP:TOO:   ClusterRevision: 4
           [1653629930.060411][8778:8783] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 3620435651
@@ -390,7 +390,7 @@ tests:
           Verify on TH(chip-tool), DUT is responds right attribute value for above command
 
           [1653630355.834677][8923:8928] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 2065044836
-          [1653630355.834735][8923:8928] CHIP:TOO:   identify type: 2
+          [1653630355.834735][8923:8928] CHIP:TOO:   IdentifyType: 2
           [1653630355.834801][8923:8928] CHIP:EM: Sending Standalone Ack for MessageCounter:1314384 on exchange 51148i
       disabled: true
 
@@ -667,17 +667,17 @@ tests:
 
           sudo ./chip-tool identify read identify-time 1 1
           [1653631418.770328][9322:9327] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435651
-          [1653631418.770402][9322:9327] CHIP:TOO:   identify time: 0
+          [1653631418.770402][9322:9327] CHIP:TOO:   IdentifyTime: 0
           [1653631418.770491][9322:9327] CHIP:EM: Sending Standalone Ack for MessageCounter:12532212 on exchange 36485i
 
           sudo ./chip-tool identify read identify-time 1 1
           [1653631479.556292][9357:9362] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435651
-          [1653631479.556345][9357:9362] CHIP:TOO:   identify time: 0
+          [1653631479.556345][9357:9362] CHIP:TOO:   IdentifyTime: 0
           [1653631479.556418][9357:9362] CHIP:EM: Sending Standalone Ack for MessageCounter:7220061 on exchange 60774i
 
            sudo ./chip-tool identify read identify-time 1 1
           [1653632941.731096][9571:9576] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435651
-          [1653632941.731146][9571:9576] CHIP:TOO:   identify time: 0
+          [1653632941.731146][9571:9576] CHIP:TOO:   IdentifyTime: 0
           [1653632941.731258][9571:9576] CHIP:EM: Sending Standalone Ack for MessageCounter:578130 on exchange 46565i
       disabled: true
 
@@ -718,7 +718,7 @@ tests:
           [1653633746.448375][9791:9796] CHIP:DMG:         InteractionModelRevision = 1
           [1653633746.448389][9791:9796] CHIP:DMG: }
           [1653633746.448532][9791:9796] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435654
-          [1653633746.448576][9791:9796] CHIP:TOO:   identify time: 0
+          [1653633746.448576][9791:9796] CHIP:TOO:   IdentifyTime: 0
           [1653633746.448656][9791:9796] CHIP:EM: Sending Standalone Ack for MessageCounter:16255130 on exchange 13134i
 
            TH sends a  below mentioned second read request to the same cluster with the DataVersionFilter Field set with the dataversion value received before.
@@ -776,7 +776,7 @@ tests:
           [1653632941.730858][9571:9576] CHIP:DMG:         InteractionModelRevision = 1
           [1653632941.730912][9571:9576] CHIP:DMG: }
           [1653632941.731096][9571:9576] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435651
-          [1653632941.731146][9571:9576] CHIP:TOO:   identify time: 0
+          [1653632941.731146][9571:9576] CHIP:TOO:   IdentifyTime: 0
           [1653632941.731258][9571:9576] CHIP:EM: Sending Standalone Ack for MessageCounter:578130 on exchange 46565i
 
 
@@ -793,7 +793,7 @@ tests:
            sudo ./chip-tool identify read identify-time 1 1 --data-version 0xd7cb76c3
 
           [1653633215.246620][9664:9669] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435654
-          [1653633215.246671][9664:9669] CHIP:TOO:   identify time: 0
+          [1653633215.246671][9664:9669] CHIP:TOO:   IdentifyTime: 0
           [1653633215.246786][9664:9669] CHIP:EM: Sending Standalone Ack for MessageCounter:3995786 on exchange 44935i
       disabled: true
 
@@ -814,9 +814,9 @@ tests:
 
 
           [1653633965.092996][9835:9840] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435654
-          [1653633965.093041][9835:9840] CHIP:TOO:   identify time: 0
+          [1653633965.093041][9835:9840] CHIP:TOO:   IdentifyTime: 0
           [1653633965.093120][9835:9840] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3620435654
-          [1653633965.093140][9835:9840] CHIP:TOO:   identify type: 2
+          [1653633965.093140][9835:9840] CHIP:TOO:   IdentifyType: 2
           [1653633965.093202][9835:9840] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 3620435654
           [1653633965.093221][9835:9840] CHIP:TOO:   ClusterRevision: 4
           [1653633965.093411][9835:9840] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 3620435654
@@ -872,9 +872,9 @@ tests:
 
 
           [1653634117.935268][9878:9883] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435657
-          [1653634117.935294][9878:9883] CHIP:TOO:   identify time: 0
+          [1653634117.935294][9878:9883] CHIP:TOO:   IdentifyTime: 0
           [1653634117.935322][9878:9883] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3620435657
-          [1653634117.935331][9878:9883] CHIP:TOO:   identify type: 2
+          [1653634117.935331][9878:9883] CHIP:TOO:   IdentifyType: 2
           [1653634117.935357][9878:9883] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 3620435657
           [1653634117.935366][9878:9883] CHIP:TOO:   ClusterRevision: 4
           [1653634117.935452][9878:9883] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 3620435657
@@ -912,7 +912,7 @@ tests:
           sudo ./chip-tool identify read identify-time 1 1
 
           [1653634213.984023][9909:9914] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435660
-          [1653634213.984086][9909:9914] CHIP:TOO:   identify time: 0
+          [1653634213.984086][9909:9914] CHIP:TOO:   IdentifyTime: 0
           [1653634213.984156][9909:9914] CHIP:EM: Sending Standalone Ack for MessageCounter:1385351 on exchange 48030i
 
 
@@ -964,9 +964,9 @@ tests:
           [1653634371.475517][9936:9941] CHIP:DMG:         InteractionModelRevision = 1
           [1653634371.475531][9936:9941] CHIP:DMG: }
           [1653634371.475692][9936:9941] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3620435660
-          [1653634371.475731][9936:9941] CHIP:TOO:   identify type: 2
+          [1653634371.475731][9936:9941] CHIP:TOO:   IdentifyType: 2
           [1653634371.475818][9936:9941] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3620435660
-          [1653634371.475837][9936:9941] CHIP:TOO:   identify type: 2
+          [1653634371.475837][9936:9941] CHIP:TOO:   IdentifyType: 2
           [1653634371.475907][9936:9941] CHIP:EM: Sending Standalone Ack for MessageCounter:16704146 on exchange 6313i
       disabled: true
 
@@ -987,9 +987,9 @@ tests:
           sudo ./chip-tool any read-by-id 0x03 0xFFFFFFFF 1 1
 
           [1653634446.678378][9962:9967] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3620435660
-          [1653634446.678404][9962:9967] CHIP:TOO:   identify time: 0
+          [1653634446.678404][9962:9967] CHIP:TOO:   IdentifyTime: 0
           [1653634446.678437][9962:9967] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3620435660
-          [1653634446.678447][9962:9967] CHIP:TOO:   identify type: 2
+          [1653634446.678447][9962:9967] CHIP:TOO:   IdentifyType: 2
           [1653634446.678474][9962:9967] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 3620435660
           [1653634446.678483][9962:9967] CHIP:TOO:   ClusterRevision: 4
           [1653634446.678570][9962:9967] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 3620435660
