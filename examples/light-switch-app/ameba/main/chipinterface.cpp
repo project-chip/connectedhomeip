@@ -116,7 +116,9 @@ static void InitServer(intptr_t context)
         PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     }
 
+#if CONFIG_ENABLE_CHIP_SHELL
     InitBindingHandler();
+#endif
 }
 
 extern "C" void ChipTest(void)
