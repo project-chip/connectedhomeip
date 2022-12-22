@@ -30,10 +30,17 @@ menuconfig CHIP
 	imply NET_CONFIG_NEED_IPV6
 	imply NET_SOCKETS
 	imply NETWORKING
+	imply HWINFO
+	imply FLASH
+	imply FLASH_MAP
+	imply NVS
+	imply SETTINGS
 	help
 	  This option enables Connected Home over IP libraries.
 
 if CHIP
+
+# Device and firmware identifers
 
 config CHIP_DEVICE_VENDOR_ID
 	int "Device vendor ID"
@@ -44,6 +51,13 @@ config CHIP_DEVICE_VENDOR_ID
 	  Alliance. It is used in various CHIP areas, such as the Basic Information
 	  cluster or OTA (Over-the-air update) image header.
 
+config CHIP_DEVICE_VENDOR_NAME
+	string "Human-readable vendor name"
+	help
+	  A human-readable vendor name which provides a simple string
+	  containing identification of device's vendor for the Content APP.
+	  This information should be included in the Matter Basic Cluster.
+
 config CHIP_DEVICE_PRODUCT_ID
 	int "Device product ID"
 	default 32768 # 0x8000
@@ -52,6 +66,31 @@ config CHIP_DEVICE_PRODUCT_ID
 	  Identifier of the product, assigned by the device manufacturer. It is used
 	  in various CHIP areas, such as the Basic Information cluster or OTA
 	  (Over-the-air update) image header.
+
+config CHIP_DEVICE_PRODUCT_NAME
+	string "Human-readable product name"
+	default "not-specified"
+	help
+	  A human-readable product name which provides a simple string
+	  containing identification of the product for the Content APP.
+
+config CHIP_DEVICE_HARDWARE_VERSION
+	int "Integer representation of hardware version"
+	default 0
+	help
+	  A hardware version number specifies the version number
+	  of the hardware of the device. The meaning of its value,
+	  and the versioning scheme, are vendor defined.
+
+config CHIP_DEVICE_HARDWARE_VERSION_STRING
+	string "user-friendly string representation of hardware version"
+	default "prerelease"
+	help
+	  A hardware version string parameter specifies the version
+	  of the hardware of the device as a more user-friendly value
+	  than that represented by the hardware version integer value.
+	  The meaning of its value, and the versioning scheme, are
+	  vendor defined.
 
 config CHIP_DEVICE_SOFTWARE_VERSION
 	int "Device software version"
@@ -72,18 +111,142 @@ config CHIP_DEVICE_SOFTWARE_VERSION_STRING
 	  CHIP_DEVICE_SOFTWARE_VERSION. It is used in various CHIP areas, such as
 	  the Basic Information cluster or OTA (Over-the-air update) image header.
 
-config CHIP_PROJECT_CONFIG
-	string "Project configuration file for CHIP"
+config CHIP_DEVICE_MANUFACTURING_DATE
+	string "Manufacturing date in ISO 8601"
+	default "2022-01-01"
 	help
-	  Project configuration file for CHIP. If specified, CHIP generic
-	  configuration files will include the project configuration file which can
-	  be used to override any CHIP default or platform-specific settings.
+	  A manufacturing date specifies the date that the device was manufactured.
+	  The format used for providing a manufacturing date is ISO 8601 e.g. YYYY-MM-DD.
 
-config CHIP_OPENTHREAD_CONFIG
-	string "Custom OpenThread configuration file"
+config CHIP_DEVICE_SERIAL_NUMBER
+	string "Serial number of device"
+	default "11223344556677889900"
 	help
-	  This option can be used to replace Zephyr-supplied OpenThread
-	  configuration file with a custom one.
+	  A serial number parameter defines an unique number of manufactured device.
+	  Maximum length of serial number is 32 characters.
+
+config CHIP_DEVICE_ROTATING_DEVICE_UID
+	string  "A rotating device id unique id"
+	default "91a9c12a7c80700a31ddcfa7fce63e44"
+	help
+	  A device rotating id unique id which will be generated if
+	  this config is not set in prj.conf file.
+
+config CHIP_DEVICE_TYPE
+	int "Device type"
+	default 65535
+	range 0 65535
+	help
+	  Type of device that uses the CHIP Device Type Identifier. The default value means invalid device type.
+
+config CHIP_DEVICE_DISCRIMINATOR
+	hex "Device pairing discriminator"
+	default 0xF00
+	help
+	  A 12-bit value matching the field of the same name in
+	  the setup code. Discriminator is used during
+	  a discovery process.
+
+config CHIP_DEVICE_SPAKE2_PASSCODE
+	int "Spake2+ passcode"
+	default 20202021
+	range 1 99999998
+	help
+	  A pairing passcode is a 27-bit unsigned integer which serves
+	  as a proof of possession during commissioning.
+	  Its value shall be restricted to the values 0x0000001 to 0x5F5E0FE
+	  (00000001 to 99999998 in decimal), excluding the invalid Passcode values:
+	  - 00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
+	  66666666, 77777777, 88888888, 99999999, 12345678, 87654321.
+
+config CHIP_DEVICE_SPAKE2_IT
+	int "Spake2+ iteration count"
+	default 1000
+	help
+	  The Spake2 iteration count is associated with the ephemeral
+	  PAKE passcode verifier to be used for the commissioning.
+	  The iteration count is used as a crypto parameter to process
+	  spake2 verifier.
+
+config CHIP_DEVICE_SPAKE2_SALT
+	string "Spake2+ salt in string format"
+	default "U1BBS0UyUCBLZXkgU2FsdA=="
+	help
+	  The spake2 salt is random data that is used as an additional input
+	  to a one-way function that “hashes” data.
+	  A new salt should be randomly generated for each password.
+	  The minimum length of spake2 salt is 16 Bytes.
+	  The maximum length of spake2 salt is 32 Bytes.
+
+config CHIP_DEVICE_SPAKE2_TEST_VERIFIER
+	string "Testing spake2+ verifier"
+	default "uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/SRPFNRODm3wH/MBiehuFc6FJ/NH6Rmzw=="
+	help
+	  The spake 2 verifier generated using default SPAKE2 salt,
+	  iteration count and passcode. This value can be used for development
+	  or testing purposes.
+	  Generated with:
+	  spake2p gen-verifier -o - -i 1000 -s "U1BBS0UyUCBLZXkgU2FsdA==" -p 20202021
+
+config CHIP_DEVICE_ENABLE_KEY
+	string "Enable Key for triggering test actions on device"
+	default "00112233445566778899AABBCCDDEEFF"
+	help
+	  The Enable Key is a 128-bit value that triggers test action
+	  while invoking the TestEventTrigger Command.
+	  Pattern: "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	  This value is used during Certification Tests,
+	  and should not be present on production devices.
+
+# Matter optional features and parameters
+
+config CHIP_ENABLE_PAIRING_AUTOSTART
+	bool "Enable pairing autostart"
+	default n
+	help
+	  Open pairing window automatically at application boot time.
+
+config CHIP_OTA_REQUESTOR
+	bool "Enable OTA requestor"
+	help
+	  Enables OTA (Over-the-air) Requestor role that allows a device to perform
+	  Device Firmware Upgrade by quering and downloading a new firmware image
+	  from an external OTA Provider node.
+
+config CHIP_ROTATING_DEVICE_ID
+	bool "Enable rotating device ID support"
+	help
+	  Enables rotating device identifier that provides a non-trackable identifier
+	  which is unique per device and rotates at pre-defined moments.
+
+config CHIP_COMMISSIONABLE_DEVICE_TYPE
+	bool "Enable the device type subtype in commissionable node discovery record"
+	depends on CHIP_ENABLE_DNSSD_SRP
+	help
+	  Enables including device type subtype in the commissionable node discovery record,
+	  which allows filtering of the results to find the nodes that match the device type.
+
+config CHIP_EXTENDED_DISCOVERY
+	bool "Enable extended discovery"
+	help
+	  Enables the device to advertise commissionable service when not in the
+	  commissioning mode.
+
+config CHIP_OPERATIONAL_TIME_SAVE_INTERVAL
+	int "Interval of saving node operation time to flash in hours unit"
+	default 10
+	range 1 4294967295
+	help
+	  Interval in hours with which the node operation time is saved to the flash
+	  memory. Selected value is a trade off between performing frequent saves to know
+	  precisely operation time in case of device reboot and maximizing flash memory
+	  lifetime.
+
+config CHIP_CRYPTO_PSA
+	bool "Use PSA crypto API for cryptographic operations"
+	help
+	  Use the backend for the Matter crypto layer that is based on PSA crypto
+	  API instead of the default, based on legacy mbedTLS APIs.
 
 config CHIP_LIB_SHELL
 	bool "Enable CHIP shell library"
@@ -92,23 +255,14 @@ config CHIP_LIB_SHELL
 	help
 	  Link the application with the library containing CHIP shell commands.
 
-config CHIP_PW_RPC
-	bool "Enable Pigweed RPC library"
-	default n
+config CHIP_PROJECT_CONFIG
+	string "Project configuration file for CHIP"
 	help
-	  Link the application with the library containing Pigweed RPC functionalities.
+	  Project configuration file for CHIP. If specified, CHIP generic
+	  configuration files will include the project configuration file which can
+	  be used to override any CHIP default or platform-specific settings.
 
-config CHIP_BUILD_TESTS
-	bool "Build CHIP unit tests"
-	default n
-	help
-	  This option enables building CHIP unit tests.
-
-config CHIP_ENABLE_PAIRING_AUTOSTART
-	bool "Enable pairing autostart"
-	default n
-	help
-	  Open pairing window automatically at application boot time.
+# Thread network features
 
 config CHIP_ENABLE_DNSSD_SRP
 	bool "Enable support for service registration"
@@ -157,50 +311,35 @@ config CHIP_THREAD_SSED
 	bool "Enable Thread Synchronized Sleepy End Device support"
 	depends on OPENTHREAD_CSL_RECEIVER && CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
 	help
-	Enables Thread Synchronized Sleepy End Device support in Matter.
+	  Enables Thread Synchronized Sleepy End Device support in Matter.
 
-config CHIP_OTA_REQUESTOR
-	bool "Enable OTA requestor"
+config CHIP_OPENTHREAD_CONFIG
+	string "Custom OpenThread configuration file"
 	help
-	  Enables OTA (Over-the-air) Requestor role that allows a device to perform
-	  Device Firmware Upgrade by quering and downloading a new firmware image
-	  from an external OTA Provider node.
+	  This option can be used to replace Zephyr-supplied OpenThread
+	  configuration file with a custom one.
 
-config CHIP_ROTATING_DEVICE_ID
-	bool "Enable rotating device ID support"
-	help
-	  Enables rotating device identifier that provides a non-trackable identifier
-	  which is unique per device and rotates at pre-defined moments.
+# Platform additions and configuration
 
-config CHIP_COMMISSIONABLE_DEVICE_TYPE
-	bool "Enable the device type subtype in commissionable node discovery record"
-	depends on CHIP_ENABLE_DNSSD_SRP
+config CHIP_CERTIFICATION_DECLARATION_STORAGE
+	bool "Enable storing Certification Declaration"
+	depends on CHIP_FACTORY_DATA
 	help
-	  Enables including device type subtype in the commissionable node discovery record,
-	  which allows filtering of the results to find the nodes that match the device type.
+	  Enables storing Certification Declaration in Zephyr settings
+	  instead of using hardcoded value from firmware. It also adds
+	  support for including new Certification Declaration into a firmware
+	  update image package sent via OTA Software Update.
 
-config CHIP_DEVICE_TYPE
-	int "Device type"
-	default 65535
-	range 0 65535
-	help
-	  Type of device that uses the CHIP Device Type Identifier. The default value means invalid device type.
+if CHIP_CERTIFICATION_DECLARATION_STORAGE
 
-config CHIP_OPERATIONAL_TIME_SAVE_INTERVAL
-	int "Interval of saving node operation time to flash in hours unit"
-	default 10
-	range 1 4294967295
+config CHIP_CERTIFiCATION_DECLARATION_OTA_IMAGE_ID
+	int "Certification declaration OTA image id"
+	default 205 #0xcd
 	help
-	  Interval in hours with which the node operation time is saved to the flash
-	  memory. Selected value is a trade off between performing frequent saves to know
-	  precisely operation time in case of device reboot and maximizing flash memory
-	  lifetime.
+	  The image id of Certification Declaration image
+	  for sending it via OTA Software Update purposes.
 
-config CHIP_CRYPTO_PSA
-	bool "Use PSA crypto API for cryptographic operations"
-	help
-	  Use the backend for the Matter crypto layer that is based on PSA crypto
-	  API instead of the default, based on legacy mbedTLS APIs.
+endif
 
 config CHIP_FACTORY_RESET_ERASE_NVS
 	bool "Erase NVS flash pages on factory reset"
@@ -240,12 +379,30 @@ config CHIP_MALLOC_SYS_HEAP_SIZE
 
 endif
 
+module = MATTER
+module-str = Matter
+source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
+
+# Build system options
+
 config APP_LINK_WITH_CHIP
 	bool "Link 'app' with Connected Home over IP"
 	default y
 	help
 	  Add Connected Home over IP header files to the 'app' include path
 	  and link the 'app' with Connected Home over IP libraries.
+
+config CHIP_PW_RPC
+	bool "Enable Pigweed RPC library"
+	default n
+	help
+	  Link the application with the library containing Pigweed RPC functionalities.
+
+config CHIP_BUILD_TESTS
+	bool "Build CHIP unit tests"
+	default n
+	help
+	  This option enables building CHIP unit tests.
 
 config CHIP_OTA_IMAGE_BUILD
 	bool "Generate OTA image"
@@ -267,15 +424,5 @@ config CHIP_OTA_IMAGE_EXTRA_ARGS
 	  script, used for building OTA image.
 
 endif
-
-config CHIP_EXTENDED_DISCOVERY
-	bool "Enable extended discovery"
-	help
-	  Enables the device to advertise commissionable service when not in the
-	  commissioning mode.
-
-module = MATTER
-module-str = Matter
-source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
 
 endif
