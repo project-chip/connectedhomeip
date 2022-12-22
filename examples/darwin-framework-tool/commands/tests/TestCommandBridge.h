@@ -154,6 +154,9 @@ public:
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
         SetIdentity(identity);
+        if (controller.controllerNodeId != nil) {
+            mCommissionerNodeId.SetValue([controller.controllerNodeId unsignedLongLongValue]);
+        }
 
         // Invalidate our existing CASE session; otherwise trying to work with
         // our device will just reuse it without establishing a new CASE
@@ -181,6 +184,9 @@ public:
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
         SetIdentity(identity);
+        if (controller.controllerNodeId != nil) {
+            mCommissionerNodeId.SetValue([controller.controllerNodeId unsignedLongLongValue]);
+        }
 
         [controller setDeviceControllerDelegate:mDeviceControllerDelegate queue:mCallbackQueue];
         [mDeviceControllerDelegate setDeviceId:value.nodeId];
@@ -255,6 +261,7 @@ protected:
     chip::Optional<char *> mPICSFilePath;
     chip::Optional<chip::EndpointId> mEndpointId;
     chip::Optional<uint16_t> mTimeout;
+    chip::Optional<chip::NodeId> mCommissionerNodeId;
 
     bool CheckConstraintStartsWith(
         const char * _Nonnull itemName, const NSString * _Nonnull current, const char * _Nonnull expected)
