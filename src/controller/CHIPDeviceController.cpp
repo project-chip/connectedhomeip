@@ -896,33 +896,17 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     MATTER_TRACE_EVENT_SCOPE("UnpairDevice", "DeviceCommissioner");
-    VerifyOrReturnError(mDeviceUnpair == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    Platform::UniquePtr<DeviceUnpair> deviceUnpair(new DeviceUnpair());
-    deviceUnpair->RegisterCallback(this);
-    CommissioneeDeviceProxy * commissioneeDeviceProxy = nullptr;
-    if (CHIP_NO_ERROR == GetDeviceBeingCommissioned(remoteDeviceId, &commissioneeDeviceProxy))
+    if (mState == State::Initialized)
     {
-        deviceUnpair->UnpairDevice(commissioneeDeviceProxy, remoteDeviceId);
+        err = AutoCurrentFabricRemover::RemoveCurrentFabric(this, remoteDeviceId);
     }
-    else
+    else // the device is currently being paired
     {
-        err = GetConnectedDevice(remoteDeviceId, &deviceUnpair->GetConnectedCallback(),
-                                 &deviceUnpair->GetConnectionFailureCallback());
+        err = StopPairing(remoteDeviceId);
     }
-
-    mDeviceUnpair = std::move(deviceUnpair);
 
     return err;
-}
-
-void DeviceCommissioner::OnDeviceUnpair(NodeId remoteDeviceId, CHIP_ERROR err)
-{
-    mDeviceUnpair = nullptr;
-    if (mPairingDelegate != nullptr)
-    {
-        mPairingDelegate->OnPairingDeleted(err);
-    }
 }
 
 void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)

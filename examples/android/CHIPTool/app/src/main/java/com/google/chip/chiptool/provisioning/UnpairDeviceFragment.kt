@@ -7,11 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipDeviceController
-import chip.devicecontroller.OpenCommissioningCallback
+import chip.devicecontroller.UnpairDeviceCallback
 import com.google.chip.chiptool.ChipClient
-import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.clusterclient.AddressUpdateFragment
 import kotlinx.android.synthetic.main.unpair_device_fragment.view.unpairDeviceBtn
@@ -33,8 +31,6 @@ class UnpairDeviceFragment : Fragment() {
     scope = viewLifecycleOwner.lifecycleScope
 
     return inflater.inflate(R.layout.unpair_device_fragment, container, false).apply {
-      deviceController.setCompletionListener(ChipControllerCallback())
-
       addressUpdateFragment =
         childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
 
@@ -42,14 +38,18 @@ class UnpairDeviceFragment : Fragment() {
     }
   }
 
-  inner class ChipControllerCallback : GenericChipDeviceListener() {
-    override fun onPairingDeleted(code: Int) {
-      Log.d(TAG, "onPairingDeleted : $code")
+  inner class ChipUnpairDeviceCallback : UnpairDeviceCallback {
+    override fun onError(status: Int, remoteDeviceId: Long) {
+      Log.d(TAG, "onError : $remoteDeviceId, $status")
+    }
+
+    override fun onSuccess(remoteDeviceId: Long) {
+      Log.d(TAG, "onSuccess : $remoteDeviceId")
     }
   }
 
   private  fun unpairDeviceClick() {
-    deviceController.unpairDevice(addressUpdateFragment.deviceId)
+    deviceController.unpairDeviceCallback(addressUpdateFragment.deviceId, ChipUnpairDeviceCallback())
   }
 
 
