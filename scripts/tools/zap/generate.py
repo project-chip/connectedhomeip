@@ -164,6 +164,8 @@ def runGeneration(zap_file, zcl_file, templates_file, output_dir):
     if 'ZAP_DEVELOPMENT_PATH' in os.environ:
         generate_cmd = ['node', 'src-script/zap-start.js', 'generate']
         working_directory = os.environ['ZAP_DEVELOPMENT_PATH']
+        # Make sure we don't try to munge the package.json in the ZAP repo.
+        os.environ['ZAP_SKIP_REAL_VERSION'] = '1'
     elif 'ZAP_INSTALL_PATH' in os.environ:
         generate_cmd = [os.path.join(os.environ['ZAP_INSTALL_PATH'], 'zap-cli'), 'generate']
         working_directory = None
