@@ -222,6 +222,10 @@ private:
     static void HandleGATTEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);
     static void HandleGAPEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t * param);
 
+#ifdef CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    void HandleC3CharRead(esp_ble_gatts_cb_param_t * param);
+#endif
+
 #elif CONFIG_BT_NIMBLE_ENABLED
     void HandleRXCharRead(struct ble_gatt_char_context * param);
     void HandleRXCharWrite(struct ble_gatt_char_context * param);

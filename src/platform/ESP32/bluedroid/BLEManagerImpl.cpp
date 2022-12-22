@@ -35,7 +35,9 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/internal/BLEManager.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
 
 #include "esp_bt.h"
 #include "esp_bt_main.h"
@@ -84,6 +86,14 @@ const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 const uint8_t CharProps_ReadNotify = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
 const uint8_t CharProps_Write      = ESP_GATT_CHAR_PROP_BIT_WRITE;
 
+#ifdef CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+const uint8_t UUID_CHIPoBLEChar_C3[]       = { 0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8,
+                                         0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0x63, 0x64 };
+const ChipBleUUID ChipUUID_CHIPoBLEChar_C3 = { { 0x64, 0x63, 0x02, 0x38, 0x87, 0x72, 0x45, 0xF2, 0xB8, 0x7D, 0x74, 0x8A, 0x83, 0x21,
+                                                 0x8F, 0x04 } };
+const uint8_t CharProps_Read               = ESP_GATT_CHAR_PROP_BIT_READ;
+#endif
+
 // Offsets into CHIPoBLEGATTAttrs for specific attributes.
 enum
 {
@@ -91,6 +101,9 @@ enum
     kAttrIndex_RXCharValue        = 2,
     kAttrIndex_TXCharValue        = 4,
     kAttrIndex_TXCharCCCDValue    = 5,
+#ifdef CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    kAttrIndex_C3CharValue = 7,
+#endif
 };
 
 // Table of attribute definitions for Chip over BLE GATT service.
@@ -118,6 +131,16 @@ const esp_gatts_attr_db_t CHIPoBLEGATTAttrs[] = {
     // Client characteristic configuration description (CCCD) value
     { { ESP_GATT_RSP_BY_APP },
       { ESP_UUID_LEN_16, (uint8_t *) UUID_ClientCharConfigDesc, ESP_GATT_PERM_READ | ESP_GATT_PERM_WRITE, 2, 0, NULL } },
+
+#ifdef CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    // ----- Chip over BLE Additional Data Characteristic -----
+
+    // Characteristics declaration
+    { { ESP_GATT_AUTO_RSP },
+      { ESP_UUID_LEN_16, (uint8_t *) UUID_CharDecl, ESP_GATT_PERM_READ, 1, 1, (uint8_t *) &CharProps_Read } },
+    // Characteristic value
+    { { ESP_GATT_RSP_BY_APP }, { ESP_UUID_LEN_128, (uint8_t *) UUID_CHIPoBLEChar_C3, ESP_GATT_PERM_READ, 512, 0, NULL } },
+#endif
 };
 
 const uint16_t CHIPoBLEGATTAttrCount = sizeof(CHIPoBLEGATTAttrs) / sizeof(CHIPoBLEGATTAttrs[0]);
@@ -142,6 +165,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mRXCharAttrHandle     = 0;
     mTXCharAttrHandle     = 0;
     mTXCharCCCDAttrHandle = 0;
+    mC3CharAttrHandle     = 0;
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
     memset(mDeviceName, 0, sizeof(mDeviceName));
@@ -652,7 +676,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     advData[index++] = 0x02;                            // length
     advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;        // AD type : flags
     advData[index++] = CHIP_ADV_DATA_FLAGS;             // AD value
-    advData[index++] = 0x0A;                            // length
+    advData[index++] = 0x0B;                            // length
     advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA; // AD type: (Service Data - 16-bit UUID)
     advData[index++] = ShortUUID_CHIPoBLEService[0];    // AD value
     advData[index++] = ShortUUID_CHIPoBLEService[1];    // AD value
@@ -668,6 +692,12 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     VerifyOrExit(index + sizeof(deviceIdInfo) <= sizeof(advData), err = CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG);
     memcpy(&advData[index], &deviceIdInfo, sizeof(deviceIdInfo));
     index = static_cast<uint8_t>(index + sizeof(deviceIdInfo));
+
+    // Additional Data Flag
+    advData[index] = 0;
+#ifdef CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    advData[index] = 1; // Setting bit 0, bit 7:1 are reserved
+#endif
 
     // Construct the Chip BLE Service Data to be sent in the scan response packet.
     err = MapBLEError(esp_ble_gap_config_adv_data_raw(advData, sizeof(advData)));
@@ -779,6 +809,9 @@ void BLEManagerImpl::HandleGATTControlEvent(esp_gatts_cb_event_t event, esp_gatt
         mRXCharAttrHandle     = param->add_attr_tab.handles[kAttrIndex_RXCharValue];
         mTXCharAttrHandle     = param->add_attr_tab.handles[kAttrIndex_TXCharValue];
         mTXCharCCCDAttrHandle = param->add_attr_tab.handles[kAttrIndex_TXCharCCCDValue];
+#ifdef CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+        mC3CharAttrHandle = param->add_attr_tab.handles[kAttrIndex_C3CharValue];
+#endif
 
         mFlags.Set(Flags::kAttrsRegistered);
         controlOpComplete = true;
@@ -875,6 +908,12 @@ void BLEManagerImpl::HandleGATTCommEvent(esp_gatts_cb_event_t event, esp_gatt_if
         {
             HandleTXCharCCCDRead(param);
         }
+#ifdef CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+        if (param->read.handle == mC3CharAttrHandle)
+        {
+            HandleC3CharRead(param);
+        }
+#endif
         break;
 
     case ESP_GATTS_WRITE_EVT:
@@ -1008,6 +1047,73 @@ void BLEManagerImpl::HandleTXCharCCCDRead(esp_ble_gatts_cb_param_t * param)
         ChipLogError(DeviceLayer, "esp_ble_gatts_send_response() failed: %s", ErrorStr(err));
     }
 }
+
+#ifdef CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+void BLEManagerImpl::HandleC3CharRead(esp_ble_gatts_cb_param_t * param)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIPoBLEConState * conState;
+    esp_gatt_rsp_t rsp;
+
+    chip::System::PacketBufferHandle bufferHandle;
+    BitFlags<AdditionalDataFields> additionalDataFields;
+    AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
+
+    // Data is sent in the chunk of size (ESP_GATT_DEF_BLE_MTU_SIZE - 1)
+    uint8_t chunkLen = ESP_GATT_DEF_BLE_MTU_SIZE - 1;
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    uint8_t rotatingDeviceIdUniqueId[ConfigurationManager::kRotatingDeviceIDUniqueIDLength] = {};
+    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
+
+    err = DeviceLayer::GetDeviceInstanceInfoProvider()->GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
+    SuccessOrExit(err);
+    err = ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter);
+    SuccessOrExit(err);
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
+    additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
+#endif /* CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID) */
+
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(additionalDataPayloadParams, bufferHandle,
+                                                                         additionalDataFields);
+    SuccessOrExit(err);
+
+    // Find the connection state record.
+    conState = GetConnectionState(param->read.conn_id);
+
+    memset(&rsp, 0, sizeof(esp_gatt_rsp_t));
+    rsp.attr_value.handle = param->read.handle;
+
+    if (conState != NULL)
+    {
+        if (param->read.offset + chunkLen > bufferHandle->DataLength())
+        {
+            rsp.attr_value.len = bufferHandle->DataLength() - param->read.offset;
+        }
+        else
+        {
+            rsp.attr_value.len = chunkLen;
+        }
+        rsp.attr_value.offset = param->read.offset;
+        memcpy(rsp.attr_value.value, bufferHandle->Start() + param->read.offset, rsp.attr_value.len);
+    }
+
+    err = MapBLEError(esp_ble_gatts_send_response(mAppIf, param->read.conn_id, param->read.trans_id,
+                                                  (conState != NULL) ? ESP_GATT_OK : ESP_GATT_INTERNAL_ERROR, &rsp));
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "esp_ble_gatts_send_response() failed: %s", ErrorStr(err));
+    }
+    return;
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data (%s)", __func__);
+    }
+}
+#endif
 
 void BLEManagerImpl::HandleTXCharCCCDWrite(esp_ble_gatts_cb_param_t * param)
 {
