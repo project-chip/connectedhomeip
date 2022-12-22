@@ -8,7 +8,7 @@ struct LabelStruct {
 
 server cluster Descriptor = 29 {
   struct DeviceTypeStruct {
-    devtype_id type = 0;
+    devtype_id deviceType = 0;
     int16u revision = 1;
   }
 
