@@ -19,21 +19,24 @@ NS_ASSUME_NONNULL_BEGIN
 {{> interfaceDecl struct=(asUpperCamelCase name preserveAcronyms=true)}}
 @end
 
-{{!Backwards compat for now: Add a DeviceType thing that is API-compatible with DeviceTypeStruct. }}
-{{#if (isStrEqual (asUpperCamelCase parent.name) "Descriptor")}}
-{{#if (isStrEqual (asUpperCamelCase name) "DeviceTypeStruct")}}
-{{availability (asUpperCamelCase parent.name preserveAcronyms=true) struct="DeviceType" deprecationMessage="Please use MTRDescriptorClusterDeviceTypeStruct"}}
-@interface MTRDescriptorClusterDeviceType : NSObject <NSCopying>
-{{> interfaceDecl struct="DeviceType"}}
+{{! Takes the name of the struct to use as structName. }}
+{{#*inline "oldNameDecl"}}
+{{availability (compatClusterNameRemapping parent.name) struct=structName deprecationMessage=(concat "Please use MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true))}}
+@interface MTR{{compatClusterNameRemapping parent.name}}Cluster{{structName}} : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}
 @end
-{{/if}}
+{{/inline}}
+{{! Takes the old name of the struct, if any, as oldStructName. }}
+{{#*inline "oldNameCheck"}}
+{{#if (or oldStructName
+          (hasOldName (asUpperCamelCase parent.name preserveAcronyms=true)))}}
+{{#if oldStructName}}
+{{> oldNameDecl structName=oldStructName}}
 {{else}}
-{{#unless (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name))}}
-{{availability (compatClusterNameRemapping parent.name) struct=(asUpperCamelCase name) deprecationMessage=(concat "Please use MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true))}}
-@interface MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase name}} : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name}}
-@end
-{{/unless}}
+{{> oldNameDecl structName=(asUpperCamelCase name preserveAcronyms=true)}}
 {{/if}}
+{{/if}}
+{{/inline}}
+{{> oldNameCheck oldStructName=(oldName (asUpperCamelCase parent.name preserveAcronyms=true) struct=(asUpperCamelCase name preserveAcronyms=true))}}
 {{/zcl_structs}}
 
 {{#zcl_events}}
@@ -46,12 +49,25 @@ NS_ASSUME_NONNULL_BEGIN
 {{/if}}
 {{/zcl_event_fields}}
 @end
-{{#unless (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name))}}
+{{! Takes the name of the event to use as eventName. }}
+{{#*inline "oldNameDecl"}}
 
-{{availability (compatClusterNameRemapping parent.name) event=(asUpperCamelCase name) deprecationMessage=(concat "Please use MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true) "Event")}}
-@interface MTR{{compatClusterNameRemapping parent.name}}Cluster{{asUpperCamelCase name}}Event : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event
+{{availability (compatClusterNameRemapping parent.name) event=eventName deprecationMessage=(concat "Please use MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true) "Event")}}
+@interface MTR{{compatClusterNameRemapping parent.name}}Cluster{{eventName}}Event : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event
 @end
-{{/unless}}
+{{/inline}}
+{{! Takes the old name of the event, if any, as oldEventName. }}
+{{#*inline "oldNameCheck"}}
+{{#if (or oldEventName
+          (hasOldName (asUpperCamelCase parent.name preserveAcronyms=true)))}}
+{{#if oldEventName}}
+{{> oldNameDecl eventName=oldEventName}}
+{{else}}
+{{> oldNameDecl eventName=(asUpperCamelCase name preserveAcronyms=true)}}
+{{/if}}
+{{/if}}
+{{/inline}}
+{{> oldNameCheck oldEventName=(oldName (asUpperCamelCase parent.name preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true))}}
 
 {{/zcl_events}}
 
