@@ -423,7 +423,7 @@ static void sl_wfx_disconnect_callback(uint8_t * mac, uint16_t reason)
     SILABS_LOG("WFX Disconnected %d\r\n", reason);
     sl_wfx_context->state =
         static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) & ~static_cast<int>(SL_WFX_STA_INTERFACE_CONNECTED));
-    retryInProgress        = false;
+    retryInProgress             = false;
     is_wifi_disconnection_event = true;
     xEventGroupSetBits(sl_wfx_event_group, SL_WFX_RETRY_CONNECT);
 }
