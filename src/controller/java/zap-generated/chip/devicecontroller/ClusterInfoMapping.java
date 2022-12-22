@@ -1288,11 +1288,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.AccessControlClusterAccessControlEntry> valueList) {
+    public void onSuccess(
+        List<ChipStructs.AccessControlClusterAccessControlEntryStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
-              "valueList", "List<ChipStructs.AccessControlClusterAccessControlEntry>");
+              "valueList", "List<ChipStructs.AccessControlClusterAccessControlEntryStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -1314,11 +1315,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.AccessControlClusterExtensionEntry> valueList) {
+    public void onSuccess(
+        List<ChipStructs.AccessControlClusterAccessControlExtensionStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
-              "valueList", "List<ChipStructs.AccessControlClusterExtensionEntry>");
+              "valueList", "List<ChipStructs.AccessControlClusterAccessControlExtensionStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }

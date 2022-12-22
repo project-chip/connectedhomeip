@@ -1643,8 +1643,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTRAccessControlClusterAccessControlEntry * newElement_0;
-                    newElement_0 = [MTRAccessControlClusterAccessControlEntry new];
+                    MTRAccessControlClusterAccessControlEntryStruct * newElement_0;
+                    newElement_0 = [MTRAccessControlClusterAccessControlEntryStruct new];
                     newElement_0.privilege = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.privilege)];
                     newElement_0.authMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.authMode)];
                     if (entry_0.subjects.IsNull()) {
@@ -1727,8 +1727,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTRAccessControlClusterExtensionEntry * newElement_0;
-                    newElement_0 = [MTRAccessControlClusterExtensionEntry new];
+                    MTRAccessControlClusterAccessControlExtensionStruct * newElement_0;
+                    newElement_0 = [MTRAccessControlClusterAccessControlExtensionStruct new];
                     newElement_0.data = [NSData dataWithBytes:entry_0.data.data() length:entry_0.data.size()];
                     newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     [array_0 addObject:newElement_0];

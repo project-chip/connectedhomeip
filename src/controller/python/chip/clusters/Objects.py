@@ -2894,8 +2894,8 @@ class AccessControl(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="acl", Tag=0x00000000, Type=typing.List[AccessControl.Structs.AccessControlEntry]),
-                ClusterObjectFieldDescriptor(Label="extension", Tag=0x00000001, Type=typing.Optional[typing.List[AccessControl.Structs.ExtensionEntry]]),
+                ClusterObjectFieldDescriptor(Label="acl", Tag=0x00000000, Type=typing.List[AccessControl.Structs.AccessControlEntryStruct]),
+                ClusterObjectFieldDescriptor(Label="extension", Tag=0x00000001, Type=typing.Optional[typing.List[AccessControl.Structs.AccessControlExtensionStruct]]),
                 ClusterObjectFieldDescriptor(Label="subjectsPerAccessControlEntry", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="targetsPerAccessControlEntry", Tag=0x00000003, Type=uint),
                 ClusterObjectFieldDescriptor(Label="accessControlEntriesPerFabric", Tag=0x00000004, Type=uint),
@@ -2906,8 +2906,8 @@ class AccessControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    acl: 'typing.List[AccessControl.Structs.AccessControlEntry]' = None
-    extension: 'typing.Optional[typing.List[AccessControl.Structs.ExtensionEntry]]' = None
+    acl: 'typing.List[AccessControl.Structs.AccessControlEntryStruct]' = None
+    extension: 'typing.Optional[typing.List[AccessControl.Structs.AccessControlExtensionStruct]]' = None
     subjectsPerAccessControlEntry: 'uint' = None
     targetsPerAccessControlEntry: 'uint' = None
     accessControlEntriesPerFabric: 'uint' = None
@@ -2918,22 +2918,22 @@ class AccessControl(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class AuthMode(IntEnum):
+        class AccessControlEntryAuthModeEnum(IntEnum):
             kPase = 0x01
             kCase = 0x02
             kGroup = 0x03
 
-        class ChangeTypeEnum(IntEnum):
-            kChanged = 0x00
-            kAdded = 0x01
-            kRemoved = 0x02
-
-        class Privilege(IntEnum):
+        class AccessControlEntryPrivilegeEnum(IntEnum):
             kView = 0x01
             kProxyView = 0x02
             kOperate = 0x03
             kManage = 0x04
             kAdminister = 0x05
+
+        class ChangeTypeEnum(IntEnum):
+            kChanged = 0x00
+            kAdded = 0x01
+            kRemoved = 0x02
 
 
     class Structs:
@@ -2953,26 +2953,26 @@ class AccessControl(Cluster):
             deviceType: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
-        class AccessControlEntry(ClusterObject):
+        class AccessControlEntryStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="privilege", Tag=1, Type=AccessControl.Enums.Privilege),
-                            ClusterObjectFieldDescriptor(Label="authMode", Tag=2, Type=AccessControl.Enums.AuthMode),
+                            ClusterObjectFieldDescriptor(Label="privilege", Tag=1, Type=AccessControl.Enums.AccessControlEntryPrivilegeEnum),
+                            ClusterObjectFieldDescriptor(Label="authMode", Tag=2, Type=AccessControl.Enums.AccessControlEntryAuthModeEnum),
                             ClusterObjectFieldDescriptor(Label="subjects", Tag=3, Type=typing.Union[Nullable, typing.List[uint]]),
                             ClusterObjectFieldDescriptor(Label="targets", Tag=4, Type=typing.Union[Nullable, typing.List[AccessControl.Structs.Target]]),
                             ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
-            privilege: 'AccessControl.Enums.Privilege' = 0
-            authMode: 'AccessControl.Enums.AuthMode' = 0
+            privilege: 'AccessControl.Enums.AccessControlEntryPrivilegeEnum' = 0
+            authMode: 'AccessControl.Enums.AccessControlEntryAuthModeEnum' = 0
             subjects: 'typing.Union[Nullable, typing.List[uint]]' = NullValue
             targets: 'typing.Union[Nullable, typing.List[AccessControl.Structs.Target]]' = NullValue
             fabricIndex: 'uint' = 0
 
         @dataclass
-        class ExtensionEntry(ClusterObject):
+        class AccessControlExtensionStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -3000,9 +3000,9 @@ class AccessControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[AccessControl.Structs.AccessControlEntry])
+                return ClusterObjectFieldDescriptor(Type=typing.List[AccessControl.Structs.AccessControlEntryStruct])
 
-            value: 'typing.List[AccessControl.Structs.AccessControlEntry]' = field(default_factory=lambda: [])
+            value: 'typing.List[AccessControl.Structs.AccessControlEntryStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class Extension(ClusterAttributeDescriptor):
@@ -3016,9 +3016,9 @@ class AccessControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[AccessControl.Structs.ExtensionEntry]])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[AccessControl.Structs.AccessControlExtensionStruct]])
 
-            value: 'typing.Optional[typing.List[AccessControl.Structs.ExtensionEntry]]' = None
+            value: 'typing.Optional[typing.List[AccessControl.Structs.AccessControlExtensionStruct]]' = None
 
         @dataclass
         class SubjectsPerAccessControlEntry(ClusterAttributeDescriptor):
@@ -3167,14 +3167,14 @@ class AccessControl(Cluster):
                             ClusterObjectFieldDescriptor(Label="adminNodeID", Tag=1, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="adminPasscodeID", Tag=2, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="changeType", Tag=3, Type=AccessControl.Enums.ChangeTypeEnum),
-                            ClusterObjectFieldDescriptor(Label="latestValue", Tag=4, Type=typing.Union[Nullable, AccessControl.Structs.AccessControlEntry]),
+                            ClusterObjectFieldDescriptor(Label="latestValue", Tag=4, Type=typing.Union[Nullable, AccessControl.Structs.AccessControlEntryStruct]),
                             ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             adminNodeID: 'typing.Union[Nullable, uint]' = NullValue
             adminPasscodeID: 'typing.Union[Nullable, uint]' = NullValue
             changeType: 'AccessControl.Enums.ChangeTypeEnum' = 0
-            latestValue: 'typing.Union[Nullable, AccessControl.Structs.AccessControlEntry]' = NullValue
+            latestValue: 'typing.Union[Nullable, AccessControl.Structs.AccessControlEntryStruct]' = NullValue
             fabricIndex: 'uint' = 0
 
         @dataclass
@@ -3194,14 +3194,14 @@ class AccessControl(Cluster):
                             ClusterObjectFieldDescriptor(Label="adminNodeID", Tag=1, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="adminPasscodeID", Tag=2, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="changeType", Tag=3, Type=AccessControl.Enums.ChangeTypeEnum),
-                            ClusterObjectFieldDescriptor(Label="latestValue", Tag=4, Type=typing.Union[Nullable, AccessControl.Structs.ExtensionEntry]),
+                            ClusterObjectFieldDescriptor(Label="latestValue", Tag=4, Type=typing.Union[Nullable, AccessControl.Structs.AccessControlExtensionStruct]),
                             ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             adminNodeID: 'typing.Union[Nullable, uint]' = NullValue
             adminPasscodeID: 'typing.Union[Nullable, uint]' = NullValue
             changeType: 'AccessControl.Enums.ChangeTypeEnum' = 0
-            latestValue: 'typing.Union[Nullable, AccessControl.Structs.ExtensionEntry]' = NullValue
+            latestValue: 'typing.Union[Nullable, AccessControl.Structs.AccessControlExtensionStruct]' = NullValue
             fabricIndex: 'uint' = 0
 
 

@@ -2874,7 +2874,7 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public interface AclAttributeCallback {
-      void onSuccess(List<ChipStructs.AccessControlClusterAccessControlEntry> valueList);
+      void onSuccess(List<ChipStructs.AccessControlClusterAccessControlEntryStruct> valueList);
 
       void onError(Exception ex);
 
@@ -2882,7 +2882,7 @@ public class ChipClusters {
     }
 
     public interface ExtensionAttributeCallback {
-      void onSuccess(List<ChipStructs.AccessControlClusterExtensionEntry> valueList);
+      void onSuccess(List<ChipStructs.AccessControlClusterAccessControlExtensionStruct> valueList);
 
       void onError(Exception ex);
 
@@ -2919,13 +2919,13 @@ public class ChipClusters {
 
     public void writeAclAttribute(
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.AccessControlClusterAccessControlEntry> value) {
+        ArrayList<ChipStructs.AccessControlClusterAccessControlEntryStruct> value) {
       writeAclAttribute(chipClusterPtr, callback, value, null);
     }
 
     public void writeAclAttribute(
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.AccessControlClusterAccessControlEntry> value,
+        ArrayList<ChipStructs.AccessControlClusterAccessControlEntryStruct> value,
         int timedWriteTimeoutMs) {
       writeAclAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
@@ -2941,13 +2941,13 @@ public class ChipClusters {
 
     public void writeExtensionAttribute(
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.AccessControlClusterExtensionEntry> value) {
+        ArrayList<ChipStructs.AccessControlClusterAccessControlExtensionStruct> value) {
       writeExtensionAttribute(chipClusterPtr, callback, value, null);
     }
 
     public void writeExtensionAttribute(
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.AccessControlClusterExtensionEntry> value,
+        ArrayList<ChipStructs.AccessControlClusterAccessControlExtensionStruct> value,
         int timedWriteTimeoutMs) {
       writeExtensionAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
@@ -3037,7 +3037,7 @@ public class ChipClusters {
     private native void writeAclAttribute(
         long chipClusterPtr,
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.AccessControlClusterAccessControlEntry> value,
+        ArrayList<ChipStructs.AccessControlClusterAccessControlEntryStruct> value,
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeAclAttribute(
@@ -3049,7 +3049,7 @@ public class ChipClusters {
     private native void writeExtensionAttribute(
         long chipClusterPtr,
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.AccessControlClusterExtensionEntry> value,
+        ArrayList<ChipStructs.AccessControlClusterAccessControlExtensionStruct> value,
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeExtensionAttribute(

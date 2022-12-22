@@ -198,15 +198,22 @@ typedef struct _Target
     chip::DeviceTypeId DeviceType;
 } Target;
 
-// Struct for AccessControlEntry
-typedef struct _AccessControlEntry
+// Struct for AccessControlEntryStruct
+typedef struct _AccessControlEntryStruct
 {
     uint8_t Privilege;
     uint8_t AuthMode;
     /* TYPE WARNING: array array defaults to */ uint8_t * Subjects;
     /* TYPE WARNING: array array defaults to */ uint8_t * Targets;
     chip::FabricIndex FabricIndex;
-} AccessControlEntry;
+} AccessControlEntryStruct;
+
+// Struct for AccessControlExtensionStruct
+typedef struct _AccessControlExtensionStruct
+{
+    chip::ByteSpan Data;
+    chip::FabricIndex FabricIndex;
+} AccessControlExtensionStruct;
 
 // Struct for ActionStruct
 typedef struct _ActionStruct
@@ -294,13 +301,6 @@ typedef struct _EndpointListStruct
     uint8_t Type;
     /* TYPE WARNING: array array defaults to */ uint8_t * Endpoints;
 } EndpointListStruct;
-
-// Struct for ExtensionEntry
-typedef struct _ExtensionEntry
-{
-    chip::ByteSpan Data;
-    chip::FabricIndex FabricIndex;
-} ExtensionEntry;
 
 // Struct for FabricDescriptor
 typedef struct _FabricDescriptor
