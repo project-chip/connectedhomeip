@@ -66,6 +66,7 @@ public:
     void HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId);
     void HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt);
     void HandleSoftTimerEvent(void);
+    CHIP_ERROR StartAdvertising(void);
 #else
     void HandleConnectEvent(volatile sl_bt_msg_t * evt);
     void HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt);
@@ -74,7 +75,7 @@ public:
     void HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId);
     void HandleTXCharCCCDWrite(volatile sl_bt_msg_t * evt);
     void HandleSoftTimerEvent(volatile sl_bt_msg_t * evt);
-
+    CHIP_ERROR StartAdvertising(void);
 #endif // RS91X_BLE_ENABLE
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -180,7 +181,6 @@ private:
     CHIP_ERROR MapBLEError(int bleErr);
     void DriveBLEState(void);
     CHIP_ERROR ConfigureAdvertisingData(void);
-    CHIP_ERROR StartAdvertising(void);
     CHIP_ERROR StopAdvertising(void);
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     CHIP_ERROR EncodeAdditionalDataTlv();
