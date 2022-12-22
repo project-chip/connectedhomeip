@@ -102,6 +102,8 @@ def runConversion(zap_file):
     if 'ZAP_DEVELOPMENT_PATH' in os.environ:
         convert_cmd = ['node', 'src-script/zap-start.js', 'convert']
         working_directory = os.environ['ZAP_DEVELOPMENT_PATH']
+        # Make sure we don't try to munge the package.json in the ZAP repo.
+        os.environ['ZAP_SKIP_REAL_VERSION'] = '1'
     elif 'ZAP_INSTALL_PATH' in os.environ:
         convert_cmd = [os.path.join(os.environ['ZAP_INSTALL_PATH'], 'zap-cli'), 'convert']
         working_directory = None
