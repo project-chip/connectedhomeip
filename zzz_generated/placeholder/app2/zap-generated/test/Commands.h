@@ -75,6 +75,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -219,6 +224,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -292,6 +302,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -357,6 +372,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -438,6 +458,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -553,6 +578,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -620,6 +650,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -702,6 +737,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -768,6 +808,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -900,6 +945,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -966,6 +1016,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1043,6 +1098,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1109,6 +1169,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1186,6 +1251,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1283,6 +1353,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1468,6 +1543,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1533,6 +1613,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1614,6 +1699,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
@@ -1687,6 +1777,11 @@ private:
     CHIP_ERROR DoTestStep(uint16_t testIndex) override
     {
         using namespace chip::app::Clusters;
+        // Allow yaml to access the current commissioner node id.
+        // Default to 0 (undefined node id) so we know if this isn't
+        // set correctly.
+        chip::NodeId commissionerNodeId = mCommissionerNodeId.ValueOr(0);
+        (void) commissionerNodeId;
         switch (testIndex)
         {
         case 0: {
