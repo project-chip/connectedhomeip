@@ -68,7 +68,7 @@ bool hasNotifiedIPV4 = false;
 bool hasNotifiedWifiConnectivity = false;
 
 /* Declare a flag to differentiate between after boot-up first IP connection or reconnection */
-bool is_disconnection_event = false;
+bool is_wifi_disconnection_event = false;
 
 /* Declare a variable to hold connection time intervals */
 uint32_t retryInterval = WLAN_MIN_RETRY_TIMER_MS;
@@ -201,8 +201,8 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
          * We should enable retry.. (Need config variable for this)
          */
         WFX_RSI_LOG("%s: failed. retry: %d", __func__, wfx_rsi.join_retries);
-        wfx_retry_interval_handler(is_disconnection_event, wfx_rsi.join_retries++);
-        if (is_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
+        wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries++);
+        if (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
             xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
     }
     else
@@ -236,7 +236,7 @@ static void wfx_rsi_join_fail_cb(uint16_t status, uint8_t * buf, uint32_t len)
     WFX_RSI_LOG("%s: error: failed status: %02x", __func__, status);
     wfx_rsi.join_retries += 1;
     wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
-    is_disconnection_event = true;
+    is_wifi_disconnection_event = true;
     xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
 }
 #ifdef RS911X_SOCKETS
@@ -484,7 +484,7 @@ static void wfx_rsi_do_join(void)
         /* Try to connect Wifi with given Credentials
          * untill there is a success or maximum number of tries allowed
          */
-        while (is_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
+        while (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
         {
             /* Call rsi connect call with given ssid and password
              * And check there is a success
@@ -497,7 +497,7 @@ static void wfx_rsi_do_join(void)
                 WFX_RSI_LOG("%s: rsi_wlan_connect_async failed with status: %02x on try %d", __func__, status,
                             wfx_rsi.join_retries);
 
-                wfx_retry_interval_handler(is_disconnection_event, wfx_rsi.join_retries);
+                wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries);
                 wfx_rsi.join_retries++;
             }
             else

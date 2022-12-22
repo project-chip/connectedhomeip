@@ -377,7 +377,7 @@ void sl_wfx_host_gpio_init(void);
 sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload);
 #endif
 
-void wfx_retry_interval_handler(bool is_disconnection_event, uint16_t retryJoin);
+void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin);
 
 #ifdef __cplusplus
 }

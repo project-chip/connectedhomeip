@@ -100,7 +100,7 @@ static uint8_t retryJoin         = 0;
 bool retryInProgress             = false;
 
 /* Declare a flag to differentiate between after boot-up first IP connection or reconnection */
-bool is_disconnection_event = false;
+bool is_wifi_disconnection_event = false;
 
 /* Declare a variable to hold connection time intervals */
 uint32_t retryInterval = WLAN_MIN_RETRY_TIMER_MS;
@@ -400,7 +400,7 @@ static void sl_wfx_connect_callback(sl_wfx_connect_ind_body_t connect_indication
     }
     }
 
-    if ((status != WFM_STATUS_SUCCESS) && (!is_disconnection_event ? (retryJoin < MAX_JOIN_RETRIES_COUNT) : true))
+    if ((status != WFM_STATUS_SUCCESS) && (!is_wifi_disconnection_event ? (retryJoin < MAX_JOIN_RETRIES_COUNT) : true))
     {
         retryJoin += 1;
         retryInProgress = false;
@@ -424,7 +424,7 @@ static void sl_wfx_disconnect_callback(uint8_t * mac, uint16_t reason)
     sl_wfx_context->state =
         static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) & ~static_cast<int>(SL_WFX_STA_INTERFACE_CONNECTED));
     retryInProgress        = false;
-    is_disconnection_event = true;
+    is_wifi_disconnection_event = true;
     xEventGroupSetBits(sl_wfx_event_group, SL_WFX_RETRY_CONNECT);
 }
 
@@ -543,7 +543,7 @@ static void wfx_events_task(void * p_arg)
             if (!retryInProgress)
             {
                 retryInProgress = true;
-                wfx_retry_interval_handler(is_disconnection_event, retryJoin);
+                wfx_retry_interval_handler(is_wifi_disconnection_event, retryJoin);
                 SILABS_LOG("WFX sending the connect command");
                 wfx_connect_to_ap();
             }

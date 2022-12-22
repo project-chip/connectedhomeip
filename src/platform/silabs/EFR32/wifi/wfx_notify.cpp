@@ -191,15 +191,15 @@ void wfx_ip_changed_notify(int got_ip)
 }
 
 /**************************************************************************************
- * @fn  void wfx_retry_interval_handler(bool is_disconnection_event, uint16_t retryJoin)
+ * @fn  void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin)
  * @brief
- *      Based on condition will choose specific interval.
- * @param[in]  is_disconnection_event, retryJoin
+ *      Based on condition will delay for a certain period of time.
+ * @param[in]  is_wifi_disconnection_event, retryJoin
  * @return None
  ********************************************************************************************/
-void wfx_retry_interval_handler(bool is_disconnection_event, uint16_t retryJoin)
+void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin)
 {
-    if (!is_disconnection_event)
+    if (!is_wifi_disconnection_event)
     {
         /* After the reboot or a commissioning time device failed to connect with AP.
          * Device will retry to connect with AP upto WFX_RSI_CONFIG_MAX_JOIN retries.
