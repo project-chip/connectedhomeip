@@ -26,7 +26,7 @@
 namespace chip {
 
 /**
- * @brief ClientMonitoringRegistrationTable exists to manage the persistance of entries in the ClientMonitoring Cluster.
+ * @brief ClientMonitoringRegistrationTable exists to manage the persistence of entries in the ClientMonitoring Cluster.
  *        To access persisted data with the ClientMonitoringRegistrationTable class, instantiate an instance of this class
  *        and call the LoadFromStorage function.
  *

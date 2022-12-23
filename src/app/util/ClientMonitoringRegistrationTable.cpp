@@ -28,7 +28,7 @@ namespace chip {
 ClientMonitoringRegistrationTable::ClientMonitoringRegistrationTable(PersistentStorageDelegate & storage) : mStorage(storage) {}
 
 /**
- * @brief Function loads a client registrartion entry from persitant storage for a single fabric
+ * @brief Function loads a client registration entry from persistent storage for a single fabric
  *
  * @param fabricIndex fabric index to load from storage
  * @return CHIP_ERROR
