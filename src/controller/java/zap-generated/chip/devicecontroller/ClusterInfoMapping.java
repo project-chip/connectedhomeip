@@ -2177,12 +2177,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer errorCode, String debugText) {
+    public void onSuccess(Integer ErrorCode, String DebugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "Integer");
-      responseValues.put(errorCodeResponseValue, errorCode);
-      CommandResponseInfo debugTextResponseValue = new CommandResponseInfo("debugText", "String");
-      responseValues.put(debugTextResponseValue, debugText);
+      CommandResponseInfo ErrorCodeResponseValue = new CommandResponseInfo("ErrorCode", "Integer");
+      responseValues.put(ErrorCodeResponseValue, ErrorCode);
+      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      responseValues.put(DebugTextResponseValue, DebugText);
       callback.onSuccess(responseValues);
     }
 
@@ -2203,12 +2203,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer errorCode, String debugText) {
+    public void onSuccess(Integer ErrorCode, String DebugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "Integer");
-      responseValues.put(errorCodeResponseValue, errorCode);
-      CommandResponseInfo debugTextResponseValue = new CommandResponseInfo("debugText", "String");
-      responseValues.put(debugTextResponseValue, debugText);
+      CommandResponseInfo ErrorCodeResponseValue = new CommandResponseInfo("ErrorCode", "Integer");
+      responseValues.put(ErrorCodeResponseValue, ErrorCode);
+      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      responseValues.put(DebugTextResponseValue, DebugText);
       callback.onSuccess(responseValues);
     }
 
@@ -2229,12 +2229,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer errorCode, String debugText) {
+    public void onSuccess(Integer ErrorCode, String DebugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "Integer");
-      responseValues.put(errorCodeResponseValue, errorCode);
-      CommandResponseInfo debugTextResponseValue = new CommandResponseInfo("debugText", "String");
-      responseValues.put(debugTextResponseValue, debugText);
+      CommandResponseInfo ErrorCodeResponseValue = new CommandResponseInfo("ErrorCode", "Integer");
+      responseValues.put(ErrorCodeResponseValue, ErrorCode);
+      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      responseValues.put(DebugTextResponseValue, DebugText);
       callback.onSuccess(responseValues);
     }
 

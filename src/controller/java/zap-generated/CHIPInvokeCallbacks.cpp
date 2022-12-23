@@ -1179,15 +1179,15 @@ void CHIPGeneralCommissioningClusterArmFailSafeResponseCallback::CallbackFn(
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject errorCode;
-    std::string errorCodeClassName     = "java/lang/Integer";
-    std::string errorCodeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(),
-                                                                  static_cast<uint8_t>(dataResponse.errorCode), errorCode);
-    jobject debugText;
-    debugText = env->NewStringUTF(std::string(dataResponse.debugText.data(), dataResponse.debugText.size()).c_str());
+    jobject ErrorCode;
+    std::string ErrorCodeClassName     = "java/lang/Integer";
+    std::string ErrorCodeCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(ErrorCodeClassName.c_str(), ErrorCodeCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.errorCode), ErrorCode);
+    jobject DebugText;
+    DebugText = env->NewStringUTF(std::string(dataResponse.debugText.data(), dataResponse.debugText.size()).c_str());
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, ErrorCode, DebugText);
 }
 CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback::
     CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(jobject javaCallback) :
@@ -1245,15 +1245,15 @@ void CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback::Callbac
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject errorCode;
-    std::string errorCodeClassName     = "java/lang/Integer";
-    std::string errorCodeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(),
-                                                                  static_cast<uint8_t>(dataResponse.errorCode), errorCode);
-    jobject debugText;
-    debugText = env->NewStringUTF(std::string(dataResponse.debugText.data(), dataResponse.debugText.size()).c_str());
+    jobject ErrorCode;
+    std::string ErrorCodeClassName     = "java/lang/Integer";
+    std::string ErrorCodeCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(ErrorCodeClassName.c_str(), ErrorCodeCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.errorCode), ErrorCode);
+    jobject DebugText;
+    DebugText = env->NewStringUTF(std::string(dataResponse.debugText.data(), dataResponse.debugText.size()).c_str());
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, ErrorCode, DebugText);
 }
 CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback::
     CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback(jobject javaCallback) :
@@ -1311,15 +1311,15 @@ void CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback::Callb
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject errorCode;
-    std::string errorCodeClassName     = "java/lang/Integer";
-    std::string errorCodeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(),
-                                                                  static_cast<uint8_t>(dataResponse.errorCode), errorCode);
-    jobject debugText;
-    debugText = env->NewStringUTF(std::string(dataResponse.debugText.data(), dataResponse.debugText.size()).c_str());
+    jobject ErrorCode;
+    std::string ErrorCodeClassName     = "java/lang/Integer";
+    std::string ErrorCodeCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(ErrorCodeClassName.c_str(), ErrorCodeCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.errorCode), ErrorCode);
+    jobject DebugText;
+    DebugText = env->NewStringUTF(std::string(dataResponse.debugText.data(), dataResponse.debugText.size()).c_str());
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, ErrorCode, DebugText);
 }
 CHIPNetworkCommissioningClusterScanNetworksResponseCallback::CHIPNetworkCommissioningClusterScanNetworksResponseCallback(
     jobject javaCallback) :
