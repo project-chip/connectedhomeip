@@ -3183,6 +3183,15 @@ public final class ChipIdLookup {
       return "";
     }
     if (clusterId == 47L) {
+      if (eventId == 0L) {
+        return "WiredFaultChange";
+      }
+      if (eventId == 1L) {
+        return "BatFaultChange";
+      }
+      if (eventId == 2L) {
+        return "BatChargeFaultChange";
+      }
       return "";
     }
     if (clusterId == 48L) {
