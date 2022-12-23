@@ -47,6 +47,11 @@ private:
     friend constexpr Tag AnonymousTag();
     friend constexpr Tag UnknownImplicitTag();
 
+    // The following friend functions could be Tag class methods, but it turns out in some cases
+    // they may not be inlined and then passing the tag by argument/value results in smaller code
+    // than passing it by 'this' pointer. This can be worked around by applying 'always_inline'
+    // function attribute, but friend functions are likely a more portable solution.
+
     friend constexpr uint32_t ProfileIdFromTag(Tag tag);
     friend constexpr uint16_t VendorIdFromTag(Tag tag);
     friend constexpr uint16_t ProfileNumFromTag(Tag tag);
@@ -60,9 +65,23 @@ private:
     static constexpr uint32_t kVendorIdShift       = 48;
     static constexpr uint32_t kProfileNumShift     = 32;
     static constexpr uint32_t kSpecialTagProfileId = 0xFFFFFFFF;
-    static constexpr uint32_t kAnonymousTagNum     = 0xFFFFFFFF;
-    static constexpr uint32_t kContextTagMaxNum   = UINT8_MAX;
 
+    enum SpecialTagNumber : uint32_t
+    {
+        kContextTagMaxNum = UINT8_MAX,
+        kAnonymousTagNum,
+        kUnknownImplicitTagNum
+    };
+
+    // The API representation of the tag uses the following encoding:
+    //
+    //  63                     47                       31
+    // +-----------------------+-----------------------+----------------------------------------------+
+    // | Vendor id (negated)   | Profile num (negated) | Tag number                                   |
+    // +-----------------------+-----------------------+----------------------------------------------+
+    //
+    // Vendor id and profile number are negated in order to optimize the code size when using
+    // context tags, the most commonly used tags in the SDK.
     uint64_t mVal;
 };
 
@@ -115,7 +134,7 @@ enum
  */
 constexpr Tag ProfileTag(uint32_t profileId, uint32_t tagNum)
 {
-    return Tag((static_cast<uint64_t>(profileId) << Tag::kProfileIdShift) | tagNum);
+    return Tag((static_cast<uint64_t>(~profileId) << Tag::kProfileIdShift) | tagNum);
 }
 
 /**
@@ -128,12 +147,13 @@ constexpr Tag ProfileTag(uint32_t profileId, uint32_t tagNum)
  */
 constexpr Tag ProfileTag(uint16_t vendorId, uint16_t profileNum, uint32_t tagNum)
 {
-    return Tag((static_cast<uint64_t>(vendorId) << Tag::kVendorIdShift) |
-               (static_cast<uint64_t>(profileNum) << Tag::kProfileNumShift) | tagNum);
+    constexpr uint32_t kVendorIdShift = Tag::kVendorIdShift - Tag::kProfileIdShift;
+
+    return ProfileTag((static_cast<uint32_t>(vendorId) << kVendorIdShift) | profileNum, tagNum);
 }
 
 /**
- * Generates the API representation for of context-specific TLV tag
+ * Generates the API representation of a context-specific TLV tag
  *
  * @param[in]   tagNum          The context-specific tag number assigned to the tag.
  * @return                      A 64-bit integer representing the tag.
@@ -162,9 +182,12 @@ constexpr Tag AnonymousTag()
     return ProfileTag(Tag::kSpecialTagProfileId, Tag::kAnonymousTagNum);
 }
 
+/**
+ * An invalid tag that represents a TLV element decoding error due to unknown implicit profile id.
+ */
 constexpr Tag UnknownImplicitTag()
 {
-    return ProfileTag(Tag::kSpecialTagProfileId, 0xFFFFFFFE);
+    return ProfileTag(Tag::kSpecialTagProfileId, Tag::kUnknownImplicitTagNum);
 }
 
 /**
@@ -177,7 +200,7 @@ constexpr Tag UnknownImplicitTag()
  */
 constexpr uint32_t ProfileIdFromTag(Tag tag)
 {
-    return static_cast<uint32_t>(tag.mVal >> Tag::kProfileIdShift);
+    return ~static_cast<uint32_t>(tag.mVal >> Tag::kProfileIdShift);
 }
 
 /**
@@ -190,7 +213,9 @@ constexpr uint32_t ProfileIdFromTag(Tag tag)
  */
 constexpr uint16_t VendorIdFromTag(Tag tag)
 {
-    return static_cast<uint16_t>(tag.mVal >> Tag::kVendorIdShift);
+    constexpr uint32_t kVendorIdShift = Tag::kVendorIdShift - Tag::kProfileIdShift;
+
+    return static_cast<uint16_t>(ProfileIdFromTag(tag) >> kVendorIdShift);
 }
 
 /**
@@ -203,7 +228,7 @@ constexpr uint16_t VendorIdFromTag(Tag tag)
  */
 constexpr uint16_t ProfileNumFromTag(Tag tag)
 {
-    return static_cast<uint16_t>(tag.mVal >> Tag::kProfileNumShift);
+    return static_cast<uint16_t>(ProfileIdFromTag(tag));
 }
 
 /**
