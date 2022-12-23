@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{/if}}
 {{/zcl_struct_items}}
 {{/inline}}
-{{availability (asUpperCamelCase parent.name preserveAcronyms=true) struct=(asUpperCamelCase name preserveAcronyms=true)}}
+{{availability (asUpperCamelCase parent.name preserveAcronyms=true) struct=(asUpperCamelCase name preserveAcronyms=true) deprecationMessage="This struct is unused and will be removed"}}
 @interface MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}} : NSObject <NSCopying>
 {{> interfaceDecl struct=(asUpperCamelCase name preserveAcronyms=true)}}
 @end

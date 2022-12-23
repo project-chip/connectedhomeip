@@ -85,6 +85,12 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 typedef NS_ENUM({{asUnderlyingZclType name}}, {{objCEnumName clusterName enumName}}) {
    {{#zcl_enum_items}}
    {{objCEnumName ../clusterName ../enumName}}{{objCEnumItemLabel label}} {{availability ../clusterName enum=../enumName enumValue=(objCEnumItemLabel label) deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../../name preserveAcronyms=true) ../label) (objCEnumItemLabel label))}} = {{asHex value 2}},
+   {{#*inline "oldNameItemDecl"}}
+   {{#if oldItemName}}
+   {{objCEnumName ../clusterName ../enumName}}{{objCEnumItemLabel oldItemName}} {{availability ../clusterName enum=../enumName enumValue=oldItemName deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../../name preserveAcronyms=true) ../label) (objCEnumItemLabel label))}} = {{asHex value 2}},
+   {{/if}}
+   {{/inline}}
+   {{> oldNameItemDecl oldItemName=(oldName ../clusterName enum=../enumName enumValue=(objCEnumItemLabel label))}}
    {{/zcl_enum_items}}
 }
 {{/inline}}
@@ -113,6 +119,12 @@ typedef NS_ENUM({{asUnderlyingZclType name}}, {{objCEnumName clusterName enumNam
 typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName bitmapName}}) {
    {{#zcl_bitmap_items}}
    {{objCEnumName ../clusterName ../bitmapName}}{{objCEnumItemLabel label}} {{availability ../clusterName bitmap=../bitmapName bitmapValue=(objCEnumItemLabel label) deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../../name preserveAcronyms=true) ../label) (objCEnumItemLabel label))}} = {{asHex mask}},
+   {{#*inline "oldNameItemDecl"}}
+   {{#if oldItemName}}
+   {{objCEnumName ../clusterName ../bitmapName}}{{objCEnumItemLabel oldItemName}} {{availability ../clusterName bitmap=../enumName bitmapValue=oldItemName deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../../name preserveAcronyms=true) ../label) (objCEnumItemLabel label))}} = {{asHex value 2}},
+   {{/if}}
+   {{/inline}}
+   {{> oldNameItemDecl oldItemName=(oldName ../clusterName bitmap=../bitmapName bitmapValue=(objCEnumItemLabel label))}}
    {{/zcl_bitmap_items}}
 }
 {{/inline}}
