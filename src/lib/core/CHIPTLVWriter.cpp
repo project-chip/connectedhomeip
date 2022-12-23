@@ -629,24 +629,21 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, Tag tag, uint64_
     else
         p = stagingBuf;
 
-    if (IsSpecialTag(tag))
+    if (IsContextTag(tag))
     {
-        if (tagNum <= kContextTagMaxNum)
-        {
-            if (mContainerType != kTLVType_Structure && mContainerType != kTLVType_List)
-                return CHIP_ERROR_INVALID_TLV_TAG;
+        if (mContainerType != kTLVType_Structure && mContainerType != kTLVType_List)
+            return CHIP_ERROR_INVALID_TLV_TAG;
 
-            Write8(p, TLVTagControl::ContextSpecific | elemType);
-            Write8(p, static_cast<uint8_t>(tagNum));
-        }
-        else
-        {
-            if (elemType != TLVElementType::EndOfContainer && mContainerType != kTLVType_NotSpecified &&
-                mContainerType != kTLVType_Array && mContainerType != kTLVType_List)
-                return CHIP_ERROR_INVALID_TLV_TAG;
+        Write8(p, TLVTagControl::ContextSpecific | elemType);
+        Write8(p, static_cast<uint8_t>(tagNum));
+    }
+    else if (IsSpecialTag(tag))
+    {
+        if (elemType != TLVElementType::EndOfContainer && mContainerType != kTLVType_NotSpecified &&
+            mContainerType != kTLVType_Array && mContainerType != kTLVType_List)
+            return CHIP_ERROR_INVALID_TLV_TAG;
 
-            Write8(p, TLVTagControl::Anonymous | elemType);
-        }
+        Write8(p, TLVTagControl::Anonymous | elemType);
     }
     else
     {
