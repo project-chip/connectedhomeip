@@ -18,8 +18,8 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
-import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
+import("${efr32_sdk_build_root}/efr32_executable.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -136,8 +136,8 @@ if (chip_enable_wifi) {
     efr32_lwip_defs += [ "LWIP_IPV6=0" ]
   }
 
-    wiseconnect_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
-    import("${examples_plat_dir}/SiWx917/rs911x.gni")
+  wiseconnect_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
+  import("${examples_plat_dir}/SiWx917/rs911x.gni")
 }
 
 efr32_sdk("sdk") {
@@ -201,9 +201,9 @@ efr32_executable("lock_app") {
   sources = [
     "${examples_common_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/BaseApplication.cpp",
-    "${examples_plat_dir}/siwx917_utils.cpp",
     "${examples_plat_dir}/init_ccpPlatform.cpp",
     "${examples_plat_dir}/matter_config.cpp",
+    "${examples_plat_dir}/siwx917_utils.cpp",
     "src/AppTask.cpp",
     "src/LockManager.cpp",
     "src/ZclCallbacks.cpp",

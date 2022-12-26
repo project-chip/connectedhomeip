@@ -31,7 +31,6 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #endif
 
-
 #define BLE_DEV_NAME "SiLabs-Light-Switch"
 
 extern "C" void sl_button_on_change();
@@ -52,7 +51,8 @@ static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 int main(void)
 {
     init_ccpPlatform();
-    if (SI917MatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR) {
+    if (SI917MatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
+    {
         appError(CHIP_ERROR_INTERNAL);
     }
 

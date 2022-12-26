@@ -171,7 +171,7 @@ void WindowAppImpl::OnTaskCallback(void * parameter)
     SILABS_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */
     sWiFiNetworkCommissioningInstance.Init();
-    /* added for commisioning with wifi */
+    /* added for commissioning with wifi */
 #endif
 
     sInstance.Run();
@@ -541,7 +541,7 @@ void WindowAppImpl::OnButtonChange(const sl_button_t * handle)
 // Silabs button callback from button event ISR
 void sl_button_on_change()
 {
-    const sl_button_t *handle = &sl_button_btn0;
-    WindowAppImpl * app = static_cast<WindowAppImpl *>(&WindowAppImpl::sInstance);
+    const sl_button_t * handle = &sl_button_btn0;
+    WindowAppImpl * app        = static_cast<WindowAppImpl *>(&WindowAppImpl::sInstance);
     app->OnButtonChange(handle);
 }

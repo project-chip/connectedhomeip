@@ -368,7 +368,6 @@ void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAc
     SILABS_LOG("### Lock button #### ");
     button_event.Handler = BaseApplication::ButtonHandler;
     sAppTask.PostEvent(&button_event);
-
 }
 
 void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
