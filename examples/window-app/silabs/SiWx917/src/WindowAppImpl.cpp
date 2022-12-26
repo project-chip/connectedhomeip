@@ -27,17 +27,15 @@
 #ifdef QR_CODE_ENABLED
 #include <qrcodegen.h>
 #else
-#include "EFR32DeviceDataProvider.h"
+#include "SiWx917DeviceDataProvider.h"
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #endif // QR_CODE_ENABLED
-#include <sl_simple_button_instances.h>
 
 #ifdef ENABLE_WSTK_LEDS
 #include <sl_simple_led_instances.h>
 #endif // ENABLE_WSTK_LEDS
-
-#include <sl_system_kernel.h>
+extern "C" void sl_button_on_change();
 
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
@@ -239,7 +237,7 @@ CHIP_ERROR WindowAppImpl::Init()
 CHIP_ERROR WindowAppImpl::Start()
 {
     SILABS_LOG("Starting FreeRTOS scheduler");
-    sl_system_kernel_start();
+    vTaskStartScheduler();
 
     return CHIP_NO_ERROR;
 }
@@ -537,20 +535,13 @@ WindowAppImpl::Button::Button(WindowApp::Button::Id id, const char * name) : Win
 void WindowAppImpl::OnButtonChange(const sl_button_t * handle)
 {
     WindowApp::Button * btn = static_cast<Button *>((handle == &sl_button_btn0) ? sInstance.mButtonUp : sInstance.mButtonDown);
-
-    if (sl_button_get_state(handle) == SL_SIMPLE_BUTTON_PRESSED)
-    {
-        btn->Press();
-    }
-    else
-    {
-        btn->Release();
-    }
+    btn->Press();
 }
 
 // Silabs button callback from button event ISR
-void sl_button_on_change(const sl_button_t * handle)
+void sl_button_on_change()
 {
+    const sl_button_t *handle = &sl_button_btn0;
     WindowAppImpl * app = static_cast<WindowAppImpl *>(&WindowAppImpl::sInstance);
     app->OnButtonChange(handle);
 }

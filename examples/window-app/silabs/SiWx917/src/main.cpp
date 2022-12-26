@@ -20,14 +20,12 @@
 #include <AppConfig.h>
 #include <WindowApp.h>
 
-#include "init_efrPlatform.h"
-#include "sl_simple_button_instances.h"
-#include "sl_system_kernel.h"
+#include "init_ccpPlatform.h"
 #include <DeviceInfoProviderImpl.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <matter_config.h>
-#ifdef EFR32_ATTESTATION_CREDENTIALS
+#ifdef SI917_ATTESTATION_CREDENTIALS
 #include <examples/platform/silabs/SilabsDeviceAttestationCreds.h>
 #else
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -49,8 +47,8 @@ int main(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    init_efrPlatform();
-    if (EFR32MatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
+    init_ccpPlatform();
+    if (SI917MatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
         appError(CHIP_ERROR_INTERNAL);
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
@@ -62,8 +60,8 @@ int main(void)
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     err = app.Init();
     // Initialize device attestation config
-#ifdef EFR32_ATTESTATION_CREDENTIALS
-    SetDeviceAttestationCredentialsProvider(Silabs::GetSilabsDacProvider());
+#ifdef SI917_ATTESTATION_CREDENTIALS
+    SetDeviceAttestationCredentialsProvider(SILABS::GetSILABSDacProvider());
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif

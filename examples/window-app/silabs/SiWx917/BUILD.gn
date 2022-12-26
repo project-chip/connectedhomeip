@@ -20,13 +20,13 @@ import("//build_overrides/pigweed.gni")
 import("${build_root}/config/defaults.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${efr32_sdk_build_root}/efr32_executable.gni")
-import("${efr32_sdk_build_root}/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
 
 assert(current_os == "freertos")
 
 project_dir = "${chip_root}/examples/window-app"
-efr32_project_dir = "${project_dir}/silabs/efr32"
-examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+efr32_project_dir = "${project_dir}/silabs/SiWx917"
+examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
 declare_args() {
@@ -50,7 +50,7 @@ declare_args() {
   sl_wfx_config_scan = true
 
   # Disable LCD on supported devices
-  disable_lcd = false
+  disable_lcd = true
 
   # Argument to Disable IPv4 for wifi(rs911)
   chip_enable_wifi_ipv4 = false
@@ -80,7 +80,7 @@ assert(!(use_wf200 && chip_enable_openthread))
 if (chip_enable_wifi) {
   assert(use_rs911x || use_wf200)
   enable_openthread_cli = false
-  import("${chip_root}/src/platform/silabs/EFR32/wifi_args.gni")
+  import("${chip_root}/src/platform/silabs/SiWx917/wifi_args.gni")
 }
 
 # ThunderBoards, Explorer Kit and MGM240L do not support LCD (No LCD)
@@ -110,7 +110,7 @@ if (chip_enable_wifi) {
            "ssid can't be null if psk is provided")
     defines += [ "CHIP_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
   }
-  wifi_sdk_dir = "${chip_root}/src/platform/silabs/EFR32/wifi"
+  wifi_sdk_dir = "${chip_root}/src/platform/silabs/SiWx917/wifi"
   efr32_lwip_defs = [ "LWIP_NETIF_API=1" ]
   if (lwip_ipv4) {
     efr32_lwip_defs += [
@@ -135,13 +135,8 @@ if (chip_enable_wifi) {
     efr32_lwip_defs += [ "LWIP_IPV6=0" ]
   }
 
-  if (use_rs911x) {
-    wiseconnect_sdk_root =
-        "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
-    import("${examples_plat_dir}/rs911x/rs911x.gni")
-  } else {
-    import("${examples_plat_dir}/wf200/wf200.gni")
-  }
+    wiseconnect_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
+    import("${examples_plat_dir}/SiWx917/rs911x.gni")
 }
 
 efr32_sdk("sdk") {
@@ -151,7 +146,7 @@ efr32_sdk("sdk") {
   ]
 
   include_dirs = [
-    "${chip_root}/src/platform/silabs/EFR32",
+    "${chip_root}/src/platform/silabs/SiWx917",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
@@ -201,9 +196,9 @@ efr32_executable("window_app") {
   defines = []
 
   sources = [
+    "${examples_plat_dir}/siwx917_utils.cpp",
     "${examples_common_plat_dir}/heap_4_silabs.c",
-    "${examples_plat_dir}/efr32_utils.cpp",
-    "${examples_plat_dir}/init_efrPlatform.cpp",
+    "${examples_plat_dir}/init_ccpPlatform.cpp",
     "${examples_plat_dir}/matter_config.cpp",
     "${project_dir}/common/src/WindowApp.cpp",
     "${project_dir}/common/src/ZclCallbacks.cpp",
@@ -212,11 +207,11 @@ efr32_executable("window_app") {
   ]
 
   if (use_wstk_leds) {
-    sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
+    #sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
   }
 
   if (chip_build_libshell || enable_openthread_cli || use_wf200 || use_rs911x) {
-    sources += [ "${examples_plat_dir}/uart.cpp" ]
+    #sources += [ "${examples_plat_dir}/uart.cpp" ]
   }
 
   deps = [
@@ -236,10 +231,10 @@ efr32_executable("window_app") {
     ]
   }
 
-  if (chip_enable_ota_requestor) {
-    defines += [ "EFR32_OTA_ENABLED" ]
-    sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
-  }
+#  if (chip_enable_ota_requestor) {
+#    defines += [ "EFR32_OTA_ENABLED" ]
+#    sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
+#  }
 
   # WiFi Settings
   if (chip_enable_wifi) {
@@ -323,7 +318,7 @@ efr32_executable("window_app") {
 
   # Attestation Credentials
   if (chip_build_platform_attestation_credentials_provider) {
-    deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
+    deps += [ "${examples_plat_dir}:SiWx917-attestation-credentials" ]
   }
 
   # Factory Data Provider
