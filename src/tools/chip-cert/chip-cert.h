@@ -417,8 +417,8 @@ extern bool Cmd_PrintCert(int argc, char * argv[]);
 extern bool Cmd_PrintCD(int argc, char * argv[]);
 extern bool Cmd_GenAttCert(int argc, char * argv[]);
 
-extern bool ReadCert(const char * fileNameOrStr, X509 * cert);
-extern bool ReadCert(const char * fileNameOrStr, X509 * cert, CertFormat & origCertFmt);
+extern bool ReadCert(const char * fileNameOrStr, std::unique_ptr<X509, void (*)(X509 *)> & cert);
+extern bool ReadCert(const char * fileNameOrStr, std::unique_ptr<X509, void (*)(X509 *)> & cert, CertFormat & origCertFmt);
 extern bool ReadCertDER(const char * fileNameOrStr, chip::MutableByteSpan & cert);
 extern bool LoadChipCert(const char * fileNameOrStr, bool isTrused, chip::Credentials::ChipCertificateSet & certSet,
                          chip::MutableByteSpan & chipCert);

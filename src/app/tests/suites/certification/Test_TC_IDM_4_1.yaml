@@ -591,7 +591,7 @@ tests:
           If the DUT has to provision to verify the logs,  verify that TH all-clusters-app sent Subscription report with unic subscriptionID
           [1662036515.630221][166451:166456] CHIP:DMG: }
           [1662036515.630284][166451:166456] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3175537504
-          [1662036515.630298][166451:166456] CHIP:TOO:   identify time: 0
+          [1662036515.630298][166451:166456] CHIP:TOO:   IdentifyTime: 0
           [1662036515.630329][166451:166456] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0001 DataVersion: 3999635638
           [1662036515.630338][166451:166456] CHIP:TOO:   RemainingTime: 0
           [1662036515.630366][166451:166456] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 2488235261
