@@ -1,6 +1,11 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+struct LabelStruct {
+    char_string<16> label = 0;
+    char_string<16> value = 1;
+}
+
 server cluster Identify = 3 {
   enum IdentifyEffectIdentifier : ENUM8 {
     kBlink = 0;
@@ -551,6 +556,52 @@ server cluster BasicInformation = 40 {
   readonly attribute boolean reachable = 17;
   readonly attribute char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+client cluster LocalizationConfiguration = 43 {
+  attribute char_string<35> activeLocale = 0;
+  readonly attribute CHAR_STRING supportedLocales[] = 1;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+server cluster LocalizationConfiguration = 43 {
+  attribute char_string<35> activeLocale = 0;
+  readonly attribute CHAR_STRING supportedLocales[] = 1;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+client cluster UnitLocalization = 45 {
+  enum TempUnit : ENUM8 {
+    kFahrenheit = 0;
+    kCelsius = 1;
+    kKelvin = 2;
+  }
+
+  bitmap UnitLocalizationFeature : BITMAP32 {
+    kTemperatureUnit = 0x1;
+  }
+
+  attribute TempUnit temperatureUnit = 0;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+server cluster UnitLocalization = 45 {
+  enum TempUnit : ENUM8 {
+    kFahrenheit = 0;
+    kCelsius = 1;
+    kKelvin = 2;
+  }
+
+  bitmap UnitLocalizationFeature : BITMAP32 {
+    kTemperatureUnit = 0x1;
+  }
+
+  attribute TempUnit temperatureUnit = 0;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -1454,22 +1505,18 @@ server cluster OperationalCredentials = 62 {
 }
 
 client cluster FixedLabel = 64 {
-  struct LabelStruct {
-    char_string<16> label = 0;
-    char_string<16> value = 1;
-  }
-
   readonly attribute LabelStruct labelList[] = 0;
   readonly attribute int16u clusterRevision = 65533;
 }
 
 server cluster FixedLabel = 64 {
-  struct LabelStruct {
-    char_string<16> label = 0;
-    char_string<16> value = 1;
-  }
-
   readonly attribute LabelStruct labelList[] = 0;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+server cluster UserLabel = 65 {
+  attribute access(write: manage) LabelStruct labelList[] = 0;
+  readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
@@ -2084,6 +2131,23 @@ server cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+server cluster OccupancySensing = 1030 {
+  readonly attribute bitmap8 occupancy = 0;
+  readonly attribute enum8 occupancySensorType = 1;
+  readonly attribute bitmap8 occupancySensorTypeBitmap = 2;
+  attribute access(write: manage) int16u pirOccupiedToUnoccupiedDelay = 16;
+  attribute access(write: manage) int16u pirUnoccupiedToOccupiedDelay = 17;
+  attribute access(write: manage) int8u pirUnoccupiedToOccupiedThreshold = 18;
+  attribute access(write: manage) int16u ultrasonicOccupiedToUnoccupiedDelay = 32;
+  attribute access(write: manage) int16u ultrasonicUnoccupiedToOccupiedDelay = 33;
+  attribute access(write: manage) int8u ultrasonicUnoccupiedToOccupiedThreshold = 34;
+  attribute access(write: manage) int16u physicalContactOccupiedToUnoccupiedDelay = 48;
+  attribute access(write: manage) int16u physicalContactUnoccupiedToOccupiedDelay = 49;
+  attribute access(write: manage) int8u physicalContactUnoccupiedToOccupiedThreshold = 50;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -3076,6 +3140,8 @@ endpoint 0 {
 endpoint 1 {
   device type anonymousEndpointType = 258, version 1;
   binding cluster OnOff;
+  binding cluster LocalizationConfiguration;
+  binding cluster UnitLocalization;
   binding cluster FixedLabel;
 
   server cluster Identify {
@@ -3138,9 +3204,28 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 
+  server cluster LocalizationConfiguration {
+    ram      attribute activeLocale;
+    callback attribute supportedLocales;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster UnitLocalization {
+    ram      attribute temperatureUnit;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+  }
+
   server cluster FixedLabel {
     callback attribute labelList;
     ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster UserLabel {
+    callback attribute labelList;
+    ram      attribute featureMap;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster ColorControl {
@@ -3151,6 +3236,23 @@ endpoint 1 {
     ram      attribute startUpColorTemperatureMireds;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 5;
+  }
+
+  server cluster OccupancySensing {
+    ram      attribute occupancy;
+    ram      attribute occupancySensorType;
+    ram      attribute occupancySensorTypeBitmap;
+    ram      attribute pirOccupiedToUnoccupiedDelay;
+    ram      attribute pirUnoccupiedToOccupiedDelay;
+    ram      attribute pirUnoccupiedToOccupiedThreshold default = 1;
+    ram      attribute ultrasonicOccupiedToUnoccupiedDelay;
+    ram      attribute ultrasonicUnoccupiedToOccupiedDelay;
+    ram      attribute ultrasonicUnoccupiedToOccupiedThreshold default = 1;
+    ram      attribute physicalContactOccupiedToUnoccupiedDelay;
+    ram      attribute physicalContactUnoccupiedToOccupiedDelay;
+    ram      attribute physicalContactUnoccupiedToOccupiedThreshold default = 1;
+    ram      attribute featureMap;
+    callback attribute clusterRevision default = 3;
   }
 }
 
