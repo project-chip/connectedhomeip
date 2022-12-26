@@ -20,9 +20,7 @@
 #include <AppTask.h>
 
 #include "AppConfig.h"
-#include "init_efrPlatform.h"
-#include "sl_simple_button_instances.h"
-#include "sl_system_kernel.h"
+#include "init_ccpPlatform.h"
 #include <DeviceInfoProviderImpl.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -34,6 +32,8 @@
 #endif
 
 #define BLE_DEV_NAME "SiLabs-Door-Lock"
+extern "C" void sl_button_on_change();
+
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
@@ -49,8 +49,9 @@ static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 // ================================================================================
 int main(void)
 {
-    init_efrPlatform();
-    if (EFR32MatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
+    init_ccpPlatform();
+	
+    if (SI917MatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
         appError(CHIP_ERROR_INTERNAL);
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
@@ -58,8 +59,8 @@ int main(void)
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config
-#ifdef EFR32_ATTESTATION_CREDENTIALS
-    SetDeviceAttestationCredentialsProvider(Silabs::GetSilabsDacProvider());
+#ifdef SI917_ATTESTATION_CREDENTIALS
+    SetDeviceAttestationCredentialsProvider(SI917::GetSI917DacProvider());
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
@@ -70,7 +71,7 @@ int main(void)
         appError(CHIP_ERROR_INTERNAL);
 
     SILABS_LOG("Starting FreeRTOS scheduler");
-    sl_system_kernel_start();
+    vTaskStartScheduler();
 
     // Should never get here.
     chip::Platform::MemoryShutdown();
@@ -78,7 +79,7 @@ int main(void)
     appError(CHIP_ERROR_INTERNAL);
 }
 
-void sl_button_on_change(const sl_button_t * handle)
+void sl_button_on_change()
 {
-    AppTask::GetAppTask().ButtonEventHandler(handle, sl_button_get_state(handle));
+    AppTask::GetAppTask().ButtonEventHandler(APP_FUNCTION_BUTTON, SL_SIMPLE_BUTTON_PRESSED);
 }

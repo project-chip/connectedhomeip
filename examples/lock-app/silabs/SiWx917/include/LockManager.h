@@ -47,7 +47,7 @@ struct HolidayScheduleInfo
     EmberAfPluginDoorLockHolidaySchedule schedule;
 };
 
-namespace EFR32DoorLock {
+namespace SI917DoorLock {
 namespace ResourceRanges {
 // Used to size arrays
 static constexpr uint16_t kMaxUsers                  = 10;
@@ -107,10 +107,10 @@ private:
 };
 
 } // namespace LockInitParams
-} // namespace EFR32DoorLock
+} // namespace SI917DoorLock
 
 using namespace ::chip;
-using namespace EFR32DoorLock::ResourceRanges;
+using namespace SI917DoorLock::ResourceRanges;
 
 class LockManager
 {
@@ -132,7 +132,7 @@ public:
     } State;
 
     CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
-                    EFR32DoorLock::LockInitParams::LockParam lockParam);
+                    SI917DoorLock::LockInitParams::LockParam lockParam);
     bool NextState();
     bool IsActionInProgress();
     bool InitiateAction(int32_t aActor, Action_t aAction);
@@ -209,7 +209,7 @@ private:
     DlCredential mCredentials[kMaxUsers][kMaxCredentialsPerUser];
 
     static LockManager sLock;
-    EFR32DoorLock::LockInitParams::LockParam LockParams;
+    SI917DoorLock::LockInitParams::LockParam LockParams;
 };
 
 inline LockManager & LockMgr()

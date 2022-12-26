@@ -72,7 +72,7 @@ using chip::app::Clusters::DoorLock::DlOperationSource;
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
-using namespace EFR32DoorLock::LockInitParams;
+using namespace SI917DoorLock::LockInitParams;
 
 namespace {
 #ifdef ENABLE_WSTK_LEDS
@@ -365,16 +365,10 @@ void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAc
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
 
-    if (buttonHandle == APP_LOCK_SWITCH && btnAction == SL_SIMPLE_BUTTON_PRESSED)
-    {
-        button_event.Handler = LockActionEventHandler;
-        sAppTask.PostEvent(&button_event);
-    }
-    else if (buttonHandle == APP_FUNCTION_BUTTON)
-    {
-        button_event.Handler = BaseApplication::ButtonHandler;
-        sAppTask.PostEvent(&button_event);
-    }
+    SILABS_LOG("### Lock button #### ");
+    button_event.Handler = BaseApplication::ButtonHandler;
+    sAppTask.PostEvent(&button_event);
+
 }
 
 void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)

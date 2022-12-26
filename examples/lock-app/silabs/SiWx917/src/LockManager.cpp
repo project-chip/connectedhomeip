@@ -31,7 +31,7 @@ LockManager LockManager::sLock;
 TimerHandle_t sLockTimer;
 
 using namespace ::chip::DeviceLayer::Internal;
-using namespace EFR32DoorLock::LockInitParams;
+using namespace SI917DoorLock::LockInitParams;
 
 CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state, LockParam lockParam)
 {
