@@ -26,13 +26,13 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR CurrentFabricRemover::CurrentFabricRemove(NodeId remoteDeviceId, Callback::Callback<OnCurrentFabricRemove> * callback)
+CHIP_ERROR CurrentFabricRemover::RemoveCurrentFabric(NodeId remoteNodeId, Callback::Callback<OnCurrentFabricRemove> * callback)
 {
-    mRemoteDeviceId              = remoteDeviceId;
+    mRemoteNodeId                = remoteNodeId;
     mCurrentFabricRemoveCallback = callback;
     mNextStep                    = Step::kReadCurrentFabricIndex;
 
-    return mCommissioner->GetConnectedDevice(remoteDeviceId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    return mController->GetConnectedDevice(remoteNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
 CHIP_ERROR CurrentFabricRemover::ReadCurrentFabricIndex(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
@@ -49,7 +49,6 @@ CHIP_ERROR CurrentFabricRemover::SendRemoveFabricIndex(Messaging::ExchangeManage
     {
         return CHIP_ERROR_INVALID_FABRIC_INDEX;
     }
-    ChipLogProgress(Controller, "SendRemoveFabricIndex : %u", mFabricIndex);
 
     OperationalCredentials::Commands::RemoveFabric::Type request;
     request.fabricIndex = mFabricIndex;
@@ -83,69 +82,64 @@ void CurrentFabricRemover::OnDeviceConnectedFn(void * context, Messaging::Exchan
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "%" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(Controller, "Current Fabric Remover failure : %" CHIP_ERROR_FORMAT, err.Format());
         FinishRemoveCurrentFabric(context, err);
     }
-
-    return;
 }
 
 void CurrentFabricRemover::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
 {
-    ChipLogProgress(Controller, "OnDeviceConnectionFailureFn: %s", err.AsString());
+    ChipLogProgress(Controller, "OnDeviceConnectionFailureFn: %" CHIP_ERROR_FORMAT, err.Format());
 
     auto * self = static_cast<CurrentFabricRemover *>(context);
-    VerifyOrReturn(self != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
+    VerifyOrReturn(self != nullptr, ChipLogProgress(Controller, "Device connected failure callback with null context. Ignoring"));
 
     FinishRemoveCurrentFabric(context, err);
-    return;
 }
 
-void CurrentFabricRemover::OnSuccessReadCurrentFabricIndex(void * context, uint8_t fabricIndex)
+void CurrentFabricRemover::OnSuccessReadCurrentFabricIndex(void * context, FabricIndex fabricIndex)
 {
     auto * self = static_cast<CurrentFabricRemover *>(context);
-    VerifyOrReturn(self != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
+    VerifyOrReturn(self != nullptr,
+                   ChipLogProgress(Controller, "Success Read Current Fabric index callback with null context. Ignoring"));
     self->mFabricIndex = fabricIndex;
     self->mNextStep    = Step::kSendRemoveFabric;
-    CHIP_ERROR err     = self->mCommissioner->GetConnectedDevice(self->mRemoteDeviceId, &self->mOnDeviceConnectedCallback,
-                                                             &self->mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err     = self->mController->GetConnectedDevice(self->mRemoteNodeId, &self->mOnDeviceConnectedCallback,
+                                                           &self->mOnDeviceConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         FinishRemoveCurrentFabric(context, err);
     }
-    return;
 }
 
 void CurrentFabricRemover::OnReadAttributeFailure(void * context, CHIP_ERROR err)
 {
-    ChipLogProgress(Controller, "OnReadAttributeFailure %s", err.AsString());
+    ChipLogProgress(Controller, "OnReadAttributeFailure %" CHIP_ERROR_FORMAT, err.Format());
 
     auto * self = static_cast<CurrentFabricRemover *>(context);
-    VerifyOrReturn(self != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
+    VerifyOrReturn(self != nullptr, ChipLogProgress(Controller, "Read Attribute failure callback with null context. Ignoring"));
 
     FinishRemoveCurrentFabric(context, err);
-    return;
 }
 
 void CurrentFabricRemover::OnSuccessRemoveFabric(void * context,
                                                  const OperationalCredentials::Commands::NOCResponse::DecodableType & data)
 {
     auto * self = static_cast<CurrentFabricRemover *>(context);
-    VerifyOrReturn(self != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
+    VerifyOrReturn(self != nullptr,
+                   ChipLogProgress(Controller, "Success Remove Fabric command callback with null context. Ignoring"));
 
     FinishRemoveCurrentFabric(context, CHIP_NO_ERROR);
-    return;
 }
 
 void CurrentFabricRemover::OnCommandFailure(void * context, CHIP_ERROR err)
 {
-    ChipLogProgress(Controller, "OnCommandFailure %s", err.AsString());
+    ChipLogProgress(Controller, "OnCommandFailure %" CHIP_ERROR_FORMAT, err.Format());
 
     auto * self = static_cast<CurrentFabricRemover *>(context);
-    VerifyOrReturn(self != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
+    VerifyOrReturn(self != nullptr, ChipLogProgress(Controller, "Send command failure callback with null context. Ignoring"));
 
     FinishRemoveCurrentFabric(context, err);
-    return;
 }
 
 void CurrentFabricRemover::FinishRemoveCurrentFabric(void * context, CHIP_ERROR err)
@@ -155,24 +149,24 @@ void CurrentFabricRemover::FinishRemoveCurrentFabric(void * context, CHIP_ERROR 
     self->mNextStep = Step::kAcceptRemoveFabricStart;
     if (self->mCurrentFabricRemoveCallback != nullptr)
     {
-        self->mCurrentFabricRemoveCallback->mCall(self->mCurrentFabricRemoveCallback->mContext, self->mRemoteDeviceId, err);
+        self->mCurrentFabricRemoveCallback->mCall(self->mCurrentFabricRemoveCallback->mContext, self->mRemoteNodeId, err);
     }
 }
 
-AutoCurrentFabricRemover::AutoCurrentFabricRemover(DeviceCommissioner * commissioner) :
-    CurrentFabricRemover(commissioner), mOnRemoveCurrentFabricCallback(OnRemoveCurrentFabric, this)
+AutoCurrentFabricRemover::AutoCurrentFabricRemover(DeviceController * controller) :
+    CurrentFabricRemover(controller), mOnRemoveCurrentFabricCallback(OnRemoveCurrentFabric, this)
 {}
 
-CHIP_ERROR AutoCurrentFabricRemover::RemoveCurrentFabric(DeviceCommissioner * commissoner, NodeId remoteDeviceId)
+CHIP_ERROR AutoCurrentFabricRemover::RemoveCurrentFabric(DeviceController * controller, NodeId remoteNodeId)
 {
     // Not using Platform::New because we want to keep our constructor private.
-    auto * remover = new (std::nothrow) AutoCurrentFabricRemover(commissoner);
+    auto * remover = new (std::nothrow) AutoCurrentFabricRemover(controller);
     if (remover == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    CHIP_ERROR err = remover->CurrentFabricRemover::CurrentFabricRemove(remoteDeviceId, &remover->mOnRemoveCurrentFabricCallback);
+    CHIP_ERROR err = remover->CurrentFabricRemover::RemoveCurrentFabric(remoteNodeId, &remover->mOnRemoveCurrentFabricCallback);
     if (err != CHIP_NO_ERROR)
     {
         delete remover;
@@ -181,7 +175,7 @@ CHIP_ERROR AutoCurrentFabricRemover::RemoveCurrentFabric(DeviceCommissioner * co
     return err;
 }
 
-void AutoCurrentFabricRemover::OnRemoveCurrentFabric(void * context, NodeId remoteDeviceId, CHIP_ERROR status)
+void AutoCurrentFabricRemover::OnRemoveCurrentFabric(void * context, NodeId remoteNodeId, CHIP_ERROR status)
 {
     auto * self = static_cast<AutoCurrentFabricRemover *>(context);
     delete self;

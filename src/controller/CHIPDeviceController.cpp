@@ -45,6 +45,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/util/error-mapping.h>
+#include <controller/CurrentFabricRemover.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -894,19 +895,16 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 
 CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     MATTER_TRACE_EVENT_SCOPE("UnpairDevice", "DeviceCommissioner");
 
     if (mState == State::Initialized)
     {
-        err = AutoCurrentFabricRemover::RemoveCurrentFabric(this, remoteDeviceId);
+        return AutoCurrentFabricRemover::RemoveCurrentFabric(this, remoteDeviceId);
     }
     else // the device is currently being paired
     {
-        err = StopPairing(remoteDeviceId);
+        return StopPairing(remoteDeviceId);
     }
-
-    return err;
 }
 
 void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)

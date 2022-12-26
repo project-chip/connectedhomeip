@@ -23,8 +23,8 @@
 namespace chip {
 namespace Controller {
 
-AndroidCurrentFabricRemover::AndroidCurrentFabricRemover(DeviceCommissioner * commissioner, jobject jCallbackObject) :
-    CurrentFabricRemover(commissioner), mOnRemoveCurrentFabricCallback(OnRemoveCurrentFabric, this)
+AndroidCurrentFabricRemover::AndroidCurrentFabricRemover(DeviceController * controller, jobject jCallbackObject) :
+    CurrentFabricRemover(controller), mOnRemoveCurrentFabricCallback(OnRemoveCurrentFabric, this)
 {
     JNIEnv * env  = JniReferences::GetInstance().GetEnvForCurrentThread();
     mJavaCallback = env->NewGlobalRef(jCallbackObject);
@@ -53,8 +53,7 @@ AndroidCurrentFabricRemover::~AndroidCurrentFabricRemover()
     env->DeleteGlobalRef(mJavaCallback);
 }
 
-CHIP_ERROR AndroidCurrentFabricRemover::RemoveCurrentFabric(DeviceCommissioner * controller, NodeId remoteDeviceId,
-                                                            jobject jcallback)
+CHIP_ERROR AndroidCurrentFabricRemover::RemoveCurrentFabric(DeviceController * controller, NodeId remoteNodeId, jobject jcallback)
 {
     // Not using Platform::New because we want to keep our constructor private.
     auto * remover = new AndroidCurrentFabricRemover(controller, jcallback);
@@ -63,7 +62,7 @@ CHIP_ERROR AndroidCurrentFabricRemover::RemoveCurrentFabric(DeviceCommissioner *
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    CHIP_ERROR err = remover->CurrentFabricRemover::CurrentFabricRemove(remoteDeviceId, &remover->mOnRemoveCurrentFabricCallback);
+    CHIP_ERROR err = remover->CurrentFabricRemover::RemoveCurrentFabric(remoteNodeId, &remover->mOnRemoveCurrentFabricCallback);
     if (err != CHIP_NO_ERROR)
     {
         delete remover;
@@ -72,7 +71,7 @@ CHIP_ERROR AndroidCurrentFabricRemover::RemoveCurrentFabric(DeviceCommissioner *
     return err;
 }
 
-void AndroidCurrentFabricRemover::OnRemoveCurrentFabric(void * context, NodeId remoteDeviceId, CHIP_ERROR err)
+void AndroidCurrentFabricRemover::OnRemoveCurrentFabric(void * context, NodeId remoteNodeId, CHIP_ERROR err)
 {
     auto * self = static_cast<AndroidCurrentFabricRemover *>(context);
 
@@ -83,7 +82,7 @@ void AndroidCurrentFabricRemover::OnRemoveCurrentFabric(void * context, NodeId r
         {
             if (self->mOnSuccessMethod != nullptr)
             {
-                env->CallVoidMethod(self->mJavaCallback, self->mOnSuccessMethod, static_cast<jlong>(remoteDeviceId));
+                env->CallVoidMethod(self->mJavaCallback, self->mOnSuccessMethod, static_cast<jlong>(remoteNodeId));
             }
         }
         else
@@ -91,7 +90,7 @@ void AndroidCurrentFabricRemover::OnRemoveCurrentFabric(void * context, NodeId r
             if (self->mOnErrorMethod != nullptr)
             {
                 env->CallVoidMethod(self->mJavaCallback, self->mOnErrorMethod, static_cast<jint>(err.GetValue()),
-                                    static_cast<jlong>(remoteDeviceId));
+                                    static_cast<jlong>(remoteNodeId));
             }
         }
     }

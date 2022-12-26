@@ -20,6 +20,7 @@
 
 #include "../common/CHIPCommand.h"
 #include <controller/CommissioningDelegate.h>
+#include <controller/CurrentFabricRemover.h>
 #include <zap-generated/CHIPClusters.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
@@ -190,5 +191,5 @@ private:
     chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;
     chip::Callback::Callback<chip::Controller::OnCurrentFabricRemove> mCurrentFabricRemoveCallback;
 
-    static void OnCurrentFabricRemove(void * context, NodeId remoteDeviceId, CHIP_ERROR status);
+    static void OnCurrentFabricRemove(void * context, NodeId remoteNodeId, CHIP_ERROR status);
 };

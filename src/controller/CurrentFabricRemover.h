@@ -25,7 +25,7 @@
 namespace chip {
 namespace Controller {
 
-typedef void (*OnCurrentFabricRemove)(void * context, NodeId remoteDeviceId, CHIP_ERROR status);
+typedef void (*OnCurrentFabricRemove)(void * context, NodeId remoteNodeId, CHIP_ERROR status);
 
 /**
  * A helper class to remove fabric given some parameters.
@@ -33,8 +33,8 @@ typedef void (*OnCurrentFabricRemove)(void * context, NodeId remoteDeviceId, CHI
 class CurrentFabricRemover
 {
 public:
-    CurrentFabricRemover(DeviceCommissioner * commissioner) :
-        mCommissioner(commissioner), mOnDeviceConnectedCallback(&OnDeviceConnectedFn, this),
+    CurrentFabricRemover(DeviceController * controller) :
+        mController(controller), mOnDeviceConnectedCallback(&OnDeviceConnectedFn, this),
         mOnDeviceConnectionFailureCallback(&OnDeviceConnectionFailureFn, this)
     {}
 
@@ -51,21 +51,22 @@ public:
     /*
      * @brief
      *   Try to look up the device attached to our controller with the given
-     *   remote device id and ask it to remove Fabric.
+     *   remote node id and ask it to remove Fabric.
+     *   If function returns an error, callback will never be be executed. Otherwise, callback will always be executed.
      *
-     * @param[in] remoteDeviceId The remote device Id
+     * @param[in] remoteNodeId The remote device Id
      * @param[in] callback The callback to call once the remote fabric is completed or not.
      */
-    CHIP_ERROR CurrentFabricRemove(NodeId remoteDeviceId, Callback::Callback<OnCurrentFabricRemove> * callback);
+    CHIP_ERROR RemoveCurrentFabric(NodeId remoteNodeId, Callback::Callback<OnCurrentFabricRemove> * callback);
 
 private:
-    DeviceCommissioner * mCommissioner;
+    DeviceController * mController;
 
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
     chip::Callback::Callback<OnCurrentFabricRemove> * mCurrentFabricRemoveCallback;
 
-    NodeId mRemoteDeviceId;
+    NodeId mRemoteNodeId;
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
     Step mNextStep           = Step::kAcceptRemoveFabricStart;
 
@@ -75,7 +76,7 @@ private:
     static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
-    static void OnSuccessReadCurrentFabricIndex(void * context, uint8_t fabricIndex);
+    static void OnSuccessReadCurrentFabricIndex(void * context, FabricIndex fabricIndex);
     static void OnReadAttributeFailure(void * context, CHIP_ERROR error);
 
     static void
@@ -95,11 +96,11 @@ class AutoCurrentFabricRemover : private CurrentFabricRemover
 {
 public:
     // Takes the same arguments as CurrentFabricRemover::RemoveCurrentFabric except without the callback.
-    static CHIP_ERROR RemoveCurrentFabric(DeviceCommissioner * commissoner, NodeId remoteDeviceId);
+    static CHIP_ERROR RemoveCurrentFabric(DeviceController * controller, NodeId remoteNodeId);
 
 private:
-    AutoCurrentFabricRemover(DeviceCommissioner * commissioner);
-    static void OnRemoveCurrentFabric(void * context, NodeId remoteDeviceId, CHIP_ERROR status);
+    AutoCurrentFabricRemover(DeviceController * controller);
+    static void OnRemoveCurrentFabric(void * context, NodeId remoteNodeId, CHIP_ERROR status);
     chip::Callback::Callback<OnCurrentFabricRemove> mOnRemoveCurrentFabricCallback;
 };
 

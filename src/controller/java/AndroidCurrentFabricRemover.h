@@ -24,20 +24,19 @@ namespace chip {
 namespace Controller {
 
 /**
- * A helper class that can be used by consumers that don't care about the callback from the
- * remove Fabric process and just want automatic cleanup of the CurrentFabricRemover when done
- * with it.
+ * AndroidCurrentFabricRemover class is a helper class that automatic cleanup in C++ class memory on Android Platform. Invoke the
+ * java callback object after all the operations are complete.
  */
 class AndroidCurrentFabricRemover : private CurrentFabricRemover
 {
 public:
-    static CHIP_ERROR RemoveCurrentFabric(DeviceCommissioner * controller, NodeId remoteDeviceId, jobject jcallback);
+    static CHIP_ERROR RemoveCurrentFabric(DeviceController * controller, NodeId remoteNodeId, jobject jcallback);
 
 private:
-    AndroidCurrentFabricRemover(DeviceCommissioner * commissioner, jobject javaCallbackObject);
+    AndroidCurrentFabricRemover(DeviceController * controller, jobject javaCallbackObject);
     ~AndroidCurrentFabricRemover();
 
-    static void OnRemoveCurrentFabric(void * context, NodeId remoteDeviceId, CHIP_ERROR status);
+    static void OnRemoveCurrentFabric(void * context, NodeId remoteNodeId, CHIP_ERROR status);
     chip::Callback::Callback<OnCurrentFabricRemove> mOnRemoveCurrentFabricCallback;
 
     jobject mJavaCallback;

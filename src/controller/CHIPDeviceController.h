@@ -39,7 +39,6 @@
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
-#include <controller/CurrentFabricRemover.h>
 #include <controller/DevicePairingDelegate.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <controller/SetUpCodePairer.h>
@@ -913,8 +912,6 @@ private:
     Credentials::AttestationVerificationResult mAttestationResult;
     Platform::UniquePtr<Credentials::DeviceAttestationVerifier::AttestationDeviceInfo> mAttestationDeviceInfo;
     Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
-
-    // Platform::UniquePtr<DeviceUnpair> mDeviceUnpair;
 };
 
 } // namespace Controller
