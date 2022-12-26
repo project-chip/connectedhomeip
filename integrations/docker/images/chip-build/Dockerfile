@@ -95,7 +95,22 @@ RUN set -x \
     && : # last line
 
 RUN set -x \
-    && pip3 install attrs coloredlogs PyGithub pygit future portpicker mobly click cxxfilt ghapi pandas tabulate \
+    && pip3 install \
+    attrs \
+    click \
+    coloredlogs \
+    cxxfilt \
+    flake8 \
+    future \
+    ghapi \
+    mobly \
+    pandas \
+    portpicker \
+    pygit \
+    PyGithub \
+    tabulate \
+    # Cleanup
+    && pip3 cache purge \
     && : # last line
 
 # build and install gn
