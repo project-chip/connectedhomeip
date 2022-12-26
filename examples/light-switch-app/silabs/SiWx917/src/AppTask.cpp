@@ -28,7 +28,6 @@
 
 #ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
-#include "sl_simple_led_instances.h"
 #endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
@@ -259,14 +258,6 @@ void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAc
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
 
-    if (buttonHandle == APP_LIGHT_SWITCH && btnAction == SL_SIMPLE_BUTTON_PRESSED)
-    {
-        button_event.Handler = SwitchActionEventHandler;
-        sAppTask.PostEvent(&button_event);
-    }
-    else if (buttonHandle == APP_FUNCTION_BUTTON)
-    {
-        button_event.Handler = BaseApplication::ButtonHandler;
-        sAppTask.PostEvent(&button_event);
-    }
+    button_event.Handler = SwitchActionEventHandler;
+    sAppTask.PostEvent(&button_event);
 }
