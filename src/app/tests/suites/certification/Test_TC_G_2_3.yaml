@@ -392,7 +392,7 @@ tests:
           Verify the "identifytime" on the TH(Chip-tool)  Log:
 
           [1658306684.629338][3050:3055] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3871913205
-          [1658306684.629394][3050:3055] CHIP:TOO:   identify time: 102
+          [1658306684.629394][3050:3055] CHIP:TOO:   IdentifyTime: 102
       disabled: true
 
     - label:
@@ -599,10 +599,10 @@ tests:
       verification: |
           ./chip-tool identify read identify-time 1 1
 
-          Verify the "identify time" on the TH(Chip-tool)  Log:
+          Verify the "IdentifyTime" on the TH(Chip-tool)  Log:
 
           [1658307393.820520][3274:3279] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3871913767
-          [1658307393.820575][3274:3279] CHIP:TOO:   identify time: 0
+          [1658307393.820575][3274:3279] CHIP:TOO:   IdentifyTime: 0
       disabled: true
 
     - label:

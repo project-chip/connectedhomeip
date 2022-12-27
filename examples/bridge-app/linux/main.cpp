@@ -39,9 +39,19 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ZclString.h>
 #include <platform/CommissionableDataProvider.h>
-#include <platform/Linux/NetworkCommissioningDriver.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+#include <platform/Darwin/NetworkCommissioningDriver.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/Darwin/WiFi/NetworkCommissioningWiFiDriver.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
+
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+#include <platform/Linux/NetworkCommissioningDriver.h>
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 
 #include <pthread.h>
 #include <sys/ioctl.h>
@@ -74,10 +84,36 @@ EndpointId gFirstDynamicEndpointId;
 Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 std::vector<Room *> gRooms;
 std::vector<Action *> gActions;
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && defined(CHIP_DEVICE_LAYER_TARGET_LINUX)
-DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sLinuxWiFiDriver;
-Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0, &sLinuxWiFiDriver);
-#endif
+
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+DeviceLayer::NetworkCommissioning::LinuxThreadDriver sThreadDriver;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sWiFiDriver;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+DeviceLayer::NetworkCommissioning::LinuxEthernetDriver sEthernetDriver;
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
+
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+DeviceLayer::NetworkCommissioning::DarwinWiFiDriver sWiFiDriver;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+DeviceLayer::NetworkCommissioning::DarwinEthernetDriver sEthernetDriver;
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0, &sWiFiDriver);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0, &sThreadDriver);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(0, &sEthernetDriver);
 
 const int16_t minMeasuredValue     = -27315;
 const int16_t maxMeasuredValue     = 32766;
@@ -728,9 +764,45 @@ bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj
 
 void ApplicationInit()
 {
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && defined(CHIP_DEVICE_LAYER_TARGET_LINUX)
-    sWiFiNetworkCommissioningInstance.Init();
+    const bool kThreadEnabled = {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        LinuxDeviceOptions::GetInstance().mThread
+#else
+        false
 #endif
+    };
+
+    const bool kWiFiEnabled = {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        LinuxDeviceOptions::GetInstance().mWiFi
+#else
+        false
+#endif
+    };
+
+    if (kThreadEnabled && kWiFiEnabled)
+    {
+        // Just use the Thread one.
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        sThreadNetworkCommissioningInstance.Init();
+#endif
+    }
+    else if (kThreadEnabled)
+    {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        sThreadNetworkCommissioningInstance.Init();
+#endif
+    }
+    else if (kWiFiEnabled)
+    {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        sWiFiNetworkCommissioningInstance.Init();
+#endif
+    }
+    else
+    {
+        sEthernetNetworkCommissioningInstance.Init();
+    }
 }
 
 const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, DEVICE_VERSION_DEFAULT },

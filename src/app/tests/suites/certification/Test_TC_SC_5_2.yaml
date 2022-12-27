@@ -55,8 +55,8 @@ tests:
       verification: |
           ./chip-tool identify read identify-time 1 1
 
-          Verify   identify time ,on the TH Log:
+          Verify   IdentifyTime ,on the TH Log:
 
           [1657785288.647504][1624:1629] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 1130139861
-          [1657785288.647621][1624:1629] CHIP:TOO:   identify time: 106
+          [1657785288.647621][1624:1629] CHIP:TOO:   IdentifyTime: 106
       disabled: true
