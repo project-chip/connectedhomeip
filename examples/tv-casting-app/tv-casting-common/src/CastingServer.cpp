@@ -168,6 +168,7 @@ CastingServer::GetDiscoveredCommissioner(int index, chip::Optional<TargetVideoPl
 void CastingServer::ReadServerClustersForNode(NodeId nodeId)
 {
     ChipLogProgress(NotSpecified, "ReadServerClustersForNode nodeId=0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
+    Init();
     for (const auto & binding : BindingTable::GetInstance())
     {
         ChipLogProgress(NotSpecified,
@@ -345,6 +346,7 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
 // given a fabric index, try to determine the video-player nodeId by searching the binding table
 NodeId CastingServer::GetVideoPlayerNodeForFabricIndex(FabricIndex fabricIndex)
 {
+    Init();
     for (const auto & binding : BindingTable::GetInstance())
     {
         ChipLogProgress(NotSpecified,
@@ -366,6 +368,7 @@ NodeId CastingServer::GetVideoPlayerNodeForFabricIndex(FabricIndex fabricIndex)
 // given a nodeId, try to determine the video-player fabric index by searching the binding table
 FabricIndex CastingServer::GetVideoPlayerFabricIndexForNode(NodeId nodeId)
 {
+    Init();
     for (const auto & binding : BindingTable::GetInstance())
     {
         ChipLogProgress(NotSpecified,

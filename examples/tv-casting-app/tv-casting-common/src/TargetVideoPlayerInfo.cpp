@@ -40,7 +40,10 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
         mIpAddress[i] = ipAddress[i];
     }
 
-    chip::Platform::CopyString(mDeviceName, chip::Dnssd::kMaxDeviceNameLen + 1, deviceName);
+    if (deviceName)
+    {
+        chip::Platform::CopyString(mDeviceName, chip::Dnssd::kMaxDeviceNameLen + 1, deviceName);
+    }
     for (auto & endpointInfo : mEndpoints)
     {
         endpointInfo.Reset();
