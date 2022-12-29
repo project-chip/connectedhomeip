@@ -48,6 +48,7 @@ CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto:
 CHIP_ERROR FactoryDataProvider::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
     uint8_t buffer[2048]; // FactoryData won't overflow 2KB
     uint16_t factorydata_len;
 
@@ -66,6 +67,7 @@ CHIP_ERROR FactoryDataProvider::Init()
     }
 
     ChipLogProgress(DeviceLayer, "FactoryData of length: %d retrieved successfully", factorydata_len);
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
 
     return err;
 }
