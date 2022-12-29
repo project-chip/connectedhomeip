@@ -19,7 +19,7 @@
 #include "LockAppCommandDelegate.h"
 #include <platform/PlatformManager.h>
 
-#include "LockManager.h"
+#include <LockManager.h>
 #include <utility>
 
 using chip::to_underlying;

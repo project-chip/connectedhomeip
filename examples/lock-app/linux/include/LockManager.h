@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "LockEndpoint.h"
+#include <LockEndpoint.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <cstdint>
 
