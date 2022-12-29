@@ -147,13 +147,13 @@ CHIP_ERROR AppTask::Init()
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     CHIP_ERROR err = BoltLockMgr().Init(state,
-                         ParamBuilder()
-                             .SetNumberOfUsers(numberOfUsers)
-                             .SetNumberOfCredentialsPerUser(numberOfCredentialsPerUser)
-                             .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)
-                             .SetNumberOfYeardaySchedulesPerUser(numberOfYeardaySchedulesPerUser)
-                             .SetNumberOfHolidaySchedules(numberOfHolidaySchedules)
-                             .GetLockParam());
+                                        ParamBuilder()
+                                            .SetNumberOfUsers(numberOfUsers)
+                                            .SetNumberOfCredentialsPerUser(numberOfCredentialsPerUser)
+                                            .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)
+                                            .SetNumberOfYeardaySchedulesPerUser(numberOfYeardaySchedulesPerUser)
+                                            .SetNumberOfHolidaySchedules(numberOfHolidaySchedules)
+                                            .GetLockParam());
 
     if (err != CHIP_NO_ERROR)
     {
