@@ -44,6 +44,7 @@ list(
     -Wno-unused-variable
     -Wno-deprecated-declarations
     -Wno-unused-parameter
+    -Wno-unused-label
     -Wno-format
     -Wno-stringop-truncation
     -Wno-format-nonliteral
