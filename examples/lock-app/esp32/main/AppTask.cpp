@@ -23,6 +23,7 @@
 #include "esp_log.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -60,6 +61,7 @@ StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::System;
+using namespace ESP32DoorLock::LockInitParams;
 
 AppTask AppTask::sAppTask;
 
@@ -86,7 +88,73 @@ CHIP_ERROR AppTask::Init()
                                   (void *) this,    // init timer id = app task obj context
                                   TimerEventHandler // timer callback handler
     );
-    CHIP_ERROR err = BoltLockMgr().Init();
+
+    // Initial lock state
+    chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;
+    chip::EndpointId endpointId{ 1 };
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    chip::app::Clusters::DoorLock::Attributes::LockState::Get(endpointId, state);
+
+    uint8_t numberOfCredentialsPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfCredentialsSupportedPerUser(endpointId, numberOfCredentialsPerUser))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of credentials supported per user when initializing lock endpoint, defaulting to 5 "
+                     "[endpointId=%d]",
+                     endpointId);
+        numberOfCredentialsPerUser = 5;
+    }
+
+    uint16_t numberOfUsers = 0;
+    if (!DoorLockServer::Instance().GetNumberOfUserSupported(endpointId, numberOfUsers))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of supported users when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+                     endpointId);
+        numberOfUsers = 10;
+    }
+
+    uint8_t numberOfWeekdaySchedulesPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfWeekDaySchedulesPerUserSupported(endpointId, numberOfWeekdaySchedulesPerUser))
+    {
+        ChipLogError(
+            Zcl,
+            "Unable to get number of supported weekday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+            endpointId);
+        numberOfWeekdaySchedulesPerUser = 10;
+    }
+
+    uint8_t numberOfYeardaySchedulesPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfYearDaySchedulesPerUserSupported(endpointId, numberOfYeardaySchedulesPerUser))
+    {
+        ChipLogError(
+            Zcl,
+            "Unable to get number of supported yearday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+            endpointId);
+        numberOfYeardaySchedulesPerUser = 10;
+    }
+
+    uint8_t numberOfHolidaySchedules = 0;
+    if (!DoorLockServer::Instance().GetNumberOfHolidaySchedulesSupported(endpointId, numberOfHolidaySchedules))
+    {
+        ChipLogError(
+            Zcl,
+            "Unable to get number of supported holiday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+            endpointId);
+        numberOfHolidaySchedules = 10;
+    }
+
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    CHIP_ERROR err = BoltLockMgr().Init(state,
+                         ParamBuilder()
+                             .SetNumberOfUsers(numberOfUsers)
+                             .SetNumberOfCredentialsPerUser(numberOfCredentialsPerUser)
+                             .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)
+                             .SetNumberOfYeardaySchedulesPerUser(numberOfYeardaySchedulesPerUser)
+                             .SetNumberOfHolidaySchedules(numberOfHolidaySchedules)
+                             .GetLockParam());
+
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGI(TAG, "BoltLockMgr().Init() failed");
