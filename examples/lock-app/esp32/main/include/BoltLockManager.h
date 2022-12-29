@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-
 #pragma once
 #include <app/clusters/door-lock-server/door-lock-server.h>
 

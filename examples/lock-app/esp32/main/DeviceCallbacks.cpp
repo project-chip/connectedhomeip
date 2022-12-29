@@ -63,7 +63,8 @@ void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Clus
 
 void AppDeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == app::Clusters::OnOff::Attributes::OnOff::Id, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+    VerifyOrExit(attributeId == app::Clusters::OnOff::Attributes::OnOff::Id,
+                 ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
     if (*value)
     {
@@ -79,7 +80,8 @@ exit:
 
 void AppDeviceCallbacks::OnDoorLockPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == app::Clusters::DoorLock::Attributes::LockState::Id, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+    VerifyOrExit(attributeId == app::Clusters::DoorLock::Attributes::LockState::Id,
+                 ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
     if (*value)
     {
