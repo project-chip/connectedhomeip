@@ -185,7 +185,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
     Impl()->UnlockChipStack();
 
     pthread_mutex_lock(&mStateLock);
-    mState.store(mInternallyManagedChipTask ? State::kStopping : State::kStopped, std::memory_order_relaxed);
+    mState.store(State::kStopping, std::memory_order_relaxed);
     pthread_mutex_unlock(&mStateLock);
 
     //
@@ -193,6 +193,13 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
     // StopEventLoopTask().
     //
     pthread_cond_signal(&mEventQueueStoppedCond);
+
+    //
+    // Mark event loop as truly stopped. After that line, we can not use any
+    // non-simple type member variables, because they can be destroyed by the
+    // Shutdown() method.
+    //
+    mState.store(State::kStopped, std::memory_order_relaxed);
 }
 
 template <class ImplClass>
@@ -291,7 +298,6 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
     }
 
 exit:
-    mState.store(State::kStopped, std::memory_order_relaxed);
     return CHIP_ERROR_POSIX(err);
 }
 
