@@ -347,10 +347,10 @@ DLL_LOCAL inline bool IsCategoryEnabled(uint8_t category)
 #endif // CHIP_LOG_FILTERING
 
 /* Internal macros mapping upper case definitions to camel case category constants*/
-#define _CHIP_LOG_CATEGORY_DETAIL chip::Logging::kLogCategory_Detail
-#define _CHIP_LOG_CATEGORY_PROGRESS chip::Logging::kLogCategory_Progress
-#define _CHIP_LOG_CATEGORY_ERROR chip::Logging::kLogCategory_Error
-#define _CHIP_LOG_CATEGORY_AUTOMATION chip::Logging::kLogCategory_Automation
+#define CHIP_LOG_CATEGORY_DETAIL chip::Logging::kLogCategory_Detail
+#define CHIP_LOG_CATEGORY_PROGRESS chip::Logging::kLogCategory_Progress
+#define CHIP_LOG_CATEGORY_ERROR chip::Logging::kLogCategory_Error
+#define CHIP_LOG_CATEGORY_AUTOMATION chip::Logging::kLogCategory_Automation
 
 /*
  * CHIP Logging Modules Categories filtering implementation.
@@ -412,13 +412,13 @@ DLL_LOCAL void LogV(uint8_t module, uint8_t category, const char * msg, va_list 
 #define ChipInternalLog(MOD, CAT, MSG, ...)                                                                                        \
     if (CHIP_CONFIG_LOG_MODULE_##MOD && IsModuleCategoryEnabled(MOD, CAT))                                                         \
     {                                                                                                                              \
-        ChipInternalLogImpl(MOD, _CHIP_LOG_CATEGORY_##CAT, MSG, ##__VA_ARGS__);                                                    \
+        ChipInternalLogImpl(MOD, CHIP_LOG_CATEGORY_##CAT, MSG, ##__VA_ARGS__);                                                     \
     }
 
 #define ChipInternalLogByteSpan(MOD, CAT, DATA)                                                                                    \
     if (CHIP_CONFIG_LOG_MODULE_##MOD && IsModuleCategoryEnabled(MOD, CAT))                                                         \
     {                                                                                                                              \
-        ChipInternalLogByteSpanImpl(MOD, _CHIP_LOG_CATEGORY_##CAT, DATA);                                                          \
+        ChipInternalLogByteSpanImpl(MOD, CHIP_LOG_CATEGORY_##CAT, DATA);                                                           \
     }
 #endif // CHIP_SYSTEM_CONFIG_PLATFORM_LOG
 

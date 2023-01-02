@@ -34,7 +34,7 @@
         _Pragma("clang diagnostic ignored \"-Wformat\"");                                                                          \
         os_log_with_type(chip::Logging::Platform::LoggerForModule(chip::Logging::kLogModule_##MOD, #MOD),                          \
                          static_cast<os_log_type_t>(chip::Logging::Platform::kOSLogCategory_##CAT), MSG, ##__VA_ARGS__);           \
-        ChipInternalLogImpl(MOD, CAT, MSG, ##__VA_ARGS__);                                                                         \
+        ChipInternalLogImpl(MOD, CHIP_LOG_CATEGORY_##CAT, MSG, ##__VA_ARGS__);                                                     \
         _Pragma("clang diagnostic pop");                                                                                           \
     } while (0)
 
@@ -43,7 +43,7 @@
     {                                                                                                                              \
         chip::Logging::Platform::LogByteSpan(chip::Logging::kLogModule_##MOD, #MOD,                                                \
                                              static_cast<os_log_type_t>(chip::Logging::Platform::kOSLogCategory_##CAT), DATA);     \
-        ChipInternalLogByteSpanImpl(MOD, CAT, DATA);                                                                               \
+        ChipInternalLogByteSpanImpl(MOD, CHIP_LOG_CATEGORY_##CAT, DATA);                                                           \
     } while (0)
 
 namespace chip {
