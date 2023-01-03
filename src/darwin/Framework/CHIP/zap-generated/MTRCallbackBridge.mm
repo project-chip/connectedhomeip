@@ -2688,7 +2688,7 @@ void MTROTASoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge::OnSuccessFn(void * context,
+void MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & value)
 {
@@ -2715,7 +2715,7 @@ void MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

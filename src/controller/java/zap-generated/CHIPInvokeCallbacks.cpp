@@ -946,115 +946,115 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback::CallbackFn(
         &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject status;
-    std::string statusClassName     = "java/lang/Integer";
-    std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
-                                                                  static_cast<uint8_t>(dataResponse.status), status);
-    jobject delayedActionTime;
+    jobject Status;
+    std::string StatusClassName     = "java/lang/Integer";
+    std::string StatusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(StatusClassName.c_str(), StatusCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.status), Status);
+    jobject DelayedActionTime;
     if (!dataResponse.delayedActionTime.HasValue())
     {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, delayedActionTime);
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, DelayedActionTime);
     }
     else
     {
-        jobject delayedActionTimeInsideOptional;
-        std::string delayedActionTimeInsideOptionalClassName     = "java/lang/Long";
-        std::string delayedActionTimeInsideOptionalCtorSignature = "(J)V";
+        jobject DelayedActionTimeInsideOptional;
+        std::string DelayedActionTimeInsideOptionalClassName     = "java/lang/Long";
+        std::string DelayedActionTimeInsideOptionalCtorSignature = "(J)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
-            delayedActionTimeInsideOptionalClassName.c_str(), delayedActionTimeInsideOptionalCtorSignature.c_str(),
-            dataResponse.delayedActionTime.Value(), delayedActionTimeInsideOptional);
-        chip::JniReferences::GetInstance().CreateOptional(delayedActionTimeInsideOptional, delayedActionTime);
+            DelayedActionTimeInsideOptionalClassName.c_str(), DelayedActionTimeInsideOptionalCtorSignature.c_str(),
+            dataResponse.delayedActionTime.Value(), DelayedActionTimeInsideOptional);
+        chip::JniReferences::GetInstance().CreateOptional(DelayedActionTimeInsideOptional, DelayedActionTime);
     }
-    jobject imageURI;
+    jobject ImageURI;
     if (!dataResponse.imageURI.HasValue())
     {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, imageURI);
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, ImageURI);
     }
     else
     {
-        jobject imageURIInsideOptional;
-        imageURIInsideOptional =
+        jobject ImageURIInsideOptional;
+        ImageURIInsideOptional =
             env->NewStringUTF(std::string(dataResponse.imageURI.Value().data(), dataResponse.imageURI.Value().size()).c_str());
-        chip::JniReferences::GetInstance().CreateOptional(imageURIInsideOptional, imageURI);
+        chip::JniReferences::GetInstance().CreateOptional(ImageURIInsideOptional, ImageURI);
     }
-    jobject softwareVersion;
+    jobject SoftwareVersion;
     if (!dataResponse.softwareVersion.HasValue())
     {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, softwareVersion);
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, SoftwareVersion);
     }
     else
     {
-        jobject softwareVersionInsideOptional;
-        std::string softwareVersionInsideOptionalClassName     = "java/lang/Long";
-        std::string softwareVersionInsideOptionalCtorSignature = "(J)V";
+        jobject SoftwareVersionInsideOptional;
+        std::string SoftwareVersionInsideOptionalClassName     = "java/lang/Long";
+        std::string SoftwareVersionInsideOptionalCtorSignature = "(J)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
-            softwareVersionInsideOptionalClassName.c_str(), softwareVersionInsideOptionalCtorSignature.c_str(),
-            dataResponse.softwareVersion.Value(), softwareVersionInsideOptional);
-        chip::JniReferences::GetInstance().CreateOptional(softwareVersionInsideOptional, softwareVersion);
+            SoftwareVersionInsideOptionalClassName.c_str(), SoftwareVersionInsideOptionalCtorSignature.c_str(),
+            dataResponse.softwareVersion.Value(), SoftwareVersionInsideOptional);
+        chip::JniReferences::GetInstance().CreateOptional(SoftwareVersionInsideOptional, SoftwareVersion);
     }
-    jobject softwareVersionString;
+    jobject SoftwareVersionString;
     if (!dataResponse.softwareVersionString.HasValue())
     {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, softwareVersionString);
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, SoftwareVersionString);
     }
     else
     {
-        jobject softwareVersionStringInsideOptional;
-        softwareVersionStringInsideOptional = env->NewStringUTF(
+        jobject SoftwareVersionStringInsideOptional;
+        SoftwareVersionStringInsideOptional = env->NewStringUTF(
             std::string(dataResponse.softwareVersionString.Value().data(), dataResponse.softwareVersionString.Value().size())
                 .c_str());
-        chip::JniReferences::GetInstance().CreateOptional(softwareVersionStringInsideOptional, softwareVersionString);
+        chip::JniReferences::GetInstance().CreateOptional(SoftwareVersionStringInsideOptional, SoftwareVersionString);
     }
-    jobject updateToken;
+    jobject UpdateToken;
     if (!dataResponse.updateToken.HasValue())
     {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, updateToken);
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, UpdateToken);
     }
     else
     {
-        jobject updateTokenInsideOptional;
-        jbyteArray updateTokenInsideOptionalByteArray =
+        jobject UpdateTokenInsideOptional;
+        jbyteArray UpdateTokenInsideOptionalByteArray =
             env->NewByteArray(static_cast<jsize>(dataResponse.updateToken.Value().size()));
-        env->SetByteArrayRegion(updateTokenInsideOptionalByteArray, 0, static_cast<jsize>(dataResponse.updateToken.Value().size()),
+        env->SetByteArrayRegion(UpdateTokenInsideOptionalByteArray, 0, static_cast<jsize>(dataResponse.updateToken.Value().size()),
                                 reinterpret_cast<const jbyte *>(dataResponse.updateToken.Value().data()));
-        updateTokenInsideOptional = updateTokenInsideOptionalByteArray;
-        chip::JniReferences::GetInstance().CreateOptional(updateTokenInsideOptional, updateToken);
+        UpdateTokenInsideOptional = UpdateTokenInsideOptionalByteArray;
+        chip::JniReferences::GetInstance().CreateOptional(UpdateTokenInsideOptional, UpdateToken);
     }
-    jobject userConsentNeeded;
+    jobject UserConsentNeeded;
     if (!dataResponse.userConsentNeeded.HasValue())
     {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, userConsentNeeded);
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, UserConsentNeeded);
     }
     else
     {
-        jobject userConsentNeededInsideOptional;
-        std::string userConsentNeededInsideOptionalClassName     = "java/lang/Boolean";
-        std::string userConsentNeededInsideOptionalCtorSignature = "(Z)V";
+        jobject UserConsentNeededInsideOptional;
+        std::string UserConsentNeededInsideOptionalClassName     = "java/lang/Boolean";
+        std::string UserConsentNeededInsideOptionalCtorSignature = "(Z)V";
         chip::JniReferences::GetInstance().CreateBoxedObject<bool>(
-            userConsentNeededInsideOptionalClassName.c_str(), userConsentNeededInsideOptionalCtorSignature.c_str(),
-            dataResponse.userConsentNeeded.Value(), userConsentNeededInsideOptional);
-        chip::JniReferences::GetInstance().CreateOptional(userConsentNeededInsideOptional, userConsentNeeded);
+            UserConsentNeededInsideOptionalClassName.c_str(), UserConsentNeededInsideOptionalCtorSignature.c_str(),
+            dataResponse.userConsentNeeded.Value(), UserConsentNeededInsideOptional);
+        chip::JniReferences::GetInstance().CreateOptional(UserConsentNeededInsideOptional, UserConsentNeeded);
     }
-    jobject metadataForRequestor;
+    jobject MetadataForRequestor;
     if (!dataResponse.metadataForRequestor.HasValue())
     {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, metadataForRequestor);
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, MetadataForRequestor);
     }
     else
     {
-        jobject metadataForRequestorInsideOptional;
-        jbyteArray metadataForRequestorInsideOptionalByteArray =
+        jobject MetadataForRequestorInsideOptional;
+        jbyteArray MetadataForRequestorInsideOptionalByteArray =
             env->NewByteArray(static_cast<jsize>(dataResponse.metadataForRequestor.Value().size()));
-        env->SetByteArrayRegion(metadataForRequestorInsideOptionalByteArray, 0,
+        env->SetByteArrayRegion(MetadataForRequestorInsideOptionalByteArray, 0,
                                 static_cast<jsize>(dataResponse.metadataForRequestor.Value().size()),
                                 reinterpret_cast<const jbyte *>(dataResponse.metadataForRequestor.Value().data()));
-        metadataForRequestorInsideOptional = metadataForRequestorInsideOptionalByteArray;
-        chip::JniReferences::GetInstance().CreateOptional(metadataForRequestorInsideOptional, metadataForRequestor);
+        MetadataForRequestorInsideOptional = MetadataForRequestorInsideOptionalByteArray;
+        chip::JniReferences::GetInstance().CreateOptional(MetadataForRequestorInsideOptional, MetadataForRequestor);
     }
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, status, delayedActionTime, imageURI, softwareVersion, softwareVersionString,
-                        updateToken, userConsentNeeded, metadataForRequestor);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, Status, DelayedActionTime, ImageURI, SoftwareVersion, SoftwareVersionString,
+                        UpdateToken, UserConsentNeeded, MetadataForRequestor);
 }
 CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback::CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback(
     jobject javaCallback) :
@@ -1111,19 +1111,19 @@ void CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback::CallbackFn
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject action;
-    std::string actionClassName     = "java/lang/Integer";
-    std::string actionCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(actionClassName.c_str(), actionCtorSignature.c_str(),
-                                                                  static_cast<uint8_t>(dataResponse.action), action);
-    jobject delayedActionTime;
-    std::string delayedActionTimeClassName     = "java/lang/Long";
-    std::string delayedActionTimeCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(delayedActionTimeClassName.c_str(),
-                                                                   delayedActionTimeCtorSignature.c_str(),
-                                                                   dataResponse.delayedActionTime, delayedActionTime);
+    jobject Action;
+    std::string ActionClassName     = "java/lang/Integer";
+    std::string ActionCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(ActionClassName.c_str(), ActionCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.action), Action);
+    jobject DelayedActionTime;
+    std::string DelayedActionTimeClassName     = "java/lang/Long";
+    std::string DelayedActionTimeCtorSignature = "(J)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(DelayedActionTimeClassName.c_str(),
+                                                                   DelayedActionTimeCtorSignature.c_str(),
+                                                                   dataResponse.delayedActionTime, DelayedActionTime);
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, action, delayedActionTime);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, Action, DelayedActionTime);
 }
 CHIPGeneralCommissioningClusterArmFailSafeResponseCallback::CHIPGeneralCommissioningClusterArmFailSafeResponseCallback(
     jobject javaCallback) :

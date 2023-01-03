@@ -4673,7 +4673,7 @@
               - FeatureMap
               - ClusterRevision
           OTASoftwareUpdateRequestor:
-              - DefaultOtaProviders
+              - DefaultOTAProviders
               - UpdatePossible
               - UpdateState
               - UpdateStateProgress
@@ -4723,7 +4723,7 @@
               - ApplyUpdateResponse
               - NotifyUpdateApplied
           OTASoftwareUpdateRequestor:
-              - AnnounceOtaProvider
+              - AnnounceOTAProvider
           UnitTesting:
               - Test
               - TestSpecificResponse
@@ -4880,8 +4880,8 @@
                   - arg1
           OTASoftwareUpdateProvider:
               QueryImage:
-                  - vendorId
-                  - productId
+                  - vendorID
+                  - productID
                   - softwareVersion
                   - protocolsSupported
                   - hardwareVersion
@@ -4907,9 +4907,9 @@
                   - updateToken
                   - softwareVersion
           OTASoftwareUpdateRequestor:
-              AnnounceOtaProvider:
-                  - providerNodeId
-                  - vendorId
+              AnnounceOTAProvider:
+                  - providerNodeID
+                  - vendorID
                   - announcementReason
                   - metadataForNode
                   - endpoint
@@ -5214,6 +5214,20 @@
               PIROccupiedToUnoccupiedDelay: PirOccupiedToUnoccupiedDelay
               PIRUnoccupiedToOccupiedDelay: PirUnoccupiedToOccupiedDelay
               PIRUnoccupiedToOccupiedThreshold: PirUnoccupiedToOccupiedThreshold
+          OTASoftwareUpdateRequestor:
+              DefaultOTAProviders: DefaultOtaProviders
+      commands:
+          OTASoftwareUpdateRequestor:
+              AnnounceOTAProvider: AnnounceOtaProvider
+      command fields:
+          OTASoftwareUpdateProvider:
+              QueryImage:
+                  vendorID: vendorId
+                  productID: productId
+          OTASoftwareUpdateRequestor:
+              AnnounceOTAProvider:
+                  providerNodeID: providerNodeId
+                  vendorID: vendorId
       event fields:
           Switch:
               MultiPressComplete:

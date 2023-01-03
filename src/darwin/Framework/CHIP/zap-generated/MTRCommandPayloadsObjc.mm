@@ -2081,9 +2081,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _vendorId = @(0);
+        _vendorID = @(0);
 
-        _productId = @(0);
+        _productID = @(0);
 
         _softwareVersion = @(0);
 
@@ -2105,8 +2105,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTROTASoftwareUpdateProviderClusterQueryImageParams alloc] init];
 
-    other.vendorId = self.vendorId;
-    other.productId = self.productId;
+    other.vendorID = self.vendorID;
+    other.productID = self.productID;
     other.softwareVersion = self.softwareVersion;
     other.protocolsSupported = self.protocolsSupported;
     other.hardwareVersion = self.hardwareVersion;
@@ -2121,9 +2121,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: vendorId:%@; productId:%@; softwareVersion:%@; protocolsSupported:%@; "
+        [NSString stringWithFormat:@"<%@: vendorID:%@; productID:%@; softwareVersion:%@; protocolsSupported:%@; "
                                    @"hardwareVersion:%@; location:%@; requestorCanConsent:%@; metadataForProvider:%@; >",
-                  NSStringFromClass([self class]), _vendorId, _productId, _softwareVersion, _protocolsSupported, _hardwareVersion,
+                  NSStringFromClass([self class]), _vendorID, _productID, _softwareVersion, _protocolsSupported, _hardwareVersion,
                   _location, _requestorCanConsent, [_metadataForProvider base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
@@ -2131,6 +2131,26 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTROtaSoftwareUpdateProviderClusterQueryImageParams
+
+- (void)setVendorId:(NSNumber * _Nonnull)vendorId
+{
+    self.vendorID = vendorId;
+}
+
+- (NSNumber * _Nonnull)vendorId
+{
+    return self.vendorID;
+}
+
+- (void)setProductId:(NSNumber * _Nonnull)productId
+{
+    self.productID = productId;
+}
+
+- (NSNumber * _Nonnull)productId
+{
+    return self.productID;
+}
 @end
 @implementation MTROTASoftwareUpdateProviderClusterQueryImageResponseParams
 - (instancetype)init
@@ -2296,14 +2316,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
 @end
-@implementation MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams
+@implementation MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _providerNodeId = @(0);
+        _providerNodeID = @(0);
 
-        _vendorId = @(0);
+        _vendorID = @(0);
 
         _announcementReason = @(0);
 
@@ -2317,10 +2337,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams alloc] init];
+    auto other = [[MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams alloc] init];
 
-    other.providerNodeId = self.providerNodeId;
-    other.vendorId = self.vendorId;
+    other.providerNodeID = self.providerNodeID;
+    other.vendorID = self.vendorID;
     other.announcementReason = self.announcementReason;
     other.metadataForNode = self.metadataForNode;
     other.endpoint = self.endpoint;
@@ -2332,8 +2352,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: providerNodeId:%@; vendorId:%@; announcementReason:%@; metadataForNode:%@; endpoint:%@; >",
-        NSStringFromClass([self class]), _providerNodeId, _vendorId, _announcementReason,
+        stringWithFormat:@"<%@: providerNodeID:%@; vendorID:%@; announcementReason:%@; metadataForNode:%@; endpoint:%@; >",
+        NSStringFromClass([self class]), _providerNodeID, _vendorID, _announcementReason,
         [_metadataForNode base64EncodedStringWithOptions:0], _endpoint];
     return descriptionString;
 }
@@ -2341,6 +2361,26 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams
+
+- (void)setProviderNodeId:(NSNumber * _Nonnull)providerNodeId
+{
+    self.providerNodeID = providerNodeId;
+}
+
+- (NSNumber * _Nonnull)providerNodeId
+{
+    return self.providerNodeID;
+}
+
+- (void)setVendorId:(NSNumber * _Nonnull)vendorId
+{
+    self.vendorID = vendorId;
+}
+
+- (NSNumber * _Nonnull)vendorId
+{
+    return self.vendorID;
+}
 @end
 @implementation MTRGeneralCommissioningClusterArmFailSafeParams
 - (instancetype)init

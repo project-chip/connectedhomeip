@@ -2907,8 +2907,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::OtaSoftwareUpdateRequestor;
         switch (aPath.mAttributeId)
         {
-        case Attributes::DefaultOtaProviders::Id: {
-            using TypeInfo = Attributes::DefaultOtaProviders::TypeInfo;
+        case Attributes::DefaultOTAProviders::Id: {
+            using TypeInfo = Attributes::DefaultOTAProviders::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

@@ -4332,8 +4332,8 @@ class OtaSoftwareUpdateProvider(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="vendorId", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="productId", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="vendorID", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="productID", Tag=1, Type=uint),
                             ClusterObjectFieldDescriptor(Label="softwareVersion", Tag=2, Type=uint),
                             ClusterObjectFieldDescriptor(Label="protocolsSupported", Tag=3, Type=typing.List[OtaSoftwareUpdateProvider.Enums.OTADownloadProtocol]),
                             ClusterObjectFieldDescriptor(Label="hardwareVersion", Tag=4, Type=typing.Optional[uint]),
@@ -4342,8 +4342,8 @@ class OtaSoftwareUpdateProvider(Cluster):
                             ClusterObjectFieldDescriptor(Label="metadataForProvider", Tag=7, Type=typing.Optional[bytes]),
                     ])
 
-            vendorId: 'uint' = 0
-            productId: 'uint' = 0
+            vendorID: 'uint' = 0
+            productID: 'uint' = 0
             softwareVersion: 'uint' = 0
             protocolsSupported: 'typing.List[OtaSoftwareUpdateProvider.Enums.OTADownloadProtocol]' = field(default_factory=lambda: [])
             hardwareVersion: 'typing.Optional[uint]' = None
@@ -4527,7 +4527,7 @@ class OtaSoftwareUpdateRequestor(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="defaultOtaProviders", Tag=0x00000000, Type=typing.List[OtaSoftwareUpdateRequestor.Structs.ProviderLocation]),
+                ClusterObjectFieldDescriptor(Label="defaultOTAProviders", Tag=0x00000000, Type=typing.List[OtaSoftwareUpdateRequestor.Structs.ProviderLocation]),
                 ClusterObjectFieldDescriptor(Label="updatePossible", Tag=0x00000001, Type=bool),
                 ClusterObjectFieldDescriptor(Label="updateState", Tag=0x00000002, Type=OtaSoftwareUpdateRequestor.Enums.OTAUpdateStateEnum),
                 ClusterObjectFieldDescriptor(Label="updateStateProgress", Tag=0x00000003, Type=typing.Union[Nullable, uint]),
@@ -4538,7 +4538,7 @@ class OtaSoftwareUpdateRequestor(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    defaultOtaProviders: 'typing.List[OtaSoftwareUpdateRequestor.Structs.ProviderLocation]' = None
+    defaultOTAProviders: 'typing.List[OtaSoftwareUpdateRequestor.Structs.ProviderLocation]' = None
     updatePossible: 'bool' = None
     updateState: 'OtaSoftwareUpdateRequestor.Enums.OTAUpdateStateEnum' = None
     updateStateProgress: 'typing.Union[Nullable, uint]' = None
@@ -4593,7 +4593,7 @@ class OtaSoftwareUpdateRequestor(Cluster):
 
     class Commands:
         @dataclass
-        class AnnounceOtaProvider(ClusterCommand):
+        class AnnounceOTAProvider(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x002A
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
@@ -4603,15 +4603,15 @@ class OtaSoftwareUpdateRequestor(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="providerNodeId", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="vendorId", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="providerNodeID", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="vendorID", Tag=1, Type=uint),
                             ClusterObjectFieldDescriptor(Label="announcementReason", Tag=2, Type=OtaSoftwareUpdateRequestor.Enums.OTAAnnouncementReason),
                             ClusterObjectFieldDescriptor(Label="metadataForNode", Tag=3, Type=typing.Optional[bytes]),
                             ClusterObjectFieldDescriptor(Label="endpoint", Tag=4, Type=uint),
                     ])
 
-            providerNodeId: 'uint' = 0
-            vendorId: 'uint' = 0
+            providerNodeID: 'uint' = 0
+            vendorID: 'uint' = 0
             announcementReason: 'OtaSoftwareUpdateRequestor.Enums.OTAAnnouncementReason' = 0
             metadataForNode: 'typing.Optional[bytes]' = None
             endpoint: 'uint' = 0
@@ -4619,7 +4619,7 @@ class OtaSoftwareUpdateRequestor(Cluster):
 
     class Attributes:
         @dataclass
-        class DefaultOtaProviders(ClusterAttributeDescriptor):
+        class DefaultOTAProviders(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x002A

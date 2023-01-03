@@ -2400,26 +2400,26 @@ MTR_NEWLY_AVAILABLE
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
 
 /**
- * Command AnnounceOtaProvider
+ * Command AnnounceOTAProvider
  *
  * Announce the presence of an OTA Provider
  */
-- (void)announceOtaProviderWithParams:(MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
+- (void)announceOTAProviderWithParams:(MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams *)params
                            completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeDefaultOtaProvidersWithParams:(MTRReadParams * _Nullable)params
+- (void)readAttributeDefaultOTAProvidersWithParams:(MTRReadParams * _Nullable)params
                                         completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-- (void)writeAttributeDefaultOtaProvidersWithValue:(NSArray * _Nonnull)value
+- (void)writeAttributeDefaultOTAProvidersWithValue:(NSArray * _Nonnull)value
                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-- (void)writeAttributeDefaultOtaProvidersWithValue:(NSArray * _Nonnull)value
+- (void)writeAttributeDefaultOTAProvidersWithValue:(NSArray * _Nonnull)value
                                             params:(MTRWriteParams * _Nullable)params
                                         completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
-- (void)subscribeAttributeDefaultOtaProvidersWithParams:(MTRSubscribeParams *)params
+- (void)subscribeAttributeDefaultOTAProvidersWithParams:(MTRSubscribeParams *)params
                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                           reportHandler:(void (^)(NSArray * _Nullable value,
                                                             NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
-+ (void)readAttributeDefaultOtaProvidersWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
++ (void)readAttributeDefaultOTAProvidersWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
                                                      endpoint:(NSNumber *)endpoint
                                                         queue:(dispatch_queue_t)queue
                                                    completion:(void (^)(NSArray * _Nullable value,
@@ -21970,21 +21970,21 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
 - (void)announceOtaProviderWithParams:(MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
                     completionHandler:(MTRStatusCompletion)completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use announceOtaProviderWithParams:completion:");
+        MTR_NEWLY_DEPRECATED("Please use announceOTAProviderWithParams:completion:");
 
 - (void)readAttributeDefaultOtaProvidersWithParams:(MTRReadParams * _Nullable)params
                                  completionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use readAttributeDefaultOtaProvidersWithParams:completion:");
+        MTR_NEWLY_DEPRECATED("Please use readAttributeDefaultOTAProvidersWithParams:completion:");
 - (void)writeAttributeDefaultOtaProvidersWithValue:(NSArray * _Nonnull)value
                                  completionHandler:(MTRStatusCompletion)completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use writeAttributeDefaultOtaProvidersWithValue:completion:");
+        MTR_NEWLY_DEPRECATED("Please use writeAttributeDefaultOTAProvidersWithValue:completion:");
 - (void)writeAttributeDefaultOtaProvidersWithValue:(NSArray * _Nonnull)value
                                             params:(MTRWriteParams * _Nullable)params
                                  completionHandler:(MTRStatusCompletion)completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use writeAttributeDefaultOtaProvidersWithValue:params:completion:");
+        MTR_NEWLY_DEPRECATED("Please use writeAttributeDefaultOTAProvidersWithValue:params:completion:");
 - (void)subscribeAttributeDefaultOtaProvidersWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
                                                       params:(MTRSubscribeParams * _Nullable)params
@@ -21993,14 +21993,14 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
                                                reportHandler:
                                                    (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeDefaultOtaProvidersWithParams:subscriptionEstablished:");
+        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeDefaultOTAProvidersWithParams:subscriptionEstablished:");
 + (void)readAttributeDefaultOtaProvidersWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                                   endpoint:(NSNumber *)endpoint
                                                      queue:(dispatch_queue_t)queue
                                          completionHandler:
                                              (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use readAttributeDefaultOtaProvidersWithAttributeCache:endpoint:queue:completion:");
+        MTR_NEWLY_DEPRECATED("Please use readAttributeDefaultOTAProvidersWithAttributeCache:endpoint:queue:completion:");
 
 - (void)readAttributeUpdatePossibleWithCompletionHandler:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler

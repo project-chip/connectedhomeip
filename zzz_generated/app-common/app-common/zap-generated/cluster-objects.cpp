@@ -4218,8 +4218,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kVendorId)), vendorId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kProductId)), productId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kVendorID)), vendorID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kProductID)), productID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSoftwareVersion)), softwareVersion));
     ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kProtocolsSupported)), protocolsSupported));
@@ -4247,11 +4247,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kVendorId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, vendorId));
+        case to_underlying(Fields::kVendorID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, vendorID));
             break;
-        case to_underlying(Fields::kProductId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, productId));
+        case to_underlying(Fields::kProductID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, productID));
             break;
         case to_underlying(Fields::kSoftwareVersion):
             ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
@@ -4571,13 +4571,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Structs
 
 namespace Commands {
-namespace AnnounceOtaProvider {
+namespace AnnounceOTAProvider {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kProviderNodeId)), providerNodeId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kVendorId)), vendorId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kProviderNodeID)), providerNodeID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kVendorID)), vendorID));
     ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAnnouncementReason)), announcementReason));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMetadataForNode)), metadataForNode));
@@ -4600,11 +4600,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kProviderNodeId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, providerNodeId));
+        case to_underlying(Fields::kProviderNodeID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, providerNodeID));
             break;
-        case to_underlying(Fields::kVendorId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, vendorId));
+        case to_underlying(Fields::kVendorID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, vendorID));
             break;
         case to_underlying(Fields::kAnnouncementReason):
             ReturnErrorOnFailure(DataModel::Decode(reader, announcementReason));
@@ -4624,7 +4624,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace AnnounceOtaProvider.
+} // namespace AnnounceOTAProvider.
 } // namespace Commands
 
 namespace Attributes {
@@ -4632,8 +4632,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::DefaultOtaProviders::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, defaultOtaProviders));
+    case Attributes::DefaultOTAProviders::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, defaultOTAProviders));
         break;
     case Attributes::UpdatePossible::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, updatePossible));

@@ -706,9 +706,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace OtaSoftwareUpdateRequestor {
 namespace Attributes {
 
-namespace DefaultOtaProviders {
+namespace DefaultOTAProviders {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace DefaultOtaProviders
+} // namespace DefaultOTAProviders
 
 namespace UpdatePossible {
 static constexpr AttributeId Id = 0x00000001;

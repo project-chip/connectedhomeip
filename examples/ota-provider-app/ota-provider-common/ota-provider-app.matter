@@ -225,8 +225,8 @@ server cluster OtaSoftwareUpdateProvider = 41 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct QueryImageRequest {
-    vendor_id vendorId = 0;
-    INT16U productId = 1;
+    vendor_id vendorID = 0;
+    INT16U productID = 1;
     INT32U softwareVersion = 2;
     OTADownloadProtocol protocolsSupported[] = 3;
     optional INT16U hardwareVersion = 4;

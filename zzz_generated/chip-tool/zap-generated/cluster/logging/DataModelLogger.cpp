@@ -4965,12 +4965,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case OtaSoftwareUpdateRequestor::Id: {
         switch (path.mAttributeId)
         {
-        case OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProviders::Id: {
+        case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id: {
             chip::app::DataModel::DecodableList<
                 chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("DefaultOtaProviders", 1, value);
+            return DataModelLogger::LogValue("DefaultOTAProviders", 1, value);
         }
         case OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id: {
             bool value;
