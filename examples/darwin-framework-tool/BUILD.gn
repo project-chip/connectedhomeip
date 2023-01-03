@@ -246,3 +246,9 @@ if (chip_codesign) {
     outputs = [ "${root_build_dir}/${output_name}" ]
   }
 }
+
+# Make sure we only build darwin-framework-tool, and not extraneous
+# things like address-resolve, by default.
+group("default") {
+  deps = [ ":darwin-framework-tool" ]
+}
