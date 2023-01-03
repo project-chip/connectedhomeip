@@ -2583,11 +2583,11 @@ class Descriptor(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="type", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="deviceType", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="revision", Tag=1, Type=uint),
                     ])
 
-            type: 'uint' = 0
+            deviceType: 'uint' = 0
             revision: 'uint' = 0
 
 

@@ -1274,7 +1274,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                     auto & entry_0 = iter_0.GetValue();
                     MTRDescriptorClusterDeviceTypeStruct * newElement_0;
                     newElement_0 = [MTRDescriptorClusterDeviceTypeStruct new];
-                    newElement_0.type = [NSNumber numberWithUnsignedInt:entry_0.type];
+                    newElement_0.deviceType = [NSNumber numberWithUnsignedInt:entry_0.deviceType];
                     newElement_0.revision = [NSNumber numberWithUnsignedShort:entry_0.revision];
                     [array_0 addObject:newElement_0];
                 }

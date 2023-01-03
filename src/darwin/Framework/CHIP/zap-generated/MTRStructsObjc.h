@@ -33,7 +33,9 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 @interface MTRDescriptorClusterDeviceTypeStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull type API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+@property (nonatomic, copy) NSNumber * _Nonnull deviceType MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull type API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
+    MTR_NEWLY_DEPRECATED("Please use deviceType");
 @property (nonatomic, copy) NSNumber * _Nonnull revision API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 @end
 

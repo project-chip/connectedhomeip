@@ -3075,15 +3075,15 @@ namespace Structs {
 namespace DeviceTypeStruct {
 enum class Fields
 {
-    kType     = 0,
-    kRevision = 1,
+    kDeviceType = 0,
+    kRevision   = 1,
 };
 
 struct Type
 {
 public:
-    chip::DeviceTypeId type = static_cast<chip::DeviceTypeId>(0);
-    uint16_t revision       = static_cast<uint16_t>(0);
+    chip::DeviceTypeId deviceType = static_cast<chip::DeviceTypeId>(0);
+    uint16_t revision             = static_cast<uint16_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
