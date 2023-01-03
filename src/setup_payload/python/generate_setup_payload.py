@@ -69,16 +69,12 @@ class CommissioningFlow(enum.IntEnum):
 class SetupPayload:
     def __init__(self, discriminator, pincode, rendezvous=4, flow=CommissioningFlow.Standard, vid=0, pid=0):
         self.long_discriminator = discriminator
-        self.short_discriminator = self.get_short_discriminator(discriminator)
+        self.short_discriminator = discriminator >> 8
         self.pincode = pincode
         self.rendezvous = rendezvous
         self.flow = flow
         self.vid = vid
         self.pid = pid
-
-    # 4 Most-significant bits of the 12-bits Discriminator
-    def get_short_discriminator(self, discriminator):
-        return (discriminator >> 8)
 
     def manual_chunk1(self):
         discriminator_shift = (MANUAL_DISCRIMINATOR_LEN - MANUAL_CHUNK1_DISCRIMINATOR_MSBITS_LEN)
