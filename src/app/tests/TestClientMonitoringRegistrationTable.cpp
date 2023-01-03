@@ -117,7 +117,7 @@ void TestSaveAllInvalidRegistrationValues(nlTestSuite * aSuite, void * context)
     ClientMonitoringRegistrationTable registration(testStorage);
 
     CHIP_ERROR err = registration.SaveToStorage();
-    NL_TEST_ASSERT(aSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(aSuite, err == CHIP_ERROR_INCORRECT_STATE);
 }
 
 } // namespace
