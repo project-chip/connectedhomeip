@@ -47,7 +47,7 @@ CHIP_ERROR HexToBytes(chip::CharSpan hex, F bufferAllocator, size_t * octetCount
 
     const size_t bufferSize = hex.size() / 2;
     uint8_t * buffer        = bufferAllocator(bufferSize);
-    if (buffer == nullptr)
+    if (buffer == nullptr && bufferSize != 0)
     {
         ChipLogError(chipTool, "Failed to allocate buffer of size: %llu", static_cast<unsigned long long>(bufferSize));
         return CHIP_ERROR_NO_MEMORY;
