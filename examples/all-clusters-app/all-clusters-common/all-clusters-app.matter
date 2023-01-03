@@ -258,7 +258,7 @@ server cluster OnOff = 6 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct OffWithEffectRequest {
-    OnOffEffectIdentifier effectId = 0;
+    OnOffEffectIdentifier effectIdentifier = 0;
     OnOffDelayedAllOffEffectVariant effectVariant = 1;
   }
 

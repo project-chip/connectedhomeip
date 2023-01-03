@@ -1235,7 +1235,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _effectId = @(0);
+        _effectIdentifier = @(0);
 
         _effectVariant = @(0);
         _timedInvokeTimeoutMs = nil;
@@ -1247,7 +1247,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTROnOffClusterOffWithEffectParams alloc] init];
 
-    other.effectId = self.effectId;
+    other.effectIdentifier = self.effectIdentifier;
     other.effectVariant = self.effectVariant;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
@@ -1256,11 +1256,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: effectId:%@; effectVariant:%@; >", NSStringFromClass([self class]), _effectId, _effectVariant];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: effectIdentifier:%@; effectVariant:%@; >",
+                                             NSStringFromClass([self class]), _effectIdentifier, _effectVariant];
     return descriptionString;
 }
 
+@end
+
+@implementation MTROnOffClusterOffWithEffectParams (Deprecated)
+
+- (void)setEffectId:(NSNumber * _Nonnull)effectId
+{
+    self.effectIdentifier = effectId;
+}
+
+- (NSNumber * _Nonnull)effectId
+{
+    return self.effectIdentifier;
+}
 @end
 @implementation MTROnOffClusterOnWithRecallGlobalSceneParams
 - (instancetype)init

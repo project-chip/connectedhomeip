@@ -1911,8 +1911,8 @@ public:
 namespace OffWithEffect {
 enum class Fields
 {
-    kEffectId      = 0,
-    kEffectVariant = 1,
+    kEffectIdentifier = 0,
+    kEffectVariant    = 1,
 };
 
 struct Type
@@ -1922,7 +1922,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::OffWithEffect::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
-    OnOffEffectIdentifier effectId                = static_cast<OnOffEffectIdentifier>(0);
+    OnOffEffectIdentifier effectIdentifier        = static_cast<OnOffEffectIdentifier>(0);
     OnOffDelayedAllOffEffectVariant effectVariant = static_cast<OnOffDelayedAllOffEffectVariant>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -1938,7 +1938,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::OffWithEffect::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
-    OnOffEffectIdentifier effectId                = static_cast<OnOffEffectIdentifier>(0);
+    OnOffEffectIdentifier effectIdentifier        = static_cast<OnOffEffectIdentifier>(0);
     OnOffDelayedAllOffEffectVariant effectVariant = static_cast<OnOffDelayedAllOffEffectVariant>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

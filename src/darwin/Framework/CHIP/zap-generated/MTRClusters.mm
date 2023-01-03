@@ -2074,8 +2074,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.effectId
-                    = static_cast<std::remove_reference_t<decltype(request.effectId)>>(params.effectId.unsignedCharValue);
+                request.effectIdentifier = static_cast<std::remove_reference_t<decltype(request.effectIdentifier)>>(
+                    params.effectIdentifier.unsignedCharValue);
                 request.effectVariant
                     = static_cast<std::remove_reference_t<decltype(request.effectVariant)>>(params.effectVariant.unsignedCharValue);
 

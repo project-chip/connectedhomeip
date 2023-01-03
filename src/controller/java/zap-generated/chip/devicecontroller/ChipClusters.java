@@ -1039,16 +1039,17 @@ public class ChipClusters {
     }
 
     public void offWithEffect(
-        DefaultClusterCallback callback, Integer effectId, Integer effectVariant) {
-      offWithEffect(chipClusterPtr, callback, effectId, effectVariant, null);
+        DefaultClusterCallback callback, Integer effectIdentifier, Integer effectVariant) {
+      offWithEffect(chipClusterPtr, callback, effectIdentifier, effectVariant, null);
     }
 
     public void offWithEffect(
         DefaultClusterCallback callback,
-        Integer effectId,
+        Integer effectIdentifier,
         Integer effectVariant,
         int timedInvokeTimeoutMs) {
-      offWithEffect(chipClusterPtr, callback, effectId, effectVariant, timedInvokeTimeoutMs);
+      offWithEffect(
+          chipClusterPtr, callback, effectIdentifier, effectVariant, timedInvokeTimeoutMs);
     }
 
     public void onWithRecallGlobalScene(DefaultClusterCallback callback) {
@@ -1096,7 +1097,7 @@ public class ChipClusters {
     private native void offWithEffect(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        Integer effectId,
+        Integer effectIdentifier,
         Integer effectVariant,
         @Nullable Integer timedInvokeTimeoutMs);
 

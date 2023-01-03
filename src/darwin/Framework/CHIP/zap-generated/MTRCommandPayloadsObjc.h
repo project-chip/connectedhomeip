@@ -884,7 +884,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTROnOffClusterOffWithEffectParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull effectId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSNumber * _Nonnull effectIdentifier MTR_NEWLY_AVAILABLE;
 
 @property (nonatomic, copy) NSNumber * _Nonnull effectVariant API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
@@ -902,6 +902,12 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs;
+@end
+
+@interface MTROnOffClusterOffWithEffectParams (Deprecated)
+
+@property (nonatomic, copy) NSNumber * _Nonnull effectId API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use effectIdentifier");
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
