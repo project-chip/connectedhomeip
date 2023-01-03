@@ -25,10 +25,6 @@ config CHIP_WIFI
 	select WIFI_NRF700X
 	select WIFI
 	select WPA_SUPP
-	imply FLASH
-	imply SETTINGS
-	imply NVS
-	imply FLASH_MAP
 	imply NORDIC_SECURITY_BACKEND
 	imply MBEDTLS_ENTROPY_C
 	imply MBEDTLS_PSA_CRYPTO_C
@@ -85,6 +81,13 @@ config CHIP_DFU_OVER_BT_SMP
 	imply CHIP_QSPI_NOR if BOARD_NRF5340DK_NRF5340_CPUAPP || BOARD_NRF52840DK_NRF52840
 	imply CHIP_SPI_NOR if BOARD_NRF7002DK_NRF5340_CPUAPP
 	imply BOOTLOADER_MCUBOOT
+	select MCUMGR
+	select MCUMGR_SMP_BT
+	select MCUMGR_CMD_IMG_MGMT
+	select MCUMGR_CMD_OS_MGMT
+	# Enable custom SMP request to erase settings partition.
+	select MCUMGR_GRP_ZEPHYR_BASIC if SOC_SERIES_NRF53X
+	select MCUMGR_GRP_BASIC_CMD_STORAGE_ERASE if SOC_SERIES_NRF53X
 	help
 		Enables Device Firmware Upgrade over Bluetoot LE with SMP
 		and configures set of options related to that feature.
@@ -92,22 +95,6 @@ config CHIP_DFU_OVER_BT_SMP
 if CHIP_DFU_OVER_BT_SMP
 
 # MCU Manager and SMP configuration
-config MCUMGR
-	bool
-	default y
-
-config MCUMGR_CMD_IMG_MGMT
-	bool
-	default y
-
-config MCUMGR_CMD_OS_MGMT
-	bool
-	default y
-
-config MCUMGR_SMP_BT
-	bool
-	default y
-
 config MCUMGR_SMP_BT_AUTHEN
 	bool
 	default n
@@ -136,12 +123,6 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
 	default 2800
 
 if SOC_SERIES_NRF53X
-
-# FLASH nop device is enabled to prevent bus faults when mcumgr tries to access
-# simulated partition with network core image data.
-config FLASH_NOP_DEVICE
-	bool
-	default y
 
 # Enable custom SMP request to erase settings partition.
 config MCUMGR_GRP_ZEPHYR_BASIC

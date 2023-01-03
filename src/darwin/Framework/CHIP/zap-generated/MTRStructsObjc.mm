@@ -112,35 +112,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRDescriptorClusterDeviceType
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _type = @(0);
-
-        _revision = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRDescriptorClusterDeviceType alloc] init];
-
-    other.type = self.type;
-    other.revision = self.revision;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: type:%@; revision:%@; >", NSStringFromClass([self class]), _type, _revision];
-    return descriptionString;
-}
-
+@implementation MTRDescriptorClusterDeviceType : MTRDescriptorClusterDeviceTypeStruct
 @end
 
 @implementation MTRBindingClusterTargetStruct
@@ -2079,11 +2051,10 @@ NS_ASSUME_NONNULL_BEGIN
     self.previousPosition = newPosition;
 }
 
-- (NSNumber * _Nonnull)newPosition
+- (NSNumber * _Nonnull)getNewPosition
 {
     return self.previousPosition;
 }
-
 @end
 
 @implementation MTROperationalCredentialsClusterFabricDescriptor

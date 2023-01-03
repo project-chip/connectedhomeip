@@ -24,20 +24,20 @@ tests:
       cluster: "DelayCommands"
       command: "WaitForCommissioning"
 
-    - label: "Read attribute: identify time"
+    - label: "Read attribute: IdentifyTime"
       wait: "readAttribute"
-      attribute: "identify time"
+      attribute: "IdentifyTime"
 
-    - label: "write attribute: identify time"
+    - label: "write attribute: IdentifyTime"
       wait: "writeAttribute"
-      attribute: "identify time"
+      attribute: "IdentifyTime"
       arguments:
           value:
 
-    - label: "Readback attribute: identify time"
+    - label: "Readback attribute: IdentifyTime"
       wait: "readAttribute"
-      attribute: "identify time"
+      attribute: "IdentifyTime"
 
     - label: "Read attribute: identifytype"
       wait: "readAttribute"
-      attribute: "identify type"
+      attribute: "IdentifyType"

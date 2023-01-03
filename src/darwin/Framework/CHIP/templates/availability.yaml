@@ -4542,6 +4542,10 @@
           attributes:
               Descriptor:
                   - DeviceTypeList
+  renames:
+      structs:
+          Descriptor:
+              DeviceTypeStruct: DeviceType
 
 - release: "First major API revamp"
   versions: "future"
@@ -5179,3 +5183,7 @@
               PIROccupiedToUnoccupiedDelay: PirOccupiedToUnoccupiedDelay
               PIRUnoccupiedToOccupiedDelay: PirUnoccupiedToOccupiedDelay
               PIRUnoccupiedToOccupiedThreshold: PirUnoccupiedToOccupiedThreshold
+      event fields:
+          Switch:
+              MultiPressComplete:
+                  previousPosition: newPosition

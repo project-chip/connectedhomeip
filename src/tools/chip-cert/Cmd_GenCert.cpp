@@ -992,7 +992,7 @@ bool Cmd_GenCert(int argc, char * argv[])
     uint8_t certType = kCertType_NotSpecified;
     std::unique_ptr<X509, void (*)(X509 *)> newCert(X509_new(), &X509_free);
     std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> newKey(EVP_PKEY_new(), &EVP_PKEY_free);
-    std::unique_ptr<X509, void (*)(X509 *)> caCert(X509_new(), &X509_free);
+    std::unique_ptr<X509, void (*)(X509 *)> caCert(nullptr, &X509_free);
     std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> caKey(EVP_PKEY_new(), &EVP_PKEY_free);
     X509 * caCertPtr    = nullptr;
     EVP_PKEY * caKeyPtr = nullptr;
@@ -1162,7 +1162,7 @@ bool Cmd_GenCert(int argc, char * argv[])
     }
     else
     {
-        res = ReadCert(gCACertFileNameOrStr, caCert.get());
+        res = ReadCert(gCACertFileNameOrStr, caCert);
         VerifyTrueOrExit(res);
 
         res = ReadKey(gCAKeyFileNameOrStr, caKey);
