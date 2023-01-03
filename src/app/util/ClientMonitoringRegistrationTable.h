@@ -46,9 +46,28 @@ public:
     ClientMonitoringRegistrationTable(PersistentStorageDelegate & storage);
     ~ClientMonitoringRegistrationTable(){};
 
+    /**
+     * @brief Function saves the mRegisteredClient attribute to persitant storage
+     *        To correctly persit an entry, the values must be stored in the structures attributes
+     *
+     * @return CHIP_ERROR
+     */
     CHIP_ERROR SaveToStorage();
+
+    /**
+     * @brief Function loads a client registration entry from persistent storage for a single fabric
+     *
+     * @param[in] fabricIndex fabric index to load from storage
+     * @return CHIP_ERROR
+     */
     CHIP_ERROR LoadFromStorage(FabricIndex fabricIndex);
 
+    /**
+     * @brief Accessor function that returns the client registration entry that was loaded for a fabric from persistant storage.
+     * @see LoadFromStorage
+     *
+     * @return ClientMonitoringRegistrationTable::ClientRegistrationEntry&
+     */
     ClientRegistrationEntry & GetClientRegistrationEntry();
 
 private:

@@ -27,12 +27,6 @@ namespace chip {
 
 ClientMonitoringRegistrationTable::ClientMonitoringRegistrationTable(PersistentStorageDelegate & storage) : mStorage(storage) {}
 
-/**
- * @brief Function loads a client registration entry from persistent storage for a single fabric
- *
- * @param fabricIndex fabric index to load from storage
- * @return CHIP_ERROR
- */
 CHIP_ERROR ClientMonitoringRegistrationTable::LoadFromStorage(FabricIndex fabricIndex)
 {
     uint8_t buffer[kRegStorageSize] = { 0 };
@@ -52,12 +46,6 @@ CHIP_ERROR ClientMonitoringRegistrationTable::LoadFromStorage(FabricIndex fabric
     return CHIP_NO_ERROR;
 }
 
-/**
- * @brief Function saves the mRegisteredClient attribute to persistent storage
- *        To correctly persist an entry, the values must be stored in the structures attributes
- *
- * @return CHIP_ERROR
- */
 CHIP_ERROR ClientMonitoringRegistrationTable::SaveToStorage()
 {
     VerifyOrReturnError(mRegisteredClient.IsValid(), CHIP_ERROR_INCORRECT_STATE);
@@ -73,12 +61,6 @@ CHIP_ERROR ClientMonitoringRegistrationTable::SaveToStorage()
                                     buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
-/**
- * @brief Accessor function that returns the client registration entry that was loaded for a fabric from persistant storage.
- * @see LoadFromStorage
- *
- * @return ClientMonitoringRegistrationTable::ClientRegistrationEntry&
- */
 ClientMonitoringRegistrationTable::ClientRegistrationEntry & ClientMonitoringRegistrationTable::GetClientRegistrationEntry()
 {
     return mRegisteredClient;
