@@ -53,14 +53,14 @@ CHIP_ERROR ClientMonitoringRegistrationTable::LoadFromStorage(FabricIndex fabric
 }
 
 /**
- * @brief Function saves the mRegisteredClient attribute to persitant storage
- *        To correctly persit an entry, the values must be stored in the structures attributes
+ * @brief Function saves the mRegisteredClient attribute to persistent storage
+ *        To correctly persist an entry, the values must be stored in the structures attributes
  *
  * @return CHIP_ERROR
  */
 CHIP_ERROR ClientMonitoringRegistrationTable::SaveToStorage()
 {
-    VerifyOrReturnError(mRegisteredClient.IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mRegisteredClient.IsValid(), CHIP_ERROR_INCORRECT_STATE);
 
     uint8_t buffer[kRegStorageSize] = { 0 };
     TLV::TLVWriter writer;
