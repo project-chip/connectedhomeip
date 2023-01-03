@@ -341,25 +341,25 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void addGroup(AddGroupResponseCallback callback, Integer groupId, String groupName) {
-      addGroup(chipClusterPtr, callback, groupId, groupName, null);
+    public void addGroup(AddGroupResponseCallback callback, Integer groupID, String groupName) {
+      addGroup(chipClusterPtr, callback, groupID, groupName, null);
     }
 
     public void addGroup(
         AddGroupResponseCallback callback,
-        Integer groupId,
+        Integer groupID,
         String groupName,
         int timedInvokeTimeoutMs) {
-      addGroup(chipClusterPtr, callback, groupId, groupName, timedInvokeTimeoutMs);
+      addGroup(chipClusterPtr, callback, groupID, groupName, timedInvokeTimeoutMs);
     }
 
-    public void viewGroup(ViewGroupResponseCallback callback, Integer groupId) {
-      viewGroup(chipClusterPtr, callback, groupId, null);
+    public void viewGroup(ViewGroupResponseCallback callback, Integer groupID) {
+      viewGroup(chipClusterPtr, callback, groupID, null);
     }
 
     public void viewGroup(
-        ViewGroupResponseCallback callback, Integer groupId, int timedInvokeTimeoutMs) {
-      viewGroup(chipClusterPtr, callback, groupId, timedInvokeTimeoutMs);
+        ViewGroupResponseCallback callback, Integer groupID, int timedInvokeTimeoutMs) {
+      viewGroup(chipClusterPtr, callback, groupID, timedInvokeTimeoutMs);
     }
 
     public void getGroupMembership(
@@ -374,13 +374,13 @@ public class ChipClusters {
       getGroupMembership(chipClusterPtr, callback, groupList, timedInvokeTimeoutMs);
     }
 
-    public void removeGroup(RemoveGroupResponseCallback callback, Integer groupId) {
-      removeGroup(chipClusterPtr, callback, groupId, null);
+    public void removeGroup(RemoveGroupResponseCallback callback, Integer groupID) {
+      removeGroup(chipClusterPtr, callback, groupID, null);
     }
 
     public void removeGroup(
-        RemoveGroupResponseCallback callback, Integer groupId, int timedInvokeTimeoutMs) {
-      removeGroup(chipClusterPtr, callback, groupId, timedInvokeTimeoutMs);
+        RemoveGroupResponseCallback callback, Integer groupID, int timedInvokeTimeoutMs) {
+      removeGroup(chipClusterPtr, callback, groupID, timedInvokeTimeoutMs);
     }
 
     public void removeAllGroups(DefaultClusterCallback callback) {
@@ -393,29 +393,29 @@ public class ChipClusters {
     }
 
     public void addGroupIfIdentifying(
-        DefaultClusterCallback callback, Integer groupId, String groupName) {
-      addGroupIfIdentifying(chipClusterPtr, callback, groupId, groupName, null);
+        DefaultClusterCallback callback, Integer groupID, String groupName) {
+      addGroupIfIdentifying(chipClusterPtr, callback, groupID, groupName, null);
     }
 
     public void addGroupIfIdentifying(
         DefaultClusterCallback callback,
-        Integer groupId,
+        Integer groupID,
         String groupName,
         int timedInvokeTimeoutMs) {
-      addGroupIfIdentifying(chipClusterPtr, callback, groupId, groupName, timedInvokeTimeoutMs);
+      addGroupIfIdentifying(chipClusterPtr, callback, groupID, groupName, timedInvokeTimeoutMs);
     }
 
     private native void addGroup(
         long chipClusterPtr,
         AddGroupResponseCallback Callback,
-        Integer groupId,
+        Integer groupID,
         String groupName,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void viewGroup(
         long chipClusterPtr,
         ViewGroupResponseCallback Callback,
-        Integer groupId,
+        Integer groupID,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void getGroupMembership(
@@ -427,7 +427,7 @@ public class ChipClusters {
     private native void removeGroup(
         long chipClusterPtr,
         RemoveGroupResponseCallback Callback,
-        Integer groupId,
+        Integer groupID,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void removeAllGroups(
@@ -438,18 +438,18 @@ public class ChipClusters {
     private native void addGroupIfIdentifying(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        Integer groupId,
+        Integer groupID,
         String groupName,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface AddGroupResponseCallback {
-      void onSuccess(Integer status, Integer groupId);
+      void onSuccess(Integer status, Integer groupID);
 
       void onError(Exception error);
     }
 
     public interface ViewGroupResponseCallback {
-      void onSuccess(Integer status, Integer groupId, String groupName);
+      void onSuccess(Integer status, Integer groupID, String groupName);
 
       void onError(Exception error);
     }
@@ -461,7 +461,7 @@ public class ChipClusters {
     }
 
     public interface RemoveGroupResponseCallback {
-      void onSuccess(Integer status, Integer groupId);
+      void onSuccess(Integer status, Integer groupID);
 
       void onError(Exception error);
     }

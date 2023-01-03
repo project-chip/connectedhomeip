@@ -85,7 +85,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
         _groupName = @"";
         _timedInvokeTimeoutMs = nil;
@@ -97,7 +97,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRGroupsClusterAddGroupParams alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.groupName = self.groupName;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
@@ -107,10 +107,23 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupId:%@; groupName:%@; >", NSStringFromClass([self class]), _groupId, _groupName];
+        [NSString stringWithFormat:@"<%@: groupID:%@; groupName:%@; >", NSStringFromClass([self class]), _groupID, _groupName];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRGroupsClusterAddGroupParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRGroupsClusterAddGroupResponseParams
 - (instancetype)init
@@ -119,7 +132,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -130,7 +143,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRGroupsClusterAddGroupResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -139,17 +152,30 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; >", NSStringFromClass([self class]), _status, _groupId];
+        [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; >", NSStringFromClass([self class]), _status, _groupID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRGroupsClusterAddGroupResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRGroupsClusterViewGroupParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -159,7 +185,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRGroupsClusterViewGroupParams alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -167,10 +193,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; >", NSStringFromClass([self class]), _groupId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; >", NSStringFromClass([self class]), _groupID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRGroupsClusterViewGroupParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRGroupsClusterViewGroupResponseParams
 - (instancetype)init
@@ -179,7 +218,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
 
         _groupName = @"";
         _timedInvokeTimeoutMs = nil;
@@ -192,7 +231,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRGroupsClusterViewGroupResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.groupName = self.groupName;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
@@ -201,11 +240,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; groupName:%@; >",
-                                             NSStringFromClass([self class]), _status, _groupId, _groupName];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; groupName:%@; >",
+                                             NSStringFromClass([self class]), _status, _groupID, _groupName];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRGroupsClusterViewGroupResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRGroupsClusterGetGroupMembershipParams
 - (instancetype)init
@@ -272,7 +324,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -282,7 +334,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRGroupsClusterRemoveGroupParams alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -290,10 +342,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; >", NSStringFromClass([self class]), _groupId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; >", NSStringFromClass([self class]), _groupID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRGroupsClusterRemoveGroupParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRGroupsClusterRemoveGroupResponseParams
 - (instancetype)init
@@ -302,7 +367,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -313,7 +378,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRGroupsClusterRemoveGroupResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -322,10 +387,23 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; >", NSStringFromClass([self class]), _status, _groupId];
+        [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; >", NSStringFromClass([self class]), _status, _groupID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRGroupsClusterRemoveGroupResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRGroupsClusterRemoveAllGroupsParams
 - (instancetype)init
@@ -357,7 +435,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
         _groupName = @"";
         _timedInvokeTimeoutMs = nil;
@@ -369,7 +447,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRGroupsClusterAddGroupIfIdentifyingParams alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.groupName = self.groupName;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
@@ -379,10 +457,23 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupId:%@; groupName:%@; >", NSStringFromClass([self class]), _groupId, _groupName];
+        [NSString stringWithFormat:@"<%@: groupID:%@; groupName:%@; >", NSStringFromClass([self class]), _groupID, _groupName];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRGroupsClusterAddGroupIfIdentifyingParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRScenesClusterAddSceneParams
 - (instancetype)init

@@ -217,7 +217,7 @@ class GroupsAddGroup : public ClusterCommand
 public:
     GroupsAddGroup(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("add-group", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("GroupName", &mRequest.groupName);
         ClusterCommand::AddArguments();
     }
@@ -248,7 +248,7 @@ class GroupsViewGroup : public ClusterCommand
 public:
     GroupsViewGroup(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("view-group", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         ClusterCommand::AddArguments();
     }
 
@@ -310,7 +310,7 @@ class GroupsRemoveGroup : public ClusterCommand
 public:
     GroupsRemoveGroup(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("remove-group", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         ClusterCommand::AddArguments();
     }
 
@@ -370,7 +370,7 @@ public:
     GroupsAddGroupIfIdentifying(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("add-group-if-identifying", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("GroupName", &mRequest.groupName);
         ClusterCommand::AddArguments();
     }

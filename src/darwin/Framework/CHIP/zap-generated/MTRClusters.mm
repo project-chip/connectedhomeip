@@ -343,7 +343,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.groupId = params.groupId.unsignedShortValue;
+                request.groupID = params.groupID.unsignedShortValue;
                 request.groupName = [self asCharSpan:params.groupName];
 
                 chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
@@ -402,7 +402,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.groupId = params.groupId.unsignedShortValue;
+                request.groupID = params.groupID.unsignedShortValue;
 
                 chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
@@ -541,7 +541,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.groupId = params.groupId.unsignedShortValue;
+                request.groupID = params.groupID.unsignedShortValue;
 
                 chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
@@ -663,7 +663,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.groupId = params.groupId.unsignedShortValue;
+                request.groupID = params.groupID.unsignedShortValue;
                 request.groupName = [self asCharSpan:params.groupName];
 
                 chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
