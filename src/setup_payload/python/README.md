@@ -5,8 +5,8 @@ Generates Manual Pairing Code and QR Code
 #### example usage:
 
 ```
-./GenerateSetupPayload.py -h
-./GenerateSetupPayload.py -d 3840 -p 20202021 -cf 0 -dm 2 -vid 65521 -pid 32768
+./generate_setup_payload.py -h
+./generate_setup_payload.py -d 3840 -p 20202021 -cf 0 -dm 2 -vid 65521 -pid 32768
 ```
 
 -   Output

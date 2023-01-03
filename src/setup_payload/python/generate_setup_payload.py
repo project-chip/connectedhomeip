@@ -24,37 +24,37 @@ from stdnum.verhoeff import calc_check_digit
 import Base38
 
 # See section 5.1.4.1 Manual Pairing Code in the Matter specification v1.0
-kManualDiscriminatorLength = 4
-kPincodeLength = 27
+MANUAL_DISCRIMINATOR_LEN = 4
+PINCODE_LEN = 27
 
-kManualChunk1DiscriminatorMsbitsLength = 2
-kManualChunk1DiscriminatorMsbitsPos = 0
-kManualChunk1VidPidPresentBitPos = kManualChunk1DiscriminatorMsbitsPos + kManualChunk1DiscriminatorMsbitsLength
-kManualChunk1Length = 1
+MANUAL_CHUNK1_DISCRIMINATOR_MSBITS_LEN = 2
+MANUAL_CHUNK1_DISCRIMINATOR_MSBITS_POS = 0
+MANUAL_CHUNK1_VID_PID_PRESENT_BIT_POS = MANUAL_CHUNK1_DISCRIMINATOR_MSBITS_POS + MANUAL_CHUNK1_DISCRIMINATOR_MSBITS_LEN
+MANUAL_CHUNK1_LEN = 1
 
-kManualChunk2DiscriminatorLsbitsLength = 2
-kManualChunk2PincodeLsbitsLength = 14
-kManualChunk2PincodeLsbitsPos = 0
-kManualChunk2DiscriminatorLsbitsPos = kManualChunk2PincodeLsbitsPos + kManualChunk2PincodeLsbitsLength
-kManualChunk2Length = 5
+MANUAL_CHUNK2_DISCRIMINATOR_LSBITS_LEN = 2
+MANUAL_CHUNK2_PINCODE_LSBITS_LEN = 14
+MANUAL_CHUNK2_PINCODE_LSBITS_POS = 0
+MANUAL_CHUNK2_DISCRIMINATOR_LSBITS_POS = MANUAL_CHUNK2_PINCODE_LSBITS_POS + MANUAL_CHUNK2_PINCODE_LSBITS_LEN
+MANUAL_CHUNK2_LEN = 5
 
-kManualChunk3PincodeMsbitsLength = 13
-kManualChunk3PincodeMsbitsPos = 0
-kManualChunk3Length = 4
+MANUAL_CHUNK3_PINCODE_MSBITS_LEN = 13
+MANUAL_CHUNK3_PINCODE_MSBITS_POS = 0
+MANUAL_CHUNK3_LEN = 4
 
-kManualVendorIdLength = 5
-kManualProductIdLength = 5
+MANUAL_VID_LEN = 5
+MANUAL_PID_LEN = 5
 
 # See section 5.1.3. QR Code in the Matter specification v1.0
-kQRCodeVersionLength = 3
-kQRCodeDiscriminatorLength = 12
-kQRCodeVendorIdLength = 16
-kQRCodeProductIdLength = 16
-kQRCodeCommissioningFlowLength = 2
-kQRCodeDiscoveryCapBitmaskLength = 8
-kQRCodePaddingLength = 4
-kQRCodeVersion = 0
-kQRCodePadding = 0
+QRCODE_VERSION_LEN = 3
+QRCODE_DISCRIMINATOR_LEN = 12
+QRCODE_VID_LEN = 16
+QRCODE_PID_LEN = 16
+QRCODE_COMMISSIONING_FLOW_LEN = 2
+QRCODE_DISCOVERY_CAP_BITMASK_LEN = 8
+QRCODE_PADDING_LEN = 4
+QRCODE_VERSION = 0
+QRCODE_PADDING = 0
 
 INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
                      66666666, 77777777, 88888888, 99999999, 12345678, 87654321]
@@ -68,8 +68,8 @@ class CommissioningFlow(enum.IntEnum):
 
 class SetupPayload:
     def __init__(self, discriminator, pincode, rendezvous=4, flow=CommissioningFlow.Standard, vid=0, pid=0):
-        self.longDiscriminator = discriminator
-        self.shortDiscriminator = self.GetShortDiscriminator(discriminator)
+        self.long_discriminator = discriminator
+        self.short_discriminator = self.get_short_discriminator(discriminator)
         self.pincode = pincode
         self.rendezvous = rendezvous
         self.flow = flow
@@ -77,56 +77,56 @@ class SetupPayload:
         self.pid = pid
 
     # 4 Most-significant bits of the 12-bits Discriminator
-    def GetShortDiscriminator(self, discriminator):
+    def get_short_discriminator(self, discriminator):
         return (discriminator >> 8)
 
-    def ManualChunk1(self):
-        discriminatorShift = (kManualDiscriminatorLength - kManualChunk1DiscriminatorMsbitsLength)
-        discriminatorMask = (1 << kManualChunk1DiscriminatorMsbitsLength) - 1
-        discriminatorChunk = (self.shortDiscriminator >> discriminatorShift) & discriminatorMask
-        vidPidPresentFlag = 0 if self.flow == CommissioningFlow.Standard else 1
-        return (discriminatorChunk << kManualChunk1DiscriminatorMsbitsPos) | (vidPidPresentFlag << kManualChunk1VidPidPresentBitPos)
+    def manual_chunk1(self):
+        discriminator_shift = (MANUAL_DISCRIMINATOR_LEN - MANUAL_CHUNK1_DISCRIMINATOR_MSBITS_LEN)
+        discriminator_mask = (1 << MANUAL_CHUNK1_DISCRIMINATOR_MSBITS_LEN) - 1
+        discriminator_chunk = (self.short_discriminator >> discriminator_shift) & discriminator_mask
+        vid_pid_present_flag = 0 if self.flow == CommissioningFlow.Standard else 1
+        return (discriminator_chunk << MANUAL_CHUNK1_DISCRIMINATOR_MSBITS_POS) | (vid_pid_present_flag << MANUAL_CHUNK1_VID_PID_PRESENT_BIT_POS)
 
-    def ManualChunk2(self):
-        discriminatorMask = (1 << kManualChunk2DiscriminatorLsbitsLength) - 1
-        pincodeMask = (1 << kManualChunk2PincodeLsbitsLength) - 1
-        discriminatorChunk = self.shortDiscriminator & discriminatorMask
-        return ((self.pincode & pincodeMask) << kManualChunk2PincodeLsbitsPos) | (discriminatorChunk << kManualChunk2DiscriminatorLsbitsPos)
+    def manual_chunk2(self):
+        discriminator_mask = (1 << MANUAL_CHUNK2_DISCRIMINATOR_LSBITS_LEN) - 1
+        pincode_mask = (1 << MANUAL_CHUNK2_PINCODE_LSBITS_LEN) - 1
+        discriminator_chunk = self.short_discriminator & discriminator_mask
+        return ((self.pincode & pincode_mask) << MANUAL_CHUNK2_PINCODE_LSBITS_POS) | (discriminator_chunk << MANUAL_CHUNK2_DISCRIMINATOR_LSBITS_POS)
 
-    def ManualChunk3(self):
-        pincodeShift = kPincodeLength - kManualChunk3PincodeMsbitsLength
-        pincodeMask = (1 << kManualChunk3PincodeMsbitsLength) - 1
-        return ((self.pincode >> pincodeShift) & pincodeMask) << kManualChunk3PincodeMsbitsPos
+    def manual_chunk3(self):
+        pincode_shift = PINCODE_LEN - MANUAL_CHUNK3_PINCODE_MSBITS_LEN
+        pincode_mask = (1 << MANUAL_CHUNK3_PINCODE_MSBITS_LEN) - 1
+        return ((self.pincode >> pincode_shift) & pincode_mask) << MANUAL_CHUNK3_PINCODE_MSBITS_POS
 
-    def GenerateManualCode(self):
-        payload = str(self.ManualChunk1()).zfill(kManualChunk1Length)
-        payload += str(self.ManualChunk2()).zfill(kManualChunk2Length)
-        payload += str(self.ManualChunk3()).zfill(kManualChunk3Length)
+    def generate_manualcode(self):
+        payload = str(self.manual_chunk1()).zfill(MANUAL_CHUNK1_LEN)
+        payload += str(self.manual_chunk2()).zfill(MANUAL_CHUNK2_LEN)
+        payload += str(self.manual_chunk3()).zfill(MANUAL_CHUNK3_LEN)
 
         if self.flow != CommissioningFlow.Standard:
-            payload += str(self.vid).zfill(kManualVendorIdLength)
-            payload += str(self.pid).zfill(kManualProductIdLength)
+            payload += str(self.vid).zfill(MANUAL_VID_LEN)
+            payload += str(self.pid).zfill(MANUAL_PID_LEN)
 
         payload += calc_check_digit(payload)
         return payload
 
-    def GenerateQRCode(self):
-        qrcodeBitString = '{0:b}'.format(kQRCodePadding).zfill(kQRCodePaddingLength)
-        qrcodeBitString += '{0:b}'.format(self.pincode).zfill(kPincodeLength)
-        qrcodeBitString += '{0:b}'.format(self.longDiscriminator).zfill(kQRCodeDiscriminatorLength)
-        qrcodeBitString += '{0:b}'.format(self.rendezvous).zfill(kQRCodeDiscoveryCapBitmaskLength)
-        qrcodeBitString += '{0:b}'.format(int(self.flow)).zfill(kQRCodeCommissioningFlowLength)
-        qrcodeBitString += '{0:b}'.format(self.pid).zfill(kQRCodeProductIdLength)
-        qrcodeBitString += '{0:b}'.format(self.vid).zfill(kQRCodeVendorIdLength)
-        qrcodeBitString += '{0:b}'.format(kQRCodeVersion).zfill(kQRCodeVersionLength)
+    def generate_qrcode(self):
+        qrcode_bit_string = '{0:b}'.format(QRCODE_PADDING).zfill(QRCODE_PADDING_LEN)
+        qrcode_bit_string += '{0:b}'.format(self.pincode).zfill(PINCODE_LEN)
+        qrcode_bit_string += '{0:b}'.format(self.long_discriminator).zfill(QRCODE_DISCRIMINATOR_LEN)
+        qrcode_bit_string += '{0:b}'.format(self.rendezvous).zfill(QRCODE_DISCOVERY_CAP_BITMASK_LEN)
+        qrcode_bit_string += '{0:b}'.format(int(self.flow)).zfill(QRCODE_COMMISSIONING_FLOW_LEN)
+        qrcode_bit_string += '{0:b}'.format(self.pid).zfill(QRCODE_PID_LEN)
+        qrcode_bit_string += '{0:b}'.format(self.vid).zfill(QRCODE_VID_LEN)
+        qrcode_bit_string += '{0:b}'.format(QRCODE_VERSION).zfill(QRCODE_VERSION_LEN)
 
-        qrcodeBits = bitarray(qrcodeBitString)
-        bytes = list(qrcodeBits.tobytes())
+        qrcode_bits = bitarray(qrcode_bit_string)
+        bytes = list(qrcode_bits.tobytes())
         bytes.reverse()
-        return 'MT:{}'.format(Base38.Encode(bytes))
+        return 'MT:{}'.format(Base38.encode(bytes))
 
 
-def ValidateArgs(args):
+def validate_args(args):
     def check_int_range(value, min_value, max_value, name):
         if value and ((value < min_value) or (value > max_value)):
             print('{} is out of range, should be in range from {} to {}'.format(name, min_value, max_value))
@@ -159,12 +159,12 @@ def main():
                                help='Commissionable device discovery capability bitmask. \
                                0:SoftAP, 1:BLE, 2:OnNetwork. Default: OnNetwork')
     args = parser.parse_args()
-    ValidateArgs(args)
+    validate_args(args)
 
     payloads = SetupPayload(args.discriminator, args.passcode, args.discovery_cap_bitmask,
                             CommissioningFlow(args.commissioning_flow), args.vendor_id, args.product_id)
-    manualcode = payloads.GenerateManualCode()
-    qrcode = payloads.GenerateQRCode()
+    manualcode = payloads.generate_manualcode()
+    qrcode = payloads.generate_qrcode()
 
     print("Manualcode : {}".format(manualcode))
     print("QRCode     : {}".format(qrcode))
