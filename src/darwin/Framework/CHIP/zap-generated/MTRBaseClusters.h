@@ -17124,24 +17124,54 @@ typedef NS_OPTIONS(uint8_t, MTRLevelControlOptions) {
     MTRLevelControlOptionsCoupleColorTempToLevel MTR_NEWLY_AVAILABLE = 0x2,
 } MTR_NEWLY_AVAILABLE;
 
+typedef NS_ENUM(uint8_t, MTRAccessControlEntryAuthMode) {
+    MTRAccessControlEntryAuthModePASE MTR_NEWLY_AVAILABLE = 0x01,
+    MTRAccessControlEntryAuthModeCASE MTR_NEWLY_AVAILABLE = 0x02,
+    MTRAccessControlEntryAuthModeGroup MTR_NEWLY_AVAILABLE = 0x03,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRAccessControlAuthMode) {
-    MTRAccessControlAuthModePASE API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRAccessControlAuthModeCASE API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRAccessControlAuthModeGroup API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRAccessControlAuthModePASE API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAccessControlEntryAuthModePASE")
+    = 0x01,
+    MTRAccessControlAuthModeCASE API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAccessControlEntryAuthModeCASE")
+    = 0x02,
+    MTRAccessControlAuthModeGroup API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAccessControlEntryAuthModeGroup")
+    = 0x03,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRAccessControlEntryAuthMode");
+
+typedef NS_ENUM(uint8_t, MTRAccessControlEntryPrivilege) {
+    MTRAccessControlEntryPrivilegeView MTR_NEWLY_AVAILABLE = 0x01,
+    MTRAccessControlEntryPrivilegeProxyView MTR_NEWLY_AVAILABLE = 0x02,
+    MTRAccessControlEntryPrivilegeOperate MTR_NEWLY_AVAILABLE = 0x03,
+    MTRAccessControlEntryPrivilegeManage MTR_NEWLY_AVAILABLE = 0x04,
+    MTRAccessControlEntryPrivilegeAdminister MTR_NEWLY_AVAILABLE = 0x05,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRAccessControlPrivilege) {
+    MTRAccessControlPrivilegeView API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAccessControlEntryPrivilegeView")
+    = 0x01,
+    MTRAccessControlPrivilegeProxyView API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAccessControlEntryPrivilegeProxyView")
+    = 0x02,
+    MTRAccessControlPrivilegeOperate API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAccessControlEntryPrivilegeOperate")
+    = 0x03,
+    MTRAccessControlPrivilegeManage API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAccessControlEntryPrivilegeManage")
+    = 0x04,
+    MTRAccessControlPrivilegeAdminister API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRAccessControlEntryPrivilegeAdminister")
+    = 0x05,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRAccessControlEntryPrivilege");
 
 typedef NS_ENUM(uint8_t, MTRAccessControlChangeType) {
     MTRAccessControlChangeTypeChanged API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
     MTRAccessControlChangeTypeAdded API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
     MTRAccessControlChangeTypeRemoved API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-
-typedef NS_ENUM(uint8_t, MTRAccessControlPrivilege) {
-    MTRAccessControlPrivilegeView API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRAccessControlPrivilegeProxyView API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRAccessControlPrivilegeOperate API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRAccessControlPrivilegeManage API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTRAccessControlPrivilegeAdminister API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRActionsActionError) {
