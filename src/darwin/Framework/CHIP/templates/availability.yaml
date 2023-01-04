@@ -5043,6 +5043,10 @@
               - ShutDown
               - Leave
               - ReachableChanged
+          PowerSource:
+              - WiredFaultChange
+              - BatFaultChange
+              - BatChargeFaultChange
       event fields:
           Switch:
               MultiPressComplete:
@@ -5078,6 +5082,16 @@
                   - fabricIndex
               ReachableChanged:
                   - reachableNewValue
+          PowerSource:
+              WiredFaultChange:
+                  - current
+                  - previous
+              BatFaultChange:
+                  - current
+                  - previous
+              BatChargeFaultChange:
+                  - current
+                  - previous
       enums:
           OTASoftwareUpdateProvider:
               - OTAApplyUpdateAction
@@ -5149,6 +5163,9 @@
                   - PASE
                   - CASE
                   - Group
+          PowerSource:
+              BatChargeLevel:
+                  - OK
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5229,6 +5246,10 @@
           AccessControl:
               - AccessControlEntry
               - ExtensionEntry
+          PowerSource:
+              - WiredFaultChangeType
+              - BatFaultChangeType
+              - BatChargeFaultChangeType
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5244,6 +5265,9 @@
       enum values:
           GeneralCommissioning:
               CommissioningError:
+                  - Ok
+          PowerSource:
+              BatChargeLevel:
                   - Ok
       apis:
           - Timed Invoke for server to client commands
@@ -5319,4 +5343,7 @@
       enum values:
           GeneralCommissioning:
               CommissioningError:
+                  OK: Ok
+          PowerSource:
+              BatChargeLevel:
                   OK: Ok

@@ -32,9 +32,9 @@
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 extern "C" {
-#include <bl602_hal/hal_sys.h>
 #include <bl_efuse.h>
 #include <easyflash.h>
+#include <hal_sys.h>
 }
 
 namespace chip {
@@ -213,8 +213,6 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
-    CHIP_ERROR err;
-
     ChipLogProgress(DeviceLayer, "Performing factory reset");
     ef_env_set_default();
     ChipLogProgress(DeviceLayer, "System restarting");
