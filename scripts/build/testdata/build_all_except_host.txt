@@ -1198,6 +1198,13 @@ export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
 source "$ZEPHYR_BASE/zephyr-env.sh";
 west build --cmake-only -d {out}/telink-tlsr9518adk80d-all-clusters-minimal -b tlsr9518adk80d {root}/examples/all-clusters-minimal-app/telink'
 
+# Generating telink-tlsr9518adk80d-contact-sensor
+bash -c 'export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
+export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
+source "$ZEPHYR_BASE/zephyr-env.sh";
+west build --cmake-only -d {out}/telink-tlsr9518adk80d-contact-sensor -b tlsr9518adk80d {root}/examples/contact-sensor-app/telink'
+
 # Generating telink-tlsr9518adk80d-light
 bash -c 'export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
@@ -1218,6 +1225,13 @@ export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
 export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
 source "$ZEPHYR_BASE/zephyr-env.sh";
 west build --cmake-only -d {out}/telink-tlsr9518adk80d-ota-requestor -b tlsr9518adk80d {root}/examples/ota-requestor-app/telink'
+
+# Generating telink-tlsr9518adk80d-thermostat
+bash -c 'export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
+export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
+source "$ZEPHYR_BASE/zephyr-env.sh";
+west build --cmake-only -d {out}/telink-tlsr9518adk80d-thermostat -b tlsr9518adk80d {root}/examples/thermostat/telink'
 
 # Generating tizen-arm-all-clusters
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/tizen '--args=target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters
@@ -2467,6 +2481,12 @@ export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
 export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
 ninja -C {out}/telink-tlsr9518adk80d-all-clusters-minimal'
 
+# Building telink-tlsr9518adk80d-contact-sensor
+bash -c 'export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
+export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
+ninja -C {out}/telink-tlsr9518adk80d-contact-sensor'
+
 # Building telink-tlsr9518adk80d-light
 bash -c 'export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
@@ -2484,6 +2504,12 @@ bash -c 'export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
 export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
 ninja -C {out}/telink-tlsr9518adk80d-ota-requestor'
+
+# Building telink-tlsr9518adk80d-thermostat
+bash -c 'export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
+export ZEPHYR_SDK_INSTALL_DIR="$TELINK_ZEPHYR_SDK_DIR"
+ninja -C {out}/telink-tlsr9518adk80d-thermostat'
 
 # Building tizen-arm-all-clusters
 ninja -C {out}/tizen-arm-all-clusters
