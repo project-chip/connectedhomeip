@@ -128,10 +128,18 @@ server cluster Descriptor = 29 {
 }
 
 server cluster AccessControl = 31 {
-  enum AuthMode : ENUM8 {
+  enum AccessControlEntryAuthModeEnum : ENUM8 {
     kPase = 1;
     kCase = 2;
     kGroup = 3;
+  }
+
+  enum AccessControlEntryPrivilegeEnum : ENUM8 {
+    kView = 1;
+    kProxyView = 2;
+    kOperate = 3;
+    kManage = 4;
+    kAdminister = 5;
   }
 
   enum ChangeTypeEnum : ENUM8 {
@@ -140,17 +148,9 @@ server cluster AccessControl = 31 {
     kRemoved = 2;
   }
 
-  enum Privilege : ENUM8 {
-    kView = 1;
-    kProxyView = 2;
-    kOperate = 3;
-    kManage = 4;
-    kAdminister = 5;
-  }
-
-  fabric_scoped struct AccessControlEntry {
-    fabric_sensitive Privilege privilege = 1;
-    fabric_sensitive AuthMode authMode = 2;
+  fabric_scoped struct AccessControlEntryStruct {
+    fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
+    fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
     nullable fabric_sensitive int64u subjects[] = 3;
     nullable fabric_sensitive Target targets[] = 4;
     fabric_idx fabricIndex = 254;
@@ -162,7 +162,7 @@ server cluster AccessControl = 31 {
     nullable devtype_id deviceType = 2;
   }
 
-  fabric_scoped struct ExtensionEntry {
+  fabric_scoped struct AccessControlExtensionStruct {
     fabric_sensitive octet_string<128> data = 1;
     fabric_idx fabricIndex = 254;
   }
@@ -171,7 +171,7 @@ server cluster AccessControl = 31 {
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
-    nullable AccessControlEntry latestValue = 4;
+    nullable AccessControlEntryStruct latestValue = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -179,12 +179,12 @@ server cluster AccessControl = 31 {
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
-    nullable ExtensionEntry latestValue = 4;
+    nullable AccessControlExtensionStruct latestValue = 4;
     fabric_idx fabricIndex = 254;
   }
 
-  attribute access(read: administer, write: administer) AccessControlEntry acl[] = 0;
-  attribute access(read: administer, write: administer) ExtensionEntry extension[] = 1;
+  attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
+  attribute access(read: administer, write: administer) AccessControlExtensionStruct extension[] = 1;
   readonly attribute int16u subjectsPerAccessControlEntry = 2;
   readonly attribute int16u targetsPerAccessControlEntry = 3;
   readonly attribute int16u accessControlEntriesPerFabric = 4;

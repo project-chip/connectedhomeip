@@ -129,7 +129,7 @@ class TC_SC_3_6(MatterBaseTest):
         client_list.append(dev_ctrl)
 
         if num_controllers_per_fabric > 1:
-            new_controllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=dev_ctrl.fabricAdmin, adminDevCtrl=dev_ctrl, controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=self.dut_node_id)
+            new_controllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=dev_ctrl.fabricAdmin, adminDevCtrl=dev_ctrl, controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister, targetNodeId=self.dut_node_id)
             for controller in new_controllers:
                 controller.name = all_names.pop(0)
             client_list.extend(new_controllers)
@@ -147,7 +147,7 @@ class TC_SC_3_6(MatterBaseTest):
 
             if num_controllers_per_fabric > 1:
                 new_controllers = await CommissioningBuildingBlocks.CreateControllersOnFabric(fabricAdmin=new_fabric_admin, adminDevCtrl=new_admin_ctrl,
-                                                                                              controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=self.dut_node_id)
+                                                                                              controllerNodeIds=node_ids, privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister, targetNodeId=self.dut_node_id)
                 for controller in new_controllers:
                     controller.name = all_names.pop(0)
 

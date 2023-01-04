@@ -20,19 +20,19 @@
 #include <commands/clusters/ComplexArgument.h>
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type & request,
+                                        chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("AccessControlEntry.privilege", "privilege", value.isMember("privilege")));
+        ComplexArgumentParser::EnsureMemberExist("AccessControlEntryStruct.privilege", "privilege", value.isMember("privilege")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("AccessControlEntry.authMode", "authMode", value.isMember("authMode")));
+        ComplexArgumentParser::EnsureMemberExist("AccessControlEntryStruct.authMode", "authMode", value.isMember("authMode")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("AccessControlEntry.subjects", "subjects", value.isMember("subjects")));
+        ComplexArgumentParser::EnsureMemberExist("AccessControlEntryStruct.subjects", "subjects", value.isMember("subjects")));
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("AccessControlEntry.targets", "targets", value.isMember("targets")));
+        ComplexArgumentParser::EnsureMemberExist("AccessControlEntryStruct.targets", "targets", value.isMember("targets")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "privilege");
@@ -56,12 +56,39 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.privilege);
     ComplexArgumentParser::Finalize(request.authMode);
     ComplexArgumentParser::Finalize(request.subjects);
     ComplexArgumentParser::Finalize(request.targets);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
+}
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("AccessControlExtensionStruct.data", "data", value.isMember("data")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "data");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.data, value["data"]));
+
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.data);
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Actions::Structs::ActionStruct::Type & request,
@@ -635,32 +662,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Actions::Structs::Endp
     ComplexArgumentParser::Finalize(request.name);
     ComplexArgumentParser::Finalize(request.type);
     ComplexArgumentParser::Finalize(request.endpoints);
-}
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ExtensionEntry.data", "data", value.isMember("data")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "data");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.data, value["data"]));
-
-    if (value.isMember("fabricIndex"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.data);
-    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & request,
                                         Json::Value & value)

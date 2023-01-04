@@ -2819,7 +2819,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace Target
-namespace AccessControlEntry {
+namespace AccessControlEntryStruct {
 CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     return DoEncode(writer, tag, NullOptional);
@@ -2900,8 +2900,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace AccessControlEntry
-namespace ExtensionEntry {
+} // namespace AccessControlEntryStruct
+namespace AccessControlExtensionStruct {
 CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     return DoEncode(writer, tag, NullOptional);
@@ -2961,7 +2961,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace ExtensionEntry
+} // namespace AccessControlExtensionStruct
 } // namespace Structs
 
 namespace Commands {

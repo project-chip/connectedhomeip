@@ -295,28 +295,28 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                     value_latestValue_fabricIndexClassName.c_str(), value_latestValue_fabricIndexCtorSignature.c_str(),
                     cppValue.latestValue.Value().fabricIndex, value_latestValue_fabricIndex);
 
-                jclass accessControlEntryStructClass_1;
+                jclass accessControlEntryStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$AccessControlClusterAccessControlEntry",
-                    accessControlEntryStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$AccessControlClusterAccessControlEntryStruct",
+                    accessControlEntryStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$AccessControlClusterAccessControlEntry");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$AccessControlClusterAccessControlEntryStruct");
                     return nullptr;
                 }
-                jmethodID accessControlEntryStructCtor_1 = env->GetMethodID(
-                    accessControlEntryStructClass_1, "<init>",
+                jmethodID accessControlEntryStructStructCtor_1 = env->GetMethodID(
+                    accessControlEntryStructStructClass_1, "<init>",
                     "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/ArrayList;Ljava/util/ArrayList;Ljava/lang/Integer;)V");
-                if (accessControlEntryStructCtor_1 == nullptr)
+                if (accessControlEntryStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$AccessControlClusterAccessControlEntry constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$AccessControlClusterAccessControlEntryStruct constructor");
                     return nullptr;
                 }
 
                 value_latestValue =
-                    env->NewObject(accessControlEntryStructClass_1, accessControlEntryStructCtor_1, value_latestValue_privilege,
-                                   value_latestValue_authMode, value_latestValue_subjects, value_latestValue_targets,
-                                   value_latestValue_fabricIndex);
+                    env->NewObject(accessControlEntryStructStructClass_1, accessControlEntryStructStructCtor_1,
+                                   value_latestValue_privilege, value_latestValue_authMode, value_latestValue_subjects,
+                                   value_latestValue_targets, value_latestValue_fabricIndex);
             }
 
             jobject value_fabricIndex;
@@ -338,7 +338,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             jmethodID accessControlEntryChangedStructCtor =
                 env->GetMethodID(accessControlEntryChangedStructClass, "<init>",
                                  "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Lchip/devicecontroller/"
-                                 "ChipStructs$AccessControlClusterAccessControlEntry;Ljava/lang/Integer;)V");
+                                 "ChipStructs$AccessControlClusterAccessControlEntryStruct;Ljava/lang/Integer;)V");
             if (accessControlEntryChangedStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$AccessControlClusterAccessControlEntryChangedEvent constructor");
@@ -414,24 +414,26 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                     value_latestValue_fabricIndexClassName.c_str(), value_latestValue_fabricIndexCtorSignature.c_str(),
                     cppValue.latestValue.Value().fabricIndex, value_latestValue_fabricIndex);
 
-                jclass extensionEntryStructClass_1;
+                jclass accessControlExtensionStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$AccessControlClusterExtensionEntry", extensionEntryStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$AccessControlClusterAccessControlExtensionStruct",
+                    accessControlExtensionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$AccessControlClusterExtensionEntry");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$AccessControlClusterAccessControlExtensionStruct");
                     return nullptr;
                 }
-                jmethodID extensionEntryStructCtor_1 =
-                    env->GetMethodID(extensionEntryStructClass_1, "<init>", "([BLjava/lang/Integer;)V");
-                if (extensionEntryStructCtor_1 == nullptr)
+                jmethodID accessControlExtensionStructStructCtor_1 =
+                    env->GetMethodID(accessControlExtensionStructStructClass_1, "<init>", "([BLjava/lang/Integer;)V");
+                if (accessControlExtensionStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$AccessControlClusterExtensionEntry constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$AccessControlClusterAccessControlExtensionStruct constructor");
                     return nullptr;
                 }
 
-                value_latestValue = env->NewObject(extensionEntryStructClass_1, extensionEntryStructCtor_1, value_latestValue_data,
-                                                   value_latestValue_fabricIndex);
+                value_latestValue =
+                    env->NewObject(accessControlExtensionStructStructClass_1, accessControlExtensionStructStructCtor_1,
+                                   value_latestValue_data, value_latestValue_fabricIndex);
             }
 
             jobject value_fabricIndex;
@@ -453,7 +455,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             jmethodID accessControlExtensionChangedStructCtor =
                 env->GetMethodID(accessControlExtensionChangedStructClass, "<init>",
                                  "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Lchip/devicecontroller/"
-                                 "ChipStructs$AccessControlClusterExtensionEntry;Ljava/lang/Integer;)V");
+                                 "ChipStructs$AccessControlClusterAccessControlExtensionStruct;Ljava/lang/Integer;)V");
             if (accessControlExtensionChangedStructCtor == nullptr)
             {
                 ChipLogError(Zcl,

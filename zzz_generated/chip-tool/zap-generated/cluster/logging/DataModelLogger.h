@@ -21,7 +21,9 @@
 #include <lib/core/CHIPError.h>
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType & value);
+                           const chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Actions::Structs::ActionStruct::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -61,8 +63,6 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::TimeSynchronization::Structs::DstOffsetType::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Actions::Structs::EndpointListStruct::DecodableType & value);
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
