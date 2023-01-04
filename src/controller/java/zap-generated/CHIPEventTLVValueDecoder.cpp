@@ -967,6 +967,179 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         using namespace app::Clusters::PowerSource;
         switch (aPath.mEventId)
         {
+        case Events::WiredFaultChange::Id: {
+            Events::WiredFaultChange::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_current;
+            chip::JniReferences::GetInstance().CreateArrayList(value_current);
+
+            auto iter_value_current_0 = cppValue.current.begin();
+            while (iter_value_current_0.Next())
+            {
+                auto & entry_0 = iter_value_current_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Integer";
+                std::string newElement_0CtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint8_t>(entry_0), newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value_current, newElement_0);
+            }
+
+            jobject value_previous;
+            chip::JniReferences::GetInstance().CreateArrayList(value_previous);
+
+            auto iter_value_previous_0 = cppValue.previous.begin();
+            while (iter_value_previous_0.Next())
+            {
+                auto & entry_0 = iter_value_previous_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Integer";
+                std::string newElement_0CtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint8_t>(entry_0), newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value_previous, newElement_0);
+            }
+
+            jclass wiredFaultChangeStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$PowerSourceClusterWiredFaultChangeEvent", wiredFaultChangeStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$PowerSourceClusterWiredFaultChangeEvent");
+                return nullptr;
+            }
+            jmethodID wiredFaultChangeStructCtor =
+                env->GetMethodID(wiredFaultChangeStructClass, "<init>", "(Ljava/util/ArrayList;Ljava/util/ArrayList;)V");
+            if (wiredFaultChangeStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$PowerSourceClusterWiredFaultChangeEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(wiredFaultChangeStructClass, wiredFaultChangeStructCtor, value_current, value_previous);
+
+            return value;
+        }
+        case Events::BatFaultChange::Id: {
+            Events::BatFaultChange::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_current;
+            chip::JniReferences::GetInstance().CreateArrayList(value_current);
+
+            auto iter_value_current_0 = cppValue.current.begin();
+            while (iter_value_current_0.Next())
+            {
+                auto & entry_0 = iter_value_current_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Integer";
+                std::string newElement_0CtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint8_t>(entry_0), newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value_current, newElement_0);
+            }
+
+            jobject value_previous;
+            chip::JniReferences::GetInstance().CreateArrayList(value_previous);
+
+            auto iter_value_previous_0 = cppValue.previous.begin();
+            while (iter_value_previous_0.Next())
+            {
+                auto & entry_0 = iter_value_previous_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Integer";
+                std::string newElement_0CtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint8_t>(entry_0), newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value_previous, newElement_0);
+            }
+
+            jclass batFaultChangeStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$PowerSourceClusterBatFaultChangeEvent", batFaultChangeStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$PowerSourceClusterBatFaultChangeEvent");
+                return nullptr;
+            }
+            jmethodID batFaultChangeStructCtor =
+                env->GetMethodID(batFaultChangeStructClass, "<init>", "(Ljava/util/ArrayList;Ljava/util/ArrayList;)V");
+            if (batFaultChangeStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$PowerSourceClusterBatFaultChangeEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(batFaultChangeStructClass, batFaultChangeStructCtor, value_current, value_previous);
+
+            return value;
+        }
+        case Events::BatChargeFaultChange::Id: {
+            Events::BatChargeFaultChange::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_current;
+            chip::JniReferences::GetInstance().CreateArrayList(value_current);
+
+            auto iter_value_current_0 = cppValue.current.begin();
+            while (iter_value_current_0.Next())
+            {
+                auto & entry_0 = iter_value_current_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Integer";
+                std::string newElement_0CtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint8_t>(entry_0), newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value_current, newElement_0);
+            }
+
+            jobject value_previous;
+            chip::JniReferences::GetInstance().CreateArrayList(value_previous);
+
+            auto iter_value_previous_0 = cppValue.previous.begin();
+            while (iter_value_previous_0.Next())
+            {
+                auto & entry_0 = iter_value_previous_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Integer";
+                std::string newElement_0CtorSignature = "(I)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint8_t>(entry_0), newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value_previous, newElement_0);
+            }
+
+            jclass batChargeFaultChangeStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$PowerSourceClusterBatChargeFaultChangeEvent",
+                batChargeFaultChangeStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$PowerSourceClusterBatChargeFaultChangeEvent");
+                return nullptr;
+            }
+            jmethodID batChargeFaultChangeStructCtor =
+                env->GetMethodID(batChargeFaultChangeStructClass, "<init>", "(Ljava/util/ArrayList;Ljava/util/ArrayList;)V");
+            if (batChargeFaultChangeStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$PowerSourceClusterBatChargeFaultChangeEvent constructor");
+                return nullptr;
+            }
+
+            jobject value =
+                env->NewObject(batChargeFaultChangeStructClass, batChargeFaultChangeStructCtor, value_current, value_previous);
+
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
