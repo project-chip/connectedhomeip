@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,19 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # BL602 board used
-  bl602_board = "BL-HWC-G1"
-}
+# Options from standalone-chip.mk that differ from configure defaults. These
+# options are used from examples/.
 
-if (bl602_board == "") {
-  #  bl602_board = getenv("BL602_BOARD")
-  bl602_board = "BL-HWC-G1"
-}
-
-assert(bl602_board != "", "bl602_board must be specified")
-
-board_defines = []
-#  bl602_mcu = ""
-#  enable_fem = true
-#  board_defines += [ "PAL_RTCC_CLOCK_LFRCO" ]
+custom_toolchain =
+    "//third_party/connectedhomeip/config/bouffalolab/toolchain:riscv_gcc"

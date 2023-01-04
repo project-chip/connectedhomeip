@@ -148,8 +148,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
                                                                const app::ConcreteCommandPath & commandPath,
                                                                const Commands::QueryImage::DecodableType & commandData)
 {
-    auto & vendorId            = commandData.vendorId;
-    auto & productId           = commandData.productId;
+    auto & vendorId            = commandData.vendorID;
+    auto & productId           = commandData.productID;
     auto & hardwareVersion     = commandData.hardwareVersion;
     auto & softwareVersion     = commandData.softwareVersion;
     auto & protocolsSupported  = commandData.protocolsSupported;

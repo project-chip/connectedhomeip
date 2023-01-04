@@ -12,6 +12,7 @@
 #include "lwip/prot/ip6.h"
 #include "lwip/prot/nd6.h"
 #include "lwip/raw.h"
+#include <wifi_mgmr_ext.h>
 
 typedef struct bl_route_hook_t
 {

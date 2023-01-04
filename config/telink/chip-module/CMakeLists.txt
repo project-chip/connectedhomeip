@@ -327,7 +327,7 @@ endif()
 if (CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)
     add_custom_target(merge_factory_data ALL
         COMMAND
-        dd if=${PROJECT_BINARY_DIR}/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=2000
+        dd if=${PROJECT_BINARY_DIR}/factory/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=2000
     )
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     add_dependencies(merge_factory_data merge_mcuboot)

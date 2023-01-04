@@ -32,41 +32,41 @@ tests:
       command: "ViewGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0x87
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0
 
     - label: "View First Group (not found)"
       command: "ViewGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
 
     - label: "Add First Group (no keys)"
       command: "AddGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
-              - name: "groupName"
+              - name: "GroupName"
                 value: "Group #1"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0x7e
-              - name: "groupId"
+              - name: "GroupId"
                 value: 0x0101
 
     - label: "Add KeySet"
@@ -104,99 +104,99 @@ tests:
       command: "AddGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
-              - name: "groupName"
+              - name: "GroupName"
                 value: "Group #1"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
 
     - label: "View First Group (new)"
       command: "ViewGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
-              - name: "groupName"
+              - name: "GroupName"
                 value: "Group #1"
 
     - label: "View Second Group (not found)"
       command: "ViewGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0102
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0102
 
     - label: "Get Group Membership 1 (all)"
       command: "GetGroupMembership"
       arguments:
           values:
-              - name: "groupList"
+              - name: "GroupList"
                 value: []
       response:
           values:
-              - name: "capacity"
+              - name: "Capacity"
                 value: null
-              - name: "groupList"
+              - name: "GroupList"
                 value: [0x0101]
 
     - label: "Add Second Group (new)"
       command: "AddGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0102
-              - name: "groupName"
+              - name: "GroupName"
                 value: "Group #2"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0102
 
     - label: "View Second Group (new)"
       command: "ViewGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0102
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0102
-              - name: "groupName"
+              - name: "GroupName"
                 value: "Group #2"
 
     - label: "View Group 3 (not found)"
       command: "ViewGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x7fff
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x7fff
 
     - label: "Add Group 3 (new)"
@@ -205,58 +205,58 @@ tests:
       command: "AddGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x7fff
-              - name: "groupName"
+              - name: "GroupName"
                 value: "Group #3"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x7fff
 
     - label: "View First Group (existing)"
       command: "ViewGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
-              - name: "groupName"
+              - name: "GroupName"
                 value: "Group #1"
 
     - label: "View Second Group (existing)"
       command: "ViewGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0102
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0102
-              - name: "groupName"
+              - name: "GroupName"
                 value: "Group #2"
 
     - label: "Get Group Membership 2"
       command: "GetGroupMembership"
       arguments:
           values:
-              - name: "groupList"
+              - name: "GroupList"
                 value: [0x0102, 0x0103, 0x7fff]
       response:
           values:
-              - name: "capacity"
+              - name: "Capacity"
                 value: null
-              - name: "groupList"
+              - name: "GroupList"
                 value: [0x0102]
 
     - label: "View Group 3 (new)"
@@ -265,82 +265,82 @@ tests:
       command: "ViewGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x7fff
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x7fff
-              - name: "groupName"
+              - name: "GroupName"
                 value: "Group #3"
 
     - label: "Remove Group 0 (invalid)"
       command: "RemoveGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0x87
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0
 
     - label: "Remove Group 4 (not found)"
       command: "RemoveGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0104
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0104
 
     - label: "Remove Second Group (existing)"
       command: "RemoveGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0102
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0102
 
     - label: "View First Group (not removed)"
       command: "ViewGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
-              - name: "groupName"
+              - name: "GroupName"
                 value: "Group #1"
 
     - label: "View Second Group (removed)"
       command: "ViewGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0102
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0102
 
     - label: "View Group 3 (not removed)"
@@ -349,28 +349,28 @@ tests:
       command: "ViewGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x7fff
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x7fff
-              - name: "groupName"
+              - name: "GroupName"
                 value: "Group #3"
 
     - label: "Get Group Membership 3"
       command: "GetGroupMembership"
       arguments:
           values:
-              - name: "groupList"
+              - name: "GroupList"
                 value: [0x01, 0x0101, 0x0102, 0x03]
       response:
           values:
-              - name: "capacity"
+              - name: "Capacity"
                 value: null
-              - name: "groupList"
+              - name: "GroupList"
                 value: [0x0101]
 
     - label: "Remove All"
@@ -380,50 +380,50 @@ tests:
       command: "ViewGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
 
     - label: "View Second Group (still removed)"
       command: "ViewGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0102
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0102
 
     - label: "View Group 3 (removed)"
       command: "ViewGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x7fff
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0x8B
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x7fff
 
     - label: "Get Group Membership 4"
       command: "GetGroupMembership"
       arguments:
           values:
-              - name: "groupList"
+              - name: "GroupList"
                 value: [0x01, 0x0101, 0x0102, 0x03, 0x7fff]
       response:
           values:
-              - name: "capacity"
+              - name: "Capacity"
                 value: null
-              - name: "groupList"
+              - name: "GroupList"
                 value: []

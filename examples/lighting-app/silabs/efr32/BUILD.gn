@@ -100,11 +100,6 @@ defines = []
 
 # WiFi settings
 if (chip_enable_wifi) {
-  # disabling LCD for MG24 for wifi
-  if (silabs_board == "BRD4186A" || silabs_board == "BRD4187A") {
-    show_qr_code = false
-    disable_lcd = true
-  }
   if (chip_default_wifi_ssid != "") {
     defines += [
       "CHIP_ONNETWORK_PAIRING=1",

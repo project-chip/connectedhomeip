@@ -86,7 +86,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _type = @(0);
+        _deviceType = @(0);
 
         _revision = @(0);
     }
@@ -97,7 +97,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRDescriptorClusterDeviceTypeStruct alloc] init];
 
-    other.type = self.type;
+    other.deviceType = self.deviceType;
     other.revision = self.revision;
 
     return other;
@@ -106,41 +106,23 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: type:%@; revision:%@; >", NSStringFromClass([self class]), _type, _revision];
+        [NSString stringWithFormat:@"<%@: deviceType:%@; revision:%@; >", NSStringFromClass([self class]), _deviceType, _revision];
     return descriptionString;
+}
+
+- (void)setType:(NSNumber * _Nonnull)type
+{
+    self.deviceType = type;
+}
+
+- (NSNumber * _Nonnull)type
+{
+    return self.deviceType;
 }
 
 @end
 
-@implementation MTRDescriptorClusterDeviceType
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _type = @(0);
-
-        _revision = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRDescriptorClusterDeviceType alloc] init];
-
-    other.type = self.type;
-    other.revision = self.revision;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: type:%@; revision:%@; >", NSStringFromClass([self class]), _type, _revision];
-    return descriptionString;
-}
-
+@implementation MTRDescriptorClusterDeviceType : MTRDescriptorClusterDeviceTypeStruct
 @end
 
 @implementation MTRBindingClusterTargetStruct
@@ -217,7 +199,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRAccessControlClusterAccessControlEntry
+@implementation MTRAccessControlClusterAccessControlEntryStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -237,7 +219,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRAccessControlClusterAccessControlEntry alloc] init];
+    auto other = [[MTRAccessControlClusterAccessControlEntryStruct alloc] init];
 
     other.privilege = self.privilege;
     other.authMode = self.authMode;
@@ -258,7 +240,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRAccessControlClusterExtensionEntry
+@implementation MTRAccessControlClusterAccessControlEntry : MTRAccessControlClusterAccessControlEntryStruct
+@end
+
+@implementation MTRAccessControlClusterAccessControlExtensionStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -272,7 +257,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRAccessControlClusterExtensionEntry alloc] init];
+    auto other = [[MTRAccessControlClusterAccessControlExtensionStruct alloc] init];
 
     other.data = self.data;
     other.fabricIndex = self.fabricIndex;
@@ -287,6 +272,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRAccessControlClusterExtensionEntry : MTRAccessControlClusterAccessControlExtensionStruct
 @end
 
 @implementation MTRAccessControlClusterAccessControlEntryChangedEvent
@@ -2079,11 +2067,10 @@ NS_ASSUME_NONNULL_BEGIN
     self.previousPosition = newPosition;
 }
 
-- (NSNumber * _Nonnull)newPosition
+- (NSNumber * _Nonnull)getNewPosition
 {
     return self.previousPosition;
 }
-
 @end
 
 @implementation MTROperationalCredentialsClusterFabricDescriptor

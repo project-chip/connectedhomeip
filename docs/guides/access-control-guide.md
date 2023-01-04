@@ -378,15 +378,15 @@ strongly typed values:
 
 The privileges are:
 
--   Clusters.AccessControl.Enums.Privilege.kView
--   Clusters.AccessControl.Enums.Privilege.kOperate
--   Clusters.AccessControl.Enums.Privilege.kManage
--   Clusters.AccessControl.Enums.Privilege.kAdminister
+-   `Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView`
+-   `Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate`
+-   `Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kManage`
+-   `Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister`
 
 The authentication modes are:
 
--   Clusters.AccessControl.Enums.AuthMode.kCASE
--   Clusters.AccessControl.Enums.AuthMode.kGroup
+-   `Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCASE`
+-   `Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup`
 
 Some typical clusters:
 
@@ -433,14 +433,14 @@ await devCtrl.ReadAttribute(1, [ (0, Clusters.AccessControl.Attributes.Acl ) ] )
 
 ```
 await devCtrl.WriteAttribute(1, [ (0, Clusters.AccessControl.Attributes.Acl( [
-  Clusters.AccessControl.Structs.AccessControlEntry(
-    privilege = Clusters.AccessControl.Enums.Privilege.kAdminister,
-    authMode = Clusters.AccessControl.Enums.AuthMode.kCase,
+  Clusters.AccessControl.Structs.AccessControlEntryStruct(
+    privilege = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+    authMode = Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
     subjects = [ 1 ]
   ),
-  Clusters.AccessControl.Structs.AccessControlEntry(
-    privilege = Clusters.AccessControl.Enums.Privilege.kView,
-    authMode = Clusters.AccessControl.Enums.AuthMode.kCase,
+  Clusters.AccessControl.Structs.AccessControlEntryStruct(
+    privilege = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+    authMode = Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
     subjects = [ 4444, 5555, 6666 ],
   ),
 ] ) ) ] )
@@ -482,19 +482,19 @@ await devCtrl.WriteAttribute(1, [ (0, Clusters.AccessControl.Attributes.Acl( [
 
 ```
 await devCtrl.WriteAttribute(1, [ (0, Clusters.AccessControl.Attributes.Acl( [
-  Clusters.AccessControl.Structs.AccessControlEntry(
-    privilege = Clusters.AccessControl.Enums.Privilege.kAdminister,
-    authMode = Clusters.AccessControl.Enums.AuthMode.kCase,
+  Clusters.AccessControl.Structs.AccessControlEntryStruct(
+    privilege = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+    authMode = Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
     subjects = [ 1 ]
   ),
-  Clusters.AccessControl.Structs.AccessControlEntry(
-    privilege = Clusters.AccessControl.Enums.Privilege.kView,
-    authMode = Clusters.AccessControl.Enums.AuthMode.kCase,
+  Clusters.AccessControl.Structs.AccessControlEntryStruct(
+    privilege = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+    authMode = Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
     subjects = [ 4444, 5555, 6666 ],
   ),
-  Clusters.AccessControl.Structs.AccessControlEntry(
-    privilege = Clusters.AccessControl.Enums.Privilege.kOperate,
-    authMode = Clusters.AccessControl.Enums.AuthMode.kGroup,
+  Clusters.AccessControl.Structs.AccessControlEntryStruct(
+    privilege = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+    authMode = Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup,
     subjects = [ 123, 456 ],
     targets = [
       Clusters.AccessControl.Structs.Target(

@@ -94,15 +94,15 @@ tests:
       endpoint: 1
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
-              - name: "groupName"
+              - name: "GroupName"
                 value: "Group #1"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
 
     - label: "Add Group 2 (endpoint 0)"
@@ -111,15 +111,15 @@ tests:
       endpoint: 0
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0102
-              - name: "groupName"
+              - name: "GroupName"
                 value: "Group #2"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0102
 
     - label: "Install ACLs"
@@ -347,15 +347,15 @@ tests:
       endpoint: 1
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
-              - name: "groupName"
+              - name: "GroupName"
                 value: "Group #1"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
 
     - label: "Add Group 2 (endpoint 0) for gamma"
@@ -365,15 +365,15 @@ tests:
       endpoint: 0
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0102
-              - name: "groupName"
+              - name: "GroupName"
                 value: "Group #2"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0102
 
     - label: "Install ACLs for gamma"

@@ -206,14 +206,29 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(LevelControl::StepMode 
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AuthMode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessControlEntryAuthModeEnum val)
 {
-    using EnumType = AccessControl::AuthMode;
+    using EnumType = AccessControl::AccessControlEntryAuthModeEnum;
     switch (val)
     {
     case EnumType::kPase:
     case EnumType::kCase:
     case EnumType::kGroup:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessControlEntryPrivilegeEnum val)
+{
+    using EnumType = AccessControl::AccessControlEntryPrivilegeEnum;
+    switch (val)
+    {
+    case EnumType::kView:
+    case EnumType::kProxyView:
+    case EnumType::kOperate:
+    case EnumType::kManage:
+    case EnumType::kAdminister:
         return val;
     default:
         return static_cast<EnumType>(0);
@@ -230,21 +245,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::ChangeTy
         return val;
     default:
         return static_cast<EnumType>(3);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::Privilege val)
-{
-    using EnumType = AccessControl::Privilege;
-    switch (val)
-    {
-    case EnumType::kView:
-    case EnumType::kProxyView:
-    case EnumType::kOperate:
-    case EnumType::kManage:
-    case EnumType::kAdminister:
-        return val;
-    default:
-        return static_cast<EnumType>(0);
     }
 }
 
