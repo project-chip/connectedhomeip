@@ -38,6 +38,10 @@ config LOG_DEFAULT_LEVEL
     int
     default 2
 
+config CHIP_LOG_SIZE_OPTIMIZATION
+    bool
+    default y
+
 endif
 
 config PRINTK_SYNC

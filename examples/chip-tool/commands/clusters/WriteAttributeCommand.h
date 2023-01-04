@@ -129,9 +129,7 @@ public:
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                            std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds, const T & values)
     {
-        return InteractionModelWriter::WriteAttribute(device, endpointIds, clusterIds, attributeIds, values,
-                                                      mTimedInteractionTimeoutMs, mSuppressResponse, mDataVersions, mRepeatCount,
-                                                      mRepeatDelayInMs);
+        return InteractionModelWriter::WriteAttribute(device, endpointIds, clusterIds, attributeIds, values);
     }
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex, std::vector<chip::ClusterId> clusterIds,
@@ -249,12 +247,6 @@ private:
     std::vector<chip::AttributeId> mAttributeIds;
 
     CHIP_ERROR mError = CHIP_NO_ERROR;
-    chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
-    chip::Optional<std::vector<chip::DataVersion>> mDataVersions;
-    chip::Optional<bool> mSuppressResponse;
-    chip::Optional<uint16_t> mRepeatCount;
-    chip::Optional<uint16_t> mRepeatDelayInMs;
-
     T mAttributeValues;
 };
 

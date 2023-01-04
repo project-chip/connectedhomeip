@@ -476,13 +476,14 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("DeviceTypeStruct.type", "type", value.isMember("type")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("DeviceTypeStruct.deviceType", "deviceType", value.isMember("deviceType")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("DeviceTypeStruct.revision", "revision", value.isMember("revision")));
 
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "type");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.type, value["type"]));
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "deviceType");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.deviceType, value["deviceType"]));
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "revision");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.revision, value["revision"]));
@@ -492,7 +493,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.type);
+    ComplexArgumentParser::Finalize(request.deviceType);
     ComplexArgumentParser::Finalize(request.revision);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,

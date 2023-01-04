@@ -75,11 +75,11 @@ public class ChipStructs {
   }
 
   public static class DescriptorClusterDeviceTypeStruct {
-    public Long type;
+    public Long deviceType;
     public Integer revision;
 
-    public DescriptorClusterDeviceTypeStruct(Long type, Integer revision) {
-      this.type = type;
+    public DescriptorClusterDeviceTypeStruct(Long deviceType, Integer revision) {
+      this.deviceType = deviceType;
       this.revision = revision;
     }
 
@@ -87,8 +87,8 @@ public class ChipStructs {
     public String toString() {
       StringBuilder output = new StringBuilder();
       output.append("DescriptorClusterDeviceTypeStruct {\n");
-      output.append("\ttype: ");
-      output.append(type);
+      output.append("\tdeviceType: ");
+      output.append(deviceType);
       output.append("\n");
       output.append("\trevision: ");
       output.append(revision);

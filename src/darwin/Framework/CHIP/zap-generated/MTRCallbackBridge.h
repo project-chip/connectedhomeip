@@ -640,7 +640,7 @@ typedef void (*OTASoftwareUpdateProviderAcceptedCommandListListAttributeCallback
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OTASoftwareUpdateProviderAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*OTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback)(
+typedef void (*OTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & data);
@@ -3567,16 +3567,16 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge
-    : public MTRCallbackBridge<OTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback>
+class MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackBridge
+    : public MTRCallbackBridge<OTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallback>
 {
 public:
-    MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<OTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<OTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback>(queue, handler, action,
+        MTRCallbackBridge<OTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallback>(queue, handler, action,
                                                                                               OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
@@ -3584,20 +3584,20 @@ public:
                                 chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & value);
 };
 
-class MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge
-    : public MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge
+class MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackSubscriptionBridge
+    : public MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackBridge
 {
 public:
-    MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge(
+    MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge(queue, handler, action),
+        MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge::OnDone;
+    using MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

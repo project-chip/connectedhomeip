@@ -7580,8 +7580,8 @@ bool emberAfGroupsClusterAddGroupCallback(chip::app::CommandHandler * commandObj
 /**
  * @brief Groups Cluster AddGroupResponse Command callback (from server)
  */
-bool emberAfGroupsClusterAddGroupResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t status,
-                                                  chip::GroupId groupId);
+bool emberAfGroupsClusterAddGroupResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t Status,
+                                                  chip::GroupId GroupID);
 /**
  * @brief Groups Cluster ViewGroup Command callback (from client)
  */
@@ -7591,8 +7591,8 @@ bool emberAfGroupsClusterViewGroupCallback(chip::app::CommandHandler * commandOb
 /**
  * @brief Groups Cluster ViewGroupResponse Command callback (from server)
  */
-bool emberAfGroupsClusterViewGroupResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t status,
-                                                   chip::GroupId groupId, chip::CharSpan groupName);
+bool emberAfGroupsClusterViewGroupResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t Status,
+                                                   chip::GroupId GroupID, chip::CharSpan GroupName);
 /**
  * @brief Groups Cluster GetGroupMembership Command callback (from client)
  */
@@ -7603,8 +7603,8 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(
  * @brief Groups Cluster GetGroupMembershipResponse Command callback (from server)
  */
 bool emberAfGroupsClusterGetGroupMembershipResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                            uint8_t capacity,
-                                                            /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
+                                                            uint8_t Capacity,
+                                                            /* TYPE WARNING: array array defaults to */ uint8_t * GroupList);
 /**
  * @brief Groups Cluster RemoveGroup Command callback (from client)
  */
@@ -7615,7 +7615,7 @@ bool emberAfGroupsClusterRemoveGroupCallback(chip::app::CommandHandler * command
  * @brief Groups Cluster RemoveGroupResponse Command callback (from server)
  */
 bool emberAfGroupsClusterRemoveGroupResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                     uint8_t status, chip::GroupId groupId);
+                                                     uint8_t Status, chip::GroupId GroupID);
 /**
  * @brief Groups Cluster RemoveAllGroups Command callback (from client)
  */
@@ -7912,9 +7912,9 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
  * @brief OTA Software Update Provider Cluster QueryImageResponse Command callback (from server)
  */
 bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(
-    chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t status, uint32_t delayedActionTime,
-    chip::CharSpan imageURI, uint32_t softwareVersion, chip::CharSpan softwareVersionString, chip::ByteSpan updateToken,
-    bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
+    chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t Status, uint32_t DelayedActionTime,
+    chip::CharSpan ImageURI, uint32_t SoftwareVersion, chip::CharSpan SoftwareVersionString, chip::ByteSpan UpdateToken,
+    bool UserConsentNeeded, chip::ByteSpan MetadataForRequestor);
 /**
  * @brief OTA Software Update Provider Cluster ApplyUpdateRequest Command callback (from client)
  */
@@ -7925,8 +7925,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
  * @brief OTA Software Update Provider Cluster ApplyUpdateResponse Command callback (from server)
  */
 bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback(chip::EndpointId endpoint,
-                                                                        chip::app::CommandSender * commandObj, uint8_t action,
-                                                                        uint32_t delayedActionTime);
+                                                                        chip::app::CommandSender * commandObj, uint8_t Action,
+                                                                        uint32_t DelayedActionTime);
 /**
  * @brief OTA Software Update Provider Cluster NotifyUpdateApplied Command callback (from client)
  */
@@ -7934,11 +7934,11 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData);
 /**
- * @brief OTA Software Update Requestor Cluster AnnounceOtaProvider Command callback (from client)
+ * @brief OTA Software Update Requestor Cluster AnnounceOTAProvider Command callback (from client)
  */
-bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
+bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOTAProviderCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData);
+    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData);
 /**
  * @brief General Commissioning Cluster ArmFailSafe Command callback (from client)
  */

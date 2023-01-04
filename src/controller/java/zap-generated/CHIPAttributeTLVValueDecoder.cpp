@@ -1370,11 +1370,12 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                jobject newElement_0_type;
-                std::string newElement_0_typeClassName     = "java/lang/Long";
-                std::string newElement_0_typeCtorSignature = "(J)V";
-                chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
-                    newElement_0_typeClassName.c_str(), newElement_0_typeCtorSignature.c_str(), entry_0.type, newElement_0_type);
+                jobject newElement_0_deviceType;
+                std::string newElement_0_deviceTypeClassName     = "java/lang/Long";
+                std::string newElement_0_deviceTypeCtorSignature = "(J)V";
+                chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0_deviceTypeClassName.c_str(),
+                                                                               newElement_0_deviceTypeCtorSignature.c_str(),
+                                                                               entry_0.deviceType, newElement_0_deviceType);
                 jobject newElement_0_revision;
                 std::string newElement_0_revisionClassName     = "java/lang/Integer";
                 std::string newElement_0_revisionCtorSignature = "(I)V";
@@ -1398,7 +1399,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
 
-                newElement_0 = env->NewObject(deviceTypeStructStructClass_1, deviceTypeStructStructCtor_1, newElement_0_type,
+                newElement_0 = env->NewObject(deviceTypeStructStructClass_1, deviceTypeStructStructCtor_1, newElement_0_deviceType,
                                               newElement_0_revision);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -2907,8 +2908,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::OtaSoftwareUpdateRequestor;
         switch (aPath.mAttributeId)
         {
-        case Attributes::DefaultOtaProviders::Id: {
-            using TypeInfo = Attributes::DefaultOtaProviders::TypeInfo;
+        case Attributes::DefaultOTAProviders::Id: {
+            using TypeInfo = Attributes::DefaultOTAProviders::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

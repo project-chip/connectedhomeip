@@ -2049,20 +2049,20 @@ private:
     bool keepAlive;
 };
 
-class CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback
-    : public chip::Callback::Callback<CHIPOtaSoftwareUpdateRequestorClusterDefaultOtaProvidersAttributeCallbackType>
+class CHIPOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeCallback
+    : public chip::Callback::Callback<CHIPOtaSoftwareUpdateRequestorClusterDefaultOTAProvidersAttributeCallbackType>
 {
 public:
-    CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback();
+    ~CHIPOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeCallback();
 
-    static void maybeDestroy(CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback * callback)
+    static void maybeDestroy(CHIPOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeCallback>(callback);
         }
     }
 
@@ -2072,7 +2072,7 @@ public:
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 

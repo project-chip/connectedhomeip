@@ -2735,11 +2735,12 @@ void CHIPDescriptorDeviceTypeListAttributeCallback::CallbackFn(
     {
         auto & entry_0 = iter_arrayListObj_0.GetValue();
         jobject newElement_0;
-        jobject newElement_0_type;
-        std::string newElement_0_typeClassName     = "java/lang/Long";
-        std::string newElement_0_typeCtorSignature = "(J)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
-            newElement_0_typeClassName.c_str(), newElement_0_typeCtorSignature.c_str(), entry_0.type, newElement_0_type);
+        jobject newElement_0_deviceType;
+        std::string newElement_0_deviceTypeClassName     = "java/lang/Long";
+        std::string newElement_0_deviceTypeCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0_deviceTypeClassName.c_str(),
+                                                                       newElement_0_deviceTypeCtorSignature.c_str(),
+                                                                       entry_0.deviceType, newElement_0_deviceType);
         jobject newElement_0_revision;
         std::string newElement_0_revisionClassName     = "java/lang/Integer";
         std::string newElement_0_revisionCtorSignature = "(I)V";
@@ -2763,8 +2764,8 @@ void CHIPDescriptorDeviceTypeListAttributeCallback::CallbackFn(
             return;
         }
 
-        newElement_0 =
-            env->NewObject(deviceTypeStructStructClass_1, deviceTypeStructStructCtor_1, newElement_0_type, newElement_0_revision);
+        newElement_0 = env->NewObject(deviceTypeStructStructClass_1, deviceTypeStructStructCtor_1, newElement_0_deviceType,
+                                      newElement_0_revision);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 
@@ -4847,9 +4848,9 @@ void CHIPOtaSoftwareUpdateProviderAttributeListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback::
-    CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPOtaSoftwareUpdateRequestorClusterDefaultOtaProvidersAttributeCallbackType>(CallbackFn, this),
+CHIPOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeCallback::
+    CHIPOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPOtaSoftwareUpdateRequestorClusterDefaultOTAProvidersAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -4866,8 +4867,8 @@ CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback::
     }
 }
 
-CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback::
-    ~CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback()
+CHIPOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeCallback::
+    ~CHIPOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -4878,7 +4879,7 @@ CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback::
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback::CallbackFn(
+void CHIPOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & list)
@@ -4890,8 +4891,8 @@ void CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback::Callbac
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;

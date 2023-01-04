@@ -267,8 +267,8 @@ typedef struct _ChannelInfo
 // Struct for DeviceTypeStruct
 typedef struct _DeviceTypeStruct
 {
-    chip::DeviceTypeId type;
-    uint16_t revision;
+    chip::DeviceTypeId DeviceType;
+    uint16_t Revision;
 } DeviceTypeStruct;
 
 // Struct for DlCredential
