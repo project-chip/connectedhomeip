@@ -896,11 +896,8 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
 {
     MATTER_TRACE_EVENT_SCOPE("UnpairDevice", "DeviceCommissioner");
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
-    if (mState != State::Initialized) // the device is currently being paired
-    {
-        return StopPairing(remoteDeviceId);
-    }
     return AutoCurrentFabricRemover::RemoveCurrentFabric(this, remoteDeviceId);
 }
 
