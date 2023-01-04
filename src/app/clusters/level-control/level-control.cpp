@@ -654,6 +654,7 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
         actualStepSize    = static_cast<uint8_t>(currentLevel.Value() - state->moveToLevel);
     }
 
+#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_TRANSITION
     // If the Transition time field takes the value null, then the time taken
     // to move to the new level shall instead be determined by the On/Off
     // Transition Time attribute.  If On/Off Transition Time, which is an
@@ -693,6 +694,12 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
         // Time) as tenths of a second, but we work in milliseconds.
         state->transitionTimeMs = (transitionTimeDs.Value() * MILLISECOND_TICKS_PER_SECOND / 10);
     }
+#else
+    // Transition is not supported so always use fastest transition time and ignore
+    // both the provided transition time as well as OnOffTransitionTime.
+    emberAfLevelControlClusterPrintln("Device does not support transition, ignoring transition time");
+    state->transitionTimeMs = FASTEST_TRANSITION_TIME_MS;
+#endif // IGNORE_LEVEL_CONTROL_CLUSTER_TRANSITION
 
     // The duration between events will be the transition time divided by the
     // distance we must move.
@@ -794,6 +801,7 @@ static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMo
         }
     }
 
+#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_TRANSITION
     // If the Rate field is null, the device should move at the default move rate, if available,
     // Otherwise, move as fast as possible
     if (rate.IsNull())
@@ -820,6 +828,12 @@ static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMo
     {
         state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / rate.Value();
     }
+#else
+    // Transition/rate is not supported so always use fastest transition time and ignore
+    // both the provided transition time as well as OnOffTransitionTime.
+    emberAfLevelControlClusterPrintln("Device does not support transition, ignoring rate");
+    state->eventDurationMs = FASTEST_TRANSITION_TIME_MS;
+#endif // IGNORE_LEVEL_CONTROL_CLUSTER_TRANSITION
 
     state->transitionTimeMs = difference * state->eventDurationMs;
     state->elapsedTimeMs    = 0;
@@ -925,6 +939,7 @@ static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMo
         }
     }
 
+#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_TRANSITION
     // If the Transition Time field is null, the device should move as fast as
     // it is able.
     if (transitionTimeDs.IsNull())
@@ -944,6 +959,12 @@ static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMo
             state->transitionTimeMs = (state->transitionTimeMs * actualStepSize / stepSize);
         }
     }
+#else
+    // Transition is not supported so always use fastest transition time and ignore
+    // both the provided transition time as well as OnOffTransitionTime.
+    emberAfLevelControlClusterPrintln("Device does not support transition, ignoring transition time");
+    state->transitionTimeMs = FASTEST_TRANSITION_TIME_MS;
+#endif // IGNORE_LEVEL_CONTROL_CLUSTER_TRANSITION
 
     // The duration between events will be the transition time divided by the
     // distance we must move.
@@ -1219,5 +1240,14 @@ static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoin
 #endif // IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
 
 void emberAfPluginLevelControlClusterServerPostInitCallback(EndpointId endpoint) {}
+
+bool LevelControlHasFeature(EndpointId endpoint, LevelControlFeature feature)
+{
+    bool success;
+    uint32_t featureMap;
+    success = (Attributes::FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+
+    return success ? ((featureMap & to_underlying(feature)) != 0) : false;
+}
 
 void MatterLevelControlPluginServerInitCallback() {}
