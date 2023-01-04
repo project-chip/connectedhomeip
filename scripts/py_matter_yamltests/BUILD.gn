@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,17 +16,28 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("//build_overrides/pigweed.gni")
-import("$dir_pw_build/python_dist.gni")
+import("$dir_pw_build/python.gni")
 
-# This target creates a single Python package and wheel for yamltests. It will
-# merge all Python dependencies Matter. The output is located in:
-#   out/obj/yamltests_distribution/  <- source files here
-#   out/obj/yamltests_distribution._build_wheel/yamltests-0.0.1-py3-none-any.whl
-pw_python_distribution("yamltests_distribution") {
-  packages = [ "${chip_root}/scripts/py_matter_yamltests:matter_yamltests" ]
-  generate_setup_cfg = {
-    common_config_file = "common_setup.cfg"
-    include_default_pyproject_file = true
-    append_date_to_version = true
-  }
+pw_python_package("matter_yamltests") {
+  setup = [
+    "setup.py",
+    "setup.cfg",
+    "pyproject.toml",
+  ]
+
+  sources = [
+    "matter_yamltests/__init__.py",
+    "matter_yamltests/constraints.py",
+    "matter_yamltests/definitions.py",
+    "matter_yamltests/fixes.py",
+    "matter_yamltests/parser.py",
+  ]
+
+  python_deps = [ "${chip_root}/scripts/py_matter_idl:matter_idl" ]
+
+  tests = [ "test_spec_definitions.py" ]
+
+  # TODO: at a future time consider enabling all (* or missing) here to get
+  #       pylint checking these files
+  static_analysis = []
 }

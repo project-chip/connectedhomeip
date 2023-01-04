@@ -11,9 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-[metadata]
-name = matter_yamltests
-version = 0.0.1
 
-[options]
-zip_safe = False
+
+"""The matter_idl package."""
+
+import setuptools  # type: ignore
+
+setuptools.setup()  # Package definition in setup.cfg
