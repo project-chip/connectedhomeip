@@ -35,7 +35,7 @@ class TelinkApp(Enum):
         elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
         elif self == TelinkApp.CONTACT_SENSOR:
-            return 'contact-sensor'
+            return 'contact-sensor-app'
         elif self == TelinkApp.LIGHT:
             return 'lighting-app'
         elif self == TelinkApp.SWITCH:
