@@ -62,9 +62,21 @@ public:
      */
     CHIP_ERROR LoadFromStorage(FabricIndex fabricIndex);
 
-    CHIP_ERROR DeleteFromStorage(FabricIndex fabric);
+    /**
+     * @brief Function deletes a client registration entry from persistent storage for a single fabric
+     *
+     * @param[in] fabricIndex fabric index to delete from storage
+     * @return CHIP_ERROR
+     */
+    CHIP_ERROR DeleteFromStorage(FabricIndex fabricIndex);
 
-    bool HasValueForFabric(FabricIndex);
+    /**
+     * @brief Function check if a client registration entry is stored for a single fabric
+     *
+     * @param[in] fabricIndex fabric index to check
+     * @return CHIP_ERROR
+     */
+    bool HasValueForFabric(FabricIndex fabric);
 
     /**
      * @brief Accessor function that returns the client registration entry that was loaded for a fabric from persistant storage.

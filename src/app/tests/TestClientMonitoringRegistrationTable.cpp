@@ -125,9 +125,9 @@ void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
     chip::TestPersistentStorageDelegate testStorage;
     ClientMonitoringRegistrationTable table(testStorage);
 
-    table.getClientRegistrationEntry().clientNodeId = kTestClientNodeId;
-    table.getClientRegistrationEntry().ICid         = kTestICid;
-    table.getClientRegistrationEntry().fabricIndex  = kTestFabricIndex;
+    table.GetClientRegistrationEntry().clientNodeId = kTestClientNodeId;
+    table.GetClientRegistrationEntry().ICid         = kTestICid;
+    table.GetClientRegistrationEntry().fabricIndex  = kTestFabricIndex;
 
     CHIP_ERROR err = table.SaveToStorage();
     NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);

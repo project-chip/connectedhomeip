@@ -76,5 +76,4 @@ bool ClientMonitoringRegistrationTable::HasValueForFabric(FabricIndex fabric)
     return mStorage.SyncDoesKeyExist(DefaultStorageKeyAllocator::ClientMonitoringTableEntry(fabric).KeyName());
 }
 
-
 } // namespace chip

@@ -88,7 +88,7 @@ CHIP_ERROR ClientMonitoringAttributeAccess::ReadExpectedClients(EndpointId endpo
 
         if (err == CHIP_NO_ERROR)
         {
-            ReturnErrorOnFailure(encoder.Encode(clientMonitoringRegistrationTable.getClientRegistrationEntry()));
+            ReturnErrorOnFailure(encoder.Encode(clientMonitoringRegistrationTable.GetClientRegistrationEntry()));
         }
         else if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
@@ -124,9 +124,9 @@ ClientMonitoringServer::RegisterClientMonitoringCommand(CommandHandler * command
 
     VerifyOrReturnError(!table.HasValueForFabric(fabric), InteractionModel::Status::ResourceExhausted);
 
-    table.getClientRegistrationEntry().fabricIndex  = fabric;
-    table.getClientRegistrationEntry().clientNodeId = commandData.clientNodeId;
-    table.getClientRegistrationEntry().ICid         = commandData.ICid;
+    table.GetClientRegistrationEntry().fabricIndex  = fabric;
+    table.GetClientRegistrationEntry().clientNodeId = commandData.clientNodeId;
+    table.GetClientRegistrationEntry().ICid         = commandData.ICid;
 
     VerifyOrReturnError(table.SaveToStorage() == CHIP_NO_ERROR, InteractionModel::Status::Failure);
 
@@ -153,9 +153,9 @@ ClientMonitoringServer::UnregisterClientMonitoringCommand(CommandHandler * comma
     }
 
     // Check if initiator has the token and the correct node id
-    VerifyOrReturnError(table.getClientRegistrationEntry().clientNodeId == commandData.clientNodeId,
+    VerifyOrReturnError(table.GetClientRegistrationEntry().clientNodeId == commandData.clientNodeId,
                         InteractionModel::Status::Failure);
-    VerifyOrReturnError(table.getClientRegistrationEntry().ICid == commandData.ICid, InteractionModel::Status::Failure);
+    VerifyOrReturnError(table.GetClientRegistrationEntry().ICid == commandData.ICid, InteractionModel::Status::Failure);
 
     VerifyOrReturnError(table.DeleteFromStorage(fabric) == CHIP_NO_ERROR, InteractionModel::Status::Failure);
 
