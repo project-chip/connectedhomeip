@@ -20,22 +20,6 @@ using namespace unify::matter_bridge;
 static UnifyEmberInterface ember_interface = UnifyEmberInterface();
 static device_translator dev_translator    = device_translator();
 
-chip::app::AttributeValueEncoder setupEncoder(chip::EndpointId endpoint, chip::app::ConcreteAttributePath & path,
-                                              chip::DataVersion & dataVersion)
-{
-    const chip::app::AttributeValueEncoder::AttributeEncodeState & aState =
-        chip::app::AttributeValueEncoder::AttributeEncodeState();
-    chip::app::AttributeReportIBs::Builder builder;
-    chip::FabricIndex fabricIndex = static_cast<uint8_t>(endpoint);
-    chip::app::AttributeValueEncoder encoder(builder, fabricIndex, path, dataVersion, true, aState);
-    uint8_t buf[1024];
-    chip::TLV::TLVWriter writer;
-    writer.Init(buf);
-    chip::TLV::TLVType ignored;
-    writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, ignored);
-    builder.Init(&writer, 1);
-    return encoder;
-}
 
 static void TestClusterTranslatorRevision(nlTestSuite * inSuite, void * aContext)
 {
@@ -48,9 +32,25 @@ static void TestClusterTranslatorRevision(nlTestSuite * inSuite, void * aContext
         endpoint, chip::app::Clusters::Identify::Id, chip::app::Clusters::Identify::Attributes::ClusterRevision::Id);
 
     chip::DataVersion dataVersion            = 0;
-    chip::app::AttributeValueEncoder encoder = setupEncoder(endpoint, test_attr_path, dataVersion);
+    const chip::app::AttributeValueEncoder::AttributeEncodeState & aState =
+        chip::app::AttributeValueEncoder::AttributeEncodeState();
+    chip::app::AttributeReportIBs::Builder builder;
+    chip::FabricIndex fabricIndex = static_cast<uint8_t>(endpoint);
+    chip::app::AttributeValueEncoder encoder(builder, fabricIndex, test_attr_path, dataVersion, true, aState);
+    uint8_t buf[4096];
+    chip::TLV::TLVWriter writer;
+    writer.Init(buf);
+    chip::TLV::TLVType ignored;
+    writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, ignored);
+    builder.Init(&writer, 1);
+
     auto err                                 = test_identify_attribute_handler.Read(test_attr_path, encoder);
+
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    writer.Finalize();
+    writer.EndContainer(ignored);
+
 }
 
 class TestContext

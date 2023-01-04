@@ -45,7 +45,7 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestClusterInteractor.cpp",
-    # "TestClusterTranslator.cpp",
+    "TestClusterTranslator.cpp",
     "TestDeviceMapper.cpp",
     "TestExample.cpp",
     "TestLevelControl.cpp",
