@@ -84,9 +84,9 @@ specific codegen.
 ### `*.matter` parsing and codegen
 
 `*.matter` files are both human and machine readable. Code that can process
-these files is available at `scripts/py_matter_idl` and `scripts/codegen.py`. You can read
-the [scripts/idl/idl/README.md](../scripts/idl/idl/README.md) for details of how
-things work.
+these files is available at `scripts/py_matter_idl` and `scripts/codegen.py`.
+You can read the [scripts/py_matter_idl/matter_idl/README.md](../scripts/py_matter_idl/matter_idl/README.md) for
+details of how things work.
 
 `scripts/codegen.py` can generate various outputs based on an input `*.matter`
 file.
