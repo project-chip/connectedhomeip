@@ -19,33 +19,62 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/CHIPDeviceConfig.h>
 
 namespace chip {
+
+/**
+ * @brief ClientMonitoringRegistrationTable exists to manage the persistence of entries in the ClientMonitoring Cluster.
+ *        To access persisted data with the ClientMonitoringRegistrationTable class, instantiate an instance of this class
+ *        and call the LoadFromStorage function.
+ *
+ *        This class can only manage one fabric at a time. The flow is load a fabric, execute necessary operations,
+ *        save it if there are any changes and load another fabric.
+ */
 class ClientMonitoringRegistrationTable
 {
 public:
     using MonitoringRegistrationStruct = chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::Type;
 
-    ClientMonitoringRegistrationTable(FabricIndex fabricIndex);
+    struct ClientRegistrationEntry : MonitoringRegistrationStruct
+    {
+        bool IsValid() { return clientNodeId != kUndefinedNodeId && ICid != kInvalidIcId && fabricIndex != kUndefinedFabricIndex; }
+    };
+
+    ClientMonitoringRegistrationTable(PersistentStorageDelegate & storage);
     ~ClientMonitoringRegistrationTable(){};
 
-    void SaveToStorage();
+    /**
+     * @brief Function saves the mRegisteredClient attribute to persitant storage
+     *        To correctly persit an entry, the values must be stored in the structures attributes
+     *
+     * @return CHIP_ERROR
+     */
+    CHIP_ERROR SaveToStorage();
 
-    // Getter
-    NodeId getClientNodeId();
-    uint64_t getICid();
-    FabricIndex getFaricIndex();
+    /**
+     * @brief Function loads a client registration entry from persistent storage for a single fabric
+     *
+     * @param[in] fabricIndex fabric index to load from storage
+     * @return CHIP_ERROR
+     */
+    CHIP_ERROR LoadFromStorage(FabricIndex fabricIndex);
 
-    // Setter
-    void setClientNodeId(NodeId clientNodeId);
-    void setICid(uint64_t ICid);
-    void setFabricIndex(FabricIndex fabric);
+    /**
+     * @brief Accessor function that returns the client registration entry that was loaded for a fabric from persistant storage.
+     * @see LoadFromStorage
+     *
+     * @return ClientMonitoringRegistrationTable::ClientRegistrationEntry&
+     */
+    ClientRegistrationEntry & GetClientRegistrationEntry();
 
 private:
-    void LoadFromStorage(FabricIndex fabricIndex);
-    MonitoringRegistrationStruct mRegisteredClient;
+    static constexpr uint8_t kRegStorageSize = TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(uint64_t));
+
+    ClientRegistrationEntry mRegisteredClient;
+    PersistentStorageDelegate & mStorage;
 };
 
 } // namespace chip
