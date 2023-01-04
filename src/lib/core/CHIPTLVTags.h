@@ -32,6 +32,13 @@ namespace TLV {
 class Tag
 {
 public:
+    enum SpecialTagNumber : uint32_t
+    {
+        kContextTagMaxNum = UINT8_MAX,
+        kAnonymousTagNum,
+        kUnknownImplicitTagNum
+    };
+
     Tag() = default;
 
     constexpr bool operator==(const Tag & other) const { return mVal == other.mVal; }
@@ -66,22 +73,15 @@ private:
     static constexpr uint32_t kProfileNumShift     = 32;
     static constexpr uint32_t kSpecialTagProfileId = 0xFFFFFFFF;
 
-    enum SpecialTagNumber : uint32_t
-    {
-        kContextTagMaxNum = UINT8_MAX,
-        kAnonymousTagNum,
-        kUnknownImplicitTagNum
-    };
-
-    // The API representation of the tag uses the following encoding:
+    // The storage of the tag value uses the following encoding:
     //
-    //  63                     47                       31
-    // +-----------------------+-----------------------+----------------------------------------------+
-    // | Vendor id (negated)   | Profile num (negated) | Tag number                                   |
-    // +-----------------------+-----------------------+----------------------------------------------+
+    //  63                              47                              31
+    // +-------------------------------+-------------------------------+----------------------------------------------+
+    // | Vendor id (bitwise-negated)   | Profile num (bitwise-negated) | Tag number                                   |
+    // +-------------------------------+-------------------------------+----------------------------------------------+
     //
-    // Vendor id and profile number are negated in order to optimize the code size when using
-    // context tags, the most commonly used tags in the SDK.
+    // Vendor id and profile number are bitwise-negated in order to optimize the code size when
+    // using context tags, the most commonly used tags in the SDK.
     uint64_t mVal;
 };
 
