@@ -20,7 +20,7 @@ package chip.devicecontroller;
  * deviceController.continueCommissioning(devicePtr, true)
  *
  * // Stop commissioning
- * deviceController.continueCommissioning(devicePtr, true)
+ * deviceController.continueCommissioning(devicePtr, false)
  * </pre>
  */
 public interface DeviceAttestationDelegate {
