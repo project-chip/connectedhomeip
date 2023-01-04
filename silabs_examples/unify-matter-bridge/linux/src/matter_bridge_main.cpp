@@ -30,6 +30,7 @@
 #include "matter_bridge_config_fixt.h"
 #include "matter_device_translator.hpp"
 #include "matter_node_state_monitor.hpp"
+#include "matter_bridge_qrcode_publisher.hpp"
 
 extern "C" {
 // Unify library
@@ -55,6 +56,8 @@ constexpr const char * LOG_TAG = "unify_matter_bridge";
 
 static bool matter_running;
 static std::mutex unify_mutex;
+
+
 
 static void call_unify_event_queue(intptr_t)
 {
@@ -96,7 +99,9 @@ int main(int argc, char * argv[])
                                                           { matter_bridge_cli_init, "Matter Bridge Command Line Interface" },
                                                           { NULL, "Terminator" } };
 
-    uic_init(uic_fixt_setup_steps_list, argc, argv, CMAKE_PROJECT_VERSION);
+    if(SL_STATUS_OK != uic_init(uic_fixt_setup_steps_list, argc, argv, CMAKE_PROJECT_VERSION)) {
+        return -1;
+    }
 
     const char * __argv__[] = { "matter_bridge", nullptr };
     int __argc__            = sizeof(__argv__) / sizeof(const char *) - 1;
@@ -109,10 +114,11 @@ int main(int argc, char * argv[])
     opt.payload.rendezvousInformation.Emplace().Set(RendezvousInformationFlag::kOnNetwork);
     opt.mWiFi   = false;
     opt.mThread = false;
-
     opt.KVS               = cfg->kvs_path;
     opt.payload.productID = cfg->product_id;
     opt.payload.vendorID  = cfg->vendor_id;
+    opt.payload.setUpPINCode = cfg->pin & 0xffffff;
+    opt.discriminator = chip::Optional<uint16_t>(cfg->discriminator & 0xfff);
 
     if (CHIP_NO_ERROR != InterfaceId::InterfaceNameToId(cfg->interface, opt.interfaceId))
     {
@@ -159,6 +165,8 @@ int main(int argc, char * argv[])
     TemperatureMeasurementClusterCommandHandler temperature_measurement_command_handler(node_state_monitor, unify_mqtt_handler,
                                                                                         m_group_translator);
     TemperatureMeasurementAttributeAccess temperature_measurement_attribute_access(node_state_monitor, unify_mqtt_handler);
+
+    QRCodePublisher qr_code_publisher(unify_mqtt_handler);
 
     matter_running = true;
     auto handle    = run_unify();

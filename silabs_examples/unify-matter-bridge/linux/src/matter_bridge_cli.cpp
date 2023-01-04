@@ -37,6 +37,12 @@ static sl_status_t commission_cli_func(const handle_args_t & arg)
     return SL_STATUS_OK;
 }
 
+static sl_status_t close_commission_cli_func(const handle_args_t & arg)
+{
+    Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+    return SL_STATUS_OK;
+}
+
 void set_mapping_display_instance(matter_node_state_monitor & n, group_translator & m)
 {
     node_state_monitor     = &n;
@@ -65,6 +71,7 @@ static sl_status_t groups_map_cli_func(const handle_args_t & arg)
 
 command_map_t unify_cli_commands = {
     { "commission", { "Open commissioning window", commission_cli_func } },
+    { "closecommission", { "Close the commissioning window", close_commission_cli_func } },
     { "epmap", { "Show endpoint map", epmap_cli_func } },
     { "groups_map", { "Show Matter vs Unify groups map", groups_map_cli_func } },
 };

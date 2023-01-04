@@ -15,7 +15,7 @@
 
 using namespace unify::matter_bridge;
 
-void UnifyMqtt::Publish(std::string topic, std::string message, bool retain)
+void UnifyMqtt::Publish(std::string topic, std::string message, bool retain) 
 {
     uic_mqtt_publish(topic.c_str(), message.c_str(), message.size(), retain);
 }

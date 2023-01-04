@@ -38,7 +38,8 @@ typedef struct
     const char * kvs_path;
     uint16_t vendor_id;
     uint16_t product_id;
-
+    uint16_t discriminator;
+    uint32_t pin;
 } matter_bridge_config_t;
 
 /**
