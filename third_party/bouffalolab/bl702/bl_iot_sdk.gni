@@ -546,9 +546,10 @@ template("bl_iot_sdk") {
 
     include_dirs = [
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/include",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/include/misc",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/bl_hci_wrapper",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/include/tinycrypt",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/include/misc",
     ]
 
     sources = [
