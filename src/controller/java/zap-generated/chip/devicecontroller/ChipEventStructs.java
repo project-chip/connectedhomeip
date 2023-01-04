@@ -347,6 +347,81 @@ public class ChipEventStructs {
     }
   }
 
+  public static class PowerSourceClusterWiredFaultChangeEvent {
+    public ArrayList<Object> current;
+    public ArrayList<Object> previous;
+
+    public PowerSourceClusterWiredFaultChangeEvent(
+        ArrayList<Object> current, ArrayList<Object> previous) {
+      this.current = current;
+      this.previous = previous;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("PowerSourceClusterWiredFaultChangeEvent {\n");
+      output.append("\tcurrent: ");
+      output.append(current);
+      output.append("\n");
+      output.append("\tprevious: ");
+      output.append(previous);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class PowerSourceClusterBatFaultChangeEvent {
+    public ArrayList<Object> current;
+    public ArrayList<Object> previous;
+
+    public PowerSourceClusterBatFaultChangeEvent(
+        ArrayList<Object> current, ArrayList<Object> previous) {
+      this.current = current;
+      this.previous = previous;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("PowerSourceClusterBatFaultChangeEvent {\n");
+      output.append("\tcurrent: ");
+      output.append(current);
+      output.append("\n");
+      output.append("\tprevious: ");
+      output.append(previous);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class PowerSourceClusterBatChargeFaultChangeEvent {
+    public ArrayList<Object> current;
+    public ArrayList<Object> previous;
+
+    public PowerSourceClusterBatChargeFaultChangeEvent(
+        ArrayList<Object> current, ArrayList<Object> previous) {
+      this.current = current;
+      this.previous = previous;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("PowerSourceClusterBatChargeFaultChangeEvent {\n");
+      output.append("\tcurrent: ");
+      output.append(current);
+      output.append("\n");
+      output.append("\tprevious: ");
+      output.append(previous);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class GeneralDiagnosticsClusterHardwareFaultChangeEvent {
     public ArrayList<Object> current;
     public ArrayList<Object> previous;

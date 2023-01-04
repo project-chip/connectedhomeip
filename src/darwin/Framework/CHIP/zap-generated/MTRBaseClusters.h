@@ -17416,7 +17416,10 @@ typedef NS_ENUM(uint8_t, MTRPowerSourceBatChargeFault) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRPowerSourceBatChargeLevel) {
-    MTRPowerSourceBatChargeLevelOk API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
+    MTRPowerSourceBatChargeLevelOK MTR_NEWLY_AVAILABLE = 0x00,
+    MTRPowerSourceBatChargeLevelOk API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRPowerSourceBatChargeLevelOK")
+    = 0x00,
     MTRPowerSourceBatChargeLevelWarning API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
     MTRPowerSourceBatChargeLevelCritical API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));

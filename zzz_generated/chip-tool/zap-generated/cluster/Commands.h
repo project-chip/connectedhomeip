@@ -2175,6 +2175,9 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+| * WiredFaultChange                                                  | 0x0000 |
+| * BatFaultChange                                                    | 0x0001 |
+| * BatChargeFaultChange                                              | 0x0002 |
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
@@ -9402,8 +9405,14 @@ void registerClusterPowerSource(Commands & commands, CredentialIssuerCommands * 
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                   //
+        make_unique<ReadEvent>(Id, "wired-fault-change", Events::WiredFaultChange::Id, credsIssuerConfig),               //
+        make_unique<ReadEvent>(Id, "bat-fault-change", Events::BatFaultChange::Id, credsIssuerConfig),                   //
+        make_unique<ReadEvent>(Id, "bat-charge-fault-change", Events::BatChargeFaultChange::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                              //
+        make_unique<SubscribeEvent>(Id, "wired-fault-change", Events::WiredFaultChange::Id, credsIssuerConfig),          //
+        make_unique<SubscribeEvent>(Id, "bat-fault-change", Events::BatFaultChange::Id, credsIssuerConfig),              //
+        make_unique<SubscribeEvent>(Id, "bat-charge-fault-change", Events::BatChargeFaultChange::Id, credsIssuerConfig), //
     };
 
     commands.Register(clusterName, clusterCommands);

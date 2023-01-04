@@ -794,6 +794,21 @@ server cluster PowerSource = 47 {
     kReplaceable = 0x8;
   }
 
+  info event WiredFaultChange = 0 {
+    WiredFault current[] = 0;
+    WiredFault previous[] = 1;
+  }
+
+  info event BatFaultChange = 1 {
+    BatFault current[] = 0;
+    BatFault previous[] = 1;
+  }
+
+  info event BatChargeFaultChange = 2 {
+    BatChargeFault current[] = 0;
+    BatChargeFault previous[] = 1;
+  }
+
   readonly attribute PowerSourceStatus status = 0;
   readonly attribute int8u order = 1;
   readonly attribute char_string<60> description = 2;

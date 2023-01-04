@@ -72,10 +72,10 @@ static_library("BL702") {
     # needed for MTD/FTD
 
     import("//build_overrides/bouffalolab_iot_sdk.gni")
-    import("${bl702_sdk_build_root}/bl702_sdk.gni")
+    import("${bouffalolab_iot_sdk_build_root}/bl702/bl_iot_sdk.gni")
     public_deps += [
-      "${bl702_sdk_build_root}:bl702_sdk",
-      "${bl702_sdk_build_root}:mbedtls",
+      "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk",
+      "${bouffalolab_iot_sdk_build_root}/bl702:mbedtls",
     ]
 
     sources += [
