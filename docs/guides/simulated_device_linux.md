@@ -102,7 +102,8 @@ interact with it using chip-tool
     ./out/debug/standalone/chip-tool onoff write on-time 1 0x654321 1
     ```
 
-    See [chip-tool readme](../../examples/chip-tool/README.md) for additional commands.
+    See [chip-tool readme](../../examples/chip-tool/README.md) for additional
+    commands.
 
 ## Adding simulated Tests via YAML
 

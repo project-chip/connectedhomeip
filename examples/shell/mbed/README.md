@@ -199,9 +199,9 @@ Example:
 
 The example supports building and running on the following mbed-enabled devices:
 
-| Manufacturer                                          | Hardware platform                                                         | Build target          | Platform image                                                                                                                                                                 |       Status       | Platform components                                                                                                                                                                                           |
-| ----------------------------------------------------- | ------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Cypress<br> Semiconductor](https://www.cypress.com/) | [CY8CPROTO-062-4343W](https://os.mbed.com/platforms/CY8CPROTO-062-4343W/) | `CY8CPROTO_062_4343W` | <details><summary>CY8CPROTO-062-4343W</summary><img src="https://os.mbed.com/media/cache/platforms/p6_wifi-bt_proto.png.250x250_q85.jpg" alt="CY8CPROTO-062-4343W"/></details> | ✔                  | <details><summary>LEDs</summary><ul><li>Unused</li></ul></details> <details><summary>Buttons</summary><ul><li>Unused</li></ul></details> <details><summary>Slider</summary><ul><li>Unused</li></ul></details> |
+| Manufacturer                                          | Hardware platform                                                         | Build target          | Platform image                                                                                                                                                                 | Status | Platform components                                                                                                                                                                                           |
+| ----------------------------------------------------- | ------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Cypress<br> Semiconductor](https://www.cypress.com/) | [CY8CPROTO-062-4343W](https://os.mbed.com/platforms/CY8CPROTO-062-4343W/) | `CY8CPROTO_062_4343W` | <details><summary>CY8CPROTO-062-4343W</summary><img src="https://os.mbed.com/media/cache/platforms/p6_wifi-bt_proto.png.250x250_q85.jpg" alt="CY8CPROTO-062-4343W"/></details> |   ✔    | <details><summary>LEDs</summary><ul><li>Unused</li></ul></details> <details><summary>Buttons</summary><ul><li>Unused</li></ul></details> <details><summary>Slider</summary><ul><li>Unused</li></ul></details> |
 
 ##### Notes
 
@@ -209,9 +209,8 @@ The example supports building and running on the following mbed-enabled devices:
     project with Mbed OS can be found in
     [MbedNewTarget](../../../docs/guides/mbedos_add_new_target.md)
 -   Some useful information about HW platform specific settings can be found in
-    `shell/mbed/mbed_app.json`.
-    Information about this file syntax and its meaning in mbed-os project can be
-    found here:
+    `shell/mbed/mbed_app.json`. Information about this file syntax and its
+    meaning in mbed-os project can be found here:
     [Mbed-Os configuration system](https://os.mbed.com/docs/mbed-os/latest/program-setup/advanced-configuration.html))
 
 ## Shell commands

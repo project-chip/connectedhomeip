@@ -323,9 +323,9 @@ platform image.
 
     -   If pressed for more than 0.5 seconds, it changes the brightness of the
         light on the bound lighting bulb device
-        ([lighting-app](../../lighting-app/nrfconnect/README.md)). The brightness is
-        changing from 0% to 100% with 1% increments every 300 milliseconds as
-        long as **Button 2** is pressed.
+        ([lighting-app](../../lighting-app/nrfconnect/README.md)). The
+        brightness is changing from 0% to 100% with 1% increments every 300
+        milliseconds as long as **Button 2** is pressed.
 
 -   On nRF7002 DK:
 
@@ -650,8 +650,8 @@ directory:
 
 After building and flashing the example, you can test its functionalities. For
 this purpose, you need to prepare a second device that is programmed with the
-[Lighting Example](../../lighting-app/nrfconnect/README.md), perform the binding process,
-and add Access Control Lists (ACLs).
+[Lighting Example](../../lighting-app/nrfconnect/README.md), perform the binding
+process, and add Access Control Lists (ACLs).
 
 ### Commissioning the lighting device
 
@@ -668,9 +668,9 @@ the light switch device and write proper ACL to the endpoint light bulb on the
 [Lighting Example application](../../lighting-app/nrfconnect/README.md)). For
 example, you can use the
 [CHIP Tool for Windows or Linux](../../chip-tool/README.md) as the controller.
-The ACL should contain information about all clusters that can
-be called by the light switch application. See the section about interacting
-with ZCL clusters in the
+The ACL should contain information about all clusters that can be called by the
+light switch application. See the section about interacting with ZCL clusters in
+the
 [CHIP Tool's user guide](../../../docs/guides/chip_tool_guide.md#interacting-with-zcl-clusters)
 for more information about ACLs.
 
@@ -692,8 +692,8 @@ To perform the unicast binding process, complete the following steps:
     [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md#building).
 2.  Go to the CHIP Tool build directory.
 3.  Add an ACL to the development kit that is programmed with the
-    [Lighting Application Example](../../lighting-app/nrfconnect/README.md) by running
-    the following command:
+    [Lighting Application Example](../../lighting-app/nrfconnect/README.md) by
+    running the following command:
 
         chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [2], "targets": [{"cluster": 6, "endpoint": 1, "deviceType": null}, {"cluster": 8, "endpoint": 1, "deviceType": null}]}]' 1 0
 
@@ -729,10 +729,10 @@ The group multicast binding lets you control more than one lighting device at a
 time using a single light switch.
 
 The group multicast binding targets all development kits that are programmed
-with the [Lighting Application Example](../../lighting-app/nrfconnect/README.md) and
-added to the same multicast group. After the binding is established, the light
-switch device can send multicast requests, and all of the devices in the bound
-groups can run the received command.
+with the [Lighting Application Example](../../lighting-app/nrfconnect/README.md)
+and added to the same multicast group. After the binding is established, the
+light switch device can send multicast requests, and all of the devices in the
+bound groups can run the received command.
 
 In this scenario, commands are provided for a light switch device with the
 `nodeId = 2` and a light bulb device with `nodeId = 1`, both commissioned to the

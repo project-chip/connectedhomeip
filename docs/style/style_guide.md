@@ -11,24 +11,24 @@ for general information on contributing to this project.
 
 ## Location
 
-Place all documentation contributions in the appropriate location in the
-`docs` directory. Most contributions should go into the
-`/docs/guides` subdirectory, which covers conceptual and usage content.
+Place all documentation contributions in the appropriate location in the `docs`
+directory. Most contributions should go into the `/docs/guides` subdirectory,
+which covers conceptual and usage content.
 
 Current documentation structure:
 
-| Directory               | Description                                                                                    |
-| ----------------------- | ---------------------------------------------------------------------------------------------- |
-| `/actions`              | Custom GitHub actions                                                                          |
-| `/docs/guides`          | Conceptual or usage content that doesn't fit within a subdirectory, and high-level tutorials   |
-| `/docs/guides/images`   | All images included in guide content                                                           |
-| `/docs/guides/profiles` | Content describing or illustrating use of Matter profiles                                      |
-| `/docs/guides/test`     | Content related to testing Matter                                                              |
-| `/docs/guides/tools`    | Content describing or illustrating use of Matter tools                                         |
-| `/docs/guides/primer`   | Matter Primer content                                                                          |
-| `/docs/presentations`   | PDF presentations on Matter features                                                           |
-| `/docs/specs`           | PDFs of Matter specifications                                                                  |
-| `/images`               | Top-level Matter images, such as logos                                                         |
+| Directory               | Description                                                                                  |
+| ----------------------- | -------------------------------------------------------------------------------------------- |
+| `/actions`              | Custom GitHub actions                                                                        |
+| `/docs/guides`          | Conceptual or usage content that doesn't fit within a subdirectory, and high-level tutorials |
+| `/docs/guides/images`   | All images included in guide content                                                         |
+| `/docs/guides/profiles` | Content describing or illustrating use of Matter profiles                                    |
+| `/docs/guides/test`     | Content related to testing Matter                                                            |
+| `/docs/guides/tools`    | Content describing or illustrating use of Matter tools                                       |
+| `/docs/guides/primer`   | Matter Primer content                                                                        |
+| `/docs/presentations`   | PDF presentations on Matter features                                                         |
+| `/docs/specs`           | PDFs of Matter specifications                                                                |
+| `/images`               | Top-level Matter images, such as logos                                                       |
 
 If you are unsure of the best location for your contribution, create an Issue
 and ask, or let us know in your Pull Request.
@@ -45,8 +45,8 @@ The text of a link should be descriptive, so it's clear what the link is for:
 
 ## Markdown guidelines
 
-Use standard Markdown when authoring Matter documentation. While HTML may be used
-for more complex content such as tables, use Markdown as much as possible.
+Use standard Markdown when authoring Matter documentation. While HTML may be
+used for more complex content such as tables, use Markdown as much as possible.
 
 > Note: Edit this file to see the Markdown behind the examples.
 

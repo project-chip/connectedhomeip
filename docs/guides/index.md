@@ -1,6 +1,7 @@
 # Guides
 
-Read the following guides for general information about Matter SDK configuration and features.
+Read the following guides for general information about Matter SDK configuration
+and features.
 
 ```{toctree}
 :glob:

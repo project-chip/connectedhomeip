@@ -32,12 +32,12 @@ network.
 -   [Tinycrypt ECC operations](#tinycrypt-ecc-operations)
     -   [Building steps](#building-steps)
 -   [OTA](#ota)
-    - [Writing the SSBL](#writing-the-ssbl)
-    - [Writing the PSECT](#writing-the-psect)
-    - [Writing the application](#writing-the-application)
-    - [OTA Testing](#ota-testing) 
-    - [Known issues](#known-issues-2)
-    </hr>
+    -   [Writing the SSBL](#writing-the-ssbl)
+    -   [Writing the PSECT](#writing-the-psect)
+    -   [Writing the application](#writing-the-application)
+    -   [OTA Testing](#ota-testing)
+    -   [Known issues](#known-issues-2)
+        </hr>
 
 ## Introduction
 

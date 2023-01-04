@@ -457,8 +457,8 @@ To prepare the accessory device for commissioning, complete the following steps:
 ## Commissioning accessory device
 
 To commission the accessory device onto the Thread network created in the
-[Forming Thread network](#forming-a-thread-network-on-the-border-router) section, complete the
-following steps:
+[Forming Thread network](#forming-a-thread-network-on-the-border-router)
+section, complete the following steps:
 
 1. Enable _Bluetooth_ and _Location_ services on your smartphone;
 2. Connect the smartphone to _OT-BR_ WiFi network;

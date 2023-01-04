@@ -1,6 +1,7 @@
 # Minimal mDNS example
 
-This example demonstrates the multicast DNS (mDNS) protocol functionality in Matter.
+This example demonstrates the multicast DNS (mDNS) protocol functionality in
+Matter.
 
 ## Example server
 

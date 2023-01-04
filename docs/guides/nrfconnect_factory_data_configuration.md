@@ -682,9 +682,9 @@ $ west flash
 
 The [factory data generation process](#generating-factory-data) described above
 is only an example valid for the nRF Connect platform. You can well create a HEX
-file containing all [factory data components](#factory-data-component-table) in any
-format and then implement a parser to read out all parameters and pass them to a
-provider. Each manufacturer can implement a factory data set on its own by
+file containing all [factory data components](#factory-data-component-table) in
+any format and then implement a parser to read out all parameters and pass them
+to a provider. Each manufacturer can implement a factory data set on its own by
 implementing a parser and a factory data accessor inside the Matter stack. Use
 the [nRF Connect Provider](../../src/platform/nrfconnect/FactoryDataProvider.h)
 and [FactoryDataParser](../../src/platform/nrfconnect/FactoryDataParser.h) as

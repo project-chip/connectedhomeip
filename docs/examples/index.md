@@ -1,6 +1,7 @@
 # Examples
 
-The Matter SDK provides examples of Matter devices for different development platforms.
+The Matter SDK provides examples of Matter devices for different development
+platforms.
 
 ## All clusters example
 
