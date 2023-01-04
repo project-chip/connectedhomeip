@@ -2504,17 +2504,19 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, byte[] content, Long timeStamp, Long timeSinceBoot) {
+    public void onSuccess(
+        Integer Status, byte[] LogContent, Long UTCTimeStamp, Long TimeSinceBoot) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
-      responseValues.put(statusResponseValue, status);
-      CommandResponseInfo contentResponseValue = new CommandResponseInfo("content", "byte[]");
-      responseValues.put(contentResponseValue, content);
-      CommandResponseInfo timeStampResponseValue = new CommandResponseInfo("timeStamp", "Long");
-      responseValues.put(timeStampResponseValue, timeStamp);
-      CommandResponseInfo timeSinceBootResponseValue =
-          new CommandResponseInfo("timeSinceBoot", "Long");
-      responseValues.put(timeSinceBootResponseValue, timeSinceBoot);
+      CommandResponseInfo StatusResponseValue = new CommandResponseInfo("Status", "Integer");
+      responseValues.put(StatusResponseValue, Status);
+      CommandResponseInfo LogContentResponseValue = new CommandResponseInfo("LogContent", "byte[]");
+      responseValues.put(LogContentResponseValue, LogContent);
+      CommandResponseInfo UTCTimeStampResponseValue =
+          new CommandResponseInfo("UTCTimeStamp", "Long");
+      responseValues.put(UTCTimeStampResponseValue, UTCTimeStamp);
+      CommandResponseInfo TimeSinceBootResponseValue =
+          new CommandResponseInfo("TimeSinceBoot", "Long");
+      responseValues.put(TimeSinceBootResponseValue, TimeSinceBoot);
       callback.onSuccess(responseValues);
     }
 
