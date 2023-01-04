@@ -88,8 +88,8 @@ static bool ParseJsonFileAndPopulateCandidates(
             [NSNumber numberWithUnsignedLongLong:iter.get("maxApplicableSoftwareVersion", 1000).asUInt64()];
         auto otaURL = [NSString stringWithUTF8String:iter.get("otaURL", "https://test.com").asCString()];
 
-        candidate.deviceModelData.vendorId = vendorId;
-        candidate.deviceModelData.productId = productId;
+        candidate.deviceModelData.vendorID = vendorId;
+        candidate.deviceModelData.productID = productId;
         candidate.softwareVersion = softwareVersion;
         candidate.softwareVersionString = softwareVersionString;
         candidate.deviceModelData.cDVersionNumber = cDVersionNumber;
@@ -246,8 +246,8 @@ CHIP_ERROR OTASoftwareUpdateBase::SetCandidatesFromFilePath(char * _Nonnull file
 
         ChipLogDetail(chipTool, "Validating image list candidate %s: ", [candidate.deviceModelData.otaURL UTF8String]);
 
-        auto vendorId = [candidate.deviceModelData.vendorId unsignedIntValue];
-        auto productId = [candidate.deviceModelData.productId unsignedIntValue];
+        auto vendorId = [candidate.deviceModelData.vendorID unsignedIntValue];
+        auto productId = [candidate.deviceModelData.productID unsignedIntValue];
         auto softwareVersion = [candidate.softwareVersion unsignedLongValue];
         auto softwareVersionString = [candidate.softwareVersionString UTF8String];
         auto softwareVersionStringLength = [candidate.softwareVersionString length];

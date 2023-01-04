@@ -1118,15 +1118,15 @@ private:
             return WaitForCommissioning(kIdentityAlpha, value);
         }
         case 1: {
-            LogStep(1, "Read attribute: identify time");
+            LogStep(1, "Read attribute: IdentifyTime");
             return WaitAttribute(GetEndpoint(1), Identify::Id, Identify::Attributes::IdentifyTime::Id);
         }
         case 2: {
-            LogStep(2, "write attribute: identify time");
+            LogStep(2, "write attribute: IdentifyTime");
             return WaitAttribute(GetEndpoint(1), Identify::Id, Identify::Attributes::IdentifyTime::Id);
         }
         case 3: {
-            LogStep(3, "Readback attribute: identify time");
+            LogStep(3, "Readback attribute: IdentifyTime");
             return WaitAttribute(GetEndpoint(1), Identify::Id, Identify::Attributes::IdentifyTime::Id);
         }
         case 4: {

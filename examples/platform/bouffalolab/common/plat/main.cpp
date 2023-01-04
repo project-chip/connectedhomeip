@@ -31,8 +31,9 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 
-#include <blog.h>
 extern "C" {
+
+#include <blog.h>
 
 #ifdef BL702_ENABLE
 #include <bl702_glb.h>

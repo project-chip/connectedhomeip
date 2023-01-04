@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,10 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("bl702_board.gni")
+declare_args() {
+  bouffalolab_bard = "BL-IOT-DVK"
+}
 
-riscv_arch = "rv32imfc"
-riscv_abi = "ilp32f"
-#  riscv_cpu = ""
-#  riscv_float_abi = "hard"
-#  riscv_fpu = ""
+if (bouffalolab_bard == "") {
+  bouffalolab_bard = "BL-IOT-DVK"
+}
+
+assert(bouffalolab_bard != "", "bouffalolab_bard must be specified")
+
+board_defines = []

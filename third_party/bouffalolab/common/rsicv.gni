@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("bl602_board.gni")
-
 riscv_arch = "rv32imfc"
 riscv_abi = "ilp32f"
 #  riscv_cpu = ""
