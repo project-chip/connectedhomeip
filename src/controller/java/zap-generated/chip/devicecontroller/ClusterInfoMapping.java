@@ -2609,12 +2609,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(
-        List<ChipStructs.GeneralDiagnosticsClusterNetworkInterfaceType> valueList) {
+    public void onSuccess(List<ChipStructs.GeneralDiagnosticsClusterNetworkInterface> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
-              "valueList", "List<ChipStructs.GeneralDiagnosticsClusterNetworkInterfaceType>");
+              "valueList", "List<ChipStructs.GeneralDiagnosticsClusterNetworkInterface>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }

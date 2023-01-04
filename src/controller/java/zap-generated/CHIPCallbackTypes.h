@@ -533,8 +533,8 @@ typedef void (*CHIPGeneralDiagnosticsClusterUpTimeAttributeCallbackType)(
     void *, chip::app::Clusters::GeneralDiagnostics::Attributes::UpTime::TypeInfo::DecodableArgType);
 typedef void (*CHIPGeneralDiagnosticsClusterTotalOperationalHoursAttributeCallbackType)(
     void *, chip::app::Clusters::GeneralDiagnostics::Attributes::TotalOperationalHours::TypeInfo::DecodableArgType);
-typedef void (*CHIPGeneralDiagnosticsClusterBootReasonsAttributeCallbackType)(
-    void *, chip::app::Clusters::GeneralDiagnostics::Attributes::BootReasons::TypeInfo::DecodableArgType);
+typedef void (*CHIPGeneralDiagnosticsClusterBootReasonAttributeCallbackType)(
+    void *, chip::app::Clusters::GeneralDiagnostics::Attributes::BootReason::TypeInfo::DecodableArgType);
 typedef void (*CHIPGeneralDiagnosticsClusterActiveHardwareFaultsAttributeCallbackType)(
     void *, const chip::app::Clusters::GeneralDiagnostics::Attributes::ActiveHardwareFaults::TypeInfo::DecodableType &);
 typedef void (*CHIPGeneralDiagnosticsClusterActiveRadioFaultsAttributeCallbackType)(

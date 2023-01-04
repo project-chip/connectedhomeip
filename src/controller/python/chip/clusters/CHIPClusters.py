@@ -2055,7 +2055,7 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x00000004: {
-                    "attributeName": "BootReasons",
+                    "attributeName": "BootReason",
                     "attributeId": 0x00000004,
                     "type": "int",
                     "reportable": True,

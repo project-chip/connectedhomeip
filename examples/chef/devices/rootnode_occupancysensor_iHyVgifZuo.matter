@@ -644,7 +644,7 @@ server cluster DiagnosticLogs = 50 {
 }
 
 server cluster GeneralDiagnostics = 51 {
-  enum BootReasonType : ENUM8 {
+  enum BootReasonEnum : ENUM8 {
     kUnspecified = 0;
     kPowerOnReboot = 1;
     kBrownOutReset = 2;
@@ -654,7 +654,7 @@ server cluster GeneralDiagnostics = 51 {
     kSoftwareReset = 6;
   }
 
-  enum HardwareFaultType : ENUM8 {
+  enum HardwareFault : ENUM8 {
     kUnspecified = 0;
     kRadio = 1;
     kSensor = 2;
@@ -683,7 +683,7 @@ server cluster GeneralDiagnostics = 51 {
     kConnectionFailed = 3;
   }
 
-  enum RadioFaultType : ENUM8 {
+  enum RadioFault : ENUM8 {
     kUnspecified = 0;
     kWiFiFault = 1;
     kCellularFault = 2;
@@ -693,7 +693,7 @@ server cluster GeneralDiagnostics = 51 {
     kEthernetFault = 6;
   }
 
-  struct NetworkInterfaceType {
+  struct NetworkInterface {
     char_string<32> name = 0;
     boolean isOperational = 1;
     nullable boolean offPremiseServicesReachableIPv4 = 2;
@@ -705,13 +705,13 @@ server cluster GeneralDiagnostics = 51 {
   }
 
   critical event HardwareFaultChange = 0 {
-    HardwareFaultType current[] = 0;
-    HardwareFaultType previous[] = 1;
+    HardwareFault current[] = 0;
+    HardwareFault previous[] = 1;
   }
 
   critical event RadioFaultChange = 1 {
-    RadioFaultType current[] = 0;
-    RadioFaultType previous[] = 1;
+    RadioFault current[] = 0;
+    RadioFault previous[] = 1;
   }
 
   critical event NetworkFaultChange = 2 {
@@ -720,17 +720,17 @@ server cluster GeneralDiagnostics = 51 {
   }
 
   critical event BootReason = 3 {
-    BootReasonType bootReason = 0;
+    BootReasonEnum bootReason = 0;
   }
 
-  readonly attribute NetworkInterfaceType networkInterfaces[] = 0;
+  readonly attribute NetworkInterface networkInterfaces[] = 0;
   readonly attribute int16u rebootCount = 1;
   readonly attribute int64u upTime = 2;
   readonly attribute int32u totalOperationalHours = 3;
-  readonly attribute enum8 bootReasons = 4;
-  readonly attribute ENUM8 activeHardwareFaults[] = 5;
-  readonly attribute ENUM8 activeRadioFaults[] = 6;
-  readonly attribute ENUM8 activeNetworkFaults[] = 7;
+  readonly attribute BootReasonEnum bootReason = 4;
+  readonly attribute HardwareFault activeHardwareFaults[] = 5;
+  readonly attribute RadioFault activeRadioFaults[] = 6;
+  readonly attribute NetworkFaultType activeNetworkFaults[] = 7;
   readonly attribute boolean testEventTriggersEnabled = 8;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -1152,7 +1152,7 @@ endpoint 0 {
     callback attribute rebootCount;
     callback attribute upTime;
     callback attribute totalOperationalHours;
-    callback attribute bootReasons;
+    callback attribute bootReason;
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;

@@ -4894,30 +4894,29 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     newElement_0_typeClassName.c_str(), newElement_0_typeCtorSignature.c_str(), static_cast<uint8_t>(entry_0.type),
                     newElement_0_type);
 
-                jclass networkInterfaceTypeStructClass_1;
+                jclass networkInterfaceStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$GeneralDiagnosticsClusterNetworkInterfaceType",
-                    networkInterfaceTypeStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$GeneralDiagnosticsClusterNetworkInterface",
+                    networkInterfaceStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$GeneralDiagnosticsClusterNetworkInterfaceType");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$GeneralDiagnosticsClusterNetworkInterface");
                     return nullptr;
                 }
-                jmethodID networkInterfaceTypeStructCtor_1 =
-                    env->GetMethodID(networkInterfaceTypeStructClass_1, "<init>",
+                jmethodID networkInterfaceStructCtor_1 =
+                    env->GetMethodID(networkInterfaceStructClass_1, "<init>",
                                      "(Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;[BLjava/util/"
                                      "ArrayList;Ljava/util/ArrayList;Ljava/lang/Integer;)V");
-                if (networkInterfaceTypeStructCtor_1 == nullptr)
+                if (networkInterfaceStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$GeneralDiagnosticsClusterNetworkInterfaceType constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$GeneralDiagnosticsClusterNetworkInterface constructor");
                     return nullptr;
                 }
 
-                newElement_0 =
-                    env->NewObject(networkInterfaceTypeStructClass_1, networkInterfaceTypeStructCtor_1, newElement_0_name,
-                                   newElement_0_isOperational, newElement_0_offPremiseServicesReachableIPv4,
-                                   newElement_0_offPremiseServicesReachableIPv6, newElement_0_hardwareAddress,
-                                   newElement_0_IPv4Addresses, newElement_0_IPv6Addresses, newElement_0_type);
+                newElement_0 = env->NewObject(networkInterfaceStructClass_1, networkInterfaceStructCtor_1, newElement_0_name,
+                                              newElement_0_isOperational, newElement_0_offPremiseServicesReachableIPv4,
+                                              newElement_0_offPremiseServicesReachableIPv6, newElement_0_hardwareAddress,
+                                              newElement_0_IPv4Addresses, newElement_0_IPv6Addresses, newElement_0_type);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -4967,8 +4966,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            cppValue, value);
             return value;
         }
-        case Attributes::BootReasons::Id: {
-            using TypeInfo = Attributes::BootReasons::TypeInfo;
+        case Attributes::BootReason::Id: {
+            using TypeInfo = Attributes::BootReason::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -4979,7 +4978,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             std::string valueClassName     = "java/lang/Integer";
             std::string valueCtorSignature = "(I)V";
             chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                          cppValue, value);
+                                                                          static_cast<uint8_t>(cppValue), value);
             return value;
         }
         case Attributes::ActiveHardwareFaults::Id: {
@@ -5001,7 +5000,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0ClassName     = "java/lang/Integer";
                 std::string newElement_0CtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint8_t>(entry_0), newElement_0);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -5025,7 +5024,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0ClassName     = "java/lang/Integer";
                 std::string newElement_0CtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint8_t>(entry_0), newElement_0);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -5049,7 +5048,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 std::string newElement_0ClassName     = "java/lang/Integer";
                 std::string newElement_0CtorSignature = "(I)V";
                 chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), entry_0, newElement_0);
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), static_cast<uint8_t>(entry_0), newElement_0);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;

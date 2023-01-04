@@ -8005,11 +8005,11 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeBootReasonsWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeBootReasonWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonID)
                                              params:params];
 }
 
@@ -8104,6 +8104,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                       expectedValues:expectedDataValueDictionaries
                expectedValueInterval:expectedValueIntervalMs
                           completion:completionHandler];
+}
+- (NSDictionary<NSString *, id> *)readAttributeBootReasonsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributeBootReasonWithParams:params];
 }
 @end
 
