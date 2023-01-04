@@ -88,7 +88,7 @@ namespace {
 #define CHIP_ADV_SHORT_UUID_LEN (2)
 
 #define DISC_CAUSE_REMOTE_USER_TERMINATE 0x113
-#define DISC_CAUSE_LOCAL_HOST_TERMINATE  0x116
+#define DISC_CAUSE_LOCAL_HOST_TERMINATE 0x116
 
 /* FreeRTOS sw timer */
 TimerHandle_t sbleAdvTimeoutTimer;
@@ -877,7 +877,7 @@ void BLEManagerImpl::HandleRXCharWrite(uint8_t * p_value, uint16_t len, uint8_t 
 CHIP_ERROR BLEManagerImpl::matter_blemgr_gap_connect_cb(uint8_t conn_id)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err = sInstance.HandleGAPConnect((uint16_t)conn_id);
+    err            = sInstance.HandleGAPConnect((uint16_t) conn_id);
     SuccessOrExit(err);
 
 exit:
@@ -896,7 +896,7 @@ exit:
 CHIP_ERROR BLEManagerImpl::matter_blemgr_gap_disconnect_cb(uint8_t conn_id, uint16_t disc_cause)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err = sInstance.HandleGAPDisconnect((uint16_t)conn_id, disc_cause);
+    err            = sInstance.HandleGAPDisconnect((uint16_t) conn_id, disc_cause);
     SuccessOrExit(err);
 
 exit:
@@ -912,7 +912,7 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::matter_blemgr_rx_char_write_cb(uint8_t conn_id, uint8_t *p_value, uint16_t len)
+void BLEManagerImpl::matter_blemgr_rx_char_write_cb(uint8_t conn_id, uint8_t * p_value, uint16_t len)
 {
     sInstance.HandleRXCharWrite(p_value, len, conn_id);
 
@@ -921,7 +921,7 @@ void BLEManagerImpl::matter_blemgr_rx_char_write_cb(uint8_t conn_id, uint8_t *p_
 
 void BLEManagerImpl::matter_blemgr_tx_char_cccd_write_cb(uint8_t conn_id, uint8_t indicationsEnabled, uint8_t notificationsEnabled)
 {
-    sInstance.HandleTXCharCCCDWrite((int)conn_id, (int)indicationsEnabled, (int)notificationsEnabled);
+    sInstance.HandleTXCharCCCDWrite((int) conn_id, (int) indicationsEnabled, (int) notificationsEnabled);
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
@@ -930,55 +930,49 @@ CHIP_ERROR BLEManagerImpl::matter_blemgr_tx_complete_cb(uint8_t conn_id)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = sInstance.HandleTXComplete((int)conn_id);
+    err = sInstance.HandleTXComplete((int) conn_id);
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return err;
 }
 
-int BLEManagerImpl::matter_blemgr_callback_dispatcher(void *param, T_MATTER_BLEMGR_CALLBACK_TYPE cb_type, void *p_cb_data)
+int BLEManagerImpl::matter_blemgr_callback_dispatcher(void * param, T_MATTER_BLEMGR_CALLBACK_TYPE cb_type, void * p_cb_data)
 {
     BLEManagerImpl * blemgr = static_cast<BLEManagerImpl *>(param);
 
     switch (cb_type)
     {
-        case MATTER_BLEMGR_GAP_CONNECT_CB:
-        {
-            T_MATTER_BLEMGR_GAP_CONNECT_CB_ARG *gap_connect_cb_arg = (T_MATTER_BLEMGR_GAP_CONNECT_CB_ARG *)p_cb_data;
-            blemgr->matter_blemgr_gap_connect_cb(gap_connect_cb_arg->conn_id);
-        }
-        break;
-        case MATTER_BLEMGR_GAP_DISCONNECT_CB:
-        {
-            T_MATTER_BLEMGR_GAP_DISCONNECT_CB_ARG *gap_disconnect_cb_arg = (T_MATTER_BLEMGR_GAP_DISCONNECT_CB_ARG *)p_cb_data;
-            blemgr->matter_blemgr_gap_disconnect_cb(gap_disconnect_cb_arg->conn_id,
-                                                    gap_disconnect_cb_arg->disc_cause);
-        }
-        break;
-        case MATTER_BLEMGR_RX_CHAR_WRITE_CB:
-        {
-            T_MATTER_BLEMGR_RX_CHAR_WRITE_CB_ARG *rx_char_write_cb_arg = (T_MATTER_BLEMGR_RX_CHAR_WRITE_CB_ARG *)p_cb_data;
-            blemgr->matter_blemgr_rx_char_write_cb(rx_char_write_cb_arg->conn_id,
-                                                   rx_char_write_cb_arg->p_value,
-                                                   rx_char_write_cb_arg->len);
-        }
-        break;
-        case MATTER_BLEMGR_TX_CHAR_CCCD_WRITE_CB:
-        {
-            T_MATTER_BLEMGR_TX_CHAR_CCCD_WRITE_CB_ARG *tx_char_cccd_write_cb_arg = (T_MATTER_BLEMGR_TX_CHAR_CCCD_WRITE_CB_ARG *)p_cb_data;
-            blemgr->matter_blemgr_tx_char_cccd_write_cb(tx_char_cccd_write_cb_arg->conn_id,
-                                                        tx_char_cccd_write_cb_arg->indicationsEnabled,
-                                                        tx_char_cccd_write_cb_arg->notificationsEnabled);
-        }
-        break;
-        case MATTER_BLEMGR_TX_COMPLETE_CB:
-        {
-            T_MATTER_BLEMGR_TX_COMPLETE_CB_ARG *tx_complete_cb_arg = (T_MATTER_BLEMGR_TX_COMPLETE_CB_ARG *)p_cb_data;
-            blemgr->matter_blemgr_tx_complete_cb(tx_complete_cb_arg->conn_id);
-        }
-        break;
-        default:
+    case MATTER_BLEMGR_GAP_CONNECT_CB: {
+        T_MATTER_BLEMGR_GAP_CONNECT_CB_ARG * gap_connect_cb_arg = (T_MATTER_BLEMGR_GAP_CONNECT_CB_ARG *) p_cb_data;
+        blemgr->matter_blemgr_gap_connect_cb(gap_connect_cb_arg->conn_id);
+    }
+    break;
+    case MATTER_BLEMGR_GAP_DISCONNECT_CB: {
+        T_MATTER_BLEMGR_GAP_DISCONNECT_CB_ARG * gap_disconnect_cb_arg = (T_MATTER_BLEMGR_GAP_DISCONNECT_CB_ARG *) p_cb_data;
+        blemgr->matter_blemgr_gap_disconnect_cb(gap_disconnect_cb_arg->conn_id, gap_disconnect_cb_arg->disc_cause);
+    }
+    break;
+    case MATTER_BLEMGR_RX_CHAR_WRITE_CB: {
+        T_MATTER_BLEMGR_RX_CHAR_WRITE_CB_ARG * rx_char_write_cb_arg = (T_MATTER_BLEMGR_RX_CHAR_WRITE_CB_ARG *) p_cb_data;
+        blemgr->matter_blemgr_rx_char_write_cb(rx_char_write_cb_arg->conn_id, rx_char_write_cb_arg->p_value,
+                                               rx_char_write_cb_arg->len);
+    }
+    break;
+    case MATTER_BLEMGR_TX_CHAR_CCCD_WRITE_CB: {
+        T_MATTER_BLEMGR_TX_CHAR_CCCD_WRITE_CB_ARG * tx_char_cccd_write_cb_arg =
+            (T_MATTER_BLEMGR_TX_CHAR_CCCD_WRITE_CB_ARG *) p_cb_data;
+        blemgr->matter_blemgr_tx_char_cccd_write_cb(tx_char_cccd_write_cb_arg->conn_id,
+                                                    tx_char_cccd_write_cb_arg->indicationsEnabled,
+                                                    tx_char_cccd_write_cb_arg->notificationsEnabled);
+    }
+    break;
+    case MATTER_BLEMGR_TX_COMPLETE_CB: {
+        T_MATTER_BLEMGR_TX_COMPLETE_CB_ARG * tx_complete_cb_arg = (T_MATTER_BLEMGR_TX_COMPLETE_CB_ARG *) p_cb_data;
+        blemgr->matter_blemgr_tx_complete_cb(tx_complete_cb_arg->conn_id);
+    }
+    break;
+    default:
         break;
     }
 
