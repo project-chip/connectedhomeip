@@ -28,9 +28,9 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
-#include <system/SystemError.h>
-
+#include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
+#include <system/SystemError.h>
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #include <pthread.h>
@@ -175,12 +175,12 @@ inline CHIP_ERROR Mutex::Init(Mutex & aMutex)
 
 inline void Mutex::Lock()
 {
-    k_mutex_lock(&mZephyrMutex, K_FOREVER);
+    VerifyOrDie(0 == k_mutex_lock(&mZephyrMutex, K_FOREVER));
 }
 
 inline void Mutex::Unlock(void)
 {
-    k_mutex_unlock(&mZephyrMutex);
+    VerifyOrDie(0 == k_mutex_unlock(&mZephyrMutex));
 }
 #endif // CHIP_SYSTEM_CONFIG_ZEPHYR_LOCKING
 
