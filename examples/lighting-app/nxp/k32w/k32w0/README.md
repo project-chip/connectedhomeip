@@ -502,26 +502,38 @@ Build the Linux OTA provider application:
 user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota-provider-app chip_config_network_layer_ble=false
 ```
 
-Build OTA image and start the OTA Provider Application:
-
-```
-user@computer1:~/connectedhomeip$ : ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 chip-k32w0x-light-example.bin chip-k32w0x-light-example.ota
-user@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
-user@computer1:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-k32w0x-light-example.ota
-```
-
-A note regarding OTA image header version (`-vn` option). An application binary
-has its own software version (given by
-`CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION`, which can be overwritten). For
-having a correct OTA process, the OTA header version should be the same as the
-binary embedded software version. A user can set a custom software version in
-the gn build args by setting `chip_software_version` to the wanted version.
-
 Build Linux chip-tool:
 
 ```
 user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/chip-tool out/chip-tool-app
 ```
+
+Build OTA image:
+
+In order to build an OTA image, use NXP's wrapper over the standard tool `src/app/ota_image_tool.py`:
+* `scripts/tools/nxp/factory_data_generator/ota_image_tool.py`
+The tool can be used to generate an OTA image with the following format:
+    ```
+    | OTA image header | TLV1 | TLV2 | ... | TLVn |
+    ```
+    where TLVx is in the form `|tag|length|value|`
+
+Note that "standard" TLV format is used. Matter TLV format is only used for factory data TLV value.
+A user can enable the default processors by specifying `chip_enable_ota_default_processors=1` in the build command. Please see more in the [OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
+
+Here is an example that generate an OTA image with factory data and app TLVs:
+    ```
+    user@computer1:~/connectedhomeip$ : ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 -fd --cert_declaration ~/manufacturing/Chip-Test-CD-1037-a220.der -app chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.ota
+    ```
+
+Start the OTA Provider Application:
+
+```
+user@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
+user@computer1:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-k32w0x-light-example.ota
+```
+A note regarding OTA image header version (`-vn` option). An application binary has its own software version (given by `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION`, which can be overwritten). For having a correct OTA process, the OTA header version should be the same as the binary embedded software version. A user can set a custom software version in the gn build args by setting `chip_software_version` to the wanted version.
+
 
 Provision the OTA provider application and assign node id _1_. Also, grant ACL
 entries to allow OTA requestors:
@@ -535,7 +547,7 @@ user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool accesscontrol 
 Provision the device and assign node id _2_:
 
 ```
-user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021   3840
+user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021 3840
 ```
 
 Start the OTA process:

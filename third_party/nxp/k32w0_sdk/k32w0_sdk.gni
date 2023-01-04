@@ -43,6 +43,7 @@ declare_args() {
   use_custom_factory_provider = 0
   chip_crypto_flavor = "NXP-Ultrafast-P256"
   chip_reduce_ssbl_size = false
+  chip_enable_ota_default_processors = 1
 }
 
 assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
@@ -136,6 +137,7 @@ template("k32w0_sdk") {
   print("increased TX power:", chip_with_high_power)
   print("FRO32k: ", use_fro_32k)
   print("low power: ", chip_with_low_power)
+  print("OTA default processors: ", chip_enable_ota_default_processors)
 
   if (chip_crypto == "platform") {
     print("ECC crypto lib: ", chip_crypto_flavor)
@@ -420,6 +422,10 @@ template("k32w0_sdk") {
 
     if (chip_with_factory_data == 1) {
       defines += [ "CONFIG_CHIP_K32W0_REAL_FACTORY_DATA=1" ]
+    }
+
+    if (chip_enable_ota_default_processors == 1) {
+      defines += [ "CONFIG_CHIP_K32W0_OTA_DEFAULT_PROCESSORS=1" ]
     }
 
     if (defined(invoker.defines)) {

@@ -22,12 +22,16 @@
 #include <src/app/clusters/ota-requestor/OTADownloader.h>
 #include <src/include/platform/CHIPDeviceLayer.h>
 #include <src/include/platform/OTAImageProcessor.h>
-
+#include <platform/nxp/k32w/k32w0/OTATlvProcessor.h>
+#include <map>
 namespace chip {
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
 {
 public:
+    CHIP_ERROR Init(OTADownloader * downloader);
+    void Clear();
+
     //////////// OTAImageProcessorInterface Implementation ///////////////
     CHIP_ERROR PrepareDownload() override;
     CHIP_ERROR Finalize() override;
@@ -36,18 +40,23 @@ public:
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
     bool IsFirstImageRun() override;
     CHIP_ERROR ConfirmCurrentImage() override;
-    void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
-    void SetOTAImageFile(const char * imageFile) { mImageFile = imageFile; }
+    CHIP_ERROR ProcessHeader(ByteSpan & block);
+    CHIP_ERROR ProcessPayload(ByteSpan & block);
+    CHIP_ERROR SelectProcessor(ByteSpan & block);
+    CHIP_ERROR RegisterProcessor(uint32_t tag, OTATlvProcessor * processor);
+
+    static void FetchNextData(uint32_t context);
+    static OTAImageProcessorImpl& GetDefaultInstance();
 
 private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
     static void HandlePrepareDownload(intptr_t context);
-    CHIP_ERROR ProcessHeader(ByteSpan & block);
     static void HandleFinalize(intptr_t context);
     static void HandleApply(intptr_t context);
     static void HandleAbort(intptr_t context);
     static void HandleProcessBlock(intptr_t context);
-    static void HandleBlockEraseComplete(uint32_t context);
+
+    void HandleStatus(CHIP_ERROR status);
 
     /**
      * Called to allocate memory for mBlock if necessary and set it to block
@@ -59,10 +68,12 @@ private:
      */
     CHIP_ERROR ReleaseBlock();
 
-    OTADownloader * mDownloader;
+    MutableByteSpan      mBlock;
+    OTADownloader *      mDownloader;
     OTAImageHeaderParser mHeaderParser;
-    MutableByteSpan mBlock;
-    const char * mImageFile = nullptr;
+    OTATlvProcessor *    mCurrentProcessor = nullptr;
+    OTADataAccumulator   mAccumulator;
+    std::map<uint32_t, OTATlvProcessor *> mProcessorMap;
 };
 
 } // namespace chip

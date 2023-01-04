@@ -82,8 +82,27 @@ static_library("k32w0") {
     sources += [
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
+      "OTATlvProcessor.cpp",
+      "OTATlvProcessor.h"
     ]
+
+    if (chip_enable_ota_default_processors == 1) {
+      sources += [
+        "OTAApplicationProcessor.cpp",
+        "OTAApplicationProcessor.h",
+        "OTABootloaderProcessor.cpp",
+        "OTABootloaderProcessor.h",
+      ]
+
+      if (chip_with_factory_data == 1) {
+        sources += [
+          "OTAFactoryDataProcessor.cpp",
+          "OTAFactoryDataProcessor.h",
+        ]
+      }
+    }
   }
+
 
   deps = []
 

@@ -94,7 +94,6 @@ static DefaultOTARequestor gRequestorCore;
 static DefaultOTARequestorStorage gRequestorStorage;
 static DeviceLayer::DefaultOTARequestorDriver gRequestorUser;
 static BDXDownloader gDownloader;
-static OTAImageProcessorImpl gImageProcessor;
 
 constexpr uint16_t requestedOtaBlockSize = 1024;
 #endif
@@ -245,8 +244,14 @@ void AppTask::InitOTA(intptr_t arg)
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gRequestorUser.SetMaxDownloadBlockSize(requestedOtaBlockSize);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-    gImageProcessor.SetOTADownloader(&gDownloader);
+    auto& imageProcessor = OTAImageProcessorImpl::GetDefaultInstance();
+    gRequestorUser.Init(&gRequestorCore, &imageProcessor);
+    CHIP_ERROR err = imageProcessor.Init(&gDownloader);
+    if (err != CHIP_NO_ERROR)
+    {
+        K32W_LOG("Image processor init failed");
+        assert(err == CHIP_NO_ERROR);
+    }
 
     // Connect the gDownloader and Image Processor objects
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
