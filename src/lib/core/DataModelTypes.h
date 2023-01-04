@@ -59,7 +59,7 @@ constexpr ListIndex kInvalidListIndex   = 0xFFFF; // List index is a uint16 thus
 constexpr KeysetId kInvalidKeysetId     = 0xFFFF;
 
 // Invalid IC identifier is provisional. Value will most likely change when identifying token is defined
-// https://github.com/project-chip/connectedhomeip/issues/24251 
+// https://github.com/project-chip/connectedhomeip/issues/24251
 constexpr uint64_t kInvalidIcId = 0;
 
 // These are MEIs, 0xFFFF is not a valid manufacturer code,
