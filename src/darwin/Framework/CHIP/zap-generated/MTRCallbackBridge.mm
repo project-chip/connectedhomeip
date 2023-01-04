@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MTRCallbackBridge_internal.h"
+#import "MTRCallbackBridge.h"
 #import "MTRCommandPayloadsObjc.h"
 #import "MTRStructsObjc.h"
 
@@ -1535,7 +1535,7 @@ void MTRDescriptorDeviceTypeListListAttributeCallbackBridge::OnSuccessFn(void * 
             auto & entry_0 = iter_0.GetValue();
             MTRDescriptorClusterDeviceTypeStruct * newElement_0;
             newElement_0 = [MTRDescriptorClusterDeviceTypeStruct new];
-            newElement_0.type = [NSNumber numberWithUnsignedInt:entry_0.type];
+            newElement_0.deviceType = [NSNumber numberWithUnsignedInt:entry_0.deviceType];
             newElement_0.revision = [NSNumber numberWithUnsignedShort:entry_0.revision];
             [array_0 addObject:newElement_0];
         }
@@ -1966,8 +1966,8 @@ void MTRBindingAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
 }
 
 void MTRAccessControlACLListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
-        value)
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1975,8 +1975,8 @@ void MTRAccessControlACLListAttributeCallbackBridge::OnSuccessFn(void * context,
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRAccessControlClusterAccessControlEntry * newElement_0;
-            newElement_0 = [MTRAccessControlClusterAccessControlEntry new];
+            MTRAccessControlClusterAccessControlEntryStruct * newElement_0;
+            newElement_0 = [MTRAccessControlClusterAccessControlEntryStruct new];
             newElement_0.privilege = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.privilege)];
             newElement_0.authMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.authMode)];
             if (entry_0.subjects.IsNull()) {
@@ -2063,7 +2063,8 @@ void MTRAccessControlACLListAttributeCallbackSubscriptionBridge::OnSubscriptionE
 }
 
 void MTRAccessControlExtensionListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2071,8 +2072,8 @@ void MTRAccessControlExtensionListAttributeCallbackBridge::OnSuccessFn(void * co
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRAccessControlClusterExtensionEntry * newElement_0;
-            newElement_0 = [MTRAccessControlClusterExtensionEntry new];
+            MTRAccessControlClusterAccessControlExtensionStruct * newElement_0;
+            newElement_0 = [MTRAccessControlClusterAccessControlExtensionStruct new];
             newElement_0.data = [NSData dataWithBytes:entry_0.data.data() length:entry_0.data.size()];
             newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
             [array_0 addObject:newElement_0];
@@ -2435,17 +2436,17 @@ void MTRActionsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRBasicCapabilityMinimaStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Basic::Structs::CapabilityMinimaStruct::DecodableType & value)
+void MTRBasicInformationCapabilityMinimaStructAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::BasicInformation::Structs::CapabilityMinimaStruct::DecodableType & value)
 {
-    MTRBasicClusterCapabilityMinimaStruct * _Nonnull objCValue;
-    objCValue = [MTRBasicClusterCapabilityMinimaStruct new];
+    MTRBasicInformationClusterCapabilityMinimaStruct * _Nonnull objCValue;
+    objCValue = [MTRBasicInformationClusterCapabilityMinimaStruct new];
     objCValue.caseSessionsPerFabric = [NSNumber numberWithUnsignedShort:value.caseSessionsPerFabric];
     objCValue.subscriptionsPerFabric = [NSNumber numberWithUnsignedShort:value.subscriptionsPerFabric];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBasicInformationCapabilityMinimaStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -2460,7 +2461,7 @@ void MTRBasicCapabilityMinimaStructAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRBasicGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRBasicInformationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -2483,7 +2484,7 @@ void MTRBasicGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBasicInformationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -2498,7 +2499,7 @@ void MTRBasicGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRBasicAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
+void MTRBasicInformationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -2521,7 +2522,7 @@ void MTRBasicAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBasicInformationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -2536,7 +2537,7 @@ void MTRBasicAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
+void MTRBasicInformationAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -2559,7 +2560,7 @@ void MTRBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRBasicInformationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -2688,7 +2689,7 @@ void MTROTASoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge::OnSuccessFn(void * context,
+void MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & value)
 {
@@ -2715,7 +2716,7 @@ void MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -11262,7 +11263,7 @@ void MTRGroupsClusterAddGroupResponseCallbackBridge::OnSuccessFn(
         response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
+        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
     }
     DispatchSuccess(context, response);
 };
@@ -11275,7 +11276,7 @@ void MTRGroupsClusterViewGroupResponseCallbackBridge::OnSuccessFn(
         response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
+        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
     }
     {
         response.groupName = [[NSString alloc] initWithBytes:data.groupName.data()
@@ -11325,7 +11326,7 @@ void MTRGroupsClusterRemoveGroupResponseCallbackBridge::OnSuccessFn(
         response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
+        response.groupID = [NSNumber numberWithUnsignedShort:data.groupID];
     }
     DispatchSuccess(context, response);
 };
@@ -13506,15 +13507,15 @@ void MTRNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRAccessControlClusterAuthModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::AccessControl::AuthMode value)
+void MTRAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::AccessControl::AccessControlEntryAuthModeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -13529,8 +13530,8 @@ void MTRAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AuthMode> & value)
+void MTRNullableAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AccessControlEntryAuthModeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -13541,7 +13542,57 @@ void MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::AccessControl::AccessControlEntryPrivilegeEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AccessControlEntryPrivilegeEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -13592,56 +13643,6 @@ void MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnSuc
 };
 
 void MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRAccessControlClusterPrivilegeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::AccessControl::Privilege value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::Privilege> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRNullableAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

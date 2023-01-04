@@ -20,7 +20,7 @@ class ParsingError(ValueError):
         super().__init__(message)
 
 
-class UnexpectedParsingError(ParsingError):
+class UnexpectedParsingError(ValueError):
     def __init__(self, message):
         super().__init__(message)
 

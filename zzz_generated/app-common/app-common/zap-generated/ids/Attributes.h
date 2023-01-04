@@ -571,7 +571,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace Actions
 
-namespace Basic {
+namespace BasicInformation {
 namespace Attributes {
 
 namespace DataModelRevision {
@@ -675,7 +675,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace Basic
+} // namespace BasicInformation
 
 namespace OtaSoftwareUpdateProvider {
 namespace Attributes {
@@ -706,9 +706,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace OtaSoftwareUpdateRequestor {
 namespace Attributes {
 
-namespace DefaultOtaProviders {
+namespace DefaultOTAProviders {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace DefaultOtaProviders
+} // namespace DefaultOTAProviders
 
 namespace UpdatePossible {
 static constexpr AttributeId Id = 0x00000001;

@@ -51,12 +51,12 @@ server cluster Groups = 4 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
     CHAR_STRING groupName = 1;
   }
 
   request struct ViewGroupRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
   }
 
   request struct GetGroupMembershipRequest {
@@ -64,22 +64,22 @@ server cluster Groups = 4 {
   }
 
   request struct RemoveGroupRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
   }
 
   request struct AddGroupIfIdentifyingRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
     CHAR_STRING groupName = 1;
   }
 
   response struct AddGroupResponse = 0 {
     ENUM8 status = 0;
-    group_id groupId = 1;
+    group_id groupID = 1;
   }
 
   response struct ViewGroupResponse = 1 {
     ENUM8 status = 0;
-    group_id groupId = 1;
+    group_id groupID = 1;
     CHAR_STRING groupName = 2;
   }
 
@@ -90,7 +90,7 @@ server cluster Groups = 4 {
 
   response struct RemoveGroupResponse = 3 {
     ENUM8 status = 0;
-    group_id groupId = 1;
+    group_id groupID = 1;
   }
 
   fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
@@ -519,7 +519,7 @@ server cluster BinaryInputBasic = 15 {
 
 client cluster Descriptor = 29 {
   struct DeviceTypeStruct {
-    devtype_id type = 0;
+    devtype_id deviceType = 0;
     int16u revision = 1;
   }
 
@@ -533,7 +533,7 @@ client cluster Descriptor = 29 {
 
 server cluster Descriptor = 29 {
   struct DeviceTypeStruct {
-    devtype_id type = 0;
+    devtype_id deviceType = 0;
     int16u revision = 1;
   }
 
@@ -560,10 +560,18 @@ server cluster Binding = 30 {
 }
 
 server cluster AccessControl = 31 {
-  enum AuthMode : ENUM8 {
+  enum AccessControlEntryAuthModeEnum : ENUM8 {
     kPase = 1;
     kCase = 2;
     kGroup = 3;
+  }
+
+  enum AccessControlEntryPrivilegeEnum : ENUM8 {
+    kView = 1;
+    kProxyView = 2;
+    kOperate = 3;
+    kManage = 4;
+    kAdminister = 5;
   }
 
   enum ChangeTypeEnum : ENUM8 {
@@ -572,17 +580,9 @@ server cluster AccessControl = 31 {
     kRemoved = 2;
   }
 
-  enum Privilege : ENUM8 {
-    kView = 1;
-    kProxyView = 2;
-    kOperate = 3;
-    kManage = 4;
-    kAdminister = 5;
-  }
-
-  fabric_scoped struct AccessControlEntry {
-    fabric_sensitive Privilege privilege = 1;
-    fabric_sensitive AuthMode authMode = 2;
+  fabric_scoped struct AccessControlEntryStruct {
+    fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
+    fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
     nullable fabric_sensitive int64u subjects[] = 3;
     nullable fabric_sensitive Target targets[] = 4;
     fabric_idx fabricIndex = 254;
@@ -594,7 +594,7 @@ server cluster AccessControl = 31 {
     nullable devtype_id deviceType = 2;
   }
 
-  fabric_scoped struct ExtensionEntry {
+  fabric_scoped struct AccessControlExtensionStruct {
     fabric_sensitive octet_string<128> data = 1;
     fabric_idx fabricIndex = 254;
   }
@@ -603,7 +603,7 @@ server cluster AccessControl = 31 {
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
-    nullable AccessControlEntry latestValue = 4;
+    nullable AccessControlEntryStruct latestValue = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -611,12 +611,12 @@ server cluster AccessControl = 31 {
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
-    nullable ExtensionEntry latestValue = 4;
+    nullable AccessControlExtensionStruct latestValue = 4;
     fabric_idx fabricIndex = 254;
   }
 
-  attribute access(read: administer, write: administer) AccessControlEntry acl[] = 0;
-  attribute access(read: administer, write: administer) ExtensionEntry extension[] = 1;
+  attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
+  attribute access(read: administer, write: administer) AccessControlExtensionStruct extension[] = 1;
   readonly attribute int16u subjectsPerAccessControlEntry = 2;
   readonly attribute int16u targetsPerAccessControlEntry = 3;
   readonly attribute int16u accessControlEntriesPerFabric = 4;
@@ -625,7 +625,7 @@ server cluster AccessControl = 31 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-server cluster Basic = 40 {
+server cluster BasicInformation = 40 {
   struct CapabilityMinimaStruct {
     int16u caseSessionsPerFabric = 0;
     int16u subscriptionsPerFabric = 1;
@@ -695,8 +695,8 @@ server cluster OtaSoftwareUpdateProvider = 41 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct QueryImageRequest {
-    vendor_id vendorId = 0;
-    INT16U productId = 1;
+    vendor_id vendorID = 0;
+    INT16U productID = 1;
     INT32U softwareVersion = 2;
     OTADownloadProtocol protocolsSupported[] = 3;
     optional INT16U hardwareVersion = 4;
@@ -2177,7 +2177,7 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster Basic {
+  server cluster BasicInformation {
     callback attribute dataModelRevision default = 10;
     callback attribute vendorName;
     callback attribute vendorID;

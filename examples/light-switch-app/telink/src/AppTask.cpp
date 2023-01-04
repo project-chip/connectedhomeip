@@ -119,8 +119,7 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err;
 
-    LOG_INF("Current Software Version: %u, %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION,
-            CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+    LOG_INF("SW Version: %u, %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
     // Initialize status LED
     LEDWidget::InitGpio(SYSTEM_STATE_LED_PORT);
@@ -166,7 +165,7 @@ CHIP_ERROR AppTask::Init()
     err = InitBindingHandler();
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("InitBindingHandler() failed");
+        LOG_ERR("InitBindingHandler fail");
         return err;
     }
 
@@ -180,7 +179,7 @@ CHIP_ERROR AppTask::Init()
     err = ConnectivityMgr().SetBLEDeviceName("TelinkSwitch");
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("Fail to set BLE device name");
+        LOG_ERR("SetBLEDeviceName fail");
     }
 
     return err;
@@ -192,7 +191,7 @@ CHIP_ERROR AppTask::StartApp()
 
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("AppTask.Init() failed");
+        LOG_ERR("AppTask Init fail");
         return err;
     }
 
@@ -246,7 +245,7 @@ void AppTask::FactoryResetButtonEventHandler(void)
 
 void AppTask::FactoryResetHandler(AppEvent * aEvent)
 {
-    LOG_INF("Factory Reset triggered.");
+    LOG_INF("FactoryResetHandler");
     chip::Server::GetInstance().ScheduleFactoryReset();
 }
 
@@ -262,18 +261,17 @@ void AppTask::StartThreadButtonEventHandler(void)
 
 void AppTask::StartThreadHandler(AppEvent * aEvent)
 {
-
+    LOG_INF("StartThreadHandler");
     if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
         // Switch context from BLE to Thread
         Internal::BLEManagerImpl sInstance;
         sInstance.SwitchToIeee802154();
         StartDefaultThreadNetwork();
-        LOG_INF("Device is not commissioned to a Thread network. Starting with the default configuration.");
     }
     else
     {
-        LOG_INF("Device is commissioned to a Thread network.");
+        LOG_INF("Device already commissioned");
     }
 }
 
@@ -289,24 +287,24 @@ void AppTask::StartBleAdvButtonEventHandler(void)
 
 void AppTask::StartBleAdvHandler(AppEvent * aEvent)
 {
-    LOG_INF("BLE advertising start button pressed");
+    LOG_INF("StartBleAdvHandler");
 
     // Don't allow on starting Matter service BLE advertising after Thread provisioning.
     if (ConnectivityMgr().IsThreadProvisioned())
     {
-        LOG_INF("Matter service BLE advertising not started - device is commissioned to a Thread network.");
+        LOG_INF("Device already commissioned");
         return;
     }
 
     if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
-        LOG_INF("BLE advertising is already enabled");
+        LOG_INF("BLE adv already enabled");
         return;
     }
 
     if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
     {
-        LOG_ERR("OpenBasicCommissioningWindow() failed");
+        LOG_ERR("OpenBasicCommissioningWindow fail");
     }
 }
 
@@ -370,7 +368,7 @@ void AppTask::PostEvent(AppEvent * aEvent)
 {
     if (k_msgq_put(&sAppEventQueue, aEvent, K_NO_WAIT) != 0)
     {
-        LOG_INF("Failed to post event to app task event queue");
+        LOG_INF("PostEvent fail");
     }
 }
 
@@ -382,7 +380,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
     else
     {
-        LOG_INF("Event received with no handler. Dropping event.");
+        LOG_INF("Dropping event without handler");
     }
 }
 

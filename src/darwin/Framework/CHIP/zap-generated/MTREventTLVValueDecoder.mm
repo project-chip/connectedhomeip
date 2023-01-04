@@ -162,11 +162,11 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 value.changeType = memberValue;
             } while (0);
             do {
-                MTRAccessControlClusterAccessControlEntry * _Nullable memberValue;
+                MTRAccessControlClusterAccessControlEntryStruct * _Nullable memberValue;
                 if (cppValue.latestValue.IsNull()) {
                     memberValue = nil;
                 } else {
-                    memberValue = [MTRAccessControlClusterAccessControlEntry new];
+                    memberValue = [MTRAccessControlClusterAccessControlEntryStruct new];
                     memberValue.privilege =
                         [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.latestValue.Value().privilege)];
                     memberValue.authMode =
@@ -272,11 +272,11 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 value.changeType = memberValue;
             } while (0);
             do {
-                MTRAccessControlClusterExtensionEntry * _Nullable memberValue;
+                MTRAccessControlClusterAccessControlExtensionStruct * _Nullable memberValue;
                 if (cppValue.latestValue.IsNull()) {
                     memberValue = nil;
                 } else {
-                    memberValue = [MTRAccessControlClusterExtensionEntry new];
+                    memberValue = [MTRAccessControlClusterAccessControlExtensionStruct new];
                     memberValue.data = [NSData dataWithBytes:cppValue.latestValue.Value().data.data()
                                                       length:cppValue.latestValue.Value().data.size()];
                     memberValue.fabricIndex = [NSNumber numberWithUnsignedChar:cppValue.latestValue.Value().fabricIndex];
@@ -369,8 +369,8 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
         }
         break;
     }
-    case Clusters::Basic::Id: {
-        using namespace Clusters::Basic;
+    case Clusters::BasicInformation::Id: {
+        using namespace Clusters::BasicInformation;
         switch (aPath.mEventId) {
 
         case Events::StartUp::Id: {
@@ -380,7 +380,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBasicClusterStartUpEvent new];
+            __auto_type * value = [MTRBasicInformationClusterStartUpEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -398,7 +398,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBasicClusterShutDownEvent new];
+            __auto_type * value = [MTRBasicInformationClusterShutDownEvent new];
 
             return value;
         }
@@ -410,7 +410,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBasicClusterLeaveEvent new];
+            __auto_type * value = [MTRBasicInformationClusterLeaveEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;
@@ -428,7 +428,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 return nil;
             }
 
-            __auto_type * value = [MTRBasicClusterReachableChangedEvent new];
+            __auto_type * value = [MTRBasicInformationClusterReachableChangedEvent new];
 
             do {
                 NSNumber * _Nonnull memberValue;

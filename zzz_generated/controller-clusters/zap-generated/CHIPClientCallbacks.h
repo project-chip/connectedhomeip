@@ -98,11 +98,12 @@ typedef void (*BindingAttributeListListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*AccessControlAclListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
-        data);
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType> & data);
 typedef void (*AccessControlExtensionListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & data);
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::DecodableType> & data);
 typedef void (*AccessControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*AccessControlAcceptedCommandListListAttributeCallback)(
@@ -121,15 +122,15 @@ typedef void (*ActionsAcceptedCommandListListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ActionsAttributeListListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BasicGeneratedCommandListListAttributeCallback)(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BasicAcceptedCommandListListAttributeCallback)(void * context,
-                                                              const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BasicAttributeListListAttributeCallback)(void * context,
-                                                        const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*BasicInformationGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BasicInformationAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BasicInformationAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*OtaSoftwareUpdateProviderAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*OtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback)(
+typedef void (*OtaSoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & data);

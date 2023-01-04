@@ -59,7 +59,7 @@ public final class ChipIdLookup {
       return "Actions";
     }
     if (clusterId == 40L) {
-      return "Basic";
+      return "BasicInformation";
     }
     if (clusterId == 41L) {
       return "OtaSoftwareUpdateProvider";
@@ -653,7 +653,7 @@ public final class ChipIdLookup {
     }
     if (clusterId == 42L) {
       if (attributeId == 0L) {
-        return "DefaultOtaProviders";
+        return "DefaultOTAProviders";
       }
       if (attributeId == 1L) {
         return "UpdatePossible";

@@ -341,25 +341,25 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void addGroup(AddGroupResponseCallback callback, Integer groupId, String groupName) {
-      addGroup(chipClusterPtr, callback, groupId, groupName, null);
+    public void addGroup(AddGroupResponseCallback callback, Integer groupID, String groupName) {
+      addGroup(chipClusterPtr, callback, groupID, groupName, null);
     }
 
     public void addGroup(
         AddGroupResponseCallback callback,
-        Integer groupId,
+        Integer groupID,
         String groupName,
         int timedInvokeTimeoutMs) {
-      addGroup(chipClusterPtr, callback, groupId, groupName, timedInvokeTimeoutMs);
+      addGroup(chipClusterPtr, callback, groupID, groupName, timedInvokeTimeoutMs);
     }
 
-    public void viewGroup(ViewGroupResponseCallback callback, Integer groupId) {
-      viewGroup(chipClusterPtr, callback, groupId, null);
+    public void viewGroup(ViewGroupResponseCallback callback, Integer groupID) {
+      viewGroup(chipClusterPtr, callback, groupID, null);
     }
 
     public void viewGroup(
-        ViewGroupResponseCallback callback, Integer groupId, int timedInvokeTimeoutMs) {
-      viewGroup(chipClusterPtr, callback, groupId, timedInvokeTimeoutMs);
+        ViewGroupResponseCallback callback, Integer groupID, int timedInvokeTimeoutMs) {
+      viewGroup(chipClusterPtr, callback, groupID, timedInvokeTimeoutMs);
     }
 
     public void getGroupMembership(
@@ -374,13 +374,13 @@ public class ChipClusters {
       getGroupMembership(chipClusterPtr, callback, groupList, timedInvokeTimeoutMs);
     }
 
-    public void removeGroup(RemoveGroupResponseCallback callback, Integer groupId) {
-      removeGroup(chipClusterPtr, callback, groupId, null);
+    public void removeGroup(RemoveGroupResponseCallback callback, Integer groupID) {
+      removeGroup(chipClusterPtr, callback, groupID, null);
     }
 
     public void removeGroup(
-        RemoveGroupResponseCallback callback, Integer groupId, int timedInvokeTimeoutMs) {
-      removeGroup(chipClusterPtr, callback, groupId, timedInvokeTimeoutMs);
+        RemoveGroupResponseCallback callback, Integer groupID, int timedInvokeTimeoutMs) {
+      removeGroup(chipClusterPtr, callback, groupID, timedInvokeTimeoutMs);
     }
 
     public void removeAllGroups(DefaultClusterCallback callback) {
@@ -393,29 +393,29 @@ public class ChipClusters {
     }
 
     public void addGroupIfIdentifying(
-        DefaultClusterCallback callback, Integer groupId, String groupName) {
-      addGroupIfIdentifying(chipClusterPtr, callback, groupId, groupName, null);
+        DefaultClusterCallback callback, Integer groupID, String groupName) {
+      addGroupIfIdentifying(chipClusterPtr, callback, groupID, groupName, null);
     }
 
     public void addGroupIfIdentifying(
         DefaultClusterCallback callback,
-        Integer groupId,
+        Integer groupID,
         String groupName,
         int timedInvokeTimeoutMs) {
-      addGroupIfIdentifying(chipClusterPtr, callback, groupId, groupName, timedInvokeTimeoutMs);
+      addGroupIfIdentifying(chipClusterPtr, callback, groupID, groupName, timedInvokeTimeoutMs);
     }
 
     private native void addGroup(
         long chipClusterPtr,
         AddGroupResponseCallback Callback,
-        Integer groupId,
+        Integer groupID,
         String groupName,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void viewGroup(
         long chipClusterPtr,
         ViewGroupResponseCallback Callback,
-        Integer groupId,
+        Integer groupID,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void getGroupMembership(
@@ -427,7 +427,7 @@ public class ChipClusters {
     private native void removeGroup(
         long chipClusterPtr,
         RemoveGroupResponseCallback Callback,
-        Integer groupId,
+        Integer groupID,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void removeAllGroups(
@@ -438,18 +438,18 @@ public class ChipClusters {
     private native void addGroupIfIdentifying(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        Integer groupId,
+        Integer groupID,
         String groupName,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface AddGroupResponseCallback {
-      void onSuccess(Integer status, Integer groupId);
+      void onSuccess(Integer status, Integer groupID);
 
       void onError(Exception error);
     }
 
     public interface ViewGroupResponseCallback {
-      void onSuccess(Integer status, Integer groupId, String groupName);
+      void onSuccess(Integer status, Integer groupID, String groupName);
 
       void onError(Exception error);
     }
@@ -461,7 +461,7 @@ public class ChipClusters {
     }
 
     public interface RemoveGroupResponseCallback {
-      void onSuccess(Integer status, Integer groupId);
+      void onSuccess(Integer status, Integer groupID);
 
       void onError(Exception error);
     }
@@ -1039,16 +1039,17 @@ public class ChipClusters {
     }
 
     public void offWithEffect(
-        DefaultClusterCallback callback, Integer effectId, Integer effectVariant) {
-      offWithEffect(chipClusterPtr, callback, effectId, effectVariant, null);
+        DefaultClusterCallback callback, Integer effectIdentifier, Integer effectVariant) {
+      offWithEffect(chipClusterPtr, callback, effectIdentifier, effectVariant, null);
     }
 
     public void offWithEffect(
         DefaultClusterCallback callback,
-        Integer effectId,
+        Integer effectIdentifier,
         Integer effectVariant,
         int timedInvokeTimeoutMs) {
-      offWithEffect(chipClusterPtr, callback, effectId, effectVariant, timedInvokeTimeoutMs);
+      offWithEffect(
+          chipClusterPtr, callback, effectIdentifier, effectVariant, timedInvokeTimeoutMs);
     }
 
     public void onWithRecallGlobalScene(DefaultClusterCallback callback) {
@@ -1096,7 +1097,7 @@ public class ChipClusters {
     private native void offWithEffect(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        Integer effectId,
+        Integer effectIdentifier,
         Integer effectVariant,
         @Nullable Integer timedInvokeTimeoutMs);
 
@@ -2873,7 +2874,7 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public interface AclAttributeCallback {
-      void onSuccess(List<ChipStructs.AccessControlClusterAccessControlEntry> valueList);
+      void onSuccess(List<ChipStructs.AccessControlClusterAccessControlEntryStruct> valueList);
 
       void onError(Exception ex);
 
@@ -2881,7 +2882,7 @@ public class ChipClusters {
     }
 
     public interface ExtensionAttributeCallback {
-      void onSuccess(List<ChipStructs.AccessControlClusterExtensionEntry> valueList);
+      void onSuccess(List<ChipStructs.AccessControlClusterAccessControlExtensionStruct> valueList);
 
       void onError(Exception ex);
 
@@ -2918,13 +2919,13 @@ public class ChipClusters {
 
     public void writeAclAttribute(
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.AccessControlClusterAccessControlEntry> value) {
+        ArrayList<ChipStructs.AccessControlClusterAccessControlEntryStruct> value) {
       writeAclAttribute(chipClusterPtr, callback, value, null);
     }
 
     public void writeAclAttribute(
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.AccessControlClusterAccessControlEntry> value,
+        ArrayList<ChipStructs.AccessControlClusterAccessControlEntryStruct> value,
         int timedWriteTimeoutMs) {
       writeAclAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
@@ -2940,13 +2941,13 @@ public class ChipClusters {
 
     public void writeExtensionAttribute(
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.AccessControlClusterExtensionEntry> value) {
+        ArrayList<ChipStructs.AccessControlClusterAccessControlExtensionStruct> value) {
       writeExtensionAttribute(chipClusterPtr, callback, value, null);
     }
 
     public void writeExtensionAttribute(
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.AccessControlClusterExtensionEntry> value,
+        ArrayList<ChipStructs.AccessControlClusterAccessControlExtensionStruct> value,
         int timedWriteTimeoutMs) {
       writeExtensionAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
@@ -3036,7 +3037,7 @@ public class ChipClusters {
     private native void writeAclAttribute(
         long chipClusterPtr,
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.AccessControlClusterAccessControlEntry> value,
+        ArrayList<ChipStructs.AccessControlClusterAccessControlEntryStruct> value,
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeAclAttribute(
@@ -3048,7 +3049,7 @@ public class ChipClusters {
     private native void writeExtensionAttribute(
         long chipClusterPtr,
         DefaultClusterCallback callback,
-        ArrayList<ChipStructs.AccessControlClusterExtensionEntry> value,
+        ArrayList<ChipStructs.AccessControlClusterAccessControlExtensionStruct> value,
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeExtensionAttribute(
@@ -3560,10 +3561,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class BasicCluster extends BaseChipCluster {
+  public static class BasicInformationCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 40L;
 
-    public BasicCluster(long devicePtr, int endpointId) {
+    public BasicInformationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -4065,8 +4066,8 @@ public class ChipClusters {
 
     public void queryImage(
         QueryImageResponseCallback callback,
-        Integer vendorId,
-        Integer productId,
+        Integer vendorID,
+        Integer productID,
         Long softwareVersion,
         ArrayList<Integer> protocolsSupported,
         Optional<Integer> hardwareVersion,
@@ -4076,8 +4077,8 @@ public class ChipClusters {
       queryImage(
           chipClusterPtr,
           callback,
-          vendorId,
-          productId,
+          vendorID,
+          productID,
           softwareVersion,
           protocolsSupported,
           hardwareVersion,
@@ -4089,8 +4090,8 @@ public class ChipClusters {
 
     public void queryImage(
         QueryImageResponseCallback callback,
-        Integer vendorId,
-        Integer productId,
+        Integer vendorID,
+        Integer productID,
         Long softwareVersion,
         ArrayList<Integer> protocolsSupported,
         Optional<Integer> hardwareVersion,
@@ -4101,8 +4102,8 @@ public class ChipClusters {
       queryImage(
           chipClusterPtr,
           callback,
-          vendorId,
-          productId,
+          vendorID,
+          productID,
           softwareVersion,
           protocolsSupported,
           hardwareVersion,
@@ -4142,8 +4143,8 @@ public class ChipClusters {
     private native void queryImage(
         long chipClusterPtr,
         QueryImageResponseCallback Callback,
-        Integer vendorId,
-        Integer productId,
+        Integer vendorID,
+        Integer productID,
         Long softwareVersion,
         ArrayList<Integer> protocolsSupported,
         Optional<Integer> hardwareVersion,
@@ -4253,54 +4254,54 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void announceOtaProvider(
+    public void announceOTAProvider(
         DefaultClusterCallback callback,
-        Long providerNodeId,
-        Integer vendorId,
+        Long providerNodeID,
+        Integer vendorID,
         Integer announcementReason,
         Optional<byte[]> metadataForNode,
         Integer endpoint) {
-      announceOtaProvider(
+      announceOTAProvider(
           chipClusterPtr,
           callback,
-          providerNodeId,
-          vendorId,
+          providerNodeID,
+          vendorID,
           announcementReason,
           metadataForNode,
           endpoint,
           null);
     }
 
-    public void announceOtaProvider(
+    public void announceOTAProvider(
         DefaultClusterCallback callback,
-        Long providerNodeId,
-        Integer vendorId,
+        Long providerNodeID,
+        Integer vendorID,
         Integer announcementReason,
         Optional<byte[]> metadataForNode,
         Integer endpoint,
         int timedInvokeTimeoutMs) {
-      announceOtaProvider(
+      announceOTAProvider(
           chipClusterPtr,
           callback,
-          providerNodeId,
-          vendorId,
+          providerNodeID,
+          vendorID,
           announcementReason,
           metadataForNode,
           endpoint,
           timedInvokeTimeoutMs);
     }
 
-    private native void announceOtaProvider(
+    private native void announceOTAProvider(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        Long providerNodeId,
-        Integer vendorId,
+        Long providerNodeID,
+        Integer vendorID,
         Integer announcementReason,
         Optional<byte[]> metadataForNode,
         Integer endpoint,
         @Nullable Integer timedInvokeTimeoutMs);
 
-    public interface DefaultOtaProvidersAttributeCallback {
+    public interface DefaultOTAProvidersAttributeCallback {
       void onSuccess(List<ChipStructs.OtaSoftwareUpdateRequestorClusterProviderLocation> valueList);
 
       void onError(Exception ex);
@@ -4324,26 +4325,26 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readDefaultOtaProvidersAttribute(DefaultOtaProvidersAttributeCallback callback) {
-      readDefaultOtaProvidersAttribute(chipClusterPtr, callback);
+    public void readDefaultOTAProvidersAttribute(DefaultOTAProvidersAttributeCallback callback) {
+      readDefaultOTAProvidersAttribute(chipClusterPtr, callback);
     }
 
-    public void writeDefaultOtaProvidersAttribute(
+    public void writeDefaultOTAProvidersAttribute(
         DefaultClusterCallback callback,
         ArrayList<ChipStructs.OtaSoftwareUpdateRequestorClusterProviderLocation> value) {
-      writeDefaultOtaProvidersAttribute(chipClusterPtr, callback, value, null);
+      writeDefaultOTAProvidersAttribute(chipClusterPtr, callback, value, null);
     }
 
-    public void writeDefaultOtaProvidersAttribute(
+    public void writeDefaultOTAProvidersAttribute(
         DefaultClusterCallback callback,
         ArrayList<ChipStructs.OtaSoftwareUpdateRequestorClusterProviderLocation> value,
         int timedWriteTimeoutMs) {
-      writeDefaultOtaProvidersAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+      writeDefaultOTAProvidersAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
 
-    public void subscribeDefaultOtaProvidersAttribute(
-        DefaultOtaProvidersAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeDefaultOtaProvidersAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeDefaultOTAProvidersAttribute(
+        DefaultOTAProvidersAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeDefaultOTAProvidersAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readUpdatePossibleAttribute(BooleanAttributeCallback callback) {
@@ -4400,18 +4401,18 @@ public class ChipClusters {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    private native void readDefaultOtaProvidersAttribute(
-        long chipClusterPtr, DefaultOtaProvidersAttributeCallback callback);
+    private native void readDefaultOTAProvidersAttribute(
+        long chipClusterPtr, DefaultOTAProvidersAttributeCallback callback);
 
-    private native void writeDefaultOtaProvidersAttribute(
+    private native void writeDefaultOTAProvidersAttribute(
         long chipClusterPtr,
         DefaultClusterCallback callback,
         ArrayList<ChipStructs.OtaSoftwareUpdateRequestorClusterProviderLocation> value,
         @Nullable Integer timedWriteTimeoutMs);
 
-    private native void subscribeDefaultOtaProvidersAttribute(
+    private native void subscribeDefaultOTAProvidersAttribute(
         long chipClusterPtr,
-        DefaultOtaProvidersAttributeCallback callback,
+        DefaultOTAProvidersAttributeCallback callback,
         int minInterval,
         int maxInterval);
 

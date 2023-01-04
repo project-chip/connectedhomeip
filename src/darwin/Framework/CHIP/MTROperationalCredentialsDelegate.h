@@ -69,8 +69,6 @@ public:
         return mCppCommissioner == nullptr ? chip::NullOptional : mCppCommissioner->GetCommissioningParameters();
     }
 
-    void setChipWorkQueue(dispatch_queue_t chipWorkQueue) { mChipWorkQueue = chipWorkQueue; }
-
     void SetOperationalCertificateIssuer(
         id<MTROperationalCertificateIssuer> operationalCertificateIssuer, dispatch_queue_t operationalCertificateIssuerQueue)
     {
@@ -156,7 +154,6 @@ private:
     chip::Controller::DeviceCommissioner * _Nullable mCppCommissioner = nullptr;
     id<MTROperationalCertificateIssuer> _Nullable mOperationalCertificateIssuer;
     dispatch_queue_t _Nullable mOperationalCertificateIssuerQueue;
-    dispatch_queue_t _Nullable mChipWorkQueue;
     chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * _Nullable mOnNOCCompletionCallback = nullptr;
 };
 
