@@ -1,0 +1,3 @@
+future==0.18.2
+pypng==0.0.21
+PyQRCode==1.2.1

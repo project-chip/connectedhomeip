@@ -20,6 +20,9 @@ virtualenv
 # TI
 -r requirements.ti.txt
 
+# Telink
+-r requirements.telink.txt
+
 # cirque tests
 requests>=2.24.0
 
