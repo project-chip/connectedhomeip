@@ -345,7 +345,9 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
                     CastingServer::GetInstance()->ReadCachedTargetVideoPlayerInfos();
                 if (connectableVideoPlayerList == nullptr || !connectableVideoPlayerList[0].IsInitialized())
                 {
-                    ChipLogProgress(AppServer, "No cached video players found");
+                    ChipLogError(AppServer, "CastingServer::DeviceEventCallback No cached video players found");
+                    CastingServer::GetInstance()->mCommissioningCompleteCallback(CHIP_ERROR_INCORRECT_STATE);
+                    return;
                 }
 
                 for (size_t i = 0; i < kMaxCachedVideoPlayers && connectableVideoPlayerList[i].IsInitialized(); i++)
@@ -360,6 +362,14 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
                         targetFabricIndex    = connectableVideoPlayerList[i].GetFabricIndex();
                         runPostCommissioning = true;
                     }
+                }
+
+                if (targetPeerNodeId == 0 && runPostCommissioning == false)
+                {
+                    ChipLogError(AppServer,
+                                 "CastingServer::DeviceEventCallback did NOT find the video player to initialize/connect to");
+                    CastingServer::GetInstance()->mCommissioningCompleteCallback(CHIP_ERROR_INCORRECT_STATE);
+                    return;
                 }
             }
         }
