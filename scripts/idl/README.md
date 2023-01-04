@@ -60,7 +60,7 @@ server cluster AccessControl = 31 {
 
   // request structures are regular structures that are used
   // as command inputs. Special tagging to make the use clear.
-  request struct AnnounceOtaProviderRequest {}
+  request struct AnnounceOTAProviderRequest {}
   request struct ConnectNetworkRequest {
     OCTET_STRING networkID = 0;
     INT64U breadcrumb = 1;
@@ -109,7 +109,7 @@ server cluster AccessControl = 31 {
   // IDLs specifically do not define a structure for DefaultSuccess.
   //
   // which is considered an internal type.
-  command AnnounceOtaProvider(AnnounceOtaProviderRequest): DefaultSuccess = 1;
+  command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 1;
 
   // Some commands may take no inputs at all
   command On(): DefaultSuccess = 2;

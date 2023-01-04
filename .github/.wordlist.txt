@@ -54,7 +54,7 @@ AmebaZ
 amebaz2
 announcementReason
 AnnounceOTAProvider
-AnnounceOtaProviderRequest
+AnnounceOTAProviderRequest
 APIs
 apk
 AppConfig
