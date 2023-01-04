@@ -18,7 +18,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/bouffalolab_iot_sdk.gni")
 import("${build_root}/toolchain/flashable_executable.gni")
 
-template("bl602_executable") {
+template("bouffalolab_executable") {
   output_base_name = get_path_info(invoker.output_name, "name")
 
   objcopy_image_name = output_base_name + ".bin"
@@ -40,9 +40,13 @@ template("bl602_executable") {
     "${chip_root}/scripts/flashing/bouffalolab_firmware_utils.py",
     "${chip_root}/scripts/flashing/firmware_utils.py",
 
-    "${chip_root}/examples/platform/bouffalolab/bl602/flash_config/partition_cfg_2M.toml",
-    "${chip_root}/examples/platform/bouffalolab/bl602/flash_config/partition_cfg_4M.toml",
+    "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_2M.toml",
   ]
+
+  if (invoker.bl_plat_name == "bl602") {
+    flashing_script_inputs += [ "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_4M.toml" ]
+  }
+
   copy(flashing_runtime_target) {
     sources = flashing_script_inputs
     outputs = [ "${root_out_dir}/{{source_file_part}}" ]
@@ -53,12 +57,16 @@ template("bl602_executable") {
   flashing_script_name = output_base_name + ".flash.py"
   flashing_options = [ "bouffalolab" ]
   flashing_options += [ "--chipname" ]
-  flashing_options += [ "bl602" ]
+  flashing_options += [ "${invoker.bl_plat_name}" ]
   flashing_options += [ "--xtal" ]
-  flashing_options += [ "40M" ]
-  flashing_options += [ "--pt" ]
+  if (invoker.bl_plat_name == "bl602") {
+    flashing_options += [ "40M" ]
+  } else if (invoker.bl_plat_name == "bl702") {
+    flashing_options += [ "32M" ]
+  }
 
-  if (invoker.board == "BL602-IOT-DVK-3S") {
+  flashing_options += [ "--pt" ]
+  if (invoker.board == "BL602-IOT-DVK-3S" || invoker.bl_plat_name == "bl702") {
     flashing_options +=
         [ rebase_path("partition_cfg_2M.toml", root_out_dir, root_out_dir) ]
   } else {

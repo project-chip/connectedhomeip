@@ -33,7 +33,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <blog.h>
 #include <easyflash.h>
 #include <utils_log.h>
 
@@ -82,97 +81,69 @@ CHIP_ERROR BL602Config::Init()
 CHIP_ERROR BL602Config::ReadConfigValue(Key key, bool & val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    bool tmpVal;
-    size_t ret, valLen;
+    size_t valLen  = 0;
 
-    ret = ef_get_env_blob(key.name, &tmpVal, sizeof(tmpVal), &valLen);
-    if (ret <= 0)
+    ef_get_env_blob(key.name, &val, 1, &valLen);
+    if (0 == valLen)
     {
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-    SuccessOrExit(err);
 
-    val = tmpVal;
-
-exit:
     return err;
 }
 
 CHIP_ERROR BL602Config::ReadConfigValue(Key key, uint32_t & val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint32_t tmpVal;
-    size_t ret, valLen;
+    size_t valLen  = 0;
 
-    ret = ef_get_env_blob(key.name, &tmpVal, sizeof(tmpVal), &valLen);
-    if (ret <= 0)
+    ef_get_env_blob(key.name, &val, sizeof(val), &valLen);
+    if (0 == valLen)
     {
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-    SuccessOrExit(err);
 
-    val = tmpVal;
-
-exit:
     return err;
 }
 
 CHIP_ERROR BL602Config::ReadConfigValue(Key key, uint64_t & val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint64_t tmpVal;
-    size_t ret, valLen;
+    size_t valLen  = 0;
 
-    ret = ef_get_env_blob(key.name, &tmpVal, sizeof(tmpVal), &valLen);
-    if (ret <= 0)
+    ef_get_env_blob(key.name, &val, sizeof(val), &valLen);
+    if (0 == valLen)
     {
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-    SuccessOrExit(err);
 
-    val = tmpVal;
-exit:
     return err;
 }
 
 CHIP_ERROR BL602Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
-    char tmpVal[bufSize] = { 0 };
-    size_t ret;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ret = ef_get_env_blob(key.name, tmpVal, sizeof(tmpVal) - 1, NULL);
-    if ('\0' == tmpVal[0])
+    outLen = 0;
+    ef_get_env_blob(key.name, buf, bufSize, &outLen);
+    if (0 == outLen)
     {
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-    SuccessOrExit(err);
 
-    outLen = ret;
-    Platform::CopyString(buf, outLen, tmpVal);
-
-exit:
     return err;
 }
 
 CHIP_ERROR BL602Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
-    char tmpVal[bufSize] = { 0 };
-    size_t ret;
-    size_t savedLen = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ret = ef_get_env_blob(key.name, tmpVal, sizeof(tmpVal), &savedLen);
-    if (0 == savedLen)
+    ef_get_env_blob(key.name, buf, bufSize, &outLen);
+    if (0 == outLen)
     {
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-    SuccessOrExit(err);
 
-    outLen = ret;
-    memcpy(buf, tmpVal, outLen);
-
-exit:
     return err;
 }
 
