@@ -1507,6 +1507,8 @@ CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
  *                                    for the resigned version of `referenceCertificate`.
  *  @param candidateCertificatesCount Number of certificates in the `candidateCertificates` list.
  *  @param outCertificate             A reference to the certificate or it's resigned version if found.
+ *                                    Note that it points to either `referenceCertificate` or one of
+ *                                    `candidateCertificates`, but it doesn't copy data.
  *
  *  @returns error if there is certificate parsing/format issue or CHIP_NO_ERROR otherwise.
  **/
