@@ -162,11 +162,11 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 value.changeType = memberValue;
             } while (0);
             do {
-                MTRAccessControlClusterAccessControlEntry * _Nullable memberValue;
+                MTRAccessControlClusterAccessControlEntryStruct * _Nullable memberValue;
                 if (cppValue.latestValue.IsNull()) {
                     memberValue = nil;
                 } else {
-                    memberValue = [MTRAccessControlClusterAccessControlEntry new];
+                    memberValue = [MTRAccessControlClusterAccessControlEntryStruct new];
                     memberValue.privilege =
                         [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.latestValue.Value().privilege)];
                     memberValue.authMode =
@@ -272,11 +272,11 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
                 value.changeType = memberValue;
             } while (0);
             do {
-                MTRAccessControlClusterExtensionEntry * _Nullable memberValue;
+                MTRAccessControlClusterAccessControlExtensionStruct * _Nullable memberValue;
                 if (cppValue.latestValue.IsNull()) {
                     memberValue = nil;
                 } else {
-                    memberValue = [MTRAccessControlClusterExtensionEntry new];
+                    memberValue = [MTRAccessControlClusterAccessControlExtensionStruct new];
                     memberValue.data = [NSData dataWithBytes:cppValue.latestValue.Value().data.data()
                                                       length:cppValue.latestValue.Value().data.size()];
                     memberValue.fabricIndex = [NSNumber numberWithUnsignedChar:cppValue.latestValue.Value().fabricIndex];

@@ -653,7 +653,7 @@ public final class ChipIdLookup {
     }
     if (clusterId == 42L) {
       if (attributeId == 0L) {
-        return "DefaultOtaProviders";
+        return "DefaultOTAProviders";
       }
       if (attributeId == 1L) {
         return "UpdatePossible";

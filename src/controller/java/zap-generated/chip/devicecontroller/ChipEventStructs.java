@@ -28,14 +28,14 @@ public class ChipEventStructs {
     public @Nullable Long adminNodeID;
     public @Nullable Integer adminPasscodeID;
     public Integer changeType;
-    public @Nullable ChipStructs.AccessControlClusterAccessControlEntry latestValue;
+    public @Nullable ChipStructs.AccessControlClusterAccessControlEntryStruct latestValue;
     public Integer fabricIndex;
 
     public AccessControlClusterAccessControlEntryChangedEvent(
         @Nullable Long adminNodeID,
         @Nullable Integer adminPasscodeID,
         Integer changeType,
-        @Nullable ChipStructs.AccessControlClusterAccessControlEntry latestValue,
+        @Nullable ChipStructs.AccessControlClusterAccessControlEntryStruct latestValue,
         Integer fabricIndex) {
       this.adminNodeID = adminNodeID;
       this.adminPasscodeID = adminPasscodeID;
@@ -72,14 +72,14 @@ public class ChipEventStructs {
     public @Nullable Long adminNodeID;
     public @Nullable Integer adminPasscodeID;
     public Integer changeType;
-    public @Nullable ChipStructs.AccessControlClusterExtensionEntry latestValue;
+    public @Nullable ChipStructs.AccessControlClusterAccessControlExtensionStruct latestValue;
     public Integer fabricIndex;
 
     public AccessControlClusterAccessControlExtensionChangedEvent(
         @Nullable Long adminNodeID,
         @Nullable Integer adminPasscodeID,
         Integer changeType,
-        @Nullable ChipStructs.AccessControlClusterExtensionEntry latestValue,
+        @Nullable ChipStructs.AccessControlClusterAccessControlExtensionStruct latestValue,
         Integer fabricIndex) {
       this.adminNodeID = adminNodeID;
       this.adminPasscodeID = adminPasscodeID;

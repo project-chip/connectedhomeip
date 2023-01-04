@@ -22,10 +22,15 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPError.h>
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type & request);
+static void Finalize(chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::Type & request);
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Actions::Structs::ActionStruct::Type & request,
                         Json::Value & value);
 
@@ -104,10 +109,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Actions::Struct
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::Actions::Structs::EndpointListStruct::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & request,
                         Json::Value & value);
 

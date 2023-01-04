@@ -18,6 +18,7 @@
 
 #include "Command.h"
 #include "CustomStringPrefix.h"
+#include "HexConversion.h"
 #include "platform/PlatformManager.h"
 
 #include <functional>
@@ -377,14 +378,16 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
                 // representation is always longer than the octet string it encodes,
                 // so we have enough space in argValue for the decoded version.
                 chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
-                if (!buffer.Calloc(argLen)) // Bigger than needed, but it's fine.
-                {
-                    return false;
-                }
 
-                size_t octetCount =
-                    chip::Encoding::HexToBytes(argValue + kHexStringPrefixLen, argLen - kHexStringPrefixLen, buffer.Get(), argLen);
-                if (octetCount == 0)
+                size_t octetCount;
+                CHIP_ERROR err = HexToBytes(
+                    chip::CharSpan(argValue + kHexStringPrefixLen, argLen - kHexStringPrefixLen),
+                    [&buffer](size_t allocSize) {
+                        buffer.Calloc(allocSize);
+                        return buffer.Get();
+                    },
+                    &octetCount);
+                if (err != CHIP_NO_ERROR)
                 {
                     return false;
                 }
