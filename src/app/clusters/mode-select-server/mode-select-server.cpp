@@ -42,7 +42,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeSelect;
 using namespace chip::Protocols;
 
-using BootReasonType = GeneralDiagnostics::BootReasonType;
+using BootReasonType = GeneralDiagnostics::BootReasonEnum;
 
 static InteractionModel::Status verifyModeValue(const EndpointId endpointId, const uint8_t newMode);
 

@@ -4721,6 +4721,8 @@
           WiFiNetworkDiagnostics:
               - BSSID
               - RSSI
+          GeneralDiagnostics:
+              - BootReason
       commands:
           OTASoftwareUpdateProvider:
               - QueryImage
@@ -4965,6 +4967,8 @@
               - AccessControlExtensionStruct
           SoftwareDiagnostics:
               - ThreadMetricsStruct
+          GeneralDiagnostics:
+              - NetworkInterface
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5049,6 +5053,16 @@
                   - stackFreeCurrent
                   - stackFreeMinimum
                   - stackSize
+          GeneralDiagnostics:
+              NetworkInterface:
+                  - name
+                  - isOperational
+                  - offPremiseServicesReachableIPv4
+                  - offPremiseServicesReachableIPv6
+                  - hardwareAddress
+                  - iPv4Addresses
+                  - iPv6Addresses
+                  - type
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5129,6 +5143,10 @@
               - ConnectionStatusEnum
           EthernetNetworkDiagnostics:
               - PHYRate
+          GeneralDiagnostics:
+              - HardwareFault
+              - RadioFault
+              - BootReasonEnum
       enum values:
           OTASoftwareUpdateProvider:
               OTAApplyUpdateAction:
@@ -5213,6 +5231,35 @@
                   - Rate100G
                   - Rate200G
                   - Rate400G
+          GeneralDiagnostics:
+              HardwareFault:
+                  - Unspecified
+                  - Radio
+                  - Sensor
+                  - ResettableOverTemp
+                  - NonResettableOverTemp
+                  - PowerSource
+                  - VisualDisplayFault
+                  - AudioOutputFault
+                  - UserInterfaceFault
+                  - NonVolatileMemoryError
+                  - TamperDetected
+              RadioFault:
+                  - Unspecified
+                  - WiFiFault
+                  - CellularFault
+                  - ThreadFault
+                  - NFCFault
+                  - BLEFault
+                  - EthernetFault
+              BootReasonEnum:
+                  - Unspecified
+                  - PowerOnReboot
+                  - BrownOutReset
+                  - SoftwareWatchdogReset
+                  - HardwareWatchdogReset
+                  - SoftwareUpdateCompleted
+                  - SoftwareReset
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5280,6 +5327,8 @@
           WiFiNetworkDiagnostics:
               - Bssid
               - Rssi
+          GeneralDiagnostics:
+              - BootReasons
       command fields:
           Groups:
               AddGroup:
@@ -5315,6 +5364,8 @@
               - BatChargeFaultChangeType
           SoftwareDiagnostics:
               - ThreadMetrics
+          GeneralDiagnostics:
+              - NetworkInterfaceType
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5331,6 +5382,10 @@
               - ThreadConnectionStatus
           EthernetNetworkDiagnostics:
               - PHYRateType
+          GeneralDiagnostics:
+              - HardwareFaultType
+              - RadioFaultType
+              - BootReasonType
       enum values:
           GeneralCommissioning:
               CommissioningError:
@@ -5411,6 +5466,8 @@
           WiFiNetworkDiagnostics:
               BSSID: Bssid
               RSSI: Rssi
+          GeneralDiagnostics:
+              BootReason: BootReasons
       commands:
           OTASoftwareUpdateRequestor:
               AnnounceOTAProvider: AnnounceOtaProvider
@@ -5451,6 +5508,8 @@
               AccessControlExtensionStruct: ExtensionEntry
           SoftwareDiagnostics:
               ThreadMetricsStruct: ThreadMetrics
+          GeneralDiagnostics:
+              NetworkInterface: NetworkInterfaceType
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5467,6 +5526,10 @@
               ConnectionStatusEnum: ThreadConnectionStatus
           EthernetNetworkDiagnostics:
               PHYRate: PHYRateType
+          GeneralDiagnostics:
+              HardwareFault: HardwareFaultType
+              RadioFault: RadioFaultType
+              BootReasonEnum: BootReasonType
       enum values:
           GeneralCommissioning:
               CommissioningError:
