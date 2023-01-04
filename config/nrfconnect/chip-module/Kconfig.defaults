@@ -135,6 +135,18 @@ config BT_BUF_ACL_TX_SIZE
 config BT_RX_STACK_SIZE
     default 1200
 
+config BT_CTLR_ECDH
+    bool
+    default n
+
+config BT_CTLR_LE_ENC
+    bool
+    default n
+
+config BT_DEVICE_NAME_GATT_WRITABLE
+    bool
+    default n
+
 # Enable NFC support
 
 config CHIP_NFC_COMMISSIONING
