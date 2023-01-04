@@ -14,9 +14,15 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTR{{cluster}}Cluster{{command}}Params : NSObject <NSCopying>
 {{#zcl_command_arguments}}
 
-{{! Override the getter name because some of our properties start with things
-    like "new" or "init" }}
-@property (nonatomic, copy{{#unless (isStrEqual (asGetterName label) (asStructPropertyName label))}}, getter={{asGetterName label}}{{/unless}}) {{asObjectiveCType type parent.parent.name}} {{asStructPropertyName label}} {{availability ../cluster command=../command commandField=(asStructPropertyName label)}};
+{{> struct_field_decl cluster=parent.parent.name type=type label=label}} {{availability ../cluster command=../command commandField=(asStructPropertyName label)}};
+{{#*inline "oldNameFieldDecl"}}
+
+{{> struct_field_decl cluster=parent.parent.name type=type label=commandField}} {{availability ../cluster command=../command commandField=commandField deprecationMessage=(concat "Please use " (asStructPropertyName label))}};
+{{/inline}}
+{{#if (and includeRenamedProperties
+           (hasOldName ../cluster command=../command commandField=(asStructPropertyName label)))}}
+{{> oldNameFieldDecl commandField=(oldName ../cluster command=../command commandField=(asStructPropertyName label))}}
+{{/if}}
 {{/zcl_command_arguments}}
 {{#if (isStrEqual source "client")}}
 /**
@@ -60,20 +66,48 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{availability cluster command=command deprecationMessage=(concat "Please use MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true) "Params")}}
 @interface MTR{{cluster}}Cluster{{command}}Params : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name}}Params
+{{#zcl_command_arguments}}
+{{#*inline "oldNameFieldDecl"}}
+
+{{> struct_field_decl cluster=parent.parent.name type=type label=commandField}} {{availability ../cluster command=../command commandField=commandField deprecationMessage=(concat "Please use " (asStructPropertyName label))}};
+{{/inline}}
+{{#if (hasOldName (asUpperCamelCase parent.parent.name preserveAcronyms=true) command=(asUpperCamelCase parent.name preserveAcronyms=true) commandField=(asStructPropertyName label))}}
+{{> oldNameFieldDecl commandField=(oldName (asUpperCamelCase parent.parent.name preserveAcronyms=true) command=(asUpperCamelCase parent.name preserveAcronyms=true) commandField=(asStructPropertyName label))}}
+{{/if}}
+{{/zcl_command_arguments}}
 @end
 
 {{/inline}}
 {{#if (not (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true)))}}
 {{> completeDecl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
-                 command=(asUpperCamelCase name preserveAcronyms=true)}}
+                 command=(asUpperCamelCase name preserveAcronyms=true)
+                 includeRenamedProperties=false}}
 {{#if (or (not (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name)))
           (not (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatCommandNameRemapping parent.name name))))}}
 {{> oldNameDecl cluster=(compatClusterNameRemapping parent.name)
                 command=(compatCommandNameRemapping parent.name name)}}
+{{else if (hasRenamedFields (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
+{{#*inline "deprecatedDecl"}}
+
+@interface MTR{{cluster}}Cluster{{command}}Params (Deprecated)
+{{#zcl_command_arguments}}
+{{#*inline "oldNameFieldDecl"}}
+
+{{> struct_field_decl cluster=parent.parent.name type=type label=commandField}} {{availability ../cluster command=../command commandField=commandField deprecationMessage=(concat "Please use " (asStructPropertyName label))}};
+{{/inline}}
+{{#if (hasOldName ../cluster command=../command commandField=(asStructPropertyName label))}}
+{{> oldNameFieldDecl commandField=(oldName ../cluster command=../command commandField=(asStructPropertyName label))}}
+{{/if}}
+{{/zcl_command_arguments}}
+@end
+{{/inline}}
+{{> deprecatedDecl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
+                   command=(asUpperCamelCase name preserveAcronyms=true)}}
 {{/if}}
 {{else}}
 {{> completeDecl cluster=(compatClusterNameRemapping parent.name)
-                 command=(compatCommandNameRemapping parent.name name)}}
+                 command=(compatCommandNameRemapping parent.name name)
+                 includeRenamedProperties=true}}
 {{/if}}
 {{/zcl_commands}}
 {{/zcl_clusters}}

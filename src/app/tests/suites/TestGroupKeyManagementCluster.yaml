@@ -155,15 +155,15 @@ tests:
       command: "AddGroup"
       arguments:
           values:
-              - name: "GroupId"
+              - name: "GroupID"
                 value: 0x0101
               - name: "GroupName"
                 value: "Group #1"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "GroupId"
+              - name: "GroupID"
                 value: 0x0101
 
     - label: "Add Group 2"
@@ -172,15 +172,15 @@ tests:
       command: "AddGroup"
       arguments:
           values:
-              - name: "GroupId"
+              - name: "GroupID"
                 value: 0x0102
               - name: "GroupName"
                 value: "Group #2"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "GroupId"
+              - name: "GroupID"
                 value: 0x0102
 
     - label: "Read GroupTable"
@@ -246,13 +246,13 @@ tests:
       command: "RemoveGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
 
     - label: "Read GroupTable 2"

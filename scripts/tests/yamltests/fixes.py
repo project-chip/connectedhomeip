@@ -54,8 +54,6 @@ def try_apply_yaml_float_written_as_strings(value):
     return value
 
 
-# TODO(thampson) This method is a clone of the method in
-# src/controller/python/chip/yaml/format_converter.py and should eventually be removed in that file.
 def convert_yaml_octet_string_to_bytes(s: str) -> bytes:
     '''Convert YAML octet string body to bytes.
 

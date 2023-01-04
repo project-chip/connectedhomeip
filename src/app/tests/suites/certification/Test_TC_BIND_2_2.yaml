@@ -218,8 +218,8 @@ tests:
 
           [1657719097.788236][4548:4554] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0004 Command 0x0000_0000
           [1657719097.788325][4548:4554] CHIP:TOO:   AddGroupResponse: {
-          [1657719097.788366][4548:4554] CHIP:TOO:     status: 0
-          [1657719097.788393][4548:4554] CHIP:TOO:     groupId: 1
+          [1657719097.788366][4548:4554] CHIP:TOO:     Status: 0
+          [1657719097.788393][4548:4554] CHIP:TOO:     GroupID: 1
           [1657719097.788418][4548:4554] CHIP:TOO:    }
 
 
@@ -231,8 +231,8 @@ tests:
 
           [1657717342.599740][3368:3373] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0004 Command 0x0000_0000
           [1657717342.599891][3368:3373] CHIP:TOO:   AddGroupResponse: {
-          [1657717342.599959][3368:3373] CHIP:TOO:     status: 0
-          [1657717342.600007][3368:3373] CHIP:TOO:     groupId: 1
+          [1657717342.599959][3368:3373] CHIP:TOO:     Status: 0
+          [1657717342.600007][3368:3373] CHIP:TOO:     GroupID: 1
           [1657717342.600054][3368:3373] CHIP:TOO:    }
           [1657717342.600130][3368:3373] CHIP:DMG: ICR moving
 

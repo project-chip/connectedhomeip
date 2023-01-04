@@ -19,7 +19,8 @@
 #define LOG_MESSAGE(msg) (msg)
 #endif
 
-LOG_MODULE_REGISTER(chip, CONFIG_MATTER_LOG_LEVEL);
+/* Assume using always debug level and rely on Matter logger layer filtering */
+LOG_MODULE_REGISTER(chip, LOG_LEVEL_DBG);
 
 namespace chip {
 namespace DeviceLayer {
