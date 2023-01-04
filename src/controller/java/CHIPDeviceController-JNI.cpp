@@ -333,16 +333,6 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAdminSubject", "()J", &getAdminSubject);
     SuccessOrExit(err);
 
-    jmethodID getPaaCerts;
-    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getPaaCerts", "()Ljava/util/ArrayList;",
-                                                        &getPaaCerts);
-    SuccessOrExit(err);
-
-    jmethodID getCdCerts;
-    err =
-        chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getCdCerts", "()Ljava/util/ArrayList;", &getCdCerts);
-    SuccessOrExit(err);
-
     {
         uint64_t fabricId                  = env->CallLongMethod(controllerParams, getFabricId);
         uint16_t listenPort                = env->CallIntMethod(controllerParams, getUdpListenPort);
@@ -352,8 +342,6 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         jbyteArray intermediateCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getIntermediateCertificate);
         jbyteArray operationalCertificate  = (jbyteArray) env->CallObjectMethod(controllerParams, getOperationalCertificate);
         jbyteArray ipk                     = (jbyteArray) env->CallObjectMethod(controllerParams, getIpk);
-        jobject paaCerts                   = env->CallObjectMethod(controllerParams, getPaaCerts);
-        jobject cdCerts                    = env->CallObjectMethod(controllerParams, getCdCerts);
         uint16_t failsafeTimerSeconds      = env->CallIntMethod(controllerParams, getFailsafeTimerSeconds);
         uint16_t caseFailsafeTimerSeconds  = env->CallIntMethod(controllerParams, getCASEFailsafeTimerSeconds);
         bool attemptNetworkScanWiFi        = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanWiFi);
@@ -371,9 +359,8 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         wrapper = AndroidDeviceControllerWrapper::AllocateNew(
             sJVM, self, kLocalDeviceId, fabricId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(),
             DeviceLayer::TCPEndPointManager(), DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate,
-            rootCertificate, intermediateCertificate, operationalCertificate, ipk, paaCerts, cdCerts, listenPort,
-            controllerVendorId, failsafeTimerSeconds, attemptNetworkScanWiFi, attemptNetworkScanThread, skipCommissioningComplete,
-            &err);
+            rootCertificate, intermediateCertificate, operationalCertificate, ipk, listenPort, controllerVendorId,
+            failsafeTimerSeconds, attemptNetworkScanWiFi, attemptNetworkScanThread, skipCommissioningComplete, &err);
         SuccessOrExit(err);
 
         if (caseFailsafeTimerSeconds > 0)
@@ -642,7 +629,7 @@ JNI_METHOD(void, continueCommissioning)
                                                                  : chip::Credentials::AttestationVerificationResult::kSuccess;
     chip::DeviceProxy * deviceProxy = reinterpret_cast<chip::DeviceProxy *>(devicePtr);
     err                             = wrapper->Controller()->ContinueCommissioningAfterDeviceAttestation(
-        deviceProxy, ignoreAttestationFailure ? chip::Credentials::AttestationVerificationResult::kSuccess : lastAttestationResult);
+                                    deviceProxy, ignoreAttestationFailure ? chip::Credentials::AttestationVerificationResult::kSuccess : lastAttestationResult);
 
     if (err != CHIP_NO_ERROR)
     {

@@ -36,8 +36,6 @@ shared_library("jni") {
     "AndroidDeviceControllerWrapper.h",
     "AndroidOperationalCredentialsIssuer.cpp",
     "AndroidOperationalCredentialsIssuer.h",
-    "AttestationTrustStoreBridge.cpp",
-    "AttestationTrustStoreBridge.h",
     "BaseCHIPCluster-JNI.cpp",
     "CHIPAttributeTLVValueDecoder.h",
     "CHIPDefaultCallbacks.cpp",

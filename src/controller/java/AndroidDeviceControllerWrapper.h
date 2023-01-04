@@ -40,7 +40,6 @@
 #endif // JAVA_MATTER_CONTROLLER_TEST
 
 #include "AndroidOperationalCredentialsIssuer.h"
-#include "AttestationTrustStoreBridge.h"
 #include "DeviceAttestationDelegateBridge.h"
 
 /**
@@ -105,9 +104,15 @@ public:
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
 
-    chip::Controller::AutoCommissioner * GetAutoCommissioner() { return &mAutoCommissioner; }
+    chip::Controller::AutoCommissioner * GetAutoCommissioner()
+    {
+        return &mAutoCommissioner;
+    }
 
-    chip::Credentials::PartialDACVerifier * GetPartialDACVerifier() { return &mPartialDACVerifier; }
+    chip::Credentials::PartialDACVerifier * GetPartialDACVerifier()
+    {
+        return &mPartialDACVerifier;
+    }
 
     const chip::Controller::CommissioningParameters & GetCommissioningParameters() const
     {
@@ -149,8 +154,6 @@ public:
      * @param[in] intermediateCertificate an X.509 DER-encoded intermediate certificate for this node
      * @param[in] nodeOperationalCertificate an X.509 DER-encoded operational certificate for this node
      * @param[in] ipkEpochKey the IPK epoch key to use for this node
-     * @param[in] paaCertsArrayList
-     * @param[in] cdCertsArrayList
      * @param[in] listenPort the UDP port to listen on
      * @param[in] controllerVendorId the vendor ID identifying the controller
      * @param[in] failsafeTimerSeconds the failsafe timer in seconds
@@ -170,9 +173,9 @@ public:
                 AndroidOperationalCredentialsIssuerPtr opCredsIssuer,
 #endif
                 jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate,
-                jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey, jobject paaCertsArrayList, jobject cdCertsArrayList,
-                uint16_t listenPort, uint16_t controllerVendorId, uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi,
-                bool attemptNetworkScanThread, bool skipCommissioningComplete, CHIP_ERROR * errInfoOnFailure);
+                jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId,
+                uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread,
+                bool skipCommissioningComplete, CHIP_ERROR * errInfoOnFailure);
 
 #ifdef JAVA_MATTER_CONTROLLER_TEST
     chip::Controller::ExampleOperationalCredentialsIssuer * GetAndroidOperationalCredentialsIssuer()
@@ -188,7 +191,10 @@ public:
         mDeviceAttestationDelegateBridge = deviceAttestationDelegateBridge;
     }
 
-    DeviceAttestationDelegateBridge * GetDeviceAttestationDelegateBridge() { return mDeviceAttestationDelegateBridge; }
+    DeviceAttestationDelegateBridge * GetDeviceAttestationDelegateBridge()
+    {
+        return mDeviceAttestationDelegateBridge;
+    }
 
     void ClearDeviceAttestationDelegateBridge()
     {
@@ -235,9 +241,7 @@ private:
 
     chip::Credentials::PartialDACVerifier mPartialDACVerifier;
 
-    DeviceAttestationDelegateBridge * mDeviceAttestationDelegateBridge        = nullptr;
-    AttestationTrustStoreBridge * mAttestationTrustStoreBridge                = nullptr;
-    chip::Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
+    DeviceAttestationDelegateBridge * mDeviceAttestationDelegateBridge = nullptr;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller,
 #ifdef JAVA_MATTER_CONTROLLER_TEST
