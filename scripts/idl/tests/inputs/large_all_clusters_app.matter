@@ -721,7 +721,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AnnounceOtaProviderRequest {
-      node_id providerNodeId = 0;
+    node_id providerNodeId = 0;
     vendor_id vendorId = 1;
     OTAAnnouncementReason announcementReason = 2;
     optional OCTET_STRING<512> metadataForNode = 3;
