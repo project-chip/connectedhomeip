@@ -121,7 +121,7 @@ typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName bitm
    {{objCEnumName ../clusterName ../bitmapName}}{{objCEnumItemLabel label}} {{availability ../clusterName bitmap=../bitmapName bitmapValue=(objCEnumItemLabel label) deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../../name preserveAcronyms=true) ../label) (objCEnumItemLabel label))}} = {{asHex mask}},
    {{#*inline "oldNameItemDecl"}}
    {{#if oldItemName}}
-   {{objCEnumName ../clusterName ../bitmapName}}{{objCEnumItemLabel oldItemName}} {{availability ../clusterName bitmap=../enumName bitmapValue=oldItemName deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../../name preserveAcronyms=true) ../label) (objCEnumItemLabel label))}} = {{asHex value 2}},
+   {{objCEnumName ../clusterName ../bitmapName}}{{objCEnumItemLabel oldItemName}} {{availability ../clusterName bitmap=../bitmapName bitmapValue=oldItemName deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../../name preserveAcronyms=true) ../label) (objCEnumItemLabel label))}} = {{asHex mask}},
    {{/if}}
    {{/inline}}
    {{> oldNameItemDecl oldItemName=(oldName ../clusterName bitmap=../bitmapName bitmapValue=(objCEnumItemLabel label))}}
