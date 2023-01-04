@@ -130,7 +130,7 @@ CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(chip::Transport::
 
 CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(Dnssd::DiscoveredNodeData * selectedCommissioner)
 {
-    udcInProgress = true;
+    mUdcInProgress = true;
     // Send User Directed commissioning request
     ReturnErrorOnFailure(SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
         selectedCommissioner->resolutionData.ipAddress[0], selectedCommissioner->resolutionData.port,
@@ -334,11 +334,11 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
             CastingServer::GetInstance()->ReadServerClustersForNode(
                 CastingServer::GetInstance()->GetActiveTargetVideoPlayer()->GetNodeId());
         }
-        else if (CastingServer::GetInstance()->udcInProgress)
+        else if (CastingServer::GetInstance()->mUdcInProgress)
         {
             ChipLogProgress(AppServer,
                             "CastingServer::DeviceEventCallback UDC is in progress while handling kBindingsChangedViaCluster");
-            CastingServer::GetInstance()->udcInProgress = false;
+            CastingServer::GetInstance()->mUdcInProgress = false;
             if (CastingServer::GetInstance()->mTargetVideoPlayerNumIPs > 0)
             {
                 TargetVideoPlayerInfo * connectableVideoPlayerList =
@@ -377,10 +377,10 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
     else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
         ChipLogProgress(AppServer, "CastingServer::DeviceEventCallback kCommissioningComplete received");
-        CastingServer::GetInstance()->udcInProgress = false;
-        targetPeerNodeId                            = event->CommissioningComplete.nodeId;
-        targetFabricIndex                           = event->CommissioningComplete.fabricIndex;
-        runPostCommissioning                        = true;
+        CastingServer::GetInstance()->mUdcInProgress = false;
+        targetPeerNodeId                             = event->CommissioningComplete.nodeId;
+        targetFabricIndex                            = event->CommissioningComplete.fabricIndex;
+        runPostCommissioning                         = true;
     }
 
     if (runPostCommissioning)

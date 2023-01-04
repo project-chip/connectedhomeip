@@ -415,8 +415,8 @@ private:
     void ReadServerClusters(chip::EndpointId endpointId);
 
     PersistenceManager mPersistenceManager;
-    bool mInited       = false;
-    bool udcInProgress = false;
+    bool mInited        = false;
+    bool mUdcInProgress = false;
     TargetVideoPlayerInfo mActiveTargetVideoPlayerInfo;
     TargetVideoPlayerInfo mCachedTargetVideoPlayerInfo[kMaxCachedVideoPlayers];
     uint16_t mTargetVideoPlayerVendorId                                   = 0;
