@@ -251,7 +251,6 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_adc.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_boot2.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_chip.c",
-      "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_cks.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_dma.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_efuse.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl702_hal/bl_emac.c",
@@ -297,9 +296,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_aes.c",
       "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_common.c",
       "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_pka.c",
-
-      # need update bl_sec_sha.c to fix compile error
-      # "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_sha.c",
+      "${bl_iot_sdk_root}/components/platform/hosal/sec_common/bl_sec_sha.c",
     ]
 
     cflags_c = [
@@ -309,6 +306,7 @@ template("bl_iot_sdk") {
       "-Wno-old-style-declaration",
       "-Wno-stringop-overflow",
       "-Wno-format-truncation",
+      "-Wno-shadow"
     ]
     configs += [ 
       ":${sdk_target_name}_config_soc",
@@ -544,7 +542,7 @@ template("bl_iot_sdk") {
       "CONFIG_BT_SETTINGS_USE_PRINTK",
     ]
 
-    libs = [ "${bl_iot_sdk_root}/components/network/ble/blecontroller_702_std/lib/libblecontroller_702_std.a" ]
+    libs = [ "${bl_iot_sdk_root}/components/network/ble/blecontroller_702_m1s1/lib/libblecontroller_702_m1s1.a" ]
 
     include_dirs = [
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common",
@@ -633,7 +631,7 @@ template("bl_iot_sdk") {
 
     libs = [ 
       "${bl_iot_sdk_root}/components/network/lmac154/lib/liblmac154.a", 
-      "${bl_iot_sdk_root}/components/network/thread/openthread_utils/lib/libopenthread_utils.a"
+      "${bl_iot_sdk_root}/components/network/thread/openthread_utils_bl702/lib/libopenthread_utils_bl702.a"
     ]
 
     configs += [
