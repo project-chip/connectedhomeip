@@ -7949,7 +7949,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(
  * @brief General Commissioning Cluster ArmFailSafeResponse Command callback (from server)
  */
 bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                   uint8_t errorCode, chip::CharSpan debugText);
+                                                                   uint8_t ErrorCode, chip::CharSpan DebugText);
 /**
  * @brief General Commissioning Cluster SetRegulatoryConfig Command callback (from client)
  */
@@ -7960,8 +7960,8 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(
  * @brief General Commissioning Cluster SetRegulatoryConfigResponse Command callback (from server)
  */
 bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(chip::EndpointId endpoint,
-                                                                           chip::app::CommandSender * commandObj, uint8_t errorCode,
-                                                                           chip::CharSpan debugText);
+                                                                           chip::app::CommandSender * commandObj, uint8_t ErrorCode,
+                                                                           chip::CharSpan DebugText);
 /**
  * @brief General Commissioning Cluster CommissioningComplete Command callback (from client)
  */
@@ -7973,7 +7973,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
  */
 bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(chip::EndpointId endpoint,
                                                                              chip::app::CommandSender * commandObj,
-                                                                             uint8_t errorCode, chip::CharSpan debugText);
+                                                                             uint8_t ErrorCode, chip::CharSpan DebugText);
 /**
  * @brief Network Commissioning Cluster ScanNetworks Command callback (from client)
  */

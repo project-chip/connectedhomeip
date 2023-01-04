@@ -5119,6 +5119,9 @@
                   - ValueA
                   - ValueB
                   - ValueC
+          GeneralCommissioning:
+              CommissioningError:
+                  - OK
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5204,6 +5207,10 @@
           Switch:
               MultiPressComplete:
                   - newPosition
+      enum values:
+          GeneralCommissioning:
+              CommissioningError:
+                  - Ok
       apis:
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
@@ -5267,3 +5274,7 @@
           Descriptor:
               DeviceTypeStruct:
                   deviceType: type
+      enum values:
+          GeneralCommissioning:
+              CommissioningError:
+                  OK: Ok
