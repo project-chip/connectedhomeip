@@ -13,8 +13,7 @@
 # limitations under the License.
 
 declare_args() {
-
-  bouffalolab_iot_sdk_build_root = 
+  bouffalolab_iot_sdk_build_root =
       "//third_party/connectedhomeip/third_party/bouffalolab"
 
   bouffalolab_sdk_root = "/opt/bouffalolab_sdk"
