@@ -937,35 +937,35 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(WiFiNetworkDiagnostics:
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(EthernetNetworkDiagnostics::PHYRateType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(EthernetNetworkDiagnostics::PHYRate val)
 {
-    using EnumType = EthernetNetworkDiagnostics::PHYRateType;
+    using EnumType = EthernetNetworkDiagnostics::PHYRate;
     switch (val)
     {
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EnumType::k10m:
-    case EnumType::k100m:
-    case EnumType::k1000m:
-    case EnumType::k25g:
-    case EnumType::k5g:
-    case EnumType::k10g:
-    case EnumType::k40g:
-    case EnumType::k100g:
-    case EnumType::k200g:
-    case EnumType::k400g:
+    case EnumType::kRate10M:
+    case EnumType::kRate100M:
+    case EnumType::kRate1G:
+    case EnumType::kRate25g:
+    case EnumType::kRate5G:
+    case EnumType::kRate10G:
+    case EnumType::kRate40G:
+    case EnumType::kRate100G:
+    case EnumType::kRate200G:
+    case EnumType::kRate400G:
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_PHY_RATE_TYPE_10_M:
-    case EMBER_ZCL_PHY_RATE_TYPE_100_M:
-    case EMBER_ZCL_PHY_RATE_TYPE_1000_M:
-    case EMBER_ZCL_PHY_RATE_TYPE_2__5_G:
-    case EMBER_ZCL_PHY_RATE_TYPE_5_G:
-    case EMBER_ZCL_PHY_RATE_TYPE_10_G:
-    case EMBER_ZCL_PHY_RATE_TYPE_40_G:
-    case EMBER_ZCL_PHY_RATE_TYPE_100_G:
-    case EMBER_ZCL_PHY_RATE_TYPE_200_G:
-    case EMBER_ZCL_PHY_RATE_TYPE_400_G:
+    case EMBER_ZCL_PHY_RATE_RATE10_M:
+    case EMBER_ZCL_PHY_RATE_RATE100_M:
+    case EMBER_ZCL_PHY_RATE_RATE1_G:
+    case EMBER_ZCL_PHY_RATE_RATE2_5_G:
+    case EMBER_ZCL_PHY_RATE_RATE5_G:
+    case EMBER_ZCL_PHY_RATE_RATE10_G:
+    case EMBER_ZCL_PHY_RATE_RATE40_G:
+    case EMBER_ZCL_PHY_RATE_RATE100_G:
+    case EMBER_ZCL_PHY_RATE_RATE200_G:
+    case EMBER_ZCL_PHY_RATE_RATE400_G:
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:

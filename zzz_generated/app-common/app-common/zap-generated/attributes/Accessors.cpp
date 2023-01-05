@@ -8723,10 +8723,9 @@ namespace Attributes {
 
 namespace PHYRate {
 
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType> & value)
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate> & value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
@@ -8742,9 +8741,9 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     }
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -8757,7 +8756,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthernetNetwor
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
@@ -8765,7 +8764,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint,
-                  const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType> & value)
+                  const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate> & value)
 {
     if (value.IsNull())
     {
