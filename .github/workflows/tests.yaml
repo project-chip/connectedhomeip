@@ -105,7 +105,7 @@ jobs:
               #       things.
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/idl/xml_parser.py \
+                    "./scripts/py_matter_idl/matter_idl/xml_parser.py \
                       --no-print \
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
