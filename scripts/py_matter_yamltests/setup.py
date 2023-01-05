@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-"""The yamltests package."""
+"""The matter_yamltests package."""
 
 import setuptools  # type: ignore
 

@@ -1493,6 +1493,29 @@ CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
 CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid);
 
 /**
+ * @brief Checks for resigned version of the certificate in the list and returns it.
+ *
+ * The following conditions SHOULD be satisfied for the certificate to qualify as
+ * a resigned version of a reference certificate:
+ *   - SKID of the candidate and the reference certificate should match.
+ *   - SubjectDN of the candidate and the reference certificate should match.
+ *
+ * If no resigned version is found then reference certificate itself is returned.
+ *
+ *  @param referenceCertificate       A DER certificate.
+ *  @param candidateCertificates      A pointer to the list of DER Certificates, which should be searched
+ *                                    for the resigned version of `referenceCertificate`.
+ *  @param candidateCertificatesCount Number of certificates in the `candidateCertificates` list.
+ *  @param outCertificate             A reference to the certificate or it's resigned version if found.
+ *                                    Note that it points to either `referenceCertificate` or one of
+ *                                    `candidateCertificates`, but it doesn't copy data.
+ *
+ *  @returns error if there is certificate parsing/format issue or CHIP_NO_ERROR otherwise.
+ **/
+CHIP_ERROR ReplaceCertIfResignedCertFound(const ByteSpan & referenceCertificate, const ByteSpan * candidateCertificates,
+                                          size_t candidateCertificatesCount, ByteSpan & outCertificate);
+
+/**
  * Defines DN attribute types that can include endocing of VID/PID parameters.
  */
 enum class DNAttrType
