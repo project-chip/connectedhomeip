@@ -405,15 +405,15 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {
     if (aAction == LightingManager::ON_ACTION)
     {
-        LOG_INF("Turn On Action has been initiated");
+        LOG_DBG("Turn On Action has been initiated");
     }
     else if (aAction == LightingManager::OFF_ACTION)
     {
-        LOG_INF("Turn Off Action has been initiated");
+        LOG_DBG("Turn Off Action has been initiated");
     }
     else if (aAction == LightingManager::LEVEL_ACTION)
     {
-        LOG_INF("Level Action has been initiated");
+        LOG_DBG("Level Action has been initiated");
     }
 }
 
@@ -421,15 +421,15 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction, int32_t aActor)
 {
     if (aAction == LightingManager::ON_ACTION)
     {
-        LOG_INF("Turn On Action has been completed");
+        LOG_DBG("Turn On Action has been completed");
     }
     else if (aAction == LightingManager::OFF_ACTION)
     {
-        LOG_INF("Turn Off Action has been completed");
+        LOG_DBG("Turn Off Action has been completed");
     }
     else if (aAction == LightingManager::LEVEL_ACTION)
     {
-        LOG_INF("Level Action has been completed");
+        LOG_DBG("Level Action has been completed");
     }
 
     if (aActor == AppEvent::kEventType_Button)
