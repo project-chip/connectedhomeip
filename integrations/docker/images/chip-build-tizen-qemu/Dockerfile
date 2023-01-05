@@ -19,7 +19,7 @@ RUN set -x \
 
 # ------------------------------------------------------------------------------
 # Build Tizen kernel
-ENV TIZEN_QEMU_KERNEL /opt/tizen-iot-virt-zImage
+ENV TIZEN_QEMU_KERNEL /opt/tizen-qemu/tizen-iot-virt-zImage
 
 WORKDIR /tmp/workdir
 
@@ -61,8 +61,8 @@ RUN set -x \
 
 # ------------------------------------------------------------------------------
 # Create Tizen IoT File System
-ENV TIZEN_FS_IMAGE_ROOT /opt/tizen-iot-rootfs.img
-ENV TIZEN_FS_IMAGE_DATA /opt/tizen-iot-sysdata.img
+ENV TIZEN_FS_IMAGE_ROOT /opt/tizen-qemu/tizen-iot-rootfs.img
+ENV TIZEN_FS_IMAGE_DATA /opt/tizen-qemu/tizen-iot-sysdata.img
 
 WORKDIR /tmp/workdir
 

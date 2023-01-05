@@ -20,6 +20,9 @@ import("${build_root}/config/tizen/config.gni")
 
 tizen_dev_certificate = get_path_info("tizen_dev_certificate.py", "abspath")
 tizen_manifest_parser = get_path_info("tizen_manifest_parser.py", "abspath")
+tizen_qemu_test =
+    get_path_info("${chip_root}/src/test_driver/tizen/run_qemu_test.py",
+                  "abspath")
 
 # Run Tizen Studio CLI as a project builder.
 #
@@ -96,6 +99,29 @@ template("tizen_sdk_certificate") {
   }
 }
 
+# Build and running Tizen QEMU test application.
+#
+template("qemu_test") {
+  testonly = true
+
+  action(target_name) {
+    deps = invoker.deps
+    deps += [ "${chip_root}/examples/chip-tool" ]
+
+    stamp_file = "${root_build_dir}/.${target_name}_stamp"
+    target = get_path_info(root_build_dir, "name")
+
+    args = [
+      "--target=${target}",
+      "--out-dir=${root_build_dir}/qemu-test",
+      "--log-level=debug",
+      "--verbose",
+    ]
+    script = tizen_qemu_test
+    outputs = [ stamp_file ]
+  }
+}
+
 # Package Tizen application as a TPK bundle.
 #
 # Parameters:
@@ -113,7 +139,10 @@ template("tizen_sdk_package") {
   # for this, because Tizen Studio CLI scans "res" (resources), "shared" and
   # "lib" directories for items to pack. In our case it could include in the
   # TPK package libraries available in ${root_out_dir}/lib directory.
-  tizen_package_dir = "${root_build_dir}/package"
+  simple_target_name =
+      get_label_info(get_label_info("${target_name}", "dir"), "name")
+
+  tizen_package_dir = "${root_build_dir}/package/${simple_target_name}/package"
   tizen_package_out_dir = "${tizen_package_dir}/out"
 
   # Extract data from Tizen XML manifest.
