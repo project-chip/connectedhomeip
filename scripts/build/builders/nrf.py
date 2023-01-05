@@ -147,13 +147,21 @@ class NrfConnectBuilder(Builder):
 
     def generate(self):
         if not os.path.exists(self.output_dir):
-            # NRF does a in-place update  of SDK tools
+            zephyr_sdk_dir = None
+
             if not self._runner.dry_run:
                 if 'ZEPHYR_BASE' not in os.environ:
                     raise Exception("NRF builds require ZEPHYR_BASE to be set")
 
+                # Users are expected to set ZEPHYR_SDK_INSTALL_DIR but additionally cover the Docker
+                # case by inferring ZEPHYR_SDK_INSTALL_DIR from NRF5_TOOLS_ROOT.
+                if not os.environ.get('ZEPHYR_SDK_INSTALL_DIR') and not os.environ.get('NRF5_TOOLS_ROOT'):
+                    raise Exception("NRF buils require ZEPHYR_SDK_INSTALL_DIR to be set")
+
                 zephyr_base = os.environ['ZEPHYR_BASE']
                 nrfconnect_sdk = os.path.dirname(zephyr_base)
+                zephyr_sdk_dir = os.environ.get('ZEPHYR_SDK_INSTALL_DIR') or os.path.join(
+                    os.environ['NRF5_TOOLS_ROOT'], 'zephyr-sdk-0.15.2')
 
                 # NRF builds will both try to change .west/config in nrfconnect and
                 # overall perform a git fetch on that location
@@ -186,7 +194,12 @@ class NrfConnectBuilder(Builder):
 
             cmd = '''
 source "$ZEPHYR_BASE/zephyr-env.sh";
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
+export ZEPHYR_TOOLCHAIN_VARIANT=zephyr;'''
+            if zephyr_sdk_dir:
+                cmd += f'''
+export ZEPHYR_SDK_INSTALL_DIR={zephyr_sdk_dir};'''
+
+            cmd += '''
 west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}
         '''.format(
                 outdir=shlex.quote(self.output_dir),
@@ -194,8 +207,8 @@ west build --cmake-only -d {outdir} -b {board} {sourcedir}{build_flags}
                 sourcedir=shlex.quote(os.path.join(
                     self.root, self.app.AppPath(), 'nrfconnect')),
                 build_flags=build_flags
-            ).strip()
-            self._Execute(['bash', '-c', cmd],
+            )
+            self._Execute(['bash', '-c', cmd.strip()],
                           title='Generating ' + self.identifier)
 
     def _build(self):
