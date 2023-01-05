@@ -35,7 +35,8 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-telink:0.6.27
+            # TODO: update this to connectedhomeip/chip-build-vscode:0.6.27 once we can compile
+            image: connectedhomeip/chip-build-telink:0.6.18
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
