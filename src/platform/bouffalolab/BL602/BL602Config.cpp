@@ -81,7 +81,7 @@ CHIP_ERROR BL602Config::Init()
 CHIP_ERROR BL602Config::ReadConfigValue(Key key, bool & val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    size_t valLen = 0;
+    size_t valLen  = 0;
 
     ef_get_env_blob(key.name, &val, 1, &valLen);
     if (0 == valLen)
@@ -95,7 +95,7 @@ CHIP_ERROR BL602Config::ReadConfigValue(Key key, bool & val)
 CHIP_ERROR BL602Config::ReadConfigValue(Key key, uint32_t & val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    size_t valLen = 0;
+    size_t valLen  = 0;
 
     ef_get_env_blob(key.name, &val, sizeof(val), &valLen);
     if (0 == valLen)
@@ -109,7 +109,7 @@ CHIP_ERROR BL602Config::ReadConfigValue(Key key, uint32_t & val)
 CHIP_ERROR BL602Config::ReadConfigValue(Key key, uint64_t & val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    size_t valLen = 0;
+    size_t valLen  = 0;
 
     ef_get_env_blob(key.name, &val, sizeof(val), &valLen);
     if (0 == valLen)
@@ -122,7 +122,7 @@ CHIP_ERROR BL602Config::ReadConfigValue(Key key, uint64_t & val)
 
 CHIP_ERROR BL602Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     outLen = 0;
     ef_get_env_blob(key.name, buf, bufSize, &outLen);
@@ -136,7 +136,7 @@ CHIP_ERROR BL602Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
 
 CHIP_ERROR BL602Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     ef_get_env_blob(key.name, buf, bufSize, &outLen);
     if (0 == outLen)

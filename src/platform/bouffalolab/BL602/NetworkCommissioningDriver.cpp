@@ -16,14 +16,14 @@
  */
 
 #include <aos/yloop.h>
+#include <bl60x_wifi_driver/wifi_mgmr.h>
+#include <bl60x_wifi_driver/wifi_mgmr_api.h>
 #include <hal_wifi.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lwip/tcpip.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
-#include <lwip/tcpip.h>
-#include <bl60x_wifi_driver/wifi_mgmr.h>
-#include <bl60x_wifi_driver/wifi_mgmr_api.h>
 #include <wifi_mgmr_ext.h>
 #include <wifi_mgmr_portable.h>
 

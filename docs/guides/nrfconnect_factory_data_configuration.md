@@ -41,6 +41,8 @@ data secure by applying hardware write protection.
 -   [Enabling factory data support](#enabling-factory-data-support)
 -   [Generating factory data](#generating-factory-data)
     -   [Creating factory data JSON file with the first script](#creating-factory-data-json-file-with-the-first-script)
+    -   [How to set user data](#how-to-set-user-data)
+        -   [How to handle user data](#how-to-handle-user-data)
     -   [Verifying using the JSON Schema tool](#verifying-using-the-json-schema-tool)
         -   [Option 1: Using the php-json-schema tool](#option-1-using-the-php-json-schema-tool)
         -   [Option 2: Using a website validator](#option-2-using-a-website-validator)
@@ -110,7 +112,7 @@ The following table lists the parameters of a factory data set:
 | `spake2_verifier` |           SPAKE2+ verifier           |    97 B    | byte string  |  mandatory  |                                                                                                                                                                        The SPAKE2+ verifier generated using SPAKE2+ salt, iteration counter, and passcode.                                                                                                                                                                         |
 |  `discriminator`  |            Discriminator             |    2 B     |    uint16    |  mandatory  |                                                                                                                                                   A 12-bit value matching the field of the same name in the setup code. The discriminator is used during the discovery process.                                                                                                                                                    |
 |    `passcode`     |            SPAKE passcode            |    4 B     |    uint32    |  optional   | A pairing passcode is a 27-bit unsigned integer which serves as a proof of possession during the commissioning. Its value must be restricted to the values from `0x0000001` to `0x5F5E0FE` (`00000001` to `99999998` in decimal), excluding the following invalid passcode values: `00000000`, `11111111`, `22222222`, `33333333`, `44444444`, `55555555`, `66666666`, `77777777`, `88888888`, `99999999`, `12345678`, `87654321`. |
-|      `user`       |              User data               |  variable  | JSON string  | max 1024 B  |                                                                          The user data is provided in the JSON format. This parameter is optional and depends on user's or manufacturer's purpose (or both). It is provided as a string from persistent storage and should be parsed in the user application. This data is not used by the Matter stack.                                                                           |
+|      `user`       |              User data               |  variable  | JSON string  | max 1024 B  |                             The user data is provided in the JSON format. This parameter is optional and depends on device manufacturer's purpose. It is provided as a CBOR map type from persistent storage and should be parsed in the user application. This data is not used by the Matter stack. To learn how to work with user data, see [How to set user data](#how-to-set-user-data) section.                              |
 
 ### Factory data format
 
@@ -344,6 +346,89 @@ If the script finishes successfully, go to the location you provided with the
 > that you cannot create a new JSON file with the same name in the exact
 > location as an existing file. To allow overwriting, add the `--overwrite`
 > option to the argument list of the Python script.
+
+### How to set user data
+
+The user data is an optional field provided in the factory data JSON file and
+depends on the manufacturer's purpose. The `user` field in a JSON factory data
+file is represented by a flat JSON map and it can consist of `string` or `int32`
+data types only. On the device side, the `user` data will be available as a CBOR
+map containing all defined `string` and `int32` fields.
+
+To add user data as an argument to the
+[generate_nrfconnect_chip_factory_data.py](../../scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py)
+script, add the following line to the argument list:
+
+```
+--user-data {user data JSON}
+```
+
+As `user data JSON`, provide a flat JSON map with a value file that consists of
+`string` or `int32` types. For example, you can use a JSON file that looks like
+follows:
+
+```
+{
+    "name": "product_name",
+    "version": 123,
+    "revision": "0x123"
+}
+```
+
+When added to the argument line, the final result would look like follows:
+
+```
+--user-data '{"name": "product_name", "version": 123, "revision": "0x123"}'
+```
+
+#### How to handle user data
+
+The user data is not handled anywhere in the Matter stack, so you must handle it
+in your application. To do this, you can use the
+[Factory Data Provider](../../src/platform/nrfconnect/FactoryDataProvider.h) and
+apply one of the following methods:
+
+-   `GetUserData` method to obtain raw data in the CBOR format as a
+    `MutableByteSpan`.
+
+-   `GetUserKey` method that lets you search along the user data list using a
+    specific key, and if the key exists in the user data, the method returns its
+    value.
+
+If you opt for `GetUserKey`, complete the following steps to set up the search:
+
+1. Add the `GetUserKey` method to your code.
+
+2. Given that all integer fields of the `user` Factory Data field are `int32`,
+   provide a buffer that has a size of at least `4B` or an `int32_t` variable to
+   `GetUserKey`. To read a string field from user data, the buffer should have a
+   size of at least the length of the expected string.
+
+3. Set it up to read all user data fields.
+
+Only after this setup is complete, can you use all variables in your code and
+cast the result to your own purpose.
+
+The code example of how to read all fields from the JSON example one by one can
+look like follows:
+
+    ```
+    chip::DeviceLayer::FactoryDataProvider factoryDataProvider;
+
+    factoryDataProvider.Init();
+
+    uint8_t user_name[12];
+    size_t name_len = sizeof(user_name);
+    factoryDataProvider.GetUserKey("name", user_name, name_len);
+
+    int32_t version;
+    size_t version_len = sizeof(version);
+    factoryDataProvider.GetUserKey("version", &version, version_len);
+
+    uint8_t revision[5];
+    size_t revision_len = sizeof(revision);
+    factoryDataProvider.GetUserKey("revision", revision, revision_len);
+    ```
 
 ### Verifying using the JSON Schema tool
 

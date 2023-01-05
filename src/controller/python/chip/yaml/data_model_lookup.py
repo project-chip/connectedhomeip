@@ -32,6 +32,10 @@ class DataModelLookup(ABC):
     def get_attribute(self, cluster: str, attribute: str):
         pass
 
+    @abstractmethod
+    def get_event(self, cluster: str, event: str):
+        pass
+
 
 class PreDefinedDataModelLookup(DataModelLookup):
     def get_cluster(self, cluster: str):
@@ -51,5 +55,12 @@ class PreDefinedDataModelLookup(DataModelLookup):
         try:
             attributes = getattr(Clusters, cluster, None).Attributes
             return getattr(attributes, attribute, None)
+        except AttributeError:
+            return None
+
+    def get_event(self, cluster: str, event: str):
+        try:
+            events = getattr(Clusters, cluster, None).Events
+            return getattr(events, event, None)
         except AttributeError:
             return None

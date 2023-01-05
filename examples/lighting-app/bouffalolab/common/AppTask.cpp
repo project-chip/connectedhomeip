@@ -419,7 +419,8 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     case DeviceEventType::kWiFiConnectivityChange:
 
-        ChipLogProgress(NotSpecified, "Wi-Fi state changed to %s.\r\n", ConnectivityMgr().IsWiFiStationConnected() ? "connected" : "disconnected");
+        ChipLogProgress(NotSpecified, "Wi-Fi state changed to %s.\r\n",
+                        ConnectivityMgr().IsWiFiStationConnected() ? "connected" : "disconnected");
 
         chip::app::DnssdServer::Instance().StartServer();
         NetworkCommissioning::BLWiFiDriver::GetInstance().SaveConfiguration();

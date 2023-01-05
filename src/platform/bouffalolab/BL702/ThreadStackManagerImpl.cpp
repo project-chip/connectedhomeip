@@ -121,40 +121,44 @@ extern "C" void otPlatFree(void * aPtr)
 
 extern "C" uint32_t otrEnterCrit(void) 
 {
-    if (xPortIsInsideInterrupt()) {
+    if (xPortIsInsideInterrupt())
+    {
         return taskENTER_CRITICAL_FROM_ISR();
     }
-    else {
+    else
+    {
         taskENTER_CRITICAL();
         return 0;
     }
 }
 
-extern "C" void otrExitCrit(uint32_t tag) 
+extern "C" void otrExitCrit(uint32_t tag)
 {
-    if (xPortIsInsideInterrupt()) {
+    if (xPortIsInsideInterrupt())
+    {
         taskEXIT_CRITICAL_FROM_ISR(tag);
     }
-    else {
+    else
+    {
         taskEXIT_CRITICAL();
     }
 }
 
-extern "C" ot_system_event_t otrGetNotifyEvent(void) 
+extern "C" ot_system_event_t otrGetNotifyEvent(void)
 {
     ot_system_event_t sevent = OT_SYSTEM_EVENT_NONE;
 
     taskENTER_CRITICAL();
-    sevent = ot_system_event_var;
+    sevent              = ot_system_event_var;
     ot_system_event_var = OT_SYSTEM_EVENT_NONE;
     taskEXIT_CRITICAL();
 
     return sevent;
 }
 
-extern "C" void otrNotifyEvent(ot_system_event_t sevent) 
+extern "C" void otrNotifyEvent(ot_system_event_t sevent)
 {
-    uint32_t tag = otrEnterCrit();
+    uint32_t tag        = otrEnterCrit();
     ot_system_event_var = (ot_system_event_t)(ot_system_event_var | sevent);
     otrExitCrit(tag);
 
