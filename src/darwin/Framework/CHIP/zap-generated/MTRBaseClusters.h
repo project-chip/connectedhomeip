@@ -17522,7 +17522,10 @@ typedef NS_OPTIONS(uint32_t, MTRNetworkCommissioningFeature) {
 
 typedef NS_OPTIONS(uint8_t, MTRNetworkCommissioningWiFiSecurity) {
     MTRNetworkCommissioningWiFiSecurityUnencrypted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
-    MTRNetworkCommissioningWiFiSecurityWepPersonal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
+    MTRNetworkCommissioningWiFiSecurityWEP MTR_NEWLY_AVAILABLE = 0x2,
+    MTRNetworkCommissioningWiFiSecurityWepPersonal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRNetworkCommissioningWiFiSecurityWEP")
+    = 0x2,
     MTRNetworkCommissioningWiFiSecurityWpaPersonal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x4,
     MTRNetworkCommissioningWiFiSecurityWpa2Personal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x8,
     MTRNetworkCommissioningWiFiSecurityWpa3Personal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x10,
