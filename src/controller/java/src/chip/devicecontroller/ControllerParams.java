@@ -19,6 +19,7 @@ public final class ControllerParams {
   @Nullable private final byte[] operationalCertificate;
   @Nullable private final byte[] ipk;
   private final long adminSubject;
+  @Nullable private final AttestationTrustStoreDelegate attestationTrustStoreDelegate;
 
   private static final int LEGACY_GLOBAL_CHIP_PORT = 5540;
 
@@ -38,6 +39,7 @@ public final class ControllerParams {
     this.operationalCertificate = builder.operationalCertificate;
     this.ipk = builder.ipk;
     this.adminSubject = builder.adminSubject;
+    this.attestationTrustStoreDelegate = builder.attestationTrustStoreDelegate;
   }
 
   public long getFabricId() {
@@ -97,6 +99,10 @@ public final class ControllerParams {
     return adminSubject;
   }
 
+  public AttestationTrustStoreDelegate getAttestationTrustStoreDelegate() {
+    return attestationTrustStoreDelegate;
+  }
+
   /** Returns parameters with ephemerally generated operational credentials */
   public static Builder newBuilder() {
     return new Builder();
@@ -132,6 +138,7 @@ public final class ControllerParams {
     @Nullable private byte[] operationalCertificate = null;
     @Nullable private byte[] ipk = null;
     private long adminSubject = 0;
+    @Nullable private AttestationTrustStoreDelegate attestationTrustStoreDelegate;
 
     private Builder() {}
 
@@ -282,6 +289,12 @@ public final class ControllerParams {
      */
     public Builder setAdminSubject(long adminSubject) {
       this.adminSubject = adminSubject;
+      return this;
+    }
+
+    public Builder setAttestationTrustStoreDelegate(
+        AttestationTrustStoreDelegate attestationTrustStoreDelegate) {
+      this.attestationTrustStoreDelegate = attestationTrustStoreDelegate;
       return this;
     }
 

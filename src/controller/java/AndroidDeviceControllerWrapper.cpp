@@ -66,6 +66,16 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
         delete mDeviceAttestationDelegateBridge;
         mDeviceAttestationDelegateBridge = nullptr;
     }
+    if (mDeviceAttestationVerifier != nullptr)
+    {
+        delete mDeviceAttestationVerifier;
+        mDeviceAttestationVerifier = nullptr;
+    }
+    if (mAttestationTrustStoreBridge != nullptr)
+    {
+        delete mAttestationTrustStoreBridge;
+        mAttestationTrustStoreBridge = nullptr;
+    }
 }
 
 void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
@@ -91,7 +101,8 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 #endif
     jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate,
     jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId, uint16_t failsafeTimerSeconds,
-    bool attemptNetworkScanWiFi, bool attemptNetworkScanThread, bool skipCommissioningComplete, CHIP_ERROR * errInfoOnFailure)
+    bool attemptNetworkScanWiFi, bool attemptNetworkScanThread, bool skipCommissioningComplete,
+    jobject attestationTrustStoreDelegate, CHIP_ERROR * errInfoOnFailure)
 {
     if (errInfoOnFailure == nullptr)
     {
@@ -155,9 +166,24 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
 #endif
 
     // Initialize device attestation verifier
-    // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
-    const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-    SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+    const Credentials::AttestationTrustStore * trustStore;
+    if (attestationTrustStoreDelegate != nullptr)
+    {
+        wrapper->mAttestationTrustStoreBridge = new AttestationTrustStoreBridge(attestationTrustStoreDelegate);
+        if (wrapper->mAttestationTrustStoreBridge == nullptr)
+        {
+            ChipLogError(Controller, "Failed to create AttestationTrustStoreBridge");
+            *errInfoOnFailure = CHIP_ERROR_NO_MEMORY;
+            return nullptr;
+        }
+        trustStore = wrapper->mAttestationTrustStoreBridge;
+    }
+    else
+    {
+        trustStore = chip::Credentials::GetTestAttestationTrustStore();
+    }
+
+    wrapper->mDeviceAttestationVerifier = new Credentials::DefaultDACVerifier(trustStore);
 
     chip::Controller::FactoryInitParams initParams;
     chip::Controller::SetupParams setupParams;
@@ -176,6 +202,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     setupParams.operationalCredentialsDelegate = opCredsIssuer;
     setupParams.defaultCommissioner            = &wrapper->mAutoCommissioner;
     initParams.fabricIndependentStorage        = wrapperStorage;
+    setupParams.deviceAttestationVerifier      = wrapper->mDeviceAttestationVerifier;
 
     wrapper->mGroupDataProvider.SetStorageDelegate(wrapperStorage);
 

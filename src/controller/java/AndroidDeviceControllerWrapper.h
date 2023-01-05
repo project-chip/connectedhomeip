@@ -40,6 +40,7 @@
 #endif // JAVA_MATTER_CONTROLLER_TEST
 
 #include "AndroidOperationalCredentialsIssuer.h"
+#include "AttestationTrustStoreBridge.h"
 #include "DeviceAttestationDelegateBridge.h"
 
 /**
@@ -169,7 +170,7 @@ public:
                 jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate,
                 jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId,
                 uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread,
-                bool skipCommissioningComplete, CHIP_ERROR * errInfoOnFailure);
+                bool skipCommissioningComplete, jobject attestationTrustStoreDelegate, CHIP_ERROR * errInfoOnFailure);
 
 #ifdef JAVA_MATTER_CONTROLLER_TEST
     chip::Controller::ExampleOperationalCredentialsIssuer * GetAndroidOperationalCredentialsIssuer()
@@ -232,7 +233,9 @@ private:
 
     chip::Credentials::PartialDACVerifier mPartialDACVerifier;
 
-    DeviceAttestationDelegateBridge * mDeviceAttestationDelegateBridge = nullptr;
+    DeviceAttestationDelegateBridge * mDeviceAttestationDelegateBridge        = nullptr;
+    AttestationTrustStoreBridge * mAttestationTrustStoreBridge                = nullptr;
+    chip::Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller,
 #ifdef JAVA_MATTER_CONTROLLER_TEST
