@@ -38,6 +38,7 @@ public:
         : Command(commandName)
     {
         AddArgument("commissioner-name", &mCommissionerName);
+        AddArgument("commissioner-nodeId", 0, UINT64_MAX, &mCommissionerNodeId);
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
             "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
             "directory.");
@@ -131,6 +132,7 @@ private:
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;
     chip::Optional<char *> mCommissionerName;
+    chip::Optional<uint64_t> mCommissionerNodeId;
     bool mWaitingForResponse { true };
     static dispatch_queue_t mOTAProviderCallbackQueue;
     chip::Optional<char *> mPaaTrustStorePath;

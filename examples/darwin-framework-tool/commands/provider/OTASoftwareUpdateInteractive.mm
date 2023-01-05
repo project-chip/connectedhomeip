@@ -222,10 +222,10 @@ CHIP_ERROR OTASoftwareUpdateBase::SetUserConsentNeeded(uint16_t userConsentNeede
     CHIP_ERROR error = CHIP_NO_ERROR;
     if (userConsentNeeded == 0) {
         mOTADelegate.userConsentNeeded = @(0);
-        ChipLogDetail(chipTool, "Successfully set User Consent to: OTAProviderUserGranted");
+        ChipLogDetail(chipTool, "Successfully set User Consent Needed to: OTAProviderUserGranted");
     } else if (userConsentNeeded == 1) {
         mOTADelegate.userConsentNeeded = @(1);
-        ChipLogDetail(chipTool, "Successfully set User Consent to: OTAProviderUserObtaining");
+        ChipLogDetail(chipTool, "Successfully set User Consent Needed to: OTAProviderUserObtaining");
     } else {
         ChipLogError(chipTool, "Only accepts the following: 0 (Not Needed), and 1 (Needed).");
         error = CHIP_ERROR_INTERNAL;
