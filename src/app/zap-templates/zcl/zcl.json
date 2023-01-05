@@ -241,11 +241,11 @@
             "OperationalDatasetComponents"
         ],
         "WiFi Network Diagnostics": [
-            "bssid",
+            "BSSID",
             "SecurityType",
             "WiFiVersion",
             "ChannelNumber",
-            "Rssi",
+            "RSSI",
             "BeaconLostCount",
             "BeaconRxCount",
             "PacketMulticastRxCount",
