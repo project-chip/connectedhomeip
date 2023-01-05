@@ -199,7 +199,9 @@ jobs:
             - name: Run Tests
               timeout-minutes: 65
               run: |
-                  echo ${BUILD_VARIANT} | grep -q tsan && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH_TSAN
+                  if echo ${BUILD_VARIANT} | grep -q tsan; then
+                    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH_TSAN
+                  fi
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
                      --chip-tool ./out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
@@ -348,7 +350,12 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [ipv6only-no-ble-no-wifi-tsan-clang-test]
+                # NOTE: This CI checks Python bindings with TSAN. Since TSAN check requires
+                #       init code to be executed before anything else, we cannot use Python
+                #       module with statically linked TSAN with not-instrumented CPython.
+                #       As an easy workaround, we are going to use dynamically linked TSAN
+                #       supported by GCC (we need non -clang variant here).
+                build_variant: [ipv6only-no-ble-no-wifi-tsan-test]
         env:
             BUILD_VARIANT: ${{ matrix.build_variant }}
             TSAN_OPTIONS: halt_on_error=1
