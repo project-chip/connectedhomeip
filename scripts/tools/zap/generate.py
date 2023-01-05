@@ -66,8 +66,11 @@ def checkDirExists(path):
         exit(1)
 
 
-def getFilePath(name):
-    fullpath = os.path.join(CHIP_ROOT_DIR, name)
+def getFilePath(name, prefix_chip_root_dir=True):
+    if prefix_chip_root_dir:
+        fullpath = os.path.join(CHIP_ROOT_DIR, name)
+    else:
+        fullpath = name
     checkFileExists(fullpath)
     return fullpath
 
@@ -84,18 +87,23 @@ def detectZclFile(zapFile):
     path = 'src/app/zap-templates/zcl/zcl.json'
 
     data = json.load(open(zapFile))
+    prefix_chip_root_dir = True
     for package in data["package"]:
         if package["type"] != "zcl-properties":
             continue
 
+        prefix_chip_root_dir = True
         # found the right path, try to figure out the actual path
         if package["pathRelativity"] == "relativeToZap":
             path = os.path.abspath(os.path.join(
                 os.path.dirname(zapFile), package["path"]))
+        elif package["pathRelativity"] == "resolveEnvVars":
+            path = os.path.expandvars(package["path"])
+            prefix_chip_root_dir = False
         else:
             path = package["path"]
 
-    return getFilePath(path)
+    return getFilePath(path, prefix_chip_root_dir)
 
 
 def runArgumentsParser() -> CmdLineArgs:
