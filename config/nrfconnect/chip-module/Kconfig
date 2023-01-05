@@ -146,6 +146,28 @@ config CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
 	  instead of generating new ones.
 	  If this config is set to `n` new certificates will be generated.
 
+choice CHIP_FACTORY_DATA_USE_CERTS_CHOICE
+	prompt "Certificate source"
+	depends on !CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
+	default CHIP_FACTORY_DATA_USE_GENERATED_CERTS
+
+	config CHIP_FACTORY_DATA_USE_GENERATED_CERTS
+		bool "generated"
+	config CHIP_FACTORY_DATA_USE_HDD_CERTS
+		bool "on HDD"
+endchoice
+
+if CHIP_FACTORY_DATA_USE_HDD_CERTS
+
+config CHIP_FACTORY_DATA_HDD_CERTS_DAC_CERT
+	string "Path to the DAC certificate *.der-file"
+config CHIP_FACTORY_DATA_HDD_CERTS_DAC_KEY
+	string "Path to the DAC private key *.der-file"
+config CHIP_FACTORY_DATA_HDD_CERTS_PAI_CERT
+	string "Path to the PAI certificate *.der-file"
+
+endif
+
 # Configs for SPAKE2 generation
 config CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER
 	bool "Enable spake2 verifier generation"
