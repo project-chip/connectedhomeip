@@ -205,43 +205,19 @@ std::unique_ptr<GeneratedCluster> CreateCluster(chip::ClusterId id)
     return nullptr;
 }
 
-CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const Span<const char> *)
+CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const Span<const char> & v)
 {
-    return wr.PutString(chip::TLV::Tag(), buffer, (uint32_t) strlen(buffer));
+    return wr.PutString(chip::TLV::Tag(), v);
 }
-CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const ByteSpan *)
+CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const bool & v)
 {
-    return wr.PutBytes(chip::TLV::Tag(), (const uint8_t *) buffer, (uint32_t) strlen(buffer));
-}
-CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const float *)
-{
-    return wr.Put(chip::TLV::Tag(), (float) atof(buffer));
-}
-CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const double *)
-{
-    return wr.Put(chip::TLV::Tag(), atof(buffer));
-}
-CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const int64_t *)
-{
-    return wr.Put(chip::TLV::Tag(), (int64_t) strtoll(buffer, nullptr, 10));
-}
-CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const uint32_t *)
-{
-    return wr.Put(chip::TLV::Tag(), (uint32_t) strtoll(buffer, nullptr, 10));
-}
-CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const uint64_t *)
-{
-    return wr.Put(chip::TLV::Tag(), (uint64_t) strtoll(buffer, nullptr, 10));
-}
-CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const bool *)
-{
-    return wr.PutBoolean(chip::TLV::Tag(), (*buffer) ? true : false);
+    return wr.PutBoolean(chip::TLV::Tag(), v);
 }
 
 template <typename T>
-CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const char * buffer, const T *)
+CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const T & v)
 {
-    return wr.Put(chip::TLV::Tag(), (int64_t) strtoll(buffer, nullptr, 10));
+    return wr.Put(chip::TLV::Tag(), v);
 }
 
 CHIP_ERROR WriteValueToBuffer(const bool & value, uint8_t * buffer, const uint16_t & maxReadLength)
@@ -288,7 +264,9 @@ CHIP_ERROR ReadOrWriteBuffer(std::vector<uint8_t> * data, uint8_t * buffer, uint
     {
         chip::TLV::TLVWriter wr;
         wr.Init(data->data(), data->size());
-        err = ReadValueFromBuffer(wr, (char *) buffer, (const T *) nullptr);
+        T value;
+        memcpy(&value, buffer, sizeof(T));
+        err = ReadValueFromBuffer(wr, value);
         wr.Finalize();
         data->resize(wr.GetLengthWritten());
     }
