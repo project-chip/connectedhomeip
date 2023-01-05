@@ -77,6 +77,7 @@ if(CONFIG_CHIP_FACTORY_DATA_USE_DEFAULT_CERTS)
     # convert decimal PID to its hexadecimal representation to find out certification files in repository
     math(EXPR LOCAL_PID "${CONFIG_CHIP_DEVICE_PRODUCT_ID}" OUTPUT_FORMAT HEXADECIMAL)
     string(SUBSTRING ${LOCAL_PID} 2 -1 raw_pid)
+    string(TOUPPER ${raw_pid} raw_pid_upper)
     # all certs are located in ${CHIP_ROOT}/credentials/development/attestation
     # it can be used during development without need to generate new certifications
     string(APPEND script_args "--dac-cert \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-DAC-${raw_pid_upper}-Cert.pem\"\n")
