@@ -34,5 +34,4 @@ public:
     chip::Protocols::InteractionModel::Status UnregisterClientMonitoringCommand(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::ClientMonitoring::Commands::UnregisterClientMonitoring::DecodableType & commandData);
-
 };

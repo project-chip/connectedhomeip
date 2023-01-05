@@ -83,7 +83,6 @@ CHIP_ERROR ClientMonitoringAttributeAccess::ReadExpectedClients(EndpointId endpo
     FabricIndex fabric = encoder.AccessingFabricIndex();
 
     return encoder.EncodeList([fabric](const auto & subEncoder) -> CHIP_ERROR {
-        
         // TODO : https://github.com/project-chip/connectedhomeip/issues/24289
         ClientMonitoringRegistrationTable clientMonitoringRegistrationTable(chip::Server::GetInstance().GetPersistentStorage());
         CHIP_ERROR err = clientMonitoringRegistrationTable.LoadFromStorage(fabric);
