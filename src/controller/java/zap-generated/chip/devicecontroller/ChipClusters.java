@@ -6965,7 +6965,7 @@ public class ChipClusters {
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface ThreadMetricsAttributeCallback {
-      void onSuccess(List<ChipStructs.SoftwareDiagnosticsClusterThreadMetrics> valueList);
+      void onSuccess(List<ChipStructs.SoftwareDiagnosticsClusterThreadMetricsStruct> valueList);
 
       void onError(Exception ex);
 

@@ -208,8 +208,8 @@ typedef void (*GeneralDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*SoftwareDiagnosticsThreadMetricsListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
-        data);
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::DecodableType> & data);
 typedef void (*SoftwareDiagnosticsGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*SoftwareDiagnosticsAcceptedCommandListListAttributeCallback)(

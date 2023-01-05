@@ -2130,12 +2130,12 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::NetworkCommissioning::
     ComplexArgumentParser::Finalize(request.lqi);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type & request,
+                                        chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadMetrics.id", "id", value.isMember("id")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThreadMetricsStruct.id", "id", value.isMember("id")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "id");
@@ -2168,7 +2168,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.id);
     ComplexArgumentParser::Finalize(request.name);

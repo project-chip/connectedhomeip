@@ -3488,10 +3488,9 @@ public:
         }
     }
 
-    static void CallbackFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
-            list);
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<
+                               chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::DecodableType> & list);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(

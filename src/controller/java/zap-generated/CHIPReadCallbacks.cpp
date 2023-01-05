@@ -8334,8 +8334,8 @@ CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::~CHIPSoftwareDiagnosticsT
 
 void CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
-        list)
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8431,25 +8431,27 @@ void CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::CallbackFn(
             chip::JniReferences::GetInstance().CreateOptional(newElement_0_stackSizeInsideOptional, newElement_0_stackSize);
         }
 
-        jclass threadMetricsStructClass_1;
+        jclass threadMetricsStructStructClass_1;
         err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$SoftwareDiagnosticsClusterThreadMetrics", threadMetricsStructClass_1);
+            env, "chip/devicecontroller/ChipStructs$SoftwareDiagnosticsClusterThreadMetricsStruct",
+            threadMetricsStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$SoftwareDiagnosticsClusterThreadMetrics");
+            ChipLogError(Zcl, "Could not find class ChipStructs$SoftwareDiagnosticsClusterThreadMetricsStruct");
             return;
         }
-        jmethodID threadMetricsStructCtor_1 =
-            env->GetMethodID(threadMetricsStructClass_1, "<init>",
+        jmethodID threadMetricsStructStructCtor_1 =
+            env->GetMethodID(threadMetricsStructStructClass_1, "<init>",
                              "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
-        if (threadMetricsStructCtor_1 == nullptr)
+        if (threadMetricsStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$SoftwareDiagnosticsClusterThreadMetrics constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$SoftwareDiagnosticsClusterThreadMetricsStruct constructor");
             return;
         }
 
-        newElement_0 = env->NewObject(threadMetricsStructClass_1, threadMetricsStructCtor_1, newElement_0_id, newElement_0_name,
-                                      newElement_0_stackFreeCurrent, newElement_0_stackFreeMinimum, newElement_0_stackSize);
+        newElement_0 =
+            env->NewObject(threadMetricsStructStructClass_1, threadMetricsStructStructCtor_1, newElement_0_id, newElement_0_name,
+                           newElement_0_stackFreeCurrent, newElement_0_stackFreeMinimum, newElement_0_stackSize);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 

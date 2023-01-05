@@ -2283,8 +2283,9 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -5678,7 +5679,8 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case SoftwareDiagnostics::Attributes::ThreadMetrics::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType>
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ThreadMetrics", 1, value);
