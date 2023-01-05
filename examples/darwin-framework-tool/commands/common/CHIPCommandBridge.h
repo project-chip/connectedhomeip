@@ -38,7 +38,9 @@ public:
         : Command(commandName)
     {
         AddArgument("commissioner-name", &mCommissionerName);
-        AddArgument("commissioner-nodeId", 0, UINT64_MAX, &mCommissionerNodeId);
+        AddArgument("commissioner-nodeId", 0, UINT64_MAX, &mCommissionerNodeId,
+            "Sets the commisser node ID of the given "
+            "comssioner-name. Interactive mode will only set a single commissioner on the inital command.");
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
             "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
             "directory.");
