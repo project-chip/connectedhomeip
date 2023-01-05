@@ -32,6 +32,9 @@ namespace chip {
  *
  *        This class can only manage one fabric at a time. The flow is load a fabric, execute necessary operations,
  *        save it if there are any changes and load another fabric.
+ * 
+ *        Issue to refactor the class to use one entry for the entire table
+ *        https://github.com/project-chip/connectedhomeip/issues/24288
  */
 class ClientMonitoringRegistrationTable
 {
@@ -44,7 +47,6 @@ public:
     };
 
     ClientMonitoringRegistrationTable(PersistentStorageDelegate & storage);
-    ~ClientMonitoringRegistrationTable(){};
 
     /**
      * @brief Function saves the mRegisteredClient attribute to persitant storage

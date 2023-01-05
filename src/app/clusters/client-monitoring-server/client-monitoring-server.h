@@ -26,9 +26,6 @@
 class ClientMonitoringServer
 {
 public:
-    ClientMonitoringServer(){};
-    ~ClientMonitoringServer(){};
-
     chip::Protocols::InteractionModel::Status StayAwakeRequestCommand(const chip::app::ConcreteCommandPath & commandPath);
     chip::Protocols::InteractionModel::Status RegisterClientMonitoringCommand(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -38,5 +35,4 @@ public:
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::ClientMonitoring::Commands::UnregisterClientMonitoring::DecodableType & commandData);
 
-private:
 };

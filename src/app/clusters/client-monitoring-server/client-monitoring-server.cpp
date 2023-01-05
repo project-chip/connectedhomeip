@@ -82,13 +82,15 @@ CHIP_ERROR ClientMonitoringAttributeAccess::ReadExpectedClients(EndpointId endpo
 {
     FabricIndex fabric = encoder.AccessingFabricIndex();
 
-    return encoder.EncodeList([fabric](const auto & encoder) -> CHIP_ERROR {
+    return encoder.EncodeList([fabric](const auto & subEncoder) -> CHIP_ERROR {
+        
+        // TODO : https://github.com/project-chip/connectedhomeip/issues/24289
         ClientMonitoringRegistrationTable clientMonitoringRegistrationTable(chip::Server::GetInstance().GetPersistentStorage());
         CHIP_ERROR err = clientMonitoringRegistrationTable.LoadFromStorage(fabric);
 
         if (err == CHIP_NO_ERROR)
         {
-            ReturnErrorOnFailure(encoder.Encode(clientMonitoringRegistrationTable.GetClientRegistrationEntry()));
+            ReturnErrorOnFailure(subEncoder.Encode(clientMonitoringRegistrationTable.GetClientRegistrationEntry()));
         }
         else if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
@@ -120,6 +122,7 @@ ClientMonitoringServer::RegisterClientMonitoringCommand(CommandHandler * command
 {
     FabricIndex fabric = commandObj->GetAccessingFabricIndex();
 
+    // TODO : https://github.com/project-chip/connectedhomeip/issues/24289
     ClientMonitoringRegistrationTable table(chip::Server::GetInstance().GetPersistentStorage());
 
     VerifyOrReturnError(!table.HasValueForFabric(fabric), InteractionModel::Status::ResourceExhausted);
@@ -138,6 +141,8 @@ ClientMonitoringServer::UnregisterClientMonitoringCommand(CommandHandler * comma
                                                           const Commands::UnregisterClientMonitoring::DecodableType & commandData)
 {
     FabricIndex fabric = commandObj->GetAccessingFabricIndex();
+
+    // TODO : https://github.com/project-chip/connectedhomeip/issues/24289
     ClientMonitoringRegistrationTable table(chip::Server::GetInstance().GetPersistentStorage());
 
     CHIP_ERROR err = table.LoadFromStorage(fabric);
