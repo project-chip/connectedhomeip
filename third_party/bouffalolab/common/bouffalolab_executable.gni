@@ -44,9 +44,7 @@ template("bouffalolab_executable") {
   ]
 
   if (invoker.bl_plat_name == "bl602") {
-    flashing_script_inputs += [
-      "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_4M.toml",
-    ]
+    flashing_script_inputs += [ "${chip_root}/examples/platform/bouffalolab/${invoker.bl_plat_name}/flash_config/partition_cfg_4M.toml" ]
   }
 
   copy(flashing_runtime_target) {
@@ -63,8 +61,7 @@ template("bouffalolab_executable") {
   flashing_options += [ "--xtal" ]
   if (invoker.bl_plat_name == "bl602") {
     flashing_options += [ "40M" ]
-  }
-  else if (invoker.bl_plat_name == "bl702") {
+  } else if (invoker.bl_plat_name == "bl702") {
     flashing_options += [ "32M" ]
   }
 

@@ -30,8 +30,8 @@
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
-#include <utils_log.h>
 #include <lwip/tcpip.h>
+#include <utils_log.h>
 
 #include <aos/kernel.h>
 #include <bl60x_fw_api.h>
@@ -165,7 +165,7 @@ static void WifiStaConnected(void)
             chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kConnected));
     }
 }
-typedef void (*aos_event_cb)(input_event_t *event, void *private_data);
+typedef void (*aos_event_cb)(input_event_t * event, void * private_data);
 
 void OnWiFiPlatformEvent(input_event_t * event, void * private_data)
 {
@@ -220,7 +220,7 @@ void OnWiFiPlatformEvent(input_event_t * event, void * private_data)
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
     static uint8_t stack_wifi_init = 0;
     TaskHandle_t backup_eventLoopTask;
 

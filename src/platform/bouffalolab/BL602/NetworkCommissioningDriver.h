@@ -16,8 +16,8 @@
  */
 
 #pragma once
-#include <platform/NetworkCommissioning.h>
 #include <bl60x_wifi_driver/wifi_mgmr.h>
+#include <platform/NetworkCommissioning.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -24,12 +24,11 @@
 
 #pragma once
 
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
 #include <aos/yloop.h>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
 
 namespace chip {
 namespace DeviceLayer {
-
 
 /**
  * Concrete implementation of the PlatformManager singleton object for the BL602 platform.

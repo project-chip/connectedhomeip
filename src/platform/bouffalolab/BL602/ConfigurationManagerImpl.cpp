@@ -32,9 +32,9 @@
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 extern "C" {
-#include <hal_sys.h>
 #include <bl_efuse.h>
 #include <easyflash.h>
+#include <hal_sys.h>
 }
 
 namespace chip {

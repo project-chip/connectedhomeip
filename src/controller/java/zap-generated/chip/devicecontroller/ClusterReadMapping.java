@@ -1763,24 +1763,24 @@ public class ClusterReadMapping {
     Map<String, InteractionInfo> readOtaSoftwareUpdateRequestorInteractionInfo =
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo>
-        readOtaSoftwareUpdateRequestorDefaultOtaProvidersCommandParams =
+        readOtaSoftwareUpdateRequestorDefaultOTAProvidersCommandParams =
             new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeInteractionInfo =
+    InteractionInfo readOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OtaSoftwareUpdateRequestorCluster) cluster)
-                  .readDefaultOtaProvidersAttribute(
+                  .readDefaultOTAProvidersAttribute(
                       (ChipClusters.OtaSoftwareUpdateRequestorCluster
-                              .DefaultOtaProvidersAttributeCallback)
+                              .DefaultOTAProvidersAttributeCallback)
                           callback);
             },
             () ->
                 new ClusterInfoMapping
-                    .DelegatedOtaSoftwareUpdateRequestorClusterDefaultOtaProvidersAttributeCallback(),
-            readOtaSoftwareUpdateRequestorDefaultOtaProvidersCommandParams);
+                    .DelegatedOtaSoftwareUpdateRequestorClusterDefaultOTAProvidersAttributeCallback(),
+            readOtaSoftwareUpdateRequestorDefaultOTAProvidersCommandParams);
     readOtaSoftwareUpdateRequestorInteractionInfo.put(
-        "readDefaultOtaProvidersAttribute",
-        readOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeInteractionInfo);
+        "readDefaultOTAProvidersAttribute",
+        readOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readOtaSoftwareUpdateRequestorUpdatePossibleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readOtaSoftwareUpdateRequestorUpdatePossibleAttributeInteractionInfo =

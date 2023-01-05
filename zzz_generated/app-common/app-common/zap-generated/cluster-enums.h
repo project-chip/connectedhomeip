@@ -245,12 +245,23 @@ namespace Binding {
 
 namespace AccessControl {
 
-// Enum for AuthMode
-enum class AuthMode : uint8_t
+// Enum for AccessControlEntryAuthModeEnum
+enum class AccessControlEntryAuthModeEnum : uint8_t
 {
     kPase             = 0x01,
     kCase             = 0x02,
     kGroup            = 0x03,
+    kUnknownEnumValue = 0,
+};
+
+// Enum for AccessControlEntryPrivilegeEnum
+enum class AccessControlEntryPrivilegeEnum : uint8_t
+{
+    kView             = 0x01,
+    kProxyView        = 0x02,
+    kOperate          = 0x03,
+    kManage           = 0x04,
+    kAdminister       = 0x05,
     kUnknownEnumValue = 0,
 };
 
@@ -261,17 +272,6 @@ enum class ChangeTypeEnum : uint8_t
     kAdded            = 0x01,
     kRemoved          = 0x02,
     kUnknownEnumValue = 3,
-};
-
-// Enum for Privilege
-enum class Privilege : uint8_t
-{
-    kView             = 0x01,
-    kProxyView        = 0x02,
-    kOperate          = 0x03,
-    kManage           = 0x04,
-    kAdminister       = 0x05,
-    kUnknownEnumValue = 0,
 };
 } // namespace AccessControl
 

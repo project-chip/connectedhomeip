@@ -334,9 +334,9 @@ static constexpr CommandId Id = 0x00000004;
 namespace OtaSoftwareUpdateRequestor {
 namespace Commands {
 
-namespace AnnounceOtaProvider {
+namespace AnnounceOTAProvider {
 static constexpr CommandId Id = 0x00000000;
-} // namespace AnnounceOtaProvider
+} // namespace AnnounceOTAProvider
 
 } // namespace Commands
 } // namespace OtaSoftwareUpdateRequestor

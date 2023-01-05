@@ -126,8 +126,8 @@ tests:
 
           [1651218084.427102][2526:2531] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
           [1651218084.427203][2526:2531] CHIP:TOO:   AddGroupResponse: {
-          [1651218084.427241][2526:2531] CHIP:TOO:     status: 0
-          [1651218084.427264][2526:2531] CHIP:TOO:     groupId: 1
+          [1651218084.427241][2526:2531] CHIP:TOO:     Status: 0
+          [1651218084.427264][2526:2531] CHIP:TOO:     GroupID: 1
           [1651218084.427314][2526:2531] CHIP:TOO:    }
       disabled: true
 
@@ -141,8 +141,8 @@ tests:
 
           [1651218576.149152][2635:2640] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
           [1651218576.149231][2635:2640] CHIP:TOO:   ViewGroupResponse: {
-          [1651218576.149265][2635:2640] CHIP:TOO:     status: 0
-          [1651218576.149289][2635:2640] CHIP:TOO:     groupId: 1
+          [1651218576.149265][2635:2640] CHIP:TOO:     Status: 0
+          [1651218576.149289][2635:2640] CHIP:TOO:     GroupID: 1
           [1651218576.149311][2635:2640] CHIP:TOO:     groupName: grp1
           [1651218576.149335][2635:2640] CHIP:TOO:    }
       disabled: true
@@ -158,8 +158,8 @@ tests:
 
           [1651218576.149152][2635:2640] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
           [1651218576.149231][2635:2640] CHIP:TOO:   ViewGroupResponse: {
-          [1651218576.149265][2635:2640] CHIP:TOO:     status: 0
-          [1651218576.149289][2635:2640] CHIP:TOO:     groupId: 1
+          [1651218576.149265][2635:2640] CHIP:TOO:     Status: 0
+          [1651218576.149289][2635:2640] CHIP:TOO:     GroupID: 1
           [1651218576.149311][2635:2640] CHIP:TOO:     groupName: grp1
           [1651218576.149335][2635:2640] CHIP:TOO:    }
       disabled: true

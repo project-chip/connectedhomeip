@@ -46,12 +46,12 @@ server cluster Groups = 4 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
     CHAR_STRING groupName = 1;
   }
 
   request struct ViewGroupRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
   }
 
   request struct GetGroupMembershipRequest {
@@ -59,22 +59,22 @@ server cluster Groups = 4 {
   }
 
   request struct RemoveGroupRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
   }
 
   request struct AddGroupIfIdentifyingRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
     CHAR_STRING groupName = 1;
   }
 
   response struct AddGroupResponse = 0 {
     ENUM8 status = 0;
-    group_id groupId = 1;
+    group_id groupID = 1;
   }
 
   response struct ViewGroupResponse = 1 {
     ENUM8 status = 0;
-    group_id groupId = 1;
+    group_id groupID = 1;
     CHAR_STRING groupName = 2;
   }
 
@@ -85,7 +85,7 @@ server cluster Groups = 4 {
 
   response struct RemoveGroupResponse = 3 {
     ENUM8 status = 0;
-    group_id groupId = 1;
+    group_id groupID = 1;
   }
 
   fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
@@ -247,7 +247,7 @@ client cluster OnOff = 6 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct OffWithEffectRequest {
-    OnOffEffectIdentifier effectId = 0;
+    OnOffEffectIdentifier effectIdentifier = 0;
     OnOffDelayedAllOffEffectVariant effectVariant = 1;
   }
 
@@ -308,7 +308,7 @@ server cluster OnOff = 6 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct OffWithEffectRequest {
-    OnOffEffectIdentifier effectId = 0;
+    OnOffEffectIdentifier effectIdentifier = 0;
     OnOffDelayedAllOffEffectVariant effectVariant = 1;
   }
 
@@ -418,7 +418,7 @@ server cluster LevelControl = 8 {
 
 server cluster Descriptor = 29 {
   struct DeviceTypeStruct {
-    devtype_id type = 0;
+    devtype_id deviceType = 0;
     int16u revision = 1;
   }
 
@@ -625,6 +625,21 @@ server cluster PowerSource = 47 {
     kBattery = 0x2;
     kRechargeable = 0x4;
     kReplaceable = 0x8;
+  }
+
+  info event WiredFaultChange = 0 {
+    WiredFault current[] = 0;
+    WiredFault previous[] = 1;
+  }
+
+  info event BatFaultChange = 1 {
+    BatFault current[] = 0;
+    BatFault previous[] = 1;
+  }
+
+  info event BatChargeFaultChange = 2 {
+    BatChargeFault current[] = 0;
+    BatChargeFault previous[] = 1;
   }
 
   readonly attribute PowerSourceStatus status = 0;

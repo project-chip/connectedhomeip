@@ -101,7 +101,7 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "AddGroup",
                     "args": {
-                        "groupId": "int",
+                        "groupID": "int",
                         "groupName": "str",
                     },
                 },
@@ -109,7 +109,7 @@ class ChipClusters:
                     "commandId": 0x00000001,
                     "commandName": "ViewGroup",
                     "args": {
-                        "groupId": "int",
+                        "groupID": "int",
                     },
                 },
             0x00000002: {
@@ -123,7 +123,7 @@ class ChipClusters:
                     "commandId": 0x00000003,
                     "commandName": "RemoveGroup",
                     "args": {
-                        "groupId": "int",
+                        "groupID": "int",
                     },
                 },
             0x00000004: {
@@ -136,7 +136,7 @@ class ChipClusters:
                     "commandId": 0x00000005,
                     "commandName": "AddGroupIfIdentifying",
                     "args": {
-                        "groupId": "int",
+                        "groupID": "int",
                         "groupName": "str",
                     },
                 },
@@ -333,7 +333,7 @@ class ChipClusters:
                     "commandId": 0x00000040,
                     "commandName": "OffWithEffect",
                     "args": {
-                        "effectId": "int",
+                        "effectIdentifier": "int",
                         "effectVariant": "int",
                     },
                 },
@@ -1238,8 +1238,8 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "QueryImage",
                     "args": {
-                        "vendorId": "int",
-                        "productId": "int",
+                        "vendorID": "int",
+                        "productID": "int",
                         "softwareVersion": "int",
                         "protocolsSupported": "int",
                         "hardwareVersion": "int",
@@ -1292,10 +1292,10 @@ class ChipClusters:
             "commands": {
             0x00000000: {
                     "commandId": 0x00000000,
-                    "commandName": "AnnounceOtaProvider",
+                    "commandName": "AnnounceOTAProvider",
                     "args": {
-                        "providerNodeId": "int",
-                        "vendorId": "int",
+                        "providerNodeID": "int",
+                        "vendorID": "int",
                         "announcementReason": "int",
                         "metadataForNode": "bytes",
                         "endpoint": "int",
@@ -1304,7 +1304,7 @@ class ChipClusters:
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "DefaultOtaProviders",
+                    "attributeName": "DefaultOTAProviders",
                     "attributeId": 0x00000000,
                     "type": "",
                     "reportable": True,
