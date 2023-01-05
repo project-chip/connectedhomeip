@@ -16,8 +16,8 @@
 import enum
 from typing import List
 
-from matter_idl.zapxml import ParseSource, ParseXmls
 from matter_idl.matter_idl_types import *
+from matter_idl.zapxml import ParseSource, ParseXmls
 
 
 class _ItemType(enum.Enum):
