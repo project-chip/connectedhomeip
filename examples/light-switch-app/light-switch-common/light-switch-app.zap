@@ -5344,7 +5344,7 @@
           "mfgCode": null,
           "define": "CLIENT_MONITORING_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "IdleModeInterval",
