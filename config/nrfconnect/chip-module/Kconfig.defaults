@@ -322,9 +322,6 @@ config MBEDTLS_GCM_C
 config MBEDTLS_RSA_C
     default n
 
-config PSA_WANT_KEY_TYPE_ARIA
-    default n
-
 config PSA_WANT_KEY_TYPE_CHACHA20
     default n
 
