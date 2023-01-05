@@ -69,8 +69,9 @@ tabulate
 # scripts/build
 click
 
-# scripts/idl
+# scripts/py_matter_idl/matter_idl
 lark
+# scripts/py_matter_idl/matter_idl and scripts/py_matter_yamtests/matter_yamltests
 stringcase
 
 cryptography

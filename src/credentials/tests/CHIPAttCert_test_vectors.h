@@ -258,6 +258,9 @@ extern const ByteSpan sTestCert_PAA_NoVID_SKID;
 extern const ByteSpan sTestCert_PAA_NoVID_PublicKey;
 extern const ByteSpan sTestCert_PAA_NoVID_PrivateKey;
 
+extern const ByteSpan sTestCert_PAA_NoVID_ToResignPAIs_Cert;
+extern const ByteSpan sTestCert_PAA_NoVID_ToResignPAIs_SKID;
+
 extern const ByteSpan sTestCert_PAI_FFF1_8000_Cert;
 extern const ByteSpan sTestCert_PAI_FFF1_8000_SKID;
 extern const ByteSpan sTestCert_PAI_FFF1_8000_PublicKey;
@@ -267,6 +270,17 @@ extern const ByteSpan sTestCert_PAI_FFF2_8001_Cert;
 extern const ByteSpan sTestCert_PAI_FFF2_8001_SKID;
 extern const ByteSpan sTestCert_PAI_FFF2_8001_PublicKey;
 extern const ByteSpan sTestCert_PAI_FFF2_8001_PrivateKey;
+
+extern const ByteSpan sTestCert_PAI_FFF2_8001_Resigned_Cert;
+extern const ByteSpan sTestCert_PAI_FFF2_8001_Resigned_SKID;
+
+extern const ByteSpan sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_Cert;
+extern const ByteSpan sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_SKID;
+extern const ByteSpan sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_PublicKey;
+extern const ByteSpan sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_PrivateKey;
+
+extern const ByteSpan sTestCert_PAI_FFF2_8001_ResignedSubjectDiff_Cert;
+extern const ByteSpan sTestCert_PAI_FFF2_8001_ResignedSubjectDiff_SKID;
 
 extern const ByteSpan sTestCert_PAI_FFF2_8004_FB_Cert;
 extern const ByteSpan sTestCert_PAI_FFF2_8004_FB_SKID;
@@ -307,6 +321,9 @@ extern const ByteSpan sTestCert_PAI_FFF2_NoPID_FB_Cert;
 extern const ByteSpan sTestCert_PAI_FFF2_NoPID_FB_SKID;
 extern const ByteSpan sTestCert_PAI_FFF2_NoPID_FB_PublicKey;
 extern const ByteSpan sTestCert_PAI_FFF2_NoPID_FB_PrivateKey;
+
+extern const ByteSpan sTestCert_PAI_FFF2_NoPID_Resigned_Cert;
+extern const ByteSpan sTestCert_PAI_FFF2_NoPID_Resigned_SKID;
 
 } // namespace TestCerts
 } // namespace chip
