@@ -1919,7 +1919,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 
     // Cluster WiFiNetworkDiagnostics deprecated attribute names
     MTRClusterWiFiNetworkDiagnosticsAttributeBssidID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBssidID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBSSIDID")
     = 0x00000000,
     MTRClusterWiFiNetworkDiagnosticsAttributeSecurityTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeSecurityTypeID")
@@ -1931,7 +1931,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeChannelNumberID")
     = 0x00000003,
     MTRClusterWiFiNetworkDiagnosticsAttributeRssiID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRssiID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRSSIID")
     = 0x00000004,
     MTRClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID")
@@ -1976,11 +1976,11 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster WiFiNetworkDiagnostics attributes
-    MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBssidID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBSSIDID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeSecurityTypeID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeWiFiVersionID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeChannelNumberID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRssiID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRSSIID MTR_NEWLY_AVAILABLE = 0x00000004,
     MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID MTR_NEWLY_AVAILABLE = 0x00000005,
     MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconRxCountID MTR_NEWLY_AVAILABLE = 0x00000006,
     MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketMulticastRxCountID MTR_NEWLY_AVAILABLE = 0x00000007,
