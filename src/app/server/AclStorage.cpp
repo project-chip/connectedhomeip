@@ -25,8 +25,8 @@ using namespace chip::Access;
 
 using Entry            = AccessControl::Entry;
 using EntryListener    = AccessControl::EntryListener;
-using StagingAuthMode  = Clusters::AccessControl::AuthMode;
-using StagingPrivilege = Clusters::AccessControl::Privilege;
+using StagingAuthMode  = Clusters::AccessControl::AccessControlEntryAuthModeEnum;
+using StagingPrivilege = Clusters::AccessControl::AccessControlEntryPrivilegeEnum;
 using StagingTarget    = Clusters::AccessControl::Structs::Target::Type;
 using Target           = AccessControl::Entry::Target;
 

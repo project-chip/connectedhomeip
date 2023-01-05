@@ -28,7 +28,7 @@ env:
 jobs:
     cc26x2x7:
         name: cc26x2x7
-        timeout-minutes: 60
+        timeout-minutes: 120
 
         env:
             BUILD_TYPE: gn_cc26x2x7
@@ -68,7 +68,7 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Build examples
-              timeout-minutes: 60
+              timeout-minutes: 100
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \

@@ -4673,7 +4673,7 @@
               - FeatureMap
               - ClusterRevision
           OTASoftwareUpdateRequestor:
-              - DefaultOtaProviders
+              - DefaultOTAProviders
               - UpdatePossible
               - UpdateState
               - UpdateStateProgress
@@ -4723,7 +4723,7 @@
               - ApplyUpdateResponse
               - NotifyUpdateApplied
           OTASoftwareUpdateRequestor:
-              - AnnounceOtaProvider
+              - AnnounceOTAProvider
           UnitTesting:
               - Test
               - TestSpecificResponse
@@ -4880,8 +4880,8 @@
                   - arg1
           OTASoftwareUpdateProvider:
               QueryImage:
-                  - vendorId
-                  - productId
+                  - vendorID
+                  - productID
                   - softwareVersion
                   - protocolsSupported
                   - hardwareVersion
@@ -4907,9 +4907,9 @@
                   - updateToken
                   - softwareVersion
           OTASoftwareUpdateRequestor:
-              AnnounceOtaProvider:
-                  - providerNodeId
-                  - vendorId
+              AnnounceOTAProvider:
+                  - providerNodeID
+                  - vendorID
                   - announcementReason
                   - metadataForNode
                   - endpoint
@@ -4932,6 +4932,9 @@
                   - groupID
               ViewGroupResponse:
                   - groupID
+          OnOff:
+              OffWithEffect:
+                  - effectIdentifier
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -4947,6 +4950,9 @@
               - MonitoringRegistration
           BasicInformation:
               - CapabilityMinimaStruct
+          AccessControl:
+              - AccessControlEntryStruct
+              - AccessControlExtensionStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5011,6 +5017,19 @@
               CapabilityMinimaStruct:
                   - caseSessionsPerFabric
                   - subscriptionsPerFabric
+          Descriptor:
+              DeviceTypeStruct:
+                  - deviceType
+          AccessControl:
+              AccessControlEntryStruct:
+                  - privilege
+                  - authMode
+                  - subjects
+                  - targets
+                  - fabricIndex
+              AccessControlExtensionStruct:
+                  - data
+                  - fabricIndex
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5024,6 +5043,10 @@
               - ShutDown
               - Leave
               - ReachableChanged
+          PowerSource:
+              - WiredFaultChange
+              - BatFaultChange
+              - BatChargeFaultChange
       event fields:
           Switch:
               MultiPressComplete:
@@ -5059,6 +5082,16 @@
                   - fabricIndex
               ReachableChanged:
                   - reachableNewValue
+          PowerSource:
+              WiredFaultChange:
+                  - current
+                  - previous
+              BatFaultChange:
+                  - current
+                  - previous
+              BatChargeFaultChange:
+                  - current
+                  - previous
       enums:
           OTASoftwareUpdateProvider:
               - OTAApplyUpdateAction
@@ -5070,6 +5103,9 @@
               - OTAUpdateStateEnum
           UnitTesting:
               - SimpleEnum
+          AccessControl:
+              - AccessControlEntryPrivilegeEnum
+              - AccessControlEntryAuthModeEnum
       enum values:
           OTASoftwareUpdateProvider:
               OTAApplyUpdateAction:
@@ -5113,6 +5149,23 @@
                   - ValueA
                   - ValueB
                   - ValueC
+          GeneralCommissioning:
+              CommissioningError:
+                  - OK
+          AccessControl:
+              AccessControlEntryPrivilegeEnum:
+                  - View
+                  - ProxyView
+                  - Operate
+                  - Manage
+                  - Administer
+              AccessControlEntryAuthModeEnum:
+                  - PASE
+                  - CASE
+                  - Group
+          PowerSource:
+              BatChargeLevel:
+                  - OK
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5152,6 +5205,9 @@
               LevelControlOptions:
                   - ExecuteIfOff
                   - CoupleColorTempToLevel
+          NetworkCommissioning:
+              WiFiSecurity:
+                  - WEP
   deprecated:
       clusters:
           - OtaSoftwareUpdateProvider
@@ -5184,13 +5240,42 @@
                   - groupId
               ViewGroupResponse:
                   - groupId
+          OnOff:
+              OffWithEffect:
+                  - effectId
       structs:
           Descriptor:
               - DeviceType
+          AccessControl:
+              - AccessControlEntry
+              - ExtensionEntry
+          PowerSource:
+              - WiredFaultChangeType
+              - BatFaultChangeType
+              - BatChargeFaultChangeType
+      struct fields:
+          Descriptor:
+              DeviceTypeStruct:
+                  - type
       event fields:
           Switch:
               MultiPressComplete:
                   - newPosition
+      enums:
+          AccessControl:
+              - Privilege
+              - AuthMode
+      enum values:
+          GeneralCommissioning:
+              CommissioningError:
+                  - Ok
+          PowerSource:
+              BatChargeLevel:
+                  - Ok
+      bitmap values:
+          NetworkCommissioning:
+              WiFiSecurity:
+                  - WepPersonal
       apis:
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
@@ -5214,11 +5299,20 @@
               PIROccupiedToUnoccupiedDelay: PirOccupiedToUnoccupiedDelay
               PIRUnoccupiedToOccupiedDelay: PirUnoccupiedToOccupiedDelay
               PIRUnoccupiedToOccupiedThreshold: PirUnoccupiedToOccupiedThreshold
-      event fields:
-          Switch:
-              MultiPressComplete:
-                  previousPosition: newPosition
+          OTASoftwareUpdateRequestor:
+              DefaultOTAProviders: DefaultOtaProviders
+      commands:
+          OTASoftwareUpdateRequestor:
+              AnnounceOTAProvider: AnnounceOtaProvider
       command fields:
+          OTASoftwareUpdateProvider:
+              QueryImage:
+                  vendorID: vendorId
+                  productID: productId
+          OTASoftwareUpdateRequestor:
+              AnnounceOTAProvider:
+                  providerNodeID: providerNodeId
+                  vendorID: vendorId
           Groups:
               AddGroup:
                   groupID: groupId
@@ -5234,3 +5328,33 @@
                   groupID: groupId
               ViewGroupResponse:
                   groupID: groupId
+          OnOff:
+              OffWithEffect:
+                  effectIdentifier: effectId
+      structs:
+          AccessControl:
+              AccessControlEntryStruct: AccessControlEntry
+              AccessControlExtensionStruct: ExtensionEntry
+      struct fields:
+          Descriptor:
+              DeviceTypeStruct:
+                  deviceType: type
+      event fields:
+          Switch:
+              MultiPressComplete:
+                  previousPosition: newPosition
+      enums:
+          AccessControl:
+              AccessControlEntryPrivilegeEnum: Privilege
+              AccessControlEntryAuthModeEnum: AuthMode
+      enum values:
+          GeneralCommissioning:
+              CommissioningError:
+                  OK: Ok
+          PowerSource:
+              BatChargeLevel:
+                  OK: Ok
+      bitmap values:
+          NetworkCommissioning:
+              WiFiSecurity:
+                  WEP: WepPersonal

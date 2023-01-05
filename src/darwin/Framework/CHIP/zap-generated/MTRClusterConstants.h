@@ -1024,7 +1024,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     // Cluster OtaSoftwareUpdateRequestor deprecated attribute names
     MTRClusterOtaSoftwareUpdateRequestorAttributeDefaultOtaProvidersID API_AVAILABLE(
         ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOtaProvidersID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOTAProvidersID")
     = 0x00000000,
     MTRClusterOtaSoftwareUpdateRequestorAttributeUpdatePossibleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdatePossibleID")
@@ -1055,7 +1055,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster OTASoftwareUpdateRequestor attributes
-    MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOtaProvidersID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOTAProvidersID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdatePossibleID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdateStateID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdateStateProgressID MTR_NEWLY_AVAILABLE = 0x00000003,
@@ -5886,11 +5886,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
 
     // Cluster OtaSoftwareUpdateRequestor deprecated command id names
     MTRClusterOtaSoftwareUpdateRequestorCommandAnnounceOtaProviderID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOTASoftwareUpdateRequestorCommandAnnounceOtaProviderID")
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOTASoftwareUpdateRequestorCommandAnnounceOTAProviderID")
     = 0x00000000,
 
     // Cluster OTASoftwareUpdateRequestor commands
-    MTRCommandIDTypeClusterOTASoftwareUpdateRequestorCommandAnnounceOtaProviderID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterOTASoftwareUpdateRequestorCommandAnnounceOTAProviderID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster GeneralCommissioning deprecated command id names
     MTRClusterGeneralCommissioningCommandArmFailSafeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -6820,6 +6820,13 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterOTASoftwareUpdateRequestorEventStateTransitionID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTREventIDTypeClusterOTASoftwareUpdateRequestorEventVersionAppliedID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTREventIDTypeClusterOTASoftwareUpdateRequestorEventDownloadErrorID MTR_NEWLY_AVAILABLE = 0x00000002,
+
+    // Cluster PowerSource deprecated event names
+
+    // Cluster PowerSource events
+    MTREventIDTypeClusterPowerSourceEventWiredFaultChangeID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterPowerSourceEventBatFaultChangeID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTREventIDTypeClusterPowerSourceEventBatChargeFaultChangeID MTR_NEWLY_AVAILABLE = 0x00000002,
 
     // Cluster GeneralDiagnostics deprecated event names
     MTRClusterGeneralDiagnosticsEventHardwareFaultChangeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))

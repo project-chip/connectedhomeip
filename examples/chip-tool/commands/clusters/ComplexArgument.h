@@ -36,6 +36,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
+#include <commands/common/HexConversion.h>
 #include <json/json.h>
 #include <lib/core/Optional.h>
 #include <lib/support/BytesToHex.h>
@@ -210,18 +211,22 @@ public:
                 size = str.size();
             }
 
-            if (size % 2 != 0)
-            {
-                ChipLogError(chipTool, "Error while encoding %s as a hex string: Odd number of characters.", label);
-                return CHIP_ERROR_INVALID_STRING_LENGTH;
-            }
+            CHIP_ERROR err = HexToBytes(
+                chip::CharSpan(str.c_str(), size),
+                [&buffer](size_t allocSize) {
+                    buffer = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(allocSize, sizeof(uint8_t)));
+                    return buffer;
+                },
+                &size);
 
-            buffer = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(size / 2, sizeof(uint8_t)));
-            size   = chip::Encoding::HexToBytes(str.c_str(), size, buffer, size / 2);
-            if (size == 0)
+            if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(chipTool, "Error while encoding %s as a hex string.", label);
-                return CHIP_ERROR_INTERNAL;
+                if (buffer != nullptr)
+                {
+                    chip::Platform::MemoryFree(buffer);
+                }
+
+                return err;
             }
         }
 

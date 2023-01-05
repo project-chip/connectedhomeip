@@ -21,8 +21,9 @@
 
 using namespace chip::app::Clusters;
 
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -54,6 +55,31 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Targets'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Data", indent + 1, value.data);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Data'");
             return err;
         }
     }
@@ -471,10 +497,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("Type", indent + 1, value.type);
+        CHIP_ERROR err = LogValue("DeviceType", indent + 1, value.deviceType);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Type'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DeviceType'");
             return err;
         }
     }
@@ -627,30 +653,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Endpoints'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("Data", indent + 1, value.data);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Data'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
             return err;
         }
     }
@@ -2770,6 +2772,78 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const PowerSource::Events::WiredFaultChange::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Current", indent + 1, value.current);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Current'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Previous", indent + 1, value.previous);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Previous'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const PowerSource::Events::BatFaultChange::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Current", indent + 1, value.current);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Current'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Previous", indent + 1, value.previous);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Previous'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const PowerSource::Events::BatChargeFaultChange::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Current", indent + 1, value.current);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Current'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Previous", indent + 1, value.previous);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Previous'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const GeneralDiagnostics::Events::HardwareFaultChange::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -4701,13 +4775,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case AccessControl::Attributes::Acl::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ACL", 1, value);
         }
         case AccessControl::Attributes::Extension::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> value;
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Extension", 1, value);
         }
@@ -4965,12 +5042,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case OtaSoftwareUpdateRequestor::Id: {
         switch (path.mAttributeId)
         {
-        case OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProviders::Id: {
+        case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id: {
             chip::app::DataModel::DecodableList<
                 chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("DefaultOtaProviders", 1, value);
+            return DataModelLogger::LogValue("DefaultOTAProviders", 1, value);
         }
         case OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id: {
             bool value;
@@ -10562,6 +10639,27 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("DownloadError", 1, value);
+        }
+        }
+        break;
+    }
+    case PowerSource::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case PowerSource::Events::WiredFaultChange::Id: {
+            chip::app::Clusters::PowerSource::Events::WiredFaultChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("WiredFaultChange", 1, value);
+        }
+        case PowerSource::Events::BatFaultChange::Id: {
+            chip::app::Clusters::PowerSource::Events::BatFaultChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BatFaultChange", 1, value);
+        }
+        case PowerSource::Events::BatChargeFaultChange::Id: {
+            chip::app::Clusters::PowerSource::Events::BatChargeFaultChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BatChargeFaultChange", 1, value);
         }
         }
         break;

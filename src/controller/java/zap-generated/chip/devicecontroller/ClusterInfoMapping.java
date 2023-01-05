@@ -1288,11 +1288,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.AccessControlClusterAccessControlEntry> valueList) {
+    public void onSuccess(
+        List<ChipStructs.AccessControlClusterAccessControlEntryStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
-              "valueList", "List<ChipStructs.AccessControlClusterAccessControlEntry>");
+              "valueList", "List<ChipStructs.AccessControlClusterAccessControlEntryStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -1314,11 +1315,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.AccessControlClusterExtensionEntry> valueList) {
+    public void onSuccess(
+        List<ChipStructs.AccessControlClusterAccessControlExtensionStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
-              "valueList", "List<ChipStructs.AccessControlClusterExtensionEntry>");
+              "valueList", "List<ChipStructs.AccessControlClusterAccessControlExtensionStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -1607,38 +1609,38 @@ public class ClusterInfoMapping {
 
     @Override
     public void onSuccess(
-        Integer status,
-        Optional<Long> delayedActionTime,
-        Optional<String> imageURI,
-        Optional<Long> softwareVersion,
-        Optional<String> softwareVersionString,
-        Optional<byte[]> updateToken,
-        Optional<Boolean> userConsentNeeded,
-        Optional<byte[]> metadataForRequestor) {
+        Integer Status,
+        Optional<Long> DelayedActionTime,
+        Optional<String> ImageURI,
+        Optional<Long> SoftwareVersion,
+        Optional<String> SoftwareVersionString,
+        Optional<byte[]> UpdateToken,
+        Optional<Boolean> UserConsentNeeded,
+        Optional<byte[]> MetadataForRequestor) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
-      responseValues.put(statusResponseValue, status);
-      CommandResponseInfo delayedActionTimeResponseValue =
-          new CommandResponseInfo("delayedActionTime", "Optional<Long>");
-      responseValues.put(delayedActionTimeResponseValue, delayedActionTime);
-      CommandResponseInfo imageURIResponseValue =
-          new CommandResponseInfo("imageURI", "Optional<String>");
-      responseValues.put(imageURIResponseValue, imageURI);
-      CommandResponseInfo softwareVersionResponseValue =
-          new CommandResponseInfo("softwareVersion", "Optional<Long>");
-      responseValues.put(softwareVersionResponseValue, softwareVersion);
-      CommandResponseInfo softwareVersionStringResponseValue =
-          new CommandResponseInfo("softwareVersionString", "Optional<String>");
-      responseValues.put(softwareVersionStringResponseValue, softwareVersionString);
-      CommandResponseInfo updateTokenResponseValue =
-          new CommandResponseInfo("updateToken", "Optional<byte[]>");
-      responseValues.put(updateTokenResponseValue, updateToken);
-      CommandResponseInfo userConsentNeededResponseValue =
-          new CommandResponseInfo("userConsentNeeded", "Optional<Boolean>");
-      responseValues.put(userConsentNeededResponseValue, userConsentNeeded);
-      CommandResponseInfo metadataForRequestorResponseValue =
-          new CommandResponseInfo("metadataForRequestor", "Optional<byte[]>");
-      responseValues.put(metadataForRequestorResponseValue, metadataForRequestor);
+      CommandResponseInfo StatusResponseValue = new CommandResponseInfo("Status", "Integer");
+      responseValues.put(StatusResponseValue, Status);
+      CommandResponseInfo DelayedActionTimeResponseValue =
+          new CommandResponseInfo("DelayedActionTime", "Optional<Long>");
+      responseValues.put(DelayedActionTimeResponseValue, DelayedActionTime);
+      CommandResponseInfo ImageURIResponseValue =
+          new CommandResponseInfo("ImageURI", "Optional<String>");
+      responseValues.put(ImageURIResponseValue, ImageURI);
+      CommandResponseInfo SoftwareVersionResponseValue =
+          new CommandResponseInfo("SoftwareVersion", "Optional<Long>");
+      responseValues.put(SoftwareVersionResponseValue, SoftwareVersion);
+      CommandResponseInfo SoftwareVersionStringResponseValue =
+          new CommandResponseInfo("SoftwareVersionString", "Optional<String>");
+      responseValues.put(SoftwareVersionStringResponseValue, SoftwareVersionString);
+      CommandResponseInfo UpdateTokenResponseValue =
+          new CommandResponseInfo("UpdateToken", "Optional<byte[]>");
+      responseValues.put(UpdateTokenResponseValue, UpdateToken);
+      CommandResponseInfo UserConsentNeededResponseValue =
+          new CommandResponseInfo("UserConsentNeeded", "Optional<Boolean>");
+      responseValues.put(UserConsentNeededResponseValue, UserConsentNeeded);
+      CommandResponseInfo MetadataForRequestorResponseValue =
+          new CommandResponseInfo("MetadataForRequestor", "Optional<byte[]>");
+      responseValues.put(MetadataForRequestorResponseValue, MetadataForRequestor);
       callback.onSuccess(responseValues);
     }
 
@@ -1659,13 +1661,13 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer action, Long delayedActionTime) {
+    public void onSuccess(Integer Action, Long DelayedActionTime) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo actionResponseValue = new CommandResponseInfo("action", "Integer");
-      responseValues.put(actionResponseValue, action);
-      CommandResponseInfo delayedActionTimeResponseValue =
-          new CommandResponseInfo("delayedActionTime", "Long");
-      responseValues.put(delayedActionTimeResponseValue, delayedActionTime);
+      CommandResponseInfo ActionResponseValue = new CommandResponseInfo("Action", "Integer");
+      responseValues.put(ActionResponseValue, Action);
+      CommandResponseInfo DelayedActionTimeResponseValue =
+          new CommandResponseInfo("DelayedActionTime", "Long");
+      responseValues.put(DelayedActionTimeResponseValue, DelayedActionTime);
       callback.onSuccess(responseValues);
     }
 
@@ -1699,9 +1701,9 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedOtaSoftwareUpdateRequestorClusterDefaultOtaProvidersAttributeCallback
+  public static class DelegatedOtaSoftwareUpdateRequestorClusterDefaultOTAProvidersAttributeCallback
       implements ChipClusters.OtaSoftwareUpdateRequestorCluster
-              .DefaultOtaProvidersAttributeCallback,
+              .DefaultOTAProvidersAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -2177,12 +2179,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer errorCode, String debugText) {
+    public void onSuccess(Integer ErrorCode, String DebugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "Integer");
-      responseValues.put(errorCodeResponseValue, errorCode);
-      CommandResponseInfo debugTextResponseValue = new CommandResponseInfo("debugText", "String");
-      responseValues.put(debugTextResponseValue, debugText);
+      CommandResponseInfo ErrorCodeResponseValue = new CommandResponseInfo("ErrorCode", "Integer");
+      responseValues.put(ErrorCodeResponseValue, ErrorCode);
+      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      responseValues.put(DebugTextResponseValue, DebugText);
       callback.onSuccess(responseValues);
     }
 
@@ -2203,12 +2205,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer errorCode, String debugText) {
+    public void onSuccess(Integer ErrorCode, String DebugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "Integer");
-      responseValues.put(errorCodeResponseValue, errorCode);
-      CommandResponseInfo debugTextResponseValue = new CommandResponseInfo("debugText", "String");
-      responseValues.put(debugTextResponseValue, debugText);
+      CommandResponseInfo ErrorCodeResponseValue = new CommandResponseInfo("ErrorCode", "Integer");
+      responseValues.put(ErrorCodeResponseValue, ErrorCode);
+      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      responseValues.put(DebugTextResponseValue, DebugText);
       callback.onSuccess(responseValues);
     }
 
@@ -2229,12 +2231,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer errorCode, String debugText) {
+    public void onSuccess(Integer ErrorCode, String DebugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "Integer");
-      responseValues.put(errorCodeResponseValue, errorCode);
-      CommandResponseInfo debugTextResponseValue = new CommandResponseInfo("debugText", "String");
-      responseValues.put(debugTextResponseValue, debugText);
+      CommandResponseInfo ErrorCodeResponseValue = new CommandResponseInfo("ErrorCode", "Integer");
+      responseValues.put(ErrorCodeResponseValue, ErrorCode);
+      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      responseValues.put(DebugTextResponseValue, DebugText);
       callback.onSuccess(responseValues);
     }
 
@@ -7927,9 +7929,10 @@ public class ClusterInfoMapping {
     onOffClusterInteractionInfoMap.put("toggle", onOfftoggleInteractionInfo);
     Map<String, CommandParameterInfo> onOffoffWithEffectCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo onOffoffWithEffecteffectIdCommandParameterInfo =
-        new CommandParameterInfo("effectId", Integer.class, Integer.class);
-    onOffoffWithEffectCommandParams.put("effectId", onOffoffWithEffecteffectIdCommandParameterInfo);
+    CommandParameterInfo onOffoffWithEffecteffectIdentifierCommandParameterInfo =
+        new CommandParameterInfo("effectIdentifier", Integer.class, Integer.class);
+    onOffoffWithEffectCommandParams.put(
+        "effectIdentifier", onOffoffWithEffecteffectIdentifierCommandParameterInfo);
 
     CommandParameterInfo onOffoffWithEffecteffectVariantCommandParameterInfo =
         new CommandParameterInfo("effectVariant", Integer.class, Integer.class);
@@ -7942,7 +7945,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.OnOffCluster) cluster)
                   .offWithEffect(
                       (DefaultClusterCallback) callback,
-                      (Integer) commandArguments.get("effectId"),
+                      (Integer) commandArguments.get("effectIdentifier"),
                       (Integer) commandArguments.get("effectVariant"));
             },
             () -> new DelegatedDefaultClusterCallback(),
@@ -8605,15 +8608,15 @@ public class ClusterInfoMapping {
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo> otaSoftwareUpdateProviderqueryImageCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo otaSoftwareUpdateProviderqueryImagevendorIdCommandParameterInfo =
-        new CommandParameterInfo("vendorId", Integer.class, Integer.class);
+    CommandParameterInfo otaSoftwareUpdateProviderqueryImagevendorIDCommandParameterInfo =
+        new CommandParameterInfo("vendorID", Integer.class, Integer.class);
     otaSoftwareUpdateProviderqueryImageCommandParams.put(
-        "vendorId", otaSoftwareUpdateProviderqueryImagevendorIdCommandParameterInfo);
+        "vendorID", otaSoftwareUpdateProviderqueryImagevendorIDCommandParameterInfo);
 
-    CommandParameterInfo otaSoftwareUpdateProviderqueryImageproductIdCommandParameterInfo =
-        new CommandParameterInfo("productId", Integer.class, Integer.class);
+    CommandParameterInfo otaSoftwareUpdateProviderqueryImageproductIDCommandParameterInfo =
+        new CommandParameterInfo("productID", Integer.class, Integer.class);
     otaSoftwareUpdateProviderqueryImageCommandParams.put(
-        "productId", otaSoftwareUpdateProviderqueryImageproductIdCommandParameterInfo);
+        "productID", otaSoftwareUpdateProviderqueryImageproductIDCommandParameterInfo);
 
     CommandParameterInfo otaSoftwareUpdateProviderqueryImagesoftwareVersionCommandParameterInfo =
         new CommandParameterInfo("softwareVersion", Long.class, Long.class);
@@ -8657,8 +8660,8 @@ public class ClusterInfoMapping {
                   .queryImage(
                       (ChipClusters.OtaSoftwareUpdateProviderCluster.QueryImageResponseCallback)
                           callback,
-                      (Integer) commandArguments.get("vendorId"),
-                      (Integer) commandArguments.get("productId"),
+                      (Integer) commandArguments.get("vendorID"),
+                      (Integer) commandArguments.get("productID"),
                       (Long) commandArguments.get("softwareVersion"),
                       (ArrayList<Integer>) commandArguments.get("protocolsSupported"),
                       (Optional<Integer>) commandArguments.get("hardwareVersion"),
@@ -8728,55 +8731,55 @@ public class ClusterInfoMapping {
     commandMap.put("otaSoftwareUpdateProvider", otaSoftwareUpdateProviderClusterInteractionInfoMap);
     Map<String, InteractionInfo> otaSoftwareUpdateRequestorClusterInteractionInfoMap =
         new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> otaSoftwareUpdateRequestorannounceOtaProviderCommandParams =
+    Map<String, CommandParameterInfo> otaSoftwareUpdateRequestorannounceOTAProviderCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo
-        otaSoftwareUpdateRequestorannounceOtaProviderproviderNodeIdCommandParameterInfo =
-            new CommandParameterInfo("providerNodeId", Long.class, Long.class);
-    otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put(
-        "providerNodeId",
-        otaSoftwareUpdateRequestorannounceOtaProviderproviderNodeIdCommandParameterInfo);
+        otaSoftwareUpdateRequestorannounceOTAProviderproviderNodeIDCommandParameterInfo =
+            new CommandParameterInfo("providerNodeID", Long.class, Long.class);
+    otaSoftwareUpdateRequestorannounceOTAProviderCommandParams.put(
+        "providerNodeID",
+        otaSoftwareUpdateRequestorannounceOTAProviderproviderNodeIDCommandParameterInfo);
 
-    CommandParameterInfo otaSoftwareUpdateRequestorannounceOtaProvidervendorIdCommandParameterInfo =
-        new CommandParameterInfo("vendorId", Integer.class, Integer.class);
-    otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put(
-        "vendorId", otaSoftwareUpdateRequestorannounceOtaProvidervendorIdCommandParameterInfo);
+    CommandParameterInfo otaSoftwareUpdateRequestorannounceOTAProvidervendorIDCommandParameterInfo =
+        new CommandParameterInfo("vendorID", Integer.class, Integer.class);
+    otaSoftwareUpdateRequestorannounceOTAProviderCommandParams.put(
+        "vendorID", otaSoftwareUpdateRequestorannounceOTAProvidervendorIDCommandParameterInfo);
 
     CommandParameterInfo
-        otaSoftwareUpdateRequestorannounceOtaProviderannouncementReasonCommandParameterInfo =
+        otaSoftwareUpdateRequestorannounceOTAProviderannouncementReasonCommandParameterInfo =
             new CommandParameterInfo("announcementReason", Integer.class, Integer.class);
-    otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put(
+    otaSoftwareUpdateRequestorannounceOTAProviderCommandParams.put(
         "announcementReason",
-        otaSoftwareUpdateRequestorannounceOtaProviderannouncementReasonCommandParameterInfo);
+        otaSoftwareUpdateRequestorannounceOTAProviderannouncementReasonCommandParameterInfo);
 
     CommandParameterInfo
-        otaSoftwareUpdateRequestorannounceOtaProvidermetadataForNodeCommandParameterInfo =
+        otaSoftwareUpdateRequestorannounceOTAProvidermetadataForNodeCommandParameterInfo =
             new CommandParameterInfo("metadataForNode", Optional.class, byte[].class);
-    otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put(
+    otaSoftwareUpdateRequestorannounceOTAProviderCommandParams.put(
         "metadataForNode",
-        otaSoftwareUpdateRequestorannounceOtaProvidermetadataForNodeCommandParameterInfo);
+        otaSoftwareUpdateRequestorannounceOTAProvidermetadataForNodeCommandParameterInfo);
 
-    CommandParameterInfo otaSoftwareUpdateRequestorannounceOtaProviderendpointCommandParameterInfo =
+    CommandParameterInfo otaSoftwareUpdateRequestorannounceOTAProviderendpointCommandParameterInfo =
         new CommandParameterInfo("endpoint", Integer.class, Integer.class);
-    otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put(
-        "endpoint", otaSoftwareUpdateRequestorannounceOtaProviderendpointCommandParameterInfo);
+    otaSoftwareUpdateRequestorannounceOTAProviderCommandParams.put(
+        "endpoint", otaSoftwareUpdateRequestorannounceOTAProviderendpointCommandParameterInfo);
 
-    InteractionInfo otaSoftwareUpdateRequestorannounceOtaProviderInteractionInfo =
+    InteractionInfo otaSoftwareUpdateRequestorannounceOTAProviderInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OtaSoftwareUpdateRequestorCluster) cluster)
-                  .announceOtaProvider(
+                  .announceOTAProvider(
                       (DefaultClusterCallback) callback,
-                      (Long) commandArguments.get("providerNodeId"),
-                      (Integer) commandArguments.get("vendorId"),
+                      (Long) commandArguments.get("providerNodeID"),
+                      (Integer) commandArguments.get("vendorID"),
                       (Integer) commandArguments.get("announcementReason"),
                       (Optional<byte[]>) commandArguments.get("metadataForNode"),
                       (Integer) commandArguments.get("endpoint"));
             },
             () -> new DelegatedDefaultClusterCallback(),
-            otaSoftwareUpdateRequestorannounceOtaProviderCommandParams);
+            otaSoftwareUpdateRequestorannounceOTAProviderCommandParams);
     otaSoftwareUpdateRequestorClusterInteractionInfoMap.put(
-        "announceOtaProvider", otaSoftwareUpdateRequestorannounceOtaProviderInteractionInfo);
+        "announceOTAProvider", otaSoftwareUpdateRequestorannounceOTAProviderInteractionInfo);
     commandMap.put(
         "otaSoftwareUpdateRequestor", otaSoftwareUpdateRequestorClusterInteractionInfoMap);
     Map<String, InteractionInfo> localizationConfigurationClusterInteractionInfoMap =

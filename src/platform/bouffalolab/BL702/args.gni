@@ -20,9 +20,9 @@ import("${chip_root}/examples/platform/bouffalolab/bl702/args.gni")
 
 chip_device_platform = "bl702"
 
-riscv_platform_config = "${bl702_sdk_build_root}/bl702_riscv.gni"
+riscv_platform_config = "${bouffalolab_iot_sdk_build_root}/common/rsicv.gni"
 
-mbedtls_target = "${bl702_sdk_build_root}:mbedtls"
+mbedtls_target = "${bouffalolab_iot_sdk_build_root}/bl702:mbedtls"
 
 chip_inet_config_enable_ipv4 = false
 chip_inet_config_enable_tcp_endpoint = false
@@ -37,7 +37,8 @@ openthread_core_config_platform_check_file =
     "bl702-openthread-core-bl-config-check.h"
 openthread_project_include_dirs =
     [ "${chip_root}/src/platform/bouffalolab/BL702" ]
-openthread_external_platform = "${bl702_sdk_build_root}:bl702_sdk"
+openthread_external_platform =
+    "${bouffalolab_iot_sdk_build_root}/bl702:bl_iot_sdk"
 
 pw_build_LINK_DEPS = [
   "$dir_pw_assert:impl",

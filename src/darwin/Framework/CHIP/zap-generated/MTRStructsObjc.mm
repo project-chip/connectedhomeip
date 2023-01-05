@@ -86,7 +86,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _type = @(0);
+        _deviceType = @(0);
 
         _revision = @(0);
     }
@@ -97,7 +97,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRDescriptorClusterDeviceTypeStruct alloc] init];
 
-    other.type = self.type;
+    other.deviceType = self.deviceType;
     other.revision = self.revision;
 
     return other;
@@ -106,8 +106,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: type:%@; revision:%@; >", NSStringFromClass([self class]), _type, _revision];
+        [NSString stringWithFormat:@"<%@: deviceType:%@; revision:%@; >", NSStringFromClass([self class]), _deviceType, _revision];
     return descriptionString;
+}
+
+- (void)setType:(NSNumber * _Nonnull)type
+{
+    self.deviceType = type;
+}
+
+- (NSNumber * _Nonnull)type
+{
+    return self.deviceType;
 }
 
 @end
@@ -189,7 +199,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRAccessControlClusterAccessControlEntry
+@implementation MTRAccessControlClusterAccessControlEntryStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -209,7 +219,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRAccessControlClusterAccessControlEntry alloc] init];
+    auto other = [[MTRAccessControlClusterAccessControlEntryStruct alloc] init];
 
     other.privilege = self.privilege;
     other.authMode = self.authMode;
@@ -230,7 +240,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRAccessControlClusterExtensionEntry
+@implementation MTRAccessControlClusterAccessControlEntry : MTRAccessControlClusterAccessControlEntryStruct
+@end
+
+@implementation MTRAccessControlClusterAccessControlExtensionStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -244,7 +257,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRAccessControlClusterExtensionEntry alloc] init];
+    auto other = [[MTRAccessControlClusterAccessControlExtensionStruct alloc] init];
 
     other.data = self.data;
     other.fabricIndex = self.fabricIndex;
@@ -259,6 +272,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRAccessControlClusterExtensionEntry : MTRAccessControlClusterAccessControlExtensionStruct
 @end
 
 @implementation MTRAccessControlClusterAccessControlEntryChangedEvent
@@ -878,6 +894,99 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRPowerSourceClusterWiredFaultChangeType alloc] init];
+
+    other.current = self.current;
+    other.previous = self.previous;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: current:%@; previous:%@; >", NSStringFromClass([self class]), _current, _previous];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPowerSourceClusterWiredFaultChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _current = [NSArray array];
+
+        _previous = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPowerSourceClusterWiredFaultChangeEvent alloc] init];
+
+    other.current = self.current;
+    other.previous = self.previous;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: current:%@; previous:%@; >", NSStringFromClass([self class]), _current, _previous];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPowerSourceClusterBatFaultChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _current = [NSArray array];
+
+        _previous = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPowerSourceClusterBatFaultChangeEvent alloc] init];
+
+    other.current = self.current;
+    other.previous = self.previous;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: current:%@; previous:%@; >", NSStringFromClass([self class]), _current, _previous];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPowerSourceClusterBatChargeFaultChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _current = [NSArray array];
+
+        _previous = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPowerSourceClusterBatChargeFaultChangeEvent alloc] init];
 
     other.current = self.current;
     other.previous = self.previous;

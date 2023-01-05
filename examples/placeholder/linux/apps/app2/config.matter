@@ -247,7 +247,7 @@ client cluster OnOff = 6 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct OffWithEffectRequest {
-    OnOffEffectIdentifier effectId = 0;
+    OnOffEffectIdentifier effectIdentifier = 0;
     OnOffDelayedAllOffEffectVariant effectVariant = 1;
   }
 
@@ -308,7 +308,7 @@ server cluster OnOff = 6 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct OffWithEffectRequest {
-    OnOffEffectIdentifier effectId = 0;
+    OnOffEffectIdentifier effectIdentifier = 0;
     OnOffDelayedAllOffEffectVariant effectVariant = 1;
   }
 
@@ -418,7 +418,7 @@ server cluster LevelControl = 8 {
 
 server cluster Descriptor = 29 {
   struct DeviceTypeStruct {
-    devtype_id type = 0;
+    devtype_id deviceType = 0;
     int16u revision = 1;
   }
 
@@ -627,6 +627,21 @@ server cluster PowerSource = 47 {
     kReplaceable = 0x8;
   }
 
+  info event WiredFaultChange = 0 {
+    WiredFault current[] = 0;
+    WiredFault previous[] = 1;
+  }
+
+  info event BatFaultChange = 1 {
+    BatFault current[] = 0;
+    BatFault previous[] = 1;
+  }
+
+  info event BatChargeFaultChange = 2 {
+    BatChargeFault current[] = 0;
+    BatChargeFault previous[] = 1;
+  }
+
   readonly attribute PowerSourceStatus status = 0;
   readonly attribute int8u order = 1;
   readonly attribute char_string<60> description = 2;
@@ -804,7 +819,7 @@ server cluster NetworkCommissioning = 49 {
 
   bitmap WiFiSecurity : BITMAP8 {
     kUnencrypted = 0x1;
-    kWepPersonal = 0x2;
+    kWep = 0x2;
     kWpaPersonal = 0x4;
     kWpa2Personal = 0x8;
     kWpa3Personal = 0x10;
