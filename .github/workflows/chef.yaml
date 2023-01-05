@@ -85,7 +85,8 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.6.27
+            # TODO: update this to connectedhomeip/chip-build-vscode:0.6.27 once we can compile with latest NRF
+            image: connectedhomeip/chip-build-nrf-platform:0.6.18
             options: --user root
 
         steps:
