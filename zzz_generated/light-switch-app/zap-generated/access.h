@@ -169,8 +169,6 @@
     63, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
     63, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
     63, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
-    4166, /* Cluster: Client Monitoring, Command: RegisterClientMonitoring, Privilege: manage */ \
-    4166, /* Cluster: Client Monitoring, Command: UnregisterClientMonitoring, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, *command*, privilege) for invoke command
@@ -206,8 +204,6 @@
     1, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
     3, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
     4, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
-    0, /* Cluster: Client Monitoring, Command: RegisterClientMonitoring, Privilege: manage */ \
-    1, /* Cluster: Client Monitoring, Command: UnregisterClientMonitoring, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, command, *privilege*) for invoke command
@@ -243,8 +239,6 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Client Monitoring, Command: RegisterClientMonitoring, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Client Monitoring, Command: UnregisterClientMonitoring, Privilege: manage */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

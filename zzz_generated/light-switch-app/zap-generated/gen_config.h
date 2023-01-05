@@ -57,7 +57,6 @@
 #define EMBER_AF_FIXED_LABEL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_USER_LABEL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_COLOR_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
-#define EMBER_AF_CLIENT_MONITORING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
 
@@ -195,8 +194,3 @@
 // Use this macro to check if the client side of the Color Control cluster is included
 #define ZCL_USING_COLOR_CONTROL_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_COLOR_CONTROL_CLIENT
-
-// Use this macro to check if the server side of the Client Monitoring cluster is included
-#define ZCL_USING_CLIENT_MONITORING_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_CLIENT_MONITORING_SERVER
-#define EMBER_AF_PLUGIN_CLIENT_MONITORING
