@@ -83,7 +83,10 @@ CHIP_ERROR BindingManager::Init(const BindingManagerInitParams & params)
     }
     else
     {
-        if (params.establishConnectionOnInit)
+        // In case the application does not want the BindingManager to establish a CASE session
+        // to the available bindings, it can be disabled by setting mEstablishConnectionOnInit
+        // to false.
+        if (params.mEstablishConnectionOnInit)
         {
             for (const EmberBindingTableEntry & entry : BindingTable::GetInstance())
             {
