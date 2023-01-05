@@ -17,8 +17,8 @@
  *    limitations under the License.
  */
 
-#include "AppConfig.h"
-#include "LEDWidget.h"
+#include <plat.h>
+#include <LEDWidget.h>
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -42,10 +42,8 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <NetworkCommissioningDriver.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <route_hook/bl_route_hook.h>
 #endif
-#include <PlatformManagerImpl.h>
 
 #if HEAP_MONITORING
 #include "MemMonitoring.h"
@@ -84,11 +82,6 @@ extern "C" {
 
 namespace {
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-chip::app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::BLWiFiDriver::GetInstance()));
-#endif
-
 #if defined(BL706_NIGHT_LIGHT) || defined(BL602_NIGHT_LIGHT)
 ColorLEDWidget sLightLED;
 #else
@@ -116,118 +109,6 @@ using namespace chip::Shell;
 AppTask AppTask::sAppTask;
 StackType_t AppTask::appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t AppTask::appTaskStruct;
-
-void PlatformManagerImpl::PlatformInit(void)
-{
-#if CONFIG_ENABLE_CHIP_SHELL || PW_RPC_ENABLED
-    uartInit();
-#endif
-
-#if PW_RPC_ENABLED
-    PigweedLogger::pw_init();
-#elif CONFIG_ENABLE_CHIP_SHELL
-    AppTask::StartAppShellTask();
-#endif
-
-#if HEAP_MONITORING
-    MemMonitoring::startHeapMonitoring();
-#endif
-
-    ChipLogProgress(NotSpecified, "Initializing CHIP stack");
-    CHIP_ERROR ret = PlatformMgr().InitChipStack();
-    if (ret != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "PlatformMgr().InitChipStack() failed");
-        appError(ret);
-    }
-
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("MatterLight");
-
-#if CHIP_ENABLE_OPENTHREAD
-
-    ChipLogProgress(NotSpecified, "Initializing OpenThread stack");
-    ret = ThreadStackMgr().InitThreadStack();
-    if (ret != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "ThreadStackMgr().InitThreadStack() failed");
-        appError(ret);
-    }
-
-#if CHIP_DEVICE_CONFIG_THREAD_FTD
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
-#else
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-#endif
-    if (ret != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "ConnectivityMgr().SetThreadDeviceType() failed");
-        appError(ret);
-    }
-
-#if CONFIG_ENABLE_CHIP_SHELL
-    cmd_otcli_init();
-#endif
-
-#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
-
-    ret = sWiFiNetworkCommissioningInstance.Init();
-    if (CHIP_NO_ERROR != ret)
-    {
-        ChipLogError(NotSpecified, "sWiFiNetworkCommissioningInstance.Init() failed");
-    }
-#endif
-
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXT_DISCOVERY_TIMEOUT_SECS);
-#endif
-
-    // Init ZCL Data Model
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-
-    ret = chip::Server::GetInstance().Init(initParams);
-    if (ret != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "chip::Server::GetInstance().Init(initParams) failed");
-        appError(ret);
-    }
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-#if CHIP_ENABLE_OPENTHREAD
-    ChipLogProgress(NotSpecified, "Starting OpenThread task");
-    // Start OpenThread task
-    ret = ThreadStackMgrImpl().StartThreadTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "ThreadStackMgr().StartThreadTask() failed");
-        appError(ret);
-    }
-#endif
-
-    ConfigurationMgr().LogDeviceConfig();
-
-    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
-    PlatformMgr().AddEventHandler(AppTask::ChipEventHandler, 0);
-
-#ifdef OTA_ENABLED
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    OTAConfig::Init();
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-#endif // OTA_ENABLED
-
-#if PW_RPC_ENABLED
-    chip::rpc::Init();
-#endif
-
-    GetAppTask().PostEvent(AppTask::APP_EVENT_TIMER);
-
-    vTaskResume(GetAppTask().sAppTaskHandle);
-}
 
 void StartAppTask(void)
 {
@@ -298,6 +179,8 @@ void AppTask::AppTaskMain(void * pvParameter)
         ChipLogError(NotSpecified, "PlatformMgr().StartEventLoopTask() failed");
         appError(ret);
     }
+
+    GetAppTask().PostEvent(AppTask::APP_EVENT_TIMER);
     vTaskSuspend(NULL);
 
 #ifndef LED_BTN_RESET
