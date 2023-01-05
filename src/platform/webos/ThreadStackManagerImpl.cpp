@@ -678,8 +678,8 @@ CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(A
 
     switch (attributeId)
     {
-    case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id:
-    case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id:
+    case ThreadNetworkDiagnostics::Attributes::NeighborTable::Id:
+    case ThreadNetworkDiagnostics::Attributes::RouteTable::Id:
     case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id:
         err = encoder.EncodeEmptyList();
         break;

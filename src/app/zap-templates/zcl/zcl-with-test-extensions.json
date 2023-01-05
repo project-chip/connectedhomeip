@@ -185,7 +185,7 @@
             "cluster_error_boolean"
         ],
         "Thread Network Diagnostics": [
-            "channel",
+            "Channel",
             "RoutingRole",
             "NetworkName",
             "PanId",
@@ -193,7 +193,7 @@
             "MeshLocalPrefix",
             "OverrunCount",
             "PartitionId",
-            "weighting",
+            "Weighting",
             "DataVersion",
             "StableDataVersion",
             "LeaderRouterId",
