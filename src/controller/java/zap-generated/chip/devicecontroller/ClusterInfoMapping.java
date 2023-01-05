@@ -2868,8 +2868,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedThreadNetworkDiagnosticsClusterNeighborTableListAttributeCallback
-      implements ChipClusters.ThreadNetworkDiagnosticsCluster.NeighborTableListAttributeCallback,
+  public static class DelegatedThreadNetworkDiagnosticsClusterNeighborTableAttributeCallback
+      implements ChipClusters.ThreadNetworkDiagnosticsCluster.NeighborTableAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -2895,8 +2895,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedThreadNetworkDiagnosticsClusterRouteTableListAttributeCallback
-      implements ChipClusters.ThreadNetworkDiagnosticsCluster.RouteTableListAttributeCallback,
+  public static class DelegatedThreadNetworkDiagnosticsClusterRouteTableAttributeCallback
+      implements ChipClusters.ThreadNetworkDiagnosticsCluster.RouteTableAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 

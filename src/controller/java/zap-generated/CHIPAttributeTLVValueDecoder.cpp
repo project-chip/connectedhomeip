@@ -5590,8 +5590,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            cppValue, value);
             return value;
         }
-        case Attributes::NeighborTableList::Id: {
-            using TypeInfo = Attributes::NeighborTableList::TypeInfo;
+        case Attributes::NeighborTable::Id: {
+            using TypeInfo = Attributes::NeighborTable::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -5732,8 +5732,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::RouteTableList::Id: {
-            using TypeInfo = Attributes::RouteTableList::TypeInfo;
+        case Attributes::RouteTable::Id: {
+            using TypeInfo = Attributes::RouteTable::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

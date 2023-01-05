@@ -7363,11 +7363,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::OverrunCount::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, overrunCount));
         break;
-    case Attributes::NeighborTableList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, neighborTableList));
+    case Attributes::NeighborTable::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, neighborTable));
         break;
-    case Attributes::RouteTableList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, routeTableList));
+    case Attributes::RouteTable::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, routeTable));
         break;
     case Attributes::PartitionId::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, partitionId));

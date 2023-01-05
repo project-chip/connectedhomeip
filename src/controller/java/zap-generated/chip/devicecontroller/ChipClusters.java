@@ -7217,7 +7217,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface NeighborTableListAttributeCallback {
+    public interface NeighborTableAttributeCallback {
       void onSuccess(List<ChipStructs.ThreadNetworkDiagnosticsClusterNeighborTable> valueList);
 
       void onError(Exception ex);
@@ -7225,7 +7225,7 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public interface RouteTableListAttributeCallback {
+    public interface RouteTableAttributeCallback {
       void onSuccess(List<ChipStructs.ThreadNetworkDiagnosticsClusterRouteTable> valueList);
 
       void onError(Exception ex);
@@ -7400,22 +7400,22 @@ public class ChipClusters {
       subscribeOverrunCountAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readNeighborTableListAttribute(NeighborTableListAttributeCallback callback) {
-      readNeighborTableListAttribute(chipClusterPtr, callback);
+    public void readNeighborTableAttribute(NeighborTableAttributeCallback callback) {
+      readNeighborTableAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeNeighborTableListAttribute(
-        NeighborTableListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeNeighborTableListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeNeighborTableAttribute(
+        NeighborTableAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeNeighborTableAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readRouteTableListAttribute(RouteTableListAttributeCallback callback) {
-      readRouteTableListAttribute(chipClusterPtr, callback);
+    public void readRouteTableAttribute(RouteTableAttributeCallback callback) {
+      readRouteTableAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeRouteTableListAttribute(
-        RouteTableListAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeRouteTableListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    public void subscribeRouteTableAttribute(
+        RouteTableAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeRouteTableAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readPartitionIdAttribute(PartitionIdAttributeCallback callback) {
@@ -7990,21 +7990,21 @@ public class ChipClusters {
     private native void subscribeOverrunCountAttribute(
         long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readNeighborTableListAttribute(
-        long chipClusterPtr, NeighborTableListAttributeCallback callback);
+    private native void readNeighborTableAttribute(
+        long chipClusterPtr, NeighborTableAttributeCallback callback);
 
-    private native void subscribeNeighborTableListAttribute(
+    private native void subscribeNeighborTableAttribute(
         long chipClusterPtr,
-        NeighborTableListAttributeCallback callback,
+        NeighborTableAttributeCallback callback,
         int minInterval,
         int maxInterval);
 
-    private native void readRouteTableListAttribute(
-        long chipClusterPtr, RouteTableListAttributeCallback callback);
+    private native void readRouteTableAttribute(
+        long chipClusterPtr, RouteTableAttributeCallback callback);
 
-    private native void subscribeRouteTableListAttribute(
+    private native void subscribeRouteTableAttribute(
         long chipClusterPtr,
-        RouteTableListAttributeCallback callback,
+        RouteTableAttributeCallback callback,
         int minInterval,
         int maxInterval);
 

@@ -1643,10 +1643,10 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeOverrunCountID")
     = 0x00000006,
     MTRClusterThreadNetworkDiagnosticsAttributeNeighborTableListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableID")
     = 0x00000007,
     MTRClusterThreadNetworkDiagnosticsAttributeRouteTableListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableID")
     = 0x00000008,
     MTRClusterThreadNetworkDiagnosticsAttributePartitionIdID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePartitionIdID")
@@ -1850,8 +1850,8 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeExtendedPanIdID MTR_NEWLY_AVAILABLE = 0x00000004,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeMeshLocalPrefixID MTR_NEWLY_AVAILABLE = 0x00000005,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeOverrunCountID MTR_NEWLY_AVAILABLE = 0x00000006,
-    MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableListID MTR_NEWLY_AVAILABLE = 0x00000007,
-    MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableListID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableID MTR_NEWLY_AVAILABLE = 0x00000008,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePartitionIdID MTR_NEWLY_AVAILABLE = 0x00000009,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeWeightingID MTR_NEWLY_AVAILABLE = 0x0000000A,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeDataVersionID MTR_NEWLY_AVAILABLE = 0x0000000B,

@@ -1292,13 +1292,13 @@ namespace OverrunCount {
 static constexpr AttributeId Id = 0x00000006;
 } // namespace OverrunCount
 
-namespace NeighborTableList {
+namespace NeighborTable {
 static constexpr AttributeId Id = 0x00000007;
-} // namespace NeighborTableList
+} // namespace NeighborTable
 
-namespace RouteTableList {
+namespace RouteTable {
 static constexpr AttributeId Id = 0x00000008;
-} // namespace RouteTableList
+} // namespace RouteTable
 
 namespace PartitionId {
 static constexpr AttributeId Id = 0x00000009;

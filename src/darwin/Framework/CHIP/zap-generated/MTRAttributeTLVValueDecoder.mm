@@ -4901,8 +4901,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [NSNumber numberWithUnsignedLongLong:cppValue];
             return value;
         }
-        case Attributes::NeighborTableList::Id: {
-            using TypeInfo = Attributes::NeighborTableList::TypeInfo;
+        case Attributes::NeighborTable::Id: {
+            using TypeInfo = Attributes::NeighborTable::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -4949,8 +4949,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             }
             return value;
         }
-        case Attributes::RouteTableList::Id: {
-            using TypeInfo = Attributes::RouteTableList::TypeInfo;
+        case Attributes::RouteTable::Id: {
+            using TypeInfo = Attributes::RouteTable::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {

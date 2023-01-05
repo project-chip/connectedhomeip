@@ -7942,8 +7942,8 @@ class ThreadNetworkDiagnostics(Cluster):
                 ClusterObjectFieldDescriptor(Label="extendedPanId", Tag=0x00000004, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="meshLocalPrefix", Tag=0x00000005, Type=typing.Union[Nullable, bytes]),
                 ClusterObjectFieldDescriptor(Label="overrunCount", Tag=0x00000006, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="neighborTableList", Tag=0x00000007, Type=typing.List[ThreadNetworkDiagnostics.Structs.NeighborTable]),
-                ClusterObjectFieldDescriptor(Label="routeTableList", Tag=0x00000008, Type=typing.List[ThreadNetworkDiagnostics.Structs.RouteTable]),
+                ClusterObjectFieldDescriptor(Label="neighborTable", Tag=0x00000007, Type=typing.List[ThreadNetworkDiagnostics.Structs.NeighborTable]),
+                ClusterObjectFieldDescriptor(Label="routeTable", Tag=0x00000008, Type=typing.List[ThreadNetworkDiagnostics.Structs.RouteTable]),
                 ClusterObjectFieldDescriptor(Label="partitionId", Tag=0x00000009, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="weighting", Tag=0x0000000A, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="dataVersion", Tag=0x0000000B, Type=typing.Union[Nullable, uint]),
@@ -8012,8 +8012,8 @@ class ThreadNetworkDiagnostics(Cluster):
     extendedPanId: 'typing.Union[Nullable, uint]' = None
     meshLocalPrefix: 'typing.Union[Nullable, bytes]' = None
     overrunCount: 'typing.Optional[uint]' = None
-    neighborTableList: 'typing.List[ThreadNetworkDiagnostics.Structs.NeighborTable]' = None
-    routeTableList: 'typing.List[ThreadNetworkDiagnostics.Structs.RouteTable]' = None
+    neighborTable: 'typing.List[ThreadNetworkDiagnostics.Structs.NeighborTable]' = None
+    routeTable: 'typing.List[ThreadNetworkDiagnostics.Structs.RouteTable]' = None
     partitionId: 'typing.Union[Nullable, uint]' = None
     weighting: 'typing.Union[Nullable, uint]' = None
     dataVersion: 'typing.Union[Nullable, uint]' = None
@@ -8075,6 +8075,10 @@ class ThreadNetworkDiagnostics(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
+        class ConnectionStatusEnum(IntEnum):
+            kConnected = 0x00
+            kNotConnected = 0x01
+
         class NetworkFault(IntEnum):
             kUnspecified = 0x00
             kLinkDown = 0x01
@@ -8089,10 +8093,6 @@ class ThreadNetworkDiagnostics(Cluster):
             kReed = 0x04
             kRouter = 0x05
             kLeader = 0x06
-
-        class ThreadConnectionStatus(IntEnum):
-            kConnected = 0x00
-            kNotConnected = 0x01
 
 
     class Structs:
@@ -8340,7 +8340,7 @@ class ThreadNetworkDiagnostics(Cluster):
             value: 'typing.Optional[uint]' = None
 
         @dataclass
-        class NeighborTableList(ClusterAttributeDescriptor):
+        class NeighborTable(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0035
@@ -8356,7 +8356,7 @@ class ThreadNetworkDiagnostics(Cluster):
             value: 'typing.List[ThreadNetworkDiagnostics.Structs.NeighborTable]' = field(default_factory=lambda: [])
 
         @dataclass
-        class RouteTableList(ClusterAttributeDescriptor):
+        class RouteTable(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0035
@@ -9331,10 +9331,10 @@ class ThreadNetworkDiagnostics(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="connectionStatus", Tag=0, Type=ThreadNetworkDiagnostics.Enums.ThreadConnectionStatus),
+                            ClusterObjectFieldDescriptor(Label="connectionStatus", Tag=0, Type=ThreadNetworkDiagnostics.Enums.ConnectionStatusEnum),
                     ])
 
-            connectionStatus: 'ThreadNetworkDiagnostics.Enums.ThreadConnectionStatus' = 0
+            connectionStatus: 'ThreadNetworkDiagnostics.Enums.ConnectionStatusEnum' = 0
 
         @dataclass
         class NetworkFaultChange(ClusterEvent):
