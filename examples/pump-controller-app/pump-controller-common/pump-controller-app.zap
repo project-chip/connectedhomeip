@@ -1655,7 +1655,7 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "AnnounceOtaProvider",
+              "name": "AnnounceOTAProvider",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -1673,7 +1673,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "DefaultOtaProviders",
+              "name": "DefaultOTAProviders",
               "code": 0,
               "mfgCode": null,
               "side": "server",

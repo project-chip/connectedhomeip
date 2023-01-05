@@ -43,6 +43,7 @@ chip_data_model("tv-casting-common") {
     "${chip_root}/examples/chip-tool/commands/common/Commands.cpp",
     "${chip_root}/examples/chip-tool/commands/common/Commands.h",
     "${chip_root}/examples/chip-tool/commands/common/CredentialIssuerCommands.h",
+    "${chip_root}/examples/chip-tool/commands/common/HexConversion.h",
     "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
     "${chip_root}/src/controller/ExamplePersistentStorage.h",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",

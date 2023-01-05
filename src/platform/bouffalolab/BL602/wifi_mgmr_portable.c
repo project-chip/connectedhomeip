@@ -1,15 +1,9 @@
-#include "wifi_mgmr.h"
-#include "wifi_mgmr_api.h"
+#include <bl60x_wifi_driver/wifi_mgmr.h>
+#include <bl60x_wifi_driver/wifi_mgmr_api.h>
+#include <bl60x_wifi_driver/wifi_mgmr_profile.h>
 
-#include <blog.h>
 #include <stdint.h>
 #include <string.h>
-
-BLOG_DECLARE(tcal_power)
-BLOG_DECLARE(scan)
-#define USER_UNUSED(a) ((void) (a))
-
-#define DEBUG_HEADER "[WF][SM] "
 
 int wifi_mgmr_get_bssid(uint8_t * bssid)
 {
@@ -20,7 +14,7 @@ int wifi_mgmr_get_bssid(uint8_t * bssid)
         bssid[i] = wifiMgmr.wifi_mgmr_stat_info.bssid[i];
     }
 
-    return;
+    return 0;
 }
 
 int wifi_mgmr_get_scan_ap_num(void)

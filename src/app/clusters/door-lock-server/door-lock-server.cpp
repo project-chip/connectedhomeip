@@ -2085,8 +2085,11 @@ DlStatus DoorLockServer::addCredentialToUser(chip::EndpointId endpointId, chip::
 
     for (size_t i = 0; i < user.credentials.size(); ++i)
     {
-        // appclusters, 5.2.4.40: user should not be already associated with given credentialIndex
-        if (user.credentials.data()[i].CredentialIndex == credential.CredentialIndex)
+        // appclusters, 5.2.4.40: CredentialIndex in CredentialStruct provided SHALL be for an available credential slot.
+        // appclusters, 5.6.3.2: This is the index of the specific credential used to authorize
+        // the lock operation in the list of credentials identified by CredentialType
+        if (user.credentials.data()[i].CredentialIndex == credential.CredentialIndex &&
+            user.credentials.data()[i].CredentialType == credential.CredentialType)
         {
             emberAfDoorLockClusterPrintln(
                 "[AddCredentialToUser] Unable to add credential to user: credential with this index is already associated "

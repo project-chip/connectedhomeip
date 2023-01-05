@@ -17,7 +17,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
 import("$dir_pw_build/python.gni")
-import("${chip_root}/scripts/idl/files.gni")
+import("${chip_root}/scripts/py_matter_idl/files.gni")
 
 declare_args() {
   # Location where code has been pre-generated

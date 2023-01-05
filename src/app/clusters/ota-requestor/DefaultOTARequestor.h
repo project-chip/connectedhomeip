@@ -44,7 +44,7 @@ public:
 
     void HandleAnnounceOTAProvider(
         app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-        const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) override;
+        const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) override;
 
     // Application API to send the QueryImage command and start the image update process with the next available Provider
     CHIP_ERROR TriggerImmediateQuery(FabricIndex fabricIndex) override;

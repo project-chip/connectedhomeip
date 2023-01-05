@@ -28,14 +28,14 @@ public class ChipEventStructs {
     public @Nullable Long adminNodeID;
     public @Nullable Integer adminPasscodeID;
     public Integer changeType;
-    public @Nullable ChipStructs.AccessControlClusterAccessControlEntry latestValue;
+    public @Nullable ChipStructs.AccessControlClusterAccessControlEntryStruct latestValue;
     public Integer fabricIndex;
 
     public AccessControlClusterAccessControlEntryChangedEvent(
         @Nullable Long adminNodeID,
         @Nullable Integer adminPasscodeID,
         Integer changeType,
-        @Nullable ChipStructs.AccessControlClusterAccessControlEntry latestValue,
+        @Nullable ChipStructs.AccessControlClusterAccessControlEntryStruct latestValue,
         Integer fabricIndex) {
       this.adminNodeID = adminNodeID;
       this.adminPasscodeID = adminPasscodeID;
@@ -72,14 +72,14 @@ public class ChipEventStructs {
     public @Nullable Long adminNodeID;
     public @Nullable Integer adminPasscodeID;
     public Integer changeType;
-    public @Nullable ChipStructs.AccessControlClusterExtensionEntry latestValue;
+    public @Nullable ChipStructs.AccessControlClusterAccessControlExtensionStruct latestValue;
     public Integer fabricIndex;
 
     public AccessControlClusterAccessControlExtensionChangedEvent(
         @Nullable Long adminNodeID,
         @Nullable Integer adminPasscodeID,
         Integer changeType,
-        @Nullable ChipStructs.AccessControlClusterExtensionEntry latestValue,
+        @Nullable ChipStructs.AccessControlClusterAccessControlExtensionStruct latestValue,
         Integer fabricIndex) {
       this.adminNodeID = adminNodeID;
       this.adminPasscodeID = adminPasscodeID;
@@ -341,6 +341,81 @@ public class ChipEventStructs {
       output.append("\n");
       output.append("\tplatformCode: ");
       output.append(platformCode);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class PowerSourceClusterWiredFaultChangeEvent {
+    public ArrayList<Object> current;
+    public ArrayList<Object> previous;
+
+    public PowerSourceClusterWiredFaultChangeEvent(
+        ArrayList<Object> current, ArrayList<Object> previous) {
+      this.current = current;
+      this.previous = previous;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("PowerSourceClusterWiredFaultChangeEvent {\n");
+      output.append("\tcurrent: ");
+      output.append(current);
+      output.append("\n");
+      output.append("\tprevious: ");
+      output.append(previous);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class PowerSourceClusterBatFaultChangeEvent {
+    public ArrayList<Object> current;
+    public ArrayList<Object> previous;
+
+    public PowerSourceClusterBatFaultChangeEvent(
+        ArrayList<Object> current, ArrayList<Object> previous) {
+      this.current = current;
+      this.previous = previous;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("PowerSourceClusterBatFaultChangeEvent {\n");
+      output.append("\tcurrent: ");
+      output.append(current);
+      output.append("\n");
+      output.append("\tprevious: ");
+      output.append(previous);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class PowerSourceClusterBatChargeFaultChangeEvent {
+    public ArrayList<Object> current;
+    public ArrayList<Object> previous;
+
+    public PowerSourceClusterBatChargeFaultChangeEvent(
+        ArrayList<Object> current, ArrayList<Object> previous) {
+      this.current = current;
+      this.previous = previous;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("PowerSourceClusterBatChargeFaultChangeEvent {\n");
+      output.append("\tcurrent: ");
+      output.append(current);
+      output.append("\n");
+      output.append("\tprevious: ");
+      output.append(previous);
       output.append("\n");
       output.append("}\n");
       return output.toString();
