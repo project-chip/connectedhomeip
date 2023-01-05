@@ -15,6 +15,7 @@
 
 #include "matter.h"
 #include <string>
+#include <vector>
 #include <unordered_map>
 
 #include "unify_node_state_monitor.hpp"
@@ -30,16 +31,17 @@ class cluster_interactor
   public:
   cluster_interactor(const device_translator &_translator,
                      matter_endpoint_builder &_endpoint_builder);
+                     
   std::optional<uint16_t> get_matter_type() const;
 
   void build_matter_cluster(
     const std::unordered_map<std::string, node_state_monitor::cluster>
       &clusters);
 
+  matter_endpoint_builder &endpoint_builder;
+
   private:
   const device_translator &translator;
-  matter_endpoint_builder &endpoint_builder;
-  std::vector<const char *> clusterlist;
 };
 }  // namespace unify::matter_bridge
 

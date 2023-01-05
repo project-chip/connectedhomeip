@@ -1,0 +1,21 @@
+{
+    "name": "Matter Data model",
+    "version": "Unify-dotdot-v1",
+    "helpers": [
+        "partials/helper.js",
+        "common/ListHelper.js",
+        "common/StringHelper.js",
+        "common/ChipTypesHelper.js",
+        "common/attributes/Accessors.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js",
+        "../unify-helper.js"
+    ],
+    "templates": [
+        {
+            "path": "matter_support_data_model.js.zapt",
+            "name": "Matter data model support",
+            "output": "matter_support_model.js"
+        }
+    ]
+}

@@ -9,7 +9,9 @@
         "common/attributes/Accessors.js",
         "templates/app/helper.js",
         "templates/chip/helper.js",
-        "unify-helper.js"
+        "unify-helper.js",
+        "device-type-mapper/device-type-helper.js",
+        "matter_support.js"
     ],
     "templates": [
         {
@@ -18,9 +20,9 @@
             "output": "ucl_dotdot_test.md"
         },
         {
-            "path": "unify_support_model.js.zapt",
-            "name": "Test UCL dotdot zap template",
-            "output": "unify_support_model.js"
+            "path": "device-type-mapper/matter_device_mapper.inc.zapt",
+            "name": "Type mappings for clusters values in Unify to Matter clusters",
+            "output": "device-type-mapper/matter_device_mapper.inc"
         }
     ]
 }

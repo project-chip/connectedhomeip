@@ -67,6 +67,8 @@ void matter_node_state_monitor::on_unify_node_added(
     matter_endpoint_builder builder;
     cluster_interactor cluster_interactor(matter_device_translator, builder);
     cluster_interactor.build_matter_cluster(ep.clusters);
+    // Emulator clusters, commands and attributes.
+    // emulate(builder);
     auto matter_device_type = cluster_interactor.get_matter_type();
     if (!matter_device_type.has_value()) {
       continue;

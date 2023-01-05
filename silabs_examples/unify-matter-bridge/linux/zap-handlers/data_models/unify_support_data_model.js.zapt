@@ -2,20 +2,20 @@ exports.model = {
 {{#zcl_clusters}} 
   {{#if (supportedMappedClusterCode code)}}
   {{code}}: {
-    name: "{{label}}",
+    name: "{{asUpperCamelCase label}}",
     commands: {
       {{#zcl_commands_source_server}}
       {{code}} : {
-        name : "{{label}}",
+        name : "{{asUpperCamelCase label}}",
         arguments : [
-          {{#zcl_command_arguments}}"{{label}}",{{/zcl_command_arguments}}
+          {{#zcl_command_arguments}}"{{asUpperCamelCase label}}",{{/zcl_command_arguments}}
         ],
       },
       {{/zcl_commands_source_server}}
     },
     attributes: {
       {{#zcl_attributes_server}}
-      {{code}} : "{{label}}",
+      {{code}} : "{{asUpperCamelCase label}}",
       {{/zcl_attributes_server}}
     },
   },  
@@ -24,15 +24,15 @@ exports.model = {
 
 enums: {
   {{#zcl_enums}}
-  "{{label}}" : [{{#zcl_enum_items}}"{{label}}",{{/zcl_enum_items}}]  , // {{parent.parent.code}}
+  "{{asUpperCamelCase label}}" : [{{#zcl_enum_items}}"{{asUpperCamelCase label}}",{{/zcl_enum_items}}]  , // {{parent.parent.code}}
   {{/zcl_enums}}
 },
 
 bitmaps: {
   {{#zcl_bitmaps}}
-  "{{label}}" : {
+  "{{asUpperCamelCase label}}" : {
     {{#zcl_bitmap_items}}
-    {{mask}} : "{{label}}",
+    {{mask}} : "{{asUpperCamelCase label}}",
     {{/zcl_bitmap_items}}
   },
   {{/zcl_bitmaps}}

@@ -1,0 +1,98 @@
+/******************************************************************************
+ * # License
+ * <b>Copyright 2021 Silicon Laboratories Inc. www.silabs.com</b>
+ ******************************************************************************
+ * The licensor of this software is Silicon Laboratories Inc. Your use of this
+ * software is governed by the terms of Silicon Labs Master Software License
+ * Agreement (MSLA) available at
+ * www.silabs.com/about-us/legal/master-software-license-agreement. This
+ * software is distributed to you in Source Code format and is governed by the
+ * sections of the MSLA applicable to Source Code.
+ *
+ *****************************************************************************/
+
+// This file is generated automatically. Don't try to change something here.
+// To add support for new clusters, modify addon-helper.js in uic/applications/matter_bridge/src/zap
+
+// Component include
+#include <matter_device_translator.hpp>
+
+// Standard library 
+#include <string>
+#include <optional>
+#include <unordered_map>
+
+// Matter includes
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Commands.h>
+
+// Cluster mapping Matter
+namespace chip {
+namespace app {
+namespace Clusters {
+
+static const std::unordered_map<std::string, chip::ClusterId> matter_cluster_id_map {
+    {{#zcl_clusters}}
+    { "{{asUpperCamelCase label}}", {{asUpperCamelCase label}}::Id}{{listComma this}}
+    {{/zcl_clusters}}
+};
+
+// Attribute mapping Matter
+// Attribute structure for each cluster
+{{#zcl_clusters}}
+{{#zcl_attributes_server}}
+{{#first}}
+namespace {{asUpperCamelCase parent.label}} {
+namespace Attributes {
+static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+{{/first}}
+{{#if (matterSupportedClusterAttribute parent.code code)}}
+    { "{{asUpperCamelCase label}}", {{asUpperCamelCase label}}::Id }{{listComma this}}
+{{/if}}
+{{#last}}
+};
+} // namespace Attributes
+} // namespace {{asUpperCamelCase parent.label}}
+{{/last}}
+{{/zcl_attributes_server}}
+{{/zcl_clusters}}
+
+// Global map of each clusters attributes
+static const std::unordered_map<std::string, std::unordered_map<std::string, chip::AttributeId>> matter_attribute_id_map {
+{{#zcl_clusters}}
+    { "{{asUpperCamelCase label}}",  {{asUpperCamelCase label}}::Attributes::matter_attribute_id_cluster_map }{{listComma this}}
+{{#last}}
+};
+{{/last}}
+{{/zcl_clusters}}
+
+
+// Command mapping Matter
+// Command structure for each cluster
+{{#zcl_clusters}}
+namespace {{asUpperCamelCase label}} {
+namespace Commands {
+static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+{{#zcl_commands}}
+{{#if (matterSupportedClusterCommand parent.code code)}}
+    { "{{asUpperCamelCase label}}", {{asUpperCamelCase label}}::Id }{{listComma this}}
+{{/if}}
+{{/zcl_commands}}
+};
+} // namespace Commands
+} // namespace {{asUpperCamelCase label}}
+{{/zcl_clusters}}
+
+// Global map of each clusters commands
+static const std::unordered_map<std::string, std::unordered_map<std::string, chip::CommandId>> matter_command_id_map {
+{{#zcl_clusters}}
+    { "{{asUpperCamelCase label}}",  {{asUpperCamelCase label}}::Commands::matter_command_id_cluster_map }{{listComma this}}
+{{#last}}
+};
+{{/last}}
+{{/zcl_clusters}}
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip

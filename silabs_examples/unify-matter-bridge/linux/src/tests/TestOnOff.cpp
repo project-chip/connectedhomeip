@@ -37,6 +37,15 @@ static int Initialize(void * context)
         "Off", "On", "Toggle", "OffWithEffect", "OnWithRecallGlobalScene", "OnWithTimedOff",
     };
 
+    auto & identify_cluster = ep.emplace_cluster("Identify");
+    identify_cluster.attributes.emplace("IdentifyTime");
+
+    auto & scenes_cluster = ep.emplace_cluster("Scenes");
+    scenes_cluster.attributes.emplace("SceneCount");
+
+    auto & groups_cluster = ep.emplace_cluster("Groups");
+    groups_cluster.attributes.emplace("NameSupport");
+
     return ctx->register_endpoint(ep);
 }
 

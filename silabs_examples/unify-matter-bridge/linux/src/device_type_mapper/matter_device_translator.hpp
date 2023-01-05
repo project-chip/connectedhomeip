@@ -28,7 +28,14 @@
 #ifndef MATTER_DEVICE_TRANSLATOR_HPP
 #define MATTER_DEVICE_TRANSLATOR_HPP
 
+// Matter library
 #include <app-common/zap-generated/ids/Clusters.h>
+#include "matter.h"
+
+// Unify library
+#include "unify_node_state_monitor.hpp"
+
+// Standard library
 #include <optional>
 #include <string>
 #include <vector>
@@ -47,7 +54,7 @@ public:
      * @return vector of possible device types sorted by most likely, or an empty
      * vector if none is found.
      */
-    virtual std::vector<chip::DeviceTypeId> get_device_types(const std::vector<const char *> & clusters) const;
+    virtual std::vector<chip::DeviceTypeId> get_device_types(const std::vector<EmberAfCluster> & translated_matter_clusters) const;
 
     /**
      * @brief It provides the matter device name from device id.
@@ -85,6 +92,14 @@ public:
      */
 
     virtual std::optional<chip::CommandId> get_command_id(const std::string & cluster_name, const std::string & command_name) const;
+
+    /**
+     * @brief Get the cluster id given a matter cluster name.
+     *
+     * @param matter_cluster_name
+     * @return std::optional containing the cluster id or std::nullopt_t.
+     */
+    virtual std::optional<chip::ClusterId> get_matter_cluster_id(const std::string & matter_cluster_name) const;
 
     virtual ~device_translator() = default;
 

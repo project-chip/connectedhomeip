@@ -1,0 +1,38 @@
+exports.model = {
+{{#zcl_clusters}} 
+  {{code}}: {
+    name: "{{asUpperCamelCase label}}",
+    commands: {
+      {{#zcl_commands}}
+      {{code}} : {
+        name : "{{asUpperCamelCase label}}",
+        arguments : [
+          {{#zcl_command_arguments}}"{{asUpperCamelCase label}}",{{/zcl_command_arguments}}
+        ],
+      },
+      {{/zcl_commands}}
+    },
+    attributes: {
+      {{#zcl_attributes_server}}
+      {{code}} : "{{asUpperCamelCase label}}",
+      {{/zcl_attributes_server}}
+    },
+  },
+{{/zcl_clusters}}
+
+enums: {
+  {{#zcl_enums}}
+  "{{asUpperCamelCase label}}" : [{{#zcl_enum_items}}"{{asUpperCamelCase label}}",{{/zcl_enum_items}}]  , // {{parent.parent.code}}
+  {{/zcl_enums}}
+},
+
+bitmaps: {
+  {{#zcl_bitmaps}}
+  "{{asUpperCamelCase label}}" : {
+    {{#zcl_bitmap_items}}
+    {{mask}} : "{{asUpperCamelCase label}}",
+    {{/zcl_bitmap_items}}
+  },
+  {{/zcl_bitmaps}}
+  }
+}

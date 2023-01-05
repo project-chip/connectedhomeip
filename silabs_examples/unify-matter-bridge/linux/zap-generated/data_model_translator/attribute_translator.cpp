@@ -37,37 +37,36 @@ using namespace unify::matter_bridge;
 #include "unify_accessors.hpp"
 
 // ZCL cluster revision
-constexpr uint16_t ZCL_IDENTIFY_REVISION                                = 4;
-constexpr uint16_t ZCL_ON_OFF_REVISION                                  = 4;
-constexpr uint16_t ZCL_LEVEL_CONTROL_REVISION                           = 5;
-constexpr uint16_t ZCL_DOOR_LOCK_REVISION                               = 6;
-constexpr uint16_t ZCL_BARRIER_CONTROL_REVISION                         = 0;
-constexpr uint16_t ZCL_THERMOSTAT_REVISION                              = 5;
-constexpr uint16_t ZCL_FAN_CONTROL_REVISION                             = 0;
+constexpr uint16_t ZCL_IDENTIFY_REVISION = 4;
+constexpr uint16_t ZCL_GROUPS_REVISION = 3;
+constexpr uint16_t ZCL_SCENES_REVISION = 4;
+constexpr uint16_t ZCL_ON_OFF_REVISION = 4;
+constexpr uint16_t ZCL_LEVEL_CONTROL_REVISION = 5;
+constexpr uint16_t ZCL_DOOR_LOCK_REVISION = 6;
+constexpr uint16_t ZCL_BARRIER_CONTROL_REVISION = 0;
+constexpr uint16_t ZCL_THERMOSTAT_REVISION = 5;
+constexpr uint16_t ZCL_FAN_CONTROL_REVISION = 0;
 constexpr uint16_t ZCL_THERMOSTAT_USER_INTERFACE_CONFIGURATION_REVISION = 0;
-constexpr uint16_t ZCL_COLOR_CONTROL_REVISION                           = 5;
-constexpr uint16_t ZCL_ILLUMINANCE_MEASUREMENT_REVISION                 = 3;
-constexpr uint16_t ZCL_TEMPERATURE_MEASUREMENT_REVISION                 = 0;
-constexpr uint16_t ZCL_PRESSURE_MEASUREMENT_REVISION                    = 3;
-constexpr uint16_t ZCL_RELATIVE_HUMIDITY_MEASUREMENT_REVISION           = 3;
-constexpr uint16_t ZCL_OCCUPANCY_SENSING_REVISION                       = 2;
-constexpr uint16_t ZCL_ELECTRICAL_MEASUREMENT_REVISION                  = 3;
+constexpr uint16_t ZCL_COLOR_CONTROL_REVISION = 5;
+constexpr uint16_t ZCL_ILLUMINANCE_MEASUREMENT_REVISION = 3;
+constexpr uint16_t ZCL_TEMPERATURE_MEASUREMENT_REVISION = 0;
+constexpr uint16_t ZCL_PRESSURE_MEASUREMENT_REVISION = 3;
+constexpr uint16_t ZCL_RELATIVE_HUMIDITY_MEASUREMENT_REVISION = 3;
+constexpr uint16_t ZCL_OCCUPANCY_SENSING_REVISION = 2;
+constexpr uint16_t ZCL_ELECTRICAL_MEASUREMENT_REVISION = 3;
 
 CHIP_ERROR
-IdentifyAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+IdentifyAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
 {
     namespace MN = chip::app::Clusters::Identify::Attributes;
     namespace UN = unify::matter_bridge::Identify::Attributes;
-    if (aPath.mClusterId != Clusters::Identify::Id)
-    {
+    if (aPath.mClusterId != Clusters::Identify::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
+    try {
+        switch (aPath.mAttributeId) {
         case MN::IdentifyTime::Id: { // type is int16u
             MN::IdentifyTime::TypeInfo::Type value;
             UN::IdentifyTime::Get(atr_path, value);
@@ -89,42 +88,38 @@ IdentifyAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribute
             return aEncoder.Encode(value);
         }
         }
-    } catch (const std::out_of_range & e)
-    {
+    } catch (const std::out_of_range& e) {
         sl_log_info(LOG_TAG,
-                    "The request attribute Path for endpoint [%i] is not found in the attribute state "
-                    "container: %s\n",
-                    atr_path.mEndpointId, e.what());
+            "The request attribute Path for endpoint [%i] is not found in the attribute state "
+            "container: %s\n",
+            atr_path.mEndpointId, e.what());
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR IdentifyAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR IdentifyAttributeAccess::Write(const ConcreteDataAttributePath& aPath, AttributeValueDecoder& aDecoder)
 {
     using namespace chip::app::Clusters::Identify;
 
-    if (aPath.mClusterId != Clusters::Identify::Id)
-    {
+    if (aPath.mClusterId != Clusters::Identify::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
-    if (!unify_node)
-    {
+    if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
 
     std::string attribute_name;
     nlohmann::json jsn;
 
-    switch (aPath.mAttributeId)
-    {
+    switch (aPath.mAttributeId) {
     case Attributes::IdentifyTime::Id: {
 
         Attributes::IdentifyTime::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "IdentifyTime";
         break;
     }
@@ -136,11 +131,9 @@ CHIP_ERROR IdentifyAttributeAccess::Write(const ConcreteDataAttributePath & aPat
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty())
-    {
+    if (!attribute_name.empty()) {
         std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/Identify/Attributes/" + attribute_name + "/Desired";
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/Identify/Attributes/" + attribute_name + "/Desired";
         payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
@@ -149,38 +142,34 @@ CHIP_ERROR IdentifyAttributeAccess::Write(const ConcreteDataAttributePath & aPat
     return CHIP_ERROR_NO_MESSAGE_HANDLER;
 }
 
-void IdentifyAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                               const std::string & attribute, const nlohmann::json & unify_value)
+void IdentifyAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster,
+    const std::string& attribute, const nlohmann::json& unify_value)
 {
     namespace MN = chip::app::Clusters::Identify::Attributes;
     namespace UN = unify::matter_bridge::Identify::Attributes;
 
     auto cluster_id = device_translator::instance().get_cluster_id(cluster);
 
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::Identify::Id))
-    {
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::Identify::Id)) {
         return;
     }
 
     // get attribute id
     auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
 
-    if (!attribute_id.has_value())
-    {
+    if (!attribute_id.has_value()) {
         return;
     }
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::Identify::Id, attribute_id.value());
-    switch (attribute_id.value())
-    {
+    switch (attribute_id.value()) {
     // type is int16u
     case MN::IdentifyTime::Id: {
-        using T                = MN::IdentifyTime::TypeInfo::Type;
+        using T = MN::IdentifyTime::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "IdentifyTime attribute value is %s", unify_value.dump().c_str());
             UN::IdentifyTime::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Identify::Id, MN::IdentifyTime::Id);
@@ -191,20 +180,329 @@ void IdentifyAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
 }
 
 CHIP_ERROR
-OnOffAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+GroupsAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
 {
-    namespace MN = chip::app::Clusters::OnOff::Attributes;
-    namespace UN = unify::matter_bridge::OnOff::Attributes;
-    if (aPath.mClusterId != Clusters::OnOff::Id)
-    {
+    namespace MN = chip::app::Clusters::Groups::Attributes;
+    namespace UN = unify::matter_bridge::Groups::Attributes;
+    if (aPath.mClusterId != Clusters::Groups::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
+    try {
+        switch (aPath.mAttributeId) {
+        case MN::NameSupport::Id: { // type is bitmap8
+            MN::NameSupport::TypeInfo::Type value;
+            UN::NameSupport::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::FeatureMap::Id: { // type is bitmap32
+            MN::FeatureMap::TypeInfo::Type value;
+            value = get_feature_map_settings(aPath);
+            return aEncoder.Encode(value);
+        }
+        case MN::ClusterRevision::Id: { // type is int16u
+            MN::ClusterRevision::TypeInfo::Type value;
+            value = ZCL_GROUPS_REVISION;
+            return aEncoder.Encode(value);
+        }
+        }
+    } catch (const std::out_of_range& e) {
+        sl_log_info(LOG_TAG,
+            "The request attribute Path for endpoint [%i] is not found in the attribute state "
+            "container: %s\n",
+            atr_path.mEndpointId, e.what());
+        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GroupsAttributeAccess::Write(const ConcreteDataAttributePath& aPath, AttributeValueDecoder& aDecoder)
+{
+    using namespace chip::app::Clusters::Groups;
+
+    if (aPath.mClusterId != Clusters::Groups::Id) {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
+
+    if (!unify_node) {
+        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+    }
+
+    std::string attribute_name;
+    nlohmann::json jsn;
+
+    switch (aPath.mAttributeId) {
+        // NameSupport is not supported by UCL
+        // GeneratedCommandList is not supported by UCL
+        // AcceptedCommandList is not supported by UCL
+        // AttributeList is not supported by UCL
+        // FeatureMap is not supported by UCL
+        // ClusterRevision is not supported by UCL
+    }
+
+    if (!attribute_name.empty()) {
+        std::string payload_str;
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/Groups/Attributes/" + attribute_name + "/Desired";
+        payload_str = jsn.dump();
+        m_unify_mqtt.Publish(topic, payload_str, true);
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_NO_MESSAGE_HANDLER;
+}
+
+void GroupsAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster,
+    const std::string& attribute, const nlohmann::json& unify_value)
+{
+    namespace MN = chip::app::Clusters::Groups::Attributes;
+    namespace UN = unify::matter_bridge::Groups::Attributes;
+
+    auto cluster_id = device_translator::instance().get_cluster_id(cluster);
+
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::Groups::Id)) {
+        return;
+    }
+
+    // get attribute id
+    auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
+
+    if (!attribute_id.has_value()) {
+        return;
+    }
+
+    chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
+    ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::Groups::Id, attribute_id.value());
+    switch (attribute_id.value()) {
+    // type is bitmap8
+    case MN::NameSupport::Id: {
+        using T = MN::NameSupport::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value()) {
+            sl_log_debug(LOG_TAG, "NameSupport attribute value is %s", unify_value.dump().c_str());
+            UN::NameSupport::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Groups::Id, MN::NameSupport::Id);
+        }
+        break;
+    }
+    }
+}
+
+CHIP_ERROR
+ScenesAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
+{
+    namespace MN = chip::app::Clusters::Scenes::Attributes;
+    namespace UN = unify::matter_bridge::Scenes::Attributes;
+    if (aPath.mClusterId != Clusters::Scenes::Id) {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+    try {
+        switch (aPath.mAttributeId) {
+        case MN::SceneCount::Id: { // type is int8u
+            MN::SceneCount::TypeInfo::Type value;
+            UN::SceneCount::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::CurrentScene::Id: { // type is int8u
+            MN::CurrentScene::TypeInfo::Type value;
+            UN::CurrentScene::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::CurrentGroup::Id: { // type is group_id
+            MN::CurrentGroup::TypeInfo::Type value;
+            UN::CurrentGroup::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::SceneValid::Id: { // type is boolean
+            MN::SceneValid::TypeInfo::Type value;
+            UN::SceneValid::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::NameSupport::Id: { // type is bitmap8
+            MN::NameSupport::TypeInfo::Type value;
+            UN::NameSupport::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::LastConfiguredBy::Id: { // type is node_id
+            MN::LastConfiguredBy::TypeInfo::Type value;
+            UN::LastConfiguredBy::Get(atr_path, value);
+            return aEncoder.Encode(value);
+        }
+        case MN::FeatureMap::Id: { // type is bitmap32
+            MN::FeatureMap::TypeInfo::Type value;
+            value = get_feature_map_settings(aPath);
+            return aEncoder.Encode(value);
+        }
+        case MN::ClusterRevision::Id: { // type is int16u
+            MN::ClusterRevision::TypeInfo::Type value;
+            value = ZCL_SCENES_REVISION;
+            return aEncoder.Encode(value);
+        }
+        }
+    } catch (const std::out_of_range& e) {
+        sl_log_info(LOG_TAG,
+            "The request attribute Path for endpoint [%i] is not found in the attribute state "
+            "container: %s\n",
+            atr_path.mEndpointId, e.what());
+        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ScenesAttributeAccess::Write(const ConcreteDataAttributePath& aPath, AttributeValueDecoder& aDecoder)
+{
+    using namespace chip::app::Clusters::Scenes;
+
+    if (aPath.mClusterId != Clusters::Scenes::Id) {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
+
+    if (!unify_node) {
+        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+    }
+
+    std::string attribute_name;
+    nlohmann::json jsn;
+
+    switch (aPath.mAttributeId) {
+        // SceneCount is not supported by UCL
+        // CurrentScene is not supported by UCL
+        // CurrentGroup is not supported by UCL
+        // SceneValid is not supported by UCL
+        // NameSupport is not supported by UCL
+        // LastConfiguredBy is not supported by UCL
+        // GeneratedCommandList is not supported by UCL
+        // AcceptedCommandList is not supported by UCL
+        // AttributeList is not supported by UCL
+        // FeatureMap is not supported by UCL
+        // ClusterRevision is not supported by UCL
+    }
+
+    if (!attribute_name.empty()) {
+        std::string payload_str;
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/Scenes/Attributes/" + attribute_name + "/Desired";
+        payload_str = jsn.dump();
+        m_unify_mqtt.Publish(topic, payload_str, true);
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_NO_MESSAGE_HANDLER;
+}
+
+void ScenesAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster,
+    const std::string& attribute, const nlohmann::json& unify_value)
+{
+    namespace MN = chip::app::Clusters::Scenes::Attributes;
+    namespace UN = unify::matter_bridge::Scenes::Attributes;
+
+    auto cluster_id = device_translator::instance().get_cluster_id(cluster);
+
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::Scenes::Id)) {
+        return;
+    }
+
+    // get attribute id
+    auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
+
+    if (!attribute_id.has_value()) {
+        return;
+    }
+
+    chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
+    ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::Scenes::Id, attribute_id.value());
+    switch (attribute_id.value()) {
+    // type is int8u
+    case MN::SceneCount::Id: {
+        using T = MN::SceneCount::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value()) {
+            sl_log_debug(LOG_TAG, "SceneCount attribute value is %s", unify_value.dump().c_str());
+            UN::SceneCount::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::SceneCount::Id);
+        }
+        break;
+    }
+        // type is int8u
+    case MN::CurrentScene::Id: {
+        using T = MN::CurrentScene::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value()) {
+            sl_log_debug(LOG_TAG, "CurrentScene attribute value is %s", unify_value.dump().c_str());
+            UN::CurrentScene::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::CurrentScene::Id);
+        }
+        break;
+    }
+        // type is group_id
+    case MN::CurrentGroup::Id: {
+        using T = MN::CurrentGroup::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value()) {
+            sl_log_debug(LOG_TAG, "CurrentGroup attribute value is %s", unify_value.dump().c_str());
+            UN::CurrentGroup::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::CurrentGroup::Id);
+        }
+        break;
+    }
+        // type is boolean
+    case MN::SceneValid::Id: {
+        using T = MN::SceneValid::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value()) {
+            sl_log_debug(LOG_TAG, "SceneValid attribute value is %s", unify_value.dump().c_str());
+            UN::SceneValid::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::SceneValid::Id);
+        }
+        break;
+    }
+        // type is bitmap8
+    case MN::NameSupport::Id: {
+        using T = MN::NameSupport::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value()) {
+            sl_log_debug(LOG_TAG, "NameSupport attribute value is %s", unify_value.dump().c_str());
+            UN::NameSupport::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::NameSupport::Id);
+        }
+        break;
+    }
+        // type is node_id
+    case MN::LastConfiguredBy::Id: {
+        using T = MN::LastConfiguredBy::TypeInfo::Type;
+        std::optional<T> value = from_json<T>(unify_value);
+
+        if (value.has_value()) {
+            sl_log_debug(LOG_TAG, "LastConfiguredBy attribute value is %s", unify_value.dump().c_str());
+            UN::LastConfiguredBy::Set(attrpath, value.value());
+            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::LastConfiguredBy::Id);
+        }
+        break;
+    }
+    }
+}
+
+CHIP_ERROR
+OnOffAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
+{
+    namespace MN = chip::app::Clusters::OnOff::Attributes;
+    namespace UN = unify::matter_bridge::OnOff::Attributes;
+    if (aPath.mClusterId != Clusters::OnOff::Id) {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+    try {
+        switch (aPath.mAttributeId) {
         case MN::OnOff::Id: { // type is boolean
             MN::OnOff::TypeInfo::Type value;
             UN::OnOff::Get(atr_path, value);
@@ -241,44 +539,40 @@ OnOffAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeVal
             return aEncoder.Encode(value);
         }
         }
-    } catch (const std::out_of_range & e)
-    {
+    } catch (const std::out_of_range& e) {
         sl_log_info(LOG_TAG,
-                    "The request attribute Path for endpoint [%i] is not found in the attribute state "
-                    "container: %s\n",
-                    atr_path.mEndpointId, e.what());
+            "The request attribute Path for endpoint [%i] is not found in the attribute state "
+            "container: %s\n",
+            atr_path.mEndpointId, e.what());
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OnOffAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR OnOffAttributeAccess::Write(const ConcreteDataAttributePath& aPath, AttributeValueDecoder& aDecoder)
 {
     using namespace chip::app::Clusters::OnOff;
 
-    if (aPath.mClusterId != Clusters::OnOff::Id)
-    {
+    if (aPath.mClusterId != Clusters::OnOff::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
-    if (!unify_node)
-    {
+    if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
 
     std::string attribute_name;
     nlohmann::json jsn;
 
-    switch (aPath.mAttributeId)
-    {
+    switch (aPath.mAttributeId) {
     // OnOff is not supported by UCL
     // GlobalSceneControl is not supported by UCL
     case Attributes::OnTime::Id: {
 
         Attributes::OnTime::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "OnTime";
         break;
     }
@@ -286,7 +580,7 @@ CHIP_ERROR OnOffAttributeAccess::Write(const ConcreteDataAttributePath & aPath, 
 
         Attributes::OffWaitTime::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "OffWaitTime";
         break;
     }
@@ -294,7 +588,7 @@ CHIP_ERROR OnOffAttributeAccess::Write(const ConcreteDataAttributePath & aPath, 
 
         Attributes::StartUpOnOff::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "StartUpOnOff";
         break;
     }
@@ -305,11 +599,9 @@ CHIP_ERROR OnOffAttributeAccess::Write(const ConcreteDataAttributePath & aPath, 
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty())
-    {
+    if (!attribute_name.empty()) {
         std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/OnOff/Attributes/" + attribute_name + "/Desired";
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/OnOff/Attributes/" + attribute_name + "/Desired";
         payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
@@ -318,38 +610,34 @@ CHIP_ERROR OnOffAttributeAccess::Write(const ConcreteDataAttributePath & aPath, 
     return CHIP_ERROR_NO_MESSAGE_HANDLER;
 }
 
-void OnOffAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster, const std::string & attribute,
-                                            const nlohmann::json & unify_value)
+void OnOffAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster, const std::string& attribute,
+    const nlohmann::json& unify_value)
 {
     namespace MN = chip::app::Clusters::OnOff::Attributes;
     namespace UN = unify::matter_bridge::OnOff::Attributes;
 
     auto cluster_id = device_translator::instance().get_cluster_id(cluster);
 
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::OnOff::Id))
-    {
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::OnOff::Id)) {
         return;
     }
 
     // get attribute id
     auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
 
-    if (!attribute_id.has_value())
-    {
+    if (!attribute_id.has_value()) {
         return;
     }
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
-    ConcreteAttributePath attrpath        = ConcreteAttributePath(node_matter_endpoint, Clusters::OnOff::Id, attribute_id.value());
-    switch (attribute_id.value())
-    {
+    ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::OnOff::Id, attribute_id.value());
+    switch (attribute_id.value()) {
     // type is boolean
     case MN::OnOff::Id: {
-        using T                = MN::OnOff::TypeInfo::Type;
+        using T = MN::OnOff::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OnOff attribute value is %s", unify_value.dump().c_str());
             UN::OnOff::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::OnOff::Id);
@@ -358,11 +646,10 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
     }
         // type is boolean
     case MN::GlobalSceneControl::Id: {
-        using T                = MN::GlobalSceneControl::TypeInfo::Type;
+        using T = MN::GlobalSceneControl::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "GlobalSceneControl attribute value is %s", unify_value.dump().c_str());
             UN::GlobalSceneControl::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::GlobalSceneControl::Id);
@@ -371,11 +658,10 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
     }
         // type is int16u
     case MN::OnTime::Id: {
-        using T                = MN::OnTime::TypeInfo::Type;
+        using T = MN::OnTime::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OnTime attribute value is %s", unify_value.dump().c_str());
             UN::OnTime::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::OnTime::Id);
@@ -384,11 +670,10 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
     }
         // type is int16u
     case MN::OffWaitTime::Id: {
-        using T                = MN::OffWaitTime::TypeInfo::Type;
+        using T = MN::OffWaitTime::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OffWaitTime attribute value is %s", unify_value.dump().c_str());
             UN::OffWaitTime::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::OffWaitTime::Id);
@@ -397,11 +682,10 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
     }
         // type is OnOffStartUpOnOff
     case MN::StartUpOnOff::Id: {
-        using T                = MN::StartUpOnOff::TypeInfo::Type;
+        using T = MN::StartUpOnOff::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "StartUpOnOff attribute value is %s", unify_value.dump().c_str());
             UN::StartUpOnOff::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OnOff::Id, MN::StartUpOnOff::Id);
@@ -412,20 +696,17 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint * ep, const s
 }
 
 CHIP_ERROR
-LevelControlAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+LevelControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
 {
     namespace MN = chip::app::Clusters::LevelControl::Attributes;
     namespace UN = unify::matter_bridge::LevelControl::Attributes;
-    if (aPath.mClusterId != Clusters::LevelControl::Id)
-    {
+    if (aPath.mClusterId != Clusters::LevelControl::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
+    try {
+        switch (aPath.mAttributeId) {
         case MN::CurrentLevel::Id: { // type is int8u
             MN::CurrentLevel::TypeInfo::Type value;
             UN::CurrentLevel::Get(atr_path, value);
@@ -507,37 +788,33 @@ LevelControlAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attri
             return aEncoder.Encode(value);
         }
         }
-    } catch (const std::out_of_range & e)
-    {
+    } catch (const std::out_of_range& e) {
         sl_log_info(LOG_TAG,
-                    "The request attribute Path for endpoint [%i] is not found in the attribute state "
-                    "container: %s\n",
-                    atr_path.mEndpointId, e.what());
+            "The request attribute Path for endpoint [%i] is not found in the attribute state "
+            "container: %s\n",
+            atr_path.mEndpointId, e.what());
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LevelControlAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR LevelControlAttributeAccess::Write(const ConcreteDataAttributePath& aPath, AttributeValueDecoder& aDecoder)
 {
     using namespace chip::app::Clusters::LevelControl;
 
-    if (aPath.mClusterId != Clusters::LevelControl::Id)
-    {
+    if (aPath.mClusterId != Clusters::LevelControl::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
-    if (!unify_node)
-    {
+    if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
 
     std::string attribute_name;
     nlohmann::json jsn;
 
-    switch (aPath.mAttributeId)
-    {
+    switch (aPath.mAttributeId) {
     // CurrentLevel is not supported by UCL
     // RemainingTime is not supported by UCL
     // MinLevel is not supported by UCL
@@ -549,7 +826,7 @@ CHIP_ERROR LevelControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::Options::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "Options";
         break;
     }
@@ -557,7 +834,7 @@ CHIP_ERROR LevelControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::OnOffTransitionTime::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "OnOffTransitionTime";
         break;
     }
@@ -565,7 +842,7 @@ CHIP_ERROR LevelControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::OnLevel::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "OnLevel";
         break;
     }
@@ -573,7 +850,7 @@ CHIP_ERROR LevelControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::OnTransitionTime::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "OnTransitionTime";
         break;
     }
@@ -581,7 +858,7 @@ CHIP_ERROR LevelControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::OffTransitionTime::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "OffTransitionTime";
         break;
     }
@@ -589,7 +866,7 @@ CHIP_ERROR LevelControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::DefaultMoveRate::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "DefaultMoveRate";
         break;
     }
@@ -597,7 +874,7 @@ CHIP_ERROR LevelControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::StartUpCurrentLevel::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "StartUpCurrentLevel";
         break;
     }
@@ -608,11 +885,9 @@ CHIP_ERROR LevelControlAttributeAccess::Write(const ConcreteDataAttributePath & 
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty())
-    {
+    if (!attribute_name.empty()) {
         std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/Level/Attributes/" + attribute_name + "/Desired";
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/Level/Attributes/" + attribute_name + "/Desired";
         payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
@@ -621,38 +896,34 @@ CHIP_ERROR LevelControlAttributeAccess::Write(const ConcreteDataAttributePath & 
     return CHIP_ERROR_NO_MESSAGE_HANDLER;
 }
 
-void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                                   const std::string & attribute, const nlohmann::json & unify_value)
+void LevelControlAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster,
+    const std::string& attribute, const nlohmann::json& unify_value)
 {
     namespace MN = chip::app::Clusters::LevelControl::Attributes;
     namespace UN = unify::matter_bridge::LevelControl::Attributes;
 
     auto cluster_id = device_translator::instance().get_cluster_id(cluster);
 
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::LevelControl::Id))
-    {
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::LevelControl::Id)) {
         return;
     }
 
     // get attribute id
     auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
 
-    if (!attribute_id.has_value())
-    {
+    if (!attribute_id.has_value()) {
         return;
     }
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::LevelControl::Id, attribute_id.value());
-    switch (attribute_id.value())
-    {
+    switch (attribute_id.value()) {
     // type is int8u
     case MN::CurrentLevel::Id: {
-        using T                = MN::CurrentLevel::TypeInfo::Type;
+        using T = MN::CurrentLevel::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CurrentLevel attribute value is %s", unify_value.dump().c_str());
             UN::CurrentLevel::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::CurrentLevel::Id);
@@ -661,11 +932,10 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::RemainingTime::Id: {
-        using T                = MN::RemainingTime::TypeInfo::Type;
+        using T = MN::RemainingTime::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RemainingTime attribute value is %s", unify_value.dump().c_str());
             UN::RemainingTime::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::RemainingTime::Id);
@@ -674,11 +944,10 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int8u
     case MN::MinLevel::Id: {
-        using T                = MN::MinLevel::TypeInfo::Type;
+        using T = MN::MinLevel::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinLevel attribute value is %s", unify_value.dump().c_str());
             UN::MinLevel::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::MinLevel::Id);
@@ -687,11 +956,10 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int8u
     case MN::MaxLevel::Id: {
-        using T                = MN::MaxLevel::TypeInfo::Type;
+        using T = MN::MaxLevel::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxLevel attribute value is %s", unify_value.dump().c_str());
             UN::MaxLevel::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::MaxLevel::Id);
@@ -700,11 +968,10 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::CurrentFrequency::Id: {
-        using T                = MN::CurrentFrequency::TypeInfo::Type;
+        using T = MN::CurrentFrequency::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CurrentFrequency attribute value is %s", unify_value.dump().c_str());
             UN::CurrentFrequency::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::CurrentFrequency::Id);
@@ -713,11 +980,10 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::MinFrequency::Id: {
-        using T                = MN::MinFrequency::TypeInfo::Type;
+        using T = MN::MinFrequency::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinFrequency attribute value is %s", unify_value.dump().c_str());
             UN::MinFrequency::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::MinFrequency::Id);
@@ -726,11 +992,10 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::MaxFrequency::Id: {
-        using T                = MN::MaxFrequency::TypeInfo::Type;
+        using T = MN::MaxFrequency::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxFrequency attribute value is %s", unify_value.dump().c_str());
             UN::MaxFrequency::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::MaxFrequency::Id);
@@ -739,11 +1004,10 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is LevelControlOptions
     case MN::Options::Id: {
-        using T                = MN::Options::TypeInfo::Type;
+        using T = MN::Options::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Options attribute value is %s", unify_value.dump().c_str());
             UN::Options::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::Options::Id);
@@ -752,11 +1016,10 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::OnOffTransitionTime::Id: {
-        using T                = MN::OnOffTransitionTime::TypeInfo::Type;
+        using T = MN::OnOffTransitionTime::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OnOffTransitionTime attribute value is %s", unify_value.dump().c_str());
             UN::OnOffTransitionTime::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::OnOffTransitionTime::Id);
@@ -765,11 +1028,10 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int8u
     case MN::OnLevel::Id: {
-        using T                = MN::OnLevel::TypeInfo::Type;
+        using T = MN::OnLevel::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OnLevel attribute value is %s", unify_value.dump().c_str());
             UN::OnLevel::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::OnLevel::Id);
@@ -778,11 +1040,10 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::OnTransitionTime::Id: {
-        using T                = MN::OnTransitionTime::TypeInfo::Type;
+        using T = MN::OnTransitionTime::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OnTransitionTime attribute value is %s", unify_value.dump().c_str());
             UN::OnTransitionTime::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::OnTransitionTime::Id);
@@ -791,11 +1052,10 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::OffTransitionTime::Id: {
-        using T                = MN::OffTransitionTime::TypeInfo::Type;
+        using T = MN::OffTransitionTime::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OffTransitionTime attribute value is %s", unify_value.dump().c_str());
             UN::OffTransitionTime::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::OffTransitionTime::Id);
@@ -804,11 +1064,10 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int8u
     case MN::DefaultMoveRate::Id: {
-        using T                = MN::DefaultMoveRate::TypeInfo::Type;
+        using T = MN::DefaultMoveRate::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DefaultMoveRate attribute value is %s", unify_value.dump().c_str());
             UN::DefaultMoveRate::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::DefaultMoveRate::Id);
@@ -817,11 +1076,10 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int8u
     case MN::StartUpCurrentLevel::Id: {
-        using T                = MN::StartUpCurrentLevel::TypeInfo::Type;
+        using T = MN::StartUpCurrentLevel::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "StartUpCurrentLevel attribute value is %s", unify_value.dump().c_str());
             UN::StartUpCurrentLevel::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::LevelControl::Id, MN::StartUpCurrentLevel::Id);
@@ -832,20 +1090,17 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
 }
 
 CHIP_ERROR
-DoorLockAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+DoorLockAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
 {
     namespace MN = chip::app::Clusters::DoorLock::Attributes;
     namespace UN = unify::matter_bridge::DoorLock::Attributes;
-    if (aPath.mClusterId != Clusters::DoorLock::Id)
-    {
+    if (aPath.mClusterId != Clusters::DoorLock::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
+    try {
+        switch (aPath.mAttributeId) {
         case MN::LockState::Id: { // type is DlLockState
             MN::LockState::TypeInfo::Type value;
             UN::LockState::Get(atr_path, value);
@@ -1037,37 +1292,33 @@ DoorLockAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribute
             return aEncoder.Encode(value);
         }
         }
-    } catch (const std::out_of_range & e)
-    {
+    } catch (const std::out_of_range& e) {
         sl_log_info(LOG_TAG,
-                    "The request attribute Path for endpoint [%i] is not found in the attribute state "
-                    "container: %s\n",
-                    atr_path.mEndpointId, e.what());
+            "The request attribute Path for endpoint [%i] is not found in the attribute state "
+            "container: %s\n",
+            atr_path.mEndpointId, e.what());
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath& aPath, AttributeValueDecoder& aDecoder)
 {
     using namespace chip::app::Clusters::DoorLock;
 
-    if (aPath.mClusterId != Clusters::DoorLock::Id)
-    {
+    if (aPath.mClusterId != Clusters::DoorLock::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
-    if (!unify_node)
-    {
+    if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
 
     std::string attribute_name;
     nlohmann::json jsn;
 
-    switch (aPath.mAttributeId)
-    {
+    switch (aPath.mAttributeId) {
     // LockState is not supported by UCL
     // LockType is not supported by UCL
     // ActuatorEnabled is not supported by UCL
@@ -1076,7 +1327,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
 
         Attributes::DoorOpenEvents::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "DoorOpenEvents";
         break;
     }
@@ -1084,7 +1335,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
 
         Attributes::DoorClosedEvents::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "DoorClosedEvents";
         break;
     }
@@ -1092,7 +1343,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
 
         Attributes::OpenPeriod::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "OpenPeriod";
         break;
     }
@@ -1112,7 +1363,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
 
         Attributes::Language::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "Language";
         break;
     }
@@ -1120,7 +1371,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
 
         Attributes::LEDSettings::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "LEDSettings";
         break;
     }
@@ -1128,7 +1379,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
 
         Attributes::AutoRelockTime::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "AutoRelockTime";
         break;
     }
@@ -1136,7 +1387,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
 
         Attributes::SoundVolume::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "SoundVolume";
         break;
     }
@@ -1144,7 +1395,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
 
         Attributes::OperatingMode::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "OperatingMode";
         break;
     }
@@ -1154,7 +1405,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
 
         Attributes::EnableLocalProgramming::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "EnableLocalProgramming";
         break;
     }
@@ -1162,7 +1413,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
 
         Attributes::EnableOneTouchLocking::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "EnableOneTouchLocking";
         break;
     }
@@ -1170,7 +1421,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
 
         Attributes::EnableInsideStatusLED::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "EnableInsideStatusLED";
         break;
     }
@@ -1178,7 +1429,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
 
         Attributes::EnablePrivacyModeButton::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "EnablePrivacyModeButton";
         break;
     }
@@ -1186,7 +1437,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
 
         Attributes::WrongCodeEntryLimit::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "WrongCodeEntryLimit";
         break;
     }
@@ -1194,7 +1445,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
 
         Attributes::UserCodeTemporaryDisableTime::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "UserCodeTemporaryDisableTime";
         break;
     }
@@ -1202,7 +1453,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
 
         Attributes::SendPINOverTheAir::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "SendPINOverTheAir";
         break;
     }
@@ -1210,7 +1461,7 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
 
         Attributes::RequirePINforRemoteOperation::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "RequirePINforRFOperation";
         break;
     }
@@ -1221,11 +1472,9 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty())
-    {
+    if (!attribute_name.empty()) {
         std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/DoorLock/Attributes/" + attribute_name + "/Desired";
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/DoorLock/Attributes/" + attribute_name + "/Desired";
         payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
@@ -1234,38 +1483,34 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath & aPat
     return CHIP_ERROR_NO_MESSAGE_HANDLER;
 }
 
-void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                               const std::string & attribute, const nlohmann::json & unify_value)
+void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster,
+    const std::string& attribute, const nlohmann::json& unify_value)
 {
     namespace MN = chip::app::Clusters::DoorLock::Attributes;
     namespace UN = unify::matter_bridge::DoorLock::Attributes;
 
     auto cluster_id = device_translator::instance().get_cluster_id(cluster);
 
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::DoorLock::Id))
-    {
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::DoorLock::Id)) {
         return;
     }
 
     // get attribute id
     auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
 
-    if (!attribute_id.has_value())
-    {
+    if (!attribute_id.has_value()) {
         return;
     }
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::DoorLock::Id, attribute_id.value());
-    switch (attribute_id.value())
-    {
+    switch (attribute_id.value()) {
     // type is DlLockState
     case MN::LockState::Id: {
-        using T                = MN::LockState::TypeInfo::Type;
+        using T = MN::LockState::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "LockState attribute value is %s", unify_value.dump().c_str());
             UN::LockState::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::LockState::Id);
@@ -1274,11 +1519,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is DlLockType
     case MN::LockType::Id: {
-        using T                = MN::LockType::TypeInfo::Type;
+        using T = MN::LockType::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "LockType attribute value is %s", unify_value.dump().c_str());
             UN::LockType::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::LockType::Id);
@@ -1287,11 +1531,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is boolean
     case MN::ActuatorEnabled::Id: {
-        using T                = MN::ActuatorEnabled::TypeInfo::Type;
+        using T = MN::ActuatorEnabled::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActuatorEnabled attribute value is %s", unify_value.dump().c_str());
             UN::ActuatorEnabled::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::ActuatorEnabled::Id);
@@ -1300,11 +1543,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is DlDoorState
     case MN::DoorState::Id: {
-        using T                = MN::DoorState::TypeInfo::Type;
+        using T = MN::DoorState::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DoorState attribute value is %s", unify_value.dump().c_str());
             UN::DoorState::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::DoorState::Id);
@@ -1313,11 +1555,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is int32u
     case MN::DoorOpenEvents::Id: {
-        using T                = MN::DoorOpenEvents::TypeInfo::Type;
+        using T = MN::DoorOpenEvents::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DoorOpenEvents attribute value is %s", unify_value.dump().c_str());
             UN::DoorOpenEvents::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::DoorOpenEvents::Id);
@@ -1326,11 +1567,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is int32u
     case MN::DoorClosedEvents::Id: {
-        using T                = MN::DoorClosedEvents::TypeInfo::Type;
+        using T = MN::DoorClosedEvents::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DoorClosedEvents attribute value is %s", unify_value.dump().c_str());
             UN::DoorClosedEvents::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::DoorClosedEvents::Id);
@@ -1339,11 +1579,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is int16u
     case MN::OpenPeriod::Id: {
-        using T                = MN::OpenPeriod::TypeInfo::Type;
+        using T = MN::OpenPeriod::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OpenPeriod attribute value is %s", unify_value.dump().c_str());
             UN::OpenPeriod::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::OpenPeriod::Id);
@@ -1352,25 +1591,23 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is int16u
     case MN::NumberOfTotalUsersSupported::Id: {
-        using T                = MN::NumberOfTotalUsersSupported::TypeInfo::Type;
+        using T = MN::NumberOfTotalUsersSupported::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NumberOfTotalUsersSupported attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfTotalUsersSupported::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
-                                                   MN::NumberOfTotalUsersSupported::Id);
+                MN::NumberOfTotalUsersSupported::Id);
         }
         break;
     }
         // type is int16u
     case MN::NumberOfPINUsersSupported::Id: {
-        using T                = MN::NumberOfPINUsersSupported::TypeInfo::Type;
+        using T = MN::NumberOfPINUsersSupported::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NumberOfPINUsersSupported attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfPINUsersSupported::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::NumberOfPINUsersSupported::Id);
@@ -1379,67 +1616,62 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is int16u
     case MN::NumberOfRFIDUsersSupported::Id: {
-        using T                = MN::NumberOfRFIDUsersSupported::TypeInfo::Type;
+        using T = MN::NumberOfRFIDUsersSupported::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NumberOfRFIDUsersSupported attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfRFIDUsersSupported::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
-                                                   MN::NumberOfRFIDUsersSupported::Id);
+                MN::NumberOfRFIDUsersSupported::Id);
         }
         break;
     }
         // type is int8u
     case MN::NumberOfWeekDaySchedulesSupportedPerUser::Id: {
-        using T                = MN::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo::Type;
+        using T = MN::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NumberOfWeekDaySchedulesSupportedPerUser attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfWeekDaySchedulesSupportedPerUser::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
-                                                   MN::NumberOfWeekDaySchedulesSupportedPerUser::Id);
+                MN::NumberOfWeekDaySchedulesSupportedPerUser::Id);
         }
         break;
     }
         // type is int8u
     case MN::NumberOfYearDaySchedulesSupportedPerUser::Id: {
-        using T                = MN::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo::Type;
+        using T = MN::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NumberOfYearDaySchedulesSupportedPerUser attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfYearDaySchedulesSupportedPerUser::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
-                                                   MN::NumberOfYearDaySchedulesSupportedPerUser::Id);
+                MN::NumberOfYearDaySchedulesSupportedPerUser::Id);
         }
         break;
     }
         // type is int8u
     case MN::NumberOfHolidaySchedulesSupported::Id: {
-        using T                = MN::NumberOfHolidaySchedulesSupported::TypeInfo::Type;
+        using T = MN::NumberOfHolidaySchedulesSupported::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NumberOfHolidaySchedulesSupported attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfHolidaySchedulesSupported::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
-                                                   MN::NumberOfHolidaySchedulesSupported::Id);
+                MN::NumberOfHolidaySchedulesSupported::Id);
         }
         break;
     }
         // type is int8u
     case MN::MaxPINCodeLength::Id: {
-        using T                = MN::MaxPINCodeLength::TypeInfo::Type;
+        using T = MN::MaxPINCodeLength::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxPINCodeLength attribute value is %s", unify_value.dump().c_str());
             UN::MaxPINCodeLength::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::MaxPINCodeLength::Id);
@@ -1448,11 +1680,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is int8u
     case MN::MinPINCodeLength::Id: {
-        using T                = MN::MinPINCodeLength::TypeInfo::Type;
+        using T = MN::MinPINCodeLength::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinPINCodeLength attribute value is %s", unify_value.dump().c_str());
             UN::MinPINCodeLength::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::MinPINCodeLength::Id);
@@ -1461,11 +1692,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is int8u
     case MN::MaxRFIDCodeLength::Id: {
-        using T                = MN::MaxRFIDCodeLength::TypeInfo::Type;
+        using T = MN::MaxRFIDCodeLength::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxRFIDCodeLength attribute value is %s", unify_value.dump().c_str());
             UN::MaxRFIDCodeLength::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::MaxRFIDCodeLength::Id);
@@ -1474,11 +1704,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is int8u
     case MN::MinRFIDCodeLength::Id: {
-        using T                = MN::MinRFIDCodeLength::TypeInfo::Type;
+        using T = MN::MinRFIDCodeLength::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinRFIDCodeLength attribute value is %s", unify_value.dump().c_str());
             UN::MinRFIDCodeLength::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::MinRFIDCodeLength::Id);
@@ -1487,11 +1716,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is char_string
     case MN::Language::Id: {
-        using T                = MN::Language::TypeInfo::Type;
+        using T = MN::Language::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Language attribute value is %s", unify_value.dump().c_str());
             UN::Language::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::Language::Id);
@@ -1500,11 +1728,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is int8u
     case MN::LEDSettings::Id: {
-        using T                = MN::LEDSettings::TypeInfo::Type;
+        using T = MN::LEDSettings::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "LEDSettings attribute value is %s", unify_value.dump().c_str());
             UN::LEDSettings::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::LEDSettings::Id);
@@ -1513,11 +1740,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is int32u
     case MN::AutoRelockTime::Id: {
-        using T                = MN::AutoRelockTime::TypeInfo::Type;
+        using T = MN::AutoRelockTime::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AutoRelockTime attribute value is %s", unify_value.dump().c_str());
             UN::AutoRelockTime::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::AutoRelockTime::Id);
@@ -1526,11 +1752,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is int8u
     case MN::SoundVolume::Id: {
-        using T                = MN::SoundVolume::TypeInfo::Type;
+        using T = MN::SoundVolume::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "SoundVolume attribute value is %s", unify_value.dump().c_str());
             UN::SoundVolume::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::SoundVolume::Id);
@@ -1539,11 +1764,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is DlOperatingMode
     case MN::OperatingMode::Id: {
-        using T                = MN::OperatingMode::TypeInfo::Type;
+        using T = MN::OperatingMode::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OperatingMode attribute value is %s", unify_value.dump().c_str());
             UN::OperatingMode::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::OperatingMode::Id);
@@ -1552,11 +1776,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is DlSupportedOperatingModes
     case MN::SupportedOperatingModes::Id: {
-        using T                = MN::SupportedOperatingModes::TypeInfo::Type;
+        using T = MN::SupportedOperatingModes::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "SupportedOperatingModes attribute value is %s", unify_value.dump().c_str());
             UN::SupportedOperatingModes::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::SupportedOperatingModes::Id);
@@ -1565,25 +1788,23 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is DlDefaultConfigurationRegister
     case MN::DefaultConfigurationRegister::Id: {
-        using T                = MN::DefaultConfigurationRegister::TypeInfo::Type;
+        using T = MN::DefaultConfigurationRegister::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DefaultConfigurationRegister attribute value is %s", unify_value.dump().c_str());
             UN::DefaultConfigurationRegister::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
-                                                   MN::DefaultConfigurationRegister::Id);
+                MN::DefaultConfigurationRegister::Id);
         }
         break;
     }
         // type is boolean
     case MN::EnableLocalProgramming::Id: {
-        using T                = MN::EnableLocalProgramming::TypeInfo::Type;
+        using T = MN::EnableLocalProgramming::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "EnableLocalProgramming attribute value is %s", unify_value.dump().c_str());
             UN::EnableLocalProgramming::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::EnableLocalProgramming::Id);
@@ -1592,11 +1813,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is boolean
     case MN::EnableOneTouchLocking::Id: {
-        using T                = MN::EnableOneTouchLocking::TypeInfo::Type;
+        using T = MN::EnableOneTouchLocking::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "EnableOneTouchLocking attribute value is %s", unify_value.dump().c_str());
             UN::EnableOneTouchLocking::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::EnableOneTouchLocking::Id);
@@ -1605,11 +1825,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is boolean
     case MN::EnableInsideStatusLED::Id: {
-        using T                = MN::EnableInsideStatusLED::TypeInfo::Type;
+        using T = MN::EnableInsideStatusLED::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "EnableInsideStatusLED attribute value is %s", unify_value.dump().c_str());
             UN::EnableInsideStatusLED::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::EnableInsideStatusLED::Id);
@@ -1618,11 +1837,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is boolean
     case MN::EnablePrivacyModeButton::Id: {
-        using T                = MN::EnablePrivacyModeButton::TypeInfo::Type;
+        using T = MN::EnablePrivacyModeButton::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "EnablePrivacyModeButton attribute value is %s", unify_value.dump().c_str());
             UN::EnablePrivacyModeButton::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::EnablePrivacyModeButton::Id);
@@ -1631,11 +1849,10 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is int8u
     case MN::WrongCodeEntryLimit::Id: {
-        using T                = MN::WrongCodeEntryLimit::TypeInfo::Type;
+        using T = MN::WrongCodeEntryLimit::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "WrongCodeEntryLimit attribute value is %s", unify_value.dump().c_str());
             UN::WrongCodeEntryLimit::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::WrongCodeEntryLimit::Id);
@@ -1644,25 +1861,23 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is int8u
     case MN::UserCodeTemporaryDisableTime::Id: {
-        using T                = MN::UserCodeTemporaryDisableTime::TypeInfo::Type;
+        using T = MN::UserCodeTemporaryDisableTime::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "UserCodeTemporaryDisableTime attribute value is %s", unify_value.dump().c_str());
             UN::UserCodeTemporaryDisableTime::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
-                                                   MN::UserCodeTemporaryDisableTime::Id);
+                MN::UserCodeTemporaryDisableTime::Id);
         }
         break;
     }
         // type is boolean
     case MN::SendPINOverTheAir::Id: {
-        using T                = MN::SendPINOverTheAir::TypeInfo::Type;
+        using T = MN::SendPINOverTheAir::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "SendPINOverTheAir attribute value is %s", unify_value.dump().c_str());
             UN::SendPINOverTheAir::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::SendPINOverTheAir::Id);
@@ -1671,15 +1886,14 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
     }
         // type is boolean
     case MN::RequirePINforRemoteOperation::Id: {
-        using T                = MN::RequirePINforRemoteOperation::TypeInfo::Type;
+        using T = MN::RequirePINforRemoteOperation::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RequirePINforRemoteOperation attribute value is %s", unify_value.dump().c_str());
             UN::RequirePINforRemoteOperation::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id,
-                                                   MN::RequirePINforRemoteOperation::Id);
+                MN::RequirePINforRemoteOperation::Id);
         }
         break;
     }
@@ -1687,20 +1901,17 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint * ep, cons
 }
 
 CHIP_ERROR
-BarrierControlAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+BarrierControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
 {
     namespace MN = chip::app::Clusters::BarrierControl::Attributes;
     namespace UN = unify::matter_bridge::BarrierControl::Attributes;
-    if (aPath.mClusterId != Clusters::BarrierControl::Id)
-    {
+    if (aPath.mClusterId != Clusters::BarrierControl::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
+    try {
+        switch (aPath.mAttributeId) {
         case MN::BarrierMovingState::Id: { // type is enum8
             MN::BarrierMovingState::TypeInfo::Type value;
             UN::BarrierMovingState::Get(atr_path, value);
@@ -1762,37 +1973,33 @@ BarrierControlAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Att
             return aEncoder.Encode(value);
         }
         }
-    } catch (const std::out_of_range & e)
-    {
+    } catch (const std::out_of_range& e) {
         sl_log_info(LOG_TAG,
-                    "The request attribute Path for endpoint [%i] is not found in the attribute state "
-                    "container: %s\n",
-                    atr_path.mEndpointId, e.what());
+            "The request attribute Path for endpoint [%i] is not found in the attribute state "
+            "container: %s\n",
+            atr_path.mEndpointId, e.what());
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BarrierControlAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR BarrierControlAttributeAccess::Write(const ConcreteDataAttributePath& aPath, AttributeValueDecoder& aDecoder)
 {
     using namespace chip::app::Clusters::BarrierControl;
 
-    if (aPath.mClusterId != Clusters::BarrierControl::Id)
-    {
+    if (aPath.mClusterId != Clusters::BarrierControl::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
-    if (!unify_node)
-    {
+    if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
 
     std::string attribute_name;
     nlohmann::json jsn;
 
-    switch (aPath.mAttributeId)
-    {
+    switch (aPath.mAttributeId) {
     // barrier moving state is not supported by UCL
     // barrier safety status is not supported by UCL
     // barrier capabilities is not supported by UCL
@@ -1800,7 +2007,7 @@ CHIP_ERROR BarrierControlAttributeAccess::Write(const ConcreteDataAttributePath 
 
         Attributes::BarrierOpenEvents::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "OpenEvents";
         break;
     }
@@ -1808,7 +2015,7 @@ CHIP_ERROR BarrierControlAttributeAccess::Write(const ConcreteDataAttributePath 
 
         Attributes::BarrierCloseEvents::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "CloseEvents";
         break;
     }
@@ -1816,7 +2023,7 @@ CHIP_ERROR BarrierControlAttributeAccess::Write(const ConcreteDataAttributePath 
 
         Attributes::BarrierCommandOpenEvents::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "CommandOpenEvents";
         break;
     }
@@ -1824,7 +2031,7 @@ CHIP_ERROR BarrierControlAttributeAccess::Write(const ConcreteDataAttributePath 
 
         Attributes::BarrierCommandCloseEvents::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "CommandCloseEvents";
         break;
     }
@@ -1832,7 +2039,7 @@ CHIP_ERROR BarrierControlAttributeAccess::Write(const ConcreteDataAttributePath 
 
         Attributes::BarrierOpenPeriod::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "OpenPeriod";
         break;
     }
@@ -1840,7 +2047,7 @@ CHIP_ERROR BarrierControlAttributeAccess::Write(const ConcreteDataAttributePath 
 
         Attributes::BarrierClosePeriod::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ClosePeriod";
         break;
     }
@@ -1852,11 +2059,9 @@ CHIP_ERROR BarrierControlAttributeAccess::Write(const ConcreteDataAttributePath 
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty())
-    {
+    if (!attribute_name.empty()) {
         std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/BarrierControl/Attributes/" + attribute_name + "/Desired";
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/BarrierControl/Attributes/" + attribute_name + "/Desired";
         payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
@@ -1865,39 +2070,34 @@ CHIP_ERROR BarrierControlAttributeAccess::Write(const ConcreteDataAttributePath 
     return CHIP_ERROR_NO_MESSAGE_HANDLER;
 }
 
-void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                                     const std::string & attribute, const nlohmann::json & unify_value)
+void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster,
+    const std::string& attribute, const nlohmann::json& unify_value)
 {
     namespace MN = chip::app::Clusters::BarrierControl::Attributes;
     namespace UN = unify::matter_bridge::BarrierControl::Attributes;
 
     auto cluster_id = device_translator::instance().get_cluster_id(cluster);
 
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::BarrierControl::Id))
-    {
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::BarrierControl::Id)) {
         return;
     }
 
     // get attribute id
     auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
 
-    if (!attribute_id.has_value())
-    {
+    if (!attribute_id.has_value()) {
         return;
     }
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
-    ConcreteAttributePath attrpath =
-        ConcreteAttributePath(node_matter_endpoint, Clusters::BarrierControl::Id, attribute_id.value());
-    switch (attribute_id.value())
-    {
+    ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::BarrierControl::Id, attribute_id.value());
+    switch (attribute_id.value()) {
     // type is enum8
     case MN::BarrierMovingState::Id: {
-        using T                = MN::BarrierMovingState::TypeInfo::Type;
+        using T = MN::BarrierMovingState::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierMovingState attribute value is %s", unify_value.dump().c_str());
             UN::BarrierMovingState::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierMovingState::Id);
@@ -1906,11 +2106,10 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
     }
         // type is bitmap16
     case MN::BarrierSafetyStatus::Id: {
-        using T                = MN::BarrierSafetyStatus::TypeInfo::Type;
+        using T = MN::BarrierSafetyStatus::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierSafetyStatus attribute value is %s", unify_value.dump().c_str());
             UN::BarrierSafetyStatus::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierSafetyStatus::Id);
@@ -1919,11 +2118,10 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
     }
         // type is bitmap8
     case MN::BarrierCapabilities::Id: {
-        using T                = MN::BarrierCapabilities::TypeInfo::Type;
+        using T = MN::BarrierCapabilities::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierCapabilities attribute value is %s", unify_value.dump().c_str());
             UN::BarrierCapabilities::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierCapabilities::Id);
@@ -1932,11 +2130,10 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
     }
         // type is int16u
     case MN::BarrierOpenEvents::Id: {
-        using T                = MN::BarrierOpenEvents::TypeInfo::Type;
+        using T = MN::BarrierOpenEvents::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierOpenEvents attribute value is %s", unify_value.dump().c_str());
             UN::BarrierOpenEvents::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierOpenEvents::Id);
@@ -1945,11 +2142,10 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
     }
         // type is int16u
     case MN::BarrierCloseEvents::Id: {
-        using T                = MN::BarrierCloseEvents::TypeInfo::Type;
+        using T = MN::BarrierCloseEvents::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierCloseEvents attribute value is %s", unify_value.dump().c_str());
             UN::BarrierCloseEvents::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierCloseEvents::Id);
@@ -1958,39 +2154,36 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
     }
         // type is int16u
     case MN::BarrierCommandOpenEvents::Id: {
-        using T                = MN::BarrierCommandOpenEvents::TypeInfo::Type;
+        using T = MN::BarrierCommandOpenEvents::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierCommandOpenEvents attribute value is %s", unify_value.dump().c_str());
             UN::BarrierCommandOpenEvents::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id,
-                                                   MN::BarrierCommandOpenEvents::Id);
+                MN::BarrierCommandOpenEvents::Id);
         }
         break;
     }
         // type is int16u
     case MN::BarrierCommandCloseEvents::Id: {
-        using T                = MN::BarrierCommandCloseEvents::TypeInfo::Type;
+        using T = MN::BarrierCommandCloseEvents::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierCommandCloseEvents attribute value is %s", unify_value.dump().c_str());
             UN::BarrierCommandCloseEvents::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id,
-                                                   MN::BarrierCommandCloseEvents::Id);
+                MN::BarrierCommandCloseEvents::Id);
         }
         break;
     }
         // type is int16u
     case MN::BarrierOpenPeriod::Id: {
-        using T                = MN::BarrierOpenPeriod::TypeInfo::Type;
+        using T = MN::BarrierOpenPeriod::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierOpenPeriod attribute value is %s", unify_value.dump().c_str());
             UN::BarrierOpenPeriod::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierOpenPeriod::Id);
@@ -1999,11 +2192,10 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
     }
         // type is int16u
     case MN::BarrierClosePeriod::Id: {
-        using T                = MN::BarrierClosePeriod::TypeInfo::Type;
+        using T = MN::BarrierClosePeriod::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierClosePeriod attribute value is %s", unify_value.dump().c_str());
             UN::BarrierClosePeriod::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierClosePeriod::Id);
@@ -2012,11 +2204,10 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
     }
         // type is int8u
     case MN::BarrierPosition::Id: {
-        using T                = MN::BarrierPosition::TypeInfo::Type;
+        using T = MN::BarrierPosition::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "BarrierPosition attribute value is %s", unify_value.dump().c_str());
             UN::BarrierPosition::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::BarrierControl::Id, MN::BarrierPosition::Id);
@@ -2027,20 +2218,17 @@ void BarrierControlAttributeAccess::reported_updated(const bridged_endpoint * ep
 }
 
 CHIP_ERROR
-ThermostatAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+ThermostatAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
 {
     namespace MN = chip::app::Clusters::Thermostat::Attributes;
     namespace UN = unify::matter_bridge::Thermostat::Attributes;
-    if (aPath.mClusterId != Clusters::Thermostat::Id)
-    {
+    if (aPath.mClusterId != Clusters::Thermostat::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
+    try {
+        switch (aPath.mAttributeId) {
         case MN::LocalTemperature::Id: { // type is int16s
             MN::LocalTemperature::TypeInfo::Type value;
             UN::LocalTemperature::Get(atr_path, value);
@@ -2297,37 +2485,33 @@ ThermostatAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
             return aEncoder.Encode(value);
         }
         }
-    } catch (const std::out_of_range & e)
-    {
+    } catch (const std::out_of_range& e) {
         sl_log_info(LOG_TAG,
-                    "The request attribute Path for endpoint [%i] is not found in the attribute state "
-                    "container: %s\n",
-                    atr_path.mEndpointId, e.what());
+            "The request attribute Path for endpoint [%i] is not found in the attribute state "
+            "container: %s\n",
+            atr_path.mEndpointId, e.what());
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath& aPath, AttributeValueDecoder& aDecoder)
 {
     using namespace chip::app::Clusters::Thermostat;
 
-    if (aPath.mClusterId != Clusters::Thermostat::Id)
-    {
+    if (aPath.mClusterId != Clusters::Thermostat::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
-    if (!unify_node)
-    {
+    if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
 
     std::string attribute_name;
     nlohmann::json jsn;
 
-    switch (aPath.mAttributeId)
-    {
+    switch (aPath.mAttributeId) {
     // LocalTemperature is not supported by UCL
     // OutdoorTemperature is not supported by UCL
     // Occupancy is not supported by UCL
@@ -2341,7 +2525,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::HVACSystemTypeConfiguration::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "HVACSystemTypeConfiguration";
         break;
     }
@@ -2349,7 +2533,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::LocalTemperatureCalibration::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "LocalTemperatureCalibration";
         break;
     }
@@ -2357,7 +2541,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::OccupiedCoolingSetpoint::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "OccupiedCoolingSetpoint";
         break;
     }
@@ -2365,7 +2549,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::OccupiedHeatingSetpoint::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "OccupiedHeatingSetpoint";
         break;
     }
@@ -2373,7 +2557,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::UnoccupiedCoolingSetpoint::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "UnoccupiedCoolingSetpoint";
         break;
     }
@@ -2381,7 +2565,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::UnoccupiedHeatingSetpoint::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "UnoccupiedHeatingSetpoint";
         break;
     }
@@ -2389,7 +2573,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::MinHeatSetpointLimit::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "MinHeatSetpointLimit";
         break;
     }
@@ -2397,7 +2581,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::MaxHeatSetpointLimit::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "MaxHeatSetpointLimit";
         break;
     }
@@ -2405,7 +2589,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::MinCoolSetpointLimit::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "MinCoolSetpointLimit";
         break;
     }
@@ -2413,7 +2597,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::MaxCoolSetpointLimit::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "MaxCoolSetpointLimit";
         break;
     }
@@ -2421,7 +2605,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::MinSetpointDeadBand::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "MinSetpointDeadBand";
         break;
     }
@@ -2429,7 +2613,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::RemoteSensing::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "RemoteSensing";
         break;
     }
@@ -2437,7 +2621,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::ControlSequenceOfOperation::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ControlSequenceOfOperation";
         break;
     }
@@ -2445,7 +2629,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::SystemMode::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "SystemMode";
         break;
     }
@@ -2457,7 +2641,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::TemperatureSetpointHold::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "TemperatureSetpointHold";
         break;
     }
@@ -2465,7 +2649,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::TemperatureSetpointHoldDuration::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "TemperatureSetpointHoldDuration";
         break;
     }
@@ -2473,7 +2657,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::ThermostatProgrammingOperationMode::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ThermostatProgrammingOperationMode";
         break;
     }
@@ -2485,7 +2669,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::OccupiedSetback::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "OccupiedSetback";
         break;
     }
@@ -2495,7 +2679,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::UnoccupiedSetback::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "UnoccupiedSetback";
         break;
     }
@@ -2505,7 +2689,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::EmergencyHeatDelta::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "EmergencyHeatDelta";
         break;
     }
@@ -2513,7 +2697,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::ACType::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ACType";
         break;
     }
@@ -2521,7 +2705,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::ACCapacity::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ACCapacity";
         break;
     }
@@ -2529,7 +2713,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::ACRefrigerantType::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ACRefrigerantType";
         break;
     }
@@ -2537,7 +2721,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::ACCompressorType::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ACCompressorType";
         break;
     }
@@ -2545,7 +2729,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::ACErrorCode::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ACErrorCode";
         break;
     }
@@ -2553,7 +2737,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::ACLouverPosition::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ACLouverPosition";
         break;
     }
@@ -2562,7 +2746,7 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::ACCapacityformat::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ACCapacityFormat";
         break;
     }
@@ -2573,11 +2757,9 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty())
-    {
+    if (!attribute_name.empty()) {
         std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/Thermostat/Attributes/" + attribute_name + "/Desired";
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/Thermostat/Attributes/" + attribute_name + "/Desired";
         payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
@@ -2586,38 +2768,34 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath & aP
     return CHIP_ERROR_NO_MESSAGE_HANDLER;
 }
 
-void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                                 const std::string & attribute, const nlohmann::json & unify_value)
+void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster,
+    const std::string& attribute, const nlohmann::json& unify_value)
 {
     namespace MN = chip::app::Clusters::Thermostat::Attributes;
     namespace UN = unify::matter_bridge::Thermostat::Attributes;
 
     auto cluster_id = device_translator::instance().get_cluster_id(cluster);
 
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::Thermostat::Id))
-    {
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::Thermostat::Id)) {
         return;
     }
 
     // get attribute id
     auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
 
-    if (!attribute_id.has_value())
-    {
+    if (!attribute_id.has_value()) {
         return;
     }
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::Thermostat::Id, attribute_id.value());
-    switch (attribute_id.value())
-    {
+    switch (attribute_id.value()) {
     // type is int16s
     case MN::LocalTemperature::Id: {
-        using T                = MN::LocalTemperature::TypeInfo::Type;
+        using T = MN::LocalTemperature::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "LocalTemperature attribute value is %s", unify_value.dump().c_str());
             UN::LocalTemperature::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::LocalTemperature::Id);
@@ -2626,11 +2804,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int16s
     case MN::OutdoorTemperature::Id: {
-        using T                = MN::OutdoorTemperature::TypeInfo::Type;
+        using T = MN::OutdoorTemperature::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OutdoorTemperature attribute value is %s", unify_value.dump().c_str());
             UN::OutdoorTemperature::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OutdoorTemperature::Id);
@@ -2639,11 +2816,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is bitmap8
     case MN::Occupancy::Id: {
-        using T                = MN::Occupancy::TypeInfo::Type;
+        using T = MN::Occupancy::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Occupancy attribute value is %s", unify_value.dump().c_str());
             UN::Occupancy::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::Occupancy::Id);
@@ -2652,11 +2828,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int16s
     case MN::AbsMinHeatSetpointLimit::Id: {
-        using T                = MN::AbsMinHeatSetpointLimit::TypeInfo::Type;
+        using T = MN::AbsMinHeatSetpointLimit::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AbsMinHeatSetpointLimit attribute value is %s", unify_value.dump().c_str());
             UN::AbsMinHeatSetpointLimit::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::AbsMinHeatSetpointLimit::Id);
@@ -2665,11 +2840,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int16s
     case MN::AbsMaxHeatSetpointLimit::Id: {
-        using T                = MN::AbsMaxHeatSetpointLimit::TypeInfo::Type;
+        using T = MN::AbsMaxHeatSetpointLimit::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AbsMaxHeatSetpointLimit attribute value is %s", unify_value.dump().c_str());
             UN::AbsMaxHeatSetpointLimit::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::AbsMaxHeatSetpointLimit::Id);
@@ -2678,11 +2852,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int16s
     case MN::AbsMinCoolSetpointLimit::Id: {
-        using T                = MN::AbsMinCoolSetpointLimit::TypeInfo::Type;
+        using T = MN::AbsMinCoolSetpointLimit::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AbsMinCoolSetpointLimit attribute value is %s", unify_value.dump().c_str());
             UN::AbsMinCoolSetpointLimit::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::AbsMinCoolSetpointLimit::Id);
@@ -2691,11 +2864,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int16s
     case MN::AbsMaxCoolSetpointLimit::Id: {
-        using T                = MN::AbsMaxCoolSetpointLimit::TypeInfo::Type;
+        using T = MN::AbsMaxCoolSetpointLimit::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AbsMaxCoolSetpointLimit attribute value is %s", unify_value.dump().c_str());
             UN::AbsMaxCoolSetpointLimit::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::AbsMaxCoolSetpointLimit::Id);
@@ -2704,11 +2876,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int8u
     case MN::PICoolingDemand::Id: {
-        using T                = MN::PICoolingDemand::TypeInfo::Type;
+        using T = MN::PICoolingDemand::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PICoolingDemand attribute value is %s", unify_value.dump().c_str());
             UN::PICoolingDemand::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::PICoolingDemand::Id);
@@ -2717,11 +2888,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int8u
     case MN::PIHeatingDemand::Id: {
-        using T                = MN::PIHeatingDemand::TypeInfo::Type;
+        using T = MN::PIHeatingDemand::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PIHeatingDemand attribute value is %s", unify_value.dump().c_str());
             UN::PIHeatingDemand::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::PIHeatingDemand::Id);
@@ -2730,39 +2900,36 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is bitmap8
     case MN::HVACSystemTypeConfiguration::Id: {
-        using T                = MN::HVACSystemTypeConfiguration::TypeInfo::Type;
+        using T = MN::HVACSystemTypeConfiguration::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "HVACSystemTypeConfiguration attribute value is %s", unify_value.dump().c_str());
             UN::HVACSystemTypeConfiguration::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::HVACSystemTypeConfiguration::Id);
+                MN::HVACSystemTypeConfiguration::Id);
         }
         break;
     }
         // type is int8s
     case MN::LocalTemperatureCalibration::Id: {
-        using T                = MN::LocalTemperatureCalibration::TypeInfo::Type;
+        using T = MN::LocalTemperatureCalibration::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "LocalTemperatureCalibration attribute value is %s", unify_value.dump().c_str());
             UN::LocalTemperatureCalibration::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::LocalTemperatureCalibration::Id);
+                MN::LocalTemperatureCalibration::Id);
         }
         break;
     }
         // type is int16s
     case MN::OccupiedCoolingSetpoint::Id: {
-        using T                = MN::OccupiedCoolingSetpoint::TypeInfo::Type;
+        using T = MN::OccupiedCoolingSetpoint::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OccupiedCoolingSetpoint attribute value is %s", unify_value.dump().c_str());
             UN::OccupiedCoolingSetpoint::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedCoolingSetpoint::Id);
@@ -2771,11 +2938,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int16s
     case MN::OccupiedHeatingSetpoint::Id: {
-        using T                = MN::OccupiedHeatingSetpoint::TypeInfo::Type;
+        using T = MN::OccupiedHeatingSetpoint::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OccupiedHeatingSetpoint attribute value is %s", unify_value.dump().c_str());
             UN::OccupiedHeatingSetpoint::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedHeatingSetpoint::Id);
@@ -2784,39 +2950,36 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int16s
     case MN::UnoccupiedCoolingSetpoint::Id: {
-        using T                = MN::UnoccupiedCoolingSetpoint::TypeInfo::Type;
+        using T = MN::UnoccupiedCoolingSetpoint::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "UnoccupiedCoolingSetpoint attribute value is %s", unify_value.dump().c_str());
             UN::UnoccupiedCoolingSetpoint::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::UnoccupiedCoolingSetpoint::Id);
+                MN::UnoccupiedCoolingSetpoint::Id);
         }
         break;
     }
         // type is int16s
     case MN::UnoccupiedHeatingSetpoint::Id: {
-        using T                = MN::UnoccupiedHeatingSetpoint::TypeInfo::Type;
+        using T = MN::UnoccupiedHeatingSetpoint::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "UnoccupiedHeatingSetpoint attribute value is %s", unify_value.dump().c_str());
             UN::UnoccupiedHeatingSetpoint::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::UnoccupiedHeatingSetpoint::Id);
+                MN::UnoccupiedHeatingSetpoint::Id);
         }
         break;
     }
         // type is int16s
     case MN::MinHeatSetpointLimit::Id: {
-        using T                = MN::MinHeatSetpointLimit::TypeInfo::Type;
+        using T = MN::MinHeatSetpointLimit::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinHeatSetpointLimit attribute value is %s", unify_value.dump().c_str());
             UN::MinHeatSetpointLimit::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MinHeatSetpointLimit::Id);
@@ -2825,11 +2988,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int16s
     case MN::MaxHeatSetpointLimit::Id: {
-        using T                = MN::MaxHeatSetpointLimit::TypeInfo::Type;
+        using T = MN::MaxHeatSetpointLimit::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxHeatSetpointLimit attribute value is %s", unify_value.dump().c_str());
             UN::MaxHeatSetpointLimit::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MaxHeatSetpointLimit::Id);
@@ -2838,11 +3000,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int16s
     case MN::MinCoolSetpointLimit::Id: {
-        using T                = MN::MinCoolSetpointLimit::TypeInfo::Type;
+        using T = MN::MinCoolSetpointLimit::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinCoolSetpointLimit attribute value is %s", unify_value.dump().c_str());
             UN::MinCoolSetpointLimit::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MinCoolSetpointLimit::Id);
@@ -2851,11 +3012,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int16s
     case MN::MaxCoolSetpointLimit::Id: {
-        using T                = MN::MaxCoolSetpointLimit::TypeInfo::Type;
+        using T = MN::MaxCoolSetpointLimit::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxCoolSetpointLimit attribute value is %s", unify_value.dump().c_str());
             UN::MaxCoolSetpointLimit::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MaxCoolSetpointLimit::Id);
@@ -2864,11 +3024,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int8s
     case MN::MinSetpointDeadBand::Id: {
-        using T                = MN::MinSetpointDeadBand::TypeInfo::Type;
+        using T = MN::MinSetpointDeadBand::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinSetpointDeadBand attribute value is %s", unify_value.dump().c_str());
             UN::MinSetpointDeadBand::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::MinSetpointDeadBand::Id);
@@ -2877,11 +3036,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is bitmap8
     case MN::RemoteSensing::Id: {
-        using T                = MN::RemoteSensing::TypeInfo::Type;
+        using T = MN::RemoteSensing::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RemoteSensing attribute value is %s", unify_value.dump().c_str());
             UN::RemoteSensing::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::RemoteSensing::Id);
@@ -2890,25 +3048,23 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is ThermostatControlSequence
     case MN::ControlSequenceOfOperation::Id: {
-        using T                = MN::ControlSequenceOfOperation::TypeInfo::Type;
+        using T = MN::ControlSequenceOfOperation::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ControlSequenceOfOperation attribute value is %s", unify_value.dump().c_str());
             UN::ControlSequenceOfOperation::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::ControlSequenceOfOperation::Id);
+                MN::ControlSequenceOfOperation::Id);
         }
         break;
     }
         // type is enum8
     case MN::SystemMode::Id: {
-        using T                = MN::SystemMode::TypeInfo::Type;
+        using T = MN::SystemMode::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "SystemMode attribute value is %s", unify_value.dump().c_str());
             UN::SystemMode::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::SystemMode::Id);
@@ -2917,11 +3073,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is enum8
     case MN::ThermostatRunningMode::Id: {
-        using T                = MN::ThermostatRunningMode::TypeInfo::Type;
+        using T = MN::ThermostatRunningMode::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ThermostatRunningMode attribute value is %s", unify_value.dump().c_str());
             UN::ThermostatRunningMode::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ThermostatRunningMode::Id);
@@ -2930,11 +3085,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is enum8
     case MN::StartOfWeek::Id: {
-        using T                = MN::StartOfWeek::TypeInfo::Type;
+        using T = MN::StartOfWeek::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "StartOfWeek attribute value is %s", unify_value.dump().c_str());
             UN::StartOfWeek::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::StartOfWeek::Id);
@@ -2943,39 +3097,36 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int8u
     case MN::NumberOfWeeklyTransitions::Id: {
-        using T                = MN::NumberOfWeeklyTransitions::TypeInfo::Type;
+        using T = MN::NumberOfWeeklyTransitions::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NumberOfWeeklyTransitions attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfWeeklyTransitions::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::NumberOfWeeklyTransitions::Id);
+                MN::NumberOfWeeklyTransitions::Id);
         }
         break;
     }
         // type is int8u
     case MN::NumberOfDailyTransitions::Id: {
-        using T                = MN::NumberOfDailyTransitions::TypeInfo::Type;
+        using T = MN::NumberOfDailyTransitions::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NumberOfDailyTransitions attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfDailyTransitions::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::NumberOfDailyTransitions::Id);
+                MN::NumberOfDailyTransitions::Id);
         }
         break;
     }
         // type is enum8
     case MN::TemperatureSetpointHold::Id: {
-        using T                = MN::TemperatureSetpointHold::TypeInfo::Type;
+        using T = MN::TemperatureSetpointHold::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "TemperatureSetpointHold attribute value is %s", unify_value.dump().c_str());
             UN::TemperatureSetpointHold::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::TemperatureSetpointHold::Id);
@@ -2984,39 +3135,36 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int16u
     case MN::TemperatureSetpointHoldDuration::Id: {
-        using T                = MN::TemperatureSetpointHoldDuration::TypeInfo::Type;
+        using T = MN::TemperatureSetpointHoldDuration::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "TemperatureSetpointHoldDuration attribute value is %s", unify_value.dump().c_str());
             UN::TemperatureSetpointHoldDuration::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::TemperatureSetpointHoldDuration::Id);
+                MN::TemperatureSetpointHoldDuration::Id);
         }
         break;
     }
         // type is bitmap8
     case MN::ThermostatProgrammingOperationMode::Id: {
-        using T                = MN::ThermostatProgrammingOperationMode::TypeInfo::Type;
+        using T = MN::ThermostatProgrammingOperationMode::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ThermostatProgrammingOperationMode attribute value is %s", unify_value.dump().c_str());
             UN::ThermostatProgrammingOperationMode::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::ThermostatProgrammingOperationMode::Id);
+                MN::ThermostatProgrammingOperationMode::Id);
         }
         break;
     }
         // type is bitmap16
     case MN::ThermostatRunningState::Id: {
-        using T                = MN::ThermostatRunningState::TypeInfo::Type;
+        using T = MN::ThermostatRunningState::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ThermostatRunningState attribute value is %s", unify_value.dump().c_str());
             UN::ThermostatRunningState::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ThermostatRunningState::Id);
@@ -3025,11 +3173,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is enum8
     case MN::SetpointChangeSource::Id: {
-        using T                = MN::SetpointChangeSource::TypeInfo::Type;
+        using T = MN::SetpointChangeSource::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "SetpointChangeSource attribute value is %s", unify_value.dump().c_str());
             UN::SetpointChangeSource::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::SetpointChangeSource::Id);
@@ -3038,11 +3185,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int16s
     case MN::SetpointChangeAmount::Id: {
-        using T                = MN::SetpointChangeAmount::TypeInfo::Type;
+        using T = MN::SetpointChangeAmount::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "SetpointChangeAmount attribute value is %s", unify_value.dump().c_str());
             UN::SetpointChangeAmount::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::SetpointChangeAmount::Id);
@@ -3051,25 +3197,23 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is utc
     case MN::SetpointChangeSourceTimestamp::Id: {
-        using T                = MN::SetpointChangeSourceTimestamp::TypeInfo::Type;
+        using T = MN::SetpointChangeSourceTimestamp::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "SetpointChangeSourceTimestamp attribute value is %s", unify_value.dump().c_str());
             UN::SetpointChangeSourceTimestamp::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id,
-                                                   MN::SetpointChangeSourceTimestamp::Id);
+                MN::SetpointChangeSourceTimestamp::Id);
         }
         break;
     }
         // type is int8u
     case MN::OccupiedSetback::Id: {
-        using T                = MN::OccupiedSetback::TypeInfo::Type;
+        using T = MN::OccupiedSetback::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OccupiedSetback attribute value is %s", unify_value.dump().c_str());
             UN::OccupiedSetback::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedSetback::Id);
@@ -3078,11 +3222,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int8u
     case MN::OccupiedSetbackMin::Id: {
-        using T                = MN::OccupiedSetbackMin::TypeInfo::Type;
+        using T = MN::OccupiedSetbackMin::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OccupiedSetbackMin attribute value is %s", unify_value.dump().c_str());
             UN::OccupiedSetbackMin::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedSetbackMin::Id);
@@ -3091,11 +3234,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int8u
     case MN::OccupiedSetbackMax::Id: {
-        using T                = MN::OccupiedSetbackMax::TypeInfo::Type;
+        using T = MN::OccupiedSetbackMax::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OccupiedSetbackMax attribute value is %s", unify_value.dump().c_str());
             UN::OccupiedSetbackMax::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::OccupiedSetbackMax::Id);
@@ -3104,11 +3246,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int8u
     case MN::UnoccupiedSetback::Id: {
-        using T                = MN::UnoccupiedSetback::TypeInfo::Type;
+        using T = MN::UnoccupiedSetback::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "UnoccupiedSetback attribute value is %s", unify_value.dump().c_str());
             UN::UnoccupiedSetback::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::UnoccupiedSetback::Id);
@@ -3117,11 +3258,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int8u
     case MN::UnoccupiedSetbackMin::Id: {
-        using T                = MN::UnoccupiedSetbackMin::TypeInfo::Type;
+        using T = MN::UnoccupiedSetbackMin::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "UnoccupiedSetbackMin attribute value is %s", unify_value.dump().c_str());
             UN::UnoccupiedSetbackMin::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::UnoccupiedSetbackMin::Id);
@@ -3130,11 +3270,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int8u
     case MN::UnoccupiedSetbackMax::Id: {
-        using T                = MN::UnoccupiedSetbackMax::TypeInfo::Type;
+        using T = MN::UnoccupiedSetbackMax::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "UnoccupiedSetbackMax attribute value is %s", unify_value.dump().c_str());
             UN::UnoccupiedSetbackMax::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::UnoccupiedSetbackMax::Id);
@@ -3143,11 +3282,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int8u
     case MN::EmergencyHeatDelta::Id: {
-        using T                = MN::EmergencyHeatDelta::TypeInfo::Type;
+        using T = MN::EmergencyHeatDelta::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "EmergencyHeatDelta attribute value is %s", unify_value.dump().c_str());
             UN::EmergencyHeatDelta::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::EmergencyHeatDelta::Id);
@@ -3156,11 +3294,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is enum8
     case MN::ACType::Id: {
-        using T                = MN::ACType::TypeInfo::Type;
+        using T = MN::ACType::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ACType attribute value is %s", unify_value.dump().c_str());
             UN::ACType::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACType::Id);
@@ -3169,11 +3306,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int16u
     case MN::ACCapacity::Id: {
-        using T                = MN::ACCapacity::TypeInfo::Type;
+        using T = MN::ACCapacity::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ACCapacity attribute value is %s", unify_value.dump().c_str());
             UN::ACCapacity::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACCapacity::Id);
@@ -3182,11 +3318,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is enum8
     case MN::ACRefrigerantType::Id: {
-        using T                = MN::ACRefrigerantType::TypeInfo::Type;
+        using T = MN::ACRefrigerantType::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ACRefrigerantType attribute value is %s", unify_value.dump().c_str());
             UN::ACRefrigerantType::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACRefrigerantType::Id);
@@ -3195,11 +3330,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is enum8
     case MN::ACCompressorType::Id: {
-        using T                = MN::ACCompressorType::TypeInfo::Type;
+        using T = MN::ACCompressorType::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ACCompressorType attribute value is %s", unify_value.dump().c_str());
             UN::ACCompressorType::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACCompressorType::Id);
@@ -3208,11 +3342,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is bitmap32
     case MN::ACErrorCode::Id: {
-        using T                = MN::ACErrorCode::TypeInfo::Type;
+        using T = MN::ACErrorCode::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ACErrorCode attribute value is %s", unify_value.dump().c_str());
             UN::ACErrorCode::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACErrorCode::Id);
@@ -3221,11 +3354,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is enum8
     case MN::ACLouverPosition::Id: {
-        using T                = MN::ACLouverPosition::TypeInfo::Type;
+        using T = MN::ACLouverPosition::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ACLouverPosition attribute value is %s", unify_value.dump().c_str());
             UN::ACLouverPosition::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACLouverPosition::Id);
@@ -3234,11 +3366,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is int16s
     case MN::ACCoilTemperature::Id: {
-        using T                = MN::ACCoilTemperature::TypeInfo::Type;
+        using T = MN::ACCoilTemperature::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ACCoilTemperature attribute value is %s", unify_value.dump().c_str());
             UN::ACCoilTemperature::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACCoilTemperature::Id);
@@ -3247,11 +3378,10 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is enum8
     case MN::ACCapacityformat::Id: {
-        using T                = MN::ACCapacityformat::TypeInfo::Type;
+        using T = MN::ACCapacityformat::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ACCapacityformat attribute value is %s", unify_value.dump().c_str());
             UN::ACCapacityformat::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Thermostat::Id, MN::ACCapacityformat::Id);
@@ -3262,20 +3392,17 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint * ep, co
 }
 
 CHIP_ERROR
-FanControlAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+FanControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
 {
     namespace MN = chip::app::Clusters::FanControl::Attributes;
     namespace UN = unify::matter_bridge::FanControl::Attributes;
-    if (aPath.mClusterId != Clusters::FanControl::Id)
-    {
+    if (aPath.mClusterId != Clusters::FanControl::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
+    try {
+        switch (aPath.mAttributeId) {
         case MN::FanMode::Id: { // type is FanModeType
             MN::FanMode::TypeInfo::Type value;
             UN::FanMode::Get(atr_path, value);
@@ -3342,42 +3469,38 @@ FanControlAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
             return aEncoder.Encode(value);
         }
         }
-    } catch (const std::out_of_range & e)
-    {
+    } catch (const std::out_of_range& e) {
         sl_log_info(LOG_TAG,
-                    "The request attribute Path for endpoint [%i] is not found in the attribute state "
-                    "container: %s\n",
-                    atr_path.mEndpointId, e.what());
+            "The request attribute Path for endpoint [%i] is not found in the attribute state "
+            "container: %s\n",
+            atr_path.mEndpointId, e.what());
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FanControlAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR FanControlAttributeAccess::Write(const ConcreteDataAttributePath& aPath, AttributeValueDecoder& aDecoder)
 {
     using namespace chip::app::Clusters::FanControl;
 
-    if (aPath.mClusterId != Clusters::FanControl::Id)
-    {
+    if (aPath.mClusterId != Clusters::FanControl::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
-    if (!unify_node)
-    {
+    if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
 
     std::string attribute_name;
     nlohmann::json jsn;
 
-    switch (aPath.mAttributeId)
-    {
+    switch (aPath.mAttributeId) {
     case Attributes::FanMode::Id: {
 
         Attributes::FanMode::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "FanMode";
         break;
     }
@@ -3385,7 +3508,7 @@ CHIP_ERROR FanControlAttributeAccess::Write(const ConcreteDataAttributePath & aP
 
         Attributes::FanModeSequence::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "FanModeSequence";
         break;
     }
@@ -3401,11 +3524,9 @@ CHIP_ERROR FanControlAttributeAccess::Write(const ConcreteDataAttributePath & aP
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty())
-    {
+    if (!attribute_name.empty()) {
         std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/FanControl/Attributes/" + attribute_name + "/Desired";
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/FanControl/Attributes/" + attribute_name + "/Desired";
         payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
@@ -3414,38 +3535,34 @@ CHIP_ERROR FanControlAttributeAccess::Write(const ConcreteDataAttributePath & aP
     return CHIP_ERROR_NO_MESSAGE_HANDLER;
 }
 
-void FanControlAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                                 const std::string & attribute, const nlohmann::json & unify_value)
+void FanControlAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster,
+    const std::string& attribute, const nlohmann::json& unify_value)
 {
     namespace MN = chip::app::Clusters::FanControl::Attributes;
     namespace UN = unify::matter_bridge::FanControl::Attributes;
 
     auto cluster_id = device_translator::instance().get_cluster_id(cluster);
 
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::FanControl::Id))
-    {
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::FanControl::Id)) {
         return;
     }
 
     // get attribute id
     auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
 
-    if (!attribute_id.has_value())
-    {
+    if (!attribute_id.has_value()) {
         return;
     }
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::FanControl::Id, attribute_id.value());
-    switch (attribute_id.value())
-    {
+    switch (attribute_id.value()) {
     // type is FanModeType
     case MN::FanMode::Id: {
-        using T                = MN::FanMode::TypeInfo::Type;
+        using T = MN::FanMode::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "FanMode attribute value is %s", unify_value.dump().c_str());
             UN::FanMode::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::FanMode::Id);
@@ -3454,11 +3571,10 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint * ep, co
     }
         // type is FanModeSequenceType
     case MN::FanModeSequence::Id: {
-        using T                = MN::FanModeSequence::TypeInfo::Type;
+        using T = MN::FanModeSequence::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "FanModeSequence attribute value is %s", unify_value.dump().c_str());
             UN::FanModeSequence::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::FanControl::Id, MN::FanModeSequence::Id);
@@ -3469,20 +3585,17 @@ void FanControlAttributeAccess::reported_updated(const bridged_endpoint * ep, co
 }
 
 CHIP_ERROR
-ThermostatUserInterfaceConfigurationAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+ThermostatUserInterfaceConfigurationAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
 {
     namespace MN = chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes;
     namespace UN = unify::matter_bridge::ThermostatUserInterfaceConfiguration::Attributes;
-    if (aPath.mClusterId != Clusters::ThermostatUserInterfaceConfiguration::Id)
-    {
+    if (aPath.mClusterId != Clusters::ThermostatUserInterfaceConfiguration::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
+    try {
+        switch (aPath.mAttributeId) {
         case MN::TemperatureDisplayMode::Id: { // type is enum8
             MN::TemperatureDisplayMode::TypeInfo::Type value;
             UN::TemperatureDisplayMode::Get(atr_path, value);
@@ -3509,43 +3622,39 @@ ThermostatUserInterfaceConfigurationAttributeAccess::Read(const ConcreteReadAttr
             return aEncoder.Encode(value);
         }
         }
-    } catch (const std::out_of_range & e)
-    {
+    } catch (const std::out_of_range& e) {
         sl_log_info(LOG_TAG,
-                    "The request attribute Path for endpoint [%i] is not found in the attribute state "
-                    "container: %s\n",
-                    atr_path.mEndpointId, e.what());
+            "The request attribute Path for endpoint [%i] is not found in the attribute state "
+            "container: %s\n",
+            atr_path.mEndpointId, e.what());
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ThermostatUserInterfaceConfigurationAttributeAccess::Write(const ConcreteDataAttributePath & aPath,
-                                                                      AttributeValueDecoder & aDecoder)
+CHIP_ERROR ThermostatUserInterfaceConfigurationAttributeAccess::Write(const ConcreteDataAttributePath& aPath,
+    AttributeValueDecoder& aDecoder)
 {
     using namespace chip::app::Clusters::ThermostatUserInterfaceConfiguration;
 
-    if (aPath.mClusterId != Clusters::ThermostatUserInterfaceConfiguration::Id)
-    {
+    if (aPath.mClusterId != Clusters::ThermostatUserInterfaceConfiguration::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
-    if (!unify_node)
-    {
+    if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
 
     std::string attribute_name;
     nlohmann::json jsn;
 
-    switch (aPath.mAttributeId)
-    {
+    switch (aPath.mAttributeId) {
     case Attributes::TemperatureDisplayMode::Id: {
 
         Attributes::TemperatureDisplayMode::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "TemperatureDisplayMode";
         break;
     }
@@ -3553,7 +3662,7 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationAttributeAccess::Write(const Conc
 
         Attributes::KeypadLockout::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "KeypadLockout";
         break;
     }
@@ -3561,7 +3670,7 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationAttributeAccess::Write(const Conc
 
         Attributes::ScheduleProgrammingVisibility::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ScheduleProgrammingVisibility";
         break;
     }
@@ -3572,11 +3681,9 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationAttributeAccess::Write(const Conc
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty())
-    {
+    if (!attribute_name.empty()) {
         std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/ThermostatUserInterfaceConfiguration/Attributes/" + attribute_name + "/Desired";
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/ThermostatUserInterfaceConfiguration/Attributes/" + attribute_name + "/Desired";
         payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
@@ -3585,72 +3692,65 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationAttributeAccess::Write(const Conc
     return CHIP_ERROR_NO_MESSAGE_HANDLER;
 }
 
-void ThermostatUserInterfaceConfigurationAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                                                           const std::string & attribute,
-                                                                           const nlohmann::json & unify_value)
+void ThermostatUserInterfaceConfigurationAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster,
+    const std::string& attribute,
+    const nlohmann::json& unify_value)
 {
     namespace MN = chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes;
     namespace UN = unify::matter_bridge::ThermostatUserInterfaceConfiguration::Attributes;
 
     auto cluster_id = device_translator::instance().get_cluster_id(cluster);
 
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::ThermostatUserInterfaceConfiguration::Id))
-    {
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::ThermostatUserInterfaceConfiguration::Id)) {
         return;
     }
 
     // get attribute id
     auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
 
-    if (!attribute_id.has_value())
-    {
+    if (!attribute_id.has_value()) {
         return;
     }
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
-    ConcreteAttributePath attrpath =
-        ConcreteAttributePath(node_matter_endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, attribute_id.value());
-    switch (attribute_id.value())
-    {
+    ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id, attribute_id.value());
+    switch (attribute_id.value()) {
     // type is enum8
     case MN::TemperatureDisplayMode::Id: {
-        using T                = MN::TemperatureDisplayMode::TypeInfo::Type;
+        using T = MN::TemperatureDisplayMode::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "TemperatureDisplayMode attribute value is %s", unify_value.dump().c_str());
             UN::TemperatureDisplayMode::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id,
-                                                   MN::TemperatureDisplayMode::Id);
+                MN::TemperatureDisplayMode::Id);
         }
         break;
     }
         // type is enum8
     case MN::KeypadLockout::Id: {
-        using T                = MN::KeypadLockout::TypeInfo::Type;
+        using T = MN::KeypadLockout::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "KeypadLockout attribute value is %s", unify_value.dump().c_str());
             UN::KeypadLockout::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id,
-                                                   MN::KeypadLockout::Id);
+                MN::KeypadLockout::Id);
         }
         break;
     }
         // type is enum8
     case MN::ScheduleProgrammingVisibility::Id: {
-        using T                = MN::ScheduleProgrammingVisibility::TypeInfo::Type;
+        using T = MN::ScheduleProgrammingVisibility::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ScheduleProgrammingVisibility attribute value is %s", unify_value.dump().c_str());
             UN::ScheduleProgrammingVisibility::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ThermostatUserInterfaceConfiguration::Id,
-                                                   MN::ScheduleProgrammingVisibility::Id);
+                MN::ScheduleProgrammingVisibility::Id);
         }
         break;
     }
@@ -3658,20 +3758,17 @@ void ThermostatUserInterfaceConfigurationAttributeAccess::reported_updated(const
 }
 
 CHIP_ERROR
-ColorControlAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+ColorControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
 {
     namespace MN = chip::app::Clusters::ColorControl::Attributes;
     namespace UN = unify::matter_bridge::ColorControl::Attributes;
-    if (aPath.mClusterId != Clusters::ColorControl::Id)
-    {
+    if (aPath.mClusterId != Clusters::ColorControl::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
+    try {
+        switch (aPath.mAttributeId) {
         case MN::CurrentHue::Id: { // type is int8u
             MN::CurrentHue::TypeInfo::Type value;
             UN::CurrentHue::Get(atr_path, value);
@@ -3943,37 +4040,33 @@ ColorControlAttributeAccess::Read(const ConcreteReadAttributePath & aPath, Attri
             return aEncoder.Encode(value);
         }
         }
-    } catch (const std::out_of_range & e)
-    {
+    } catch (const std::out_of_range& e) {
         sl_log_info(LOG_TAG,
-                    "The request attribute Path for endpoint [%i] is not found in the attribute state "
-                    "container: %s\n",
-                    atr_path.mEndpointId, e.what());
+            "The request attribute Path for endpoint [%i] is not found in the attribute state "
+            "container: %s\n",
+            atr_path.mEndpointId, e.what());
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath& aPath, AttributeValueDecoder& aDecoder)
 {
     using namespace chip::app::Clusters::ColorControl;
 
-    if (aPath.mClusterId != Clusters::ColorControl::Id)
-    {
+    if (aPath.mClusterId != Clusters::ColorControl::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
-    if (!unify_node)
-    {
+    if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
 
     std::string attribute_name;
     nlohmann::json jsn;
 
-    switch (aPath.mAttributeId)
-    {
+    switch (aPath.mAttributeId) {
     // CurrentHue is not supported by UCL
     // CurrentSaturation is not supported by UCL
     // RemainingTime is not supported by UCL
@@ -3987,7 +4080,7 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::Options::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "Options";
         break;
     }
@@ -4014,7 +4107,7 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::WhitePointX::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "WhitePointX";
         break;
     }
@@ -4022,7 +4115,7 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::WhitePointY::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "WhitePointY";
         break;
     }
@@ -4030,7 +4123,7 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::ColorPointRX::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ColorPointRX";
         break;
     }
@@ -4038,7 +4131,7 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::ColorPointRY::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ColorPointRY";
         break;
     }
@@ -4046,7 +4139,7 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::ColorPointRIntensity::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ColorPointRIntensity";
         break;
     }
@@ -4054,7 +4147,7 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::ColorPointGX::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ColorPointGX";
         break;
     }
@@ -4062,7 +4155,7 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::ColorPointGY::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ColorPointGY";
         break;
     }
@@ -4070,7 +4163,7 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::ColorPointGIntensity::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ColorPointGIntensity";
         break;
     }
@@ -4078,7 +4171,7 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::ColorPointBX::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ColorPointBX";
         break;
     }
@@ -4086,7 +4179,7 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::ColorPointBY::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ColorPointBY";
         break;
     }
@@ -4094,7 +4187,7 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::ColorPointBIntensity::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ColorPointBIntensity";
         break;
     }
@@ -4113,7 +4206,7 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath & 
 
         Attributes::StartUpColorTemperatureMireds::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "StartUpColorTemperatureMireds";
         break;
     }
@@ -4124,11 +4217,9 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath & 
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty())
-    {
+    if (!attribute_name.empty()) {
         std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/ColorControl/Attributes/" + attribute_name + "/Desired";
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/ColorControl/Attributes/" + attribute_name + "/Desired";
         payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
@@ -4137,38 +4228,34 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath & 
     return CHIP_ERROR_NO_MESSAGE_HANDLER;
 }
 
-void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                                   const std::string & attribute, const nlohmann::json & unify_value)
+void ColorControlAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster,
+    const std::string& attribute, const nlohmann::json& unify_value)
 {
     namespace MN = chip::app::Clusters::ColorControl::Attributes;
     namespace UN = unify::matter_bridge::ColorControl::Attributes;
 
     auto cluster_id = device_translator::instance().get_cluster_id(cluster);
 
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::ColorControl::Id))
-    {
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::ColorControl::Id)) {
         return;
     }
 
     // get attribute id
     auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
 
-    if (!attribute_id.has_value())
-    {
+    if (!attribute_id.has_value()) {
         return;
     }
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::ColorControl::Id, attribute_id.value());
-    switch (attribute_id.value())
-    {
+    switch (attribute_id.value()) {
     // type is int8u
     case MN::CurrentHue::Id: {
-        using T                = MN::CurrentHue::TypeInfo::Type;
+        using T = MN::CurrentHue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CurrentHue attribute value is %s", unify_value.dump().c_str());
             UN::CurrentHue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CurrentHue::Id);
@@ -4177,11 +4264,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int8u
     case MN::CurrentSaturation::Id: {
-        using T                = MN::CurrentSaturation::TypeInfo::Type;
+        using T = MN::CurrentSaturation::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CurrentSaturation attribute value is %s", unify_value.dump().c_str());
             UN::CurrentSaturation::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CurrentSaturation::Id);
@@ -4190,11 +4276,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::RemainingTime::Id: {
-        using T                = MN::RemainingTime::TypeInfo::Type;
+        using T = MN::RemainingTime::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RemainingTime attribute value is %s", unify_value.dump().c_str());
             UN::RemainingTime::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::RemainingTime::Id);
@@ -4203,11 +4288,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::CurrentX::Id: {
-        using T                = MN::CurrentX::TypeInfo::Type;
+        using T = MN::CurrentX::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CurrentX attribute value is %s", unify_value.dump().c_str());
             UN::CurrentX::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CurrentX::Id);
@@ -4216,11 +4300,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::CurrentY::Id: {
-        using T                = MN::CurrentY::TypeInfo::Type;
+        using T = MN::CurrentY::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CurrentY attribute value is %s", unify_value.dump().c_str());
             UN::CurrentY::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CurrentY::Id);
@@ -4229,11 +4312,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is enum8
     case MN::DriftCompensation::Id: {
-        using T                = MN::DriftCompensation::TypeInfo::Type;
+        using T = MN::DriftCompensation::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DriftCompensation attribute value is %s", unify_value.dump().c_str());
             UN::DriftCompensation::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::DriftCompensation::Id);
@@ -4242,11 +4324,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is char_string
     case MN::CompensationText::Id: {
-        using T                = MN::CompensationText::TypeInfo::Type;
+        using T = MN::CompensationText::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CompensationText attribute value is %s", unify_value.dump().c_str());
             UN::CompensationText::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::CompensationText::Id);
@@ -4255,25 +4336,23 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::ColorTemperatureMireds::Id: {
-        using T                = MN::ColorTemperatureMireds::TypeInfo::Type;
+        using T = MN::ColorTemperatureMireds::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorTemperatureMireds attribute value is %s", unify_value.dump().c_str());
             UN::ColorTemperatureMireds::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
-                                                   MN::ColorTemperatureMireds::Id);
+                MN::ColorTemperatureMireds::Id);
         }
         break;
     }
         // type is enum8
     case MN::ColorMode::Id: {
-        using T                = MN::ColorMode::TypeInfo::Type;
+        using T = MN::ColorMode::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorMode attribute value is %s", unify_value.dump().c_str());
             UN::ColorMode::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorMode::Id);
@@ -4282,11 +4361,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is bitmap8
     case MN::Options::Id: {
-        using T                = MN::Options::TypeInfo::Type;
+        using T = MN::Options::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Options attribute value is %s", unify_value.dump().c_str());
             UN::Options::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Options::Id);
@@ -4295,11 +4373,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int8u
     case MN::NumberOfPrimaries::Id: {
-        using T                = MN::NumberOfPrimaries::TypeInfo::Type;
+        using T = MN::NumberOfPrimaries::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NumberOfPrimaries attribute value is %s", unify_value.dump().c_str());
             UN::NumberOfPrimaries::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::NumberOfPrimaries::Id);
@@ -4308,11 +4385,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::Primary1X::Id: {
-        using T                = MN::Primary1X::TypeInfo::Type;
+        using T = MN::Primary1X::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary1X attribute value is %s", unify_value.dump().c_str());
             UN::Primary1X::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary1X::Id);
@@ -4321,11 +4397,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::Primary1Y::Id: {
-        using T                = MN::Primary1Y::TypeInfo::Type;
+        using T = MN::Primary1Y::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary1Y attribute value is %s", unify_value.dump().c_str());
             UN::Primary1Y::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary1Y::Id);
@@ -4334,11 +4409,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int8u
     case MN::Primary1Intensity::Id: {
-        using T                = MN::Primary1Intensity::TypeInfo::Type;
+        using T = MN::Primary1Intensity::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary1Intensity attribute value is %s", unify_value.dump().c_str());
             UN::Primary1Intensity::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary1Intensity::Id);
@@ -4347,11 +4421,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::Primary2X::Id: {
-        using T                = MN::Primary2X::TypeInfo::Type;
+        using T = MN::Primary2X::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary2X attribute value is %s", unify_value.dump().c_str());
             UN::Primary2X::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary2X::Id);
@@ -4360,11 +4433,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::Primary2Y::Id: {
-        using T                = MN::Primary2Y::TypeInfo::Type;
+        using T = MN::Primary2Y::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary2Y attribute value is %s", unify_value.dump().c_str());
             UN::Primary2Y::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary2Y::Id);
@@ -4373,11 +4445,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int8u
     case MN::Primary2Intensity::Id: {
-        using T                = MN::Primary2Intensity::TypeInfo::Type;
+        using T = MN::Primary2Intensity::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary2Intensity attribute value is %s", unify_value.dump().c_str());
             UN::Primary2Intensity::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary2Intensity::Id);
@@ -4386,11 +4457,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::Primary3X::Id: {
-        using T                = MN::Primary3X::TypeInfo::Type;
+        using T = MN::Primary3X::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary3X attribute value is %s", unify_value.dump().c_str());
             UN::Primary3X::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary3X::Id);
@@ -4399,11 +4469,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::Primary3Y::Id: {
-        using T                = MN::Primary3Y::TypeInfo::Type;
+        using T = MN::Primary3Y::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary3Y attribute value is %s", unify_value.dump().c_str());
             UN::Primary3Y::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary3Y::Id);
@@ -4412,11 +4481,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int8u
     case MN::Primary3Intensity::Id: {
-        using T                = MN::Primary3Intensity::TypeInfo::Type;
+        using T = MN::Primary3Intensity::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary3Intensity attribute value is %s", unify_value.dump().c_str());
             UN::Primary3Intensity::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary3Intensity::Id);
@@ -4425,11 +4493,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::Primary4X::Id: {
-        using T                = MN::Primary4X::TypeInfo::Type;
+        using T = MN::Primary4X::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary4X attribute value is %s", unify_value.dump().c_str());
             UN::Primary4X::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary4X::Id);
@@ -4438,11 +4505,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::Primary4Y::Id: {
-        using T                = MN::Primary4Y::TypeInfo::Type;
+        using T = MN::Primary4Y::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary4Y attribute value is %s", unify_value.dump().c_str());
             UN::Primary4Y::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary4Y::Id);
@@ -4451,11 +4517,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int8u
     case MN::Primary4Intensity::Id: {
-        using T                = MN::Primary4Intensity::TypeInfo::Type;
+        using T = MN::Primary4Intensity::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary4Intensity attribute value is %s", unify_value.dump().c_str());
             UN::Primary4Intensity::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary4Intensity::Id);
@@ -4464,11 +4529,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::Primary5X::Id: {
-        using T                = MN::Primary5X::TypeInfo::Type;
+        using T = MN::Primary5X::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary5X attribute value is %s", unify_value.dump().c_str());
             UN::Primary5X::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary5X::Id);
@@ -4477,11 +4541,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::Primary5Y::Id: {
-        using T                = MN::Primary5Y::TypeInfo::Type;
+        using T = MN::Primary5Y::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary5Y attribute value is %s", unify_value.dump().c_str());
             UN::Primary5Y::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary5Y::Id);
@@ -4490,11 +4553,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int8u
     case MN::Primary5Intensity::Id: {
-        using T                = MN::Primary5Intensity::TypeInfo::Type;
+        using T = MN::Primary5Intensity::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary5Intensity attribute value is %s", unify_value.dump().c_str());
             UN::Primary5Intensity::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary5Intensity::Id);
@@ -4503,11 +4565,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::Primary6X::Id: {
-        using T                = MN::Primary6X::TypeInfo::Type;
+        using T = MN::Primary6X::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary6X attribute value is %s", unify_value.dump().c_str());
             UN::Primary6X::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary6X::Id);
@@ -4516,11 +4577,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::Primary6Y::Id: {
-        using T                = MN::Primary6Y::TypeInfo::Type;
+        using T = MN::Primary6Y::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary6Y attribute value is %s", unify_value.dump().c_str());
             UN::Primary6Y::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary6Y::Id);
@@ -4529,11 +4589,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int8u
     case MN::Primary6Intensity::Id: {
-        using T                = MN::Primary6Intensity::TypeInfo::Type;
+        using T = MN::Primary6Intensity::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Primary6Intensity attribute value is %s", unify_value.dump().c_str());
             UN::Primary6Intensity::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::Primary6Intensity::Id);
@@ -4542,11 +4601,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::WhitePointX::Id: {
-        using T                = MN::WhitePointX::TypeInfo::Type;
+        using T = MN::WhitePointX::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "WhitePointX attribute value is %s", unify_value.dump().c_str());
             UN::WhitePointX::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::WhitePointX::Id);
@@ -4555,11 +4613,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::WhitePointY::Id: {
-        using T                = MN::WhitePointY::TypeInfo::Type;
+        using T = MN::WhitePointY::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "WhitePointY attribute value is %s", unify_value.dump().c_str());
             UN::WhitePointY::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::WhitePointY::Id);
@@ -4568,11 +4625,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::ColorPointRX::Id: {
-        using T                = MN::ColorPointRX::TypeInfo::Type;
+        using T = MN::ColorPointRX::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorPointRX attribute value is %s", unify_value.dump().c_str());
             UN::ColorPointRX::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointRX::Id);
@@ -4581,11 +4637,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::ColorPointRY::Id: {
-        using T                = MN::ColorPointRY::TypeInfo::Type;
+        using T = MN::ColorPointRY::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorPointRY attribute value is %s", unify_value.dump().c_str());
             UN::ColorPointRY::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointRY::Id);
@@ -4594,11 +4649,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int8u
     case MN::ColorPointRIntensity::Id: {
-        using T                = MN::ColorPointRIntensity::TypeInfo::Type;
+        using T = MN::ColorPointRIntensity::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorPointRIntensity attribute value is %s", unify_value.dump().c_str());
             UN::ColorPointRIntensity::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointRIntensity::Id);
@@ -4607,11 +4661,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::ColorPointGX::Id: {
-        using T                = MN::ColorPointGX::TypeInfo::Type;
+        using T = MN::ColorPointGX::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorPointGX attribute value is %s", unify_value.dump().c_str());
             UN::ColorPointGX::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointGX::Id);
@@ -4620,11 +4673,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::ColorPointGY::Id: {
-        using T                = MN::ColorPointGY::TypeInfo::Type;
+        using T = MN::ColorPointGY::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorPointGY attribute value is %s", unify_value.dump().c_str());
             UN::ColorPointGY::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointGY::Id);
@@ -4633,11 +4685,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int8u
     case MN::ColorPointGIntensity::Id: {
-        using T                = MN::ColorPointGIntensity::TypeInfo::Type;
+        using T = MN::ColorPointGIntensity::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorPointGIntensity attribute value is %s", unify_value.dump().c_str());
             UN::ColorPointGIntensity::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointGIntensity::Id);
@@ -4646,11 +4697,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::ColorPointBX::Id: {
-        using T                = MN::ColorPointBX::TypeInfo::Type;
+        using T = MN::ColorPointBX::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorPointBX attribute value is %s", unify_value.dump().c_str());
             UN::ColorPointBX::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointBX::Id);
@@ -4659,11 +4709,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::ColorPointBY::Id: {
-        using T                = MN::ColorPointBY::TypeInfo::Type;
+        using T = MN::ColorPointBY::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorPointBY attribute value is %s", unify_value.dump().c_str());
             UN::ColorPointBY::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointBY::Id);
@@ -4672,11 +4721,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int8u
     case MN::ColorPointBIntensity::Id: {
-        using T                = MN::ColorPointBIntensity::TypeInfo::Type;
+        using T = MN::ColorPointBIntensity::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorPointBIntensity attribute value is %s", unify_value.dump().c_str());
             UN::ColorPointBIntensity::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorPointBIntensity::Id);
@@ -4685,11 +4733,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::EnhancedCurrentHue::Id: {
-        using T                = MN::EnhancedCurrentHue::TypeInfo::Type;
+        using T = MN::EnhancedCurrentHue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "EnhancedCurrentHue attribute value is %s", unify_value.dump().c_str());
             UN::EnhancedCurrentHue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::EnhancedCurrentHue::Id);
@@ -4698,11 +4745,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is enum8
     case MN::EnhancedColorMode::Id: {
-        using T                = MN::EnhancedColorMode::TypeInfo::Type;
+        using T = MN::EnhancedColorMode::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "EnhancedColorMode attribute value is %s", unify_value.dump().c_str());
             UN::EnhancedColorMode::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::EnhancedColorMode::Id);
@@ -4711,11 +4757,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int8u
     case MN::ColorLoopActive::Id: {
-        using T                = MN::ColorLoopActive::TypeInfo::Type;
+        using T = MN::ColorLoopActive::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorLoopActive attribute value is %s", unify_value.dump().c_str());
             UN::ColorLoopActive::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorLoopActive::Id);
@@ -4724,11 +4769,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int8u
     case MN::ColorLoopDirection::Id: {
-        using T                = MN::ColorLoopDirection::TypeInfo::Type;
+        using T = MN::ColorLoopDirection::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorLoopDirection attribute value is %s", unify_value.dump().c_str());
             UN::ColorLoopDirection::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorLoopDirection::Id);
@@ -4737,11 +4781,10 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::ColorLoopTime::Id: {
-        using T                = MN::ColorLoopTime::TypeInfo::Type;
+        using T = MN::ColorLoopTime::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorLoopTime attribute value is %s", unify_value.dump().c_str());
             UN::ColorLoopTime::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorLoopTime::Id);
@@ -4750,39 +4793,36 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::ColorLoopStartEnhancedHue::Id: {
-        using T                = MN::ColorLoopStartEnhancedHue::TypeInfo::Type;
+        using T = MN::ColorLoopStartEnhancedHue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorLoopStartEnhancedHue attribute value is %s", unify_value.dump().c_str());
             UN::ColorLoopStartEnhancedHue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
-                                                   MN::ColorLoopStartEnhancedHue::Id);
+                MN::ColorLoopStartEnhancedHue::Id);
         }
         break;
     }
         // type is int16u
     case MN::ColorLoopStoredEnhancedHue::Id: {
-        using T                = MN::ColorLoopStoredEnhancedHue::TypeInfo::Type;
+        using T = MN::ColorLoopStoredEnhancedHue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorLoopStoredEnhancedHue attribute value is %s", unify_value.dump().c_str());
             UN::ColorLoopStoredEnhancedHue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
-                                                   MN::ColorLoopStoredEnhancedHue::Id);
+                MN::ColorLoopStoredEnhancedHue::Id);
         }
         break;
     }
         // type is bitmap16
     case MN::ColorCapabilities::Id: {
-        using T                = MN::ColorCapabilities::TypeInfo::Type;
+        using T = MN::ColorCapabilities::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorCapabilities attribute value is %s", unify_value.dump().c_str());
             UN::ColorCapabilities::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id, MN::ColorCapabilities::Id);
@@ -4791,57 +4831,53 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
     }
         // type is int16u
     case MN::ColorTempPhysicalMinMireds::Id: {
-        using T                = MN::ColorTempPhysicalMinMireds::TypeInfo::Type;
+        using T = MN::ColorTempPhysicalMinMireds::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorTempPhysicalMinMireds attribute value is %s", unify_value.dump().c_str());
             UN::ColorTempPhysicalMinMireds::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
-                                                   MN::ColorTempPhysicalMinMireds::Id);
+                MN::ColorTempPhysicalMinMireds::Id);
         }
         break;
     }
         // type is int16u
     case MN::ColorTempPhysicalMaxMireds::Id: {
-        using T                = MN::ColorTempPhysicalMaxMireds::TypeInfo::Type;
+        using T = MN::ColorTempPhysicalMaxMireds::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ColorTempPhysicalMaxMireds attribute value is %s", unify_value.dump().c_str());
             UN::ColorTempPhysicalMaxMireds::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
-                                                   MN::ColorTempPhysicalMaxMireds::Id);
+                MN::ColorTempPhysicalMaxMireds::Id);
         }
         break;
     }
         // type is int16u
     case MN::CoupleColorTempToLevelMinMireds::Id: {
-        using T                = MN::CoupleColorTempToLevelMinMireds::TypeInfo::Type;
+        using T = MN::CoupleColorTempToLevelMinMireds::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CoupleColorTempToLevelMinMireds attribute value is %s", unify_value.dump().c_str());
             UN::CoupleColorTempToLevelMinMireds::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
-                                                   MN::CoupleColorTempToLevelMinMireds::Id);
+                MN::CoupleColorTempToLevelMinMireds::Id);
         }
         break;
     }
         // type is int16u
     case MN::StartUpColorTemperatureMireds::Id: {
-        using T                = MN::StartUpColorTemperatureMireds::TypeInfo::Type;
+        using T = MN::StartUpColorTemperatureMireds::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "StartUpColorTemperatureMireds attribute value is %s", unify_value.dump().c_str());
             UN::StartUpColorTemperatureMireds::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ColorControl::Id,
-                                                   MN::StartUpColorTemperatureMireds::Id);
+                MN::StartUpColorTemperatureMireds::Id);
         }
         break;
     }
@@ -4849,20 +4885,17 @@ void ColorControlAttributeAccess::reported_updated(const bridged_endpoint * ep, 
 }
 
 CHIP_ERROR
-IlluminanceMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+IlluminanceMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
 {
     namespace MN = chip::app::Clusters::IlluminanceMeasurement::Attributes;
     namespace UN = unify::matter_bridge::IlluminanceMeasurement::Attributes;
-    if (aPath.mClusterId != Clusters::IlluminanceMeasurement::Id)
-    {
+    if (aPath.mClusterId != Clusters::IlluminanceMeasurement::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
+    try {
+        switch (aPath.mAttributeId) {
         case MN::MeasuredValue::Id: { // type is int16u
             MN::MeasuredValue::TypeInfo::Type value;
             UN::MeasuredValue::Get(atr_path, value);
@@ -4899,37 +4932,33 @@ IlluminanceMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aP
             return aEncoder.Encode(value);
         }
         }
-    } catch (const std::out_of_range & e)
-    {
+    } catch (const std::out_of_range& e) {
         sl_log_info(LOG_TAG,
-                    "The request attribute Path for endpoint [%i] is not found in the attribute state "
-                    "container: %s\n",
-                    atr_path.mEndpointId, e.what());
+            "The request attribute Path for endpoint [%i] is not found in the attribute state "
+            "container: %s\n",
+            atr_path.mEndpointId, e.what());
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR IlluminanceMeasurementAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR IlluminanceMeasurementAttributeAccess::Write(const ConcreteDataAttributePath& aPath, AttributeValueDecoder& aDecoder)
 {
     using namespace chip::app::Clusters::IlluminanceMeasurement;
 
-    if (aPath.mClusterId != Clusters::IlluminanceMeasurement::Id)
-    {
+    if (aPath.mClusterId != Clusters::IlluminanceMeasurement::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
-    if (!unify_node)
-    {
+    if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
 
     std::string attribute_name;
     nlohmann::json jsn;
 
-    switch (aPath.mAttributeId)
-    {
+    switch (aPath.mAttributeId) {
         // MeasuredValue is not supported by UCL
         // MinMeasuredValue is not supported by UCL
         // MaxMeasuredValue is not supported by UCL
@@ -4942,11 +4971,9 @@ CHIP_ERROR IlluminanceMeasurementAttributeAccess::Write(const ConcreteDataAttrib
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty())
-    {
+    if (!attribute_name.empty()) {
         std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/IlluminanceMeasurement/Attributes/" + attribute_name + "/Desired";
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/IlluminanceMeasurement/Attributes/" + attribute_name + "/Desired";
         payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
@@ -4955,81 +4982,73 @@ CHIP_ERROR IlluminanceMeasurementAttributeAccess::Write(const ConcreteDataAttrib
     return CHIP_ERROR_NO_MESSAGE_HANDLER;
 }
 
-void IlluminanceMeasurementAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                                             const std::string & attribute, const nlohmann::json & unify_value)
+void IlluminanceMeasurementAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster,
+    const std::string& attribute, const nlohmann::json& unify_value)
 {
     namespace MN = chip::app::Clusters::IlluminanceMeasurement::Attributes;
     namespace UN = unify::matter_bridge::IlluminanceMeasurement::Attributes;
 
     auto cluster_id = device_translator::instance().get_cluster_id(cluster);
 
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::IlluminanceMeasurement::Id))
-    {
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::IlluminanceMeasurement::Id)) {
         return;
     }
 
     // get attribute id
     auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
 
-    if (!attribute_id.has_value())
-    {
+    if (!attribute_id.has_value()) {
         return;
     }
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
-    ConcreteAttributePath attrpath =
-        ConcreteAttributePath(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id, attribute_id.value());
-    switch (attribute_id.value())
-    {
+    ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id, attribute_id.value());
+    switch (attribute_id.value()) {
     // type is int16u
     case MN::MeasuredValue::Id: {
-        using T                = MN::MeasuredValue::TypeInfo::Type;
+        using T = MN::MeasuredValue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id,
-                                                   MN::MeasuredValue::Id);
+                MN::MeasuredValue::Id);
         }
         break;
     }
         // type is int16u
     case MN::MinMeasuredValue::Id: {
-        using T                = MN::MinMeasuredValue::TypeInfo::Type;
+        using T = MN::MinMeasuredValue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinMeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MinMeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id,
-                                                   MN::MinMeasuredValue::Id);
+                MN::MinMeasuredValue::Id);
         }
         break;
     }
         // type is int16u
     case MN::MaxMeasuredValue::Id: {
-        using T                = MN::MaxMeasuredValue::TypeInfo::Type;
+        using T = MN::MaxMeasuredValue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxMeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MaxMeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id,
-                                                   MN::MaxMeasuredValue::Id);
+                MN::MaxMeasuredValue::Id);
         }
         break;
     }
         // type is int16u
     case MN::Tolerance::Id: {
-        using T                = MN::Tolerance::TypeInfo::Type;
+        using T = MN::Tolerance::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Tolerance attribute value is %s", unify_value.dump().c_str());
             UN::Tolerance::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id, MN::Tolerance::Id);
@@ -5038,15 +5057,14 @@ void IlluminanceMeasurementAttributeAccess::reported_updated(const bridged_endpo
     }
         // type is enum8
     case MN::LightSensorType::Id: {
-        using T                = MN::LightSensorType::TypeInfo::Type;
+        using T = MN::LightSensorType::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "LightSensorType attribute value is %s", unify_value.dump().c_str());
             UN::LightSensorType::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::IlluminanceMeasurement::Id,
-                                                   MN::LightSensorType::Id);
+                MN::LightSensorType::Id);
         }
         break;
     }
@@ -5054,20 +5072,17 @@ void IlluminanceMeasurementAttributeAccess::reported_updated(const bridged_endpo
 }
 
 CHIP_ERROR
-TemperatureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+TemperatureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
 {
     namespace MN = chip::app::Clusters::TemperatureMeasurement::Attributes;
     namespace UN = unify::matter_bridge::TemperatureMeasurement::Attributes;
-    if (aPath.mClusterId != Clusters::TemperatureMeasurement::Id)
-    {
+    if (aPath.mClusterId != Clusters::TemperatureMeasurement::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
+    try {
+        switch (aPath.mAttributeId) {
         case MN::MeasuredValue::Id: { // type is int16s
             MN::MeasuredValue::TypeInfo::Type value;
             UN::MeasuredValue::Get(atr_path, value);
@@ -5099,37 +5114,33 @@ TemperatureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aP
             return aEncoder.Encode(value);
         }
         }
-    } catch (const std::out_of_range & e)
-    {
+    } catch (const std::out_of_range& e) {
         sl_log_info(LOG_TAG,
-                    "The request attribute Path for endpoint [%i] is not found in the attribute state "
-                    "container: %s\n",
-                    atr_path.mEndpointId, e.what());
+            "The request attribute Path for endpoint [%i] is not found in the attribute state "
+            "container: %s\n",
+            atr_path.mEndpointId, e.what());
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TemperatureMeasurementAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR TemperatureMeasurementAttributeAccess::Write(const ConcreteDataAttributePath& aPath, AttributeValueDecoder& aDecoder)
 {
     using namespace chip::app::Clusters::TemperatureMeasurement;
 
-    if (aPath.mClusterId != Clusters::TemperatureMeasurement::Id)
-    {
+    if (aPath.mClusterId != Clusters::TemperatureMeasurement::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
-    if (!unify_node)
-    {
+    if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
 
     std::string attribute_name;
     nlohmann::json jsn;
 
-    switch (aPath.mAttributeId)
-    {
+    switch (aPath.mAttributeId) {
         // MeasuredValue is not supported by UCL
         // MinMeasuredValue is not supported by UCL
         // MaxMeasuredValue is not supported by UCL
@@ -5141,11 +5152,9 @@ CHIP_ERROR TemperatureMeasurementAttributeAccess::Write(const ConcreteDataAttrib
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty())
-    {
+    if (!attribute_name.empty()) {
         std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/TemperatureMeasurement/Attributes/" + attribute_name + "/Desired";
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/TemperatureMeasurement/Attributes/" + attribute_name + "/Desired";
         payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
@@ -5154,81 +5163,73 @@ CHIP_ERROR TemperatureMeasurementAttributeAccess::Write(const ConcreteDataAttrib
     return CHIP_ERROR_NO_MESSAGE_HANDLER;
 }
 
-void TemperatureMeasurementAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                                             const std::string & attribute, const nlohmann::json & unify_value)
+void TemperatureMeasurementAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster,
+    const std::string& attribute, const nlohmann::json& unify_value)
 {
     namespace MN = chip::app::Clusters::TemperatureMeasurement::Attributes;
     namespace UN = unify::matter_bridge::TemperatureMeasurement::Attributes;
 
     auto cluster_id = device_translator::instance().get_cluster_id(cluster);
 
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::TemperatureMeasurement::Id))
-    {
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::TemperatureMeasurement::Id)) {
         return;
     }
 
     // get attribute id
     auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
 
-    if (!attribute_id.has_value())
-    {
+    if (!attribute_id.has_value()) {
         return;
     }
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
-    ConcreteAttributePath attrpath =
-        ConcreteAttributePath(node_matter_endpoint, Clusters::TemperatureMeasurement::Id, attribute_id.value());
-    switch (attribute_id.value())
-    {
+    ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::TemperatureMeasurement::Id, attribute_id.value());
+    switch (attribute_id.value()) {
     // type is int16s
     case MN::MeasuredValue::Id: {
-        using T                = MN::MeasuredValue::TypeInfo::Type;
+        using T = MN::MeasuredValue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TemperatureMeasurement::Id,
-                                                   MN::MeasuredValue::Id);
+                MN::MeasuredValue::Id);
         }
         break;
     }
         // type is int16s
     case MN::MinMeasuredValue::Id: {
-        using T                = MN::MinMeasuredValue::TypeInfo::Type;
+        using T = MN::MinMeasuredValue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinMeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MinMeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TemperatureMeasurement::Id,
-                                                   MN::MinMeasuredValue::Id);
+                MN::MinMeasuredValue::Id);
         }
         break;
     }
         // type is int16s
     case MN::MaxMeasuredValue::Id: {
-        using T                = MN::MaxMeasuredValue::TypeInfo::Type;
+        using T = MN::MaxMeasuredValue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxMeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MaxMeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TemperatureMeasurement::Id,
-                                                   MN::MaxMeasuredValue::Id);
+                MN::MaxMeasuredValue::Id);
         }
         break;
     }
         // type is int16u
     case MN::Tolerance::Id: {
-        using T                = MN::Tolerance::TypeInfo::Type;
+        using T = MN::Tolerance::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Tolerance attribute value is %s", unify_value.dump().c_str());
             UN::Tolerance::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::TemperatureMeasurement::Id, MN::Tolerance::Id);
@@ -5239,20 +5240,17 @@ void TemperatureMeasurementAttributeAccess::reported_updated(const bridged_endpo
 }
 
 CHIP_ERROR
-PressureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+PressureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
 {
     namespace MN = chip::app::Clusters::PressureMeasurement::Attributes;
     namespace UN = unify::matter_bridge::PressureMeasurement::Attributes;
-    if (aPath.mClusterId != Clusters::PressureMeasurement::Id)
-    {
+    if (aPath.mClusterId != Clusters::PressureMeasurement::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
+    try {
+        switch (aPath.mAttributeId) {
         case MN::MeasuredValue::Id: { // type is int16s
             MN::MeasuredValue::TypeInfo::Type value;
             UN::MeasuredValue::Get(atr_path, value);
@@ -5309,37 +5307,33 @@ PressureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aPath
             return aEncoder.Encode(value);
         }
         }
-    } catch (const std::out_of_range & e)
-    {
+    } catch (const std::out_of_range& e) {
         sl_log_info(LOG_TAG,
-                    "The request attribute Path for endpoint [%i] is not found in the attribute state "
-                    "container: %s\n",
-                    atr_path.mEndpointId, e.what());
+            "The request attribute Path for endpoint [%i] is not found in the attribute state "
+            "container: %s\n",
+            atr_path.mEndpointId, e.what());
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PressureMeasurementAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR PressureMeasurementAttributeAccess::Write(const ConcreteDataAttributePath& aPath, AttributeValueDecoder& aDecoder)
 {
     using namespace chip::app::Clusters::PressureMeasurement;
 
-    if (aPath.mClusterId != Clusters::PressureMeasurement::Id)
-    {
+    if (aPath.mClusterId != Clusters::PressureMeasurement::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
-    if (!unify_node)
-    {
+    if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
 
     std::string attribute_name;
     nlohmann::json jsn;
 
-    switch (aPath.mAttributeId)
-    {
+    switch (aPath.mAttributeId) {
         // MeasuredValue is not supported by UCL
         // MinMeasuredValue is not supported by UCL
         // MaxMeasuredValue is not supported by UCL
@@ -5356,11 +5350,9 @@ CHIP_ERROR PressureMeasurementAttributeAccess::Write(const ConcreteDataAttribute
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty())
-    {
+    if (!attribute_name.empty()) {
         std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/PressureMeasurement/Attributes/" + attribute_name + "/Desired";
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/PressureMeasurement/Attributes/" + attribute_name + "/Desired";
         payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
@@ -5369,39 +5361,34 @@ CHIP_ERROR PressureMeasurementAttributeAccess::Write(const ConcreteDataAttribute
     return CHIP_ERROR_NO_MESSAGE_HANDLER;
 }
 
-void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                                          const std::string & attribute, const nlohmann::json & unify_value)
+void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster,
+    const std::string& attribute, const nlohmann::json& unify_value)
 {
     namespace MN = chip::app::Clusters::PressureMeasurement::Attributes;
     namespace UN = unify::matter_bridge::PressureMeasurement::Attributes;
 
     auto cluster_id = device_translator::instance().get_cluster_id(cluster);
 
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::PressureMeasurement::Id))
-    {
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::PressureMeasurement::Id)) {
         return;
     }
 
     // get attribute id
     auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
 
-    if (!attribute_id.has_value())
-    {
+    if (!attribute_id.has_value()) {
         return;
     }
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
-    ConcreteAttributePath attrpath =
-        ConcreteAttributePath(node_matter_endpoint, Clusters::PressureMeasurement::Id, attribute_id.value());
-    switch (attribute_id.value())
-    {
+    ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::PressureMeasurement::Id, attribute_id.value());
+    switch (attribute_id.value()) {
     // type is int16s
     case MN::MeasuredValue::Id: {
-        using T                = MN::MeasuredValue::TypeInfo::Type;
+        using T = MN::MeasuredValue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::MeasuredValue::Id);
@@ -5410,39 +5397,36 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
     }
         // type is int16s
     case MN::MinMeasuredValue::Id: {
-        using T                = MN::MinMeasuredValue::TypeInfo::Type;
+        using T = MN::MinMeasuredValue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinMeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MinMeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id,
-                                                   MN::MinMeasuredValue::Id);
+                MN::MinMeasuredValue::Id);
         }
         break;
     }
         // type is int16s
     case MN::MaxMeasuredValue::Id: {
-        using T                = MN::MaxMeasuredValue::TypeInfo::Type;
+        using T = MN::MaxMeasuredValue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxMeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MaxMeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id,
-                                                   MN::MaxMeasuredValue::Id);
+                MN::MaxMeasuredValue::Id);
         }
         break;
     }
         // type is int16u
     case MN::Tolerance::Id: {
-        using T                = MN::Tolerance::TypeInfo::Type;
+        using T = MN::Tolerance::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Tolerance attribute value is %s", unify_value.dump().c_str());
             UN::Tolerance::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::Tolerance::Id);
@@ -5451,11 +5435,10 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
     }
         // type is int16s
     case MN::ScaledValue::Id: {
-        using T                = MN::ScaledValue::TypeInfo::Type;
+        using T = MN::ScaledValue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ScaledValue attribute value is %s", unify_value.dump().c_str());
             UN::ScaledValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::ScaledValue::Id);
@@ -5464,11 +5447,10 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
     }
         // type is int16s
     case MN::MinScaledValue::Id: {
-        using T                = MN::MinScaledValue::TypeInfo::Type;
+        using T = MN::MinScaledValue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinScaledValue attribute value is %s", unify_value.dump().c_str());
             UN::MinScaledValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::MinScaledValue::Id);
@@ -5477,11 +5459,10 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
     }
         // type is int16s
     case MN::MaxScaledValue::Id: {
-        using T                = MN::MaxScaledValue::TypeInfo::Type;
+        using T = MN::MaxScaledValue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxScaledValue attribute value is %s", unify_value.dump().c_str());
             UN::MaxScaledValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::MaxScaledValue::Id);
@@ -5490,25 +5471,23 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
     }
         // type is int16u
     case MN::ScaledTolerance::Id: {
-        using T                = MN::ScaledTolerance::TypeInfo::Type;
+        using T = MN::ScaledTolerance::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ScaledTolerance attribute value is %s", unify_value.dump().c_str());
             UN::ScaledTolerance::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id,
-                                                   MN::ScaledTolerance::Id);
+                MN::ScaledTolerance::Id);
         }
         break;
     }
         // type is int8s
     case MN::Scale::Id: {
-        using T                = MN::Scale::TypeInfo::Type;
+        using T = MN::Scale::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Scale attribute value is %s", unify_value.dump().c_str());
             UN::Scale::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::PressureMeasurement::Id, MN::Scale::Id);
@@ -5519,20 +5498,17 @@ void PressureMeasurementAttributeAccess::reported_updated(const bridged_endpoint
 }
 
 CHIP_ERROR
-RelativeHumidityMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+RelativeHumidityMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
 {
     namespace MN = chip::app::Clusters::RelativeHumidityMeasurement::Attributes;
     namespace UN = unify::matter_bridge::RelativeHumidityMeasurement::Attributes;
-    if (aPath.mClusterId != Clusters::RelativeHumidityMeasurement::Id)
-    {
+    if (aPath.mClusterId != Clusters::RelativeHumidityMeasurement::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
+    try {
+        switch (aPath.mAttributeId) {
         case MN::MeasuredValue::Id: { // type is int16u
             MN::MeasuredValue::TypeInfo::Type value;
             UN::MeasuredValue::Get(atr_path, value);
@@ -5564,38 +5540,34 @@ RelativeHumidityMeasurementAttributeAccess::Read(const ConcreteReadAttributePath
             return aEncoder.Encode(value);
         }
         }
-    } catch (const std::out_of_range & e)
-    {
+    } catch (const std::out_of_range& e) {
         sl_log_info(LOG_TAG,
-                    "The request attribute Path for endpoint [%i] is not found in the attribute state "
-                    "container: %s\n",
-                    atr_path.mEndpointId, e.what());
+            "The request attribute Path for endpoint [%i] is not found in the attribute state "
+            "container: %s\n",
+            atr_path.mEndpointId, e.what());
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR RelativeHumidityMeasurementAttributeAccess::Write(const ConcreteDataAttributePath & aPath,
-                                                             AttributeValueDecoder & aDecoder)
+CHIP_ERROR RelativeHumidityMeasurementAttributeAccess::Write(const ConcreteDataAttributePath& aPath,
+    AttributeValueDecoder& aDecoder)
 {
     using namespace chip::app::Clusters::RelativeHumidityMeasurement;
 
-    if (aPath.mClusterId != Clusters::RelativeHumidityMeasurement::Id)
-    {
+    if (aPath.mClusterId != Clusters::RelativeHumidityMeasurement::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
-    if (!unify_node)
-    {
+    if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
 
     std::string attribute_name;
     nlohmann::json jsn;
 
-    switch (aPath.mAttributeId)
-    {
+    switch (aPath.mAttributeId) {
         // measured value is not supported by UCL
         // min measured value is not supported by UCL
         // max measured value is not supported by UCL
@@ -5607,11 +5579,9 @@ CHIP_ERROR RelativeHumidityMeasurementAttributeAccess::Write(const ConcreteDataA
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty())
-    {
+    if (!attribute_name.empty()) {
         std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/RelativityHumidity/Attributes/" + attribute_name + "/Desired";
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/RelativityHumidity/Attributes/" + attribute_name + "/Desired";
         payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
@@ -5620,85 +5590,77 @@ CHIP_ERROR RelativeHumidityMeasurementAttributeAccess::Write(const ConcreteDataA
     return CHIP_ERROR_NO_MESSAGE_HANDLER;
 }
 
-void RelativeHumidityMeasurementAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                                                  const std::string & attribute, const nlohmann::json & unify_value)
+void RelativeHumidityMeasurementAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster,
+    const std::string& attribute, const nlohmann::json& unify_value)
 {
     namespace MN = chip::app::Clusters::RelativeHumidityMeasurement::Attributes;
     namespace UN = unify::matter_bridge::RelativeHumidityMeasurement::Attributes;
 
     auto cluster_id = device_translator::instance().get_cluster_id(cluster);
 
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::RelativeHumidityMeasurement::Id))
-    {
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::RelativeHumidityMeasurement::Id)) {
         return;
     }
 
     // get attribute id
     auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
 
-    if (!attribute_id.has_value())
-    {
+    if (!attribute_id.has_value()) {
         return;
     }
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
-    ConcreteAttributePath attrpath =
-        ConcreteAttributePath(node_matter_endpoint, Clusters::RelativeHumidityMeasurement::Id, attribute_id.value());
-    switch (attribute_id.value())
-    {
+    ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::RelativeHumidityMeasurement::Id, attribute_id.value());
+    switch (attribute_id.value()) {
     // type is int16u
     case MN::MeasuredValue::Id: {
-        using T                = MN::MeasuredValue::TypeInfo::Type;
+        using T = MN::MeasuredValue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::RelativeHumidityMeasurement::Id,
-                                                   MN::MeasuredValue::Id);
+                MN::MeasuredValue::Id);
         }
         break;
     }
         // type is int16u
     case MN::MinMeasuredValue::Id: {
-        using T                = MN::MinMeasuredValue::TypeInfo::Type;
+        using T = MN::MinMeasuredValue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MinMeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MinMeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::RelativeHumidityMeasurement::Id,
-                                                   MN::MinMeasuredValue::Id);
+                MN::MinMeasuredValue::Id);
         }
         break;
     }
         // type is int16u
     case MN::MaxMeasuredValue::Id: {
-        using T                = MN::MaxMeasuredValue::TypeInfo::Type;
+        using T = MN::MaxMeasuredValue::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MaxMeasuredValue attribute value is %s", unify_value.dump().c_str());
             UN::MaxMeasuredValue::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::RelativeHumidityMeasurement::Id,
-                                                   MN::MaxMeasuredValue::Id);
+                MN::MaxMeasuredValue::Id);
         }
         break;
     }
         // type is int16u
     case MN::Tolerance::Id: {
-        using T                = MN::Tolerance::TypeInfo::Type;
+        using T = MN::Tolerance::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Tolerance attribute value is %s", unify_value.dump().c_str());
             UN::Tolerance::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::RelativeHumidityMeasurement::Id,
-                                                   MN::Tolerance::Id);
+                MN::Tolerance::Id);
         }
         break;
     }
@@ -5706,20 +5668,17 @@ void RelativeHumidityMeasurementAttributeAccess::reported_updated(const bridged_
 }
 
 CHIP_ERROR
-OccupancySensingAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+OccupancySensingAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
 {
     namespace MN = chip::app::Clusters::OccupancySensing::Attributes;
     namespace UN = unify::matter_bridge::OccupancySensing::Attributes;
-    if (aPath.mClusterId != Clusters::OccupancySensing::Id)
-    {
+    if (aPath.mClusterId != Clusters::OccupancySensing::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
+    try {
+        switch (aPath.mAttributeId) {
         case MN::Occupancy::Id: { // type is bitmap8
             MN::Occupancy::TypeInfo::Type value;
             UN::Occupancy::Get(atr_path, value);
@@ -5791,37 +5750,33 @@ OccupancySensingAttributeAccess::Read(const ConcreteReadAttributePath & aPath, A
             return aEncoder.Encode(value);
         }
         }
-    } catch (const std::out_of_range & e)
-    {
+    } catch (const std::out_of_range& e) {
         sl_log_info(LOG_TAG,
-                    "The request attribute Path for endpoint [%i] is not found in the attribute state "
-                    "container: %s\n",
-                    atr_path.mEndpointId, e.what());
+            "The request attribute Path for endpoint [%i] is not found in the attribute state "
+            "container: %s\n",
+            atr_path.mEndpointId, e.what());
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePath& aPath, AttributeValueDecoder& aDecoder)
 {
     using namespace chip::app::Clusters::OccupancySensing;
 
-    if (aPath.mClusterId != Clusters::OccupancySensing::Id)
-    {
+    if (aPath.mClusterId != Clusters::OccupancySensing::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
-    if (!unify_node)
-    {
+    if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
 
     std::string attribute_name;
     nlohmann::json jsn;
 
-    switch (aPath.mAttributeId)
-    {
+    switch (aPath.mAttributeId) {
     // occupancy is not supported by UCL
     // occupancy sensor type is not supported by UCL
     // occupancy sensor type bitmap is not supported by UCL
@@ -5829,7 +5784,7 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
 
         Attributes::PirOccupiedToUnoccupiedDelay::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "PIROccupiedToUnoccupiedDelay";
         break;
     }
@@ -5837,7 +5792,7 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
 
         Attributes::PirUnoccupiedToOccupiedDelay::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "PIRUnoccupiedToOccupiedDelay";
         break;
     }
@@ -5845,7 +5800,7 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
 
         Attributes::PirUnoccupiedToOccupiedThreshold::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "PIRUnoccupiedToOccupiedThreshold";
         break;
     }
@@ -5853,7 +5808,7 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
 
         Attributes::UltrasonicOccupiedToUnoccupiedDelay::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "UltrasonicOccupiedToUnoccupiedDelay";
         break;
     }
@@ -5861,7 +5816,7 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
 
         Attributes::UltrasonicUnoccupiedToOccupiedDelay::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "UltrasonicUnoccupiedToOccupiedDelay";
         break;
     }
@@ -5869,7 +5824,7 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
 
         Attributes::UltrasonicUnoccupiedToOccupiedThreshold::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "UltrasonicUnoccupiedToOccupiedThreshold";
         break;
     }
@@ -5877,7 +5832,7 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
 
         Attributes::PhysicalContactOccupiedToUnoccupiedDelay::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "PhysicalContactOccupiedToUnoccupiedDelay";
         break;
     }
@@ -5885,7 +5840,7 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
 
         Attributes::PhysicalContactUnoccupiedToOccupiedDelay::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "PhysicalContactUnoccupiedToOccupiedDelay";
         break;
     }
@@ -5893,7 +5848,7 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
 
         Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "PhysicalContactUnoccupiedToOccupiedThreshold";
         break;
     }
@@ -5904,11 +5859,9 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty())
-    {
+    if (!attribute_name.empty()) {
         std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/OccupancySensing/Attributes/" + attribute_name + "/Desired";
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/OccupancySensing/Attributes/" + attribute_name + "/Desired";
         payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
@@ -5917,39 +5870,34 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
     return CHIP_ERROR_NO_MESSAGE_HANDLER;
 }
 
-void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                                       const std::string & attribute, const nlohmann::json & unify_value)
+void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster,
+    const std::string& attribute, const nlohmann::json& unify_value)
 {
     namespace MN = chip::app::Clusters::OccupancySensing::Attributes;
     namespace UN = unify::matter_bridge::OccupancySensing::Attributes;
 
     auto cluster_id = device_translator::instance().get_cluster_id(cluster);
 
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::OccupancySensing::Id))
-    {
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::OccupancySensing::Id)) {
         return;
     }
 
     // get attribute id
     auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
 
-    if (!attribute_id.has_value())
-    {
+    if (!attribute_id.has_value()) {
         return;
     }
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
-    ConcreteAttributePath attrpath =
-        ConcreteAttributePath(node_matter_endpoint, Clusters::OccupancySensing::Id, attribute_id.value());
-    switch (attribute_id.value())
-    {
+    ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::OccupancySensing::Id, attribute_id.value());
+    switch (attribute_id.value()) {
     // type is bitmap8
     case MN::Occupancy::Id: {
-        using T                = MN::Occupancy::TypeInfo::Type;
+        using T = MN::Occupancy::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Occupancy attribute value is %s", unify_value.dump().c_str());
             UN::Occupancy::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id, MN::Occupancy::Id);
@@ -5958,155 +5906,144 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
     }
         // type is enum8
     case MN::OccupancySensorType::Id: {
-        using T                = MN::OccupancySensorType::TypeInfo::Type;
+        using T = MN::OccupancySensorType::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OccupancySensorType attribute value is %s", unify_value.dump().c_str());
             UN::OccupancySensorType::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::OccupancySensorType::Id);
+                MN::OccupancySensorType::Id);
         }
         break;
     }
         // type is bitmap8
     case MN::OccupancySensorTypeBitmap::Id: {
-        using T                = MN::OccupancySensorTypeBitmap::TypeInfo::Type;
+        using T = MN::OccupancySensorTypeBitmap::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OccupancySensorTypeBitmap attribute value is %s", unify_value.dump().c_str());
             UN::OccupancySensorTypeBitmap::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::OccupancySensorTypeBitmap::Id);
+                MN::OccupancySensorTypeBitmap::Id);
         }
         break;
     }
         // type is int16u
     case MN::PirOccupiedToUnoccupiedDelay::Id: {
-        using T                = MN::PirOccupiedToUnoccupiedDelay::TypeInfo::Type;
+        using T = MN::PirOccupiedToUnoccupiedDelay::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PirOccupiedToUnoccupiedDelay attribute value is %s", unify_value.dump().c_str());
             UN::PirOccupiedToUnoccupiedDelay::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::PirOccupiedToUnoccupiedDelay::Id);
+                MN::PirOccupiedToUnoccupiedDelay::Id);
         }
         break;
     }
         // type is int16u
     case MN::PirUnoccupiedToOccupiedDelay::Id: {
-        using T                = MN::PirUnoccupiedToOccupiedDelay::TypeInfo::Type;
+        using T = MN::PirUnoccupiedToOccupiedDelay::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PirUnoccupiedToOccupiedDelay attribute value is %s", unify_value.dump().c_str());
             UN::PirUnoccupiedToOccupiedDelay::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::PirUnoccupiedToOccupiedDelay::Id);
+                MN::PirUnoccupiedToOccupiedDelay::Id);
         }
         break;
     }
         // type is int8u
     case MN::PirUnoccupiedToOccupiedThreshold::Id: {
-        using T                = MN::PirUnoccupiedToOccupiedThreshold::TypeInfo::Type;
+        using T = MN::PirUnoccupiedToOccupiedThreshold::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PirUnoccupiedToOccupiedThreshold attribute value is %s", unify_value.dump().c_str());
             UN::PirUnoccupiedToOccupiedThreshold::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::PirUnoccupiedToOccupiedThreshold::Id);
+                MN::PirUnoccupiedToOccupiedThreshold::Id);
         }
         break;
     }
         // type is int16u
     case MN::UltrasonicOccupiedToUnoccupiedDelay::Id: {
-        using T                = MN::UltrasonicOccupiedToUnoccupiedDelay::TypeInfo::Type;
+        using T = MN::UltrasonicOccupiedToUnoccupiedDelay::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "UltrasonicOccupiedToUnoccupiedDelay attribute value is %s", unify_value.dump().c_str());
             UN::UltrasonicOccupiedToUnoccupiedDelay::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::UltrasonicOccupiedToUnoccupiedDelay::Id);
+                MN::UltrasonicOccupiedToUnoccupiedDelay::Id);
         }
         break;
     }
         // type is int16u
     case MN::UltrasonicUnoccupiedToOccupiedDelay::Id: {
-        using T                = MN::UltrasonicUnoccupiedToOccupiedDelay::TypeInfo::Type;
+        using T = MN::UltrasonicUnoccupiedToOccupiedDelay::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "UltrasonicUnoccupiedToOccupiedDelay attribute value is %s", unify_value.dump().c_str());
             UN::UltrasonicUnoccupiedToOccupiedDelay::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::UltrasonicUnoccupiedToOccupiedDelay::Id);
+                MN::UltrasonicUnoccupiedToOccupiedDelay::Id);
         }
         break;
     }
         // type is int8u
     case MN::UltrasonicUnoccupiedToOccupiedThreshold::Id: {
-        using T                = MN::UltrasonicUnoccupiedToOccupiedThreshold::TypeInfo::Type;
+        using T = MN::UltrasonicUnoccupiedToOccupiedThreshold::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "UltrasonicUnoccupiedToOccupiedThreshold attribute value is %s", unify_value.dump().c_str());
             UN::UltrasonicUnoccupiedToOccupiedThreshold::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::UltrasonicUnoccupiedToOccupiedThreshold::Id);
+                MN::UltrasonicUnoccupiedToOccupiedThreshold::Id);
         }
         break;
     }
         // type is int16u
     case MN::PhysicalContactOccupiedToUnoccupiedDelay::Id: {
-        using T                = MN::PhysicalContactOccupiedToUnoccupiedDelay::TypeInfo::Type;
+        using T = MN::PhysicalContactOccupiedToUnoccupiedDelay::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PhysicalContactOccupiedToUnoccupiedDelay attribute value is %s", unify_value.dump().c_str());
             UN::PhysicalContactOccupiedToUnoccupiedDelay::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::PhysicalContactOccupiedToUnoccupiedDelay::Id);
+                MN::PhysicalContactOccupiedToUnoccupiedDelay::Id);
         }
         break;
     }
         // type is int16u
     case MN::PhysicalContactUnoccupiedToOccupiedDelay::Id: {
-        using T                = MN::PhysicalContactUnoccupiedToOccupiedDelay::TypeInfo::Type;
+        using T = MN::PhysicalContactUnoccupiedToOccupiedDelay::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PhysicalContactUnoccupiedToOccupiedDelay attribute value is %s", unify_value.dump().c_str());
             UN::PhysicalContactUnoccupiedToOccupiedDelay::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::PhysicalContactUnoccupiedToOccupiedDelay::Id);
+                MN::PhysicalContactUnoccupiedToOccupiedDelay::Id);
         }
         break;
     }
         // type is int8u
     case MN::PhysicalContactUnoccupiedToOccupiedThreshold::Id: {
-        using T                = MN::PhysicalContactUnoccupiedToOccupiedThreshold::TypeInfo::Type;
+        using T = MN::PhysicalContactUnoccupiedToOccupiedThreshold::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PhysicalContactUnoccupiedToOccupiedThreshold attribute value is %s", unify_value.dump().c_str());
             UN::PhysicalContactUnoccupiedToOccupiedThreshold::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::OccupancySensing::Id,
-                                                   MN::PhysicalContactUnoccupiedToOccupiedThreshold::Id);
+                MN::PhysicalContactUnoccupiedToOccupiedThreshold::Id);
         }
         break;
     }
@@ -6114,20 +6051,17 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint * 
 }
 
 CHIP_ERROR
-ElectricalMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+ElectricalMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
 {
     namespace MN = chip::app::Clusters::ElectricalMeasurement::Attributes;
     namespace UN = unify::matter_bridge::ElectricalMeasurement::Attributes;
-    if (aPath.mClusterId != Clusters::ElectricalMeasurement::Id)
-    {
+    if (aPath.mClusterId != Clusters::ElectricalMeasurement::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-    try
-    {
-        switch (aPath.mAttributeId)
-        {
+    try {
+        switch (aPath.mAttributeId) {
         case MN::MeasurementType::Id: { // type is bitmap32
             MN::MeasurementType::TypeInfo::Type value;
             UN::MeasurementType::Get(atr_path, value);
@@ -6779,37 +6713,33 @@ ElectricalMeasurementAttributeAccess::Read(const ConcreteReadAttributePath & aPa
             return aEncoder.Encode(value);
         }
         }
-    } catch (const std::out_of_range & e)
-    {
+    } catch (const std::out_of_range& e) {
         sl_log_info(LOG_TAG,
-                    "The request attribute Path for endpoint [%i] is not found in the attribute state "
-                    "container: %s\n",
-                    atr_path.mEndpointId, e.what());
+            "The request attribute Path for endpoint [%i] is not found in the attribute state "
+            "container: %s\n",
+            atr_path.mEndpointId, e.what());
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttributePath& aPath, AttributeValueDecoder& aDecoder)
 {
     using namespace chip::app::Clusters::ElectricalMeasurement;
 
-    if (aPath.mClusterId != Clusters::ElectricalMeasurement::Id)
-    {
+    if (aPath.mClusterId != Clusters::ElectricalMeasurement::Id) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
 
-    if (!unify_node)
-    {
+    if (!unify_node) {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
 
     std::string attribute_name;
     nlohmann::json jsn;
 
-    switch (aPath.mAttributeId)
-    {
+    switch (aPath.mAttributeId) {
     // measurement type is not supported by UCL
     // dc voltage is not supported by UCL
     // dc voltage min is not supported by UCL
@@ -6872,7 +6802,7 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
 
         Attributes::AverageRmsVoltageMeasurementPeriod::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "AverageRMSVoltageMeasurementPeriod";
         break;
     }
@@ -6880,7 +6810,7 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
 
         Attributes::AverageRmsUnderVoltageCounter::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "AverageRMSUnderVoltageCounter";
         break;
     }
@@ -6888,7 +6818,7 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
 
         Attributes::RmsExtremeOverVoltagePeriod::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "RMSExtremeOverVoltagePeriod";
         break;
     }
@@ -6896,7 +6826,7 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
 
         Attributes::RmsExtremeUnderVoltagePeriod::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "RMSExtremeUnderVoltagePeriod";
         break;
     }
@@ -6904,7 +6834,7 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
 
         Attributes::RmsVoltageSagPeriod::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "RMSVoltageSagPeriod";
         break;
     }
@@ -6912,7 +6842,7 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
 
         Attributes::RmsVoltageSwellPeriod::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "RMSVoltageSwellPeriod";
         break;
     }
@@ -6926,7 +6856,7 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
 
         Attributes::OverloadAlarmsMask::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "DCOverloadAlarmsMask";
         break;
     }
@@ -6936,7 +6866,7 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
 
         Attributes::AcOverloadAlarmsMask::TypeInfo::DecodableType value;
         aDecoder.Decode(value);
-        jsn["value"]   = to_json(value);
+        jsn["value"] = to_json(value);
         attribute_name = "ACAlarmsMask";
         break;
     }
@@ -7001,11 +6931,9 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
         // ClusterRevision is not supported by UCL
     }
 
-    if (!attribute_name.empty())
-    {
+    if (!attribute_name.empty()) {
         std::string payload_str;
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) +
-            "/ElectricalMeasurement/Attributes/" + attribute_name + "/Desired";
+        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/ElectricalMeasurement/Attributes/" + attribute_name + "/Desired";
         payload_str = jsn.dump();
         m_unify_mqtt.Publish(topic, payload_str, true);
         return CHIP_NO_ERROR;
@@ -7014,53 +6942,47 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
     return CHIP_ERROR_NO_MESSAGE_HANDLER;
 }
 
-void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoint * ep, const std::string & cluster,
-                                                            const std::string & attribute, const nlohmann::json & unify_value)
+void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster,
+    const std::string& attribute, const nlohmann::json& unify_value)
 {
     namespace MN = chip::app::Clusters::ElectricalMeasurement::Attributes;
     namespace UN = unify::matter_bridge::ElectricalMeasurement::Attributes;
 
     auto cluster_id = device_translator::instance().get_cluster_id(cluster);
 
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::ElectricalMeasurement::Id))
-    {
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::ElectricalMeasurement::Id)) {
         return;
     }
 
     // get attribute id
     auto attribute_id = device_translator::instance().get_attribute_id(cluster, attribute);
 
-    if (!attribute_id.has_value())
-    {
+    if (!attribute_id.has_value()) {
         return;
     }
 
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
-    ConcreteAttributePath attrpath =
-        ConcreteAttributePath(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, attribute_id.value());
-    switch (attribute_id.value())
-    {
+    ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, attribute_id.value());
+    switch (attribute_id.value()) {
     // type is bitmap32
     case MN::MeasurementType::Id: {
-        using T                = MN::MeasurementType::TypeInfo::Type;
+        using T = MN::MeasurementType::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasurementType attribute value is %s", unify_value.dump().c_str());
             UN::MeasurementType::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::MeasurementType::Id);
+                MN::MeasurementType::Id);
         }
         break;
     }
         // type is int16s
     case MN::DcVoltage::Id: {
-        using T                = MN::DcVoltage::TypeInfo::Type;
+        using T = MN::DcVoltage::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcVoltage attribute value is %s", unify_value.dump().c_str());
             UN::DcVoltage::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcVoltage::Id);
@@ -7069,11 +6991,10 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
     }
         // type is int16s
     case MN::DcVoltageMin::Id: {
-        using T                = MN::DcVoltageMin::TypeInfo::Type;
+        using T = MN::DcVoltageMin::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcVoltageMin attribute value is %s", unify_value.dump().c_str());
             UN::DcVoltageMin::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcVoltageMin::Id);
@@ -7082,11 +7003,10 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
     }
         // type is int16s
     case MN::DcVoltageMax::Id: {
-        using T                = MN::DcVoltageMax::TypeInfo::Type;
+        using T = MN::DcVoltageMax::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcVoltageMax attribute value is %s", unify_value.dump().c_str());
             UN::DcVoltageMax::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcVoltageMax::Id);
@@ -7095,11 +7015,10 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
     }
         // type is int16s
     case MN::DcCurrent::Id: {
-        using T                = MN::DcCurrent::TypeInfo::Type;
+        using T = MN::DcCurrent::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcCurrent attribute value is %s", unify_value.dump().c_str());
             UN::DcCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcCurrent::Id);
@@ -7108,11 +7027,10 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
     }
         // type is int16s
     case MN::DcCurrentMin::Id: {
-        using T                = MN::DcCurrentMin::TypeInfo::Type;
+        using T = MN::DcCurrentMin::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcCurrentMin attribute value is %s", unify_value.dump().c_str());
             UN::DcCurrentMin::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcCurrentMin::Id);
@@ -7121,11 +7039,10 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
     }
         // type is int16s
     case MN::DcCurrentMax::Id: {
-        using T                = MN::DcCurrentMax::TypeInfo::Type;
+        using T = MN::DcCurrentMax::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcCurrentMax attribute value is %s", unify_value.dump().c_str());
             UN::DcCurrentMax::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcCurrentMax::Id);
@@ -7134,11 +7051,10 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
     }
         // type is int16s
     case MN::DcPower::Id: {
-        using T                = MN::DcPower::TypeInfo::Type;
+        using T = MN::DcPower::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcPower attribute value is %s", unify_value.dump().c_str());
             UN::DcPower::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcPower::Id);
@@ -7147,11 +7063,10 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
     }
         // type is int16s
     case MN::DcPowerMin::Id: {
-        using T                = MN::DcPowerMin::TypeInfo::Type;
+        using T = MN::DcPowerMin::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcPowerMin attribute value is %s", unify_value.dump().c_str());
             UN::DcPowerMin::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcPowerMin::Id);
@@ -7160,11 +7075,10 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
     }
         // type is int16s
     case MN::DcPowerMax::Id: {
-        using T                = MN::DcPowerMax::TypeInfo::Type;
+        using T = MN::DcPowerMax::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcPowerMax attribute value is %s", unify_value.dump().c_str());
             UN::DcPowerMax::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::DcPowerMax::Id);
@@ -7173,95 +7087,88 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
     }
         // type is int16u
     case MN::DcVoltageMultiplier::Id: {
-        using T                = MN::DcVoltageMultiplier::TypeInfo::Type;
+        using T = MN::DcVoltageMultiplier::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcVoltageMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::DcVoltageMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::DcVoltageMultiplier::Id);
+                MN::DcVoltageMultiplier::Id);
         }
         break;
     }
         // type is int16u
     case MN::DcVoltageDivisor::Id: {
-        using T                = MN::DcVoltageDivisor::TypeInfo::Type;
+        using T = MN::DcVoltageDivisor::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcVoltageDivisor attribute value is %s", unify_value.dump().c_str());
             UN::DcVoltageDivisor::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::DcVoltageDivisor::Id);
+                MN::DcVoltageDivisor::Id);
         }
         break;
     }
         // type is int16u
     case MN::DcCurrentMultiplier::Id: {
-        using T                = MN::DcCurrentMultiplier::TypeInfo::Type;
+        using T = MN::DcCurrentMultiplier::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcCurrentMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::DcCurrentMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::DcCurrentMultiplier::Id);
+                MN::DcCurrentMultiplier::Id);
         }
         break;
     }
         // type is int16u
     case MN::DcCurrentDivisor::Id: {
-        using T                = MN::DcCurrentDivisor::TypeInfo::Type;
+        using T = MN::DcCurrentDivisor::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcCurrentDivisor attribute value is %s", unify_value.dump().c_str());
             UN::DcCurrentDivisor::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::DcCurrentDivisor::Id);
+                MN::DcCurrentDivisor::Id);
         }
         break;
     }
         // type is int16u
     case MN::DcPowerMultiplier::Id: {
-        using T                = MN::DcPowerMultiplier::TypeInfo::Type;
+        using T = MN::DcPowerMultiplier::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcPowerMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::DcPowerMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::DcPowerMultiplier::Id);
+                MN::DcPowerMultiplier::Id);
         }
         break;
     }
         // type is int16u
     case MN::DcPowerDivisor::Id: {
-        using T                = MN::DcPowerDivisor::TypeInfo::Type;
+        using T = MN::DcPowerDivisor::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "DcPowerDivisor attribute value is %s", unify_value.dump().c_str());
             UN::DcPowerDivisor::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::DcPowerDivisor::Id);
+                MN::DcPowerDivisor::Id);
         }
         break;
     }
         // type is int16u
     case MN::AcFrequency::Id: {
-        using T                = MN::AcFrequency::TypeInfo::Type;
+        using T = MN::AcFrequency::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcFrequency attribute value is %s", unify_value.dump().c_str());
             UN::AcFrequency::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::AcFrequency::Id);
@@ -7270,305 +7177,283 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
     }
         // type is int16u
     case MN::AcFrequencyMin::Id: {
-        using T                = MN::AcFrequencyMin::TypeInfo::Type;
+        using T = MN::AcFrequencyMin::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcFrequencyMin attribute value is %s", unify_value.dump().c_str());
             UN::AcFrequencyMin::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcFrequencyMin::Id);
+                MN::AcFrequencyMin::Id);
         }
         break;
     }
         // type is int16u
     case MN::AcFrequencyMax::Id: {
-        using T                = MN::AcFrequencyMax::TypeInfo::Type;
+        using T = MN::AcFrequencyMax::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcFrequencyMax attribute value is %s", unify_value.dump().c_str());
             UN::AcFrequencyMax::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcFrequencyMax::Id);
+                MN::AcFrequencyMax::Id);
         }
         break;
     }
         // type is int16u
     case MN::NeutralCurrent::Id: {
-        using T                = MN::NeutralCurrent::TypeInfo::Type;
+        using T = MN::NeutralCurrent::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "NeutralCurrent attribute value is %s", unify_value.dump().c_str());
             UN::NeutralCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::NeutralCurrent::Id);
+                MN::NeutralCurrent::Id);
         }
         break;
     }
         // type is int32s
     case MN::TotalActivePower::Id: {
-        using T                = MN::TotalActivePower::TypeInfo::Type;
+        using T = MN::TotalActivePower::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "TotalActivePower attribute value is %s", unify_value.dump().c_str());
             UN::TotalActivePower::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::TotalActivePower::Id);
+                MN::TotalActivePower::Id);
         }
         break;
     }
         // type is int32s
     case MN::TotalReactivePower::Id: {
-        using T                = MN::TotalReactivePower::TypeInfo::Type;
+        using T = MN::TotalReactivePower::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "TotalReactivePower attribute value is %s", unify_value.dump().c_str());
             UN::TotalReactivePower::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::TotalReactivePower::Id);
+                MN::TotalReactivePower::Id);
         }
         break;
     }
         // type is int32u
     case MN::TotalApparentPower::Id: {
-        using T                = MN::TotalApparentPower::TypeInfo::Type;
+        using T = MN::TotalApparentPower::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "TotalApparentPower attribute value is %s", unify_value.dump().c_str());
             UN::TotalApparentPower::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::TotalApparentPower::Id);
+                MN::TotalApparentPower::Id);
         }
         break;
     }
         // type is int16s
     case MN::Measured1stHarmonicCurrent::Id: {
-        using T                = MN::Measured1stHarmonicCurrent::TypeInfo::Type;
+        using T = MN::Measured1stHarmonicCurrent::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Measured1stHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::Measured1stHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::Measured1stHarmonicCurrent::Id);
+                MN::Measured1stHarmonicCurrent::Id);
         }
         break;
     }
         // type is int16s
     case MN::Measured3rdHarmonicCurrent::Id: {
-        using T                = MN::Measured3rdHarmonicCurrent::TypeInfo::Type;
+        using T = MN::Measured3rdHarmonicCurrent::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Measured3rdHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::Measured3rdHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::Measured3rdHarmonicCurrent::Id);
+                MN::Measured3rdHarmonicCurrent::Id);
         }
         break;
     }
         // type is int16s
     case MN::Measured5thHarmonicCurrent::Id: {
-        using T                = MN::Measured5thHarmonicCurrent::TypeInfo::Type;
+        using T = MN::Measured5thHarmonicCurrent::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Measured5thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::Measured5thHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::Measured5thHarmonicCurrent::Id);
+                MN::Measured5thHarmonicCurrent::Id);
         }
         break;
     }
         // type is int16s
     case MN::Measured7thHarmonicCurrent::Id: {
-        using T                = MN::Measured7thHarmonicCurrent::TypeInfo::Type;
+        using T = MN::Measured7thHarmonicCurrent::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Measured7thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::Measured7thHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::Measured7thHarmonicCurrent::Id);
+                MN::Measured7thHarmonicCurrent::Id);
         }
         break;
     }
         // type is int16s
     case MN::Measured9thHarmonicCurrent::Id: {
-        using T                = MN::Measured9thHarmonicCurrent::TypeInfo::Type;
+        using T = MN::Measured9thHarmonicCurrent::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Measured9thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::Measured9thHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::Measured9thHarmonicCurrent::Id);
+                MN::Measured9thHarmonicCurrent::Id);
         }
         break;
     }
         // type is int16s
     case MN::Measured11thHarmonicCurrent::Id: {
-        using T                = MN::Measured11thHarmonicCurrent::TypeInfo::Type;
+        using T = MN::Measured11thHarmonicCurrent::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "Measured11thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::Measured11thHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::Measured11thHarmonicCurrent::Id);
+                MN::Measured11thHarmonicCurrent::Id);
         }
         break;
     }
         // type is int16s
     case MN::MeasuredPhase1stHarmonicCurrent::Id: {
-        using T                = MN::MeasuredPhase1stHarmonicCurrent::TypeInfo::Type;
+        using T = MN::MeasuredPhase1stHarmonicCurrent::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredPhase1stHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredPhase1stHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::MeasuredPhase1stHarmonicCurrent::Id);
+                MN::MeasuredPhase1stHarmonicCurrent::Id);
         }
         break;
     }
         // type is int16s
     case MN::MeasuredPhase3rdHarmonicCurrent::Id: {
-        using T                = MN::MeasuredPhase3rdHarmonicCurrent::TypeInfo::Type;
+        using T = MN::MeasuredPhase3rdHarmonicCurrent::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredPhase3rdHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredPhase3rdHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::MeasuredPhase3rdHarmonicCurrent::Id);
+                MN::MeasuredPhase3rdHarmonicCurrent::Id);
         }
         break;
     }
         // type is int16s
     case MN::MeasuredPhase5thHarmonicCurrent::Id: {
-        using T                = MN::MeasuredPhase5thHarmonicCurrent::TypeInfo::Type;
+        using T = MN::MeasuredPhase5thHarmonicCurrent::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredPhase5thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredPhase5thHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::MeasuredPhase5thHarmonicCurrent::Id);
+                MN::MeasuredPhase5thHarmonicCurrent::Id);
         }
         break;
     }
         // type is int16s
     case MN::MeasuredPhase7thHarmonicCurrent::Id: {
-        using T                = MN::MeasuredPhase7thHarmonicCurrent::TypeInfo::Type;
+        using T = MN::MeasuredPhase7thHarmonicCurrent::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredPhase7thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredPhase7thHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::MeasuredPhase7thHarmonicCurrent::Id);
+                MN::MeasuredPhase7thHarmonicCurrent::Id);
         }
         break;
     }
         // type is int16s
     case MN::MeasuredPhase9thHarmonicCurrent::Id: {
-        using T                = MN::MeasuredPhase9thHarmonicCurrent::TypeInfo::Type;
+        using T = MN::MeasuredPhase9thHarmonicCurrent::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredPhase9thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredPhase9thHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::MeasuredPhase9thHarmonicCurrent::Id);
+                MN::MeasuredPhase9thHarmonicCurrent::Id);
         }
         break;
     }
         // type is int16s
     case MN::MeasuredPhase11thHarmonicCurrent::Id: {
-        using T                = MN::MeasuredPhase11thHarmonicCurrent::TypeInfo::Type;
+        using T = MN::MeasuredPhase11thHarmonicCurrent::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "MeasuredPhase11thHarmonicCurrent attribute value is %s", unify_value.dump().c_str());
             UN::MeasuredPhase11thHarmonicCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::MeasuredPhase11thHarmonicCurrent::Id);
+                MN::MeasuredPhase11thHarmonicCurrent::Id);
         }
         break;
     }
         // type is int16u
     case MN::AcFrequencyMultiplier::Id: {
-        using T                = MN::AcFrequencyMultiplier::TypeInfo::Type;
+        using T = MN::AcFrequencyMultiplier::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcFrequencyMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::AcFrequencyMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcFrequencyMultiplier::Id);
+                MN::AcFrequencyMultiplier::Id);
         }
         break;
     }
         // type is int16u
     case MN::AcFrequencyDivisor::Id: {
-        using T                = MN::AcFrequencyDivisor::TypeInfo::Type;
+        using T = MN::AcFrequencyDivisor::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcFrequencyDivisor attribute value is %s", unify_value.dump().c_str());
             UN::AcFrequencyDivisor::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcFrequencyDivisor::Id);
+                MN::AcFrequencyDivisor::Id);
         }
         break;
     }
         // type is int32u
     case MN::PowerMultiplier::Id: {
-        using T                = MN::PowerMultiplier::TypeInfo::Type;
+        using T = MN::PowerMultiplier::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PowerMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::PowerMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::PowerMultiplier::Id);
+                MN::PowerMultiplier::Id);
         }
         break;
     }
         // type is int32u
     case MN::PowerDivisor::Id: {
-        using T                = MN::PowerDivisor::TypeInfo::Type;
+        using T = MN::PowerDivisor::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PowerDivisor attribute value is %s", unify_value.dump().c_str());
             UN::PowerDivisor::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::PowerDivisor::Id);
@@ -7577,81 +7462,75 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
     }
         // type is int8s
     case MN::HarmonicCurrentMultiplier::Id: {
-        using T                = MN::HarmonicCurrentMultiplier::TypeInfo::Type;
+        using T = MN::HarmonicCurrentMultiplier::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "HarmonicCurrentMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::HarmonicCurrentMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::HarmonicCurrentMultiplier::Id);
+                MN::HarmonicCurrentMultiplier::Id);
         }
         break;
     }
         // type is int8s
     case MN::PhaseHarmonicCurrentMultiplier::Id: {
-        using T                = MN::PhaseHarmonicCurrentMultiplier::TypeInfo::Type;
+        using T = MN::PhaseHarmonicCurrentMultiplier::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PhaseHarmonicCurrentMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::PhaseHarmonicCurrentMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::PhaseHarmonicCurrentMultiplier::Id);
+                MN::PhaseHarmonicCurrentMultiplier::Id);
         }
         break;
     }
         // type is int16u
     case MN::InstantaneousLineCurrent::Id: {
-        using T                = MN::InstantaneousLineCurrent::TypeInfo::Type;
+        using T = MN::InstantaneousLineCurrent::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "InstantaneousLineCurrent attribute value is %s", unify_value.dump().c_str());
             UN::InstantaneousLineCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::InstantaneousLineCurrent::Id);
+                MN::InstantaneousLineCurrent::Id);
         }
         break;
     }
         // type is int16s
     case MN::InstantaneousActiveCurrent::Id: {
-        using T                = MN::InstantaneousActiveCurrent::TypeInfo::Type;
+        using T = MN::InstantaneousActiveCurrent::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "InstantaneousActiveCurrent attribute value is %s", unify_value.dump().c_str());
             UN::InstantaneousActiveCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::InstantaneousActiveCurrent::Id);
+                MN::InstantaneousActiveCurrent::Id);
         }
         break;
     }
         // type is int16s
     case MN::InstantaneousReactiveCurrent::Id: {
-        using T                = MN::InstantaneousReactiveCurrent::TypeInfo::Type;
+        using T = MN::InstantaneousReactiveCurrent::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "InstantaneousReactiveCurrent attribute value is %s", unify_value.dump().c_str());
             UN::InstantaneousReactiveCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::InstantaneousReactiveCurrent::Id);
+                MN::InstantaneousReactiveCurrent::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsVoltage::Id: {
-        using T                = MN::RmsVoltage::TypeInfo::Type;
+        using T = MN::RmsVoltage::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltage attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltage::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::RmsVoltage::Id);
@@ -7660,39 +7539,36 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
     }
         // type is int16u
     case MN::RmsVoltageMin::Id: {
-        using T                = MN::RmsVoltageMin::TypeInfo::Type;
+        using T = MN::RmsVoltageMin::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageMin attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageMin::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageMin::Id);
+                MN::RmsVoltageMin::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsVoltageMax::Id: {
-        using T                = MN::RmsVoltageMax::TypeInfo::Type;
+        using T = MN::RmsVoltageMax::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageMax attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageMax::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageMax::Id);
+                MN::RmsVoltageMax::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsCurrent::Id: {
-        using T                = MN::RmsCurrent::TypeInfo::Type;
+        using T = MN::RmsCurrent::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsCurrent attribute value is %s", unify_value.dump().c_str());
             UN::RmsCurrent::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::RmsCurrent::Id);
@@ -7701,39 +7577,36 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
     }
         // type is int16u
     case MN::RmsCurrentMin::Id: {
-        using T                = MN::RmsCurrentMin::TypeInfo::Type;
+        using T = MN::RmsCurrentMin::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsCurrentMin attribute value is %s", unify_value.dump().c_str());
             UN::RmsCurrentMin::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsCurrentMin::Id);
+                MN::RmsCurrentMin::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsCurrentMax::Id: {
-        using T                = MN::RmsCurrentMax::TypeInfo::Type;
+        using T = MN::RmsCurrentMax::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsCurrentMax attribute value is %s", unify_value.dump().c_str());
             UN::RmsCurrentMax::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsCurrentMax::Id);
+                MN::RmsCurrentMax::Id);
         }
         break;
     }
         // type is int16s
     case MN::ActivePower::Id: {
-        using T                = MN::ActivePower::TypeInfo::Type;
+        using T = MN::ActivePower::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActivePower attribute value is %s", unify_value.dump().c_str());
             UN::ActivePower::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::ActivePower::Id);
@@ -7742,67 +7615,62 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
     }
         // type is int16s
     case MN::ActivePowerMin::Id: {
-        using T                = MN::ActivePowerMin::TypeInfo::Type;
+        using T = MN::ActivePowerMin::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActivePowerMin attribute value is %s", unify_value.dump().c_str());
             UN::ActivePowerMin::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActivePowerMin::Id);
+                MN::ActivePowerMin::Id);
         }
         break;
     }
         // type is int16s
     case MN::ActivePowerMax::Id: {
-        using T                = MN::ActivePowerMax::TypeInfo::Type;
+        using T = MN::ActivePowerMax::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActivePowerMax attribute value is %s", unify_value.dump().c_str());
             UN::ActivePowerMax::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActivePowerMax::Id);
+                MN::ActivePowerMax::Id);
         }
         break;
     }
         // type is int16s
     case MN::ReactivePower::Id: {
-        using T                = MN::ReactivePower::TypeInfo::Type;
+        using T = MN::ReactivePower::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ReactivePower attribute value is %s", unify_value.dump().c_str());
             UN::ReactivePower::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ReactivePower::Id);
+                MN::ReactivePower::Id);
         }
         break;
     }
         // type is int16u
     case MN::ApparentPower::Id: {
-        using T                = MN::ApparentPower::TypeInfo::Type;
+        using T = MN::ApparentPower::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ApparentPower attribute value is %s", unify_value.dump().c_str());
             UN::ApparentPower::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ApparentPower::Id);
+                MN::ApparentPower::Id);
         }
         break;
     }
         // type is int8s
     case MN::PowerFactor::Id: {
-        using T                = MN::PowerFactor::TypeInfo::Type;
+        using T = MN::PowerFactor::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PowerFactor attribute value is %s", unify_value.dump().c_str());
             UN::PowerFactor::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id, MN::PowerFactor::Id);
@@ -7811,981 +7679,911 @@ void ElectricalMeasurementAttributeAccess::reported_updated(const bridged_endpoi
     }
         // type is int16u
     case MN::AverageRmsVoltageMeasurementPeriod::Id: {
-        using T                = MN::AverageRmsVoltageMeasurementPeriod::TypeInfo::Type;
+        using T = MN::AverageRmsVoltageMeasurementPeriod::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsVoltageMeasurementPeriod attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsVoltageMeasurementPeriod::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsVoltageMeasurementPeriod::Id);
+                MN::AverageRmsVoltageMeasurementPeriod::Id);
         }
         break;
     }
         // type is int16u
     case MN::AverageRmsUnderVoltageCounter::Id: {
-        using T                = MN::AverageRmsUnderVoltageCounter::TypeInfo::Type;
+        using T = MN::AverageRmsUnderVoltageCounter::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsUnderVoltageCounter attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsUnderVoltageCounter::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsUnderVoltageCounter::Id);
+                MN::AverageRmsUnderVoltageCounter::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsExtremeOverVoltagePeriod::Id: {
-        using T                = MN::RmsExtremeOverVoltagePeriod::TypeInfo::Type;
+        using T = MN::RmsExtremeOverVoltagePeriod::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsExtremeOverVoltagePeriod attribute value is %s", unify_value.dump().c_str());
             UN::RmsExtremeOverVoltagePeriod::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsExtremeOverVoltagePeriod::Id);
+                MN::RmsExtremeOverVoltagePeriod::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsExtremeUnderVoltagePeriod::Id: {
-        using T                = MN::RmsExtremeUnderVoltagePeriod::TypeInfo::Type;
+        using T = MN::RmsExtremeUnderVoltagePeriod::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsExtremeUnderVoltagePeriod attribute value is %s", unify_value.dump().c_str());
             UN::RmsExtremeUnderVoltagePeriod::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsExtremeUnderVoltagePeriod::Id);
+                MN::RmsExtremeUnderVoltagePeriod::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsVoltageSagPeriod::Id: {
-        using T                = MN::RmsVoltageSagPeriod::TypeInfo::Type;
+        using T = MN::RmsVoltageSagPeriod::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageSagPeriod attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageSagPeriod::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageSagPeriod::Id);
+                MN::RmsVoltageSagPeriod::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsVoltageSwellPeriod::Id: {
-        using T                = MN::RmsVoltageSwellPeriod::TypeInfo::Type;
+        using T = MN::RmsVoltageSwellPeriod::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageSwellPeriod attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageSwellPeriod::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageSwellPeriod::Id);
+                MN::RmsVoltageSwellPeriod::Id);
         }
         break;
     }
         // type is int16u
     case MN::AcVoltageMultiplier::Id: {
-        using T                = MN::AcVoltageMultiplier::TypeInfo::Type;
+        using T = MN::AcVoltageMultiplier::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcVoltageMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::AcVoltageMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcVoltageMultiplier::Id);
+                MN::AcVoltageMultiplier::Id);
         }
         break;
     }
         // type is int16u
     case MN::AcVoltageDivisor::Id: {
-        using T                = MN::AcVoltageDivisor::TypeInfo::Type;
+        using T = MN::AcVoltageDivisor::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcVoltageDivisor attribute value is %s", unify_value.dump().c_str());
             UN::AcVoltageDivisor::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcVoltageDivisor::Id);
+                MN::AcVoltageDivisor::Id);
         }
         break;
     }
         // type is int16u
     case MN::AcCurrentMultiplier::Id: {
-        using T                = MN::AcCurrentMultiplier::TypeInfo::Type;
+        using T = MN::AcCurrentMultiplier::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcCurrentMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::AcCurrentMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcCurrentMultiplier::Id);
+                MN::AcCurrentMultiplier::Id);
         }
         break;
     }
         // type is int16u
     case MN::AcCurrentDivisor::Id: {
-        using T                = MN::AcCurrentDivisor::TypeInfo::Type;
+        using T = MN::AcCurrentDivisor::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcCurrentDivisor attribute value is %s", unify_value.dump().c_str());
             UN::AcCurrentDivisor::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcCurrentDivisor::Id);
+                MN::AcCurrentDivisor::Id);
         }
         break;
     }
         // type is int16u
     case MN::AcPowerMultiplier::Id: {
-        using T                = MN::AcPowerMultiplier::TypeInfo::Type;
+        using T = MN::AcPowerMultiplier::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcPowerMultiplier attribute value is %s", unify_value.dump().c_str());
             UN::AcPowerMultiplier::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcPowerMultiplier::Id);
+                MN::AcPowerMultiplier::Id);
         }
         break;
     }
         // type is int16u
     case MN::AcPowerDivisor::Id: {
-        using T                = MN::AcPowerDivisor::TypeInfo::Type;
+        using T = MN::AcPowerDivisor::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcPowerDivisor attribute value is %s", unify_value.dump().c_str());
             UN::AcPowerDivisor::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcPowerDivisor::Id);
+                MN::AcPowerDivisor::Id);
         }
         break;
     }
         // type is bitmap8
     case MN::OverloadAlarmsMask::Id: {
-        using T                = MN::OverloadAlarmsMask::TypeInfo::Type;
+        using T = MN::OverloadAlarmsMask::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "OverloadAlarmsMask attribute value is %s", unify_value.dump().c_str());
             UN::OverloadAlarmsMask::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::OverloadAlarmsMask::Id);
+                MN::OverloadAlarmsMask::Id);
         }
         break;
     }
         // type is int16s
     case MN::VoltageOverload::Id: {
-        using T                = MN::VoltageOverload::TypeInfo::Type;
+        using T = MN::VoltageOverload::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "VoltageOverload attribute value is %s", unify_value.dump().c_str());
             UN::VoltageOverload::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::VoltageOverload::Id);
+                MN::VoltageOverload::Id);
         }
         break;
     }
         // type is int16s
     case MN::CurrentOverload::Id: {
-        using T                = MN::CurrentOverload::TypeInfo::Type;
+        using T = MN::CurrentOverload::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "CurrentOverload attribute value is %s", unify_value.dump().c_str());
             UN::CurrentOverload::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::CurrentOverload::Id);
+                MN::CurrentOverload::Id);
         }
         break;
     }
         // type is bitmap16
     case MN::AcOverloadAlarmsMask::Id: {
-        using T                = MN::AcOverloadAlarmsMask::TypeInfo::Type;
+        using T = MN::AcOverloadAlarmsMask::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcOverloadAlarmsMask attribute value is %s", unify_value.dump().c_str());
             UN::AcOverloadAlarmsMask::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcOverloadAlarmsMask::Id);
+                MN::AcOverloadAlarmsMask::Id);
         }
         break;
     }
         // type is int16s
     case MN::AcVoltageOverload::Id: {
-        using T                = MN::AcVoltageOverload::TypeInfo::Type;
+        using T = MN::AcVoltageOverload::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcVoltageOverload attribute value is %s", unify_value.dump().c_str());
             UN::AcVoltageOverload::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcVoltageOverload::Id);
+                MN::AcVoltageOverload::Id);
         }
         break;
     }
         // type is int16s
     case MN::AcCurrentOverload::Id: {
-        using T                = MN::AcCurrentOverload::TypeInfo::Type;
+        using T = MN::AcCurrentOverload::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcCurrentOverload attribute value is %s", unify_value.dump().c_str());
             UN::AcCurrentOverload::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcCurrentOverload::Id);
+                MN::AcCurrentOverload::Id);
         }
         break;
     }
         // type is int16s
     case MN::AcActivePowerOverload::Id: {
-        using T                = MN::AcActivePowerOverload::TypeInfo::Type;
+        using T = MN::AcActivePowerOverload::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcActivePowerOverload attribute value is %s", unify_value.dump().c_str());
             UN::AcActivePowerOverload::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcActivePowerOverload::Id);
+                MN::AcActivePowerOverload::Id);
         }
         break;
     }
         // type is int16s
     case MN::AcReactivePowerOverload::Id: {
-        using T                = MN::AcReactivePowerOverload::TypeInfo::Type;
+        using T = MN::AcReactivePowerOverload::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AcReactivePowerOverload attribute value is %s", unify_value.dump().c_str());
             UN::AcReactivePowerOverload::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AcReactivePowerOverload::Id);
+                MN::AcReactivePowerOverload::Id);
         }
         break;
     }
         // type is int16s
     case MN::AverageRmsOverVoltage::Id: {
-        using T                = MN::AverageRmsOverVoltage::TypeInfo::Type;
+        using T = MN::AverageRmsOverVoltage::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsOverVoltage attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsOverVoltage::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsOverVoltage::Id);
+                MN::AverageRmsOverVoltage::Id);
         }
         break;
     }
         // type is int16s
     case MN::AverageRmsUnderVoltage::Id: {
-        using T                = MN::AverageRmsUnderVoltage::TypeInfo::Type;
+        using T = MN::AverageRmsUnderVoltage::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsUnderVoltage attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsUnderVoltage::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsUnderVoltage::Id);
+                MN::AverageRmsUnderVoltage::Id);
         }
         break;
     }
         // type is int16s
     case MN::RmsExtremeOverVoltage::Id: {
-        using T                = MN::RmsExtremeOverVoltage::TypeInfo::Type;
+        using T = MN::RmsExtremeOverVoltage::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsExtremeOverVoltage attribute value is %s", unify_value.dump().c_str());
             UN::RmsExtremeOverVoltage::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsExtremeOverVoltage::Id);
+                MN::RmsExtremeOverVoltage::Id);
         }
         break;
     }
         // type is int16s
     case MN::RmsExtremeUnderVoltage::Id: {
-        using T                = MN::RmsExtremeUnderVoltage::TypeInfo::Type;
+        using T = MN::RmsExtremeUnderVoltage::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsExtremeUnderVoltage attribute value is %s", unify_value.dump().c_str());
             UN::RmsExtremeUnderVoltage::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsExtremeUnderVoltage::Id);
+                MN::RmsExtremeUnderVoltage::Id);
         }
         break;
     }
         // type is int16s
     case MN::RmsVoltageSag::Id: {
-        using T                = MN::RmsVoltageSag::TypeInfo::Type;
+        using T = MN::RmsVoltageSag::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageSag attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageSag::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageSag::Id);
+                MN::RmsVoltageSag::Id);
         }
         break;
     }
         // type is int16s
     case MN::RmsVoltageSwell::Id: {
-        using T                = MN::RmsVoltageSwell::TypeInfo::Type;
+        using T = MN::RmsVoltageSwell::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageSwell attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageSwell::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageSwell::Id);
+                MN::RmsVoltageSwell::Id);
         }
         break;
     }
         // type is int16u
     case MN::LineCurrentPhaseB::Id: {
-        using T                = MN::LineCurrentPhaseB::TypeInfo::Type;
+        using T = MN::LineCurrentPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "LineCurrentPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::LineCurrentPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::LineCurrentPhaseB::Id);
+                MN::LineCurrentPhaseB::Id);
         }
         break;
     }
         // type is int16s
     case MN::ActiveCurrentPhaseB::Id: {
-        using T                = MN::ActiveCurrentPhaseB::TypeInfo::Type;
+        using T = MN::ActiveCurrentPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActiveCurrentPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::ActiveCurrentPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActiveCurrentPhaseB::Id);
+                MN::ActiveCurrentPhaseB::Id);
         }
         break;
     }
         // type is int16s
     case MN::ReactiveCurrentPhaseB::Id: {
-        using T                = MN::ReactiveCurrentPhaseB::TypeInfo::Type;
+        using T = MN::ReactiveCurrentPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ReactiveCurrentPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::ReactiveCurrentPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ReactiveCurrentPhaseB::Id);
+                MN::ReactiveCurrentPhaseB::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsVoltagePhaseB::Id: {
-        using T                = MN::RmsVoltagePhaseB::TypeInfo::Type;
+        using T = MN::RmsVoltagePhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltagePhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltagePhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltagePhaseB::Id);
+                MN::RmsVoltagePhaseB::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsVoltageMinPhaseB::Id: {
-        using T                = MN::RmsVoltageMinPhaseB::TypeInfo::Type;
+        using T = MN::RmsVoltageMinPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageMinPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageMinPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageMinPhaseB::Id);
+                MN::RmsVoltageMinPhaseB::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsVoltageMaxPhaseB::Id: {
-        using T                = MN::RmsVoltageMaxPhaseB::TypeInfo::Type;
+        using T = MN::RmsVoltageMaxPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageMaxPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageMaxPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageMaxPhaseB::Id);
+                MN::RmsVoltageMaxPhaseB::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsCurrentPhaseB::Id: {
-        using T                = MN::RmsCurrentPhaseB::TypeInfo::Type;
+        using T = MN::RmsCurrentPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsCurrentPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsCurrentPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsCurrentPhaseB::Id);
+                MN::RmsCurrentPhaseB::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsCurrentMinPhaseB::Id: {
-        using T                = MN::RmsCurrentMinPhaseB::TypeInfo::Type;
+        using T = MN::RmsCurrentMinPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsCurrentMinPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsCurrentMinPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsCurrentMinPhaseB::Id);
+                MN::RmsCurrentMinPhaseB::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsCurrentMaxPhaseB::Id: {
-        using T                = MN::RmsCurrentMaxPhaseB::TypeInfo::Type;
+        using T = MN::RmsCurrentMaxPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsCurrentMaxPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsCurrentMaxPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsCurrentMaxPhaseB::Id);
+                MN::RmsCurrentMaxPhaseB::Id);
         }
         break;
     }
         // type is int16s
     case MN::ActivePowerPhaseB::Id: {
-        using T                = MN::ActivePowerPhaseB::TypeInfo::Type;
+        using T = MN::ActivePowerPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActivePowerPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::ActivePowerPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActivePowerPhaseB::Id);
+                MN::ActivePowerPhaseB::Id);
         }
         break;
     }
         // type is int16s
     case MN::ActivePowerMinPhaseB::Id: {
-        using T                = MN::ActivePowerMinPhaseB::TypeInfo::Type;
+        using T = MN::ActivePowerMinPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActivePowerMinPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::ActivePowerMinPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActivePowerMinPhaseB::Id);
+                MN::ActivePowerMinPhaseB::Id);
         }
         break;
     }
         // type is int16s
     case MN::ActivePowerMaxPhaseB::Id: {
-        using T                = MN::ActivePowerMaxPhaseB::TypeInfo::Type;
+        using T = MN::ActivePowerMaxPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActivePowerMaxPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::ActivePowerMaxPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActivePowerMaxPhaseB::Id);
+                MN::ActivePowerMaxPhaseB::Id);
         }
         break;
     }
         // type is int16s
     case MN::ReactivePowerPhaseB::Id: {
-        using T                = MN::ReactivePowerPhaseB::TypeInfo::Type;
+        using T = MN::ReactivePowerPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ReactivePowerPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::ReactivePowerPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ReactivePowerPhaseB::Id);
+                MN::ReactivePowerPhaseB::Id);
         }
         break;
     }
         // type is int16u
     case MN::ApparentPowerPhaseB::Id: {
-        using T                = MN::ApparentPowerPhaseB::TypeInfo::Type;
+        using T = MN::ApparentPowerPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ApparentPowerPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::ApparentPowerPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ApparentPowerPhaseB::Id);
+                MN::ApparentPowerPhaseB::Id);
         }
         break;
     }
         // type is int8s
     case MN::PowerFactorPhaseB::Id: {
-        using T                = MN::PowerFactorPhaseB::TypeInfo::Type;
+        using T = MN::PowerFactorPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PowerFactorPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::PowerFactorPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::PowerFactorPhaseB::Id);
+                MN::PowerFactorPhaseB::Id);
         }
         break;
     }
         // type is int16u
     case MN::AverageRmsVoltageMeasurementPeriodPhaseB::Id: {
-        using T                = MN::AverageRmsVoltageMeasurementPeriodPhaseB::TypeInfo::Type;
+        using T = MN::AverageRmsVoltageMeasurementPeriodPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsVoltageMeasurementPeriodPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsVoltageMeasurementPeriodPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsVoltageMeasurementPeriodPhaseB::Id);
+                MN::AverageRmsVoltageMeasurementPeriodPhaseB::Id);
         }
         break;
     }
         // type is int16u
     case MN::AverageRmsOverVoltageCounterPhaseB::Id: {
-        using T                = MN::AverageRmsOverVoltageCounterPhaseB::TypeInfo::Type;
+        using T = MN::AverageRmsOverVoltageCounterPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsOverVoltageCounterPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsOverVoltageCounterPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsOverVoltageCounterPhaseB::Id);
+                MN::AverageRmsOverVoltageCounterPhaseB::Id);
         }
         break;
     }
         // type is int16u
     case MN::AverageRmsUnderVoltageCounterPhaseB::Id: {
-        using T                = MN::AverageRmsUnderVoltageCounterPhaseB::TypeInfo::Type;
+        using T = MN::AverageRmsUnderVoltageCounterPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsUnderVoltageCounterPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsUnderVoltageCounterPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsUnderVoltageCounterPhaseB::Id);
+                MN::AverageRmsUnderVoltageCounterPhaseB::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsExtremeOverVoltagePeriodPhaseB::Id: {
-        using T                = MN::RmsExtremeOverVoltagePeriodPhaseB::TypeInfo::Type;
+        using T = MN::RmsExtremeOverVoltagePeriodPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsExtremeOverVoltagePeriodPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsExtremeOverVoltagePeriodPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsExtremeOverVoltagePeriodPhaseB::Id);
+                MN::RmsExtremeOverVoltagePeriodPhaseB::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsExtremeUnderVoltagePeriodPhaseB::Id: {
-        using T                = MN::RmsExtremeUnderVoltagePeriodPhaseB::TypeInfo::Type;
+        using T = MN::RmsExtremeUnderVoltagePeriodPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsExtremeUnderVoltagePeriodPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsExtremeUnderVoltagePeriodPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsExtremeUnderVoltagePeriodPhaseB::Id);
+                MN::RmsExtremeUnderVoltagePeriodPhaseB::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsVoltageSagPeriodPhaseB::Id: {
-        using T                = MN::RmsVoltageSagPeriodPhaseB::TypeInfo::Type;
+        using T = MN::RmsVoltageSagPeriodPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageSagPeriodPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageSagPeriodPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageSagPeriodPhaseB::Id);
+                MN::RmsVoltageSagPeriodPhaseB::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsVoltageSwellPeriodPhaseB::Id: {
-        using T                = MN::RmsVoltageSwellPeriodPhaseB::TypeInfo::Type;
+        using T = MN::RmsVoltageSwellPeriodPhaseB::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageSwellPeriodPhaseB attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageSwellPeriodPhaseB::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageSwellPeriodPhaseB::Id);
+                MN::RmsVoltageSwellPeriodPhaseB::Id);
         }
         break;
     }
         // type is int16u
     case MN::LineCurrentPhaseC::Id: {
-        using T                = MN::LineCurrentPhaseC::TypeInfo::Type;
+        using T = MN::LineCurrentPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "LineCurrentPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::LineCurrentPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::LineCurrentPhaseC::Id);
+                MN::LineCurrentPhaseC::Id);
         }
         break;
     }
         // type is int16s
     case MN::ActiveCurrentPhaseC::Id: {
-        using T                = MN::ActiveCurrentPhaseC::TypeInfo::Type;
+        using T = MN::ActiveCurrentPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActiveCurrentPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::ActiveCurrentPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActiveCurrentPhaseC::Id);
+                MN::ActiveCurrentPhaseC::Id);
         }
         break;
     }
         // type is int16s
     case MN::ReactiveCurrentPhaseC::Id: {
-        using T                = MN::ReactiveCurrentPhaseC::TypeInfo::Type;
+        using T = MN::ReactiveCurrentPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ReactiveCurrentPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::ReactiveCurrentPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ReactiveCurrentPhaseC::Id);
+                MN::ReactiveCurrentPhaseC::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsVoltagePhaseC::Id: {
-        using T                = MN::RmsVoltagePhaseC::TypeInfo::Type;
+        using T = MN::RmsVoltagePhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltagePhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltagePhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltagePhaseC::Id);
+                MN::RmsVoltagePhaseC::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsVoltageMinPhaseC::Id: {
-        using T                = MN::RmsVoltageMinPhaseC::TypeInfo::Type;
+        using T = MN::RmsVoltageMinPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageMinPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageMinPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageMinPhaseC::Id);
+                MN::RmsVoltageMinPhaseC::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsVoltageMaxPhaseC::Id: {
-        using T                = MN::RmsVoltageMaxPhaseC::TypeInfo::Type;
+        using T = MN::RmsVoltageMaxPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageMaxPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageMaxPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageMaxPhaseC::Id);
+                MN::RmsVoltageMaxPhaseC::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsCurrentPhaseC::Id: {
-        using T                = MN::RmsCurrentPhaseC::TypeInfo::Type;
+        using T = MN::RmsCurrentPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsCurrentPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsCurrentPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsCurrentPhaseC::Id);
+                MN::RmsCurrentPhaseC::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsCurrentMinPhaseC::Id: {
-        using T                = MN::RmsCurrentMinPhaseC::TypeInfo::Type;
+        using T = MN::RmsCurrentMinPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsCurrentMinPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsCurrentMinPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsCurrentMinPhaseC::Id);
+                MN::RmsCurrentMinPhaseC::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsCurrentMaxPhaseC::Id: {
-        using T                = MN::RmsCurrentMaxPhaseC::TypeInfo::Type;
+        using T = MN::RmsCurrentMaxPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsCurrentMaxPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsCurrentMaxPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsCurrentMaxPhaseC::Id);
+                MN::RmsCurrentMaxPhaseC::Id);
         }
         break;
     }
         // type is int16s
     case MN::ActivePowerPhaseC::Id: {
-        using T                = MN::ActivePowerPhaseC::TypeInfo::Type;
+        using T = MN::ActivePowerPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActivePowerPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::ActivePowerPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActivePowerPhaseC::Id);
+                MN::ActivePowerPhaseC::Id);
         }
         break;
     }
         // type is int16s
     case MN::ActivePowerMinPhaseC::Id: {
-        using T                = MN::ActivePowerMinPhaseC::TypeInfo::Type;
+        using T = MN::ActivePowerMinPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActivePowerMinPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::ActivePowerMinPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActivePowerMinPhaseC::Id);
+                MN::ActivePowerMinPhaseC::Id);
         }
         break;
     }
         // type is int16s
     case MN::ActivePowerMaxPhaseC::Id: {
-        using T                = MN::ActivePowerMaxPhaseC::TypeInfo::Type;
+        using T = MN::ActivePowerMaxPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ActivePowerMaxPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::ActivePowerMaxPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ActivePowerMaxPhaseC::Id);
+                MN::ActivePowerMaxPhaseC::Id);
         }
         break;
     }
         // type is int16s
     case MN::ReactivePowerPhaseC::Id: {
-        using T                = MN::ReactivePowerPhaseC::TypeInfo::Type;
+        using T = MN::ReactivePowerPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ReactivePowerPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::ReactivePowerPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ReactivePowerPhaseC::Id);
+                MN::ReactivePowerPhaseC::Id);
         }
         break;
     }
         // type is int16u
     case MN::ApparentPowerPhaseC::Id: {
-        using T                = MN::ApparentPowerPhaseC::TypeInfo::Type;
+        using T = MN::ApparentPowerPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "ApparentPowerPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::ApparentPowerPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::ApparentPowerPhaseC::Id);
+                MN::ApparentPowerPhaseC::Id);
         }
         break;
     }
         // type is int8s
     case MN::PowerFactorPhaseC::Id: {
-        using T                = MN::PowerFactorPhaseC::TypeInfo::Type;
+        using T = MN::PowerFactorPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "PowerFactorPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::PowerFactorPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::PowerFactorPhaseC::Id);
+                MN::PowerFactorPhaseC::Id);
         }
         break;
     }
         // type is int16u
     case MN::AverageRmsVoltageMeasurementPeriodPhaseC::Id: {
-        using T                = MN::AverageRmsVoltageMeasurementPeriodPhaseC::TypeInfo::Type;
+        using T = MN::AverageRmsVoltageMeasurementPeriodPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsVoltageMeasurementPeriodPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsVoltageMeasurementPeriodPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsVoltageMeasurementPeriodPhaseC::Id);
+                MN::AverageRmsVoltageMeasurementPeriodPhaseC::Id);
         }
         break;
     }
         // type is int16u
     case MN::AverageRmsOverVoltageCounterPhaseC::Id: {
-        using T                = MN::AverageRmsOverVoltageCounterPhaseC::TypeInfo::Type;
+        using T = MN::AverageRmsOverVoltageCounterPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsOverVoltageCounterPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsOverVoltageCounterPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsOverVoltageCounterPhaseC::Id);
+                MN::AverageRmsOverVoltageCounterPhaseC::Id);
         }
         break;
     }
         // type is int16u
     case MN::AverageRmsUnderVoltageCounterPhaseC::Id: {
-        using T                = MN::AverageRmsUnderVoltageCounterPhaseC::TypeInfo::Type;
+        using T = MN::AverageRmsUnderVoltageCounterPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "AverageRmsUnderVoltageCounterPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::AverageRmsUnderVoltageCounterPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::AverageRmsUnderVoltageCounterPhaseC::Id);
+                MN::AverageRmsUnderVoltageCounterPhaseC::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsExtremeOverVoltagePeriodPhaseC::Id: {
-        using T                = MN::RmsExtremeOverVoltagePeriodPhaseC::TypeInfo::Type;
+        using T = MN::RmsExtremeOverVoltagePeriodPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsExtremeOverVoltagePeriodPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsExtremeOverVoltagePeriodPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsExtremeOverVoltagePeriodPhaseC::Id);
+                MN::RmsExtremeOverVoltagePeriodPhaseC::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsExtremeUnderVoltagePeriodPhaseC::Id: {
-        using T                = MN::RmsExtremeUnderVoltagePeriodPhaseC::TypeInfo::Type;
+        using T = MN::RmsExtremeUnderVoltagePeriodPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsExtremeUnderVoltagePeriodPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsExtremeUnderVoltagePeriodPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsExtremeUnderVoltagePeriodPhaseC::Id);
+                MN::RmsExtremeUnderVoltagePeriodPhaseC::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsVoltageSagPeriodPhaseC::Id: {
-        using T                = MN::RmsVoltageSagPeriodPhaseC::TypeInfo::Type;
+        using T = MN::RmsVoltageSagPeriodPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageSagPeriodPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageSagPeriodPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageSagPeriodPhaseC::Id);
+                MN::RmsVoltageSagPeriodPhaseC::Id);
         }
         break;
     }
         // type is int16u
     case MN::RmsVoltageSwellPeriodPhaseC::Id: {
-        using T                = MN::RmsVoltageSwellPeriodPhaseC::TypeInfo::Type;
+        using T = MN::RmsVoltageSwellPeriodPhaseC::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
 
-        if (value.has_value())
-        {
+        if (value.has_value()) {
             sl_log_debug(LOG_TAG, "RmsVoltageSwellPeriodPhaseC attribute value is %s", unify_value.dump().c_str());
             UN::RmsVoltageSwellPeriodPhaseC::Set(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::ElectricalMeasurement::Id,
-                                                   MN::RmsVoltageSwellPeriodPhaseC::Id);
+                MN::RmsVoltageSwellPeriodPhaseC::Id);
         }
         break;
     }

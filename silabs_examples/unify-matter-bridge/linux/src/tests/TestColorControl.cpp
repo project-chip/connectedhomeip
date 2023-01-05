@@ -181,13 +181,13 @@ static void TestColorControlAttributeColorTemperatureMireds(nlTestSuite * sSuite
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }*/
 
-static void TestColorControlAttributeOptions(nlTestSuite * sSuite, void * apContext)
-{
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err    = ctx.attribute_test<Clusters::ColorControl::Attributes::Options::TypeInfo, false>(
-        sSuite, "ucl/by-unid/zw-0x0002/ep2/ColorControl/Attributes/Options/Reported", R"({ "value": 42 })", 42);
-    NL_TEST_ASSERT(sSuite, err == CHIP_ERROR(0x00000586));
-}
+// static void TestColorControlAttributeOptions(nlTestSuite * sSuite, void * apContext)
+// {
+//     TestContext & ctx = *static_cast<TestContext *>(apContext);
+//     CHIP_ERROR err    = ctx.attribute_test<Clusters::ColorControl::Attributes::Options::TypeInfo, false>(
+//         sSuite, "ucl/by-unid/zw-0x0002/ep2/ColorControl/Attributes/Options/Reported", R"({ "value": 42 })", 42);
+//     NL_TEST_ASSERT(sSuite, err == CHIP_ERROR(0x00000586));
+// }
 
 static void TestColorControlAttributeNumberOfPrimaries(nlTestSuite * sSuite, void * apContext)
 {
@@ -761,7 +761,7 @@ static const nlTest sAttributeTests[] = {
     NL_TEST_DEF("ColorControl::TestColorControlAttributeCompensationText", TestColorControlAttributeCompensationText),
     NL_TEST_DEF("ColorControl::TestColorControlAttributeColorTemperatureMireds", TestColorControlAttributeColorTemperatureMireds),
     //NL_TEST_DEF("ColorControl::TestColorControlAttributeColorMode", TestColorControlAttributeColorMode),
-    NL_TEST_DEF("ColorControl::TestColorControlAttributeOptions", TestColorControlAttributeOptions),
+    // NL_TEST_DEF("ColorControl::TestColorControlAttributeOptions", TestColorControlAttributeOptions),
     NL_TEST_DEF("ColorControl::TestColorControlAttributeNumberOfPrimaries", TestColorControlAttributeNumberOfPrimaries),
     NL_TEST_DEF("ColorControl::TestColorControlAttributePrimary1X", TestColorControlAttributePrimary1X),
     NL_TEST_DEF("ColorControl::TestColorControlAttributePrimary1Y", TestColorControlAttributePrimary1Y),

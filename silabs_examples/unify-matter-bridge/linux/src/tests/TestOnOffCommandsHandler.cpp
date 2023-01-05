@@ -53,6 +53,13 @@ void TestOnOffClusterCommandHandler(nlTestSuite * inSuite, void * aContext)
     auto & onoff_cluster             = ep.emplace_cluster("OnOff");
     onoff_cluster.supported_commands = { "On", "Off", "Toggle" };
     onoff_cluster.attributes.emplace("OnOff");
+    auto & identify_cluster = ep.emplace_cluster("Identify");
+    identify_cluster.attributes.emplace("IdentifyTime");
+    auto & scenes_cluster = ep.emplace_cluster("Scenes");
+    scenes_cluster.attributes.emplace("SceneCount");
+    auto & groups_cluster = ep.emplace_cluster("Groups");
+    groups_cluster.attributes.emplace("NameSupport");
+
 
     test_matter_node_state_monitor.call_on_unify_node_added(node_ember_1);
     auto bridged_ep = test_matter_node_state_monitor.bridged_endpoint(node_id, endpoint);

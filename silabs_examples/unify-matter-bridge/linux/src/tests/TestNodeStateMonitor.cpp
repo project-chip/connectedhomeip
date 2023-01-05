@@ -332,17 +332,17 @@ static void TestEmberInterfaceNodeAdded(nlTestSuite * inSuite, void * aContext)
 
     // Check the cluster mapping to a device of the node is always
     // present in the device type list. Do not know why.
-    const uint16_t dimmable_light   = 0x0101;
+    const uint16_t dimmable_plugin_light   = 0x010B;
     const uint16_t bridge_device_id = 0x0013;
 
-    bool dimmable_light_device_id_present = false;
+    bool dimmable_plugin_light_device_id_present = false;
     bool device_is_a_bridge_device        = false;
     for (auto & deviceType : unify_ember_interface.calledWithDeviceTypeList)
     {
         sl_log_debug(TEST_LOG_TAG, "Device types in list %d", deviceType.deviceId);
-        if (deviceType.deviceId == dimmable_light)
+        if (deviceType.deviceId == dimmable_plugin_light)
         {
-            dimmable_light_device_id_present = true;
+            dimmable_plugin_light_device_id_present = true;
         }
 
         if (deviceType.deviceId == bridge_device_id)
@@ -350,7 +350,7 @@ static void TestEmberInterfaceNodeAdded(nlTestSuite * inSuite, void * aContext)
             device_is_a_bridge_device = true;
         }
     }
-    NL_TEST_ASSERT(inSuite, dimmable_light_device_id_present);
+    NL_TEST_ASSERT(inSuite, dimmable_plugin_light_device_id_present);
     NL_TEST_ASSERT(inSuite, device_is_a_bridge_device);
     node_state_monitor.display_map(std::cout);
 }

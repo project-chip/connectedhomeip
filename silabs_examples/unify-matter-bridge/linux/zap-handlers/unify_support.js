@@ -1,6 +1,6 @@
 
 var unify_matter_mapping = require('./unify_matter_mapping.js')
-var unify = require('../zap-generated/data_model_translator/unify_support_model.js')
+var unify = require('../zap-generated/data-models/unify_support_model.js')
 
 
 function unifySupportedCluster(clusterID) {

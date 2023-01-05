@@ -10,8 +10,9 @@
         "templates/app/helper.js",
         "templates/chip/helper.js",
         "unify-helper.js",
-        "unify_support.js"
-
+        "unify_support.js",
+        "matter_support.js",
+        "device-type-mapper/device-type-helper.js"
     ],
     "override": "../../../../src/app/zap-templates/common/override.js",
     "templates": [
@@ -54,8 +55,7 @@
             "path": "unify_accessors.cpp.zapt",
             "name": "Attribute Accessor Source",
             "output": "unify_accessors.cpp"
-        }
-        ,
+        },
         {
             "path": "attribute_type_size.hpp.zapt",
             "name": "Attribute Type/Size Header",
@@ -72,10 +72,14 @@
             "output": "zcl_global_types.hpp"
         },
         {
-            "path": "unify_support_model.js.zapt",
-            "name": "Test UCL dotdot zap template",
-            "output": "matter_support_model.js"
+            "path": "device-type-mapper/matter_device_types_clusters_list.inc.zapt",
+            "name": "Matter Device Types Mapping Data Model",
+            "output": "device-type-mapper/matter_device_types_clusters_list.inc"
+        },
+        {
+            "path": "device-type-mapper/matter_id_model.inc.zapt",
+            "name": "Matter IDs Mapping Data Model",
+            "output": "device-type-mapper/matter_id_model.inc"
         }
-
     ]
 }

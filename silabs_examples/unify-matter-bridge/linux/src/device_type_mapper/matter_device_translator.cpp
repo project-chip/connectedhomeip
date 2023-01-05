@@ -10,115 +10,44 @@
  * sections of the MSLA applicable to Source Code.
  *
  *****************************************************************************/
-#include "matter_device_mapper.inc"
+// Own header
 #include "matter_device_translator.hpp"
-#include "matter_device_types_clusters_list_updated.inc"
+
+// Application library
+#include "matter_device_type_selection.hpp"
+#include "matter_device_mapper.inc"
+#include "matter_id_model.inc"
+#include "matter_device_types_clusters_list.inc"
+
+// Matter library
+#include "matter.h"
+
+// Unify components
 #include "sl_log.h"
 
-#include <algorithm>
+// Standard library
 #include <cstring>
-#include <stdio.h>
 #include <string>
-#include <unordered_map>
 
 using namespace chip::app::Clusters;
 
 constexpr const char * LOG_TAG = "matter_device_translator";
 
 namespace unify::matter_bridge {
-static uint8_t device_type_mapper_compare_cluster_lists(const std::vector<const char *> & unify_clusters,
-                                                        const std::vector<const char *> & matter_clusters)
-{
-    uint8_t count = 0;
-    for (const auto & unify_cluster : unify_clusters)
-    {
-        // Find matching unify_cluster
-        const auto it = std::find_if(matter_clusters.begin(), matter_clusters.end(), [unify_cluster](const char * matter_cluster) {
-            return strcmp(unify_cluster, matter_cluster) == 0;
-        });
-        if (it != matter_clusters.end())
-        {
-            count = count + 1;
-        }
-    }
-    return count;
-}
 
-/**
- * @brief Cluster Score struct
- *
- * Holds the information on cluster scores used to determine possible device
- * types in \ref get_device_types.
- *
- */
-struct cluster_score
-{
-    /// Number of unify clusters that didn't match matter clusters (0 means all
-    /// match).
-    unsigned int unify_miss_count;
-    /// Number of matter clusters that didn't match the unify clusters (0 means
-    /// all match).
-    unsigned int matter_miss_count;
-    chip::DeviceTypeId device_type_id;
-    cluster_score(unsigned int _unify_miss_count, unsigned int _matter_miss_count, chip::DeviceTypeId _device_type_id) :
-        unify_miss_count(_unify_miss_count), matter_miss_count(_matter_miss_count), device_type_id(_device_type_id)
-    {}
-};
 /**
  * The API provides possible matched matter device types from list of clusters.
  */
-std::vector<chip::DeviceTypeId> device_translator::get_device_types(const std::vector<const char *> & unify_cluster_list) const
-{
-    // contains scores that reflect if all list clusters present under a given
-    // device type
-    std::vector<cluster_score> device_type_match_score;
-
-    for (const auto & [matter_device_type_id, matter_device] : matter_device_type_vs_clusters_map)
-    {
-        uint8_t clusters_matched = device_type_mapper_compare_cluster_lists(unify_cluster_list, matter_device.first);
-
-        unsigned int unify_miss_count  = unify_cluster_list.size() - clusters_matched;
-        unsigned int matter_miss_count = matter_device.first.size() - clusters_matched;
-        device_type_match_score.emplace_back(unify_miss_count, matter_miss_count, matter_device_type_id);
-    }
-    std::sort(device_type_match_score.begin(), device_type_match_score.end(), [](const cluster_score & a, const cluster_score & b) {
-        // Sorting algorithm first sort based on unify_miss_count, if that
-        // match sort based on matter_miss_count.
-        if (a.unify_miss_count < b.unify_miss_count)
-        {
-            return true;
-        }
-        else if (b.unify_miss_count < a.unify_miss_count)
-        {
-            return false;
-        }
-        else
-        {
-            // unify_miss_count match on a and b, now we sort based on
-            // matter_miss_count.
-            return a.matter_miss_count <= b.matter_miss_count;
-        }
-    });
-    // Select possible device types based on score list.
-    std::vector<chip::DeviceTypeId> possible_device_list;
-    const auto it_first = device_type_match_score.begin();
-    if (it_first != device_type_match_score.end())
-    {
-        possible_device_list.push_back(it_first->device_type_id);
-        auto iter = it_first;
-        ++iter;
-        for (; iter != device_type_match_score.end(); ++iter)
-        {
-            if ((it_first->unify_miss_count == iter->unify_miss_count) && (it_first->matter_miss_count == iter->matter_miss_count))
-            {
-                possible_device_list.push_back(iter->device_type_id);
-            }
-        }
-    }
+std::vector<chip::DeviceTypeId> device_translator::get_device_types(const std::vector<EmberAfCluster> & translated_matter_clusters) const
+{  
+    std::vector<chip::DeviceTypeId> possible_device_list = select_possible_device_types_on_score(translated_matter_clusters);
     if (!possible_device_list.empty())
     {
-        sl_log_info(LOG_TAG, "Prioritized Matter Device Type'%s' ",
-                       matter_device_type_vs_clusters_map.find(possible_device_list[0])->second.second);
+        sl_log_info(LOG_TAG, "Prioritized Matter Device Type:'%s'",
+                       matter_device_type_vs_clusters_map.find(possible_device_list[0])->second.device_type_name);
+        return possible_device_list;
+    } else {
+        sl_log_warning(LOG_TAG, "No matching Matter Device Type found");
     }
 
     return possible_device_list;
@@ -129,7 +58,7 @@ std::optional<const char *> device_translator::get_device_name(chip::DeviceTypeI
     const auto it = matter_device_type_vs_clusters_map.find(device_id);
     if (it != matter_device_type_vs_clusters_map.end())
     {
-        return it->second.second;
+        return it->second.device_type_name;
     }
     else
     {
@@ -171,6 +100,16 @@ std::optional<chip::ClusterId> device_translator::get_cluster_id(const std::stri
 {
     const auto cluster_map_iter = unify_cluster_id_map.find(cluster_name);
     if (cluster_map_iter != unify_cluster_id_map.end())
+    {
+        return cluster_map_iter->second;
+    }
+    return std::nullopt;
+}
+
+std::optional<chip::ClusterId> device_translator::get_matter_cluster_id(const std::string & matter_cluster_name) const
+{
+    const auto cluster_map_iter = matter_cluster_id_map.find(matter_cluster_name);
+    if (cluster_map_iter != matter_cluster_id_map.end())
     {
         return cluster_map_iter->second;
     }

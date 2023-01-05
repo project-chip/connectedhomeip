@@ -1,0 +1,44 @@
+/******************************************************************************
+ * # License
+ * <b>Copyright 2022 Silicon Laboratories Inc. www.silabs.com</b>
+ ******************************************************************************
+ * The licensor of this software is Silicon Laboratories Inc. Your use of this
+ * software is governed by the terms of Silicon Labs Master Software License
+ * Agreement (MSLA) available at
+ * www.silabs.com/about-us/legal/master-software-license-agreement. This
+ * software is distributed to you in Source Code format and is governed by the
+ * sections of the MSLA applicable to Source Code.
+ *
+ *****************************************************************************/
+
+#include <vector>
+#include <map>
+#include <string>
+#include <app-common/zap-generated/ids/Clusters.h>
+
+typedef struct {
+    const char* cluster_name;
+    bool is_mandatory;
+    std::vector<std::string> required_commands;
+    std::vector<std::string> required_attributes;
+} DeviceClusterData;
+
+typedef struct {
+    std::vector<DeviceClusterData> clusters;
+    const char* device_type_name;
+    bool conform_clusters_to_spec;
+    bool conform_attributes_to_spec;
+    bool conform_commands_to_spec;
+} DeviceTypeData;
+
+// Device type IDs mapping
+static const std::map<chip::DeviceTypeId, DeviceTypeData> matter_device_type_vs_clusters_map = {
+{{#zcl_device_types}}
+ {{#if (supportedDeviceTypes label)}} { {{asHex code 4}}, { { {{#zcl_device_type_clusters}}{ "{{asUpperCamelCase clusterName}}", {{isMandatoryCluster}}, 
+    { {{#zcl_device_type_cluster_commands}} "{{name}}"{{listComma this}} {{/zcl_device_type_cluster_commands}} }, 
+    { {{#zcl_device_type_cluster_attributes}} "{{name}}"{{listComma this}} {{/zcl_device_type_cluster_attributes}} } } {{listComma this}} {{/zcl_device_type_clusters}} }, 
+    "{{cleanDeviceTypeName label}}", {{deviceTypeClusterSpecConformance label}}, {{deviceTypeAttributeSpecConformance label}}, {{deviceTypeCommandSpecConformance label}} } 
+    }{{listComma this}}
+  {{/if}}
+{{/zcl_device_types}}
+};

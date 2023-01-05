@@ -69,9 +69,14 @@ public:
      */
     const matter_endpoint_context finalize();
 
+    /**
+     * @brief List of matter clusters that are registered in this endpoint.
+     * 
+     */
+    std::vector<EmberAfCluster> clusters;
+
   private:
-  std::vector<EmberAfCluster> clusters;
-  matter_endpoint_context owned_ember_endpoint;
+    matter_endpoint_context owned_ember_endpoint;
 };
 } // namespace unify::matter_bridge
 #endif

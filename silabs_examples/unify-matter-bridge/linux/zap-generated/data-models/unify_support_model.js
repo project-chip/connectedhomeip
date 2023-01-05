@@ -1,4 +1,38 @@
 exports.model = {
+  0 : {
+    name : "Basic",
+    commands : {
+      0 : {
+        name : "ResetToFactoryDefaults",
+        arguments : [
+
+        ],
+      },
+    },
+    attributes : {
+      0 : "ZCLVersion",
+      1 : "ApplicationVersion",
+      2 : "StackVersion",
+      3 : "HWVersion",
+      4 : "ManufacturerName",
+      5 : "ModelIdentifier",
+      6 : "DateCode",
+      7 : "PowerSource",
+      8 : "GenericDeviceClass",
+      9 : "GenericDeviceType",
+      10 : "ProductCode",
+      11 : "ProductURL",
+      12 : "ManufacturerVersionDetails",
+      13 : "SerialNumber",
+      14 : "ProductLabel",
+      16 : "LocationDescription",
+      17 : "PhysicalEnvironment",
+      18 : "DeviceEnabled",
+      19 : "AlarmMask",
+      20 : "DisableLocalConfig",
+      16384 : "SWBuildID",
+    },
+  },
   3 : {
     name : "Identify",
     commands : {
@@ -24,6 +58,143 @@ exports.model = {
     },
     attributes : {
       0 : "IdentifyTime",
+    },
+  },
+  4 : {
+    name : "Groups",
+    commands : {
+      0 : {
+        name : "AddGroup",
+        arguments : [
+          "GroupId",
+          "GroupName",
+        ],
+      },
+      1 : {
+        name : "ViewGroup",
+        arguments : [
+          "GroupId",
+        ],
+      },
+      2 : {
+        name : "GetGroupMembership",
+        arguments : [
+          "GroupList",
+        ],
+      },
+      3 : {
+        name : "RemoveGroup",
+        arguments : [
+          "GroupId",
+        ],
+      },
+      4 : {
+        name : "RemoveAllGroups",
+        arguments : [
+
+        ],
+      },
+      5 : {
+        name : "AddGroupIfIdentifying",
+        arguments : [
+          "GroupId",
+          "GroupName",
+        ],
+      },
+    },
+    attributes : {
+      0 : "NameSupport",
+    },
+  },
+  5 : {
+    name : "Scenes",
+    commands : {
+      0 : {
+        name : "AddScene",
+        arguments : [
+          "GroupID",
+          "SceneID",
+          "TransitionTime",
+          "SceneName",
+          "ExtensionFieldSets",
+        ],
+      },
+      1 : {
+        name : "ViewScene",
+        arguments : [
+          "GroupID",
+          "SceneID",
+        ],
+      },
+      2 : {
+        name : "RemoveScene",
+        arguments : [
+          "GroupID",
+          "SceneID",
+        ],
+      },
+      3 : {
+        name : "RemoveAllScenes",
+        arguments : [
+          "GroupID",
+        ],
+      },
+      4 : {
+        name : "StoreScene",
+        arguments : [
+          "GroupID",
+          "SceneID",
+        ],
+      },
+      5 : {
+        name : "RecallScene",
+        arguments : [
+          "GroupID",
+          "SceneID",
+          "TransitionTime",
+        ],
+      },
+      6 : {
+        name : "GetSceneMembership",
+        arguments : [
+          "GroupID",
+        ],
+      },
+      64 : {
+        name : "EnhancedAddScene",
+        arguments : [
+          "GroupID",
+          "SceneID",
+          "TransitionTime",
+          "SceneName",
+          "ExtensionFieldSets",
+        ],
+      },
+      65 : {
+        name : "EnhancedViewScene",
+        arguments : [
+          "GroupID",
+          "SceneID",
+        ],
+      },
+      66 : {
+        name : "CopyScene",
+        arguments : [
+          "Mode",
+          "GroupIdentifierFrom",
+          "SceneIdentifierFrom",
+          "GroupIdentifierTo",
+          "SceneIdentifierTo",
+        ],
+      },
+    },
+    attributes : {
+      0 : "SceneCount",
+      1 : "CurrentScene",
+      2 : "CurrentGroup",
+      3 : "SceneValid",
+      4 : "NameSupport",
+      5 : "LastConfiguredBy",
     },
   },
   6 : {
@@ -263,7 +434,7 @@ exports.model = {
           "UserID",
           "UserStatus",
           "UserType",
-          "PIN",
+          "Pin",
         ],
       },
       6 : {
@@ -1058,27 +1229,27 @@ exports.model = {
 
   enums : {
     "AoXLocatorAntennaMode" : [
-      "Array 4x4 URA",
-      "Array 3x3 URA",
-      "Array 1x4 ULA",
-      "Array 4x4 DP URA",
-      "Array COREHW_15x15 DP",
-      "Array COREHW 12x12 DP",
+      "Array4x4Ura",
+      "Array3x3Ura",
+      "Array1x4Ula",
+      "Array4x4DpUra",
+      "ArrayCorehw15x15Dp",
+      "ArrayCorehw12x12Dp",
     ], //
     "AoXLocatorAoXMode" : [
-      "One Shot Basic",
-      "One Shot Basic Lightweight",
-      "One Shot Fast Response",
-      "One Shot High Accuracy",
-      "One Shot Basic Azimuth Only",
-      "One Shot Fast Response Azimuth Only",
-      "One Shot High Accuracy Azimuth Only",
-      "Real Time Fast Response",
-      "Real Time Basic",
-      "Real Time High Accuracy",
+      "OneShotBasic",
+      "OneShotBasicLightweight",
+      "OneShotFastResponse",
+      "OneShotHighAccuracy",
+      "OneShotBasicAzimuthOnly",
+      "OneShotFastResponseAzimuthOnly",
+      "OneShotHighAccuracyAzimuthOnly",
+      "RealTimeFastResponse",
+      "RealTimeBasic",
+      "RealTimeHighAccuracy",
     ], //
     "AoXLocatorCTEMode" : [
-      "Silicon Labs",
+      "SiliconLabs",
       "Connection",
       "Connectionless",
     ], //
@@ -1106,14 +1277,14 @@ exports.model = {
       "Closing",
       "Opening",
     ], //
-    "BasicGenericDevice-Class" : [
+    "BasicGenericDeviceClass" : [
       "Lighting",
     ], //
-    "BasicGenericDevice-Type" : [
+    "BasicGenericDeviceType" : [
       "Incandescent",
       "SpotlightHalogen",
       "HalogenBulb",
-      "CFL",
+      "Cfl",
       "LinearFluorescent",
       "LEDBulb",
       "SpotlightLED",
@@ -1157,7 +1328,7 @@ exports.model = {
       "MainFloor",
       "Upstairs",
       "Downstairs",
-      "Basement/LowerLevel",
+      "BasementLowerLevel",
       "Gallery",
       "GameRoom",
       "Garage",
@@ -1265,12 +1436,12 @@ exports.model = {
       "NoBattery",
       "BuiltIn",
       "Other",
-      "AA",
-      "AAA",
+      "Aa",
+      "Aaa",
       "C",
       "D",
-      "CR2",
-      "CR123A",
+      "Cr2",
+      "Cr123a",
       "Unknown",
     ], //
     "BypassResponseZoneIDBypassResult" : [
@@ -1344,8 +1515,8 @@ exports.model = {
       "JoinUsingMACAssociation",
     ], //
     "DehumidificationControlDehumidificationLockout" : [
-      "DehumidificationNotAllowed.",
-      "DehumidificationAllowed.",
+      "DehumidificationNotAllowed",
+      "DehumidificationAllowed",
     ], //
     "DehumidificationControlRelativeHumidityDisplay" : [
       "NotDisplayed",
@@ -1389,7 +1560,7 @@ exports.model = {
     ], //
     "DoorLockSecurityLevel" : [
       "Network",
-      "APS",
+      "Aps",
     ], //
     "DoorLockSoundVolume" : [
       "SilentMode",
@@ -1398,9 +1569,9 @@ exports.model = {
     ], //
     "DrlkOperEventSource" : [
       "Keypad",
-      "RF",
+      "Rf",
       "Manual",
-      "RFID",
+      "Rfid",
       "Indeterminate",
     ], //
     "DrlkOperMode" : [
@@ -1545,12 +1716,12 @@ exports.model = {
     ], //
     "IlluminanceLevelSensingLightSensorType" : [
       "Photodiode",
-      "CMOS",
+      "Cmos",
       "Unknown",
     ], //
     "IlluminanceMeasurementLightSensorType" : [
       "Photodiode",
-      "CMOS",
+      "Cmos",
       "Unknown",
     ], //
     "ImageNotifyPayloadType" : [
@@ -1575,9 +1746,9 @@ exports.model = {
       "ImperialGallonsOrImperialGallonsPerhour",
       "BTUsOrBTUPerhour",
       "LitersOrLitersPerHour",
-      "kPAGaugein",
-      "kPAabsolute",
-      "mcfCubicFeetOr mcfPerHour",
+      "KPAGaugein",
+      "KPAabsolute",
+      "McfCubicFeetOrMcfPerHour",
       "Unitless",
       "MegaJouleMegaJoulePerSecond",
     ], //
@@ -1615,9 +1786,9 @@ exports.model = {
       "ImperialGallonsOrImperialGallonsPerhour",
       "BTUsOrBTUPerhour",
       "LitersOrLitersPerHour",
-      "kPAGaugein",
-      "kPAabsolute",
-      "mcfCubicFeetOr mcfPerHour",
+      "KPAGaugein",
+      "KPAabsolute",
+      "McfCubicFeetOrMcfPerHour",
       "Unitless",
       "MegaJouleMegaJoulePerSecond",
     ], //
@@ -1625,31 +1796,31 @@ exports.model = {
       "Up",
       "Down",
     ], //
-    "NM_State" : [
-      "idle",
-      "add node",
-      "remove node",
-      "join network",
-      "leave network",
-      "network repair",
-      "network update",
-      "reset",
-      "scan mode",
+    "NmState" : [
+      "Idle",
+      "AddNode",
+      "RemoveNode",
+      "JoinNetwork",
+      "LeaveNetwork",
+      "NetworkRepair",
+      "NetworkUpdate",
+      "Reset",
+      "ScanMode",
     ], //
     "NodeStateNetworkStatus" : [
-      "Online functional",
-      "Online interviewing",
-      "Online non-functional",
+      "OnlineFunctional",
+      "OnlineInterviewing",
+      "OnlineNonFunctional",
       "Unavailable",
       "Offline",
     ], //
     "NodeStateSecurity" : [
       "None",
-      "Z-Wave S0",
-      "Z-Wave S2 Unauthenticated",
-      "Z-Wave S2 Authenticated",
-      "Z-Wave S2 Access Control",
-      "Zigbee Z3",
+      "ZWaveS0",
+      "ZWaveS2Unauthenticated",
+      "ZWaveS2Authenticated",
+      "ZWaveS2AccessControl",
+      "ZigbeeZ3",
     ], //
     "OTADeviceSpecificImageType" : [
       "ClientSecurityCredentials",
@@ -1675,7 +1846,7 @@ exports.model = {
       "DoNotApplyUpgradeAfterTimeout",
     ], //
     "OccupancySensingOccupancySensorType" : [
-      "PIR",
+      "Pir",
       "Ultrasonic",
       "PIRAndUltrasonic",
       "PhysicalContact",
@@ -1733,8 +1904,8 @@ exports.model = {
     ], //
     "ProgrammingEventNotificationProgramEventSource" : [
       "Keypad",
-      "RF",
-      "RFID",
+      "Rf",
+      "Rfid",
       "Indeterminate",
     ], //
     "PumpControlMode" : [
@@ -1881,10 +2052,10 @@ exports.model = {
       "Default",
     ], //
     "TxReportTransmissionSpeed" : [
-      "Z-Wave-9600-bits-per-second",
-      "Z-Wave-40-kbits-per-second",
-      "Z-Wave-100-kbits-per-second",
-      "Z-WaveLongRange-100-kbits-per-second",
+      "ZWave9600BitsPerSecond",
+      "ZWave40KbitsPerSecond",
+      "ZWave100KbitsPerSecond",
+      "ZWaveLongRange100KbitsPerSecond",
       "Other",
       "Unknown",
     ], //
@@ -1906,104 +2077,104 @@ exports.model = {
       "NoEnrollPermit",
       "TooManyZones",
     ], //
-    "attributeReportingStatus" : [
+    "AttributeReportingStatus" : [
       "Pending",
       "Complete",
     ], //
-    "zclStatus" : [
-      "SUCCESS",
-      "FAILURE",
-      "NOT_AUTHORIZED",
-      "MALFORMED_COMMAND",
-      "UNSUP_CLUSTER_COMMAND",
-      "UNSUP_GENERAL_COMMAND",
-      "UNSUP_MANUF_CLUSTER_COMMAND",
-      "UNSUP_MANUF_GENERAL_COMMAND",
-      "INVALID_FIELD",
-      "UNSUPPORTED_ATTRIBUTE",
-      "INVALID_VALUE",
-      "READ_ONLY",
-      "INSUFFICIENT_SPACE",
-      "DUPLICATE_EXISTS",
-      "NOT_FOUND",
-      "UNREPORTABLE_ATTRIBUTE",
-      "INVALID_DATA_TYPE",
-      "INVALID_SELECTOR",
-      "WRITE_ONLY",
-      "INCONSISTENT_STARTUP_STATE",
-      "DEFINED_OUT_OF_BAND",
-      "INCONSISTENT",
-      "ACTION_DENIED",
-      "TIMEOUT",
-      "ABORT",
-      "INVALID_IMAGE",
-      "WAIT_FOR_DATA",
-      "NO_IMAGE_AVAILABLE",
-      "REQUIRE_MORE_IMAGE",
-      "NOTIFICATION_PENDING",
-      "HARDWARE_FAILURE",
-      "SOFTWARE_FAILURE",
-      "CALIBRATION_ERROR",
-      "UNSUPPORTED_CLUSTER",
-      "LIMIT_REACHED",
+    "ZclStatus" : [
+      "Success",
+      "Failure",
+      "NotAuthorized",
+      "MalformedCommand",
+      "UnsupClusterCommand",
+      "UnsupGeneralCommand",
+      "UnsupManufClusterCommand",
+      "UnsupManufGeneralCommand",
+      "InvalidField",
+      "UnsupportedAttribute",
+      "InvalidValue",
+      "ReadOnly",
+      "InsufficientSpace",
+      "DuplicateExists",
+      "NotFound",
+      "UnreportableAttribute",
+      "InvalidDataType",
+      "InvalidSelector",
+      "WriteOnly",
+      "InconsistentStartupState",
+      "DefinedOutOfBand",
+      "Inconsistent",
+      "ActionDenied",
+      "Timeout",
+      "Abort",
+      "InvalidImage",
+      "WaitForData",
+      "NoImageAvailable",
+      "RequireMoreImage",
+      "NotificationPending",
+      "HardwareFailure",
+      "SoftwareFailure",
+      "CalibrationError",
+      "UnsupportedCluster",
+      "LimitReached",
     ], //
-    "zclType" : [
-      "nodata",
-      "data8",
-      "data16",
-      "data24",
-      "data32",
-      "data40",
-      "data48",
-      "data56",
-      "data64",
-      "bool",
-      "map8",
-      "map16",
-      "map24",
-      "map32",
-      "map40",
-      "map48",
-      "map56",
-      "map64",
-      "uint8",
-      "uint16",
-      "uint24",
-      "uint32",
-      "uint40",
-      "uint48",
-      "uint56",
-      "uint64",
-      "int8",
-      "int16",
-      "int24",
-      "int32",
-      "int40",
-      "int48",
-      "int56",
-      "int64",
-      "enum8",
-      "enum16",
-      "semi",
-      "single",
-      "double",
-      "octstr",
-      "string",
-      "octstr16",
-      "string16",
-      "array",
-      "struct",
-      "set",
-      "bag",
+    "ZclType" : [
+      "Nodata",
+      "Data8",
+      "Data16",
+      "Data24",
+      "Data32",
+      "Data40",
+      "Data48",
+      "Data56",
+      "Data64",
+      "Bool",
+      "Map8",
+      "Map16",
+      "Map24",
+      "Map32",
+      "Map40",
+      "Map48",
+      "Map56",
+      "Map64",
+      "Uint8",
+      "Uint16",
+      "Uint24",
+      "Uint32",
+      "Uint40",
+      "Uint48",
+      "Uint56",
+      "Uint64",
+      "Int8",
+      "Int16",
+      "Int24",
+      "Int32",
+      "Int40",
+      "Int48",
+      "Int56",
+      "Int64",
+      "Enum8",
+      "Enum16",
+      "Semi",
+      "Single",
+      "Double",
+      "Octstr",
+      "String",
+      "Octstr16",
+      "String16",
+      "Array",
+      "Struct",
+      "Set",
+      "Bag",
       "ToD",
-      "date",
-      "UTC",
-      "clusterId",
-      "attribId",
-      "bacOID",
-      "EUI64",
-      "key128",
-      "unk",
+      "Date",
+      "Utc",
+      "ClusterId",
+      "AttribId",
+      "BacOID",
+      "Eui64",
+      "Key128",
+      "Unk",
     ], //
   },
 
@@ -2257,7 +2428,7 @@ exports.model = {
       1 : "SensedOccupancy",
     },
     "OccupancySensingOccupancySensorTypeBitmap" : {
-      1 : "PIR",
+      1 : "Pir",
       2 : "Ultrasonic",
       4 : "PhysicalContact",
     },
@@ -2402,13 +2573,13 @@ exports.model = {
       4 : "MaintenanceMode",
       8 : "LEDFeedback",
     },
-    "map16" : {},
-    "map24" : {},
-    "map32" : {},
-    "map40" : {},
-    "map48" : {},
-    "map56" : {},
-    "map64" : {},
-    "map8" : {},
+    "Map16" : {},
+    "Map24" : {},
+    "Map32" : {},
+    "Map40" : {},
+    "Map48" : {},
+    "Map56" : {},
+    "Map64" : {},
+    "Map8" : {},
   }
 }

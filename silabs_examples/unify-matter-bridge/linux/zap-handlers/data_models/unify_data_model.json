@@ -1,0 +1,21 @@
+{
+    "name": "Unify Data model",
+    "version": "Unify-dotdot-v1",
+    "helpers": [
+        "partials/helper.js",
+        "common/ListHelper.js",
+        "common/StringHelper.js",
+        "common/ChipTypesHelper.js",
+        "common/attributes/Accessors.js",
+        "templates/app/helper.js",
+        "templates/chip/helper.js",
+        "../unify-helper.js"
+    ],
+    "templates": [
+        {
+            "path": "unify_support_data_model.js.zapt",
+            "name": "Unify data model support",
+            "output": "unify_support_model.js"
+        }
+    ]
+}

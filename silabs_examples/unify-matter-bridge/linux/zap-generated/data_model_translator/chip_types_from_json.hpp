@@ -16,13 +16,13 @@
 
 // Default translation
 template <typename T>
-std::optional<T> inline from_json(const nlohmann::json & value)
+std::optional<T> inline from_json(const nlohmann::json& value)
 {
     return std::optional<T>(value);
 }
 
 template <>
-std::optional<chip::Span<const char>> inline from_json(const nlohmann::json & value)
+std::optional<chip::Span<const char>> inline from_json(const nlohmann::json& value)
 {
     std::string s = value.get<std::string>();
     chip::Span<const char> span(s.c_str(), s.length());
@@ -32,7 +32,7 @@ std::optional<chip::Span<const char>> inline from_json(const nlohmann::json & va
 /***************************** Bitmap Converters **************/
 
 template <>
-inline std::optional<Identify::IdentifyEffectIdentifier> from_json(const nlohmann::json & value)
+inline std::optional<Identify::IdentifyEffectIdentifier> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, Identify::IdentifyEffectIdentifier> table = {
         { "Blink", Identify::IdentifyEffectIdentifier::kBlink },
@@ -44,34 +44,28 @@ inline std::optional<Identify::IdentifyEffectIdentifier> from_json(const nlohman
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<Identify::IdentifyEffectVariant> from_json(const nlohmann::json & value)
+inline std::optional<Identify::IdentifyEffectVariant> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, Identify::IdentifyEffectVariant> table = {
         { "Default", Identify::IdentifyEffectVariant::kDefault },
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<Identify::IdentifyIdentifyType> from_json(const nlohmann::json & value)
+inline std::optional<Identify::IdentifyIdentifyType> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, Identify::IdentifyIdentifyType> table = {
         { "None FIXME", Identify::IdentifyIdentifyType::kNone },
@@ -83,32 +77,47 @@ inline std::optional<Identify::IdentifyIdentifyType> from_json(const nlohmann::j
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 /***************************** Bitmap Converters **************/
 template <>
-inline std::optional<chip::BitMask<OnOff::OnOffControl>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<Groups::GroupClusterFeature>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<Groups::GroupClusterFeature> r;
+    r.SetField(Groups::GroupClusterFeature::kGroupNames, obj.value("GroupNames FIXME", false));
+    return r;
+}
+
+/***************************** Bitmap Converters **************/
+template <>
+inline std::optional<chip::BitMask<Scenes::ScenesCopyMode>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<Scenes::ScenesCopyMode> r;
+    r.SetField(Scenes::ScenesCopyMode::kCopyAllScenes, obj.value("CopyAllScenes", false));
+    return r;
+}
+
+/***************************** Bitmap Converters **************/
+template <>
+inline std::optional<chip::BitMask<OnOff::OnOffControl>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<OnOff::OnOffControl> r;
     r.SetField(OnOff::OnOffControl::kAcceptOnlyWhenOn, obj.value("AcceptOnlyWhenOn", false));
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<OnOff::OnOffFeature>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<OnOff::OnOffFeature>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<OnOff::OnOffFeature> r;
     r.SetField(OnOff::OnOffFeature::kLighting, obj.value("Lighting FIXME", false));
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<OnOff::SceneFeatures>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<OnOff::SceneFeatures>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<OnOff::SceneFeatures> r;
     r.SetField(OnOff::SceneFeatures::kSceneNames, obj.value("SceneNames FIXME", false));
@@ -116,45 +125,39 @@ inline std::optional<chip::BitMask<OnOff::SceneFeatures>> from_json(const nlohma
 }
 
 template <>
-inline std::optional<OnOff::OnOffDelayedAllOffEffectVariant> from_json(const nlohmann::json & value)
+inline std::optional<OnOff::OnOffDelayedAllOffEffectVariant> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, OnOff::OnOffDelayedAllOffEffectVariant> table = {
         { "FadeToOffIn_0p8Seconds FIXME", OnOff::OnOffDelayedAllOffEffectVariant::kFadeToOffIn0p8Seconds },
         { "NoFade FIXME", OnOff::OnOffDelayedAllOffEffectVariant::kNoFade },
         { "50PercentDimDownIn_0p8SecondsThenFadeToOffIn_12Seconds FIXME",
-          OnOff::OnOffDelayedAllOffEffectVariant::k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds },
+            OnOff::OnOffDelayedAllOffEffectVariant::k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds },
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<OnOff::OnOffDyingLightEffectVariant> from_json(const nlohmann::json & value)
+inline std::optional<OnOff::OnOffDyingLightEffectVariant> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, OnOff::OnOffDyingLightEffectVariant> table = {
         { "20PercenterDimUpIn_0p5SecondsThenFadeToOffIn_1Second FIXME",
-          OnOff::OnOffDyingLightEffectVariant::k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second },
+            OnOff::OnOffDyingLightEffectVariant::k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second },
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<OnOff::OnOffEffectIdentifier> from_json(const nlohmann::json & value)
+inline std::optional<OnOff::OnOffEffectIdentifier> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, OnOff::OnOffEffectIdentifier> table = {
         { "DelayedAllOff", OnOff::OnOffEffectIdentifier::kDelayedAllOff },
@@ -162,17 +165,14 @@ inline std::optional<OnOff::OnOffEffectIdentifier> from_json(const nlohmann::jso
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<OnOff::OnOffStartUpOnOff> from_json(const nlohmann::json & value)
+inline std::optional<OnOff::OnOffStartUpOnOff> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, OnOff::OnOffStartUpOnOff> table = {
         { "SetOnOffTo0", OnOff::OnOffStartUpOnOff::kOff },
@@ -181,18 +181,15 @@ inline std::optional<OnOff::OnOffStartUpOnOff> from_json(const nlohmann::json & 
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 /***************************** Bitmap Converters **************/
 template <>
-inline std::optional<chip::BitMask<LevelControl::LevelControlFeature>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<LevelControl::LevelControlFeature>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<LevelControl::LevelControlFeature> r;
     r.SetField(LevelControl::LevelControlFeature::kOnOff, obj.value("OnOff FIXME", false));
@@ -201,7 +198,7 @@ inline std::optional<chip::BitMask<LevelControl::LevelControlFeature>> from_json
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<LevelControl::LevelControlOptions>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<LevelControl::LevelControlOptions>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<LevelControl::LevelControlOptions> r;
     r.SetField(LevelControl::LevelControlOptions::kExecuteIfOff, obj.value("ExecuteIfOff", false));
@@ -210,7 +207,7 @@ inline std::optional<chip::BitMask<LevelControl::LevelControlOptions>> from_json
 }
 
 template <>
-inline std::optional<LevelControl::MoveMode> from_json(const nlohmann::json & value)
+inline std::optional<LevelControl::MoveMode> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, LevelControl::MoveMode> table = {
         { "Up", LevelControl::MoveMode::kUp },
@@ -218,17 +215,14 @@ inline std::optional<LevelControl::MoveMode> from_json(const nlohmann::json & va
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<LevelControl::StepMode> from_json(const nlohmann::json & value)
+inline std::optional<LevelControl::StepMode> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, LevelControl::StepMode> table = {
         { "Up", LevelControl::StepMode::kUp },
@@ -236,18 +230,15 @@ inline std::optional<LevelControl::StepMode> from_json(const nlohmann::json & va
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 /***************************** Bitmap Converters **************/
 template <>
-inline std::optional<chip::BitMask<DoorLock::DlCredentialRuleMask>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<DoorLock::DlCredentialRuleMask>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<DoorLock::DlCredentialRuleMask> r;
     r.SetField(DoorLock::DlCredentialRuleMask::kSingle, obj.value("Single FIXME", false));
@@ -256,7 +247,7 @@ inline std::optional<chip::BitMask<DoorLock::DlCredentialRuleMask>> from_json(co
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<DoorLock::DlCredentialRulesSupport>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<DoorLock::DlCredentialRulesSupport>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<DoorLock::DlCredentialRulesSupport> r;
     r.SetField(DoorLock::DlCredentialRulesSupport::kSingle, obj.value("Single FIXME", false));
@@ -265,7 +256,7 @@ inline std::optional<chip::BitMask<DoorLock::DlCredentialRulesSupport>> from_jso
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<DoorLock::DlDaysMaskMap>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<DoorLock::DlDaysMaskMap>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<DoorLock::DlDaysMaskMap> r;
     r.SetField(DoorLock::DlDaysMaskMap::kSunday, obj.value("Sun", false));
@@ -278,22 +269,22 @@ inline std::optional<chip::BitMask<DoorLock::DlDaysMaskMap>> from_json(const nlo
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<DoorLock::DlDefaultConfigurationRegister>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<DoorLock::DlDefaultConfigurationRegister>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<DoorLock::DlDefaultConfigurationRegister> r;
     r.SetField(DoorLock::DlDefaultConfigurationRegister::kEnableLocalProgrammingEnabled,
-               obj.value("DefaultEnableLocalProgrammingAttributeIsEnabled", false));
+        obj.value("DefaultEnableLocalProgrammingAttributeIsEnabled", false));
     r.SetField(DoorLock::DlDefaultConfigurationRegister::kKeypadInterfaceDefaultAccessEnabled,
-               obj.value("DefaultKeypadInterfaceIsEnabled", false));
+        obj.value("DefaultKeypadInterfaceIsEnabled", false));
     r.SetField(DoorLock::DlDefaultConfigurationRegister::kRemoteInterfaceDefaultAccessIsEnabled,
-               obj.value("DefaultRFInterfaceIsEnabled", false));
+        obj.value("DefaultRFInterfaceIsEnabled", false));
     r.SetField(DoorLock::DlDefaultConfigurationRegister::kSoundEnabled, obj.value("DefaultSoundVolumeIsEnabled", false));
     r.SetField(DoorLock::DlDefaultConfigurationRegister::kAutoRelockTimeSet, obj.value("DefaultAutoRelockTimeIsEnabled", false));
     r.SetField(DoorLock::DlDefaultConfigurationRegister::kLEDSettingsSet, obj.value("DefaultLEDSettingsIsEnabled", false));
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<DoorLock::DlKeypadOperationEventMask>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<DoorLock::DlKeypadOperationEventMask>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<DoorLock::DlKeypadOperationEventMask> r;
     r.SetField(DoorLock::DlKeypadOperationEventMask::kUnknown, obj.value("KeypadOpUnknownOrMS", false));
@@ -307,7 +298,7 @@ inline std::optional<chip::BitMask<DoorLock::DlKeypadOperationEventMask>> from_j
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<DoorLock::DlKeypadProgrammingEventMask>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<DoorLock::DlKeypadProgrammingEventMask>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<DoorLock::DlKeypadProgrammingEventMask> r;
     r.SetField(DoorLock::DlKeypadProgrammingEventMask::kUnknown, obj.value("KeypadProgUnknownOrMS", false));
@@ -318,21 +309,21 @@ inline std::optional<chip::BitMask<DoorLock::DlKeypadProgrammingEventMask>> from
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<DoorLock::DlLocalProgrammingFeatures>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<DoorLock::DlLocalProgrammingFeatures>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<DoorLock::DlLocalProgrammingFeatures> r;
     r.SetField(DoorLock::DlLocalProgrammingFeatures::kAddUsersCredentialsSchedulesLocally,
-               obj.value("AddUsersCredentialsSchedulesLocally FIXME", false));
+        obj.value("AddUsersCredentialsSchedulesLocally FIXME", false));
     r.SetField(DoorLock::DlLocalProgrammingFeatures::kModifyUsersCredentialsSchedulesLocally,
-               obj.value("ModifyUsersCredentialsSchedulesLocally FIXME", false));
+        obj.value("ModifyUsersCredentialsSchedulesLocally FIXME", false));
     r.SetField(DoorLock::DlLocalProgrammingFeatures::kClearUsersCredentialsSchedulesLocally,
-               obj.value("ClearUsersCredentialsSchedulesLocally FIXME", false));
+        obj.value("ClearUsersCredentialsSchedulesLocally FIXME", false));
     r.SetField(DoorLock::DlLocalProgrammingFeatures::kAdjustLockSettingsLocally,
-               obj.value("AdjustLockSettingsLocally FIXME", false));
+        obj.value("AdjustLockSettingsLocally FIXME", false));
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<DoorLock::DlManualOperationEventMask>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<DoorLock::DlManualOperationEventMask>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<DoorLock::DlManualOperationEventMask> r;
     r.SetField(DoorLock::DlManualOperationEventMask::kUnknown, obj.value("Unknown FIXME", false));
@@ -349,7 +340,7 @@ inline std::optional<chip::BitMask<DoorLock::DlManualOperationEventMask>> from_j
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<DoorLock::DlRFIDOperationEventMask>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<DoorLock::DlRFIDOperationEventMask>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<DoorLock::DlRFIDOperationEventMask> r;
     r.SetField(DoorLock::DlRFIDOperationEventMask::kUnknown, obj.value("RFIDOpUnknownOrMS", false));
@@ -362,7 +353,7 @@ inline std::optional<chip::BitMask<DoorLock::DlRFIDOperationEventMask>> from_jso
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<DoorLock::DlRFIDProgrammingEventMask>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<DoorLock::DlRFIDProgrammingEventMask>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<DoorLock::DlRFIDProgrammingEventMask> r;
     r.SetField(DoorLock::DlRFIDProgrammingEventMask::kUnknown, obj.value("RFIDProgUnknownOrMS", false));
@@ -371,7 +362,7 @@ inline std::optional<chip::BitMask<DoorLock::DlRFIDProgrammingEventMask>> from_j
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<DoorLock::DlRemoteOperationEventMask>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<DoorLock::DlRemoteOperationEventMask>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<DoorLock::DlRemoteOperationEventMask> r;
     r.SetField(DoorLock::DlRemoteOperationEventMask::kUnknown, obj.value("RFOpUnknownOrMS", false));
@@ -384,7 +375,7 @@ inline std::optional<chip::BitMask<DoorLock::DlRemoteOperationEventMask>> from_j
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<DoorLock::DlRemoteProgrammingEventMask>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<DoorLock::DlRemoteProgrammingEventMask>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<DoorLock::DlRemoteProgrammingEventMask> r;
     r.SetField(DoorLock::DlRemoteProgrammingEventMask::kUnknown, obj.value("RFProgUnknownOrMS", false));
@@ -397,7 +388,7 @@ inline std::optional<chip::BitMask<DoorLock::DlRemoteProgrammingEventMask>> from
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<DoorLock::DlSupportedOperatingModes>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<DoorLock::DlSupportedOperatingModes>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<DoorLock::DlSupportedOperatingModes> r;
     r.SetField(DoorLock::DlSupportedOperatingModes::kNormal, obj.value("Normal FIXME", false));
@@ -408,7 +399,7 @@ inline std::optional<chip::BitMask<DoorLock::DlSupportedOperatingModes>> from_js
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<DoorLock::DoorLockDayOfWeek>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<DoorLock::DoorLockDayOfWeek>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<DoorLock::DoorLockDayOfWeek> r;
     r.SetField(DoorLock::DoorLockDayOfWeek::kSunday, obj.value("Sunday FIXME", false));
@@ -421,7 +412,7 @@ inline std::optional<chip::BitMask<DoorLock::DoorLockDayOfWeek>> from_json(const
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<DoorLock::DoorLockFeature>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<DoorLock::DoorLockFeature>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<DoorLock::DoorLockFeature> r;
     r.SetField(DoorLock::DoorLockFeature::kPINCredentials, obj.value("PINCredentials FIXME", false));
@@ -440,7 +431,7 @@ inline std::optional<chip::BitMask<DoorLock::DoorLockFeature>> from_json(const n
 }
 
 template <>
-inline std::optional<DoorLock::DlAlarmCode> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DlAlarmCode> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DlAlarmCode> table = {
         { "LockJammed FIXME", DoorLock::DlAlarmCode::kLockJammed },
@@ -454,17 +445,14 @@ inline std::optional<DoorLock::DlAlarmCode> from_json(const nlohmann::json & val
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DlCredentialRule> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DlCredentialRule> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DlCredentialRule> table = {
         { "Single FIXME", DoorLock::DlCredentialRule::kSingle },
@@ -473,17 +461,14 @@ inline std::optional<DoorLock::DlCredentialRule> from_json(const nlohmann::json 
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DlCredentialType> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DlCredentialType> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DlCredentialType> table = {
         { "ProgrammingPIN FIXME", DoorLock::DlCredentialType::kProgrammingPIN },
@@ -495,17 +480,14 @@ inline std::optional<DoorLock::DlCredentialType> from_json(const nlohmann::json 
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DlDataOperationType> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DlDataOperationType> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DlDataOperationType> table = {
         { "Add FIXME", DoorLock::DlDataOperationType::kAdd },
@@ -514,17 +496,14 @@ inline std::optional<DoorLock::DlDataOperationType> from_json(const nlohmann::js
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DlDoorState> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DlDoorState> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DlDoorState> table = {
         { "Open", DoorLock::DlDoorState::kDoorOpen },
@@ -536,17 +515,14 @@ inline std::optional<DoorLock::DlDoorState> from_json(const nlohmann::json & val
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DlLockDataType> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DlLockDataType> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DlLockDataType> table = {
         { "Unspecified FIXME", DoorLock::DlLockDataType::kUnspecified },
@@ -561,17 +537,14 @@ inline std::optional<DoorLock::DlLockDataType> from_json(const nlohmann::json & 
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DlLockOperationType> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DlLockOperationType> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DlLockOperationType> table = {
         { "Lock FIXME", DoorLock::DlLockOperationType::kLock },
@@ -581,17 +554,14 @@ inline std::optional<DoorLock::DlLockOperationType> from_json(const nlohmann::js
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DlLockState> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DlLockState> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DlLockState> table = {
         { "NotFullyLocked", DoorLock::DlLockState::kNotFullyLocked },
@@ -600,17 +570,14 @@ inline std::optional<DoorLock::DlLockState> from_json(const nlohmann::json & val
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DlLockType> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DlLockType> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DlLockType> table = {
         { "DeadBolt", DoorLock::DlLockType::kDeadBolt },
@@ -627,17 +594,14 @@ inline std::optional<DoorLock::DlLockType> from_json(const nlohmann::json & valu
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DlOperatingMode> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DlOperatingMode> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DlOperatingMode> table = {
         { "Normal FIXME", DoorLock::DlOperatingMode::kNormal },
@@ -648,17 +612,14 @@ inline std::optional<DoorLock::DlOperatingMode> from_json(const nlohmann::json &
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DlOperationError> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DlOperationError> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DlOperationError> table = {
         { "Unspecified FIXME", DoorLock::DlOperationError::kUnspecified },
@@ -669,17 +630,14 @@ inline std::optional<DoorLock::DlOperationError> from_json(const nlohmann::json 
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DlOperationSource> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DlOperationSource> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DlOperationSource> table = {
         { "Unspecified FIXME", DoorLock::DlOperationSource::kUnspecified },
@@ -695,17 +653,14 @@ inline std::optional<DoorLock::DlOperationSource> from_json(const nlohmann::json
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DlStatus> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DlStatus> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DlStatus> table = {
         { "Success FIXME", DoorLock::DlStatus::kSuccess },
@@ -718,17 +673,14 @@ inline std::optional<DoorLock::DlStatus> from_json(const nlohmann::json & value)
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DlUserStatus> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DlUserStatus> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DlUserStatus> table = {
         { "Available FIXME", DoorLock::DlUserStatus::kAvailable },
@@ -737,17 +689,14 @@ inline std::optional<DoorLock::DlUserStatus> from_json(const nlohmann::json & va
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DlUserType> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DlUserType> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DlUserType> table = {
         { "UnrestrictedUser FIXME", DoorLock::DlUserType::kUnrestrictedUser },
@@ -763,17 +712,14 @@ inline std::optional<DoorLock::DlUserType> from_json(const nlohmann::json & valu
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DoorLockOperationEventCode> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DoorLockOperationEventCode> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DoorLockOperationEventCode> table = {
         { "UnknownOrMS", DoorLock::DoorLockOperationEventCode::kUnknownOrMfgSpecific },
@@ -794,17 +740,14 @@ inline std::optional<DoorLock::DoorLockOperationEventCode> from_json(const nlohm
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DoorLockProgrammingEventCode> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DoorLockProgrammingEventCode> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DoorLockProgrammingEventCode> table = {
         { "UnknownOrMS", DoorLock::DoorLockProgrammingEventCode::kUnknownOrMfgSpecific },
@@ -817,17 +760,14 @@ inline std::optional<DoorLock::DoorLockProgrammingEventCode> from_json(const nlo
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DoorLockSetPinOrIdStatus> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DoorLockSetPinOrIdStatus> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DoorLockSetPinOrIdStatus> table = {
         { "Success", DoorLock::DoorLockSetPinOrIdStatus::kSuccess },
@@ -837,17 +777,14 @@ inline std::optional<DoorLock::DoorLockSetPinOrIdStatus> from_json(const nlohman
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DoorLockUserStatus> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DoorLockUserStatus> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DoorLockUserStatus> table = {
         { "Available", DoorLock::DoorLockUserStatus::kAvailable },
@@ -857,17 +794,14 @@ inline std::optional<DoorLock::DoorLockUserStatus> from_json(const nlohmann::jso
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<DoorLock::DoorLockUserType> from_json(const nlohmann::json & value)
+inline std::optional<DoorLock::DoorLockUserType> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, DoorLock::DoorLockUserType> table = {
         { "UnrestrictedUser", DoorLock::DoorLockUserType::kUnrestricted },
@@ -879,12 +813,9 @@ inline std::optional<DoorLock::DoorLockUserType> from_json(const nlohmann::json 
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
@@ -892,7 +823,7 @@ inline std::optional<DoorLock::DoorLockUserType> from_json(const nlohmann::json 
 
 /***************************** Bitmap Converters **************/
 template <>
-inline std::optional<chip::BitMask<Thermostat::DayOfWeek>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<Thermostat::DayOfWeek>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<Thermostat::DayOfWeek> r;
     r.SetField(Thermostat::DayOfWeek::kSunday, obj.value("Sunday FIXME", false));
@@ -906,7 +837,7 @@ inline std::optional<chip::BitMask<Thermostat::DayOfWeek>> from_json(const nlohm
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<Thermostat::ModeForSequence>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<Thermostat::ModeForSequence>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<Thermostat::ModeForSequence> r;
     r.SetField(Thermostat::ModeForSequence::kHeatSetpointFieldPresent, obj.value("HeatSetpointFieldPresent FIXME", false));
@@ -914,7 +845,7 @@ inline std::optional<chip::BitMask<Thermostat::ModeForSequence>> from_json(const
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<Thermostat::ThermostatFeature>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<Thermostat::ThermostatFeature>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<Thermostat::ThermostatFeature> r;
     r.SetField(Thermostat::ThermostatFeature::kHeating, obj.value("Heating FIXME", false));
@@ -927,7 +858,7 @@ inline std::optional<chip::BitMask<Thermostat::ThermostatFeature>> from_json(con
 }
 
 template <>
-inline std::optional<Thermostat::SetpointAdjustMode> from_json(const nlohmann::json & value)
+inline std::optional<Thermostat::SetpointAdjustMode> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, Thermostat::SetpointAdjustMode> table = {
         { "Heat", Thermostat::SetpointAdjustMode::kHeatSetpoint },
@@ -936,17 +867,14 @@ inline std::optional<Thermostat::SetpointAdjustMode> from_json(const nlohmann::j
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<Thermostat::ThermostatControlSequence> from_json(const nlohmann::json & value)
+inline std::optional<Thermostat::ThermostatControlSequence> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, Thermostat::ThermostatControlSequence> table = {
         { "CoolingOnly", Thermostat::ThermostatControlSequence::kCoolingOnly },
@@ -958,17 +886,14 @@ inline std::optional<Thermostat::ThermostatControlSequence> from_json(const nloh
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<Thermostat::ThermostatRunningMode> from_json(const nlohmann::json & value)
+inline std::optional<Thermostat::ThermostatRunningMode> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, Thermostat::ThermostatRunningMode> table = {
         { "Off", Thermostat::ThermostatRunningMode::kOff },
@@ -977,17 +902,14 @@ inline std::optional<Thermostat::ThermostatRunningMode> from_json(const nlohmann
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<Thermostat::ThermostatSystemMode> from_json(const nlohmann::json & value)
+inline std::optional<Thermostat::ThermostatSystemMode> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, Thermostat::ThermostatSystemMode> table = {
         { "Off", Thermostat::ThermostatSystemMode::kOff },
@@ -1000,18 +922,15 @@ inline std::optional<Thermostat::ThermostatSystemMode> from_json(const nlohmann:
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 /***************************** Bitmap Converters **************/
 template <>
-inline std::optional<chip::BitMask<FanControl::FanControlFeature>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<FanControl::FanControlFeature>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<FanControl::FanControlFeature> r;
     r.SetField(FanControl::FanControlFeature::kMultiSpeed, obj.value("MultiSpeed FIXME", false));
@@ -1021,7 +940,7 @@ inline std::optional<chip::BitMask<FanControl::FanControlFeature>> from_json(con
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<FanControl::RockSupportMask>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<FanControl::RockSupportMask>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<FanControl::RockSupportMask> r;
     r.SetField(FanControl::RockSupportMask::kRockLeftRight, obj.value("RockLeftRight FIXME", false));
@@ -1030,7 +949,7 @@ inline std::optional<chip::BitMask<FanControl::RockSupportMask>> from_json(const
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<FanControl::WindSettingMask>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<FanControl::WindSettingMask>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<FanControl::WindSettingMask> r;
     r.SetField(FanControl::WindSettingMask::kSleepWind, obj.value("SleepWind FIXME", false));
@@ -1038,7 +957,7 @@ inline std::optional<chip::BitMask<FanControl::WindSettingMask>> from_json(const
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<FanControl::WindSupportMask>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<FanControl::WindSupportMask>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<FanControl::WindSupportMask> r;
     r.SetField(FanControl::WindSupportMask::kSleepWind, obj.value("SleepWind FIXME", false));
@@ -1047,7 +966,7 @@ inline std::optional<chip::BitMask<FanControl::WindSupportMask>> from_json(const
 }
 
 template <>
-inline std::optional<FanControl::FanModeSequenceType> from_json(const nlohmann::json & value)
+inline std::optional<FanControl::FanModeSequenceType> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, FanControl::FanModeSequenceType> table = {
         { "Off/Low/Med/High FIXME", FanControl::FanModeSequenceType::kOffLowMedHigh },
@@ -1059,32 +978,29 @@ inline std::optional<FanControl::FanModeSequenceType> from_json(const nlohmann::
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<FanControl::FanModeType> from_json(const nlohmann::json & value)
+inline std::optional<FanControl::FanModeType> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, FanControl::FanModeType> table = {
-        { "Off FIXME", FanControl::FanModeType::kOff },       { "Low FIXME", FanControl::FanModeType::kLow },
-        { "Medium FIXME", FanControl::FanModeType::kMedium }, { "High FIXME", FanControl::FanModeType::kHigh },
-        { "On FIXME", FanControl::FanModeType::kOn },         { "Auto FIXME", FanControl::FanModeType::kAuto },
+        { "Off FIXME", FanControl::FanModeType::kOff },
+        { "Low FIXME", FanControl::FanModeType::kLow },
+        { "Medium FIXME", FanControl::FanModeType::kMedium },
+        { "High FIXME", FanControl::FanModeType::kHigh },
+        { "On FIXME", FanControl::FanModeType::kOn },
+        { "Auto FIXME", FanControl::FanModeType::kAuto },
         { "Smart FIXME", FanControl::FanModeType::kSmart },
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
@@ -1092,7 +1008,7 @@ inline std::optional<FanControl::FanModeType> from_json(const nlohmann::json & v
 
 /***************************** Bitmap Converters **************/
 template <>
-inline std::optional<chip::BitMask<ColorControl::ColorCapabilities>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<ColorControl::ColorCapabilities>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<ColorControl::ColorCapabilities> r;
     r.SetField(ColorControl::ColorCapabilities::kHueSaturationSupported, obj.value("HueSaturationSupported", false));
@@ -1103,7 +1019,7 @@ inline std::optional<chip::BitMask<ColorControl::ColorCapabilities>> from_json(c
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<ColorControl::ColorControlFeature>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<ColorControl::ColorControlFeature>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<ColorControl::ColorControlFeature> r;
     r.SetField(ColorControl::ColorControlFeature::kHueAndSaturation, obj.value("HueAndSaturation FIXME", false));
@@ -1114,7 +1030,7 @@ inline std::optional<chip::BitMask<ColorControl::ColorControlFeature>> from_json
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<ColorControl::ColorLoopUpdateFlags>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<ColorControl::ColorLoopUpdateFlags>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<ColorControl::ColorLoopUpdateFlags> r;
     r.SetField(ColorControl::ColorLoopUpdateFlags::kUpdateAction, obj.value("UpdateAction", false));
@@ -1125,7 +1041,7 @@ inline std::optional<chip::BitMask<ColorControl::ColorLoopUpdateFlags>> from_jso
 }
 
 template <>
-inline std::optional<ColorControl::ColorLoopAction> from_json(const nlohmann::json & value)
+inline std::optional<ColorControl::ColorLoopAction> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, ColorControl::ColorLoopAction> table = {
         { "DeactivateColorLoop", ColorControl::ColorLoopAction::kDeactivate },
@@ -1134,17 +1050,14 @@ inline std::optional<ColorControl::ColorLoopAction> from_json(const nlohmann::js
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<ColorControl::ColorLoopDirection> from_json(const nlohmann::json & value)
+inline std::optional<ColorControl::ColorLoopDirection> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, ColorControl::ColorLoopDirection> table = {
         { "DecrementEnhancedCurrentHue", ColorControl::ColorLoopDirection::kDecrementHue },
@@ -1152,17 +1065,14 @@ inline std::optional<ColorControl::ColorLoopDirection> from_json(const nlohmann:
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<ColorControl::ColorMode> from_json(const nlohmann::json & value)
+inline std::optional<ColorControl::ColorMode> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, ColorControl::ColorMode> table = {
         { "CurrentHueAndCurrentSaturation", ColorControl::ColorMode::kCurrentHueAndCurrentSaturation },
@@ -1171,17 +1081,14 @@ inline std::optional<ColorControl::ColorMode> from_json(const nlohmann::json & v
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<ColorControl::HueDirection> from_json(const nlohmann::json & value)
+inline std::optional<ColorControl::HueDirection> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, ColorControl::HueDirection> table = {
         { "ShortestDistance", ColorControl::HueDirection::kShortestDistance },
@@ -1191,17 +1098,14 @@ inline std::optional<ColorControl::HueDirection> from_json(const nlohmann::json 
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<ColorControl::HueMoveMode> from_json(const nlohmann::json & value)
+inline std::optional<ColorControl::HueMoveMode> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, ColorControl::HueMoveMode> table = {
         { "Stop", ColorControl::HueMoveMode::kStop },
@@ -1210,17 +1114,14 @@ inline std::optional<ColorControl::HueMoveMode> from_json(const nlohmann::json &
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<ColorControl::HueStepMode> from_json(const nlohmann::json & value)
+inline std::optional<ColorControl::HueStepMode> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, ColorControl::HueStepMode> table = {
         { "Up", ColorControl::HueStepMode::kUp },
@@ -1228,17 +1129,14 @@ inline std::optional<ColorControl::HueStepMode> from_json(const nlohmann::json &
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<ColorControl::SaturationMoveMode> from_json(const nlohmann::json & value)
+inline std::optional<ColorControl::SaturationMoveMode> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, ColorControl::SaturationMoveMode> table = {
         { "stop FIXME", ColorControl::SaturationMoveMode::kStop },
@@ -1247,17 +1145,14 @@ inline std::optional<ColorControl::SaturationMoveMode> from_json(const nlohmann:
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 template <>
-inline std::optional<ColorControl::SaturationStepMode> from_json(const nlohmann::json & value)
+inline std::optional<ColorControl::SaturationStepMode> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, ColorControl::SaturationStepMode> table = {
         { "Up FIXME", ColorControl::SaturationStepMode::kUp },
@@ -1265,32 +1160,26 @@ inline std::optional<ColorControl::SaturationStepMode> from_json(const nlohmann:
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
 /***************************** Bitmap Converters **************/
 
 template <>
-inline std::optional<IlluminanceMeasurement::LightSensorType> from_json(const nlohmann::json & value)
+inline std::optional<IlluminanceMeasurement::LightSensorType> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, IlluminanceMeasurement::LightSensorType> table = {
         { "Photodiode", IlluminanceMeasurement::LightSensorType::kPhotodiode },
-        { "CMOS", IlluminanceMeasurement::LightSensorType::kCmos },
+        { "Cmos", IlluminanceMeasurement::LightSensorType::kCmos },
     };
 
     auto i = table.find(value);
-    if (i != table.end())
-    {
+    if (i != table.end()) {
         return i->second;
-    }
-    else
-    {
+    } else {
         return std::nullopt;
     }
 }
@@ -1298,7 +1187,7 @@ inline std::optional<IlluminanceMeasurement::LightSensorType> from_json(const nl
 
 /***************************** Bitmap Converters **************/
 template <>
-inline std::optional<chip::BitMask<PressureMeasurement::PressureFeature>> from_json(const nlohmann::json & obj)
+inline std::optional<chip::BitMask<PressureMeasurement::PressureFeature>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<PressureMeasurement::PressureFeature> r;
     r.SetField(PressureMeasurement::PressureFeature::kExt, obj.value("EXT FIXME", false));

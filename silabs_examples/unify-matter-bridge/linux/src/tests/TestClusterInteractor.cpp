@@ -1,5 +1,5 @@
 // A mapping from a cluster to its device name.
-#include "matter_device_types_clusters_list_updated.inc"
+#include "matter_device_types_clusters_list.inc"
 
 // Unify bridge components
 #include "matter_cluster_interactor.hpp"
@@ -23,10 +23,9 @@ static void TestClusterInteractorNotYetBuilt(nlTestSuite * inSuite, void * aCont
     unify::matter_bridge::cluster_interactor cluster_interactor =
         unify::matter_bridge::cluster_interactor(matter_device_translator, builder);
 
-    // Fall back to "flowsensor" device type.
-    const char * dt = matter_device_type_vs_clusters_map.find(cluster_interactor.get_matter_type().value())->second.second;
+    const char * dt = matter_device_type_vs_clusters_map.find(cluster_interactor.get_matter_type().value())->second.device_type_name;
     std::string device_type(dt);
-    NL_TEST_ASSERT(inSuite, device_type == "flowsensor");
+    NL_TEST_ASSERT(inSuite, device_type == "pressuresensor");
 }
 
 static void TestClusterInteractorEmpty(nlTestSuite * inSuite, void * aContext)
@@ -39,9 +38,9 @@ static void TestClusterInteractorEmpty(nlTestSuite * inSuite, void * aContext)
 
     std::unordered_map<std::string, unify::node_state_monitor::cluster> clusters = {};
     cluster_interactor.build_matter_cluster(clusters);
-    const char * dt = matter_device_type_vs_clusters_map.find(cluster_interactor.get_matter_type().value())->second.second;
+    const char * dt = matter_device_type_vs_clusters_map.find(cluster_interactor.get_matter_type().value())->second.device_type_name;
     std::string device_type(dt);
-    NL_TEST_ASSERT(inSuite, device_type == "flowsensor");
+    NL_TEST_ASSERT(inSuite, device_type == "pressuresensor");
 }
 
 static void TestClusterInteractorDoorLock(nlTestSuite * inSuite, void * aContext)
@@ -56,8 +55,8 @@ static void TestClusterInteractorDoorLock(nlTestSuite * inSuite, void * aContext
         { "Basic", unify::node_state_monitor::cluster("Basic") },
         { "Identify", unify::node_state_monitor::cluster("Identify") },
         { "DoorLock", unify::node_state_monitor::cluster("DoorLock") },
-        { "Scenes", unify::node_state_monitor::cluster("Scenes") },
-        { "Groups", unify::node_state_monitor::cluster("Groups") },
+        { "TimeSynchronization", unify::node_state_monitor::cluster("TimeSynchronization") },
+        { "Binding", unify::node_state_monitor::cluster("Binding") },
     };
 
     for (auto & [_matter, unify] : clusters)
@@ -66,7 +65,7 @@ static void TestClusterInteractorDoorLock(nlTestSuite * inSuite, void * aContext
     }
 
     cluster_interactor.build_matter_cluster(clusters);
-    const char * dt = matter_device_type_vs_clusters_map.find(cluster_interactor.get_matter_type().value())->second.second;
+    const char * dt = matter_device_type_vs_clusters_map.find(cluster_interactor.get_matter_type().value())->second.device_type_name;
     std::string device_type(dt);
     NL_TEST_ASSERT(inSuite, device_type == "doorlock");
 }
@@ -92,7 +91,7 @@ static void TestClusterInteractorOccupancySensor(nlTestSuite * inSuite, void * a
     }
 
     cluster_interactor.build_matter_cluster(clusters);
-    const char * dt = matter_device_type_vs_clusters_map.find(cluster_interactor.get_matter_type().value())->second.second;
+    const char * dt = matter_device_type_vs_clusters_map.find(cluster_interactor.get_matter_type().value())->second.device_type_name;
     std::string device_type(dt);
     NL_TEST_ASSERT(inSuite, device_type == "occupancysensor");
 }

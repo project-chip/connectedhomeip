@@ -54,12 +54,11 @@ static void append_bridged_clusters(unify::matter_bridge::matter_endpoint_builde
 
 namespace unify::matter_bridge {
 cluster_interactor::cluster_interactor(const device_translator & _translator, matter_endpoint_builder & _endpoint_builder) :
-    translator(_translator), endpoint_builder(_endpoint_builder)
+    endpoint_builder(_endpoint_builder), translator(_translator) 
 {}
 
 void cluster_interactor::build_matter_cluster(const std::unordered_map<std::string, node_state_monitor::cluster> & clusters)
 {
-
     bool basic_cluster_is_supported = false;
     for (const auto & [cluster_name, cluster] : clusters)
     {
@@ -80,7 +79,7 @@ void cluster_interactor::build_matter_cluster(const std::unordered_map<std::stri
         }
         else
         {
-            sl_log_info(LOG_TAG, "Mapping cluster %s", cluster_name.c_str());
+            sl_log_info(LOG_TAG, "Mapping cluster %s to cluster_id: %d", cluster_name.c_str(), cluster_id.value());
         }
 
         auto cluster_builder = endpoint_builder.register_cluster(cluster_id.value());
@@ -125,7 +124,6 @@ void cluster_interactor::build_matter_cluster(const std::unordered_map<std::stri
         cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{ ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID,
                                                                           ZCL_INT16U_ATTRIBUTE_TYPE, 2, 0, ZAP_EMPTY_DEFAULT() });
 
-        clusterlist.push_back(cluster_name.c_str());
     }
     if (!basic_cluster_is_supported)
     {
@@ -144,7 +142,7 @@ void cluster_interactor::build_matter_cluster(const std::unordered_map<std::stri
 
 std::optional<uint16_t> cluster_interactor::get_matter_type() const
 {
-    std::vector<chip::DeviceTypeId> possible_device_types = translator.get_device_types(clusterlist);
+    std::vector<chip::DeviceTypeId> possible_device_types = translator.get_device_types(endpoint_builder.clusters);
     if (possible_device_types.empty())
     {
         return std::nullopt;

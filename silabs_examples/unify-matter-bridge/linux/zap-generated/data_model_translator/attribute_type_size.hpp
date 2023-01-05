@@ -13,8 +13,7 @@
  ******************************************************************************/
 #include <stdint.h>
 
-struct attr_type_size
-{
+struct attr_type_size {
     uint8_t attrType;
     uint8_t attrSize;
 };

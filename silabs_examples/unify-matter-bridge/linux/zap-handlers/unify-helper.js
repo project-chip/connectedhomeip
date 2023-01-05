@@ -1,14 +1,13 @@
 
-
 // Match supportedMappedCluster but with codes instead of names
 function supportedMappedClusterCode(code) {
   switch (code) {
-    // case 0: return true // Cluster Basic
+    case 0: return true // Cluster Basic
     // case 1: return true // Cluster PowerConfiguration
     // case 2: return true // Cluster DeviceTemperatureConfiguration
     case 3: return true // Cluster Identify
-    // case 4: return true // Cluster Groups
-    // case 5: return true // Cluster Scenes
+    case 4: return true // Cluster Groups
+    case 5: return true // Cluster Scenes
     case 6: return true // Cluster OnOff
     case 8: return true // Cluster Level
     case 9: return true // Cluster Alarms
@@ -16,6 +15,7 @@ function supportedMappedClusterCode(code) {
     // case 21: return true // Cluster Commissioning
     // case 25: return true // Cluster OTAUpgrade
     // case 32: return true // Cluster PollControl
+    case 57: return true // Cluster BridgeBasic
     // case 256: return true // Cluster ShadeConfiguration
     case 257: return true // Cluster DoorLock
     // case 258: return true // Cluster WindowCovering

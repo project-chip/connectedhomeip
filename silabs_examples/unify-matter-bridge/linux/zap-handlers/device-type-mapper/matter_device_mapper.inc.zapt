@@ -34,39 +34,41 @@ namespace Clusters {
 
 static const std::unordered_map<std::string, chip::ClusterId> unify_cluster_id_map {
     {{#zcl_clusters}}
-    {{#if (chipSupportedCluster label)}}
-    { "{{asUpperCamelCase label}}", {{chipClusterConversion label}}::Id}{{listComma this}}
-    {{/if}}
+        {{#if (supportedMappedClusterCode code)}}
+        {{#if (matterSupportedClusterFiltered code)}}
+    { "{{asUpperCamelCase label}}", {{matterClusterNameFiltered code}}::Id}{{listComma this}}
+        {{/if}}
+        {{/if}}
     {{/zcl_clusters}}
 };
 
 // Attribute mapping Unify->Matter conversion
 // Attribute structure for each cluster
 {{#zcl_clusters}}
-{{#zcl_attributes_server}}
-{{#if (chipSupportedCluster parent.label)}}
-{{#first}}
-namespace {{chipClusterConversion parent.label}} {
+{{#if (supportedMappedClusterCode code)}}
+{{#if (matterSupportedClusterFiltered code)}}
+namespace {{matterClusterNameFiltered code}} {
 namespace Attributes {
 static const std::unordered_map<std::string, chip::AttributeId> unify_to_matter_attribute_id_cluster_map {
-{{/first}}
-{{#if (chipSupportedAttribute parent.label label)}}
-    { "{{asUpperCamelCase label}}", {{chipAttributeConversion label}}::Id }{{listComma this}}
-{{/if}}
-{{#last}}
-};
-} // namespace Attributes
-} // namespace {{asUpperCamelCase parent.label false}}
-{{/last}}
+{{#zcl_attributes_server}}
+{{#if (matterSupportedClusterAttributeFiltered parent.code code)}}
+    { "{{asUpperCamelCase label}}", {{matterClusterAttributeNameFiltered parent.code code}}::Id }{{listComma this}}
 {{/if}}
 {{/zcl_attributes_server}}
+};
+} // namespace Attributes
+} // namespace {{asUpperCamelCase label}}
+{{/if}}
+{{/if}}
 {{/zcl_clusters}}
 
 // Global map of each clusters attributes
 static const std::unordered_map<std::string, std::unordered_map<std::string, chip::AttributeId>> unify_to_matter_attribute_id_map {
 {{#zcl_clusters}}
-{{#if (chipSupportedCluster label)}}
-    { "{{asUpperCamelCase label}}",  {{chipClusterConversion label}}::Attributes::unify_to_matter_attribute_id_cluster_map }{{listComma this}}
+{{#if (supportedMappedClusterCode code)}}
+{{#if (matterSupportedClusterFiltered code)}}
+    { "{{asUpperCamelCase label}}",  {{matterClusterNameFiltered code}}::Attributes::unify_to_matter_attribute_id_cluster_map }{{listComma this}}
+{{/if}}
 {{/if}}
 {{#last}}
 };
@@ -77,30 +79,30 @@ static const std::unordered_map<std::string, std::unordered_map<std::string, chi
 // Command mapping Unify->Matter conversion
 // Command structure for each cluster
 {{#zcl_clusters}}
-{{#zcl_commands}}
-{{#if (chipSupportedCluster parent.label)}}
-{{#first}}
-namespace {{chipClusterConversion parent.label}} {
+{{#if (supportedMappedClusterCode code)}}
+{{#if (matterSupportedClusterFiltered code)}}
+namespace {{matterClusterNameFiltered code}} {
 namespace Commands {
-static const std::unordered_map<std::string, chip::CommandId> unify_to_matter_command_id_cluster_map {
-{{/first}}
-{{#if (chipSupportedCommands parent.label label)}}
-    { "{{asUpperCamelCase label}}", {{chipCommandsConversion label}}::Id }{{listComma this}}
-{{/if}}
-{{#last}}
-};
-} // namespace Commands
-} // namespace {{asUpperCamelCase parent.label false}}
-{{/last}}
+    static const std::unordered_map<std::string, chip::CommandId> unify_to_matter_command_id_cluster_map {
+{{#zcl_commands}}
+{{#if (matterSupportedClusterCommandFiltered parent.code code)}}
+    { "{{asUpperCamelCase label}}", {{matterClusterCommandNameFiltered parent.code code}}::Id }{{listComma this}}
 {{/if}}
 {{/zcl_commands}}
+};
+} // namespace Commands
+} // namespace {{asUpperCamelCase label}}
+{{/if}}
+{{/if}}
 {{/zcl_clusters}}
 
 // Global map of each clusters commands
 static const std::unordered_map<std::string, std::unordered_map<std::string, chip::CommandId>> unify_to_matter_command_id_map {
 {{#zcl_clusters}}
-{{#if (chipSupportedClusterWithCommands label)}}
-    { "{{asUpperCamelCase label}}",  {{chipClusterConversion label}}::Commands::unify_to_matter_command_id_cluster_map }{{listComma this}}
+{{#if (supportedMappedClusterCode code)}}
+{{#if (matterSupportedClusterFiltered code)}}
+    { "{{asUpperCamelCase label}}",  {{matterClusterNameFiltered code}}::Commands::unify_to_matter_command_id_cluster_map }{{listComma this}}
+{{/if}}
 {{/if}}
 {{#last}}
 };
