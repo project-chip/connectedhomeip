@@ -622,7 +622,7 @@ enum class NetworkCommissioningFeature : uint32_t
 enum class WiFiSecurity : uint8_t
 {
     kUnencrypted  = 0x1,
-    kWepPersonal  = 0x2,
+    kWep          = 0x2,
     kWpaPersonal  = 0x4,
     kWpa2Personal = 0x8,
     kWpa3Personal = 0x10,
