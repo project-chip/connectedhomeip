@@ -89,10 +89,10 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         env:
-          # NOTE: zap version should be kept in sync with the image used by 
-            # Docker, currently connectedhomeip/chip-build:0.6.17 
-            ZAP_VERSION: v2022.11.29-nightly
-            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2022.11.29-nightly
+            # NOTE: zap version should be kept in sync with the image used by 
+            # Docker, currently connectedhomeip/chip-build:0.6.25 
+            ZAP_VERSION: v2022.12.20-nightly
+            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2022.12.20-nightly
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.36

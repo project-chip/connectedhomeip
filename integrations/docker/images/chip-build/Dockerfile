@@ -181,8 +181,11 @@ RUN set -x \
 #
 # If you change this, make sure you also change (once used)
 #   - scripts/tools/zap/zap_execution.py
-#   - .github/workflows/darwin.yaml
+#   - .github/workflows/build.yaml
 #   - .github/workflows/darwin-tests.yaml
+#   - .github/workflows/darwin.yaml
+#   - .github/workflows/fuzzing-build.yaml
+#   - .github/workflows/tests.yaml   
 ENV ZAP_VERSION=v2023.01.05-nightly
 
 RUN set -x \
