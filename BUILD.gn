@@ -122,7 +122,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   pw_python_pip_install("pip_install_matter_packages") {
     packages = [
       "//examples/common/pigweed/rpc_console:chip_rpc_distribution",
-      "//scripts:yamltests_distribution",
+      "//scripts:matter_yamltests_distribution",
     ]
   }
 
