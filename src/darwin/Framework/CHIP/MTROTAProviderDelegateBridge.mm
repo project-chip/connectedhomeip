@@ -160,7 +160,7 @@ private:
 
         auto completionHandler = ^(NSError * _Nullable error) {
             [controller
-                asyncDispatchToMatterQueue:^(chip::Controller::DeviceCommissioner *) {
+                asyncDispatchToMatterQueue:^() {
                     assertChipStackLockedByCurrentThread();
 
                     if (!mInitialized || mTransferGeneration != transferGeneration) {
@@ -264,7 +264,7 @@ private:
 
         auto completionHandler = ^(NSData * _Nullable data, BOOL isEOF) {
             [controller
-                asyncDispatchToMatterQueue:^(chip::Controller::DeviceCommissioner *) {
+                asyncDispatchToMatterQueue:^() {
                     assertChipStackLockedByCurrentThread();
 
                     if (!mInitialized || mTransferGeneration != transferGeneration) {
@@ -552,7 +552,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
     auto completionHandler
         = ^(MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error) {
               [controller
-                  asyncDispatchToMatterQueue:^(chip::Controller::DeviceCommissioner *) {
+                  asyncDispatchToMatterQueue:^() {
                       assertChipStackLockedByCurrentThread();
 
                       CommandHandler * handler = EnsureValidState(handle, cachedCommandPath, "QueryImage", data, error);
@@ -646,7 +646,7 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(CommandHandler * com
     auto completionHandler
         = ^(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error) {
               [controller
-                  asyncDispatchToMatterQueue:^(chip::Controller::DeviceCommissioner *) {
+                  asyncDispatchToMatterQueue:^() {
                       assertChipStackLockedByCurrentThread();
 
                       CommandHandler * handler = EnsureValidState(handle, cachedCommandPath, "ApplyUpdateRequest", data, error);
@@ -707,7 +707,7 @@ void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * co
 
     auto completionHandler = ^(NSError * _Nullable error) {
         [controller
-            asyncDispatchToMatterQueue:^(chip::Controller::DeviceCommissioner *) {
+            asyncDispatchToMatterQueue:^() {
                 assertChipStackLockedByCurrentThread();
 
                 CommandHandler * handler = EnsureValidState(handle, cachedCommandPath, "NotifyUpdateApplied", error);
@@ -746,8 +746,8 @@ void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * co
 CHIP_ERROR MTROTAProviderDelegateBridge::ConvertToQueryImageParams(
     const Commands::QueryImage::DecodableType & commandData, MTROTASoftwareUpdateProviderClusterQueryImageParams * commandParams)
 {
-    commandParams.vendorId = [NSNumber numberWithUnsignedShort:commandData.vendorId];
-    commandParams.productId = [NSNumber numberWithUnsignedShort:commandData.productId];
+    commandParams.vendorID = [NSNumber numberWithUnsignedShort:commandData.vendorID];
+    commandParams.productID = [NSNumber numberWithUnsignedShort:commandData.productID];
     commandParams.softwareVersion = [NSNumber numberWithUnsignedLong:commandData.softwareVersion];
     auto iterator = commandData.protocolsSupported.begin();
     NSMutableArray * protocolsSupported = [[NSMutableArray alloc] init];

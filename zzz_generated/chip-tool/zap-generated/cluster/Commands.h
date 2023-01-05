@@ -45,7 +45,7 @@
 | Binding                                                             | 0x001E |
 | AccessControl                                                       | 0x001F |
 | Actions                                                             | 0x0025 |
-| Basic                                                               | 0x0028 |
+| BasicInformation                                                    | 0x0028 |
 | OtaSoftwareUpdateProvider                                           | 0x0029 |
 | OtaSoftwareUpdateRequestor                                          | 0x002A |
 | LocalizationConfiguration                                           | 0x002B |
@@ -217,7 +217,7 @@ class GroupsAddGroup : public ClusterCommand
 public:
     GroupsAddGroup(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("add-group", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("GroupName", &mRequest.groupName);
         ClusterCommand::AddArguments();
     }
@@ -248,7 +248,7 @@ class GroupsViewGroup : public ClusterCommand
 public:
     GroupsViewGroup(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("view-group", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         ClusterCommand::AddArguments();
     }
 
@@ -310,7 +310,7 @@ class GroupsRemoveGroup : public ClusterCommand
 public:
     GroupsRemoveGroup(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("remove-group", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         ClusterCommand::AddArguments();
     }
 
@@ -370,7 +370,7 @@ public:
     GroupsAddGroupIfIdentifying(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("add-group-if-identifying", credsIssuerConfig)
     {
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
+        AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("GroupName", &mRequest.groupName);
         ClusterCommand::AddArguments();
     }
@@ -870,7 +870,7 @@ class OnOffOffWithEffect : public ClusterCommand
 public:
     OnOffOffWithEffect(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("off-with-effect", credsIssuerConfig)
     {
-        AddArgument("EffectId", 0, UINT8_MAX, &mRequest.effectId);
+        AddArgument("EffectIdentifier", 0, UINT8_MAX, &mRequest.effectIdentifier);
         AddArgument("EffectVariant", 0, UINT8_MAX, &mRequest.effectVariant);
         ClusterCommand::AddArguments();
     }
@@ -1815,7 +1815,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster Basic                                                       | 0x0028 |
+| Cluster BasicInformation                                            | 0x0028 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * MfgSpecificPing                                                   |   0x00 |
@@ -1857,10 +1857,11 @@ private:
 /*
  * Command MfgSpecificPing
  */
-class BasicMfgSpecificPing : public ClusterCommand
+class BasicInformationMfgSpecificPing : public ClusterCommand
 {
 public:
-    BasicMfgSpecificPing(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("mfg-specific-ping", credsIssuerConfig)
+    BasicInformationMfgSpecificPing(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("mfg-specific-ping", credsIssuerConfig)
     {
         ClusterCommand::AddArguments();
     }
@@ -1880,7 +1881,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::Basic::Commands::MfgSpecificPing::Type mRequest;
+    chip::app::Clusters::BasicInformation::Commands::MfgSpecificPing::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -1910,8 +1911,8 @@ public:
     OtaSoftwareUpdateProviderQueryImage(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("query-image", credsIssuerConfig), mComplex_ProtocolsSupported(&mRequest.protocolsSupported)
     {
-        AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId);
-        AddArgument("ProductId", 0, UINT16_MAX, &mRequest.productId);
+        AddArgument("VendorID", 0, UINT16_MAX, &mRequest.vendorID);
+        AddArgument("ProductID", 0, UINT16_MAX, &mRequest.productID);
         AddArgument("SoftwareVersion", 0, UINT32_MAX, &mRequest.softwareVersion);
         AddArgument("ProtocolsSupported", &mComplex_ProtocolsSupported);
         AddArgument("HardwareVersion", 0, UINT16_MAX, &mRequest.hardwareVersion);
@@ -2009,10 +2010,10 @@ private:
 | Cluster OtaSoftwareUpdateRequestor                                  | 0x002A |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * AnnounceOtaProvider                                               |   0x00 |
+| * AnnounceOTAProvider                                               |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * DefaultOtaProviders                                               | 0x0000 |
+| * DefaultOTAProviders                                               | 0x0000 |
 | * UpdatePossible                                                    | 0x0001 |
 | * UpdateState                                                       | 0x0002 |
 | * UpdateStateProgress                                               | 0x0003 |
@@ -2029,16 +2030,16 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command AnnounceOtaProvider
+ * Command AnnounceOTAProvider
  */
-class OtaSoftwareUpdateRequestorAnnounceOtaProvider : public ClusterCommand
+class OtaSoftwareUpdateRequestorAnnounceOTAProvider : public ClusterCommand
 {
 public:
-    OtaSoftwareUpdateRequestorAnnounceOtaProvider(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("announce-ota-provider", credsIssuerConfig)
+    OtaSoftwareUpdateRequestorAnnounceOTAProvider(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("announce-otaprovider", credsIssuerConfig)
     {
-        AddArgument("ProviderNodeId", 0, UINT64_MAX, &mRequest.providerNodeId);
-        AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId);
+        AddArgument("ProviderNodeID", 0, UINT64_MAX, &mRequest.providerNodeID);
+        AddArgument("VendorID", 0, UINT16_MAX, &mRequest.vendorID);
         AddArgument("AnnouncementReason", 0, UINT8_MAX, &mRequest.announcementReason);
         AddArgument("MetadataForNode", &mRequest.metadataForNode);
         AddArgument("Endpoint", 0, UINT16_MAX, &mRequest.endpoint);
@@ -2060,7 +2061,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type mRequest;
+    chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -2174,6 +2175,9 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+| * WiredFaultChange                                                  | 0x0000 |
+| * BatFaultChange                                                    | 0x0001 |
+| * BatChargeFaultChange                                              | 0x0002 |
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
@@ -8859,10 +8863,10 @@ void registerClusterAccessControl(Commands & commands, CredentialIssuerCommands 
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>>>(
+            chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::Type>>>(
             Id, "acl", Attributes::Acl::Id, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type>>>(
+            chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::Type>>>(
             Id, "extension", Attributes::Extension::Id, credsIssuerConfig),                             //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                         //
         make_unique<SubscribeAttribute>(Id, "acl", Attributes::Acl::Id, credsIssuerConfig),             //
@@ -8952,18 +8956,18 @@ void registerClusterActions(Commands & commands, CredentialIssuerCommands * cred
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterBasic(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterBasicInformation(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::Basic;
+    using namespace chip::app::Clusters::BasicInformation;
 
-    const char * clusterName = "Basic";
+    const char * clusterName = "BasicInformation";
 
     commands_list clusterCommands = {
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),   //
-        make_unique<BasicMfgSpecificPing>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),              //
+        make_unique<BasicInformationMfgSpecificPing>(credsIssuerConfig), //
         //
         // Attributes
         //
@@ -9091,12 +9095,12 @@ void registerClusterOtaSoftwareUpdateRequestor(Commands & commands, CredentialIs
         // Commands
         //
         make_unique<ClusterCommand>(Id, credsIssuerConfig),                            //
-        make_unique<OtaSoftwareUpdateRequestorAnnounceOtaProvider>(credsIssuerConfig), //
+        make_unique<OtaSoftwareUpdateRequestorAnnounceOTAProvider>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "default-ota-providers", Attributes::DefaultOtaProviders::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "default-otaproviders", Attributes::DefaultOTAProviders::Id, credsIssuerConfig),    //
         make_unique<ReadAttribute>(Id, "update-possible", Attributes::UpdatePossible::Id, credsIssuerConfig),              //
         make_unique<ReadAttribute>(Id, "update-state", Attributes::UpdateState::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "update-state-progress", Attributes::UpdateStateProgress::Id, credsIssuerConfig),   //
@@ -9108,9 +9112,9 @@ void registerClusterOtaSoftwareUpdateRequestor(Commands & commands, CredentialIs
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type>>>(
-            Id, "default-ota-providers", Attributes::DefaultOtaProviders::Id, credsIssuerConfig),                               //
+            Id, "default-otaproviders", Attributes::DefaultOTAProviders::Id, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "default-ota-providers", Attributes::DefaultOtaProviders::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "default-otaproviders", Attributes::DefaultOTAProviders::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "update-possible", Attributes::UpdatePossible::Id, credsIssuerConfig),              //
         make_unique<SubscribeAttribute>(Id, "update-state", Attributes::UpdateState::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "update-state-progress", Attributes::UpdateStateProgress::Id, credsIssuerConfig),   //
@@ -9401,8 +9405,14 @@ void registerClusterPowerSource(Commands & commands, CredentialIssuerCommands * 
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                   //
+        make_unique<ReadEvent>(Id, "wired-fault-change", Events::WiredFaultChange::Id, credsIssuerConfig),               //
+        make_unique<ReadEvent>(Id, "bat-fault-change", Events::BatFaultChange::Id, credsIssuerConfig),                   //
+        make_unique<ReadEvent>(Id, "bat-charge-fault-change", Events::BatChargeFaultChange::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                              //
+        make_unique<SubscribeEvent>(Id, "wired-fault-change", Events::WiredFaultChange::Id, credsIssuerConfig),          //
+        make_unique<SubscribeEvent>(Id, "bat-fault-change", Events::BatFaultChange::Id, credsIssuerConfig),              //
+        make_unique<SubscribeEvent>(Id, "bat-charge-fault-change", Events::BatChargeFaultChange::Id, credsIssuerConfig), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -13500,7 +13510,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterBinding(commands, credsIssuerConfig);
     registerClusterAccessControl(commands, credsIssuerConfig);
     registerClusterActions(commands, credsIssuerConfig);
-    registerClusterBasic(commands, credsIssuerConfig);
+    registerClusterBasicInformation(commands, credsIssuerConfig);
     registerClusterOtaSoftwareUpdateProvider(commands, credsIssuerConfig);
     registerClusterOtaSoftwareUpdateRequestor(commands, credsIssuerConfig);
     registerClusterLocalizationConfiguration(commands, credsIssuerConfig);

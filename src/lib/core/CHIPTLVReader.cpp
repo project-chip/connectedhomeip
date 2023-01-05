@@ -749,7 +749,7 @@ CHIP_ERROR TLVReader::VerifyElement()
     }
     else
     {
-        if (mElemTag == UnknownImplicitTag)
+        if (mElemTag == UnknownImplicitTag())
             return CHIP_ERROR_UNKNOWN_IMPLICIT_TLV_TAG;
         switch (mContainerType)
         {
@@ -806,11 +806,11 @@ Tag TLVReader::ReadTag(TLVTagControl tagControl, const uint8_t *& p) const
         return CommonTag(LittleEndian::Read32(p));
     case TLVTagControl::ImplicitProfile_2Bytes:
         if (ImplicitProfileId == kProfileIdNotSpecified)
-            return UnknownImplicitTag;
+            return UnknownImplicitTag();
         return ProfileTag(ImplicitProfileId, LittleEndian::Read16(p));
     case TLVTagControl::ImplicitProfile_4Bytes:
         if (ImplicitProfileId == kProfileIdNotSpecified)
-            return UnknownImplicitTag;
+            return UnknownImplicitTag();
         return ProfileTag(ImplicitProfileId, LittleEndian::Read32(p));
     case TLVTagControl::FullyQualified_6Bytes:
         vendorId   = LittleEndian::Read16(p);

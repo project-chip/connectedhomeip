@@ -59,7 +59,7 @@ public final class ChipIdLookup {
       return "Actions";
     }
     if (clusterId == 40L) {
-      return "Basic";
+      return "BasicInformation";
     }
     if (clusterId == 41L) {
       return "OtaSoftwareUpdateProvider";
@@ -653,7 +653,7 @@ public final class ChipIdLookup {
     }
     if (clusterId == 42L) {
       if (attributeId == 0L) {
-        return "DefaultOtaProviders";
+        return "DefaultOTAProviders";
       }
       if (attributeId == 1L) {
         return "UpdatePossible";
@@ -3183,6 +3183,15 @@ public final class ChipIdLookup {
       return "";
     }
     if (clusterId == 47L) {
+      if (eventId == 0L) {
+        return "WiredFaultChange";
+      }
+      if (eventId == 1L) {
+        return "BatFaultChange";
+      }
+      if (eventId == 2L) {
+        return "BatChargeFaultChange";
+      }
       return "";
     }
     if (clusterId == 48L) {

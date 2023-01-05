@@ -29,12 +29,59 @@
 namespace chip {
 namespace TLV {
 
-struct Tag
+class Tag
 {
-    explicit constexpr Tag(uint64_t val) : mVal(val) {}
-    Tag() {}
+public:
+    enum SpecialTagNumber : uint32_t
+    {
+        kContextTagMaxNum = UINT8_MAX,
+        kAnonymousTagNum,
+        kUnknownImplicitTagNum
+    };
+
+    Tag() = default;
+
     constexpr bool operator==(const Tag & other) const { return mVal == other.mVal; }
     constexpr bool operator!=(const Tag & other) const { return mVal != other.mVal; }
+
+private:
+    explicit constexpr Tag(uint64_t val) : mVal(val) {}
+
+    friend constexpr Tag ProfileTag(uint32_t profileId, uint32_t tagNum);
+    friend constexpr Tag ProfileTag(uint16_t vendorId, uint16_t profileNum, uint32_t tagNum);
+    friend constexpr Tag ContextTag(uint8_t tagNum);
+    friend constexpr Tag CommonTag(uint32_t tagNum);
+    friend constexpr Tag AnonymousTag();
+    friend constexpr Tag UnknownImplicitTag();
+
+    // The following friend functions could be Tag class methods, but it turns out in some cases
+    // they may not be inlined and then passing the tag by argument/value results in smaller code
+    // than passing it by 'this' pointer. This can be worked around by applying 'always_inline'
+    // function attribute, but friend functions are likely a more portable solution.
+
+    friend constexpr uint32_t ProfileIdFromTag(Tag tag);
+    friend constexpr uint16_t VendorIdFromTag(Tag tag);
+    friend constexpr uint16_t ProfileNumFromTag(Tag tag);
+    friend constexpr uint32_t TagNumFromTag(Tag tag);
+
+    friend constexpr bool IsProfileTag(Tag tag);
+    friend constexpr bool IsContextTag(Tag tag);
+    friend constexpr bool IsSpecialTag(Tag tag);
+
+    static constexpr uint32_t kProfileIdShift      = 32;
+    static constexpr uint32_t kVendorIdShift       = 48;
+    static constexpr uint32_t kProfileNumShift     = 32;
+    static constexpr uint32_t kSpecialTagProfileId = 0xFFFFFFFF;
+
+    // The storage of the tag value uses the following encoding:
+    //
+    //  63                              47                              31
+    // +-------------------------------+-------------------------------+----------------------------------------------+
+    // | Vendor id (bitwise-negated)   | Profile num (bitwise-negated) | Tag number                                   |
+    // +-------------------------------+-------------------------------+----------------------------------------------+
+    //
+    // Vendor id and profile number are bitwise-negated in order to optimize the code size when
+    // using context tags, the most commonly used tags in the SDK.
     uint64_t mVal;
 };
 
@@ -48,20 +95,6 @@ enum TLVCommonProfiles
 
     // TODO: Replace with chip::Profiles::kCHIPProfile_Common
     kCommonProfileId = 0
-};
-
-// TODO: Move to private namespace
-enum TLVTagFields
-{
-    kProfileIdMask    = 0xFFFFFFFF00000000ULL,
-    kProfileNumMask   = 0x0000FFFF00000000ULL,
-    kVendorIdMask     = 0xFFFF000000000000ULL,
-    kProfileIdShift   = 32,
-    kVendorIdShift    = 48,
-    kProfileNumShift  = 32,
-    kTagNumMask       = 0x00000000FFFFFFFFULL,
-    kSpecialTagMarker = 0xFFFFFFFF00000000ULL,
-    kContextTagMaxNum = UINT8_MAX
 };
 
 // TODO: Move to private namespace
@@ -99,9 +132,9 @@ enum
  * @param[in]   tagNum          The profile-specific tag number assigned to the tag.
  * @return                      A 64-bit integer representing the tag.
  */
-inline constexpr Tag ProfileTag(uint32_t profileId, uint32_t tagNum)
+constexpr Tag ProfileTag(uint32_t profileId, uint32_t tagNum)
 {
-    return Tag(((static_cast<uint64_t>(profileId)) << kProfileIdShift) | tagNum);
+    return Tag((static_cast<uint64_t>(~profileId) << Tag::kProfileIdShift) | tagNum);
 }
 
 /**
@@ -112,21 +145,22 @@ inline constexpr Tag ProfileTag(uint32_t profileId, uint32_t tagNum)
  * @param[in]   tagNum          The profile-specific tag number assigned to the tag.
  * @return                      A 64-bit integer representing the tag.
  */
-inline constexpr Tag ProfileTag(uint16_t vendorId, uint16_t profileNum, uint32_t tagNum)
+constexpr Tag ProfileTag(uint16_t vendorId, uint16_t profileNum, uint32_t tagNum)
 {
-    return Tag(((static_cast<uint64_t>(vendorId)) << kVendorIdShift) | ((static_cast<uint64_t>(profileNum)) << kProfileNumShift) |
-               tagNum);
+    constexpr uint32_t kVendorIdShift = Tag::kVendorIdShift - Tag::kProfileIdShift;
+
+    return ProfileTag((static_cast<uint32_t>(vendorId) << kVendorIdShift) | profileNum, tagNum);
 }
 
 /**
- * Generates the API representation for of context-specific TLV tag
+ * Generates the API representation of a context-specific TLV tag
  *
  * @param[in]   tagNum          The context-specific tag number assigned to the tag.
  * @return                      A 64-bit integer representing the tag.
  */
-inline constexpr Tag ContextTag(uint8_t tagNum)
+constexpr Tag ContextTag(uint8_t tagNum)
 {
-    return Tag(kSpecialTagMarker | tagNum);
+    return ProfileTag(Tag::kSpecialTagProfileId, tagNum);
 }
 
 /**
@@ -135,7 +169,7 @@ inline constexpr Tag ContextTag(uint8_t tagNum)
  * @param[in]   tagNum          The common profile tag number assigned to the tag.
  * @return                      A 64-bit integer representing the tag.
  */
-inline constexpr Tag CommonTag(uint32_t tagNum)
+constexpr Tag CommonTag(uint32_t tagNum)
 {
     return ProfileTag(kCommonProfileId, tagNum);
 }
@@ -143,12 +177,18 @@ inline constexpr Tag CommonTag(uint32_t tagNum)
 /**
  * A value signifying a TLV element that has no tag (i.e. an anonymous element).
  */
-inline constexpr Tag AnonymousTag()
+constexpr Tag AnonymousTag()
 {
-    return Tag(kSpecialTagMarker | 0x00000000FFFFFFFFULL);
+    return ProfileTag(Tag::kSpecialTagProfileId, Tag::kAnonymousTagNum);
 }
-// TODO: Move to private namespace
-static constexpr Tag UnknownImplicitTag(kSpecialTagMarker | 0x00000000FFFFFFFEULL);
+
+/**
+ * An invalid tag that represents a TLV element decoding error due to unknown implicit profile id.
+ */
+constexpr Tag UnknownImplicitTag()
+{
+    return ProfileTag(Tag::kSpecialTagProfileId, Tag::kUnknownImplicitTagNum);
+}
 
 /**
  * Returns the profile id from a TLV tag
@@ -158,9 +198,24 @@ static constexpr Tag UnknownImplicitTag(kSpecialTagMarker | 0x00000000FFFFFFFEUL
  * @param[in]   tag             The API representation of a profile-specific TLV tag.
  * @return                      The profile id.
  */
-inline constexpr uint32_t ProfileIdFromTag(Tag tag)
+constexpr uint32_t ProfileIdFromTag(Tag tag)
 {
-    return static_cast<uint32_t>((tag.mVal & kProfileIdMask) >> kProfileIdShift);
+    return ~static_cast<uint32_t>(tag.mVal >> Tag::kProfileIdShift);
+}
+
+/**
+ * Returns the vendor id from a TLV tag
+ *
+ * @note The behavior of this function is undefined if the supplied tag is not a profile-specific tag.
+ *
+ * @param[in]   tag             The API representation of a profile-specific TLV tag.
+ * @return                      The associated vendor id.
+ */
+constexpr uint16_t VendorIdFromTag(Tag tag)
+{
+    constexpr uint32_t kVendorIdShift = Tag::kVendorIdShift - Tag::kProfileIdShift;
+
+    return static_cast<uint16_t>(ProfileIdFromTag(tag) >> kVendorIdShift);
 }
 
 /**
@@ -171,9 +226,9 @@ inline constexpr uint32_t ProfileIdFromTag(Tag tag)
  * @param[in]   tag             The API representation of a profile-specific TLV tag.
  * @return                      The associated profile number.
  */
-inline constexpr uint16_t ProfileNumFromTag(Tag tag)
+constexpr uint16_t ProfileNumFromTag(Tag tag)
 {
-    return static_cast<uint16_t>((tag.mVal & kProfileNumMask) >> kProfileNumShift);
+    return static_cast<uint16_t>(ProfileIdFromTag(tag));
 }
 
 /**
@@ -187,44 +242,31 @@ inline constexpr uint16_t ProfileNumFromTag(Tag tag)
  * @param[in]   tag             The API representation of a profile-specific or context-specific TLV tag.
  * @return                      The associated tag number.
  */
-inline constexpr uint32_t TagNumFromTag(Tag tag)
+constexpr uint32_t TagNumFromTag(Tag tag)
 {
-    return static_cast<uint32_t>(tag.mVal & kTagNumMask);
-}
-
-/**
- * Returns the vendor id from a TLV tag
- *
- * @note The behavior of this function is undefined if the supplied tag is not a profile-specific tag.
- *
- * @param[in]   tag             The API representation of a profile-specific TLV tag.
- * @return                      The associated vendor id.
- */
-inline constexpr uint16_t VendorIdFromTag(Tag tag)
-{
-    return static_cast<uint16_t>((tag.mVal & kVendorIdMask) >> kVendorIdShift);
+    return static_cast<uint32_t>(tag.mVal);
 }
 
 /**
  * Returns true of the supplied tag is a profile-specific tag.
  */
-inline constexpr bool IsProfileTag(Tag tag)
+constexpr bool IsProfileTag(Tag tag)
 {
-    return (tag.mVal & kProfileIdMask) != kSpecialTagMarker;
+    return ProfileIdFromTag(tag) != Tag::kSpecialTagProfileId;
 }
 
 /**
  * Returns true if the supplied tag is a context-specific tag.
  */
-inline constexpr bool IsContextTag(Tag tag)
+constexpr bool IsContextTag(Tag tag)
 {
-    return (tag.mVal & kProfileIdMask) == kSpecialTagMarker && TagNumFromTag(tag) <= kContextTagMaxNum;
+    return ProfileIdFromTag(tag) == Tag::kSpecialTagProfileId && TagNumFromTag(tag) <= Tag::kContextTagMaxNum;
 }
 
 // TODO: move to private namespace
-inline constexpr bool IsSpecialTag(Tag tag)
+constexpr bool IsSpecialTag(Tag tag)
 {
-    return (tag.mVal & kProfileIdMask) == kSpecialTagMarker;
+    return ProfileIdFromTag(tag) == Tag::kSpecialTagProfileId;
 }
 
 } // namespace TLV

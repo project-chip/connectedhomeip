@@ -6,15 +6,7 @@
 #include <lib/support/logging/Constants.h>
 
 #include <stdio.h>
-
-// #ifdef LOG_LOCAL_LEVEL
-// #undef LOG_LOCAL_LEVEL
-// #endif
-// #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
-
-extern "C" {
-#include <blog.h>
-}
+#include <utils_log.h>
 
 #ifdef PW_RPC_ENABLED
 #include "PigweedLogger.h"

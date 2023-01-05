@@ -272,6 +272,12 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj)
 
     mWaitingForDiscovery[kBLETransport] = false;
 
+    // In order to not wait for all the possible addresses discovered over mdns to
+    // be tried before trying to connect over BLE, the discovered connection object is
+    // inserted at the beginning of the list.
+    //
+    // It makes it the 'next' thing to try to connect to if there are already some
+    // discovered parameters in the list.
     mDiscoveredParameters.emplace_front(connObj);
     ConnectToDiscoveredDevice();
 }

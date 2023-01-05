@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/src/crypto/crypto.gni")
 
 chip_test_suite("tests") {
   output_name = "libChipCryptoTests"
@@ -43,10 +44,13 @@ chip_test_suite("tests") {
     "TestCryptoLayer.h",
   ]
 
-  test_sources = [
-    "TestGroupOperationalCredentials.cpp",
-    "TestPersistentStorageOpKeyStore.cpp",
-  ]
+  test_sources = [ "TestGroupOperationalCredentials.cpp" ]
+
+  if (chip_crypto == "psa") {
+    test_sources += [ "TestPSAOpKeyStore.cpp" ]
+  } else {
+    test_sources += [ "TestPersistentStorageOpKeyStore.cpp" ]
+  }
 
   if (chip_device_platform == "esp32" || chip_device_platform == "nrfconnect" ||
       chip_device_platform == "efr32" || chip_device_platform == "openiotsdk") {

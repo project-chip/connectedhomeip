@@ -141,7 +141,7 @@ Silicon Labs platform.
           $ cd ~/connectedhomeip/examples/lighting-app/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export EFR32_BOARD=BRD4161A
+          $ export silabs_board=BRD4161A
           $ gn gen out/debug
           $ ninja -C out/debug
 
@@ -167,7 +167,7 @@ Silicon Labs platform.
           $ cd ~/connectedhomeip/examples/lighting-app/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export EFR32_BOARD=BRD4161A
+          $ export silabs_board=BRD4161A
           $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
           $ ninja -C out/debug
 

@@ -88,7 +88,8 @@ def detectZclFile(zapFile):
 
         # found the right path, try to figure out the actual path
         if package["pathRelativity"] == "relativeToZap":
-            path = os.path.abspath(os.path.join(os.path.dirname(zapFile), package["path"]))
+            path = os.path.abspath(os.path.join(
+                os.path.dirname(zapFile), package["path"]))
         else:
             path = package["path"]
 
@@ -113,9 +114,11 @@ def runArgumentsParser() -> CmdLineArgs:
     parser.add_argument('--parallel', action='store_true')
     parser.add_argument('--no-parallel', action='store_false', dest='parallel')
     parser.add_argument('--prettify-output', action='store_true')
-    parser.add_argument('--no-prettify-output', action='store_false', dest='prettify_output')
+    parser.add_argument('--no-prettify-output',
+                        action='store_false', dest='prettify_output')
     parser.add_argument('--version-check', action='store_true')
-    parser.add_argument('--no-version-check', action='store_false', dest='version_check')
+    parser.add_argument('--no-version-check',
+                        action='store_false', dest='version_check')
     parser.set_defaults(parallel=True)
     parser.set_defaults(prettify_output=True)
     parser.set_defaults(version_check=True)
@@ -176,7 +179,8 @@ def runGeneration(cmdLineArgs):
     if cmdLineArgs.version_check:
         tool.version_check()
 
-    args = ['-z', zcl_file, '-g', templates_file, '-i', zap_file, '-o', output_dir]
+    args = ['-z', zcl_file, '-g', templates_file,
+            '-i', zap_file, '-o', output_dir]
 
     if parallel:
         # Parallel-compatible runs will need separate state
@@ -208,7 +212,8 @@ def runClangPrettifier(templates_file, output_dir):
             # installed.  In particular, clang-format-13 is available on various
             # Linux distributions and clang-format-11 is available via homebrew
             # on Mac.  If all else fails, fall back to clang-format.
-            clang_formats = ['clang-format-13', 'clang-format-12', 'clang-format-11', 'clang-format']
+            clang_formats = ['clang-format-13', 'clang-format-12',
+                             'clang-format-11', 'clang-format']
             for clang_format in clang_formats:
                 args = [clang_format, '-i']
                 args.extend(clangOutputs)
@@ -257,7 +262,8 @@ def main():
     cmdLineArgs = runArgumentsParser()
 
     if cmdLineArgs.runBootstrap:
-        subprocess.check_call(getFilePath("scripts/tools/zap/zap_bootstrap.sh"), shell=True)
+        subprocess.check_call(getFilePath(
+            "scripts/tools/zap/zap_bootstrap.sh"), shell=True)
 
     # The maximum memory usage is over 4GB (#15620)
     os.environ["NODE_OPTIONS"] = "--max-old-space-size=8192"

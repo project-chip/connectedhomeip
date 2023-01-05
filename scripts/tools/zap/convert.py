@@ -83,7 +83,8 @@ def detectZclFile(zapFile):
 
         # found the right path, try to figure out the actual path
         if package["pathRelativity"] == "relativeToZap":
-            path = os.path.abspath(os.path.join(os.path.dirname(zapFile), package["path"]))
+            path = os.path.abspath(os.path.join(
+                os.path.dirname(zapFile), package["path"]))
         else:
             path = package["path"]
 
@@ -94,7 +95,8 @@ def runConversion(zap_file):
     templates_file = getFilePath('src/app/zap-templates/app-templates.json')
     zcl_file = detectZclFile(zap_file)
     tool = ZapTool()
-    tool.run('convert', '-z', zcl_file, '-g', templates_file, '-o', zap_file, zap_file)
+    tool.run('convert', '-z', zcl_file, '-g',
+             templates_file, '-o', zap_file, zap_file)
 
 
 def main():
@@ -102,7 +104,8 @@ def main():
     zap_file, run_bootstrap = runArgumentsParser()
 
     if run_bootstrap:
-        subprocess.check_call(getFilePath("scripts/tools/zap/zap_bootstrap.sh"), shell=True)
+        subprocess.check_call(getFilePath(
+            "scripts/tools/zap/zap_bootstrap.sh"), shell=True)
 
     os.chdir(CHIP_ROOT_DIR)
 

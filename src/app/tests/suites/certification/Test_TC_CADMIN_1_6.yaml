@@ -168,7 +168,7 @@ tests:
 
     - label: "TH_CR1 writes the mandatory attribute NodeLabel of DUT_CE"
       identity: "alpha"
-      cluster: "Basic"
+      cluster: "Basic Information"
       command: "writeAttribute"
       attribute: "NodeLabel"
       PICS: BINFO.S.A0005
@@ -177,7 +177,7 @@ tests:
 
     - label: "TH_CR1 read the mandatory attribute NodeLabel of DUT_CE"
       identity: "alpha"
-      cluster: "Basic"
+      cluster: "Basic Information"
       command: "readAttribute"
       attribute: "NodeLabel"
       PICS: BINFO.S.A0005

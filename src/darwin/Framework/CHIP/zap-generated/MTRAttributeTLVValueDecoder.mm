@@ -1274,7 +1274,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                     auto & entry_0 = iter_0.GetValue();
                     MTRDescriptorClusterDeviceTypeStruct * newElement_0;
                     newElement_0 = [MTRDescriptorClusterDeviceTypeStruct new];
-                    newElement_0.type = [NSNumber numberWithUnsignedInt:entry_0.type];
+                    newElement_0.deviceType = [NSNumber numberWithUnsignedInt:entry_0.deviceType];
                     newElement_0.revision = [NSNumber numberWithUnsignedShort:entry_0.revision];
                     [array_0 addObject:newElement_0];
                 }
@@ -1643,8 +1643,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTRAccessControlClusterAccessControlEntry * newElement_0;
-                    newElement_0 = [MTRAccessControlClusterAccessControlEntry new];
+                    MTRAccessControlClusterAccessControlEntryStruct * newElement_0;
+                    newElement_0 = [MTRAccessControlClusterAccessControlEntryStruct new];
                     newElement_0.privilege = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.privilege)];
                     newElement_0.authMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.authMode)];
                     if (entry_0.subjects.IsNull()) {
@@ -1727,8 +1727,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTRAccessControlClusterExtensionEntry * newElement_0;
-                    newElement_0 = [MTRAccessControlClusterExtensionEntry new];
+                    MTRAccessControlClusterAccessControlExtensionStruct * newElement_0;
+                    newElement_0 = [MTRAccessControlClusterAccessControlExtensionStruct new];
                     newElement_0.data = [NSData dataWithBytes:entry_0.data.data() length:entry_0.data.size()];
                     newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                     [array_0 addObject:newElement_0];
@@ -2082,8 +2082,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
         }
         break;
     }
-    case Clusters::Basic::Id: {
-        using namespace Clusters::Basic;
+    case Clusters::BasicInformation::Id: {
+        using namespace Clusters::BasicInformation;
         switch (aPath.mAttributeId) {
         case Attributes::DataModelRevision::Id: {
             using TypeInfo = Attributes::DataModelRevision::TypeInfo;
@@ -2301,8 +2301,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            MTRBasicClusterCapabilityMinimaStruct * _Nonnull value;
-            value = [MTRBasicClusterCapabilityMinimaStruct new];
+            MTRBasicInformationClusterCapabilityMinimaStruct * _Nonnull value;
+            value = [MTRBasicInformationClusterCapabilityMinimaStruct new];
             value.caseSessionsPerFabric = [NSNumber numberWithUnsignedShort:cppValue.caseSessionsPerFabric];
             value.subscriptionsPerFabric = [NSNumber numberWithUnsignedShort:cppValue.subscriptionsPerFabric];
             return value;
@@ -2525,8 +2525,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
     case Clusters::OtaSoftwareUpdateRequestor::Id: {
         using namespace Clusters::OtaSoftwareUpdateRequestor;
         switch (aPath.mAttributeId) {
-        case Attributes::DefaultOtaProviders::Id: {
-            using TypeInfo = Attributes::DefaultOtaProviders::TypeInfo;
+        case Attributes::DefaultOTAProviders::Id: {
+            using TypeInfo = Attributes::DefaultOTAProviders::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
