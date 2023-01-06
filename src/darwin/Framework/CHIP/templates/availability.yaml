@@ -4718,6 +4718,9 @@
           ThreadNetworkDiagnostics:
               - NeighborTable
               - RouteTable
+          WiFiNetworkDiagnostics:
+              - BSSID
+              - RSSI
       commands:
           OTASoftwareUpdateProvider:
               - QueryImage
@@ -5188,6 +5191,14 @@
               ConnectionStatusEnum:
                   - Connected
                   - NotConnected
+          WiFiNetworkDiagnostics:
+              WiFiVersionType:
+                  - A
+                  - B
+                  - G
+                  - N
+                  - Ac
+                  - Ax
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5252,6 +5263,9 @@
           ThreadNetworkDiagnostics:
               - NeighborTableList
               - RouteTableList
+          WiFiNetworkDiagnostics:
+              - Bssid
+              - Rssi
       command fields:
           Groups:
               AddGroup:
@@ -5308,6 +5322,14 @@
           PowerSource:
               BatChargeLevel:
                   - Ok
+          WiFiNetworkDiagnostics:
+              WiFiVersionType:
+                  - 80211a
+                  - 80211b
+                  - 80211g
+                  - 80211n
+                  - 80211ac
+                  - 80211ax
       bitmap values:
           NetworkCommissioning:
               WiFiSecurity:
@@ -5343,6 +5365,9 @@
           ThreadNetworkDiagnostics:
               NeighborTable: NeighborTableList
               RouteTable: RouteTableList
+          WiFiNetworkDiagnostics:
+              BSSID: Bssid
+              RSSI: Rssi
       commands:
           OTASoftwareUpdateRequestor:
               AnnounceOTAProvider: AnnounceOtaProvider
@@ -5404,6 +5429,14 @@
           PowerSource:
               BatChargeLevel:
                   OK: Ok
+          WiFiNetworkDiagnostics:
+              WiFiVersionType:
+                  A: 80211a
+                  B: 80211b
+                  G: 80211g
+                  N: 80211n
+                  Ac: 80211ac
+                  Ax: 80211ax
       bitmap values:
           NetworkCommissioning:
               WiFiSecurity:

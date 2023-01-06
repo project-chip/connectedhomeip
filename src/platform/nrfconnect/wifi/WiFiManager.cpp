@@ -356,7 +356,7 @@ CHIP_ERROR WiFiManager::GetWiFiInfo(WiFiInfo & info) const
         // i.e. the AP might support WiFi 5 only even though the station
         // is WiFi 6 ready (so the connection is WiFi 5 effectively).
         // For now just return what the station supports.
-        info.mWiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11AX;
+        info.mWiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_AX;
 
         wpa_signal_info signalInfo{};
         if (0 == wpa_drv_signal_poll(wpa_s, &signalInfo))
