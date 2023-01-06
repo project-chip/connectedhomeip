@@ -180,7 +180,7 @@ CHIP_ERROR AppTask::Init()
                                   false,            // no timer reload (==one-shot)
                                   (void *) this,    // init timer id = app task obj context
                                   TimerEventHandler // timer callback handler
-    ); 
+    );
 
     CHIP_ERROR err = BoltLockMgr().InitLockState();
 
