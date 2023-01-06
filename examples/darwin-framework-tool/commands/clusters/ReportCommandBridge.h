@@ -185,6 +185,21 @@ public:
     SubscribeEvent()
         : ModelCommand("subscribe-all-events")
     {
+        AddCommonArguments();
+    }
+
+    SubscribeEvent(chip::ClusterId clusterId)
+        : ModelCommand("subscribe-event-by-id")
+        , mClusterId(clusterId)
+    {
+        AddArgument("event-id", 0, UINT32_MAX, &mEventId);
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
+        AddArgument("is-urgent", 0, 1, &mIsUrgent);
+        AddCommonArguments();
+    }
+
+    void AddCommonArguments()
+    {
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
@@ -206,27 +221,54 @@ public:
             params.resubscribeIfLost = mAutoResubscribe.Value();
         }
 
-        [device subscribeWithQueue:callbackQueue
-            params:params
-            clusterStateCacheContainer:nil
-            attributeReportHandler:^(NSArray * value) {
-                SetCommandExitStatus(CHIP_NO_ERROR);
-            }
-            eventReportHandler:^(NSArray * value) {
-                for (id item in value) {
-                    NSLog(@"Response Item: %@", [item description]);
+        if (mClusterId != chip::kInvalidAttributeId)
+        {
+            NSNumber * eventMin = (mEventNumber.HasValue()) ? [NSNumber numberWithUnsignedLongLong:mEventNumber.Value()] : nil;
+            NSNumber * isUrgent = (mIsUrgent.HasValue()) ? [NSNumber numberWithBool:mIsUrgent.Value()] : nil;
+
+            [device subscribeToEventsWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
+                clusterID:[NSNumber numberWithUnsignedInteger:mClusterId]
+                eventID:[NSNumber numberWithUnsignedInteger:mEventId]
+                eventMin:eventMin
+                isUrgent:isUrgent
+                params:params
+                queue:callbackQueue
+                reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    if (values) {
+                        for (id item in values) {
+                            NSLog(@"Response Item: %@", [item description]);
+                        }
+                    }
+                    SetCommandExitStatus(error);
                 }
-                SetCommandExitStatus(CHIP_NO_ERROR);
-            }
-            errorHandler:^(NSError * error) {
-                SetCommandExitStatus(error);
-            }
-            subscriptionEstablished:^() {
-                mSubscriptionEstablished = YES;
-            }
-            resubscriptionScheduled:^(NSError * error, NSNumber * resubscriptionDelay) {
-                NSLog(@"Subscription dropped with error %@.  Resubscription in %@ms", error, resubscriptionDelay);
-            }];
+                subscriptionEstablished:^() {
+                    mSubscriptionEstablished = YES;
+                }];
+        }
+        else
+        {
+            [device subscribeWithQueue:callbackQueue
+                params:params
+                clusterStateCacheContainer:nil
+                attributeReportHandler:^(NSArray * value) {
+                    SetCommandExitStatus(CHIP_NO_ERROR);
+                }
+                eventReportHandler:^(NSArray * value) {
+                    for (id item in value) {
+                        NSLog(@"Response Item: %@", [item description]);
+                    }
+                    SetCommandExitStatus(CHIP_NO_ERROR);
+                }
+                errorHandler:^(NSError * error) {
+                    SetCommandExitStatus(error);
+                }
+                subscriptionEstablished:^() {
+                    mSubscriptionEstablished = YES;
+                }
+                resubscriptionScheduled:^(NSError * error, NSNumber * resubscriptionDelay) {
+                    NSLog(@"Subscription dropped with error %@.  Resubscription in %@ms", error, resubscriptionDelay);
+                }];
+        }
 
         return CHIP_NO_ERROR;
     }
@@ -237,9 +279,22 @@ protected:
     chip::Optional<bool> mKeepSubscriptions;
     chip::Optional<bool> mAutoResubscribe;
     chip::Optional<chip::EventNumber> mEventNumber;
+    chip::Optional<bool> mIsUrgent;
     bool mSubscriptionEstablished = NO;
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
+
+    void Shutdown() override
+    {
+        mSubscriptionEstablished = NO;
+        ModelCommand::Shutdown();
+    }
+
+    bool DeferInteractiveCleanup() override { return mSubscriptionEstablished; }
+
+private:
+    chip::ClusterId mClusterId = chip::kInvalidAttributeId;
+    chip::EventId mEventId;
 };
 
 class ReadEvent : public ModelCommand {
@@ -249,6 +304,7 @@ public:
     {
         AddArgument("cluster-id", 0, UINT32_MAX, &mClusterId);
         AddArgument("event-id", 0, UINT32_MAX, &mEventId);
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ModelCommand::AddArguments();
     }
 
@@ -257,6 +313,7 @@ public:
         , mClusterId(clusterId)
     {
         AddArgument("event-id", 0, UINT32_MAX, &mEventId);
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ModelCommand::AddArguments();
     }
 
@@ -264,6 +321,7 @@ public:
         : ModelCommand("read-event")
     {
         AddArgument("event-name", eventName);
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ModelCommand::AddArguments();
     }
 
@@ -276,9 +334,12 @@ public:
         if (mFabricFiltered.HasValue()) {
             params.filterByFabric = mFabricFiltered.Value();
         }
+        NSNumber * eventMin = (mEventNumber.HasValue()) ? [NSNumber numberWithUnsignedLongLong:mEventNumber.Value()] : nil;
+
         [device readEventsWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
                                clusterID:[NSNumber numberWithUnsignedInteger:mClusterId]
                                  eventID:[NSNumber numberWithUnsignedInteger:mEventId]
+                                eventMin:eventMin
                                   params:params
                                    queue:callbackQueue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
@@ -297,6 +358,7 @@ public:
 
 protected:
     chip::Optional<bool> mFabricFiltered;
+    chip::Optional<chip::EventNumber> mEventNumber;
 
 private:
     chip::ClusterId mClusterId;

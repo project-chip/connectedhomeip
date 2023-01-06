@@ -332,10 +332,34 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
 - (void)readEventsWithEndpointID:(NSNumber * _Nullable)endpointID
                        clusterID:(NSNumber * _Nullable)clusterID
                          eventID:(NSNumber * _Nullable)eventID
+                        eventMin:(NSNumber * _Nullable)eventMin
                           params:(MTRReadParams * _Nullable)params
                            queue:(dispatch_queue_t)queue
                       completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
 
+/**
+ * Subscribes to the specified events on the device.
+ *
+ * Nil values for endpointID, clusterID, eventID indicate wildcards
+ * (e.g. nil eventID means "subscribe to all the events from the
+ * endpoint(s) and cluster(s) that match endpointID/clusterID").
+ *
+ * If all of endpointID, clusterID, eventID are non-nil, a single event
+ * will be subscribed to.
+ *
+ * If all of endpointID, clusterID, eventID are nil, all events on the
+ * device will be subscribed to.
+ */
+- (void)subscribeToEventsWithEndpointID:(NSNumber * _Nullable)endpointID
+                              clusterID:(NSNumber * _Nullable)clusterID
+                                eventID:(NSNumber * _Nullable)eventID
+                               eventMin:(NSNumber * _Nullable)eventMin
+                               isUrgent:(NSNumber * _Nullable)isUrgent
+                                 params:(MTRSubscribeParams * _Nullable)params
+                                  queue:(dispatch_queue_t)queue
+                          reportHandler:(MTRDeviceResponseHandler)reportHandler
+                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+    MTR_NEWLY_AVAILABLE;
 @end
 
 /**
