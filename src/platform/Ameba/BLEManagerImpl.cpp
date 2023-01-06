@@ -859,18 +859,11 @@ void BLEManagerImpl::HandleRXCharWrite(uint8_t * p_value, uint16_t len, uint8_t 
     buf->SetDataLength(len);
 
     // Post an event to the Chip queue to deliver the data into the Chip stack.
-    {
-        ChipDeviceEvent event;
-        event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
-        event.CHIPoBLEWriteReceived.ConId = (uint16_t) conn_id;
-        event.CHIPoBLEWriteReceived.Data  = std::move(buf).UnsafeRelease();
-        PlatformMgr().PostEventOrDie(&event);
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
-    }
+    ChipDeviceEvent event;
+    event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
+    event.CHIPoBLEWriteReceived.ConId = (uint16_t) conn_id;
+    event.CHIPoBLEWriteReceived.Data  = std::move(buf).UnsafeRelease();
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 #if defined(CONFIG_MATTER_BLEMGR_ADAPTER) && CONFIG_MATTER_BLEMGR_ADAPTER
@@ -878,9 +871,7 @@ CHIP_ERROR BLEManagerImpl::matter_blemgr_gap_connect_cb(uint8_t conn_id)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     err            = sInstance.HandleGAPConnect((uint16_t) conn_id);
-    SuccessOrExit(err);
 
-exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
@@ -897,9 +888,7 @@ CHIP_ERROR BLEManagerImpl::matter_blemgr_gap_disconnect_cb(uint8_t conn_id, uint
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     err            = sInstance.HandleGAPDisconnect((uint16_t) conn_id, disc_cause);
-    SuccessOrExit(err);
 
-exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
