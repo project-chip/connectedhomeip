@@ -219,4 +219,4 @@ The application supports common Matter shell commands. They are used to control
 the basic functionalities of the device.
 
 For more details visit:
-[Common shell commands](../README.md#chip-shell-command-details)
+[Common shell commands](../README.md#matter-shell-command-details)

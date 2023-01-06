@@ -73,5 +73,6 @@ external_content_link_prefixes = [
     "scripts/",
     "examples/android/",
     "examples/platform/",
+    "platform",
 ]
 external_content_link_extensions = [".md", ".png", ".jpg", ".svg"]

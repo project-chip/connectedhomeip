@@ -671,7 +671,7 @@ example, you can use the
 The ACL should contain information about all clusters that can be called by the
 light switch application. See the section about interacting with ZCL clusters in
 the
-[CHIP Tool's user guide](../../../docs/guides/chip_tool_guide.md#interacting-with-zcl-clusters)
+[CHIP Tool's user guide](../../../docs/guides/chip_tool_guide.md#interacting-with-data-model-clusters)
 for more information about ACLs.
 
 You can perform the binding process to a single remote endpoint (unicast
@@ -689,7 +689,7 @@ same Matter network.
 To perform the unicast binding process, complete the following steps:
 
 1.  Build the CHIP Tool according to the steps from the
-    [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md#building).
+    [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md#building-and-running-the-chip-tool).
 2.  Go to the CHIP Tool build directory.
 3.  Add an ACL to the development kit that is programmed with the
     [Lighting Application Example](../../lighting-app/nrfconnect/README.md) by
@@ -741,7 +741,7 @@ same Matter network.
 To perform the unicast binding process, complete the following steps:
 
 1.  Build the CHIP Tool according to the steps from the
-    [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md#building).
+    [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md#building-and-running-the-chip-tool).
 2.  Go to the CHIP Tool build directory.
 
 3.  Add the light switch device to the multicast group by running the following

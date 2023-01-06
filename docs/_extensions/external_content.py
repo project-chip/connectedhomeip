@@ -59,6 +59,7 @@ def adjust_includes(
     encoding: str,
     link_prefixes: List[str],
     extensions: List[str],
+    targets: List[Path],
     dstpath: Optional[Path] = None,
 ) -> None:
     """Adjust included content paths.
@@ -69,6 +70,7 @@ def adjust_includes(
         encoding: Sources encoding.
         link_prefixes: Prefixes of links that are made external.
         extensions: Filename extensions links to which are not made external.
+        targets: List of all files that are being copied.
         dstpath: Destination path for fname if its path is not the actual destination.
     """
 
@@ -81,6 +83,18 @@ def adjust_includes(
         # ignore absolute paths, section links, hyperlinks and same folder
         if path.startswith(("/", "#", "http", "www")) or not "/" in path:
             return path
+
+        # for files that are being copied modify reference to and out of /docs
+        filepath = path.split("#")[0]
+        absolute = (basepath / filepath).resolve()
+        if absolute in targets:
+            if "docs/" in path:
+                path = path.replace("docs/", "")
+            elif "../examples" in path:
+                path = path.replace("../", "", 1)
+            return path
+
+        # otherwise change links to point to their targets' original location
         return Path(os.path.relpath(basepath / path, dstpath)).as_posix()
 
     def _adjust_links(m):
@@ -99,12 +113,6 @@ def adjust_includes(
 
         return f"[{displayed}]({EXTERNAL_LINK_URL_PREFIX}{target})"
 
-    def _remove_section_links(m):
-        (file_link, path) = m.groups()
-        if path.startswith("http"):
-            return m.group(0)
-        return file_link + ")"
-
     def _adjust_image_link(m):
         prefix, fpath, postfix = m.groups()
         fpath_adj = _adjust_path(fpath)
@@ -120,10 +128,6 @@ def adjust_includes(
             r"\[([^\[\]]*)\]\s*\((?:\.\./)*((?:" + "|".join(link_prefixes) + r")[^)]*)\)",
             _adjust_external,
         ),
-
-        # Find links that lead to a section within another file and
-        # remove the section part of the link.
-        (r"(\[[^\[\]]*\]\s*\(([^)]*\.md))#.*\)", _remove_section_links),
 
         # Find links that lead to a non-presentable filetype and transform
         # it into an external link.
@@ -183,6 +187,8 @@ def sync_contents(app: Sphinx) -> None:
             else:
                 to_copy.append((src, prefix_src))
 
+    list_of_destinations = [f for f, _ in to_copy]
+
     for entry in to_copy:
         src, prefix_src = entry
         dst = (srcdir / src.relative_to(prefix_src)).resolve()
@@ -202,6 +208,7 @@ def sync_contents(app: Sphinx) -> None:
                 app.config.source_encoding,
                 app.config.external_content_link_prefixes,
                 app.config.external_content_link_extensions,
+                list_of_destinations,
             )
         # if origin file is modified only copy if different
         elif src.stat().st_mtime > dst.stat().st_mtime:
@@ -215,6 +222,7 @@ def sync_contents(app: Sphinx) -> None:
                     app.config.source_encoding,
                     app.config.external_content_link_prefixes,
                     app.config.external_content_link_extensions,
+                    list_of_destinations,
                     dstpath=dst.parent,
                 )
 
