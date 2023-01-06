@@ -11912,10 +11912,10 @@ void MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(
         response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     {
-        response.content = [NSData dataWithBytes:data.content.data() length:data.content.size()];
+        response.logContent = [NSData dataWithBytes:data.logContent.data() length:data.logContent.size()];
     }
     {
-        response.timeStamp = [NSNumber numberWithUnsignedInt:data.timeStamp];
+        response.utcTimeStamp = [NSNumber numberWithUnsignedInt:data.UTCTimeStamp];
     }
     {
         response.timeSinceBoot = [NSNumber numberWithUnsignedInt:data.timeSinceBoot];

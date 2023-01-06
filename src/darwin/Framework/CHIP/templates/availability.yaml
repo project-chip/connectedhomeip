@@ -4935,6 +4935,10 @@
           OnOff:
               OffWithEffect:
                   - effectIdentifier
+          DiagnosticLogs:
+              RetrieveLogsResponse:
+                  - logContent
+                  - utcTimeStamp
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -5246,6 +5250,10 @@
           OnOff:
               OffWithEffect:
                   - effectId
+          DiagnosticLogs:
+              RetrieveLogsResponse:
+                  - content
+                  - timeStamp
       structs:
           Descriptor:
               - DeviceType
@@ -5337,6 +5345,10 @@
           OnOff:
               OffWithEffect:
                   effectIdentifier: effectId
+          DiagnosticLogs:
+              RetrieveLogsResponse:
+                  logContent: content
+                  utcTimeStamp: timeStamp
       structs:
           AccessControl:
               AccessControlEntryStruct: AccessControlEntry

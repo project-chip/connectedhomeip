@@ -7571,8 +7571,8 @@ namespace RetrieveLogsResponse {
 enum class Fields
 {
     kStatus        = 0,
-    kContent       = 1,
-    kTimeStamp     = 2,
+    kLogContent    = 1,
+    kUTCTimeStamp  = 2,
     kTimeSinceBoot = 3,
 };
 
@@ -7584,8 +7584,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
 
     LogsStatus status = static_cast<LogsStatus>(0);
-    chip::ByteSpan content;
-    uint32_t timeStamp     = static_cast<uint32_t>(0);
+    chip::ByteSpan logContent;
+    uint32_t UTCTimeStamp  = static_cast<uint32_t>(0);
     uint32_t timeSinceBoot = static_cast<uint32_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -7602,8 +7602,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
 
     LogsStatus status = static_cast<LogsStatus>(0);
-    chip::ByteSpan content;
-    uint32_t timeStamp     = static_cast<uint32_t>(0);
+    chip::ByteSpan logContent;
+    uint32_t UTCTimeStamp  = static_cast<uint32_t>(0);
     uint32_t timeSinceBoot = static_cast<uint32_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

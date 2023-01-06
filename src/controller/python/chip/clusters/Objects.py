@@ -7151,14 +7151,14 @@ class DiagnosticLogs(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=DiagnosticLogs.Enums.LogsStatus),
-                            ClusterObjectFieldDescriptor(Label="content", Tag=1, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="timeStamp", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="logContent", Tag=1, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="UTCTimeStamp", Tag=2, Type=uint),
                             ClusterObjectFieldDescriptor(Label="timeSinceBoot", Tag=3, Type=uint),
                     ])
 
             status: 'DiagnosticLogs.Enums.LogsStatus' = 0
-            content: 'bytes' = b""
-            timeStamp: 'uint' = 0
+            logContent: 'bytes' = b""
+            UTCTimeStamp: 'uint' = 0
             timeSinceBoot: 'uint' = 0
 
 
