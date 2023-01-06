@@ -152,7 +152,7 @@ ClientMonitoringServer::UnregisterClientMonitoringCommand(CommandHandler * comma
         return InteractionModel::Status::Success;
     }
 
-    VerifyOrReturnError(err != CHIP_NO_ERROR, InteractionModel::Status::Failure);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, InteractionModel::Status::Failure);
 
     // Check if initiator has the token and the correct node id
     VerifyOrReturnError(table.GetClientRegistrationEntry().clientNodeId == commandData.clientNodeId,
