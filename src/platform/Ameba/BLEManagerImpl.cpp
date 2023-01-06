@@ -910,7 +910,8 @@ void BLEManagerImpl::matter_blemgr_rx_char_write_cb(uint8_t conn_id, uint8_t * p
 
 void BLEManagerImpl::matter_blemgr_tx_char_cccd_write_cb(uint8_t conn_id, uint8_t indicationsEnabled, uint8_t notificationsEnabled)
 {
-    sInstance.HandleTXCharCCCDWrite((int) conn_id, (int) indicationsEnabled, (int) notificationsEnabled);
+    sInstance.HandleTXCharCCCDWrite(static_cast<int>(conn_id), static_cast<int>(indicationsEnabled),
+                                    static_cast<int>(notificationsEnabled));
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
@@ -919,7 +920,7 @@ CHIP_ERROR BLEManagerImpl::matter_blemgr_tx_complete_cb(uint8_t conn_id)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = sInstance.HandleTXComplete((int) conn_id);
+    err = sInstance.HandleTXComplete(static_cast<int>(conn_id));
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
