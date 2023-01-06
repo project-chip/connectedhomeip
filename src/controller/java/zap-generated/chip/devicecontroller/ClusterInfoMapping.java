@@ -2783,11 +2783,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.SoftwareDiagnosticsClusterThreadMetrics> valueList) {
+    public void onSuccess(
+        List<ChipStructs.SoftwareDiagnosticsClusterThreadMetricsStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
-              "valueList", "List<ChipStructs.SoftwareDiagnosticsClusterThreadMetrics>");
+              "valueList", "List<ChipStructs.SoftwareDiagnosticsClusterThreadMetricsStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }

@@ -4620,8 +4620,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTRSoftwareDiagnosticsClusterThreadMetrics * newElement_0;
-                    newElement_0 = [MTRSoftwareDiagnosticsClusterThreadMetrics new];
+                    MTRSoftwareDiagnosticsClusterThreadMetricsStruct * newElement_0;
+                    newElement_0 = [MTRSoftwareDiagnosticsClusterThreadMetricsStruct new];
                     newElement_0.id = [NSNumber numberWithUnsignedLongLong:entry_0.id];
                     if (entry_0.name.HasValue()) {
                         newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.Value().data()

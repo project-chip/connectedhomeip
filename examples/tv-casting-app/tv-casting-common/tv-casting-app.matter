@@ -1117,7 +1117,7 @@ server cluster SoftwareDiagnostics = 52 {
     kWaterMarks = 0x1;
   }
 
-  struct ThreadMetrics {
+  struct ThreadMetricsStruct {
     int64u id = 0;
     optional char_string<8> name = 1;
     optional int32u stackFreeCurrent = 2;
@@ -1131,7 +1131,7 @@ server cluster SoftwareDiagnostics = 52 {
     optional OCTET_STRING faultRecording = 2;
   }
 
-  readonly attribute ThreadMetrics threadMetrics[] = 0;
+  readonly attribute ThreadMetricsStruct threadMetrics[] = 0;
   readonly attribute int64u currentHeapFree = 1;
   readonly attribute int64u currentHeapUsed = 2;
   readonly attribute int64u currentHeapHighWatermark = 3;

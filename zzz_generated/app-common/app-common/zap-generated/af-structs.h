@@ -554,15 +554,15 @@ typedef struct _ThreadInterfaceScanResult
     uint8_t LQI;
 } ThreadInterfaceScanResult;
 
-// Struct for ThreadMetrics
-typedef struct _ThreadMetrics
+// Struct for ThreadMetricsStruct
+typedef struct _ThreadMetricsStruct
 {
     uint64_t Id;
     chip::CharSpan Name;
     uint32_t StackFreeCurrent;
     uint32_t StackFreeMinimum;
     uint32_t StackSize;
-} ThreadMetrics;
+} ThreadMetricsStruct;
 
 // Struct for TimeZoneType
 typedef struct _TimeZoneType

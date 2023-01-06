@@ -4957,6 +4957,8 @@
           AccessControl:
               - AccessControlEntryStruct
               - AccessControlExtensionStruct
+          SoftwareDiagnostics:
+              - ThreadMetricsStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5034,6 +5036,13 @@
               AccessControlExtensionStruct:
                   - data
                   - fabricIndex
+          SoftwareDiagnostics:
+              ThreadMetricsStruct:
+                  - id
+                  - name
+                  - stackFreeCurrent
+                  - stackFreeMinimum
+                  - stackSize
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5264,6 +5273,8 @@
               - WiredFaultChangeType
               - BatFaultChangeType
               - BatChargeFaultChangeType
+          SoftwareDiagnostics:
+              - ThreadMetrics
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5353,6 +5364,8 @@
           AccessControl:
               AccessControlEntryStruct: AccessControlEntry
               AccessControlExtensionStruct: ExtensionEntry
+          SoftwareDiagnostics:
+              ThreadMetricsStruct: ThreadMetrics
       struct fields:
           Descriptor:
               DeviceTypeStruct:
