@@ -174,7 +174,7 @@ class TC_RR_1_1(MatterBaseTest):
         node_label = await self.read_single_attribute(client, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.BasicInformation.Attributes.NodeLabel)
         asserts.assert_equal(node_label, BEFORE_LABEL, "NodeLabel must match what was written")
 
-        # Step 3: Add 3 Access Control entries on DUT with a list of 4 Subjects and 3 Targets with the following parameters (...)
+        # Step 3: Add 4 Access Control entries on DUT with a list of 4 Subjects and 3 Targets with the following parameters (...)
         logging.info("Step 3: Fill ACL table so that all minimas are reached")
 
         for idx in range(num_fabrics_to_commission):
@@ -398,6 +398,11 @@ class TC_RR_1_1(MatterBaseTest):
         # - AuthMode field: CASE (2)
         # - Subjects field: [0x3000_0000_0000_0001, 0x3000_0000_0000_0002, 0x3000_0000_0000_0003, 0x3000_0000_0000_0004]
         # - Targets field: [{Cluster: 0xFFF1_FC40, DeviceType: 0xFFF1_FC20}, {Cluster: 0xFFF1_FC41, DeviceType: 0xFFF1_FC21}, {Cluster: 0xFFF1_FC02, DeviceType: 0xFFF1_FC42}]
+        # . struct
+        # - Privilege field: View (3)
+        # - AuthMode field: CASE (2)
+        # - Subjects field: [0x4000_0000_0000_0001, 0x4000_0000_0000_0002, 0x4000_0000_0000_0003, 0x4000_0000_0000_0004]
+        # - Targets field: [{Cluster: 0xFFF1_FC80, DeviceType: 0xFFF1_FC20}, {Cluster: 0xFFF1_FC81, DeviceType: 0xFFF1_FC21}, {Cluster: 0xFFF1_FC82, DeviceType: 0xFFF1_FC22}]
 
         # Administer ACL entry
         admin_subjects = [0xFFFF_FFFD_0001_0001, 0x2000_0000_0000_0001, 0x2000_0000_0000_0002, 0x2000_0000_0000_0003]
@@ -440,6 +445,20 @@ class TC_RR_1_1(MatterBaseTest):
                                                                                     subjects=operate_subjects,
                                                                                     targets=operate_targets)
         acl.append(operate_acl_entry)
+
+        # Operate ACL entry
+        view_subjects = [0x4000_0000_0000_0001, 0x4000_0000_0000_0002, 0x4000_0000_0000_0003, 0x4000_0000_0000_0004]
+        view_targets = [
+            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC80, deviceType=0xFFF1_BC20),
+            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC81, deviceType=0xFFF1_BC21),
+            Clusters.AccessControl.Structs.Target(cluster=0xFFF1_FC82, deviceType=0xFFF1_BC22)
+        ]
+
+        view_acl_entry = Clusters.AccessControl.Structs.AccessControlEntryStruct(privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+                                                                                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                                                                                    subjects=view_subjects,
+                                                                                    targets=view_targets)
+        acl.append(view_acl_entry)
 
         return acl
 
