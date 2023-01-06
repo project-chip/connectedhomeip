@@ -151,16 +151,15 @@ ClientMonitoringServer::UnregisterClientMonitoringCommand(CommandHandler * comma
         // Success if there was no key
         return InteractionModel::Status::Success;
     }
-    else if (err != CHIP_NO_ERROR)
-    {
-        return InteractionModel::Status::Failure;
-    }
+
+    VerifyOrReturnError(err != CHIP_NO_ERROR, InteractionModel::Status::Failure);
 
     // Check if initiator has the token and the correct node id
     VerifyOrReturnError(table.GetClientRegistrationEntry().clientNodeId == commandData.clientNodeId,
                         InteractionModel::Status::Failure);
     VerifyOrReturnError(table.GetClientRegistrationEntry().ICid == commandData.ICid, InteractionModel::Status::Failure);
 
+    // Delete Key from storage afters checks
     VerifyOrReturnError(table.DeleteFromStorage(fabric) == CHIP_NO_ERROR, InteractionModel::Status::Failure);
 
     return InteractionModel::Status::Success;
