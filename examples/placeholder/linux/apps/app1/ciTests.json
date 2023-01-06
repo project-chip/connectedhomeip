@@ -18,7 +18,13 @@
         "Test_TC_PSCFG_3_1_Simulated",
         "Test_TC_RH_3_1_Simulated",
         "Test_TC_SWTCH_3_1_Simulated",
-        "Test_TC_WNCV_5_1_Simulated"
+        "Test_TC_WNCV_5_1_Simulated",
+        "Test_TC_LCFG_3_1_Simulated",
+        "Test_TC_LUNIT_1_1_Simulated",
+        "Test_TC_LUNIT_2_1_Simulated",
+        "Test_TC_OCC_2_2_Simulated",
+        "Test_TC_OCC_2_4_Simulated",
+        "Test_TC_ULABEL_3_1_Simulated"
     ],
     "collection": ["Test"]
 }
