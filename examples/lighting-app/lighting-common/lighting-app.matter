@@ -1101,12 +1101,12 @@ server cluster WiFiNetworkDiagnostics = 54 {
   }
 
   enum WiFiVersionType : ENUM8 {
-    k80211a = 0;
-    k80211b = 1;
-    k80211g = 2;
-    k80211n = 3;
-    k80211ac = 4;
-    k80211ax = 5;
+    kA = 0;
+    kB = 1;
+    kG = 2;
+    kN = 3;
+    kAc = 4;
+    kAx = 5;
   }
 
   info event Disconnection = 0 {
