@@ -631,7 +631,7 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, Tag tag, uint64_
 
     if (IsSpecialTag(tag))
     {
-        if (tagNum <= kContextTagMaxNum)
+        if (tagNum <= Tag::kContextTagMaxNum)
         {
             if (mContainerType != kTLVType_Structure && mContainerType != kTLVType_List)
                 return CHIP_ERROR_INVALID_TLV_TAG;

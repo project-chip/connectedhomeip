@@ -17416,7 +17416,10 @@ typedef NS_ENUM(uint8_t, MTRPowerSourceBatChargeFault) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRPowerSourceBatChargeLevel) {
-    MTRPowerSourceBatChargeLevelOk API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
+    MTRPowerSourceBatChargeLevelOK MTR_NEWLY_AVAILABLE = 0x00,
+    MTRPowerSourceBatChargeLevelOk API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRPowerSourceBatChargeLevelOK")
+    = 0x00,
     MTRPowerSourceBatChargeLevelWarning API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
     MTRPowerSourceBatChargeLevelCritical API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
@@ -17519,10 +17522,22 @@ typedef NS_OPTIONS(uint32_t, MTRNetworkCommissioningFeature) {
 
 typedef NS_OPTIONS(uint8_t, MTRNetworkCommissioningWiFiSecurity) {
     MTRNetworkCommissioningWiFiSecurityUnencrypted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
-    MTRNetworkCommissioningWiFiSecurityWepPersonal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
-    MTRNetworkCommissioningWiFiSecurityWpaPersonal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x4,
-    MTRNetworkCommissioningWiFiSecurityWpa2Personal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x8,
-    MTRNetworkCommissioningWiFiSecurityWpa3Personal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x10,
+    MTRNetworkCommissioningWiFiSecurityWEP MTR_NEWLY_AVAILABLE = 0x2,
+    MTRNetworkCommissioningWiFiSecurityWepPersonal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRNetworkCommissioningWiFiSecurityWEP")
+    = 0x2,
+    MTRNetworkCommissioningWiFiSecurityWPAPersonal MTR_NEWLY_AVAILABLE = 0x4,
+    MTRNetworkCommissioningWiFiSecurityWpaPersonal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRNetworkCommissioningWiFiSecurityWPAPersonal")
+    = 0x4,
+    MTRNetworkCommissioningWiFiSecurityWPA2Personal MTR_NEWLY_AVAILABLE = 0x8,
+    MTRNetworkCommissioningWiFiSecurityWpa2Personal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRNetworkCommissioningWiFiSecurityWPA2Personal")
+    = 0x8,
+    MTRNetworkCommissioningWiFiSecurityWPA3Personal MTR_NEWLY_AVAILABLE = 0x10,
+    MTRNetworkCommissioningWiFiSecurityWpa3Personal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRNetworkCommissioningWiFiSecurityWPA3Personal")
+    = 0x10,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRDiagnosticLogsLogsIntent) {

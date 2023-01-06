@@ -59,6 +59,7 @@ static_library("chip-tool-utils") {
     "commands/common/Commands.h",
     "commands/common/CredentialIssuerCommands.h",
     "commands/common/HexConversion.h",
+    "commands/delay/SleepCommand.cpp",
     "commands/discover/DiscoverCommand.cpp",
     "commands/discover/DiscoverCommissionablesCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
