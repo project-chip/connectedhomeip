@@ -766,6 +766,14 @@ enum class SoftwareDiagnosticsFeature : uint32_t
 
 namespace ThreadNetworkDiagnostics {
 
+// Enum for ConnectionStatusEnum
+enum class ConnectionStatusEnum : uint8_t
+{
+    kConnected        = 0x00,
+    kNotConnected     = 0x01,
+    kUnknownEnumValue = 2,
+};
+
 // Enum for NetworkFault
 enum class NetworkFault : uint8_t
 {
@@ -795,14 +803,6 @@ enum class RoutingRole : uint8_t
 using RoutingRole                                                                      = EmberAfRoutingRole;
 static RoutingRole __attribute__((unused)) kRoutingRolekUnknownEnumValue               = static_cast<RoutingRole>(7);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-
-// Enum for ThreadConnectionStatus
-enum class ThreadConnectionStatus : uint8_t
-{
-    kConnected        = 0x00,
-    kNotConnected     = 0x01,
-    kUnknownEnumValue = 2,
-};
 
 // Bitmap for ThreadNetworkDiagnosticsFeature
 enum class ThreadNetworkDiagnosticsFeature : uint32_t

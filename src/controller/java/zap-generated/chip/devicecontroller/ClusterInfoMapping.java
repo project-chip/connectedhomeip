@@ -2504,17 +2504,19 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, byte[] content, Long timeStamp, Long timeSinceBoot) {
+    public void onSuccess(
+        Integer Status, byte[] LogContent, Long UTCTimeStamp, Long TimeSinceBoot) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
-      responseValues.put(statusResponseValue, status);
-      CommandResponseInfo contentResponseValue = new CommandResponseInfo("content", "byte[]");
-      responseValues.put(contentResponseValue, content);
-      CommandResponseInfo timeStampResponseValue = new CommandResponseInfo("timeStamp", "Long");
-      responseValues.put(timeStampResponseValue, timeStamp);
-      CommandResponseInfo timeSinceBootResponseValue =
-          new CommandResponseInfo("timeSinceBoot", "Long");
-      responseValues.put(timeSinceBootResponseValue, timeSinceBoot);
+      CommandResponseInfo StatusResponseValue = new CommandResponseInfo("Status", "Integer");
+      responseValues.put(StatusResponseValue, Status);
+      CommandResponseInfo LogContentResponseValue = new CommandResponseInfo("LogContent", "byte[]");
+      responseValues.put(LogContentResponseValue, LogContent);
+      CommandResponseInfo UTCTimeStampResponseValue =
+          new CommandResponseInfo("UTCTimeStamp", "Long");
+      responseValues.put(UTCTimeStampResponseValue, UTCTimeStamp);
+      CommandResponseInfo TimeSinceBootResponseValue =
+          new CommandResponseInfo("TimeSinceBoot", "Long");
+      responseValues.put(TimeSinceBootResponseValue, TimeSinceBoot);
       callback.onSuccess(responseValues);
     }
 
@@ -2781,11 +2783,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipStructs.SoftwareDiagnosticsClusterThreadMetrics> valueList) {
+    public void onSuccess(
+        List<ChipStructs.SoftwareDiagnosticsClusterThreadMetricsStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
-              "valueList", "List<ChipStructs.SoftwareDiagnosticsClusterThreadMetrics>");
+              "valueList", "List<ChipStructs.SoftwareDiagnosticsClusterThreadMetricsStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -2868,8 +2871,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedThreadNetworkDiagnosticsClusterNeighborTableListAttributeCallback
-      implements ChipClusters.ThreadNetworkDiagnosticsCluster.NeighborTableListAttributeCallback,
+  public static class DelegatedThreadNetworkDiagnosticsClusterNeighborTableAttributeCallback
+      implements ChipClusters.ThreadNetworkDiagnosticsCluster.NeighborTableAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -2895,8 +2898,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedThreadNetworkDiagnosticsClusterRouteTableListAttributeCallback
-      implements ChipClusters.ThreadNetworkDiagnosticsCluster.RouteTableListAttributeCallback,
+  public static class DelegatedThreadNetworkDiagnosticsClusterRouteTableAttributeCallback
+      implements ChipClusters.ThreadNetworkDiagnosticsCluster.RouteTableAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 

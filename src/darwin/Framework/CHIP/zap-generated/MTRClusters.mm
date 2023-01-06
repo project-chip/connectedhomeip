@@ -8426,19 +8426,19 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeNeighborTableListWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeNeighborTableWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableListID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableID)
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeRouteTableListWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeRouteTableWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableListID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableID)
                                              params:params];
 }
 
@@ -8959,6 +8959,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                  expectedValues:expectedValues
           expectedValueInterval:expectedValueIntervalMs
               completionHandler:completionHandler];
+}
+- (NSDictionary<NSString *, id> *)readAttributeNeighborTableListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributeNeighborTableWithParams:params];
+}
+- (NSDictionary<NSString *, id> *)readAttributeRouteTableListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributeRouteTableWithParams:params];
 }
 @end
 

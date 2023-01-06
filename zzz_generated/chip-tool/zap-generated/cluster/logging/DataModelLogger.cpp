@@ -2283,8 +2283,9 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3891,8 +3892,8 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("content", indent + 1, value.content));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("timeStamp", indent + 1, value.timeStamp));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("logContent", indent + 1, value.logContent));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("UTCTimeStamp", indent + 1, value.UTCTimeStamp));
     ReturnErrorOnFailure(DataModelLogger::LogValue("timeSinceBoot", indent + 1, value.timeSinceBoot));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
@@ -5678,7 +5679,8 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case SoftwareDiagnostics::Attributes::ThreadMetrics::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType>
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ThreadMetrics", 1, value);
@@ -5732,7 +5734,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ThreadNetworkDiagnostics::Attributes::Channel::Id: {
             chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("channel", 1, value);
+            return DataModelLogger::LogValue("Channel", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::RoutingRole::Id: {
             chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole> value;
@@ -5764,18 +5766,18 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OverrunCount", 1, value);
         }
-        case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id: {
+        case ThreadNetworkDiagnostics::Attributes::NeighborTable::Id: {
             chip::app::DataModel::DecodableList<
                 chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("NeighborTableList", 1, value);
+            return DataModelLogger::LogValue("NeighborTable", 1, value);
         }
-        case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id: {
+        case ThreadNetworkDiagnostics::Attributes::RouteTable::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("RouteTableList", 1, value);
+            return DataModelLogger::LogValue("RouteTable", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::PartitionId::Id: {
             chip::app::DataModel::Nullable<uint32_t> value;
@@ -5785,7 +5787,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ThreadNetworkDiagnostics::Attributes::Weighting::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("weighting", 1, value);
+            return DataModelLogger::LogValue("Weighting", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::DataVersion::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;

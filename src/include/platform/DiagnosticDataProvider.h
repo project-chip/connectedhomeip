@@ -45,7 +45,7 @@ constexpr size_t kMaxIPv6AddrCount = 8;
 
 using BootReasonType = app::Clusters::GeneralDiagnostics::BootReasonType;
 
-struct ThreadMetrics : public app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type
+struct ThreadMetrics : public app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::Type
 {
     char NameBuf[kMaxThreadNameLength + 1];
     ThreadMetrics * Next; /* Pointer to the next structure.  */

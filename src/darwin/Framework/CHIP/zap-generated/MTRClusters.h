@@ -1722,11 +1722,9 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (NSDictionary<NSString *, id> *)readAttributeOverrunCountWithParams:(MTRReadParams * _Nullable)params
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-- (NSDictionary<NSString *, id> *)readAttributeNeighborTableListWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeNeighborTableWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> *)readAttributeRouteTableListWithParams:(MTRReadParams * _Nullable)params
-    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+- (NSDictionary<NSString *, id> *)readAttributeRouteTableWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributePartitionIdWithParams:(MTRReadParams * _Nullable)params
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
@@ -7332,6 +7330,12 @@ MTR_NEWLY_DEPRECATED("Please use MTRClusterUnitTesting")
                     completionHandler:(MTRStatusCompletion)completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use resetCountsWithExpectedValues:expectedValueIntervalMs:completion:");
+- (NSDictionary<NSString *, id> *)readAttributeNeighborTableListWithParams:(MTRReadParams * _Nullable)params
+    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use readAttributeNeighborTableWithParams on MTRClusterThreadNetworkDiagnostics");
+- (NSDictionary<NSString *, id> *)readAttributeRouteTableListWithParams:(MTRReadParams * _Nullable)params
+    API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use readAttributeRouteTableWithParams on MTRClusterThreadNetworkDiagnostics");
 @end
 
 @interface MTRClusterWiFiNetworkDiagnostics (Deprecated)

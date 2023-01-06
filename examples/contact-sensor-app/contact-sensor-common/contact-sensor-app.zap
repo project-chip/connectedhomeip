@@ -2985,7 +2985,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "channel",
+              "name": "Channel",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -3097,7 +3097,7 @@
               "reportableChange": 0
             },
             {
-              "name": "NeighborTableList",
+              "name": "NeighborTable",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -3113,7 +3113,7 @@
               "reportableChange": 0
             },
             {
-              "name": "RouteTableList",
+              "name": "RouteTable",
               "code": 8,
               "mfgCode": null,
               "side": "server",
@@ -3145,7 +3145,7 @@
               "reportableChange": 0
             },
             {
-              "name": "weighting",
+              "name": "Weighting",
               "code": 10,
               "mfgCode": null,
               "side": "server",

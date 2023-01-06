@@ -4370,8 +4370,8 @@ void MTRGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::
 }
 
 void MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
-        value)
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4379,8 +4379,8 @@ void MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessFn
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
-            MTRSoftwareDiagnosticsClusterThreadMetrics * newElement_0;
-            newElement_0 = [MTRSoftwareDiagnosticsClusterThreadMetrics new];
+            MTRSoftwareDiagnosticsClusterThreadMetricsStruct * newElement_0;
+            newElement_0 = [MTRSoftwareDiagnosticsClusterThreadMetricsStruct new];
             newElement_0.id = [NSNumber numberWithUnsignedLongLong:entry_0.id];
             if (entry_0.name.HasValue()) {
                 newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.Value().data()
@@ -4545,7 +4545,7 @@ void MTRSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::OnSuccessFn(void * context,
+void MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & value)
 {
@@ -4591,7 +4591,7 @@ void MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::On
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -4606,7 +4606,7 @@ void MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscripti
     }
 }
 
-void MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::OnSuccessFn(void * context,
+void MTRThreadNetworkDiagnosticsRouteTableListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
         value)
 {
@@ -4640,7 +4640,7 @@ void MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRThreadNetworkDiagnosticsRouteTableListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -11912,10 +11912,10 @@ void MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(
         response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     {
-        response.content = [NSData dataWithBytes:data.content.data() length:data.content.size()];
+        response.logContent = [NSData dataWithBytes:data.logContent.data() length:data.logContent.size()];
     }
     {
-        response.timeStamp = [NSNumber numberWithUnsignedInt:data.timeStamp];
+        response.utcTimeStamp = [NSNumber numberWithUnsignedInt:data.UTCTimeStamp];
     }
     {
         response.timeSinceBoot = [NSNumber numberWithUnsignedInt:data.timeSinceBoot];
@@ -15309,6 +15309,56 @@ void MTRNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscrip
     }
 }
 
+void MTRThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
 void MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault value)
 {
@@ -15395,57 +15445,6 @@ void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridg
 };
 
 void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::ThreadConnectionStatus value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
-{
-    if (!mQueue) {
-        return;
-    }
-
-    if (mEstablishedHandler != nil) {
-        dispatch_async(mQueue, mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        mEstablishedHandler = nil;
-    }
-}
-
-void MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::ThreadConnectionStatus> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

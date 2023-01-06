@@ -1055,10 +1055,10 @@ public final class ChipIdLookup {
         return "OverrunCount";
       }
       if (attributeId == 7L) {
-        return "NeighborTableList";
+        return "NeighborTable";
       }
       if (attributeId == 8L) {
-        return "RouteTableList";
+        return "RouteTable";
       }
       if (attributeId == 9L) {
         return "PartitionId";

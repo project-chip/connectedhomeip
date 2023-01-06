@@ -678,14 +678,14 @@ public class ChipStructs {
     }
   }
 
-  public static class SoftwareDiagnosticsClusterThreadMetrics {
+  public static class SoftwareDiagnosticsClusterThreadMetricsStruct {
     public Long id;
     public Optional<String> name;
     public Optional<Long> stackFreeCurrent;
     public Optional<Long> stackFreeMinimum;
     public Optional<Long> stackSize;
 
-    public SoftwareDiagnosticsClusterThreadMetrics(
+    public SoftwareDiagnosticsClusterThreadMetricsStruct(
         Long id,
         Optional<String> name,
         Optional<Long> stackFreeCurrent,
@@ -701,7 +701,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("SoftwareDiagnosticsClusterThreadMetrics {\n");
+      output.append("SoftwareDiagnosticsClusterThreadMetricsStruct {\n");
       output.append("\tid: ");
       output.append(id);
       output.append("\n");
