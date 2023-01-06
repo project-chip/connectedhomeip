@@ -25,6 +25,7 @@ config CHIP_DEVICE_VENDOR_NAME
 config CHIP_APP_LOG_LEVEL
 	int "Set logging level in application"
 	default LOG_DEFAULT_LEVEL
+	depends on LOG
 	help
 	  Sets the logging level in Matter application. 
 	  This config should be used only within application.

@@ -21,27 +21,20 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "ButtonManager.h"
-#include <app/server/OnboardingCodesUtil.h>
-#include <app/server/Server.h>
-
-#include <DeviceInfoProviderImpl.h>
 
 #include "ThreadUtil.h"
 
+#include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
+#include <app/util/af-enums.h>
 #include <app/util/attribute-storage.h>
-
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-
-#include <platform/CHIPDeviceLayer.h>
-
-#include <lib/support/ErrorStr.h>
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <setup_payload/SetupPayload.h>
-#include <system/SystemClock.h>
 
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include "OTAUtil.h"
@@ -50,23 +43,33 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/zephyr.h>
 
-#include <algorithm>
-
 LOG_MODULE_DECLARE(app);
 
+using namespace ::chip;
+using namespace ::chip::app;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
+
 namespace {
+
 constexpr int kFactoryResetTriggerTimeout = 2000;
 constexpr int kAppEventQueueSize          = 10;
 constexpr uint8_t kButtonPushEvent        = 1;
 constexpr uint8_t kButtonReleaseEvent     = 0;
 
+// NOTE! This key is for test/certification only and should not be available in production devices!
+// If CONFIG_CHIP_FACTORY_DATA is enabled, this value is read from the factory data.
+uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 k_timer sFactoryResetTimer;
 
 LEDWidget sStatusLED;
+LEDWidget sContactSensorLED;
 
 Button sFactoryResetButton;
-Button sThreadStartButton;
+Button sToggleContactStateButton;
 Button sBleAdvStartButton;
 
 bool sIsThreadProvisioned       = false;
@@ -110,11 +113,6 @@ Identify sIdentify = {
 
 } // namespace
 
-using namespace chip;
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
-using namespace ::chip::DeviceLayer::Internal;
-
 AppTask AppTask::sAppTask;
 
 class AppFabricTableDelegate : public FabricTable::Delegate
@@ -128,11 +126,9 @@ class AppFabricTableDelegate : public FabricTable::Delegate
     }
 };
 
-constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
-
 CHIP_ERROR AppTask::Init()
 {
-    CHIP_ERROR ret;
+    CHIP_ERROR err;
 
     LOG_INF("SW Version: %u, %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
@@ -143,26 +139,42 @@ CHIP_ERROR AppTask::Init()
 
     UpdateStatusLED();
 
+    sContactSensorLED.Init(CONTACT_STATE_LED_PIN);
+    sContactSensorLED.Set(ContactSensorMgr().IsContactClosed());
+
+    UpdateDeviceState();
+
     InitButtons();
 
     // Initialize function button timer
     k_timer_init(&sFactoryResetTimer, &AppTask::FactoryResetTimerTimeoutCallback, nullptr);
     k_timer_user_data_set(&sFactoryResetTimer, this);
 
-    // Init ZCL Data Model and start server
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Server::GetInstance().Init(initParams);
-
-    // We only have network commissioning on endpoint 0.
-    // Set up a valid Network Commissioning cluster on endpoint 0 is done in
-    // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp
-    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
-
-    // Initialize device attestation config
+    // Initialize CHIP server
+#if CONFIG_CHIP_FACTORY_DATA
+    ReturnErrorOnFailure(mFactoryDataProvider.Init());
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+    SetCommissionableDataProvider(&mFactoryDataProvider);
+    // Read EnableKey from the factory data.
+    MutableByteSpan enableKey(sTestEventTriggerEnableKey);
+    err = mFactoryDataProvider.GetEnableKey(enableKey);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("GetEnableKey fail");
+        memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
+    }
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
 
-    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
+    static CommonCaseDeviceServerInitParams initParams;
+    // static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    // initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+    ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
 #if CONFIG_CHIP_OTA_REQUESTOR
@@ -177,24 +189,48 @@ CHIP_ERROR AppTask::Init()
     // between the main and the CHIP threads.
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
-    ret = ConnectivityMgr().SetBLEDeviceName("TelinkOTAReq");
-    if (ret != CHIP_NO_ERROR)
+    ContactSensorMgr().SetCallback(OnStateChanged);
+
+    err = ConnectivityMgr().SetBLEDeviceName("TelinkSensor");
+    if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("SetBLEDeviceName fail");
-        return ret;
+        return err;
     }
 
-    ret = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(new AppFabricTableDelegate);
-    if (ret != CHIP_NO_ERROR)
+    err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(new AppFabricTableDelegate);
+    if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("AppFabricTableDelegate fail");
-        return ret;
+        return err;
     }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AppTask::StartApp()
+void AppTask::OnStateChanged(ContactSensorManager::State aState)
+{
+    // If the contact state was changed, update LED state and cluster state (only if button was pressed).
+    //  - turn on the contact LED if contact sensor is in closed state.
+    //  - turn off the lock LED if contact sensor is in opened state.
+    if (ContactSensorManager::State::kContactClosed == aState)
+    {
+        LOG_INF("Contact state changed to CLOSED");
+        sContactSensorLED.Set(true);
+    }
+    else if (ContactSensorManager::State::kContactOpened == aState)
+    {
+        LOG_INF("Contact state changed to OPEN");
+        sContactSensorLED.Set(false);
+    }
+
+    if (sAppTask.IsSyncClusterToButtonAction())
+    {
+        sAppTask.UpdateClusterState();
+    }
+}
+
+CHIP_ERROR AppTask::StartApp(void)
 {
     CHIP_ERROR err = Init();
 
@@ -216,6 +252,27 @@ CHIP_ERROR AppTask::StartApp()
             ret = k_msgq_get(&sAppEventQueue, &event, K_NO_WAIT);
         }
     }
+}
+
+void AppTask::PostContactActionRequest(ContactSensorManager::Action aAction)
+{
+    AppEvent event;
+    event.Type                = AppEvent::kEventType_Contact;
+    event.ContactEvent.Action = static_cast<uint8_t>(aAction);
+    event.Handler             = ContactActionEventHandler;
+
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::ToggleContactStateButtonEventHandler(void)
+{
+    AppEvent event;
+
+    event.Type               = AppEvent::kEventType_Button;
+    event.ButtonEvent.Action = kButtonPushEvent;
+    event.Handler            = ContactActionEventHandler;
+
+    sAppTask.PostEvent(&event);
 }
 
 void AppTask::FactoryResetButtonEventHandler(void)
@@ -242,29 +299,54 @@ void AppTask::FactoryResetHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::StartThreadButtonEventHandler(void)
+void AppTask::UpdateClusterStateInternal(intptr_t arg)
 {
-    AppEvent event;
+    uint8_t newValue = ContactSensorMgr().IsContactClosed();
 
-    event.Type               = AppEvent::kEventType_Button;
-    event.ButtonEvent.Action = kButtonPushEvent;
-    event.Handler            = StartThreadHandler;
-    sAppTask.PostEvent(&event);
+    ChipLogProgress(NotSpecified, "emberAfWriteAttribute : %d", newValue);
+
+    // write the new boolean state value
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_BOOLEAN_STATE_CLUSTER_ID, ZCL_STATE_VALUE_ATTRIBUTE_ID,
+                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: updating boolean status value %x", status);
+    }
 }
 
-void AppTask::StartThreadHandler(AppEvent * aEvent)
+void AppTask::ContactActionEventHandler(AppEvent * aEvent)
 {
-    LOG_INF("StartThreadHandler");
-    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    ContactSensorManager::Action action = ContactSensorManager::Action::kInvalid;
+    CHIP_ERROR err                      = CHIP_NO_ERROR;
+
+    ChipLogProgress(NotSpecified, "ContactActionEventHandler");
+
+    if (aEvent->Type == AppEvent::kEventType_Contact)
     {
-        // Switch context from BLE to Thread
-        BLEManagerImpl sInstance;
-        sInstance.SwitchToIeee802154();
-        StartDefaultThreadNetwork();
+        action = static_cast<ContactSensorManager::Action>(aEvent->ContactEvent.Action);
+    }
+    else if (aEvent->Type == AppEvent::kEventType_Button)
+    {
+        if (ContactSensorMgr().IsContactClosed())
+        {
+            action = ContactSensorManager::Action::kSignalLost;
+        }
+        else
+        {
+            action = ContactSensorManager::Action::kSignalDetected;
+        }
+
+        sAppTask.SetSyncClusterToButtonAction(true);
     }
     else
     {
-        LOG_INF("Device already commissioned");
+        err    = APP_ERROR_UNHANDLED_EVENT;
+        action = ContactSensorManager::Action::kInvalid;
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        ContactSensorMgr().InitiateAction(action);
     }
 }
 
@@ -318,7 +400,7 @@ void AppTask::LEDStateUpdateHandler(LEDWidget * ledWidget)
     sAppTask.PostEvent(&event);
 }
 
-void AppTask::UpdateStatusLED()
+void AppTask::UpdateStatusLED(void)
 {
     if (sIsThreadProvisioned && sIsThreadEnabled)
     {
@@ -364,10 +446,6 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
     }
 }
 
-void AppTask::ActionInitiated(AppTask::Action_t aAction, int32_t aActor) {}
-
-void AppTask::ActionCompleted(AppTask::Action_t aAction, int32_t aActor) {}
-
 void AppTask::PostEvent(AppEvent * aEvent)
 {
     if (k_msgq_put(&sAppEventQueue, aEvent, K_NO_WAIT) != 0)
@@ -386,6 +464,11 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     {
         LOG_INF("Dropping event without handler");
     }
+}
+
+void AppTask::UpdateClusterState(void)
+{
+    PlatformMgr().ScheduleWork(UpdateClusterStateInternal, 0);
 }
 
 void AppTask::FactoryResetTimerTimeoutCallback(k_timer * timer)
@@ -416,10 +499,26 @@ void AppTask::FactoryResetTimerEventHandler(AppEvent * aEvent)
 void AppTask::InitButtons(void)
 {
     sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, true, FactoryResetButtonEventHandler);
-    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, false, StartThreadButtonEventHandler);
+    sToggleContactStateButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, false, ToggleContactStateButtonEventHandler);
     sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, false, StartBleAdvButtonEventHandler);
 
     ButtonManagerInst().AddButton(sFactoryResetButton);
-    ButtonManagerInst().AddButton(sThreadStartButton);
+    ButtonManagerInst().AddButton(sToggleContactStateButton);
     ButtonManagerInst().AddButton(sBleAdvStartButton);
+}
+
+void AppTask::UpdateDeviceState(void)
+{
+    PlatformMgr().ScheduleWork(UpdateDeviceStateInternal, 0);
+}
+
+void AppTask::UpdateDeviceStateInternal(intptr_t arg)
+{
+    bool stateValueAttrValue = 0;
+
+    /* get boolean state attribute value */
+    (void) emberAfReadAttribute(1, ZCL_BOOLEAN_STATE_CLUSTER_ID, ZCL_STATE_VALUE_ATTRIBUTE_ID, (uint8_t *) &stateValueAttrValue, 1);
+
+    ChipLogProgress(NotSpecified, "emberAfReadAttribute : %d", stateValueAttrValue);
+    sContactSensorLED.Set(stateValueAttrValue);
 }

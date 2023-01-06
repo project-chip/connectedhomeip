@@ -35,8 +35,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            # TODO: update this to connectedhomeip/chip-build-vscode:0.6.27 once we can compile
-            image: connectedhomeip/chip-build-telink:0.6.18
+            image: connectedhomeip/chip-build-telink:0.6.27
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -74,6 +73,15 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d all-clusters-minimal-app \
                     out/telink-tlsr9518adk80d-all-clusters-minimal/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: Build example Telink Contact Sensor App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-contact-sensor' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9518adk80d contact-sensor-app \
+                    out/telink-tlsr9518adk80d-contact-sensor/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: Build example Telink Lighting App

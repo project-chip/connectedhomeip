@@ -18,41 +18,20 @@
 
 #pragma once
 
-#include <cstdint>
+// ---- Contact Sensor Example App Config ----
 
-struct AppEvent;
-typedef void (*EventHandler)(AppEvent *);
+// Buttons config
+#define BUTTON_PORT DEVICE_DT_GET(DT_NODELABEL(gpioc))
 
-class LEDWidget;
+#define BUTTON_PIN_1 2
+#define BUTTON_PIN_3 3
+#define BUTTON_PIN_4 1
+#define BUTTON_PIN_2 0
 
-struct AppEvent
-{
-    enum AppEventTypes
-    {
-        kEventType_Button = 0,
-        kEventType_Timer,
-        kEventType_UpdateLedState,
-        kEventType_Thermostat,
-        kEventType_Install,
-    };
+// LEDs config
+// System led config
+#define SYSTEM_STATE_LED_PORT DEVICE_DT_GET(DT_NODELABEL(gpiob))
+#define SYSTEM_STATE_LED_PIN 7
 
-    uint16_t Type;
-
-    union
-    {
-        struct
-        {
-            uint8_t Action;
-        } ButtonEvent;
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-        struct
-        {
-            LEDWidget * LedWidget;
-        } UpdateLedStateEvent;
-    };
-
-    EventHandler Handler;
-};
+// Contact state led
+#define CONTACT_STATE_LED_PIN 4
