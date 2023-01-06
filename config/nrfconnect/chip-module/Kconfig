@@ -143,13 +143,13 @@ choice CHIP_FACTORY_DATA_CERT_SOURCE
 	config CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
 		bool "Use pre-generated development certificates"
 		help
-	        Use pre-generated certificate files from the credentials/development/attestation/
-	        directory that match the configured Product ID. This can be used for development
+			Use pre-generated certificate files from the credentials/development/attestation/
+			directory that match the configured Product ID. This can be used for development
 			purpose.
 	config CHIP_FACTORY_DATA_CERT_SOURCE_GENERATED
 		bool "Auto-generate certificates"
 		help
-	        Generate new certificates instead of using pre-generated ones.
+			Generate new certificates instead of using pre-generated ones.
 			The certificates are generated on every build.
 	config CHIP_FACTORY_DATA_CERT_SOURCE_USER
 		bool "Use user-provided certificate files"
