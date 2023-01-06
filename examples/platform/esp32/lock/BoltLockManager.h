@@ -23,8 +23,8 @@
 
 #include "AppEvent.h"
 
-#include "FreeRTOS.h"
-#include "timers.h" // provides FreeRTOS timer support
+#include "freertos/FreeRTOS.h"
+#include "freertos/timers.h" // provides FreeRTOS timer support
 
 #include <lib/core/CHIPError.h>
 
@@ -130,6 +130,7 @@ public:
         kState_UnlockCompleted,
     } State;
 
+    CHIP_ERROR InitLockState();
     CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
                     ESP32DoorLock::LockInitParams::LockParam lockParam);
     bool IsUnlocked();

@@ -20,8 +20,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "AppEvent.h"
-#include "BoltLockManager.h"
+#include <lock/AppEvent.h>
+#include <lock/BoltLockManager.h>
 
 #include "freertos/FreeRTOS.h"
 #include <ble/BLEEndPoint.h>
@@ -36,6 +36,7 @@
 #define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
 #define APP_ERROR_ALLOCATION_FAILED CHIP_APPLICATION_ERROR(0x07)
+
 
 class AppTask
 {

@@ -18,8 +18,7 @@
 #pragma once
 
 #include <stdint.h>
-
-#include "AppConfig.h"
+#include "driver/gpio.h"
 #include "AppTask.h"
 #include "freertos/FreeRTOS.h"
 
