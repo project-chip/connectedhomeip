@@ -9809,7 +9809,7 @@ class EthernetNetworkDiagnostics(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="PHYRate", Tag=0x00000000, Type=typing.Union[None, Nullable, EthernetNetworkDiagnostics.Enums.PHYRateType]),
+                ClusterObjectFieldDescriptor(Label="PHYRate", Tag=0x00000000, Type=typing.Union[None, Nullable, EthernetNetworkDiagnostics.Enums.PHYRate]),
                 ClusterObjectFieldDescriptor(Label="fullDuplex", Tag=0x00000001, Type=typing.Union[None, Nullable, bool]),
                 ClusterObjectFieldDescriptor(Label="packetRxCount", Tag=0x00000002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="packetTxCount", Tag=0x00000003, Type=typing.Optional[uint]),
@@ -9825,7 +9825,7 @@ class EthernetNetworkDiagnostics(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    PHYRate: 'typing.Union[None, Nullable, EthernetNetworkDiagnostics.Enums.PHYRateType]' = None
+    PHYRate: 'typing.Union[None, Nullable, EthernetNetworkDiagnostics.Enums.PHYRate]' = None
     fullDuplex: 'typing.Union[None, Nullable, bool]' = None
     packetRxCount: 'typing.Optional[uint]' = None
     packetTxCount: 'typing.Optional[uint]' = None
@@ -9841,17 +9841,17 @@ class EthernetNetworkDiagnostics(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class PHYRateType(IntEnum):
-            k10m = 0x00
-            k100m = 0x01
-            k1000m = 0x02
-            k25g = 0x03
-            k5g = 0x04
-            k10g = 0x05
-            k40g = 0x06
-            k100g = 0x07
-            k200g = 0x08
-            k400g = 0x09
+        class PHYRate(IntEnum):
+            kRate10M = 0x00
+            kRate100M = 0x01
+            kRate1G = 0x02
+            kRate25g = 0x03
+            kRate5G = 0x04
+            kRate10G = 0x05
+            kRate40G = 0x06
+            kRate100G = 0x07
+            kRate200G = 0x08
+            kRate400G = 0x09
 
 
 
@@ -9884,9 +9884,9 @@ class EthernetNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, EthernetNetworkDiagnostics.Enums.PHYRateType])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, EthernetNetworkDiagnostics.Enums.PHYRate])
 
-            value: 'typing.Union[None, Nullable, EthernetNetworkDiagnostics.Enums.PHYRateType]' = None
+            value: 'typing.Union[None, Nullable, EthernetNetworkDiagnostics.Enums.PHYRate]' = None
 
         @dataclass
         class FullDuplex(ClusterAttributeDescriptor):

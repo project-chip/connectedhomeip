@@ -1138,20 +1138,20 @@ server cluster WiFiNetworkDiagnostics = 54 {
 }
 
 server cluster EthernetNetworkDiagnostics = 55 {
-  enum PHYRateType : ENUM8 {
-    k10m = 0;
-    k100m = 1;
-    k1000m = 2;
-    k25g = 3;
-    k5g = 4;
-    k10g = 5;
-    k40g = 6;
-    k100g = 7;
-    k200g = 8;
-    k400g = 9;
+  enum PHYRate : ENUM8 {
+    kRate10M = 0;
+    kRate100M = 1;
+    kRate1G = 2;
+    kRate25g = 3;
+    kRate5G = 4;
+    kRate10G = 5;
+    kRate40G = 6;
+    kRate100G = 7;
+    kRate200G = 8;
+    kRate400G = 9;
   }
 
-  readonly attribute nullable PHYRateType PHYRate = 0;
+  readonly attribute nullable PHYRate PHYRate = 0;
   readonly attribute nullable boolean fullDuplex = 1;
   readonly attribute int64u packetRxCount = 2;
   readonly attribute int64u packetTxCount = 3;

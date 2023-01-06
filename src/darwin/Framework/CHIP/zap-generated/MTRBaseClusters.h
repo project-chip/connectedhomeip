@@ -17708,18 +17708,52 @@ typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsWiFiVersionType) {
     = 0x05,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTREthernetNetworkDiagnosticsPHYRate) {
+    MTREthernetNetworkDiagnosticsPHYRateRate10M MTR_NEWLY_AVAILABLE = 0x00,
+    MTREthernetNetworkDiagnosticsPHYRateRate100M MTR_NEWLY_AVAILABLE = 0x01,
+    MTREthernetNetworkDiagnosticsPHYRateRate1G MTR_NEWLY_AVAILABLE = 0x02,
+    MTREthernetNetworkDiagnosticsPHYRateRate25G MTR_NEWLY_AVAILABLE = 0x03,
+    MTREthernetNetworkDiagnosticsPHYRateRate5G MTR_NEWLY_AVAILABLE = 0x04,
+    MTREthernetNetworkDiagnosticsPHYRateRate10G MTR_NEWLY_AVAILABLE = 0x05,
+    MTREthernetNetworkDiagnosticsPHYRateRate40G MTR_NEWLY_AVAILABLE = 0x06,
+    MTREthernetNetworkDiagnosticsPHYRateRate100G MTR_NEWLY_AVAILABLE = 0x07,
+    MTREthernetNetworkDiagnosticsPHYRateRate200G MTR_NEWLY_AVAILABLE = 0x08,
+    MTREthernetNetworkDiagnosticsPHYRateRate400G MTR_NEWLY_AVAILABLE = 0x09,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTREthernetNetworkDiagnosticsPHYRateType) {
-    MTREthernetNetworkDiagnosticsPHYRateType10M API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTREthernetNetworkDiagnosticsPHYRateType100M API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTREthernetNetworkDiagnosticsPHYRateType1000M API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTREthernetNetworkDiagnosticsPHYRateType25G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTREthernetNetworkDiagnosticsPHYRateType5G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTREthernetNetworkDiagnosticsPHYRateType10G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
-    MTREthernetNetworkDiagnosticsPHYRateType40G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
-    MTREthernetNetworkDiagnosticsPHYRateType100G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x07,
-    MTREthernetNetworkDiagnosticsPHYRateType200G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x08,
-    MTREthernetNetworkDiagnosticsPHYRateType400G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x09,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTREthernetNetworkDiagnosticsPHYRateType10M API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate10M")
+    = 0x00,
+    MTREthernetNetworkDiagnosticsPHYRateType100M API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate100M")
+    = 0x01,
+    MTREthernetNetworkDiagnosticsPHYRateType1000M API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate1G")
+    = 0x02,
+    MTREthernetNetworkDiagnosticsPHYRateType25G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate25G")
+    = 0x03,
+    MTREthernetNetworkDiagnosticsPHYRateType5G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate5G")
+    = 0x04,
+    MTREthernetNetworkDiagnosticsPHYRateType10G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate10G")
+    = 0x05,
+    MTREthernetNetworkDiagnosticsPHYRateType40G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate40G")
+    = 0x06,
+    MTREthernetNetworkDiagnosticsPHYRateType100G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate100G")
+    = 0x07,
+    MTREthernetNetworkDiagnosticsPHYRateType200G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate200G")
+    = 0x08,
+    MTREthernetNetworkDiagnosticsPHYRateType400G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate400G")
+    = 0x09,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRate");
 
 typedef NS_ENUM(uint8_t, MTRTimeSynchronizationGranularity) {
     MTRTimeSynchronizationGranularityNoTimeGranularity API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,

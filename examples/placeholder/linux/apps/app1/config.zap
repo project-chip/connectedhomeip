@@ -2785,7 +2785,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "PHYRateType",
+              "type": "PHYRate",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,

@@ -5127,6 +5127,8 @@
               - AccessControlEntryAuthModeEnum
           ThreadNetworkDiagnostics:
               - ConnectionStatusEnum
+          EthernetNetworkDiagnostics:
+              - PHYRate
       enum values:
           OTASoftwareUpdateProvider:
               OTAApplyUpdateAction:
@@ -5199,6 +5201,18 @@
                   - N
                   - Ac
                   - Ax
+          EthernetNetworkDiagnostics:
+              PHYRate:
+                  - Rate10M
+                  - Rate100M
+                  - Rate1G
+                  - Rate25G
+                  - Rate5G
+                  - Rate10G
+                  - Rate40G
+                  - Rate100G
+                  - Rate200G
+                  - Rate400G
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5315,6 +5329,8 @@
               - AuthMode
           ThreadNetworkDiagnostics:
               - ThreadConnectionStatus
+          EthernetNetworkDiagnostics:
+              - PHYRateType
       enum values:
           GeneralCommissioning:
               CommissioningError:
@@ -5344,6 +5360,33 @@
       commands:
           BasicInformation:
               - MfgSpecificPing
+      enum values:
+          EthernetNetworkDiagnostics:
+              # Both the enum and the values got renamed, so don't output the
+              # new values with the old enum name or the old values with the
+              # new enum name.
+              PHYRateType:
+                  - Rate10M
+                  - Rate100M
+                  - Rate1G
+                  - Rate25G
+                  - Rate5G
+                  - Rate10G
+                  - Rate40G
+                  - Rate100G
+                  - Rate200G
+                  - Rate400G
+              PHYRate:
+                  - 10M
+                  - 100M
+                  - 1000M
+                  - 25G
+                  - 5G
+                  - 10G
+                  - 40G
+                  - 100G
+                  - 200G
+                  - 400G
   renames:
       clusters:
           UnitTesting: TestCluster
@@ -5422,6 +5465,8 @@
               AccessControlEntryAuthModeEnum: AuthMode
           ThreadNetworkDiagnostics:
               ConnectionStatusEnum: ThreadConnectionStatus
+          EthernetNetworkDiagnostics:
+              PHYRate: PHYRateType
       enum values:
           GeneralCommissioning:
               CommissioningError:
@@ -5437,6 +5482,29 @@
                   N: 80211n
                   Ac: 80211ac
                   Ax: 80211ax
+          EthernetNetworkDiagnostics:
+              PHYRate:
+                  Rate10M: 10M
+                  Rate100M: 100M
+                  Rate1G: 1000M
+                  Rate25G: 25G
+                  Rate5G: 5G
+                  Rate10G: 10G
+                  Rate40G: 40G
+                  Rate100G: 100G
+                  Rate200G: 200G
+                  Rate400G: 400G
+              PHYRateType:
+                  Rate10M: 10M
+                  Rate100M: 100M
+                  Rate1G: 1000M
+                  Rate25G: 25G
+                  Rate5G: 5G
+                  Rate10G: 10G
+                  Rate40G: 40G
+                  Rate100G: 100G
+                  Rate200G: 200G
+                  Rate400G: 400G
       bitmap values:
           NetworkCommissioning:
               WiFiSecurity:
