@@ -8,6 +8,9 @@
         "templates/app/helper.js",
         "templates/chip/helper.js"
     ],
+    "resources": {
+        "weak-enum-list": "weak-enum-list.yaml"
+    },
     "override": "../../zap-templates/common/override.js",
     "partials": [
         {

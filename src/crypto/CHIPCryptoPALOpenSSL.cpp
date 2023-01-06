@@ -2045,5 +2045,65 @@ exit:
     return err;
 }
 
+CHIP_ERROR ReplaceCertIfResignedCertFound(const ByteSpan & referenceCertificate, const ByteSpan * candidateCertificates,
+                                          size_t candidateCertificatesCount, ByteSpan & outCertificate)
+{
+    CHIP_ERROR err                        = CHIP_NO_ERROR;
+    X509 * x509ReferenceCertificate       = nullptr;
+    X509 * x509CandidateCertificate       = nullptr;
+    const uint8_t * pReferenceCertificate = referenceCertificate.data();
+    X509_NAME * referenceSubject          = nullptr;
+    X509_NAME * candidateSubject          = nullptr;
+    uint8_t referenceSKIDBuf[kSubjectKeyIdentifierLength];
+    uint8_t candidateSKIDBuf[kSubjectKeyIdentifierLength];
+    MutableByteSpan referenceSKID(referenceSKIDBuf);
+    MutableByteSpan candidateSKID(candidateSKIDBuf);
+
+    ReturnErrorCodeIf(referenceCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    outCertificate = referenceCertificate;
+
+    ReturnErrorCodeIf(candidateCertificates == nullptr || candidateCertificatesCount == 0, CHIP_NO_ERROR);
+
+    ReturnErrorOnFailure(ExtractSKIDFromX509Cert(referenceCertificate, referenceSKID));
+
+    x509ReferenceCertificate = d2i_X509(nullptr, &pReferenceCertificate, static_cast<long>(referenceCertificate.size()));
+    VerifyOrExit(x509ReferenceCertificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    referenceSubject = X509_get_subject_name(x509ReferenceCertificate);
+    VerifyOrExit(referenceSubject != nullptr, err = CHIP_ERROR_INTERNAL);
+
+    for (size_t i = 0; i < candidateCertificatesCount; i++)
+    {
+        const ByteSpan candidateCertificate   = candidateCertificates[i];
+        const uint8_t * pCandidateCertificate = candidateCertificate.data();
+
+        VerifyOrExit(!candidateCertificate.empty(), err = CHIP_ERROR_INVALID_ARGUMENT);
+
+        SuccessOrExit(err = ExtractSKIDFromX509Cert(candidateCertificate, candidateSKID));
+
+        x509CandidateCertificate = d2i_X509(nullptr, &pCandidateCertificate, static_cast<long>(candidateCertificate.size()));
+        VerifyOrExit(x509CandidateCertificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+        candidateSubject = X509_get_subject_name(x509CandidateCertificate);
+        VerifyOrExit(candidateSubject != nullptr, err = CHIP_ERROR_INTERNAL);
+
+        if (referenceSKID.data_equal(candidateSKID) && X509_NAME_cmp(referenceSubject, candidateSubject) == 0)
+        {
+            outCertificate = candidateCertificate;
+            ExitNow();
+        }
+
+        X509_free(x509CandidateCertificate);
+        x509CandidateCertificate = nullptr;
+    }
+
+exit:
+    X509_free(x509ReferenceCertificate);
+    X509_free(x509CandidateCertificate);
+
+    return err;
+}
+
 } // namespace Crypto
 } // namespace chip

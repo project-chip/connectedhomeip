@@ -173,6 +173,8 @@ protected:
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs,
                     "If provided, do a timed invoke with the given timed interaction timeout. See \"7.6.10. Timed Interaction\" in "
                     "the Matter specification.");
+        AddArgument("busyWaitForMs", 0, UINT16_MAX, &mBusyWaitForMs,
+                    "If provided, block the main thread processing for the given time right after sending a command.");
         AddArgument("suppressResponse", 0, 1, &mSuppressResponse);
         AddArgument("repeat-count", 1, UINT16_MAX, &mRepeatCount);
         AddArgument("repeat-delay-ms", 0, UINT16_MAX, &mRepeatDelayInMs);

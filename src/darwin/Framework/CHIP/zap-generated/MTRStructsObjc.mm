@@ -910,6 +910,99 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRPowerSourceClusterWiredFaultChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _current = [NSArray array];
+
+        _previous = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPowerSourceClusterWiredFaultChangeEvent alloc] init];
+
+    other.current = self.current;
+    other.previous = self.previous;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: current:%@; previous:%@; >", NSStringFromClass([self class]), _current, _previous];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPowerSourceClusterBatFaultChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _current = [NSArray array];
+
+        _previous = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPowerSourceClusterBatFaultChangeEvent alloc] init];
+
+    other.current = self.current;
+    other.previous = self.previous;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: current:%@; previous:%@; >", NSStringFromClass([self class]), _current, _previous];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRPowerSourceClusterBatChargeFaultChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _current = [NSArray array];
+
+        _previous = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRPowerSourceClusterBatChargeFaultChangeEvent alloc] init];
+
+    other.current = self.current;
+    other.previous = self.previous;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: current:%@; previous:%@; >", NSStringFromClass([self class]), _current, _previous];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRGeneralCommissioningClusterBasicCommissioningInfo
 - (instancetype)init
 {

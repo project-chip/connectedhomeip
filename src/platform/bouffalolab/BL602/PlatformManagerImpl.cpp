@@ -31,14 +31,14 @@
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 #include <lwip/tcpip.h>
+#include <utils_log.h>
 
 #include <aos/kernel.h>
-#include <aos/yloop.h>
 #include <bl60x_fw_api.h>
 #include <bl_sec.h>
 #include <event_device.h>
 #include <hal_wifi.h>
-#include <tcpip.h>
+#include <lwip/tcpip.h>
 #include <wifi_mgmr_ext.h>
 
 extern "C" {
@@ -165,13 +165,10 @@ static void WifiStaConnected(void)
             chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kConnected));
     }
 }
+typedef void (*aos_event_cb)(input_event_t * event, void * private_data);
 
 void OnWiFiPlatformEvent(input_event_t * event, void * private_data)
 {
-    static char * ssid;
-    static char * password;
-    int ret;
-
     switch (event->code)
     {
     case CODE_WIFI_ON_INIT_DONE: {
@@ -223,7 +220,7 @@ void OnWiFiPlatformEvent(input_event_t * event, void * private_data)
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
     static uint8_t stack_wifi_init = 0;
     TaskHandle_t backup_eventLoopTask;
 
@@ -238,7 +235,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     if (1 == stack_wifi_init)
     {
         log_error("Wi-Fi already initialized!\r\n");
-        return;
+        return CHIP_NO_ERROR;
     }
 
     hal_wifi_start_firmware_task();
@@ -255,6 +252,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err                  = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::mEventLoopTask = backup_eventLoopTask;
+
 exit:
     return err;
 }

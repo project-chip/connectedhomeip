@@ -239,21 +239,48 @@ MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterDownloadErr
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("This struct is unused and will be removed")
 @interface MTRPowerSourceClusterBatChargeFaultChangeType : NSObject <NSCopying>
-@property (nonatomic, copy) NSArray * _Nonnull current API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSArray * _Nonnull previous API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSArray * _Nonnull current API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRPowerSourceClusterBatChargeFaultChangeType");
+@property (nonatomic, copy) NSArray * _Nonnull previous API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRPowerSourceClusterBatChargeFaultChangeType");
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("This struct is unused and will be removed")
 @interface MTRPowerSourceClusterBatFaultChangeType : NSObject <NSCopying>
-@property (nonatomic, copy) NSArray * _Nonnull current API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSArray * _Nonnull previous API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSArray * _Nonnull current API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRPowerSourceClusterBatFaultChangeType");
+@property (nonatomic, copy) NSArray * _Nonnull previous API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRPowerSourceClusterBatFaultChangeType");
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+MTR_NEWLY_DEPRECATED("This struct is unused and will be removed")
 @interface MTRPowerSourceClusterWiredFaultChangeType : NSObject <NSCopying>
-@property (nonatomic, copy) NSArray * _Nonnull current API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSArray * _Nonnull previous API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSArray * _Nonnull current API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRPowerSourceClusterWiredFaultChangeType");
+@property (nonatomic, copy) NSArray * _Nonnull previous API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRPowerSourceClusterWiredFaultChangeType");
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRPowerSourceClusterWiredFaultChangeEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSArray * _Nonnull current MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull previous MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRPowerSourceClusterBatFaultChangeEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSArray * _Nonnull current MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull previous MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_AVAILABLE
+@interface MTRPowerSourceClusterBatChargeFaultChangeEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSArray * _Nonnull current MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull previous MTR_NEWLY_AVAILABLE;
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
