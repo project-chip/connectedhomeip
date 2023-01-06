@@ -5205,6 +5205,12 @@
               LevelControlOptions:
                   - ExecuteIfOff
                   - CoupleColorTempToLevel
+          NetworkCommissioning:
+              WiFiSecurity:
+                  - WEP
+                  - WPAPersonal
+                  - WPA2Personal
+                  - WPA3Personal
   deprecated:
       clusters:
           - OtaSoftwareUpdateProvider
@@ -5269,6 +5275,13 @@
           PowerSource:
               BatChargeLevel:
                   - Ok
+      bitmap values:
+          NetworkCommissioning:
+              WiFiSecurity:
+                  - WepPersonal
+                  - WpaPersonal
+                  - Wpa2Personal
+                  - Wpa3Personal
       apis:
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
@@ -5347,3 +5360,10 @@
           PowerSource:
               BatChargeLevel:
                   OK: Ok
+      bitmap values:
+          NetworkCommissioning:
+              WiFiSecurity:
+                  WEP: WepPersonal
+                  WPAPersonal: WpaPersonal
+                  WPA2Personal: Wpa2Personal
+                  WPA3Personal: Wpa3Personal

@@ -624,7 +624,7 @@ server cluster NetworkCommissioning = 49 {
 
   bitmap WiFiSecurity : BITMAP8 {
     kUnencrypted = 0x1;
-    kWepPersonal = 0x2;
+    kWep = 0x2;
     kWpaPersonal = 0x4;
     kWpa2Personal = 0x8;
     kWpa3Personal = 0x10;

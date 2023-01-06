@@ -21,6 +21,21 @@
 using namespace chip;
 using namespace chip::app;
 
+namespace chip {
+namespace test_utils {
+void BusyWaitMillis(uint16_t busyWaitForMs)
+{
+    auto & clock = chip::System::SystemClock();
+    auto start   = clock.GetMonotonicTimestamp();
+    chip::System::Clock::Milliseconds32 durationInMs(busyWaitForMs);
+    while (clock.GetMonotonicTimestamp() - start < durationInMs)
+    {
+        // nothing to do.
+    };
+}
+} // namespace test_utils
+} // namespace chip
+
 CHIP_ERROR InteractionModel::ReadAttribute(const char * identity, EndpointId endpointId, ClusterId clusterId,
                                            AttributeId attributeId, bool fabricFiltered, const Optional<DataVersion> & dataVersion)
 {
