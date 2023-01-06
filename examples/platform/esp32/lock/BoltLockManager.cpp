@@ -268,7 +268,7 @@ void BoltLockManager::TimerEventHandler(TimerHandle_t xTimer)
     // once sLockTimer expires. Post an event to apptask queue with the actual handler
     // so that the event can be handled in the context of the apptask.
     AppEvent event;
-    event.mType               = AppEvent::kEventType_Timer;
+    event.mType                = AppEvent::kEventType_Timer;
     event.mTimerEvent.mContext = lock;
     if (lock->mAutoLockTimerArmed)
     {

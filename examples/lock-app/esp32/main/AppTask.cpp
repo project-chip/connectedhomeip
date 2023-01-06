@@ -16,13 +16,13 @@
  */
 
 #include "AppTask.h"
-#include <lock/AppConfig.h>
-#include <lock/AppEvent.h>
 #include "Button.h"
 #include "LEDWidget.h"
 #include "esp_log.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <lock/AppConfig.h>
+#include <lock/AppEvent.h>
 //#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -61,7 +61,7 @@ StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::System;
-//using namespace ESP32DoorLock::LockInitParams;
+// using namespace ESP32DoorLock::LockInitParams;
 
 AppTask AppTask::sAppTask;
 
@@ -258,9 +258,9 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
 void AppTask::TimerEventHandler(TimerHandle_t xTimer)
 {
     AppEvent event;
-    event.mType               = AppEvent::kEventType_Timer;
+    event.mType                = AppEvent::kEventType_Timer;
     event.mTimerEvent.mContext = (void *) xTimer;
-    event.mHandler            = FunctionTimerEventHandler;
+    event.mHandler             = FunctionTimerEventHandler;
     sAppTask.PostEvent(&event);
 }
 
@@ -428,10 +428,10 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
 void AppTask::PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction)
 {
     AppEvent event;
-    event.mType             = AppEvent::kEventType_Lock;
+    event.mType              = AppEvent::kEventType_Lock;
     event.mLockEvent.mActor  = aActor;
     event.mLockEvent.mAction = aAction;
-    event.mHandler          = LockActionEventHandler;
+    event.mHandler           = LockActionEventHandler;
     PostEvent(&event);
 }
 
