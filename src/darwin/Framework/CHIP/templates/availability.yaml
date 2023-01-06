@@ -5208,6 +5208,9 @@
           NetworkCommissioning:
               WiFiSecurity:
                   - WEP
+                  - WPAPersonal
+                  - WPA2Personal
+                  - WPA3Personal
   deprecated:
       clusters:
           - OtaSoftwareUpdateProvider
@@ -5276,6 +5279,9 @@
           NetworkCommissioning:
               WiFiSecurity:
                   - WepPersonal
+                  - WpaPersonal
+                  - Wpa2Personal
+                  - Wpa3Personal
       apis:
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
@@ -5358,3 +5364,6 @@
           NetworkCommissioning:
               WiFiSecurity:
                   WEP: WepPersonal
+                  WPAPersonal: WpaPersonal
+                  WPA2Personal: Wpa2Personal
+                  WPA3Personal: Wpa3Personal
