@@ -16,14 +16,14 @@
  */
 
 #include "AppTask.h"
-#include "AppConfig.h"
-#include "AppEvent.h"
+#include <lock/AppConfig.h>
+#include <lock/AppEvent.h>
 #include "Button.h"
 #include "LEDWidget.h"
 #include "esp_log.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
+//#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -61,7 +61,7 @@ StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::System;
-using namespace ESP32DoorLock::LockInitParams;
+//using namespace ESP32DoorLock::LockInitParams;
 
 AppTask AppTask::sAppTask;
 
@@ -81,85 +81,14 @@ CHIP_ERROR AppTask::StartAppTask()
 
 CHIP_ERROR AppTask::Init()
 {
-    // Create FreeRTOS sw timer for Function Selection.
+    // Create FreeRTOS sw timer for Function Selection
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
                                   1,                // == default timer period (mS)
                                   false,            // no timer reload (==one-shot)
                                   (void *) this,    // init timer id = app task obj context
                                   TimerEventHandler // timer callback handler
     );
-
-    // Initial lock state
-    chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;
-    chip::EndpointId endpointId{ 1 };
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    chip::app::Clusters::DoorLock::Attributes::LockState::Get(endpointId, state);
-
-    uint8_t numberOfCredentialsPerUser = 0;
-    if (!DoorLockServer::Instance().GetNumberOfCredentialsSupportedPerUser(endpointId, numberOfCredentialsPerUser))
-    {
-        ChipLogError(Zcl,
-                     "Unable to get number of credentials supported per user when initializing lock endpoint, defaulting to 5 "
-                     "[endpointId=%d]",
-                     endpointId);
-        numberOfCredentialsPerUser = 5;
-    }
-
-    uint16_t numberOfUsers = 0;
-    if (!DoorLockServer::Instance().GetNumberOfUserSupported(endpointId, numberOfUsers))
-    {
-        ChipLogError(Zcl,
-                     "Unable to get number of supported users when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
-                     endpointId);
-        numberOfUsers = 10;
-    }
-
-    uint8_t numberOfWeekdaySchedulesPerUser = 0;
-    if (!DoorLockServer::Instance().GetNumberOfWeekDaySchedulesPerUserSupported(endpointId, numberOfWeekdaySchedulesPerUser))
-    {
-        ChipLogError(
-            Zcl,
-            "Unable to get number of supported weekday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
-            endpointId);
-        numberOfWeekdaySchedulesPerUser = 10;
-    }
-
-    uint8_t numberOfYeardaySchedulesPerUser = 0;
-    if (!DoorLockServer::Instance().GetNumberOfYearDaySchedulesPerUserSupported(endpointId, numberOfYeardaySchedulesPerUser))
-    {
-        ChipLogError(
-            Zcl,
-            "Unable to get number of supported yearday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
-            endpointId);
-        numberOfYeardaySchedulesPerUser = 10;
-    }
-
-    uint8_t numberOfHolidaySchedules = 0;
-    if (!DoorLockServer::Instance().GetNumberOfHolidaySchedulesSupported(endpointId, numberOfHolidaySchedules))
-    {
-        ChipLogError(
-            Zcl,
-            "Unable to get number of supported holiday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
-            endpointId);
-        numberOfHolidaySchedules = 10;
-    }
-
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-    CHIP_ERROR err = BoltLockMgr().Init(state,
-                                        ParamBuilder()
-                                            .SetNumberOfUsers(numberOfUsers)
-                                            .SetNumberOfCredentialsPerUser(numberOfCredentialsPerUser)
-                                            .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)
-                                            .SetNumberOfYeardaySchedulesPerUser(numberOfYeardaySchedulesPerUser)
-                                            .SetNumberOfHolidaySchedules(numberOfHolidaySchedules)
-                                            .GetLockParam());
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGI(TAG, "BoltLockMgr().Init() failed");
-        return err;
-    }
+    CHIP_ERROR err = BoltLockMgr().InitLockState();
 
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
@@ -269,12 +198,12 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     int32_t actor;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (aEvent->Type == AppEvent::kEventType_Lock)
+    if (aEvent->mType == AppEvent::kEventType_Lock)
     {
-        action = static_cast<BoltLockManager::Action_t>(aEvent->LockEvent.Action);
-        actor  = aEvent->LockEvent.Actor;
+        action = static_cast<BoltLockManager::Action_t>(aEvent->mLockEvent.mAction);
+        actor  = aEvent->mLockEvent.mActor;
     }
-    else if (aEvent->Type == AppEvent::kEventType_Button)
+    else if (aEvent->mType == AppEvent::kEventType_Button)
     {
         if (BoltLockMgr().IsUnlocked())
         {
@@ -309,19 +238,19 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
         return;
     }
 
-    AppEvent button_event           = {};
-    button_event.Type               = AppEvent::kEventType_Button;
-    button_event.ButtonEvent.PinNo  = btnIdx;
-    button_event.ButtonEvent.Action = btnAction;
+    AppEvent button_event             = {};
+    button_event.mType                = AppEvent::kEventType_Button;
+    button_event.mButtonEvent.mPinNo  = btnIdx;
+    button_event.mButtonEvent.mAction = btnAction;
 
     if (btnIdx == APP_LOCK_BUTTON && btnAction == APP_BUTTON_PRESSED)
     {
-        button_event.Handler = LockActionEventHandler;
+        button_event.mHandler = LockActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
     else if (btnIdx == APP_FUNCTION_BUTTON)
     {
-        button_event.Handler = FunctionHandler;
+        button_event.mHandler = FunctionHandler;
         sAppTask.PostEvent(&button_event);
     }
 }
@@ -329,15 +258,15 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
 void AppTask::TimerEventHandler(TimerHandle_t xTimer)
 {
     AppEvent event;
-    event.Type               = AppEvent::kEventType_Timer;
-    event.TimerEvent.Context = (void *) xTimer;
-    event.Handler            = FunctionTimerEventHandler;
+    event.mType               = AppEvent::kEventType_Timer;
+    event.mTimerEvent.mContext = (void *) xTimer;
+    event.mHandler            = FunctionTimerEventHandler;
     sAppTask.PostEvent(&event);
 }
 
 void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 {
-    if (aEvent->Type != AppEvent::kEventType_Timer)
+    if (aEvent->mType != AppEvent::kEventType_Timer)
     {
         return;
     }
@@ -372,7 +301,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
 void AppTask::FunctionHandler(AppEvent * aEvent)
 {
-    if (aEvent->ButtonEvent.PinNo != APP_FUNCTION_BUTTON)
+    if (aEvent->mButtonEvent.mPinNo != APP_FUNCTION_BUTTON)
     {
         return;
     }
@@ -384,7 +313,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     // FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
     // To cancel factory reset: release the APP_FUNCTION_BUTTON once all LEDs
     // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    if (aEvent->ButtonEvent.Action == APP_BUTTON_PRESSED)
+    if (aEvent->mButtonEvent.mAction == APP_BUTTON_PRESSED)
     {
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
         {
@@ -499,10 +428,10 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
 void AppTask::PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction)
 {
     AppEvent event;
-    event.Type             = AppEvent::kEventType_Lock;
-    event.LockEvent.Actor  = aActor;
-    event.LockEvent.Action = aAction;
-    event.Handler          = LockActionEventHandler;
+    event.mType             = AppEvent::kEventType_Lock;
+    event.mLockEvent.mActor  = aActor;
+    event.mLockEvent.mAction = aAction;
+    event.mHandler          = LockActionEventHandler;
     PostEvent(&event);
 }
 
@@ -519,9 +448,9 @@ void AppTask::PostEvent(const AppEvent * aEvent)
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {
-    if (aEvent->Handler)
+    if (aEvent->mHandler)
     {
-        aEvent->Handler(aEvent);
+        aEvent->mHandler(aEvent);
     }
     else
     {

@@ -24,8 +24,8 @@
  **/
 
 #include "DeviceCallbacks.h"
-#include "AppConfig.h"
-#include "BoltLockManager.h"
+#include <lock/AppConfig.h>
+#include <lock/BoltLockManager.h>
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/ids/Clusters.h>

@@ -20,7 +20,6 @@ set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/all-clusters-app"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/include"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/lock-app/linux/include"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/nlfaultinjection/repo/include"                      
@@ -30,11 +29,11 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/all-clusters-app/zap-generated"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/lock-app/linux/src"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/ota"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/common"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/shell_extension"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/lock"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/reporting"
@@ -95,7 +94,7 @@ set(SRC_DIRS_LIST
 )
 
 set(EXCLUDE_SRCS_LIST
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/lock-app/linux/src/LockAppCommandDelegate.cpp"
+                     # "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/lock-app/esp32/main/LockAppCommandDelegate.cpp"
 )
 
 if (CONFIG_ENABLE_PW_RPC)

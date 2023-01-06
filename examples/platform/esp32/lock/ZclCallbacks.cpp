@@ -20,7 +20,7 @@
  *   This file implements the handler for data model messages.
  */
 
-#include "AppConfig.h"
+//#include "AppConfig.h"
 #include "BoltLockManager.h"
 #include <platform/CHIPDeviceLayer.h>
 

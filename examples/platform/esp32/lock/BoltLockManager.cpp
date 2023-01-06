@@ -19,7 +19,6 @@
 
 #include "AppConfig.h"
 #include "AppTask.h"
-#include <FreeRTOS.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
@@ -269,22 +268,22 @@ void BoltLockManager::TimerEventHandler(TimerHandle_t xTimer)
     // once sLockTimer expires. Post an event to apptask queue with the actual handler
     // so that the event can be handled in the context of the apptask.
     AppEvent event;
-    event.Type               = AppEvent::kEventType_Timer;
-    event.TimerEvent.Context = lock;
+    event.mType               = AppEvent::kEventType_Timer;
+    event.mTimerEvent.mContext = lock;
     if (lock->mAutoLockTimerArmed)
     {
-        event.Handler = AutoReLockTimerEventHandler;
+        event.mHandler = AutoReLockTimerEventHandler;
     }
     else
     {
-        event.Handler = ActuatorMovementTimerEventHandler;
+        event.mHandler = ActuatorMovementTimerEventHandler;
     }
     GetAppTask().PostEvent(&event);
 }
 
 void BoltLockManager::AutoReLockTimerEventHandler(AppEvent * aEvent)
 {
-    BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->TimerEvent.Context);
+    BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->mTimerEvent.mContext);
     int32_t actor          = 0;
 
     // Make sure auto lock timer is still armed.
@@ -304,7 +303,7 @@ void BoltLockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
 {
     Action_t actionCompleted = INVALID_ACTION;
 
-    BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->TimerEvent.Context);
+    BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->mTimerEvent.mContext);
 
     if (lock->mState == kState_LockInitiated)
     {
@@ -757,4 +756,81 @@ bool BoltLockManager::setLockState(chip::EndpointId endpointId, DlLockState lock
 
     err = DlOperationError::kInvalidCredential;
     return false;
+}
+
+CHIP_ERROR BoltLockManager::InitLockState()
+{
+
+    // Initial lock state
+    chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;
+    chip::EndpointId endpointId{ 1 };
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    chip::app::Clusters::DoorLock::Attributes::LockState::Get(endpointId, state);
+
+    uint8_t numberOfCredentialsPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfCredentialsSupportedPerUser(endpointId, numberOfCredentialsPerUser))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of credentials supported per user when initializing lock endpoint, defaulting to 5 "
+                     "[endpointId=%d]",
+                     endpointId);
+        numberOfCredentialsPerUser = 5;
+    }
+
+    uint16_t numberOfUsers = 0;
+    if (!DoorLockServer::Instance().GetNumberOfUserSupported(endpointId, numberOfUsers))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of supported users when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+                     endpointId);
+        numberOfUsers = 10;
+    }
+
+    uint8_t numberOfWeekdaySchedulesPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfWeekDaySchedulesPerUserSupported(endpointId, numberOfWeekdaySchedulesPerUser))
+    {
+        ChipLogError(
+            Zcl,
+            "Unable to get number of supported weekday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+            endpointId);
+        numberOfWeekdaySchedulesPerUser = 10;
+    }
+
+    uint8_t numberOfYeardaySchedulesPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfYearDaySchedulesPerUserSupported(endpointId, numberOfYeardaySchedulesPerUser))
+    {
+        ChipLogError(
+            Zcl,
+            "Unable to get number of supported yearday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+            endpointId);
+        numberOfYeardaySchedulesPerUser = 10;
+    }
+
+    uint8_t numberOfHolidaySchedules = 0;
+    if (!DoorLockServer::Instance().GetNumberOfHolidaySchedulesSupported(endpointId, numberOfHolidaySchedules))
+    {
+        ChipLogError(
+            Zcl,
+            "Unable to get number of supported holiday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+            endpointId);
+        numberOfHolidaySchedules = 10;
+    }
+
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    CHIP_ERROR err = BoltLockMgr().Init(state,
+                                        ParamBuilder()
+                                            .SetNumberOfUsers(numberOfUsers)
+                                            .SetNumberOfCredentialsPerUser(numberOfCredentialsPerUser)
+                                            .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)
+                                            .SetNumberOfYeardaySchedulesPerUser(numberOfYeardaySchedulesPerUser)
+                                            .SetNumberOfHolidaySchedules(numberOfHolidaySchedules)
+                                            .GetLockParam());
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGI(TAG, "BoltLockMgr().Init() failed");
+        return err;
+    }
+
+    return err;
 }
