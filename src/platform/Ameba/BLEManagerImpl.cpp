@@ -242,7 +242,7 @@ CHIP_ERROR BLEManagerImpl::HandleTXComplete(int conn_id)
     return CHIP_NO_ERROR;
 }
 
-uint16_t BLEManagerImpl::_NumConnections(void)
+uint16_t BLEManagerImpl::_NumConnections()
 {
     uint16_t numCons = 0;
     for (uint16_t i = 0; i < kMaxConnections; i++)
@@ -609,7 +609,7 @@ exit:
  * Private functions
  *******************************************************************************/
 
-CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
+CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData()
 {
     CHIP_ERROR err;
     uint8_t advData[MAX_ADV_DATA_LEN]    = { 0 };
@@ -676,7 +676,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
+CHIP_ERROR BLEManagerImpl::StartAdvertising()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -707,7 +707,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
+CHIP_ERROR BLEManagerImpl::StopAdvertising()
 {
     CHIP_ERROR err;
 
@@ -748,7 +748,7 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
     }
 }
 
-void BLEManagerImpl::DriveBLEState(void)
+void BLEManagerImpl::DriveBLEState()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -788,7 +788,7 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
     sInstance.DriveBLEState();
 }
 
-void BLEManagerImpl::InitSubscribed(void)
+void BLEManagerImpl::InitSubscribed()
 {
     for (uint16_t i = 0; i < kMaxConnections; i++)
     {
