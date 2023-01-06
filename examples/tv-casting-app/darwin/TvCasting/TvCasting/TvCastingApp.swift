@@ -64,7 +64,11 @@ struct TvCastingApp: App {
                     {
                         if let castingServerBridge = CastingServerBridge.getSharedInstance()
                         {
-                            castingServerBridge.startMatterServer()
+                            castingServerBridge.startMatterServer(DispatchQueue.main, startMatterServerCompletionCallback: { (error: MatterError) -> () in
+                                DispatchQueue.main.async {
+                                    self.Log.info("TvCastingApp.startMatterServerCompletionCallback called with \(error)")
+                                }
+                            })
                         }
                     }
                     firstAppActivation = false
