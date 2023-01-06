@@ -19,6 +19,7 @@
 #include "commands/common/Commands.h"
 #include "commands/example/ExampleCredentialIssuerCommands.h"
 
+#include "commands/delay/Commands.h"
 #include "commands/discover/Commands.h"
 #include "commands/group/Commands.h"
 #include "commands/interactive/Commands.h"
@@ -36,6 +37,7 @@ int main(int argc, char * argv[])
 {
     ExampleCredentialIssuerCommands credIssuerCommands;
     Commands commands;
+    registerCommandsDelay(commands, &credIssuerCommands);
     registerCommandsDiscover(commands, &credIssuerCommands);
     registerCommandsInteractive(commands, &credIssuerCommands);
     registerCommandsPayload(commands);

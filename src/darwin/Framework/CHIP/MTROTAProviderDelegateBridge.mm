@@ -746,8 +746,8 @@ void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(CommandHandler * co
 CHIP_ERROR MTROTAProviderDelegateBridge::ConvertToQueryImageParams(
     const Commands::QueryImage::DecodableType & commandData, MTROTASoftwareUpdateProviderClusterQueryImageParams * commandParams)
 {
-    commandParams.vendorId = [NSNumber numberWithUnsignedShort:commandData.vendorId];
-    commandParams.productId = [NSNumber numberWithUnsignedShort:commandData.productId];
+    commandParams.vendorID = [NSNumber numberWithUnsignedShort:commandData.vendorID];
+    commandParams.productID = [NSNumber numberWithUnsignedShort:commandData.productID];
     commandParams.softwareVersion = [NSNumber numberWithUnsignedLong:commandData.softwareVersion];
     auto iterator = commandData.protocolsSupported.begin();
     NSMutableArray * protocolsSupported = [[NSMutableArray alloc] init];

@@ -236,10 +236,10 @@ see how to use different CHIP tools to commission and control the application
 within a WiFi network.
 
 After commissioning is successful, announce OTA provider's presence using
-`OtaSoftwareUpdateRequestor` cluster with `AnnounceOtaProvider` command. On
+`OtaSoftwareUpdateRequestor` cluster with `AnnounceOTAProvider` command. On
 receiving this command OTA requestor will query for OTA image:
 
-    chip-device-ctrl > zcl OtaSoftwareUpdateRequestor AnnounceOtaProvider 1234 0 0 providerNodeId=1235 vendorId=9020 announcementReason=0
+    chip-device-ctrl > zcl OtaSoftwareUpdateRequestor AnnounceOTAProvider 1234 0 0 providerNodeId=1235 vendorId=9020 announcementReason=0
 
 The OTA requestor should communicate with provider, download update image and
 apply it.

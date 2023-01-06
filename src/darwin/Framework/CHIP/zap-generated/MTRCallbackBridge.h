@@ -168,15 +168,17 @@ typedef void (*NullableLevelControlClusterMoveModeAttributeCallback)(
 typedef void (*LevelControlClusterStepModeAttributeCallback)(void *, chip::app::Clusters::LevelControl::StepMode);
 typedef void (*NullableLevelControlClusterStepModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::StepMode> &);
-typedef void (*AccessControlClusterAuthModeAttributeCallback)(void *, chip::app::Clusters::AccessControl::AuthMode);
-typedef void (*NullableAccessControlClusterAuthModeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AuthMode> &);
+typedef void (*AccessControlClusterAccessControlEntryAuthModeEnumAttributeCallback)(
+    void *, chip::app::Clusters::AccessControl::AccessControlEntryAuthModeEnum);
+typedef void (*NullableAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AccessControlEntryAuthModeEnum> &);
+typedef void (*AccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallback)(
+    void *, chip::app::Clusters::AccessControl::AccessControlEntryPrivilegeEnum);
+typedef void (*NullableAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AccessControlEntryPrivilegeEnum> &);
 typedef void (*AccessControlClusterChangeTypeEnumAttributeCallback)(void *, chip::app::Clusters::AccessControl::ChangeTypeEnum);
 typedef void (*NullableAccessControlClusterChangeTypeEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::ChangeTypeEnum> &);
-typedef void (*AccessControlClusterPrivilegeAttributeCallback)(void *, chip::app::Clusters::AccessControl::Privilege);
-typedef void (*NullableAccessControlClusterPrivilegeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::Privilege> &);
 typedef void (*ActionsClusterActionErrorEnumAttributeCallback)(void *, chip::app::Clusters::Actions::ActionErrorEnum);
 typedef void (*NullableActionsClusterActionErrorEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::ActionErrorEnum> &);
@@ -293,6 +295,10 @@ typedef void (*GeneralDiagnosticsClusterRadioFaultTypeAttributeCallback)(void *,
                                                                          chip::app::Clusters::GeneralDiagnostics::RadioFaultType);
 typedef void (*NullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::RadioFaultType> &);
+typedef void (*ThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallback)(
+    void *, chip::app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum);
+typedef void (*NullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum> &);
 typedef void (*ThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallback)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault);
 typedef void (*NullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallback)(
@@ -301,10 +307,6 @@ typedef void (*ThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallback)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole);
 typedef void (*NullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole> &);
-typedef void (*ThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallback)(
-    void *, chip::app::Clusters::ThreadNetworkDiagnostics::ThreadConnectionStatus);
-typedef void (*NullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::ThreadConnectionStatus> &);
 typedef void (*WiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallback)(
     void *, chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause);
 typedef void (*NullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallback)(
@@ -603,11 +605,12 @@ typedef void (*BindingAttributeListListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*AccessControlACLListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
-        data);
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType> & data);
 typedef void (*AccessControlExtensionListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & data);
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::DecodableType> & data);
 typedef void (*AccessControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*AccessControlAcceptedCommandListListAttributeCallback)(
@@ -640,7 +643,7 @@ typedef void (*OTASoftwareUpdateProviderAcceptedCommandListListAttributeCallback
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OTASoftwareUpdateProviderAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*OTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback)(
+typedef void (*OTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & data);
@@ -734,19 +737,19 @@ typedef void (*GeneralDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*SoftwareDiagnosticsThreadMetricsListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
-        data);
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::DecodableType> & data);
 typedef void (*SoftwareDiagnosticsGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*SoftwareDiagnosticsAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*SoftwareDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback)(
+typedef void (*ThreadNetworkDiagnosticsNeighborTableListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & data);
-typedef void (*ThreadNetworkDiagnosticsRouteTableListListAttributeCallback)(
+typedef void (*ThreadNetworkDiagnosticsRouteTableListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
         data);
@@ -3017,10 +3020,9 @@ public:
     MTRAccessControlACLListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
         MTRCallbackBridge<AccessControlACLListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
-            value);
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType> & value);
 };
 
 class MTRAccessControlACLListAttributeCallbackSubscriptionBridge : public MTRAccessControlACLListAttributeCallbackBridge
@@ -3050,10 +3052,9 @@ public:
     MTRAccessControlExtensionListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
         MTRCallbackBridge<AccessControlExtensionListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> &
-            value);
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::DecodableType> & value);
 };
 
 class MTRAccessControlExtensionListAttributeCallbackSubscriptionBridge : public MTRAccessControlExtensionListAttributeCallbackBridge
@@ -3567,16 +3568,16 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge
-    : public MTRCallbackBridge<OTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback>
+class MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackBridge
+    : public MTRCallbackBridge<OTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallback>
 {
 public:
-    MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<OTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<OTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback>(queue, handler, action,
+        MTRCallbackBridge<OTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallback>(queue, handler, action,
                                                                                               OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
@@ -3584,20 +3585,20 @@ public:
                                 chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & value);
 };
 
-class MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge
-    : public MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge
+class MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackSubscriptionBridge
+    : public MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackBridge
 {
 public:
-    MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge(
+    MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge(queue, handler, action),
+        MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTROTASoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge::OnDone;
+    using MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -5014,10 +5015,9 @@ public:
                                                                    MTRActionBlock action) :
         MTRCallbackBridge<SoftwareDiagnosticsThreadMetricsListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
-            value);
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::DecodableType> & value);
 };
 
 class MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackSubscriptionBridge
@@ -5138,71 +5138,71 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>
+class MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackBridge
+    : public MTRCallbackBridge<ThreadNetworkDiagnosticsNeighborTableListAttributeCallback>
 {
 public:
-    MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ThreadNetworkDiagnosticsNeighborTableListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            MTRActionBlock action) :
-        MTRCallbackBridge<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<ThreadNetworkDiagnosticsNeighborTableListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
                                 chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & value);
 };
 
-class MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscriptionBridge
-    : public MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge
+class MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackSubscriptionBridge
+    : public MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackBridge
 {
 public:
-    MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscriptionBridge(
+    MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge(queue, handler, action),
+        MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::OnDone;
+    using MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge
-    : public MTRCallbackBridge<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>
+class MTRThreadNetworkDiagnosticsRouteTableListAttributeCallbackBridge
+    : public MTRCallbackBridge<ThreadNetworkDiagnosticsRouteTableListAttributeCallback>
 {
 public:
-    MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRThreadNetworkDiagnosticsRouteTableListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ThreadNetworkDiagnosticsRouteTableListAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         MTRActionBlock action) :
-        MTRCallbackBridge<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRThreadNetworkDiagnosticsRouteTableListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     MTRActionBlock action) :
+        MTRCallbackBridge<ThreadNetworkDiagnosticsRouteTableListAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
                                 chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> & value);
 };
 
-class MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscriptionBridge
-    : public MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge
+class MTRThreadNetworkDiagnosticsRouteTableListAttributeCallbackSubscriptionBridge
+    : public MTRThreadNetworkDiagnosticsRouteTableListAttributeCallbackBridge
 {
 public:
-    MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscriptionBridge(
+    MTRThreadNetworkDiagnosticsRouteTableListAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge(queue, handler, action),
+        MTRThreadNetworkDiagnosticsRouteTableListAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::OnDone;
+    using MTRThreadNetworkDiagnosticsRouteTableListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThreadNetworkDiagnosticsRouteTableListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12233,67 +12233,147 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRAccessControlClusterAuthModeAttributeCallbackBridge
-    : public MTRCallbackBridge<AccessControlClusterAuthModeAttributeCallback>
+class MTRAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<AccessControlClusterAccessControlEntryAuthModeEnumAttributeCallback>
 {
 public:
-    MTRAccessControlClusterAuthModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<AccessControlClusterAuthModeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<AccessControlClusterAccessControlEntryAuthModeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRAccessControlClusterAuthModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<AccessControlClusterAuthModeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<AccessControlClusterAccessControlEntryAuthModeEnumAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::AccessControl::AuthMode value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::AccessControl::AccessControlEntryAuthModeEnum value);
 };
 
-class MTRAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge
-    : public MTRAccessControlClusterAuthModeAttributeCallbackBridge
+class MTRAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackSubscriptionBridge
+    : public MTRAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge
 {
 public:
-    MTRAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       MTRActionBlock action,
-                                                                       MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRAccessControlClusterAuthModeAttributeCallbackBridge(queue, handler, action),
+    MTRAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRAccessControlClusterAuthModeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRAccessControlClusterAuthModeAttributeCallbackBridge::OnDone;
+    using MTRAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableAccessControlClusterAuthModeAttributeCallback>
+class MTRNullableAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallback>
 {
 public:
-    MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableAccessControlClusterAuthModeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler) :
+        MTRCallbackBridge<NullableAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallback>(queue, handler,
+                                                                                                       OnSuccessFn){};
 
-    MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   MTRActionBlock action) :
-        MTRCallbackBridge<NullableAccessControlClusterAuthModeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRNullableAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                         ResponseHandler handler,
+                                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<NullableAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallback>(queue, handler, action,
+                                                                                                       OnSuccessFn){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AuthMode> & value);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AccessControlEntryAuthModeEnum> & value);
 };
 
-class MTRNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge
-    : public MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge
+class MTRNullableAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge(
+    MTRNullableAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge(queue, handler, action),
+        MTRNullableAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableAccessControlClusterAuthModeAttributeCallbackBridge::OnDone;
+    using MTRNullableAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<AccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallback>
+{
+public:
+    MTRAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<AccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<AccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallback>(queue, handler, action,
+                                                                                                OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::AccessControl::AccessControlEntryPrivilegeEnum value);
+};
+
+class MTRAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackSubscriptionBridge
+    : public MTRAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge
+{
+public:
+    MTRAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallback>
+{
+public:
+    MTRNullableAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                          ResponseHandler handler) :
+        MTRCallbackBridge<NullableAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallback>(queue, handler,
+                                                                                                        OnSuccessFn){};
+
+    MTRNullableAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                          ResponseHandler handler,
+                                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<NullableAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallback>(queue, handler, action,
+                                                                                                        OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AccessControlEntryPrivilegeEnum> & value);
+};
+
+class MTRNullableAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -12361,73 +12441,6 @@ public:
     void OnSubscriptionEstablished();
     using MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRAccessControlClusterPrivilegeAttributeCallbackBridge
-    : public MTRCallbackBridge<AccessControlClusterPrivilegeAttributeCallback>
-{
-public:
-    MTRAccessControlClusterPrivilegeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<AccessControlClusterPrivilegeAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRAccessControlClusterPrivilegeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                            MTRActionBlock action) :
-        MTRCallbackBridge<AccessControlClusterPrivilegeAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::AccessControl::Privilege value);
-};
-
-class MTRAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge
-    : public MTRAccessControlClusterPrivilegeAttributeCallbackBridge
-{
-public:
-    MTRAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        MTRActionBlock action,
-                                                                        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRAccessControlClusterPrivilegeAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRAccessControlClusterPrivilegeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRAccessControlClusterPrivilegeAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableAccessControlClusterPrivilegeAttributeCallback>
-{
-public:
-    MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableAccessControlClusterPrivilegeAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    MTRActionBlock action) :
-        MTRCallbackBridge<NullableAccessControlClusterPrivilegeAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::Privilege> & value);
-};
-
-class MTRNullableAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge
-    : public MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge
-{
-public:
-    MTRNullableAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableAccessControlClusterPrivilegeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
@@ -14701,6 +14714,79 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class MTRThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<ThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallback>
+{
+public:
+    MTRThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<ThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallback>(queue, handler, action,
+                                                                                                OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum value);
+};
+
+class MTRThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackSubscriptionBridge
+    : public MTRThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge
+{
+public:
+    MTRThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallback>
+{
+public:
+    MTRNullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                          ResponseHandler handler) :
+        MTRCallbackBridge<NullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallback>(queue, handler,
+                                                                                                        OnSuccessFn){};
+
+    MTRNullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                          ResponseHandler handler,
+                                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<NullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallback>(queue, handler, action,
+                                                                                                        OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum> & value);
+};
+
+class MTRNullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class MTRThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge
     : public MTRCallbackBridge<ThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallback>
 {
@@ -14834,80 +14920,6 @@ public:
     void OnSubscriptionEstablished();
     using MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<ThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallback>
-{
-public:
-    MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                    ResponseHandler handler) :
-        MTRCallbackBridge<ThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                    MTRActionBlock action) :
-        MTRCallbackBridge<ThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallback>(queue, handler, action,
-                                                                                                  OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::ThreadNetworkDiagnostics::ThreadConnectionStatus value);
-};
-
-class MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge
-    : public MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge
-{
-public:
-    MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallback>
-{
-public:
-    MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                            ResponseHandler handler) :
-        MTRCallbackBridge<NullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallback>(queue, handler,
-                                                                                                          OnSuccessFn){};
-
-    MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                            ResponseHandler handler,
-                                                                                            MTRActionBlock action) :
-        MTRCallbackBridge<NullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallback>(queue, handler, action,
-                                                                                                          OnSuccessFn){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::ThreadConnectionStatus> & value);
-};
-
-class MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge
-    : public MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge
-{
-public:
-    MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

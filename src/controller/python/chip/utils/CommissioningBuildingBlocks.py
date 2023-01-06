@@ -43,7 +43,7 @@ async def _IsNodeInFabricList(devCtrl, nodeId):
     return False
 
 
-async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDeviceController, privilege: Clusters.AccessControl.Enums.Privilege, targetNodeId: int, targetCatTags: typing.List[int] = []):
+async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDeviceController, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, targetNodeId: int, targetCatTags: typing.List[int] = []):
     ''' Given an existing controller with admin privileges over a target node, grants the specified privilege to the new ChipDeviceController instance to the entire Node. This is achieved
         by updating the ACL entries on the target.
 
@@ -96,8 +96,8 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
                 raise ValueError(
                     f"Cannot add another ACL entry to grant privilege to existing count of {currentAcls} ACLs -- will exceed minimas!")
 
-            currentAcls.append(Clusters.AccessControl.Structs.AccessControlEntry(privilege=privilege, authMode=Clusters.AccessControl.Enums.AuthMode.kCase,
-                                                                                 subjects=targetSubjects))
+            currentAcls.append(Clusters.AccessControl.Structs.AccessControlEntryStruct(privilege=privilege, authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                                                                                       subjects=targetSubjects))
 
     # Step 4: Prune ACLs which have empty subjects.
     currentAcls = [acl for acl in currentAcls if acl.subjects != NullValue and len(acl.subjects) != 0]
@@ -106,7 +106,7 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
     await adminCtrl.WriteAttribute(targetNodeId, [(0, Clusters.AccessControl.Attributes.Acl(currentAcls))])
 
 
-async def CreateControllersOnFabric(fabricAdmin: FabricAdmin, adminDevCtrl: ChipDeviceController, controllerNodeIds: typing.List[int], privilege: Clusters.AccessControl.Enums.Privilege, targetNodeId: int, catTags: typing.List[int] = []) -> typing.List[ChipDeviceController]:
+async def CreateControllersOnFabric(fabricAdmin: FabricAdmin, adminDevCtrl: ChipDeviceController, controllerNodeIds: typing.List[int], privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, targetNodeId: int, catTags: typing.List[int] = []) -> typing.List[ChipDeviceController]:
     ''' Create new ChipDeviceController instances on a given fabric with a specific privilege on a target node.
 
         Args:

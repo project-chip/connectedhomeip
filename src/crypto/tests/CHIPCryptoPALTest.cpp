@@ -2301,6 +2301,87 @@ static void TestVIDPID_x509Extraction(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+static void TestX509_ReplaceCertIfResignedCertFound(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+
+    struct TestCase
+    {
+        ByteSpan referenceCert;
+        ByteSpan * candidateCertsList;
+        size_t candidateCertsCount;
+        ByteSpan expectedOutCert;
+    };
+
+    // clang-format off
+    ByteSpan TestCandidateCertsList1[] = { sTestCert_DAC_FFF1_8000_0004_Cert,
+                                           sTestCert_PAI_FFF2_8004_FB_Cert,
+                                           sTestCert_PAA_FFF1_Cert };
+    ByteSpan TestCandidateCertsList2[] = { sTestCert_DAC_FFF1_8000_0004_Cert,
+                                           sTestCert_PAI_FFF2_NoPID_Resigned_Cert };
+    ByteSpan TestCandidateCertsList3[] = { sTestCert_DAC_FFF1_8000_0004_Cert,
+                                           sTestCert_PAI_FFF2_8001_Resigned_Cert };
+    ByteSpan TestCandidateCertsList4[] = { sTestCert_PAI_FFF2_8001_Resigned_Cert,
+                                           sTestCert_PAI_FFF1_8000_Cert };
+    ByteSpan TestCandidateCertsList5[] = { sTestCert_PAI_FFF2_NoPID_Resigned_Cert,
+                                           sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_Cert };
+    ByteSpan TestCandidateCertsList6[] = { sTestCert_PAI_FFF2_8001_ResignedSubjectDiff_Cert,
+                                           sTestCert_DAC_FFF1_8000_0004_Cert };
+    ByteSpan TestCandidateCertsList7[] = { sTestCert_PAA_NoVID_ToResignPAIs_Cert,
+                                           sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_Cert,
+                                           sTestCert_PAI_FFF2_8001_ResignedSubjectDiff_Cert,
+                                           sTestCert_PAI_FFF2_8001_Resigned_Cert,
+                                           sTestCert_PAI_FFF2_NoPID_Resigned_Cert };
+    ByteSpan TestCandidateCertsList8[] = { sTestCert_PAA_NoVID_ToResignPAIs_Cert,
+                                           sTestCert_PAI_FFF2_8001_Resigned_Cert,
+                                           ByteSpan(),
+                                           sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_Cert,
+                                           sTestCert_PAI_FFF2_8001_ResignedSubjectDiff_Cert,
+                                           sTestCert_PAI_FFF2_NoPID_Resigned_Cert };
+
+    const TestCase kTestCases[] = {
+        { sTestCert_PAI_FFF2_8001_Cert, nullptr, 5, sTestCert_PAI_FFF2_8001_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList3, 0, sTestCert_PAI_FFF2_8001_Cert },
+        { sTestCert_PAI_FFF1_8000_Cert, TestCandidateCertsList1, ArraySize(TestCandidateCertsList1), sTestCert_PAI_FFF1_8000_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList2, ArraySize(TestCandidateCertsList2), sTestCert_PAI_FFF2_8001_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList3, ArraySize(TestCandidateCertsList3), sTestCert_PAI_FFF2_8001_Resigned_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList4, ArraySize(TestCandidateCertsList4), sTestCert_PAI_FFF2_8001_Resigned_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList5, ArraySize(TestCandidateCertsList5), sTestCert_PAI_FFF2_8001_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList6, ArraySize(TestCandidateCertsList6), sTestCert_PAI_FFF2_8001_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList7, ArraySize(TestCandidateCertsList7), sTestCert_PAI_FFF2_8001_Resigned_Cert },
+        { sTestCert_PAI_FFF2_NoPID_Cert, TestCandidateCertsList7, ArraySize(TestCandidateCertsList7), sTestCert_PAI_FFF2_NoPID_Resigned_Cert },
+    };
+    // clang-format on
+
+    for (const auto & testCase : kTestCases)
+    {
+        ByteSpan outCert;
+        CHIP_ERROR result = ReplaceCertIfResignedCertFound(testCase.referenceCert, testCase.candidateCertsList,
+                                                           testCase.candidateCertsCount, outCert);
+
+        NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, outCert.data_equal(testCase.expectedOutCert));
+    }
+
+    // Error case: invalid input argument for referenceCertificate
+    {
+        ByteSpan outCert;
+        CHIP_ERROR result =
+            ReplaceCertIfResignedCertFound(ByteSpan(), TestCandidateCertsList7, ArraySize(TestCandidateCertsList7), outCert);
+        NL_TEST_ASSERT(inSuite, result == CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Error case: invalid input argument for one of the certificates in the candidateCertificates list
+    {
+        ByteSpan outCert;
+        CHIP_ERROR result =
+            ReplaceCertIfResignedCertFound(ByteSpan(), TestCandidateCertsList8, ArraySize(TestCandidateCertsList8), outCert);
+        NL_TEST_ASSERT(inSuite, result == CHIP_ERROR_INVALID_ARGUMENT);
+    }
+}
+
 static const uint8_t kCompressedFabricId[] = { 0x29, 0x06, 0xC9, 0x08, 0xD1, 0x15, 0xD3, 0x62 };
 
 const uint8_t kEpochKeyBuffer1[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7,
@@ -2462,6 +2543,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Authority Key Id Extraction from x509 Certificate", TestAKID_x509Extraction),
     NL_TEST_DEF("Test Vendor ID and Product ID Extraction from Attribute String", TestVIDPID_StringExtraction),
     NL_TEST_DEF("Test Vendor ID and Product ID Extraction from x509 Attestation Certificate", TestVIDPID_x509Extraction),
+    NL_TEST_DEF("Test Replace Resigned Certificate Version if Found", TestX509_ReplaceCertIfResignedCertFound),
     NL_TEST_DEF("Test Group Operation Key Derivation", TestGroup_OperationalKeyDerivation),
     NL_TEST_DEF("Test Group Session ID Derivation", TestGroup_SessionIdDerivation),
     NL_TEST_DEF("Test Group Privacy Key Derivation", TestGroup_PrivacyKeyDerivation),

@@ -49,11 +49,9 @@ config CHIP_QSPI_NOR
 if CHIP_QSPI_NOR
 
 config NORDIC_QSPI_NOR
-	bool
 	default y
 
 config NORDIC_QSPI_NOR_STACK_WRITE_BUFFER_SIZE
-	int
 	default 16
 
 endif # CHIP_QSPI_NOR
@@ -71,7 +69,6 @@ config CHIP_SPI_NOR
 if CHIP_SPI_NOR
 
 config SPI_NOR_FLASH_LAYOUT_PAGE_SIZE
-	int
 	default 4096
 
 endif # CHIP_SPI_NOR
@@ -96,41 +93,33 @@ if CHIP_DFU_OVER_BT_SMP
 
 # MCU Manager and SMP configuration
 config MCUMGR_SMP_BT_AUTHEN
-	bool
 	default n
 
 config MCUMGR_BUF_COUNT
-	int
 	default 6
 
 # Increase BT MTU and RX buffer for big size DFU messages
 config BT_L2CAP_TX_MTU
-	int
 	default 498
 
 config BT_BUF_ACL_RX_SIZE
-	int
 	default 502
 
 # Increase MCUMGR_BUF_SIZE, as it must be big enough to fit MAX MTU + overhead and for single-image DFU default is 384 B
 config MCUMGR_BUF_SIZE
-	int
 	default 1024
 
 # Increase system workqueue size, as SMP is processed within it
 config SYSTEM_WORKQUEUE_STACK_SIZE
-	int
 	default 2800
 
 if SOC_SERIES_NRF53X
 
 # Enable custom SMP request to erase settings partition.
 config MCUMGR_GRP_ZEPHYR_BASIC
-	bool
 	default y
 
 config MCUMGR_GRP_BASIC_CMD_STORAGE_ERASE
-	bool
 	default y
 
 endif # SOC_SERIES_NRF53X

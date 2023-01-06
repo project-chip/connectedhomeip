@@ -198,15 +198,22 @@ typedef struct _Target
     chip::DeviceTypeId DeviceType;
 } Target;
 
-// Struct for AccessControlEntry
-typedef struct _AccessControlEntry
+// Struct for AccessControlEntryStruct
+typedef struct _AccessControlEntryStruct
 {
     uint8_t Privilege;
     uint8_t AuthMode;
     /* TYPE WARNING: array array defaults to */ uint8_t * Subjects;
     /* TYPE WARNING: array array defaults to */ uint8_t * Targets;
     chip::FabricIndex FabricIndex;
-} AccessControlEntry;
+} AccessControlEntryStruct;
+
+// Struct for AccessControlExtensionStruct
+typedef struct _AccessControlExtensionStruct
+{
+    chip::ByteSpan Data;
+    chip::FabricIndex FabricIndex;
+} AccessControlExtensionStruct;
 
 // Struct for ActionStruct
 typedef struct _ActionStruct
@@ -267,8 +274,8 @@ typedef struct _ChannelInfo
 // Struct for DeviceTypeStruct
 typedef struct _DeviceTypeStruct
 {
-    chip::DeviceTypeId type;
-    uint16_t revision;
+    chip::DeviceTypeId DeviceType;
+    uint16_t Revision;
 } DeviceTypeStruct;
 
 // Struct for DlCredential
@@ -294,13 +301,6 @@ typedef struct _EndpointListStruct
     uint8_t Type;
     /* TYPE WARNING: array array defaults to */ uint8_t * Endpoints;
 } EndpointListStruct;
-
-// Struct for ExtensionEntry
-typedef struct _ExtensionEntry
-{
-    chip::ByteSpan Data;
-    chip::FabricIndex FabricIndex;
-} ExtensionEntry;
 
 // Struct for FabricDescriptor
 typedef struct _FabricDescriptor
@@ -554,15 +554,15 @@ typedef struct _ThreadInterfaceScanResult
     uint8_t LQI;
 } ThreadInterfaceScanResult;
 
-// Struct for ThreadMetrics
-typedef struct _ThreadMetrics
+// Struct for ThreadMetricsStruct
+typedef struct _ThreadMetricsStruct
 {
     uint64_t Id;
     chip::CharSpan Name;
     uint32_t StackFreeCurrent;
     uint32_t StackFreeMinimum;
     uint32_t StackSize;
-} ThreadMetrics;
+} ThreadMetricsStruct;
 
 // Struct for TimeZoneType
 typedef struct _TimeZoneType

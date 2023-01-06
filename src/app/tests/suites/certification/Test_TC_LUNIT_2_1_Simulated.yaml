@@ -1,0 +1,48 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    104.2.1. [TC-LUNIT-2.1] Read and Write Unit Localization Cluster Attributes
+    [DUT as Client]
+
+PICS:
+    - LUNIT.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Unit Localization"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the device to be commissioned"
+      cluster: "DelayCommands"
+      command: "WaitForCommissioning"
+
+    - label: "DUT reads TemperatureUnit attribute from TH"
+      PICS: LUNIT.C.A0000
+      wait: "readAttribute"
+      attribute: "TemperatureUnit"
+
+    - label: "DUT writes 3 to TemperatureUnit attribute on TH"
+      PICS: LUNIT.C.A0000
+      wait: "writeAttribute"
+      attribute: "TemperatureUnit"
+      arguments:
+          value:
+
+    - label: "DUT reads TemperatureUnit attribute from TH"
+      PICS: LUNIT.C.A0000
+      wait: "readAttribute"
+      attribute: "TemperatureUnit"

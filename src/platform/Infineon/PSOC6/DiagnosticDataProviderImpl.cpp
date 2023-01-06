@@ -260,17 +260,17 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wiFiVersion)
     /* VHT Capable */
     if (bss_info.vht_cap)
     {
-        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11AC;
+        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_AC;
     }
     /* HT Capable */
     else if (bss_info.n_cap)
     {
-        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N;
+        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_N;
     }
     /* 11g Capable */
     else
     {
-        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11G;
+        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_G;
     }
 
 exit:

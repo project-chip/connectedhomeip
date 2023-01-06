@@ -343,7 +343,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.groupId = params.groupId.unsignedShortValue;
+                request.groupID = params.groupID.unsignedShortValue;
                 request.groupName = [self asCharSpan:params.groupName];
 
                 chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
@@ -402,7 +402,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.groupId = params.groupId.unsignedShortValue;
+                request.groupID = params.groupID.unsignedShortValue;
 
                 chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
@@ -541,7 +541,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.groupId = params.groupId.unsignedShortValue;
+                request.groupID = params.groupID.unsignedShortValue;
 
                 chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
@@ -663,7 +663,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.groupId = params.groupId.unsignedShortValue;
+                request.groupID = params.groupID.unsignedShortValue;
                 request.groupName = [self asCharSpan:params.groupName];
 
                 chip::Controller::GroupsCluster cppCluster(exchangeManager, session, self->_endpoint);
@@ -2074,8 +2074,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.effectId
-                    = static_cast<std::remove_reference_t<decltype(request.effectId)>>(params.effectId.unsignedCharValue);
+                request.effectIdentifier = static_cast<std::remove_reference_t<decltype(request.effectIdentifier)>>(
+                    params.effectIdentifier.unsignedCharValue);
                 request.effectVariant
                     = static_cast<std::remove_reference_t<decltype(request.effectVariant)>>(params.effectVariant.unsignedCharValue);
 
@@ -5533,9 +5533,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.vendorId
-                    = static_cast<std::remove_reference_t<decltype(request.vendorId)>>(params.vendorId.unsignedShortValue);
-                request.productId = params.productId.unsignedShortValue;
+                request.vendorID
+                    = static_cast<std::remove_reference_t<decltype(request.vendorID)>>(params.vendorID.unsignedShortValue);
+                request.productID = params.productID.unsignedShortValue;
                 request.softwareVersion = params.softwareVersion.unsignedIntValue;
                 {
                     using ListType_0 = std::remove_reference_t<decltype(request.protocolsSupported)>;
@@ -5826,14 +5826,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     return self;
 }
 
-- (void)announceOtaProviderWithParams:(MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams *)params
+- (void)announceOTAProviderWithParams:(MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams *)params
                        expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
                 expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                            completion:(MTRStatusCompletion)completion
 {
     NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
                                      _endpoint, (unsigned int) MTRClusterIDTypeOTASoftwareUpdateRequestorID,
-                                     (unsigned int) MTRCommandIDTypeClusterOTASoftwareUpdateRequestorCommandAnnounceOtaProviderID];
+                                     (unsigned int) MTRCommandIDTypeClusterOTASoftwareUpdateRequestorCommandAnnounceOTAProviderID];
     // Make a copy of params before we go async.
     params = [params copy];
     NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
@@ -5858,13 +5858,13 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
                 chip::Optional<uint16_t> timedInvokeTimeoutMs;
                 ListFreer listFreer;
-                OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type request;
+                OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type request;
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.providerNodeId = params.providerNodeId.unsignedLongLongValue;
-                request.vendorId
-                    = static_cast<std::remove_reference_t<decltype(request.vendorId)>>(params.vendorId.unsignedShortValue);
+                request.providerNodeID = params.providerNodeID.unsignedLongLongValue;
+                request.vendorID
+                    = static_cast<std::remove_reference_t<decltype(request.vendorID)>>(params.vendorID.unsignedShortValue);
                 request.announcementReason = static_cast<std::remove_reference_t<decltype(request.announcementReason)>>(
                     params.announcementReason.unsignedCharValue);
                 if (params.metadataForNode != nil) {
@@ -5892,21 +5892,21 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     }
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeDefaultOtaProvidersWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeDefaultOTAProvidersWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device
         readAttributeWithEndpointID:@(_endpoint)
                           clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
-                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOtaProvidersID)
+                        attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOTAProvidersID)
                              params:params];
 }
 
-- (void)writeAttributeDefaultOtaProvidersWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributeDefaultOTAProvidersWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
-    [self writeAttributeDefaultOtaProvidersWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+    [self writeAttributeDefaultOTAProvidersWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
 }
-- (void)writeAttributeDefaultOtaProvidersWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+- (void)writeAttributeDefaultOTAProvidersWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
                              expectedValueInterval:(NSNumber *)expectedValueIntervalMs
                                             params:(MTRWriteParams * _Nullable)params
 {
@@ -5914,7 +5914,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
     [self.device writeAttributeWithEndpointID:@(_endpoint)
                                     clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
-                                  attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOtaProvidersID)
+                                  attributeID:@(MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOTAProvidersID)
                                         value:dataValueDictionary
                         expectedValueInterval:expectedValueIntervalMs
                             timedWriteTimeout:timedWriteTimeout];
@@ -6004,10 +6004,27 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
                     completionHandler:(MTRStatusCompletion)completionHandler
 {
-    [self announceOtaProviderWithParams:params
+    [self announceOTAProviderWithParams:params
                          expectedValues:expectedDataValueDictionaries
                   expectedValueInterval:expectedValueIntervalMs
                              completion:completionHandler];
+}
+- (NSDictionary<NSString *, id> *)readAttributeDefaultOtaProvidersWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributeDefaultOTAProvidersWithParams:params];
+}
+- (void)writeAttributeDefaultOtaProvidersWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeDefaultOTAProvidersWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs];
+}
+- (void)writeAttributeDefaultOtaProvidersWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                            params:(MTRWriteParams * _Nullable)params
+{
+    [self writeAttributeDefaultOTAProvidersWithValue:dataValueDictionary
+                               expectedValueInterval:expectedValueIntervalMs
+                                              params:params];
 }
 @end
 
@@ -8409,19 +8426,19 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeNeighborTableListWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeNeighborTableWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableListID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableID)
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeRouteTableListWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeRouteTableWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableListID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableID)
                                              params:params];
 }
 
@@ -8943,6 +8960,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
           expectedValueInterval:expectedValueIntervalMs
               completionHandler:completionHandler];
 }
+- (NSDictionary<NSString *, id> *)readAttributeNeighborTableListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributeNeighborTableWithParams:params];
+}
+- (NSDictionary<NSString *, id> *)readAttributeRouteTableListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributeRouteTableWithParams:params];
+}
 @end
 
 @implementation MTRClusterWiFiNetworkDiagnostics
@@ -9025,11 +9050,11 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     }
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeBssidWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeBSSIDWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBssidID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBSSIDID)
                                              params:params];
 }
 
@@ -9057,11 +9082,11 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeRssiWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeRSSIWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRssiID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRSSIID)
                                              params:params];
 }
 
@@ -9201,6 +9226,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                  expectedValues:expectedValues
           expectedValueInterval:expectedValueIntervalMs
               completionHandler:completionHandler];
+}
+- (NSDictionary<NSString *, id> *)readAttributeBssidWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributeBSSIDWithParams:params];
+}
+- (NSDictionary<NSString *, id> *)readAttributeRssiWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributeRSSIWithParams:params];
 }
 @end
 

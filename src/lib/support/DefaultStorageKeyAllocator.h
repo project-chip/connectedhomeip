@@ -175,6 +175,13 @@ public:
     static StorageKeyName BindingTable() { return StorageKeyName::FromConst("g/bt"); }
     static StorageKeyName BindingTableEntry(uint8_t index) { return StorageKeyName::Formatted("g/bt/%x", index); }
 
+    // Client Monitoring
+
+    static StorageKeyName ClientMonitoringTableEntry(chip::FabricIndex fabric)
+    {
+        return StorageKeyName::Formatted("f/%x/cm", fabric);
+    }
+
     static StorageKeyName OTADefaultProviders() { return StorageKeyName::FromConst("g/o/dp"); }
     static StorageKeyName OTACurrentProvider() { return StorageKeyName::FromConst("g/o/cp"); }
     static StorageKeyName OTAUpdateToken() { return StorageKeyName::FromConst("g/o/ut"); }

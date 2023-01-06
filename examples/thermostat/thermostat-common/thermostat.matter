@@ -86,12 +86,12 @@ server cluster Groups = 4 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
     CHAR_STRING groupName = 1;
   }
 
   request struct ViewGroupRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
   }
 
   request struct GetGroupMembershipRequest {
@@ -99,22 +99,22 @@ server cluster Groups = 4 {
   }
 
   request struct RemoveGroupRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
   }
 
   request struct AddGroupIfIdentifyingRequest {
-    group_id groupId = 0;
+    group_id groupID = 0;
     CHAR_STRING groupName = 1;
   }
 
   response struct AddGroupResponse = 0 {
     ENUM8 status = 0;
-    group_id groupId = 1;
+    group_id groupID = 1;
   }
 
   response struct ViewGroupResponse = 1 {
     ENUM8 status = 0;
-    group_id groupId = 1;
+    group_id groupID = 1;
     CHAR_STRING groupName = 2;
   }
 
@@ -125,7 +125,7 @@ server cluster Groups = 4 {
 
   response struct RemoveGroupResponse = 3 {
     ENUM8 status = 0;
-    group_id groupId = 1;
+    group_id groupID = 1;
   }
 
   fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
@@ -246,7 +246,7 @@ server cluster Scenes = 5 {
 
 server cluster Descriptor = 29 {
   struct DeviceTypeStruct {
-    devtype_id type = 0;
+    devtype_id deviceType = 0;
     int16u revision = 1;
   }
 
@@ -273,10 +273,18 @@ server cluster Binding = 30 {
 }
 
 server cluster AccessControl = 31 {
-  enum AuthMode : ENUM8 {
+  enum AccessControlEntryAuthModeEnum : ENUM8 {
     kPase = 1;
     kCase = 2;
     kGroup = 3;
+  }
+
+  enum AccessControlEntryPrivilegeEnum : ENUM8 {
+    kView = 1;
+    kProxyView = 2;
+    kOperate = 3;
+    kManage = 4;
+    kAdminister = 5;
   }
 
   enum ChangeTypeEnum : ENUM8 {
@@ -285,17 +293,9 @@ server cluster AccessControl = 31 {
     kRemoved = 2;
   }
 
-  enum Privilege : ENUM8 {
-    kView = 1;
-    kProxyView = 2;
-    kOperate = 3;
-    kManage = 4;
-    kAdminister = 5;
-  }
-
-  fabric_scoped struct AccessControlEntry {
-    fabric_sensitive Privilege privilege = 1;
-    fabric_sensitive AuthMode authMode = 2;
+  fabric_scoped struct AccessControlEntryStruct {
+    fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
+    fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
     nullable fabric_sensitive int64u subjects[] = 3;
     nullable fabric_sensitive Target targets[] = 4;
     fabric_idx fabricIndex = 254;
@@ -307,7 +307,7 @@ server cluster AccessControl = 31 {
     nullable devtype_id deviceType = 2;
   }
 
-  fabric_scoped struct ExtensionEntry {
+  fabric_scoped struct AccessControlExtensionStruct {
     fabric_sensitive octet_string<128> data = 1;
     fabric_idx fabricIndex = 254;
   }
@@ -316,7 +316,7 @@ server cluster AccessControl = 31 {
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
-    nullable AccessControlEntry latestValue = 4;
+    nullable AccessControlEntryStruct latestValue = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -324,12 +324,12 @@ server cluster AccessControl = 31 {
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
-    nullable ExtensionEntry latestValue = 4;
+    nullable AccessControlExtensionStruct latestValue = 4;
     fabric_idx fabricIndex = 254;
   }
 
-  attribute access(read: administer, write: administer) AccessControlEntry acl[] = 0;
-  attribute access(read: administer, write: administer) ExtensionEntry extension[] = 1;
+  attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
+  attribute access(read: administer, write: administer) AccessControlExtensionStruct extension[] = 1;
   readonly attribute int16u subjectsPerAccessControlEntry = 2;
   readonly attribute int16u targetsPerAccessControlEntry = 3;
   readonly attribute int16u accessControlEntriesPerFabric = 4;
@@ -408,8 +408,8 @@ client cluster OtaSoftwareUpdateProvider = 41 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct QueryImageRequest {
-    vendor_id vendorId = 0;
-    INT16U productId = 1;
+    vendor_id vendorID = 0;
+    INT16U productID = 1;
     INT32U softwareVersion = 2;
     OTADownloadProtocol protocolsSupported[] = 3;
     optional INT16U hardwareVersion = 4;
@@ -501,22 +501,22 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
     nullable INT64S platformCode = 3;
   }
 
-  attribute ProviderLocation defaultOtaProviders[] = 0;
+  attribute ProviderLocation defaultOTAProviders[] = 0;
   readonly attribute boolean updatePossible = 1;
   readonly attribute OTAUpdateStateEnum updateState = 2;
   readonly attribute nullable int8u updateStateProgress = 3;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  request struct AnnounceOtaProviderRequest {
-    node_id providerNodeId = 0;
-    vendor_id vendorId = 1;
+  request struct AnnounceOTAProviderRequest {
+    node_id providerNodeID = 0;
+    vendor_id vendorID = 1;
     OTAAnnouncementReason announcementReason = 2;
     optional OCTET_STRING<512> metadataForNode = 3;
     endpoint_no endpoint = 4;
   }
 
-  command AnnounceOtaProvider(AnnounceOtaProviderRequest): DefaultSuccess = 0;
+  command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
 server cluster LocalizationConfiguration = 43 {
@@ -662,7 +662,7 @@ server cluster NetworkCommissioning = 49 {
 
   bitmap WiFiSecurity : BITMAP8 {
     kUnencrypted = 0x1;
-    kWepPersonal = 0x2;
+    kWep = 0x2;
     kWpaPersonal = 0x4;
     kWpa2Personal = 0x8;
     kWpa3Personal = 0x10;
@@ -900,7 +900,7 @@ server cluster SoftwareDiagnostics = 52 {
     kWaterMarks = 0x1;
   }
 
-  struct ThreadMetrics {
+  struct ThreadMetricsStruct {
     int64u id = 0;
     optional char_string<8> name = 1;
     optional int32u stackFreeCurrent = 2;
@@ -914,7 +914,7 @@ server cluster SoftwareDiagnostics = 52 {
     optional OCTET_STRING faultRecording = 2;
   }
 
-  readonly attribute ThreadMetrics threadMetrics[] = 0;
+  readonly attribute ThreadMetricsStruct threadMetrics[] = 0;
   readonly attribute int64u currentHeapFree = 1;
   readonly attribute int64u currentHeapUsed = 2;
   readonly attribute int64u currentHeapHighWatermark = 3;
@@ -923,6 +923,11 @@ server cluster SoftwareDiagnostics = 52 {
 }
 
 server cluster ThreadNetworkDiagnostics = 53 {
+  enum ConnectionStatusEnum : ENUM8 {
+    kConnected = 0;
+    kNotConnected = 1;
+  }
+
   enum NetworkFault : ENUM8 {
     kUnspecified = 0;
     kLinkDown = 1;
@@ -938,11 +943,6 @@ server cluster ThreadNetworkDiagnostics = 53 {
     kReed = 4;
     kRouter = 5;
     kLeader = 6;
-  }
-
-  enum ThreadConnectionStatus : ENUM8 {
-    kConnected = 0;
-    kNotConnected = 1;
   }
 
   bitmap ThreadNetworkDiagnosticsFeature : BITMAP32 {
@@ -984,7 +984,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
 
   struct SecurityPolicy {
     int16u rotationTime = 0;
-    bitmap16 flags = 1;
+    int16u flags = 1;
   }
 
   struct OperationalDatasetComponents {
@@ -1003,7 +1003,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
   }
 
   info event ConnectionStatus = 0 {
-    ThreadConnectionStatus connectionStatus = 0;
+    ConnectionStatusEnum connectionStatus = 0;
   }
 
   info event NetworkFaultChange = 1 {
@@ -1018,8 +1018,8 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute nullable int64u extendedPanId = 4;
   readonly attribute nullable octet_string<17> meshLocalPrefix = 5;
   readonly attribute int64u overrunCount = 6;
-  readonly attribute NeighborTable neighborTableList[] = 7;
-  readonly attribute RouteTable routeTableList[] = 8;
+  readonly attribute NeighborTable neighborTable[] = 7;
+  readonly attribute RouteTable routeTable[] = 8;
   readonly attribute nullable int32u partitionId = 9;
   readonly attribute nullable int8u weighting = 10;
   readonly attribute nullable int8u dataVersion = 11;
@@ -1101,12 +1101,12 @@ server cluster WiFiNetworkDiagnostics = 54 {
   }
 
   enum WiFiVersionType : ENUM8 {
-    k80211a = 0;
-    k80211b = 1;
-    k80211g = 2;
-    k80211n = 3;
-    k80211ac = 4;
-    k80211ax = 5;
+    kA = 0;
+    kB = 1;
+    kG = 2;
+    kN = 3;
+    kAc = 4;
+    kAx = 5;
   }
 
   info event Disconnection = 0 {
@@ -1550,7 +1550,7 @@ endpoint 0 {
   }
 
   server cluster OtaSoftwareUpdateRequestor {
-    callback attribute defaultOtaProviders;
+    callback attribute defaultOTAProviders;
     ram      attribute updatePossible default = 1;
     ram      attribute updateState;
     ram      attribute updateStateProgress;
@@ -1638,8 +1638,8 @@ endpoint 0 {
     callback attribute extendedPanId;
     callback attribute meshLocalPrefix;
     callback attribute overrunCount;
-    callback attribute neighborTableList;
-    callback attribute routeTableList;
+    callback attribute neighborTable;
+    callback attribute routeTable;
     callback attribute partitionId;
     callback attribute weighting;
     callback attribute dataVersion;
