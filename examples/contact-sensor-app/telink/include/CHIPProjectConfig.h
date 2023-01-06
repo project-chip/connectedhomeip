@@ -16,43 +16,24 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *          Example project configuration file for CHIP.
+ *
+ *          This is a place to put application or project-specific overrides
+ *          to the default configuration values for general CHIP features.
+ *
+ */
+
 #pragma once
 
-#include <cstdint>
+// Use a default pairing code if one hasn't been provisioned in flash.
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
-struct AppEvent;
-typedef void (*EventHandler)(AppEvent *);
-
-class LEDWidget;
-
-struct AppEvent
-{
-    enum AppEventTypes
-    {
-        kEventType_Button = 0,
-        kEventType_Timer,
-        kEventType_UpdateLedState,
-        kEventType_Thermostat,
-        kEventType_Install,
-    };
-
-    uint16_t Type;
-
-    union
-    {
-        struct
-        {
-            uint8_t Action;
-        } ButtonEvent;
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-        struct
-        {
-            LEDWidget * LedWidget;
-        } UpdateLedStateEvent;
-    };
-
-    EventHandler Handler;
-};
+/**
+ * CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
+ *
+ * Reduce packet buffer pool size to 8 (default 15) to reduce ram consumption
+ */
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 8

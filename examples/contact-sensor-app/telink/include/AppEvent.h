@@ -32,8 +32,7 @@ struct AppEvent
         kEventType_Button = 0,
         kEventType_Timer,
         kEventType_UpdateLedState,
-        kEventType_Thermostat,
-        kEventType_Install,
+        kEventType_Contact,
     };
 
     uint16_t Type;
@@ -46,8 +45,8 @@ struct AppEvent
         } ButtonEvent;
         struct
         {
-            void * Context;
-        } TimerEvent;
+            uint8_t Action;
+        } ContactEvent;
         struct
         {
             LEDWidget * LedWidget;

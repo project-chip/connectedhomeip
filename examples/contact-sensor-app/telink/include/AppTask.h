@@ -19,9 +19,8 @@
 #pragma once
 
 #include "AppEvent.h"
+#include "ContactSensorManager.h"
 #include "LEDWidget.h"
-#include "SensorManager.h"
-#include "TemperatureManager.h"
 
 #include <zephyr/drivers/gpio.h>
 
@@ -33,28 +32,40 @@
 
 #include <cstdint>
 
+// Application-defined error codes in the CHIP_ERROR space.
+#define APP_ERROR_UNHANDLED_EVENT CHIP_APPLICATION_ERROR(0x03)
+
 struct k_timer;
 
 class AppTask
 {
 public:
-    CHIP_ERROR StartApp();
+    CHIP_ERROR StartApp(void);
 
+    void PostContactActionRequest(ContactSensorManager::Action aAction);
     void PostEvent(AppEvent * event);
-    void UpdateClusterState();
-    void UpdateThermoStatUI();
+    void UpdateClusterState(void);
+    void UpdateDeviceState(void);
+
+    bool IsSyncClusterToButtonAction(void);
+    void SetSyncClusterToButtonAction(bool value);
 
 private:
     friend AppTask & GetAppTask(void);
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(void);
 
     void DispatchEvent(AppEvent * event);
 
-    static void UpdateStatusLED();
+    static void OnStateChanged(ContactSensorManager::State aState);
+
+    static void UpdateClusterStateInternal(intptr_t arg);
+    static void UpdateDeviceStateInternal(intptr_t arg);
+
+    static void UpdateStatusLED(void);
     static void LEDStateUpdateHandler(LEDWidget * ledWidget);
     static void FactoryResetButtonEventHandler(void);
-    static void StartThreadButtonEventHandler(void);
     static void StartBleAdvButtonEventHandler(void);
+    static void ToggleContactStateButtonEventHandler(void);
 
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
@@ -62,13 +73,15 @@ private:
 
     static void FactoryResetTimerEventHandler(AppEvent * aEvent);
     static void FactoryResetHandler(AppEvent * aEvent);
-    static void StartThreadHandler(AppEvent * aEvent);
     static void StartBleAdvHandler(AppEvent * aEvent);
+    static void ContactActionEventHandler(AppEvent * aEvent);
     static void UpdateLedStateEventHandler(AppEvent * aEvent);
 
     static void InitButtons(void);
 
     static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
+    bool mSyncClusterToButtonAction = false;
 
     static AppTask sAppTask;
 
@@ -81,4 +94,14 @@ private:
 inline AppTask & GetAppTask(void)
 {
     return AppTask::sAppTask;
+}
+
+inline bool AppTask::IsSyncClusterToButtonAction()
+{
+    return mSyncClusterToButtonAction;
+}
+
+inline void AppTask::SetSyncClusterToButtonAction(bool value)
+{
+    mSyncClusterToButtonAction = value;
 }
