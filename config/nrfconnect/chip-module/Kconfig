@@ -135,16 +135,45 @@ config CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE
 	  As a result, a new output file merged.hex will consist of all partitions including 
 	  factory data.
 
-# Use default certificates without generating or providing them
-config CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
-	bool "Use default certificates located in Matter repository"
-	default y
+# Select source of the certificates
+choice CHIP_FACTORY_DATA_CERT_SOURCE
+	prompt "Attestation certificate file source"
+	default CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
+
+	config CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
+		bool "Use pre-generated development certificates"
+		help
+			Use pre-generated certificate files from the credentials/development/attestation/
+			directory that match the configured Product ID. This can be used for development
+			purpose.
+	config CHIP_FACTORY_DATA_CERT_SOURCE_GENERATED
+		bool "Auto-generate certificates"
+		help
+			Generate new certificates instead of using pre-generated ones.
+			The certificates are generated on every build.
+	config CHIP_FACTORY_DATA_CERT_SOURCE_USER
+		bool "Use user-provided certificate files"
+		help
+			Use user-provided certificate files.
+			The user needs to specify the absolute path to all necessary files.
+endchoice
+
+if CHIP_FACTORY_DATA_CERT_SOURCE_USER
+
+config CHIP_FACTORY_DATA_USER_CERTS_DAC_CERT
+	string "Path to the DAC certificate *.der-file"
 	help
-	  Pre-generated certificates can be used for development purpose.
-	  This config includes default pre-generated certificates 
-	  which are located in credentials/development/attestation/ directory 
-	  instead of generating new ones.
-	  If this config is set to `n` new certificates will be generated.
+		Absolute path to the DAC certificate file in binary format.
+config CHIP_FACTORY_DATA_USER_CERTS_DAC_KEY
+	string "Path to the DAC private key *.der-file"
+	help
+		Absolute path to the DAC keysfile in binary format.
+		Note that both public and private keys must be present (will be extracted automatically).
+config CHIP_FACTORY_DATA_USER_CERTS_PAI_CERT
+	string "Path to the PAI certificate *.der-file"
+	help
+		Absolute path pointing to the PAI certificate in binary format.
+endif
 
 # Configs for SPAKE2 generation
 config CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER
