@@ -6395,8 +6395,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStatus)), status));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kContent)), content));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTimeStamp)), timeStamp));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kLogContent)), logContent));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUTCTimeStamp)), UTCTimeStamp));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTimeSinceBoot)), timeSinceBoot));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -6419,11 +6419,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kStatus):
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
             break;
-        case to_underlying(Fields::kContent):
-            ReturnErrorOnFailure(DataModel::Decode(reader, content));
+        case to_underlying(Fields::kLogContent):
+            ReturnErrorOnFailure(DataModel::Decode(reader, logContent));
             break;
-        case to_underlying(Fields::kTimeStamp):
-            ReturnErrorOnFailure(DataModel::Decode(reader, timeStamp));
+        case to_underlying(Fields::kUTCTimeStamp):
+            ReturnErrorOnFailure(DataModel::Decode(reader, UTCTimeStamp));
             break;
         case to_underlying(Fields::kTimeSinceBoot):
             ReturnErrorOnFailure(DataModel::Decode(reader, timeSinceBoot));
@@ -6811,7 +6811,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace GeneralDiagnostics
 namespace SoftwareDiagnostics {
 namespace Structs {
-namespace ThreadMetrics {
+namespace ThreadMetricsStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -6866,7 +6866,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace ThreadMetrics
+} // namespace ThreadMetricsStruct
 } // namespace Structs
 
 namespace Commands {
@@ -7363,11 +7363,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::OverrunCount::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, overrunCount));
         break;
-    case Attributes::NeighborTableList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, neighborTableList));
+    case Attributes::NeighborTable::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, neighborTable));
         break;
-    case Attributes::RouteTableList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, routeTableList));
+    case Attributes::RouteTable::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, routeTable));
         break;
     case Attributes::PartitionId::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, partitionId));

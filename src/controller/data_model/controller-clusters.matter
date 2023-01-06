@@ -1280,8 +1280,8 @@ client cluster DiagnosticLogs = 50 {
 
   response struct RetrieveLogsResponse = 1 {
     LogsStatus status = 0;
-    OCTET_STRING content = 1;
-    epoch_s timeStamp = 2;
+    OCTET_STRING logContent = 1;
+    epoch_s UTCTimeStamp = 2;
     INT32U timeSinceBoot = 3;
   }
 
@@ -1396,7 +1396,7 @@ client cluster SoftwareDiagnostics = 52 {
     kWaterMarks = 0x1;
   }
 
-  struct ThreadMetrics {
+  struct ThreadMetricsStruct {
     int64u id = 0;
     optional char_string<8> name = 1;
     optional int32u stackFreeCurrent = 2;
@@ -1410,7 +1410,7 @@ client cluster SoftwareDiagnostics = 52 {
     optional OCTET_STRING faultRecording = 2;
   }
 
-  readonly attribute ThreadMetrics threadMetrics[] = 0;
+  readonly attribute ThreadMetricsStruct threadMetrics[] = 0;
   readonly attribute int64u currentHeapFree = 1;
   readonly attribute int64u currentHeapUsed = 2;
   readonly attribute int64u currentHeapHighWatermark = 3;
@@ -1424,6 +1424,11 @@ client cluster SoftwareDiagnostics = 52 {
 }
 
 client cluster ThreadNetworkDiagnostics = 53 {
+  enum ConnectionStatusEnum : ENUM8 {
+    kConnected = 0;
+    kNotConnected = 1;
+  }
+
   enum NetworkFault : ENUM8 {
     kUnspecified = 0;
     kLinkDown = 1;
@@ -1439,11 +1444,6 @@ client cluster ThreadNetworkDiagnostics = 53 {
     kReed = 4;
     kRouter = 5;
     kLeader = 6;
-  }
-
-  enum ThreadConnectionStatus : ENUM8 {
-    kConnected = 0;
-    kNotConnected = 1;
   }
 
   bitmap ThreadNetworkDiagnosticsFeature : BITMAP32 {
@@ -1485,7 +1485,7 @@ client cluster ThreadNetworkDiagnostics = 53 {
 
   struct SecurityPolicy {
     int16u rotationTime = 0;
-    bitmap16 flags = 1;
+    int16u flags = 1;
   }
 
   struct OperationalDatasetComponents {
@@ -1504,7 +1504,7 @@ client cluster ThreadNetworkDiagnostics = 53 {
   }
 
   info event ConnectionStatus = 0 {
-    ThreadConnectionStatus connectionStatus = 0;
+    ConnectionStatusEnum connectionStatus = 0;
   }
 
   info event NetworkFaultChange = 1 {
@@ -1519,8 +1519,8 @@ client cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute nullable int64u extendedPanId = 4;
   readonly attribute nullable octet_string<17> meshLocalPrefix = 5;
   readonly attribute int64u overrunCount = 6;
-  readonly attribute NeighborTable neighborTableList[] = 7;
-  readonly attribute RouteTable routeTableList[] = 8;
+  readonly attribute NeighborTable neighborTable[] = 7;
+  readonly attribute RouteTable routeTable[] = 8;
   readonly attribute nullable int32u partitionId = 9;
   readonly attribute nullable int8u weighting = 10;
   readonly attribute nullable int8u dataVersion = 11;
@@ -1607,12 +1607,12 @@ client cluster WiFiNetworkDiagnostics = 54 {
   }
 
   enum WiFiVersionType : ENUM8 {
-    k80211a = 0;
-    k80211b = 1;
-    k80211g = 2;
-    k80211n = 3;
-    k80211ac = 4;
-    k80211ax = 5;
+    kA = 0;
+    kB = 1;
+    kG = 2;
+    kN = 3;
+    kAc = 4;
+    kAx = 5;
   }
 
   info event Disconnection = 0 {

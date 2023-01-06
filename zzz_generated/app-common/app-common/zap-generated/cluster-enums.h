@@ -766,6 +766,14 @@ enum class SoftwareDiagnosticsFeature : uint32_t
 
 namespace ThreadNetworkDiagnostics {
 
+// Enum for ConnectionStatusEnum
+enum class ConnectionStatusEnum : uint8_t
+{
+    kConnected        = 0x00,
+    kNotConnected     = 0x01,
+    kUnknownEnumValue = 2,
+};
+
 // Enum for NetworkFault
 enum class NetworkFault : uint8_t
 {
@@ -795,14 +803,6 @@ enum class RoutingRole : uint8_t
 using RoutingRole                                                                      = EmberAfRoutingRole;
 static RoutingRole __attribute__((unused)) kRoutingRolekUnknownEnumValue               = static_cast<RoutingRole>(7);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-
-// Enum for ThreadConnectionStatus
-enum class ThreadConnectionStatus : uint8_t
-{
-    kConnected        = 0x00,
-    kNotConnected     = 0x01,
-    kUnknownEnumValue = 2,
-};
 
 // Bitmap for ThreadNetworkDiagnosticsFeature
 enum class ThreadNetworkDiagnosticsFeature : uint32_t
@@ -859,12 +859,12 @@ enum class WiFiConnectionStatus : uint8_t
 // Enum for WiFiVersionType
 enum class WiFiVersionType : uint8_t
 {
-    k80211a           = 0x00,
-    k80211b           = 0x01,
-    k80211g           = 0x02,
-    k80211n           = 0x03,
-    k80211ac          = 0x04,
-    k80211ax          = 0x05,
+    kA                = 0x00,
+    kB                = 0x01,
+    kG                = 0x02,
+    kN                = 0x03,
+    kAc               = 0x04,
+    kAx               = 0x05,
     kUnknownEnumValue = 6,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM

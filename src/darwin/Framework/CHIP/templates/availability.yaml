@@ -4715,6 +4715,12 @@
               - AttributeList
               - FeatureMap
               - ClusterRevision
+          ThreadNetworkDiagnostics:
+              - NeighborTable
+              - RouteTable
+          WiFiNetworkDiagnostics:
+              - BSSID
+              - RSSI
       commands:
           OTASoftwareUpdateProvider:
               - QueryImage
@@ -4935,6 +4941,10 @@
           OnOff:
               OffWithEffect:
                   - effectIdentifier
+          DiagnosticLogs:
+              RetrieveLogsResponse:
+                  - logContent
+                  - utcTimeStamp
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -4953,6 +4963,8 @@
           AccessControl:
               - AccessControlEntryStruct
               - AccessControlExtensionStruct
+          SoftwareDiagnostics:
+              - ThreadMetricsStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5030,6 +5042,13 @@
               AccessControlExtensionStruct:
                   - data
                   - fabricIndex
+          SoftwareDiagnostics:
+              ThreadMetricsStruct:
+                  - id
+                  - name
+                  - stackFreeCurrent
+                  - stackFreeMinimum
+                  - stackSize
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5106,6 +5125,8 @@
           AccessControl:
               - AccessControlEntryPrivilegeEnum
               - AccessControlEntryAuthModeEnum
+          ThreadNetworkDiagnostics:
+              - ConnectionStatusEnum
       enum values:
           OTASoftwareUpdateProvider:
               OTAApplyUpdateAction:
@@ -5166,6 +5187,18 @@
           PowerSource:
               BatChargeLevel:
                   - OK
+          ThreadNetworkDiagnostics:
+              ConnectionStatusEnum:
+                  - Connected
+                  - NotConnected
+          WiFiNetworkDiagnostics:
+              WiFiVersionType:
+                  - A
+                  - B
+                  - G
+                  - N
+                  - Ac
+                  - Ax
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5227,6 +5260,12 @@
               - PirOccupiedToUnoccupiedDelay
               - PirUnoccupiedToOccupiedDelay
               - PirUnoccupiedToOccupiedThreshold
+          ThreadNetworkDiagnostics:
+              - NeighborTableList
+              - RouteTableList
+          WiFiNetworkDiagnostics:
+              - Bssid
+              - Rssi
       command fields:
           Groups:
               AddGroup:
@@ -5246,6 +5285,10 @@
           OnOff:
               OffWithEffect:
                   - effectId
+          DiagnosticLogs:
+              RetrieveLogsResponse:
+                  - content
+                  - timeStamp
       structs:
           Descriptor:
               - DeviceType
@@ -5256,6 +5299,8 @@
               - WiredFaultChangeType
               - BatFaultChangeType
               - BatChargeFaultChangeType
+          SoftwareDiagnostics:
+              - ThreadMetrics
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5268,6 +5313,8 @@
           AccessControl:
               - Privilege
               - AuthMode
+          ThreadNetworkDiagnostics:
+              - ThreadConnectionStatus
       enum values:
           GeneralCommissioning:
               CommissioningError:
@@ -5275,6 +5322,14 @@
           PowerSource:
               BatChargeLevel:
                   - Ok
+          WiFiNetworkDiagnostics:
+              WiFiVersionType:
+                  - 80211a
+                  - 80211b
+                  - 80211g
+                  - 80211n
+                  - 80211ac
+                  - 80211ax
       bitmap values:
           NetworkCommissioning:
               WiFiSecurity:
@@ -5307,6 +5362,12 @@
               PIRUnoccupiedToOccupiedThreshold: PirUnoccupiedToOccupiedThreshold
           OTASoftwareUpdateRequestor:
               DefaultOTAProviders: DefaultOtaProviders
+          ThreadNetworkDiagnostics:
+              NeighborTable: NeighborTableList
+              RouteTable: RouteTableList
+          WiFiNetworkDiagnostics:
+              BSSID: Bssid
+              RSSI: Rssi
       commands:
           OTASoftwareUpdateRequestor:
               AnnounceOTAProvider: AnnounceOtaProvider
@@ -5337,10 +5398,16 @@
           OnOff:
               OffWithEffect:
                   effectIdentifier: effectId
+          DiagnosticLogs:
+              RetrieveLogsResponse:
+                  logContent: content
+                  utcTimeStamp: timeStamp
       structs:
           AccessControl:
               AccessControlEntryStruct: AccessControlEntry
               AccessControlExtensionStruct: ExtensionEntry
+          SoftwareDiagnostics:
+              ThreadMetricsStruct: ThreadMetrics
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5353,6 +5420,8 @@
           AccessControl:
               AccessControlEntryPrivilegeEnum: Privilege
               AccessControlEntryAuthModeEnum: AuthMode
+          ThreadNetworkDiagnostics:
+              ConnectionStatusEnum: ThreadConnectionStatus
       enum values:
           GeneralCommissioning:
               CommissioningError:
@@ -5360,6 +5429,14 @@
           PowerSource:
               BatChargeLevel:
                   OK: Ok
+          WiFiNetworkDiagnostics:
+              WiFiVersionType:
+                  A: 80211a
+                  B: 80211b
+                  G: 80211g
+                  N: 80211n
+                  Ac: 80211ac
+                  Ax: 80211ax
       bitmap values:
           NetworkCommissioning:
               WiFiSecurity:
