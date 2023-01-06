@@ -41,8 +41,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    # TODO: update this to connectedhomeip/chip-build-vscode:0.6.27 once we can compile with latest NRF
-    - name: "connectedhomeip/chip-build-vscode:0.6.18"
+    - name: "connectedhomeip/chip-build-vscode:0.6.27"
       id: NRFConnect
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
