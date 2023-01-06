@@ -4322,28 +4322,28 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                             completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeNeighborTableListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeNeighborTableWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-- (void)subscribeAttributeNeighborTableListWithParams:(MTRSubscribeParams *)params
-                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeNeighborTableWithParams:(MTRSubscribeParams *)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
     MTR_NEWLY_AVAILABLE;
-+ (void)readAttributeNeighborTableListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
-                                                   endpoint:(NSNumber *)endpoint
-                                                      queue:(dispatch_queue_t)queue
-                                                 completion:(void (^)(NSArray * _Nullable value,
-                                                                NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
++ (void)readAttributeNeighborTableWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                               endpoint:(NSNumber *)endpoint
+                                                  queue:(dispatch_queue_t)queue
+                                             completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeRouteTableListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeRouteTableWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-- (void)subscribeAttributeRouteTableListWithParams:(MTRSubscribeParams *)params
-                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeRouteTableWithParams:(MTRSubscribeParams *)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
     MTR_NEWLY_AVAILABLE;
-+ (void)readAttributeRouteTableListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
-                                                endpoint:(NSNumber *)endpoint
-                                                   queue:(dispatch_queue_t)queue
-                                              completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
++ (void)readAttributeRouteTableWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                            endpoint:(NSNumber *)endpoint
+                                               queue:(dispatch_queue_t)queue
+                                          completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributePartitionIdWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
@@ -17615,6 +17615,21 @@ typedef NS_OPTIONS(uint32_t, MTRSoftwareDiagnosticsFeature) {
     MTRSoftwareDiagnosticsFeatureWaterMarks API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTRThreadNetworkDiagnosticsConnectionStatus) {
+    MTRThreadNetworkDiagnosticsConnectionStatusConnected MTR_NEWLY_AVAILABLE = 0x00,
+    MTRThreadNetworkDiagnosticsConnectionStatusNotConnected MTR_NEWLY_AVAILABLE = 0x01,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRThreadNetworkDiagnosticsThreadConnectionStatus) {
+    MTRThreadNetworkDiagnosticsThreadConnectionStatusConnected API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRThreadNetworkDiagnosticsConnectionStatusConnected")
+    = 0x00,
+    MTRThreadNetworkDiagnosticsThreadConnectionStatusNotConnected API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRThreadNetworkDiagnosticsConnectionStatusNotConnected")
+    = 0x01,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRThreadNetworkDiagnosticsConnectionStatus");
+
 typedef NS_ENUM(uint8_t, MTRThreadNetworkDiagnosticsNetworkFault) {
     MTRThreadNetworkDiagnosticsNetworkFaultUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
     MTRThreadNetworkDiagnosticsNetworkFaultLinkDown API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
@@ -17630,13 +17645,6 @@ typedef NS_ENUM(uint8_t, MTRThreadNetworkDiagnosticsRoutingRole) {
     MTRThreadNetworkDiagnosticsRoutingRoleREED API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
     MTRThreadNetworkDiagnosticsRoutingRoleRouter API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
     MTRThreadNetworkDiagnosticsRoutingRoleLeader API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-
-typedef NS_ENUM(uint8_t, MTRThreadNetworkDiagnosticsThreadConnectionStatus) {
-    MTRThreadNetworkDiagnosticsThreadConnectionStatusConnected API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    = 0x00,
-    MTRThreadNetworkDiagnosticsThreadConnectionStatusNotConnected API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    = 0x01,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRThreadNetworkDiagnosticsFeature) {
@@ -24844,7 +24852,7 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
 - (void)readAttributeNeighborTableListWithCompletionHandler:
     (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use readAttributeNeighborTableListWithCompletion:");
+        MTR_NEWLY_DEPRECATED("Please use readAttributeNeighborTableWithCompletion:");
 - (void)
     subscribeAttributeNeighborTableListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                            maxInterval:(NSNumber * _Nonnull)maxInterval
@@ -24852,19 +24860,19 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                          reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeNeighborTableListWithParams:subscriptionEstablished:");
+        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeNeighborTableWithParams:subscriptionEstablished:");
 + (void)readAttributeNeighborTableListWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                                 endpoint:(NSNumber *)endpoint
                                                    queue:(dispatch_queue_t)queue
                                        completionHandler:
                                            (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use readAttributeNeighborTableListWithAttributeCache:endpoint:queue:completion:");
+        MTR_NEWLY_DEPRECATED("Please use readAttributeNeighborTableWithAttributeCache:endpoint:queue:completion:");
 
 - (void)readAttributeRouteTableListWithCompletionHandler:
     (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use readAttributeRouteTableListWithCompletion:");
+        MTR_NEWLY_DEPRECATED("Please use readAttributeRouteTableWithCompletion:");
 - (void)subscribeAttributeRouteTableListWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(MTRSubscribeParams * _Nullable)params
@@ -24872,14 +24880,14 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
                                           reportHandler:
                                               (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeRouteTableListWithParams:subscriptionEstablished:");
+        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeRouteTableWithParams:subscriptionEstablished:");
 + (void)readAttributeRouteTableListWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                              endpoint:(NSNumber *)endpoint
                                                 queue:(dispatch_queue_t)queue
                                     completionHandler:
                                         (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use readAttributeRouteTableListWithAttributeCache:endpoint:queue:completion:");
+        MTR_NEWLY_DEPRECATED("Please use readAttributeRouteTableWithAttributeCache:endpoint:queue:completion:");
 
 - (void)readAttributePartitionIdWithCompletionHandler:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler

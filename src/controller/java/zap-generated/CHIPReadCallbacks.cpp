@@ -9071,9 +9071,9 @@ void CHIPThreadNetworkDiagnosticsMeshLocalPrefixAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
-CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback::CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback(
+CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback::CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback(
     jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterNeighborTableListAttributeCallbackType>(CallbackFn, this),
+    chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterNeighborTableAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -9090,7 +9090,7 @@ CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback::CHIPThreadNetwor
     }
 }
 
-CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback::~CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback()
+CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback::~CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -9101,7 +9101,7 @@ CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback::~CHIPThreadNetwo
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback::CallbackFn(
+void CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & list)
@@ -9113,8 +9113,8 @@ void CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -9260,9 +9260,9 @@ void CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback::CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback(
+CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback::CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback(
     jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterRouteTableListAttributeCallbackType>(CallbackFn, this),
+    chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterRouteTableAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -9279,7 +9279,7 @@ CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback::CHIPThreadNetworkDi
     }
 }
 
-CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback::~CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback()
+CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback::~CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -9290,7 +9290,7 @@ CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback::~CHIPThreadNetworkD
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback::CallbackFn(
+void CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
         list)
@@ -9302,8 +9302,8 @@ void CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;

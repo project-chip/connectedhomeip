@@ -800,6 +800,18 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Rad
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(ThreadNetworkDiagnostics::ConnectionStatusEnum val)
+{
+    using EnumType = ThreadNetworkDiagnostics::ConnectionStatusEnum;
+    switch (val)
+    {
+    case EnumType::kConnected:
+    case EnumType::kNotConnected:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(ThreadNetworkDiagnostics::NetworkFault val)
 {
     using EnumType = ThreadNetworkDiagnostics::NetworkFault;
@@ -841,18 +853,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ThreadNetworkDiagnostic
         return val;
     default:
         return static_cast<EnumType>(7);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(ThreadNetworkDiagnostics::ThreadConnectionStatus val)
-{
-    using EnumType = ThreadNetworkDiagnostics::ThreadConnectionStatus;
-    switch (val)
-    {
-    case EnumType::kConnected:
-    case EnumType::kNotConnected:
-        return val;
-    default:
-        return static_cast<EnumType>(2);
     }
 }
 

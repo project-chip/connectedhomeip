@@ -4715,6 +4715,9 @@
               - AttributeList
               - FeatureMap
               - ClusterRevision
+          ThreadNetworkDiagnostics:
+              - NeighborTable
+              - RouteTable
       commands:
           OTASoftwareUpdateProvider:
               - QueryImage
@@ -5119,6 +5122,8 @@
           AccessControl:
               - AccessControlEntryPrivilegeEnum
               - AccessControlEntryAuthModeEnum
+          ThreadNetworkDiagnostics:
+              - ConnectionStatusEnum
       enum values:
           OTASoftwareUpdateProvider:
               OTAApplyUpdateAction:
@@ -5179,6 +5184,10 @@
           PowerSource:
               BatChargeLevel:
                   - OK
+          ThreadNetworkDiagnostics:
+              ConnectionStatusEnum:
+                  - Connected
+                  - NotConnected
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5240,6 +5249,9 @@
               - PirOccupiedToUnoccupiedDelay
               - PirUnoccupiedToOccupiedDelay
               - PirUnoccupiedToOccupiedThreshold
+          ThreadNetworkDiagnostics:
+              - NeighborTableList
+              - RouteTableList
       command fields:
           Groups:
               AddGroup:
@@ -5287,6 +5299,8 @@
           AccessControl:
               - Privilege
               - AuthMode
+          ThreadNetworkDiagnostics:
+              - ThreadConnectionStatus
       enum values:
           GeneralCommissioning:
               CommissioningError:
@@ -5326,6 +5340,9 @@
               PIRUnoccupiedToOccupiedThreshold: PirUnoccupiedToOccupiedThreshold
           OTASoftwareUpdateRequestor:
               DefaultOTAProviders: DefaultOtaProviders
+          ThreadNetworkDiagnostics:
+              NeighborTable: NeighborTableList
+              RouteTable: RouteTableList
       commands:
           OTASoftwareUpdateRequestor:
               AnnounceOTAProvider: AnnounceOtaProvider
@@ -5378,6 +5395,8 @@
           AccessControl:
               AccessControlEntryPrivilegeEnum: Privilege
               AccessControlEntryAuthModeEnum: AuthMode
+          ThreadNetworkDiagnostics:
+              ConnectionStatusEnum: ThreadConnectionStatus
       enum values:
           GeneralCommissioning:
               CommissioningError:

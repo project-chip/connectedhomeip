@@ -8576,7 +8576,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OverrunCount
-namespace NeighborTableList {
+namespace NeighborTable {
 struct TypeInfo
 {
     using Type = chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::Type>;
@@ -8586,11 +8586,11 @@ struct TypeInfo
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::NeighborTableList::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NeighborTable::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace NeighborTableList
-namespace RouteTableList {
+} // namespace NeighborTable
+namespace RouteTable {
 struct TypeInfo
 {
     using Type = chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::Type>;
@@ -8600,10 +8600,10 @@ struct TypeInfo
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RouteTableList::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RouteTable::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace RouteTableList
+} // namespace RouteTable
 namespace PartitionId {
 struct TypeInfo
 {
@@ -9305,8 +9305,8 @@ struct TypeInfo
         Attributes::ExtendedPanId::TypeInfo::DecodableType extendedPanId;
         Attributes::MeshLocalPrefix::TypeInfo::DecodableType meshLocalPrefix;
         Attributes::OverrunCount::TypeInfo::DecodableType overrunCount = static_cast<uint64_t>(0);
-        Attributes::NeighborTableList::TypeInfo::DecodableType neighborTableList;
-        Attributes::RouteTableList::TypeInfo::DecodableType routeTableList;
+        Attributes::NeighborTable::TypeInfo::DecodableType neighborTable;
+        Attributes::RouteTable::TypeInfo::DecodableType routeTable;
         Attributes::PartitionId::TypeInfo::DecodableType partitionId;
         Attributes::Weighting::TypeInfo::DecodableType weighting;
         Attributes::DataVersion::TypeInfo::DecodableType dataVersion;
@@ -9387,7 +9387,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    ThreadConnectionStatus connectionStatus = static_cast<ThreadConnectionStatus>(0);
+    ConnectionStatusEnum connectionStatus = static_cast<ConnectionStatusEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -9399,7 +9399,7 @@ public:
     static constexpr EventId GetEventId() { return Events::ConnectionStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
 
-    ThreadConnectionStatus connectionStatus = static_cast<ThreadConnectionStatus>(0);
+    ConnectionStatusEnum connectionStatus = static_cast<ConnectionStatusEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

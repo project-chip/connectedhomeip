@@ -2239,13 +2239,13 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x00000007: {
-                    "attributeName": "NeighborTableList",
+                    "attributeName": "NeighborTable",
                     "attributeId": 0x00000007,
                     "type": "",
                     "reportable": True,
                 },
                 0x00000008: {
-                    "attributeName": "RouteTableList",
+                    "attributeName": "RouteTable",
                     "attributeId": 0x00000008,
                     "type": "",
                     "reportable": True,

@@ -587,10 +587,10 @@ typedef void (*CHIPThreadNetworkDiagnosticsClusterMeshLocalPrefixAttributeCallba
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::MeshLocalPrefix::TypeInfo::DecodableArgType);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterOverrunCountAttributeCallbackType)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::OverrunCount::TypeInfo::DecodableArgType);
-typedef void (*CHIPThreadNetworkDiagnosticsClusterNeighborTableListAttributeCallbackType)(
-    void *, const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::NeighborTableList::TypeInfo::DecodableType &);
-typedef void (*CHIPThreadNetworkDiagnosticsClusterRouteTableListAttributeCallbackType)(
-    void *, const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RouteTableList::TypeInfo::DecodableType &);
+typedef void (*CHIPThreadNetworkDiagnosticsClusterNeighborTableAttributeCallbackType)(
+    void *, const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::NeighborTable::TypeInfo::DecodableType &);
+typedef void (*CHIPThreadNetworkDiagnosticsClusterRouteTableAttributeCallbackType)(
+    void *, const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RouteTable::TypeInfo::DecodableType &);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterPartitionIdAttributeCallbackType)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::PartitionId::TypeInfo::DecodableArgType);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterWeightingAttributeCallbackType)(

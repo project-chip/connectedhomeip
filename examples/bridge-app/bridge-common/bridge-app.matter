@@ -921,6 +921,11 @@ server cluster SoftwareDiagnostics = 52 {
 }
 
 server cluster ThreadNetworkDiagnostics = 53 {
+  enum ConnectionStatusEnum : ENUM8 {
+    kConnected = 0;
+    kNotConnected = 1;
+  }
+
   enum NetworkFault : ENUM8 {
     kUnspecified = 0;
     kLinkDown = 1;
@@ -936,11 +941,6 @@ server cluster ThreadNetworkDiagnostics = 53 {
     kReed = 4;
     kRouter = 5;
     kLeader = 6;
-  }
-
-  enum ThreadConnectionStatus : ENUM8 {
-    kConnected = 0;
-    kNotConnected = 1;
   }
 
   bitmap ThreadNetworkDiagnosticsFeature : BITMAP32 {
@@ -982,7 +982,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
 
   struct SecurityPolicy {
     int16u rotationTime = 0;
-    bitmap16 flags = 1;
+    int16u flags = 1;
   }
 
   struct OperationalDatasetComponents {
@@ -1001,7 +1001,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
   }
 
   info event ConnectionStatus = 0 {
-    ThreadConnectionStatus connectionStatus = 0;
+    ConnectionStatusEnum connectionStatus = 0;
   }
 
   info event NetworkFaultChange = 1 {
@@ -1016,8 +1016,8 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute nullable int64u extendedPanId = 4;
   readonly attribute nullable octet_string<17> meshLocalPrefix = 5;
   readonly attribute int64u overrunCount = 6;
-  readonly attribute NeighborTable neighborTableList[] = 7;
-  readonly attribute RouteTable routeTableList[] = 8;
+  readonly attribute NeighborTable neighborTable[] = 7;
+  readonly attribute RouteTable routeTable[] = 8;
   readonly attribute nullable int32u partitionId = 9;
   readonly attribute nullable int8u weighting = 10;
   readonly attribute nullable int8u dataVersion = 11;
@@ -1607,8 +1607,8 @@ endpoint 0 {
     callback attribute extendedPanId;
     callback attribute meshLocalPrefix;
     callback attribute overrunCount;
-    callback attribute neighborTableList;
-    callback attribute routeTableList;
+    callback attribute neighborTable;
+    callback attribute routeTable;
     callback attribute partitionId;
     callback attribute weighting;
     callback attribute dataVersion;

@@ -3775,20 +3775,20 @@ private:
     bool keepAlive;
 };
 
-class CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback
-    : public chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterNeighborTableListAttributeCallbackType>
+class CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback
+    : public chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterNeighborTableAttributeCallbackType>
 {
 public:
-    CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback();
+    ~CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback();
 
-    static void maybeDestroy(CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback * callback)
+    static void maybeDestroy(CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback>(callback);
         }
     }
 
@@ -3798,7 +3798,7 @@ public:
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3807,20 +3807,20 @@ private:
     bool keepAlive;
 };
 
-class CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback
-    : public chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterRouteTableListAttributeCallbackType>
+class CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback
+    : public chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterRouteTableAttributeCallbackType>
 {
 public:
-    CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback();
+    ~CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback();
 
-    static void maybeDestroy(CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback * callback)
+    static void maybeDestroy(CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback>(callback);
         }
     }
 
@@ -3830,7 +3830,7 @@ public:
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
