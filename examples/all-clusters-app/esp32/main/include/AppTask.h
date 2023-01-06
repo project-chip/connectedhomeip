@@ -19,8 +19,8 @@
 
 #pragma once
 #include <lock/AppEvent.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <lock/BoltLockManager.h>
+#include <platform/CHIPDeviceLayer.h>
 
 // Application-defined error codes in the CHIP_ERROR space.
 #define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
