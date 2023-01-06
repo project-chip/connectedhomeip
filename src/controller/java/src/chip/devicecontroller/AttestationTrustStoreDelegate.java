@@ -1,9 +1,12 @@
 package chip.devicecontroller;
 
+import javax.annotation.Nullable;
+
 /**
  * Delegate for attestation trust store for device attestation verifiers.
  *
- * <p>API is synchronous.
+ * <p>API is synchronous. This implementation will replace the built-in attestation trust store,
+ * please make sure you have the required paa certificate before commissioning.
  */
 public interface AttestationTrustStoreDelegate {
   /**
@@ -17,5 +20,6 @@ public interface AttestationTrustStoreDelegate {
    * @param skid Buffer containing the subject key identifier (SKID) of the PAA to look-up
    * @return If found, the result should return paa cert in x.509 format, if not found, return null.
    */
+  @Nullable
   byte[] getProductAttestationAuthorityCert(byte[] skid);
 }

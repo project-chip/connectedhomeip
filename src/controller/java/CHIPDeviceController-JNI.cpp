@@ -334,7 +334,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     SuccessOrExit(err);
 
     jmethodID getAttestationTrustStoreDelegate;
-    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "attestationTrustStoreDelegate",
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAttestationTrustStoreDelegate",
                                                         "()Lchip/devicecontroller/AttestationTrustStoreDelegate;",
                                                         &getAttestationTrustStoreDelegate);
     SuccessOrExit(err);
@@ -740,22 +740,20 @@ exit:
     return outJbytes;
 }
 
-JNI_METHOD(jbyteArray, extractSKIDFromX509Cert)
-(JNIEnv * env, jobject self, jbyteArray x509Cert)
+JNI_METHOD(jbyteArray, extractSkidFromPaaCert)
+(JNIEnv * env, jobject self, jbyteArray paaCert)
 {
-    chip::DeviceLayer::StackLock lock;
-
     uint32_t allocatedCertLength = chip::Credentials::kMaxCHIPCertLength;
     chip::Platform::ScopedMemoryBuffer<uint8_t> outBuf;
     jbyteArray outJbytes = nullptr;
-    JniByteArray x509CertBytes(env, x509Cert);
+    JniByteArray paaCertBytes(env, paaCert);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(outBuf.Alloc(allocatedCertLength), err = CHIP_ERROR_NO_MEMORY);
     {
         MutableByteSpan outBytes(outBuf.Get(), allocatedCertLength);
 
-        err = chip::Crypto::ExtractSKIDFromX509Cert(x509CertBytes.byteSpan(), outBytes);
+        err = chip::Crypto::ExtractSKIDFromX509Cert(paaCertBytes.byteSpan(), outBytes);
         SuccessOrExit(err);
 
         VerifyOrExit(chip::CanCastTo<uint32_t>(outBytes.size()), err = CHIP_ERROR_INTERNAL);

@@ -169,7 +169,8 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     const Credentials::AttestationTrustStore * trustStore;
     if (attestationTrustStoreDelegate != nullptr)
     {
-        wrapper->mAttestationTrustStoreBridge = new AttestationTrustStoreBridge(attestationTrustStoreDelegate);
+        jobject attestationTrustStoreDelegateRef = env->NewGlobalRef(attestationTrustStoreDelegate);
+        wrapper->mAttestationTrustStoreBridge    = new AttestationTrustStoreBridge(attestationTrustStoreDelegateRef);
         if (wrapper->mAttestationTrustStoreBridge == nullptr)
         {
             ChipLogError(Controller, "Failed to create AttestationTrustStoreBridge");

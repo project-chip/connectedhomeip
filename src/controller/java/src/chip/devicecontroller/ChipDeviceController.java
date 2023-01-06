@@ -623,6 +623,14 @@ public class ChipDeviceController {
   public native byte[] convertX509CertToMatterCert(byte[] x509Cert);
 
   /**
+   * Extract skid from paa cert.
+   *
+   * @param paaCert
+   * @return
+   */
+  public native byte[] extractSkidFromPaaCert(byte[] paaCert);
+
+  /**
    * Generates a new PASE verifier for the given setup PIN code.
    *
    * @param devicePtr a pointer to the device object for which to generate the PASE verifier

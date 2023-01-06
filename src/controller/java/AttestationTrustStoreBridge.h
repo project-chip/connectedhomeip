@@ -32,4 +32,6 @@ public:
 
 private:
     jobject mAttestationTrustStoreDelegate = nullptr;
+
+    CHIP_ERROR GetPaaCertFromJava(const chip::ByteSpan & skid, chip::MutableByteSpan & outPaaDerBuffer) const;
 };
