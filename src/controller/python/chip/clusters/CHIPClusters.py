@@ -3020,7 +3020,7 @@ class ChipClusters:
                     "commandName": "OpenCommissioningWindow",
                     "args": {
                         "commissioningTimeout": "int",
-                        "PAKEVerifier": "bytes",
+                        "PAKEPasscodeVerifier": "bytes",
                         "discriminator": "int",
                         "iterations": "int",
                         "salt": "bytes",

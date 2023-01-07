@@ -3168,7 +3168,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _commissioningTimeout = @(0);
 
-        _pakeVerifier = [NSData data];
+        _pakePasscodeVerifier = [NSData data];
 
         _discriminator = @(0);
 
@@ -3185,7 +3185,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRAdministratorCommissioningClusterOpenCommissioningWindowParams alloc] init];
 
     other.commissioningTimeout = self.commissioningTimeout;
-    other.pakeVerifier = self.pakeVerifier;
+    other.pakePasscodeVerifier = self.pakePasscodeVerifier;
     other.discriminator = self.discriminator;
     other.iterations = self.iterations;
     other.salt = self.salt;
@@ -3196,13 +3196,26 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: commissioningTimeout:%@; pakeVerifier:%@; discriminator:%@; iterations:%@; salt:%@; >",
-                  NSStringFromClass([self class]), _commissioningTimeout, [_pakeVerifier base64EncodedStringWithOptions:0],
-                  _discriminator, _iterations, [_salt base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: commissioningTimeout:%@; pakePasscodeVerifier:%@; discriminator:%@; iterations:%@; salt:%@; >",
+        NSStringFromClass([self class]), _commissioningTimeout, [_pakePasscodeVerifier base64EncodedStringWithOptions:0],
+        _discriminator, _iterations, [_salt base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRAdministratorCommissioningClusterOpenCommissioningWindowParams (Deprecated)
+
+- (void)setPakeVerifier:(NSData * _Nonnull)pakeVerifier
+{
+    self.pakePasscodeVerifier = pakeVerifier;
+}
+
+- (NSData * _Nonnull)pakeVerifier
+{
+    return self.pakePasscodeVerifier;
+}
 @end
 @implementation MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams
 - (instancetype)init

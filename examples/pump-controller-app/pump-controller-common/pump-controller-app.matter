@@ -793,7 +793,7 @@ server cluster AdministratorCommissioning = 60 {
 
   request struct OpenCommissioningWindowRequest {
     INT16U commissioningTimeout = 0;
-    OCTET_STRING PAKEVerifier = 1;
+    OCTET_STRING PAKEPasscodeVerifier = 1;
     INT16U discriminator = 2;
     INT32U iterations = 3;
     OCTET_STRING salt = 4;

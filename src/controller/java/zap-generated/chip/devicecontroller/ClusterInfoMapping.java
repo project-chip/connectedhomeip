@@ -9194,11 +9194,11 @@ public class ClusterInfoMapping {
         administratorCommissioningopenCommissioningWindowcommissioningTimeoutCommandParameterInfo);
 
     CommandParameterInfo
-        administratorCommissioningopenCommissioningWindowPAKEVerifierCommandParameterInfo =
-            new CommandParameterInfo("PAKEVerifier", byte[].class, byte[].class);
+        administratorCommissioningopenCommissioningWindowPAKEPasscodeVerifierCommandParameterInfo =
+            new CommandParameterInfo("PAKEPasscodeVerifier", byte[].class, byte[].class);
     administratorCommissioningopenCommissioningWindowCommandParams.put(
-        "PAKEVerifier",
-        administratorCommissioningopenCommissioningWindowPAKEVerifierCommandParameterInfo);
+        "PAKEPasscodeVerifier",
+        administratorCommissioningopenCommissioningWindowPAKEPasscodeVerifierCommandParameterInfo);
 
     CommandParameterInfo
         administratorCommissioningopenCommissioningWindowdiscriminatorCommandParameterInfo =
@@ -9226,7 +9226,7 @@ public class ClusterInfoMapping {
                   .openCommissioningWindow(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("commissioningTimeout"),
-                      (byte[]) commandArguments.get("PAKEVerifier"),
+                      (byte[]) commandArguments.get("PAKEPasscodeVerifier"),
                       (Integer) commandArguments.get("discriminator"),
                       (Long) commandArguments.get("iterations"),
                       (byte[]) commandArguments.get("salt"),
