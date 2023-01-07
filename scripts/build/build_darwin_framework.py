@@ -52,7 +52,7 @@ def build_darwin_framework(args):
         args.project_path,
         '-derivedDataPath',
         abs_path,
-        "PLATFORM_PREFERRED_ARCH={}".format(args.target_arch),
+        "ARCHS={}".format(args.target_arch),
         # For now disable unguarded-availability-new warnings because we
         # internally use APIs that we are annotating as only available on
         # new enough versions.  Maybe we should change out deployment
