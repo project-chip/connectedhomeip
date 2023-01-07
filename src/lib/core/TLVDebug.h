@@ -23,14 +23,13 @@
  *
  */
 
-#ifndef CHIPTLVDEBUG_HPP
-#define CHIPTLVDEBUG_HPP
+#pragma once
 
 #include <stddef.h>
 #include <stdint.h>
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 
 namespace chip {
 
@@ -69,5 +68,3 @@ extern CHIP_ERROR Dump(const TLVReader & aReader, DumpWriter aWriter);
 } // namespace TLV
 
 } // namespace chip
-
-#endif // CHIPTLVDEBUG_HPP

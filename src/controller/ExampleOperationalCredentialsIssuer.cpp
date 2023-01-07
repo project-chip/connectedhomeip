@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/CHIPCert.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/PersistentStorageMacros.h>

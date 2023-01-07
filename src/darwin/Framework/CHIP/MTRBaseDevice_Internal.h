@@ -107,6 +107,6 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 
 // Exported utility function
 // Convert TLV data into data-value dictionary as described in MTRDeviceResponseHandler
-id _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data);
+id _Nullable MTRDecodeDataValueDictionaryFromTLV(chip::TLV::TLVReader * data);
 
 NS_ASSUME_NONNULL_END

@@ -50,9 +50,9 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::Protocols::InteractionModel;
-using chip::Messaging::ExchangeManager;
 using chip::Optional;
 using chip::SessionHandle;
+using chip::Messaging::ExchangeManager;
 
 NSString * const MTRAttributePathKey = @"attributePath";
 NSString * const MTRCommandPathKey = @"commandPath";
@@ -437,7 +437,7 @@ public:
 }
 
 // Convert TLV data into data-value dictionary as described in MTRDeviceResponseHandler
-id _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data)
+id _Nullable MTRDecodeDataValueDictionaryFromTLV(chip::TLV::TLVReader * data)
 {
     chip::TLV::TLVType dataTLVType = data->GetType();
     switch (dataTLVType) {
@@ -535,7 +535,7 @@ id _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data
         NSMutableArray * array = [[NSMutableArray alloc] init];
         while ((err = data->Next()) == CHIP_NO_ERROR) {
             chip::TLV::Tag tag = data->GetTag();
-            id value = MTRDecodeDataValueDictionaryFromCHIPTLV(data);
+            id value = MTRDecodeDataValueDictionaryFromTLV(data);
             if (value == nullptr) {
                 MTR_LOG_ERROR("Error when decoding TLV container");
                 return nil;
@@ -695,7 +695,7 @@ public:
 
     CHIP_ERROR Decode(chip::TLV::TLVReader & data)
     {
-        decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&data);
+        decodedObj = MTRDecodeDataValueDictionaryFromTLV(&data);
         if (decodedObj == nil) {
             MTR_LOG_ERROR("Error: Failed to get value from TLV data for attribute reading response");
         }

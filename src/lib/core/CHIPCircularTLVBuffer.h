@@ -30,9 +30,9 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/CHIPTLVTags.h>
-#include <lib/core/CHIPTLVTypes.h>
+#include <lib/core/TLV.h>
+#include <lib/core/TLVTags.h>
+#include <lib/core/TLVTypes.h>
 
 #include <lib/support/DLLUtil.h>
 

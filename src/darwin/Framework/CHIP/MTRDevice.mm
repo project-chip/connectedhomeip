@@ -948,7 +948,7 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
             MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]
         }];
     } else {
-        id value = MTRDecodeDataValueDictionaryFromCHIPTLV(apData);
+        id value = MTRDecodeDataValueDictionaryFromTLV(apData);
         if (value) {
             [mEventReports addObject:@ { MTREventPathKey : eventPath, MTRDataKey : value }];
         }
@@ -978,7 +978,7 @@ void SubscriptionCallback::OnAttributeData(
             MTRErrorKey : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]
         }];
     } else {
-        id value = MTRDecodeDataValueDictionaryFromCHIPTLV(apData);
+        id value = MTRDecodeDataValueDictionaryFromTLV(apData);
         if (value) {
             [mAttributeReports addObject:@ { MTRAttributePathKey : attributePath, MTRDataKey : value }];
         }
