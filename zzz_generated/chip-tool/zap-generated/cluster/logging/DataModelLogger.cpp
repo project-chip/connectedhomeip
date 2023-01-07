@@ -6364,17 +6364,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Switch::Attributes::NumberOfPositions::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("number of positions", 1, value);
+            return DataModelLogger::LogValue("NumberOfPositions", 1, value);
         }
         case Switch::Attributes::CurrentPosition::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("current position", 1, value);
+            return DataModelLogger::LogValue("CurrentPosition", 1, value);
         }
         case Switch::Attributes::MultiPressMax::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("multi press max", 1, value);
+            return DataModelLogger::LogValue("MultiPressMax", 1, value);
         }
         case Switch::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
