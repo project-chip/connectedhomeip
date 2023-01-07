@@ -36,6 +36,8 @@
 #   * "ids": Can contain clusters, attributes, commands, events as described
 #            above inside it, but just indicates whether the id was
 #            introduced/deprecated, not the construct itself.
+#   * "command payloads": Lists commands only, if we introduced the payload without
+#                         actually exposing API for the command.
 #   * "global attributes": An array of names of global attributes.
 #   * "apis": An array of API labels that codegen can use.
 #
