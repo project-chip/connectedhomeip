@@ -288,6 +288,10 @@ public class ChipDeviceController {
     unpairDevice(deviceControllerPtr, deviceId);
   }
 
+  public void unpairDeviceCallback(long deviceId, UnpairDeviceCallback callback) {
+    unpairDeviceCallback(deviceControllerPtr, deviceId, callback);
+  }
+
   /**
    * Returns a pointer to a device currently being commissioned. This should be used before the
    * device is operationally available.
@@ -699,6 +703,9 @@ public class ChipDeviceController {
       long deviceControllerPtr, long devicePtr, boolean ignoreAttestationFailure);
 
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
+
+  private native void unpairDeviceCallback(
+      long deviceControllerPtr, long deviceId, UnpairDeviceCallback callback);
 
   private native long getDeviceBeingCommissionedPointer(long deviceControllerPtr, long nodeId);
 

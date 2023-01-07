@@ -53,7 +53,7 @@ public:
     static CHIP_ERROR GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCount);
     static CHIP_ERROR GetWiFiCurrentMaxRate(const char * ifname, uint64_t & currentMaxRate);
     static CHIP_ERROR GetEthInterfaceName(char * ifname, size_t bufSize);
-    static CHIP_ERROR GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiagnostics::PHYRateType & pHYRate);
+    static CHIP_ERROR GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiagnostics::PHYRate & pHYRate);
     static CHIP_ERROR GetEthFullDuplex(const char * ifname, bool & fullDuplex);
 
 private:

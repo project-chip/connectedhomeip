@@ -84,21 +84,29 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 {{#*inline "enumDef"}}
 typedef NS_ENUM({{asUnderlyingZclType name}}, {{objCEnumName clusterName enumName}}) {
    {{#zcl_enum_items}}
+   {{#unless (wasRemoved ../clusterName enum=../enumName enumValue=(asUpperCamelCase label preserveAcronyms=true))}}
    {{objCEnumName ../clusterName ../enumName}}{{asUpperCamelCase label preserveAcronyms=true}} {{availability ../clusterName enum=../enumName enumValue=(asUpperCamelCase label preserveAcronyms=true) deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../../name preserveAcronyms=true) ../label) (asUpperCamelCase label preserveAcronyms=true))}} = {{asHex value 2}},
+   {{/unless}}
    {{#*inline "oldNameItemDecl"}}
    {{#if oldItemName}}
+   {{#unless (wasRemoved ../clusterName enum=../enumName enumValue=oldItemName)}}
    {{objCEnumName ../clusterName ../enumName}}{{objCEnumItemLabel oldItemName}} {{availability ../clusterName enum=../enumName enumValue=oldItemName deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../../name preserveAcronyms=true) ../label) (asUpperCamelCase label preserveAcronyms=true))}} = {{asHex value 2}},
+   {{/unless}}
    {{/if}}
    {{/inline}}
    {{> oldNameItemDecl oldItemName=(oldName ../clusterName enum=../enumName enumValue=(asUpperCamelCase label preserveAcronyms=true))}}
    {{/zcl_enum_items}}
 }
 {{/inline}}
+{{#unless (wasRemoved (asUpperCamelCase ../name preserveAcronyms=true) enum=(asUpperCamelCase label preserveAcronyms=true))}}
 {{> enumDef name=name clusterName=(asUpperCamelCase ../name preserveAcronyms=true) enumName=(asUpperCamelCase label preserveAcronyms=true)}} {{availability (asUpperCamelCase ../name preserveAcronyms=true) enum=(asUpperCamelCase label preserveAcronyms=true)}};
+{{/unless}}
 {{! Takes the name of the enum to use as enumName. }}
 {{#*inline "oldNameDecl"}}
+{{#unless (wasRemoved (compatClusterNameRemapping ../name) enum=enumName)}}
 
 {{> enumDef name=name clusterName=(compatClusterNameRemapping ../name) enumName=enumName}} {{availability (compatClusterNameRemapping ../name) enum=enumName deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../name preserveAcronyms=true) label))}};
+{{/unless}}
 {{/inline}}
 {{! Takes the old name of the enum, if any, as oldEnumName. }}
 {{#*inline "oldNameCheck"}}
@@ -118,21 +126,29 @@ typedef NS_ENUM({{asUnderlyingZclType name}}, {{objCEnumName clusterName enumNam
 {{#*inline "bitmapDef"}}
 typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName bitmapName}}) {
    {{#zcl_bitmap_items}}
+   {{#unless (wasRemoved ../clusterName bitmap=../bitmapName bitmapValue=(asUpperCamelCase label preserveAcronyms=true))}}
    {{objCEnumName ../clusterName ../bitmapName}}{{asUpperCamelCase label preserveAcronyms=true}} {{availability ../clusterName bitmap=../bitmapName bitmapValue=(asUpperCamelCase label preserveAcronyms=true) deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../../name preserveAcronyms=true) ../label) (asUpperCamelCase label preserveAcronyms=true))}} = {{asHex mask}},
+   {{/unless}}
    {{#*inline "oldNameItemDecl"}}
    {{#if oldItemName}}
+   {{#unless (wasRemoved ../clusterName bitmap=../bitmapName bitmapValue=oldItemName)}}
    {{objCEnumName ../clusterName ../bitmapName}}{{objCEnumItemLabel oldItemName}} {{availability ../clusterName bitmap=../bitmapName bitmapValue=oldItemName deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../../name preserveAcronyms=true) ../label) (asUpperCamelCase label preserveAcronyms=true))}} = {{asHex mask}},
+   {{/unless}}
    {{/if}}
    {{/inline}}
    {{> oldNameItemDecl oldItemName=(oldName ../clusterName bitmap=../bitmapName bitmapValue=(asUpperCamelCase label preserveAcronyms=true))}}
    {{/zcl_bitmap_items}}
 }
 {{/inline}}
+{{#unless (wasRemoved (asUpperCamelCase ../name preserveAcronyms=true) bitmap=(asUpperCamelCase label preserveAcronyms=true))}}
 {{> bitmapDef name=name clusterName=(asUpperCamelCase ../name preserveAcronyms=true) bitmapName=(asUpperCamelCase label preserveAcronyms=true)}} {{availability (asUpperCamelCase ../name preserveAcronyms=true) bitmap=(asUpperCamelCase label preserveAcronyms=true)}};
+{{/unless}}
 {{! Takes the name of the bitmap to use as bitmapName. }}
 {{#*inline "oldNameDecl"}}
+{{#unless (wasRemoved (compatClusterNameRemapping ../name) bitmap=bitmapName)}}
 
 {{> bitmapDef name=name clusterName=(compatClusterNameRemapping ../name) bitmapName=bitmapName}} {{availability (compatClusterNameRemapping ../name) bitmap=bitmapName deprecationMessage=(concat "Please use " (objCEnumName (asUpperCamelCase ../name preserveAcronyms=true) label))}};
+{{/unless}}
 {{/inline}}
 {{! Takes the old name of the bitmap, if any, as oldBitmapName. }}
 {{#*inline "oldNameCheck"}}

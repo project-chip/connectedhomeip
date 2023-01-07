@@ -1138,7 +1138,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id: {
+    case ThreadNetworkDiagnostics::Attributes::NeighborTable::Id: {
         err = encoder.EncodeList([this](const auto & aEncoder) -> CHIP_ERROR {
             constexpr uint16_t kFrameErrorRate100Percent   = 0xffff;
             constexpr uint16_t kMessageErrorRate100Percent = 0xffff;
@@ -1196,7 +1196,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id: {
+    case ThreadNetworkDiagnostics::Attributes::RouteTable::Id: {
         err = encoder.EncodeList([this](const auto & aEncoder) -> CHIP_ERROR {
             otRouterInfo routerInfo;
 

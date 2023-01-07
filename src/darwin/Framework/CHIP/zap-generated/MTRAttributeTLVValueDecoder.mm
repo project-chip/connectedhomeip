@@ -4620,8 +4620,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTRSoftwareDiagnosticsClusterThreadMetrics * newElement_0;
-                    newElement_0 = [MTRSoftwareDiagnosticsClusterThreadMetrics new];
+                    MTRSoftwareDiagnosticsClusterThreadMetricsStruct * newElement_0;
+                    newElement_0 = [MTRSoftwareDiagnosticsClusterThreadMetricsStruct new];
                     newElement_0.id = [NSNumber numberWithUnsignedLongLong:entry_0.id];
                     if (entry_0.name.HasValue()) {
                         newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.Value().data()
@@ -4901,8 +4901,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [NSNumber numberWithUnsignedLongLong:cppValue];
             return value;
         }
-        case Attributes::NeighborTableList::Id: {
-            using TypeInfo = Attributes::NeighborTableList::TypeInfo;
+        case Attributes::NeighborTable::Id: {
+            using TypeInfo = Attributes::NeighborTable::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -4949,8 +4949,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             }
             return value;
         }
-        case Attributes::RouteTableList::Id: {
-            using TypeInfo = Attributes::RouteTableList::TypeInfo;
+        case Attributes::RouteTable::Id: {
+            using TypeInfo = Attributes::RouteTable::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
