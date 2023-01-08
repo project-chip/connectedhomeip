@@ -45,13 +45,13 @@ tests:
       command: "ArmFailSafe"
       arguments:
           values:
-              - name: "expiryLengthSeconds"
+              - name: "ExpiryLengthSeconds"
                 value: 0
-              - name: "breadcrumb"
+              - name: "Breadcrumb"
                 value: 0
       response:
           values:
-              - name: "errorCode"
+              - name: "ErrorCode"
                 value: 0
 
     - label: "Reads NodeLabel mandatory attribute of target device"

@@ -44,7 +44,7 @@ tests:
 
           verify on chip-tool logs:
 
-          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOtaProviders: 1 entries
+          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOTAProviders: 1 entries
           [1651277342848] [26860:35431852] CHIP: [TOO]     [1]: {
           [1651277342848] [26860:35431852] CHIP: [TOO]       ProviderNodeID: 1
           [1651277342848] [26860:35431852] CHIP: [TOO]       Endpoint: 0
@@ -72,7 +72,7 @@ tests:
 
           verify on chip-tool logs:
 
-          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOtaProviders: 1 entries
+          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOTAProviders: 1 entries
           [1651277342848] [26860:35431852] CHIP: [TOO]     [1]: {
           [1651277342848] [26860:35431852] CHIP: [TOO]       ProviderNodeID: 1
           [1651277342848] [26860:35431852] CHIP: [TOO]       Endpoint: 0
@@ -83,7 +83,7 @@ tests:
 
           verify on chip-tool logs:
 
-          [1651277543492] [26864:35434761] CHIP: [TOO]   DefaultOtaProviders: 1 entries
+          [1651277543492] [26864:35434761] CHIP: [TOO]   DefaultOTAProviders: 1 entries
           [1651277543492] [26864:35434761] CHIP: [TOO]     [1]: {
           [1651277543492] [26864:35434761] CHIP: [TOO]       ProviderNodeID: 5
           [1651277543492] [26864:35434761] CHIP: [TOO]       Endpoint: 0
@@ -108,7 +108,7 @@ tests:
 
           verify on chip-tool logs:
 
-          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOtaProviders: 1 entries
+          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOTAProviders: 1 entries
           [1651277342848] [26860:35431852] CHIP: [TOO]     [1]: {
           [1651277342848] [26860:35431852] CHIP: [TOO]       ProviderNodeID: 10
           [1651277342848] [26860:35431852] CHIP: [TOO]       Endpoint: 0
@@ -119,7 +119,7 @@ tests:
 
           verify on chip-tool logs:
 
-          [1651277543492] [26864:35434761] CHIP: [TOO]   DefaultOtaProviders: 1 entries
+          [1651277543492] [26864:35434761] CHIP: [TOO]   DefaultOTAProviders: 1 entries
           [1651277543492] [26864:35434761] CHIP: [TOO]     [1]: {
           [1651277543492] [26864:35434761] CHIP: [TOO]       ProviderNodeID: 5
           [1651277543492] [26864:35434761] CHIP: [TOO]       Endpoint: 0
@@ -144,7 +144,7 @@ tests:
 
           verify on chip-tool logs:
 
-          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOtaProviders: 1 entries
+          [1651277342848] [26860:35431852] CHIP: [TOO]   DefaultOTAProviders: 1 entries
           [1651277342848] [26860:35431852] CHIP: [TOO]     [1]: {
           [1651277342848] [26860:35431852] CHIP: [TOO]       ProviderNodeID: 10
           [1651277342848] [26860:35431852] CHIP: [TOO]       Endpoint: 0
@@ -155,7 +155,7 @@ tests:
 
           verify on chip-tool logs:
 
-          [1651280268033] [27804:35481732] CHIP: [TOO]   DefaultOtaProviders: 0 entries
+          [1651280268033] [27804:35481732] CHIP: [TOO]   DefaultOTAProviders: 0 entries
       disabled: true
 
     - label:

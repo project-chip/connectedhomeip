@@ -26,6 +26,7 @@ list(
     -DCONFIG_PLATFORM_8721D
     -DCONFIG_USE_MBEDTLS_ROM_ALG
     -DCONFIG_FUNCION_O0_OPTIMIZE
+    -DCONFIG_ENABLE_AMEBA_FACTORY_DATA=0
     -DDM_ODM_SUPPORT_TYPE=32
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
@@ -43,6 +44,7 @@ list(
     -Wno-unused-variable
     -Wno-deprecated-declarations
     -Wno-unused-parameter
+    -Wno-unused-label
     -Wno-format
     -Wno-stringop-truncation
     -Wno-format-nonliteral

@@ -44,6 +44,7 @@ import com.google.chip.chiptool.provisioning.AddressCommissioningFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
 import com.google.chip.chiptool.provisioning.EnterNetworkFragment
 import com.google.chip.chiptool.provisioning.ProvisionNetworkType
+import com.google.chip.chiptool.provisioning.UnpairDeviceFragment
 import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
@@ -189,6 +190,10 @@ class CHIPToolActivity :
 
   override fun handleCustomFlowClicked() {
     showFragment(BarcodeFragment.newInstance())
+  }
+
+  override fun handleUnpairDeviceClicked() {
+    showFragment(UnpairDeviceFragment.newInstance())
   }
 
   private fun showFragment(fragment: Fragment, showOnBack: Boolean = true) {

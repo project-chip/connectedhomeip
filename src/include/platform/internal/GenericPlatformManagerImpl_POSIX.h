@@ -55,23 +55,18 @@ protected:
     // OS-specific members (pthread)
     pthread_mutex_t mChipStackLock = PTHREAD_MUTEX_INITIALIZER;
 
-    enum TaskType
+    enum class State
     {
-        kExternallyManagedTask = 0,
-        kInternallyManagedTask = 1
+        kStopped  = 0,
+        kRunning  = 1,
+        kStopping = 2,
     };
 
     pthread_t mChipTask;
-    bool mHasValidChipTask = false;
-    TaskType mTaskType;
+    bool mInternallyManagedChipTask = false;
+    std::atomic<State> mState{ State::kStopped };
     pthread_cond_t mEventQueueStoppedCond;
     pthread_mutex_t mStateLock;
-
-    //
-    // TODO: This variable is very similar to mMainLoopIsStarted, track the
-    // cleanup and consolidation in this issue:
-    //
-    bool mEventQueueHasStopped = false;
 
     pthread_attr_t mChipTaskAttr;
     struct sched_param mChipTaskSchedParam;
@@ -109,7 +104,7 @@ private:
     void ProcessDeviceEvents();
 
     DeviceSafeQueue mChipEventQueue;
-    std::atomic<bool> mShouldRunEventLoop;
+    std::atomic<bool> mShouldRunEventLoop{ true };
     static void * EventLoopTaskMain(void * arg);
 };
 

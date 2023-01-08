@@ -1024,7 +1024,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     // Cluster OtaSoftwareUpdateRequestor deprecated attribute names
     MTRClusterOtaSoftwareUpdateRequestorAttributeDefaultOtaProvidersID API_AVAILABLE(
         ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOtaProvidersID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOTAProvidersID")
     = 0x00000000,
     MTRClusterOtaSoftwareUpdateRequestorAttributeUpdatePossibleID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdatePossibleID")
@@ -1055,7 +1055,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster OTASoftwareUpdateRequestor attributes
-    MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOtaProvidersID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeDefaultOTAProvidersID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdatePossibleID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdateStateID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterOTASoftwareUpdateRequestorAttributeUpdateStateProgressID MTR_NEWLY_AVAILABLE = 0x00000003,
@@ -1643,10 +1643,10 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeOverrunCountID")
     = 0x00000006,
     MTRClusterThreadNetworkDiagnosticsAttributeNeighborTableListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableID")
     = 0x00000007,
     MTRClusterThreadNetworkDiagnosticsAttributeRouteTableListID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableListID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableID")
     = 0x00000008,
     MTRClusterThreadNetworkDiagnosticsAttributePartitionIdID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePartitionIdID")
@@ -1850,8 +1850,8 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeExtendedPanIdID MTR_NEWLY_AVAILABLE = 0x00000004,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeMeshLocalPrefixID MTR_NEWLY_AVAILABLE = 0x00000005,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeOverrunCountID MTR_NEWLY_AVAILABLE = 0x00000006,
-    MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableListID MTR_NEWLY_AVAILABLE = 0x00000007,
-    MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableListID MTR_NEWLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableID MTR_NEWLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableID MTR_NEWLY_AVAILABLE = 0x00000008,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributePartitionIdID MTR_NEWLY_AVAILABLE = 0x00000009,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeWeightingID MTR_NEWLY_AVAILABLE = 0x0000000A,
     MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeDataVersionID MTR_NEWLY_AVAILABLE = 0x0000000B,
@@ -1919,7 +1919,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 
     // Cluster WiFiNetworkDiagnostics deprecated attribute names
     MTRClusterWiFiNetworkDiagnosticsAttributeBssidID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBssidID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBSSIDID")
     = 0x00000000,
     MTRClusterWiFiNetworkDiagnosticsAttributeSecurityTypeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeSecurityTypeID")
@@ -1931,7 +1931,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeChannelNumberID")
     = 0x00000003,
     MTRClusterWiFiNetworkDiagnosticsAttributeRssiID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRssiID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRSSIID")
     = 0x00000004,
     MTRClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID")
@@ -1976,11 +1976,11 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster WiFiNetworkDiagnostics attributes
-    MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBssidID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBSSIDID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeSecurityTypeID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeWiFiVersionID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeChannelNumberID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRssiID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRSSIID MTR_NEWLY_AVAILABLE = 0x00000004,
     MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID MTR_NEWLY_AVAILABLE = 0x00000005,
     MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBeaconRxCountID MTR_NEWLY_AVAILABLE = 0x00000006,
     MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributePacketMulticastRxCountID MTR_NEWLY_AVAILABLE = 0x00000007,
@@ -5886,11 +5886,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
 
     // Cluster OtaSoftwareUpdateRequestor deprecated command id names
     MTRClusterOtaSoftwareUpdateRequestorCommandAnnounceOtaProviderID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOTASoftwareUpdateRequestorCommandAnnounceOtaProviderID")
+        MTR_NEWLY_DEPRECATED("Please use MTRCommandIDTypeClusterOTASoftwareUpdateRequestorCommandAnnounceOTAProviderID")
     = 0x00000000,
 
     // Cluster OTASoftwareUpdateRequestor commands
-    MTRCommandIDTypeClusterOTASoftwareUpdateRequestorCommandAnnounceOtaProviderID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterOTASoftwareUpdateRequestorCommandAnnounceOTAProviderID MTR_NEWLY_AVAILABLE = 0x00000000,
 
     // Cluster GeneralCommissioning deprecated command id names
     MTRClusterGeneralCommissioningCommandArmFailSafeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
@@ -6820,6 +6820,13 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterOTASoftwareUpdateRequestorEventStateTransitionID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTREventIDTypeClusterOTASoftwareUpdateRequestorEventVersionAppliedID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTREventIDTypeClusterOTASoftwareUpdateRequestorEventDownloadErrorID MTR_NEWLY_AVAILABLE = 0x00000002,
+
+    // Cluster PowerSource deprecated event names
+
+    // Cluster PowerSource events
+    MTREventIDTypeClusterPowerSourceEventWiredFaultChangeID MTR_NEWLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterPowerSourceEventBatFaultChangeID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTREventIDTypeClusterPowerSourceEventBatChargeFaultChangeID MTR_NEWLY_AVAILABLE = 0x00000002,
 
     // Cluster GeneralDiagnostics deprecated event names
     MTRClusterGeneralDiagnosticsEventHardwareFaultChangeID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))

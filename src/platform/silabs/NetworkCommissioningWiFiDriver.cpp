@@ -203,7 +203,7 @@ chip::BitFlags<WiFiSecurity> SlWiFiDriver::ConvertSecuritytype(uint8_t security)
     }
     else if (security & WFX_SEC_WEP)
     {
-        securityType = WiFiSecurity::kWepPersonal;
+        securityType = WiFiSecurity::kWep;
     }
     else if (security & WFX_SEC_WPA)
     {
