@@ -411,14 +411,18 @@ std::list<ClusterId> ContentAppFactoryImpl::GetAllowedClusterListForStaticEndpoi
     {
         if (GetVendorPrivilege(vendorId) == Access::Privilege::kAdminister)
         {
-            ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl GetAllowedClusterListForStaticEndpoint priviledged vendor accessible clusters being returned.");
-            return { chip::app::Clusters::Descriptor::Id,      chip::app::Clusters::OnOff::Id,
-                    chip::app::Clusters::WakeOnLan::Id,       chip::app::Clusters::MediaPlayback::Id,
-                    chip::app::Clusters::LowPower::Id,        chip::app::Clusters::KeypadInput::Id,
-                    chip::app::Clusters::ContentLauncher::Id, chip::app::Clusters::AudioOutput::Id,
-                    chip::app::Clusters::ApplicationLauncher::Id };
+            ChipLogProgress(DeviceLayer,
+                            "ContentAppFactoryImpl GetAllowedClusterListForStaticEndpoint priviledged vendor accessible clusters "
+                            "being returned.");
+            return { chip::app::Clusters::Descriptor::Id,         chip::app::Clusters::OnOff::Id,
+                     chip::app::Clusters::WakeOnLan::Id,          chip::app::Clusters::MediaPlayback::Id,
+                     chip::app::Clusters::LowPower::Id,           chip::app::Clusters::KeypadInput::Id,
+                     chip::app::Clusters::ContentLauncher::Id,    chip::app::Clusters::AudioOutput::Id,
+                     chip::app::Clusters::ApplicationLauncher::Id };
         }
-        ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl GetAllowedClusterListForStaticEndpoint operator vendor accessible clusters being returned.");
+        ChipLogProgress(
+            DeviceLayer,
+            "ContentAppFactoryImpl GetAllowedClusterListForStaticEndpoint operator vendor accessible clusters being returned.");
         return { chip::app::Clusters::Descriptor::Id,      chip::app::Clusters::OnOff::Id,
                  chip::app::Clusters::WakeOnLan::Id,       chip::app::Clusters::MediaPlayback::Id,
                  chip::app::Clusters::LowPower::Id,        chip::app::Clusters::KeypadInput::Id,

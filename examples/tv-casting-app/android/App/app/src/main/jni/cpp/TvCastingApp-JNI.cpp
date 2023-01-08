@@ -452,7 +452,9 @@ JNI_METHOD(jboolean, contentLauncher_1subscribeToSupportedStreamingProtocols)
     err = TvCastingAppJNIMgr().getSupportedStreamingProtocolsSuccessHandler().SetUp(env, jReadSuccessHandler);
     VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "SuccessHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
-    err = TvCastingAppJNIMgr().getSubscriptionReadFailureHandler(ContentLauncher_SupportedStreamingProtocols).SetUp(env, jReadFailureHandler);
+    err = TvCastingAppJNIMgr()
+              .getSubscriptionReadFailureHandler(ContentLauncher_SupportedStreamingProtocols)
+              .SetUp(env, jReadFailureHandler);
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "SubscriptionReadFailureHandler.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
@@ -726,8 +728,7 @@ JNI_METHOD(jboolean, onOff_1on)
 
     err = CastingServer::GetInstance()->OnOff_On(
         &endpoint, [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(OnOff_On).Handle(err); });
-    VerifyOrExit(CHIP_NO_ERROR == err,
-                 ChipLogError(AppServer, "CastingServer.OnOff_On failed %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "CastingServer.OnOff_On failed %" CHIP_ERROR_FORMAT, err.Format()));
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -757,8 +758,7 @@ JNI_METHOD(jboolean, onOff_1off)
 
     err = CastingServer::GetInstance()->OnOff_Off(
         &endpoint, [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(OnOff_Off).Handle(err); });
-    VerifyOrExit(CHIP_NO_ERROR == err,
-                 ChipLogError(AppServer, "CastingServer.OnOff_Off failed %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrExit(CHIP_NO_ERROR == err, ChipLogError(AppServer, "CastingServer.OnOff_Off failed %" CHIP_ERROR_FORMAT, err.Format()));
 
 exit:
     if (err != CHIP_NO_ERROR)

@@ -16,15 +16,14 @@
  *    limitations under the License.
  */
 
-#include "MediaCommandBase.h"
 #include "MediaBase.h"
+#include "MediaCommandBase.h"
 
 #include <functional>
 #include <zap-generated/CHIPClusters.h>
 
 // COMMAND CLASSES
-class OnCommand : public MediaCommandBase<chip::app::Clusters::OnOff::Commands::On::Type,
-                                            chip::app::DataModel::NullObjectType>
+class OnCommand : public MediaCommandBase<chip::app::Clusters::OnOff::Commands::On::Type, chip::app::DataModel::NullObjectType>
 {
 public:
     OnCommand() : MediaCommandBase(chip::app::Clusters::OnOff::Id) {}
@@ -32,8 +31,7 @@ public:
     CHIP_ERROR Invoke(std::function<void(CHIP_ERROR)> responseCallback);
 };
 
-class OffCommand : public MediaCommandBase<chip::app::Clusters::OnOff::Commands::Off::Type,
-                                             chip::app::DataModel::NullObjectType>
+class OffCommand : public MediaCommandBase<chip::app::Clusters::OnOff::Commands::Off::Type, chip::app::DataModel::NullObjectType>
 {
 public:
     OffCommand() : MediaCommandBase(chip::app::Clusters::OnOff::Id) {}
@@ -41,8 +39,8 @@ public:
     CHIP_ERROR Invoke(std::function<void(CHIP_ERROR)> responseCallback);
 };
 
-class ToggleCommand : public MediaCommandBase<chip::app::Clusters::OnOff::Commands::Toggle::Type,
-                                            chip::app::DataModel::NullObjectType>
+class ToggleCommand
+    : public MediaCommandBase<chip::app::Clusters::OnOff::Commands::Toggle::Type, chip::app::DataModel::NullObjectType>
 {
 public:
     ToggleCommand() : MediaCommandBase(chip::app::Clusters::OnOff::Id) {}
