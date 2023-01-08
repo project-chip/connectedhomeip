@@ -17,6 +17,7 @@
  */
 #include "CommonDeviceCallbacks.h"
 
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CONFIG_BT_ENABLED
 #include "esp_bt.h"
 #if CONFIG_BT_NIMBLE_ENABLED
@@ -26,6 +27,7 @@
 #include "nimble/nimble_port.h"
 #endif // CONFIG_BT_NIMBLE_ENABLED
 #endif // CONFIG_BT_ENABLED
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include "esp_err.h"
 #include "esp_heap_caps.h"
@@ -78,7 +80,7 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
 
     case DeviceEventType::kCommissioningComplete: {
         ESP_LOGI(TAG, "Commissioning complete");
-#if CONFIG_BT_NIMBLE_ENABLED && CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CONFIG_BT_NIMBLE_ENABLED && CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
 
         if (ble_hs_is_enabled())
         {
