@@ -93,9 +93,9 @@ public class SelectClusterFragment extends Fragment {
     getView()
         .findViewById(R.id.selectMediaPlaybackButton)
         .setOnClickListener(selectMediaPlaybackButtonClickListener);
-      getView()
-              .findViewById(R.id.selectCertTestButton)
-              .setOnClickListener(selectCertTestButtonClickListener);
+    getView()
+        .findViewById(R.id.selectCertTestButton)
+        .setOnClickListener(selectCertTestButtonClickListener);
     getView().findViewById(R.id.disconnectButton).setOnClickListener(disconnectButtonClickListener);
   }
 

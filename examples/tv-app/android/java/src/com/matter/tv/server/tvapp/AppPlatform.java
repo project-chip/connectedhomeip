@@ -55,7 +55,8 @@ public class AppPlatform {
   // Method to report attribute change for content app endpoints to the SDK
   public native void reportAttributeChange(int endpointId, int clusterId, int attributeId);
 
-  // Method to add the current vendorId of the node as an admin to enable clients from same vendor to be admins
+  // Method to add the current vendorId of the node as an admin to enable clients from same vendor
+  // to be admins
   public native void addSelfVendorAsAdmin();
 
   static {
