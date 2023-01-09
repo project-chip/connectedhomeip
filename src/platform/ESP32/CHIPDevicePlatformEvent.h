@@ -44,12 +44,13 @@ enum
     kESPSystemEvent = kRange_PublicPlatformSpecific,
 };
 
+#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 /**
  * Enumerates ESP32 platform-specific event types that are internal to the Chip Device Layer.
  */
 enum InternalPlatformSpecificEventTypes
 {
-    kPlatformLinuxEvent = kRange_InternalPlatformSpecific,
+    kPlatformESP32Event = kRange_InternalPlatformSpecific,
     kPlatformESP32BLECentralConnected,
     kPlatformESP32BLECentralConnectFailed,
     kPlatformESP32BLEWriteComplete,
@@ -57,6 +58,7 @@ enum InternalPlatformSpecificEventTypes
     kPlatformESP32BLEIndicationReceived,
 };
 
+#endif
 } // namespace DeviceEventType
 
 /**
@@ -87,6 +89,7 @@ struct ChipDevicePlatformEvent final
                 wifi_event_ap_probe_req_rx_t WiFiApProbeReqRecved;
             } Data;
         } ESPSystemEvent;
+#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
         struct
         {
             BLE_CONNECTION_OBJECT mConnection;
@@ -97,21 +100,19 @@ struct ChipDevicePlatformEvent final
         } BLECentralConnectFailed;
         struct
         {
-            //    BLE_CONNECTION_OBJECT mConnection;
-            uint16_t mConnection;
+            BLE_CONNECTION_OBJECT mConnection;
         } BLEWriteComplete;
         struct
         {
-            //      BLE_CONNECTION_OBJECT mConnection;
-            uint16_t mConnection;
+            BLE_CONNECTION_OBJECT mConnection;
             bool mIsSubscribed;
         } BLESubscribeOpComplete;
         struct
         {
-            //        BLE_CONNECTION_OBJECT mConnection;
-            uint16_t mConnection;
+            BLE_CONNECTION_OBJECT mConnection;
             chip::System::PacketBuffer * mData;
         } BLEIndicationReceived;
+#endif
     };
 };
 

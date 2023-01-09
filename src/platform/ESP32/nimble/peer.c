@@ -17,6 +17,8 @@
  * under the License.
  */
 
+#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+
 #include "blecent.h"
 #include "host/ble_hs.h"
 #include <assert.h>
@@ -823,3 +825,4 @@ err:
     peer_free_mem();
     return rc;
 }
+#endif

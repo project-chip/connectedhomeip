@@ -24,6 +24,7 @@ declare_args() {
   chip_use_factory_data_provider = false
   chip_use_device_info_provider = false
   chip_config_software_version_number = 0
+  chip_enable_chipoble = true
   chip_bt_nimble_enabled = false
   chip_bt_bluedroid_enabled = false
 }
@@ -35,7 +36,6 @@ defines = [
 static_library("ESP32") {
   sources = [
     "../SingletonConfigurationManager.cpp",
-    "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "ConfigurationManagerImpl.cpp",
@@ -70,6 +70,7 @@ static_library("ESP32") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]
+
   if (chip_enable_ota_requestor) {
     sources += [
       "OTAImageProcessorImpl.cpp",
@@ -77,11 +78,17 @@ static_library("ESP32") {
     ]
   }
 
+  if (chip_enable_chipoble) {
+    sources += [
+      "BLEManagerImpl.h",
+      "ChipDeviceScanner.h",
+    ]
+  }
+
   if (chip_bt_nimble_enabled) {
     sources += [
       "nimble/BLEManagerImpl.cpp",
       "nimble/ChipDeviceScanner.cpp",
-      "nimble/ChipDeviceScanner.h",
       "nimble/blecent.h",
       "nimble/misc.c",
       "nimble/peer.c",
@@ -92,9 +99,9 @@ static_library("ESP32") {
     sources += [
       "bluedroid/BLEManagerImpl.cpp",
       "bluedroid/ChipDeviceScanner.cpp",
-      "bluedroid/ChipDeviceScanner.h",
     ]
   }
+
   if (chip_enable_wifi) {
     sources += [
       "ConnectivityManagerImpl_WiFi.cpp",

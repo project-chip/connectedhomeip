@@ -15,10 +15,12 @@
  *    limitations under the License.
  */
 
-#include "ChipDeviceScanner.h"
+#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+
 #include "blecent.h"
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/ESP32/ChipDeviceScanner.h>
 
 #define CHIPoBLE_SERVICE_UUID 0xFFF6
 
@@ -34,22 +36,18 @@ bool NimbleGetChipDeviceInfo(const ble_hs_adv_fields & fields, chip::Ble::ChipBL
 
     if (fields.svc_data_uuid16 != NULL)
     {
-        print_adv_fields(&fields);
-        if (fields.svc_data_uuid16_len > 5 && fields.svc_data_uuid16[0] == 0xf6 && fields.svc_data_uuid16[1] == 0xff)
+        if (fields.svc_data_uuid16_len > 8 && fields.svc_data_uuid16[0] == 0xf6 && fields.svc_data_uuid16[1] == 0xff)
         {
-            if (fields.svc_data_uuid16[3] == 0x00 && fields.svc_data_uuid16[4] == 0x0f)
-            {
-                deviceInfo.OpCode                              = fields.svc_data_uuid16[2];
-                deviceInfo.DeviceDiscriminatorAndAdvVersion[0] = fields.svc_data_uuid16[3];
-                deviceInfo.DeviceDiscriminatorAndAdvVersion[1] = fields.svc_data_uuid16[4];
-                // vendor and product Id from adv
-                deviceInfo.DeviceVendorId[0]  = fields.svc_data_uuid16[5];
-                deviceInfo.DeviceVendorId[1]  = fields.svc_data_uuid16[6];
-                deviceInfo.DeviceProductId[0] = fields.svc_data_uuid16[7];
-                deviceInfo.DeviceProductId[1] = fields.svc_data_uuid16[8];
-                deviceInfo.AdditionalDataFlag = fields.svc_data_uuid16[9];
-                return true;
-            }
+            deviceInfo.OpCode                              = fields.svc_data_uuid16[2];
+            deviceInfo.DeviceDiscriminatorAndAdvVersion[0] = fields.svc_data_uuid16[3];
+            deviceInfo.DeviceDiscriminatorAndAdvVersion[1] = fields.svc_data_uuid16[4];
+            // vendor and product Id from adv
+            deviceInfo.DeviceVendorId[0]  = fields.svc_data_uuid16[5];
+            deviceInfo.DeviceVendorId[1]  = fields.svc_data_uuid16[6];
+            deviceInfo.DeviceProductId[0] = fields.svc_data_uuid16[7];
+            deviceInfo.DeviceProductId[1] = fields.svc_data_uuid16[8];
+            deviceInfo.AdditionalDataFlag = fields.svc_data_uuid16[9];
+            return true;
         }
     }
     return false;
@@ -155,3 +153,4 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
+#endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
