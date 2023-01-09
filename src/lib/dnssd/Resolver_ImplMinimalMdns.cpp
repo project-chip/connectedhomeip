@@ -279,6 +279,7 @@ public:
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override { mCommissioningDelegate = delegate; }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
+    void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR StopDiscovery() override;
@@ -659,6 +660,11 @@ CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId)
     return SendAllPendingQueries();
 }
 
+void MinMdnsResolver::NodeIdResolutionNoLongerNeeded(const PeerId & peerId)
+{
+    mActiveResolves.NodeIdResolutionNoLongerNeeded(peerId);
+}
+
 CHIP_ERROR MinMdnsResolver::ScheduleRetries()
 {
     ReturnErrorCodeIf(mSystemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -708,6 +714,11 @@ CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId)
                     ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
     chip::Dnssd::Resolver::Instance().SetOperationalDelegate(mDelegate);
     return chip::Dnssd::Resolver::Instance().ResolveNodeId(peerId);
+}
+
+void ResolverProxy::NodeIdResolutionNoLongerNeeded(const PeerId & peerId)
+{
+    return chip::Dnssd::Resolver::Instance().NodeIdResolutionNoLongerNeeded(peerId);
 }
 
 CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)

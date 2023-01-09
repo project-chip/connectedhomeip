@@ -140,7 +140,7 @@ system. You can install it from the zap project
 
 You should install a compatible release version, generally checking against the
 release set in
-[integrations/docker/images/chip-build/Dockerfile](../../../integrations/docker/images/chip-build/Dockerfile).
+[integrations/docker/images/chip-build/Dockerfile](../../integrations/docker/images/chip-build/Dockerfile).
 
 On linux, installation from `zap-linux.zip` is recommended as it pulls fewer
 dependencies than the `.deb` package.

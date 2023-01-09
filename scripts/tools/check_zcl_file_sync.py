@@ -23,10 +23,10 @@ Current rule:
     Ensure that the two fies are in sync EXCEPT the extension.
 """
 
-import json
-import sys
-import os
 import difflib
+import json
+import os
+import sys
 
 
 def main():

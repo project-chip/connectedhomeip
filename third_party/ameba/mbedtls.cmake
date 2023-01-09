@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 
 project(mbedtls)
 
-set(dir "${sdk_root}/component/common/network/ssl/mbedtls-matter")
+set(dir "${sdk_root}/component/common/application/matter/mbedtls")
 set(dir_mbedtlschip "${ameba_matter_root}/third_party/mbedtls/repo/library")
 
 list(

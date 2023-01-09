@@ -29,9 +29,10 @@
 #define EMBER_APS_UNICAST_MESSAGE_COUNT 10
 
 /**** Cluster endpoint counts ****/
+#define EMBER_AF_DESCRIPTOR_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_ACCESS_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_ACCESS_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_BASIC_INFORMATION_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_LOCALIZATION_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_TIME_FORMAT_LOCALIZATION_CLUSTER_SERVER_ENDPOINT_COUNT (1)
@@ -46,6 +47,11 @@
 
 /**** Cluster Plugins ****/
 
+// Use this macro to check if the server side of the Descriptor cluster is included
+#define ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_DESCRIPTOR_SERVER
+#define EMBER_AF_PLUGIN_DESCRIPTOR
+
 // Use this macro to check if the client side of the Access Control cluster is included
 #define ZCL_USING_ACCESS_CONTROL_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_ACCESS_CONTROL_CLIENT
@@ -55,10 +61,10 @@
 #define EMBER_AF_PLUGIN_ACCESS_CONTROL_SERVER
 #define EMBER_AF_PLUGIN_ACCESS_CONTROL
 
-// Use this macro to check if the server side of the Basic cluster is included
-#define ZCL_USING_BASIC_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_BASIC_SERVER
-#define EMBER_AF_PLUGIN_BASIC
+// Use this macro to check if the server side of the Basic Information cluster is included
+#define ZCL_USING_BASIC_INFORMATION_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_BASIC_INFORMATION_SERVER
+#define EMBER_AF_PLUGIN_BASIC_INFORMATION
 
 // Use this macro to check if the server side of the OTA Software Update Provider cluster is included
 #define ZCL_USING_OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_SERVER

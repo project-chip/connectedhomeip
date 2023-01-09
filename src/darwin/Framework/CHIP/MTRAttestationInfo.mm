@@ -19,6 +19,32 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@implementation MTRAttestationInfo : NSObject
+
+- (instancetype)initWithChallenge:(NSData *)challenge
+                                        nonce:(NSData *)nonce
+                                  elementsTLV:(MTRTLVBytes)elementsTLV
+                            elementsSignature:(NSData *)elementsSignature
+                 deviceAttestationCertificate:(MTRCertificateDERBytes)deviceAttestationCertificate
+    productAttestationIntermediateCertificate:(MTRCertificateDERBytes)productAttestationIntermediateCertificate
+                     certificationDeclaration:(NSData *)certificationDeclaration
+                                 firmwareInfo:(NSData *)firmwareInfo
+{
+    if (self = [super init]) {
+        _challenge = challenge;
+        _nonce = nonce;
+        _elementsTLV = elementsTLV;
+        _elementsSignature = elementsSignature;
+        _deviceAttestationCertificate = deviceAttestationCertificate;
+        _productAttestationIntermediateCertificate = productAttestationIntermediateCertificate;
+        _certificationDeclaration = certificationDeclaration;
+        _firmwareInfo = firmwareInfo;
+    }
+    return self;
+}
+
+@end
+
 @implementation AttestationInfo : NSObject
 
 - (instancetype)initWithChallenge:(NSData *)challenge

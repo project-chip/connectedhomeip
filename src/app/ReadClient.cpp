@@ -64,6 +64,7 @@ void ReadClient::ClearActiveSubscriptionState()
     mMinIntervalFloorSeconds      = 0;
     mMaxInterval                  = 0;
     mSubscriptionId               = 0;
+    mIsResubscriptionScheduled    = false;
     MoveToState(ClientState::Idle);
 }
 
@@ -155,6 +156,7 @@ CHIP_ERROR ReadClient::ScheduleResubscription(uint32_t aTimeTillNextResubscripti
     ReturnErrorOnFailure(
         InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
             System::Clock::Milliseconds32(aTimeTillNextResubscriptionMs), OnResubscribeTimerCallback, this));
+    mIsResubscriptionScheduled = true;
 
     return CHIP_NO_ERROR;
 }
@@ -841,6 +843,7 @@ void ReadClient::CancelResubscribeTimer()
 {
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
         OnResubscribeTimerCallback, this);
+    mIsResubscriptionScheduled = false;
 }
 
 void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void * apAppState)
@@ -1094,6 +1097,8 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void 
 {
     ReadClient * const _this = static_cast<ReadClient *>(apAppState);
     VerifyOrDie(_this != nullptr);
+
+    _this->mIsResubscriptionScheduled = false;
 
     CHIP_ERROR err;
 

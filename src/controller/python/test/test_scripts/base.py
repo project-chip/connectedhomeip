@@ -16,32 +16,30 @@
 #
 
 import asyncio
+import copy
+import ctypes
+import faulthandler
+import inspect
+import logging
+import os
+import secrets
+import sys
+import threading
+import time
 from dataclasses import dataclass
 from inspect import Attribute
-import inspect
 from typing import Any
-import typing
-from chip import ChipDeviceCtrl
-from chip import ChipCommissionableNodeCtrl
-import chip.interaction_model as IM
-import threading
-import os
-import sys
-import logging
-import time
-import ctypes
+
+import chip.CertificateAuthority
 import chip.clusters as Clusters
 import chip.clusters.Attribute as Attribute
-from chip.utils import CommissioningBuildingBlocks
-from chip.ChipStack import *
-import chip.native
-import chip.FabricAdmin
-import chip.CertificateAuthority
 import chip.discovery
-import copy
-import secrets
-import faulthandler
-import ipdb
+import chip.FabricAdmin
+import chip.interaction_model as IM
+import chip.native
+from chip import ChipDeviceCtrl
+from chip.ChipStack import *
+from chip.utils import CommissioningBuildingBlocks
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -395,16 +393,16 @@ class BaseTestHelper:
 
         # Read out an attribute using the new controller. It has no privileges, so this should fail with an UnsupportedAccess error.
         res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
+        if (res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
             self.logger.error(f"1: Received data instead of an error:{res}")
             return False
 
         # Grant the new controller privilege by adding the CAT tag to the subject.
-        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[0], privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=nodeid, targetCatTags=[0x0001_0001])
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[0], privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister, targetNodeId=nodeid, targetCatTags=[0x0001_0001])
 
         # Read out the attribute again - this time, it should succeed.
         res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntry):
+        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntryStruct):
             self.logger.error(f"2: Received something other than data:{res}")
             return False
 
@@ -426,7 +424,7 @@ class BaseTestHelper:
         # Read out the ACL list from one of the newly minted controllers which has no access. This should return an IM error.
         #
         res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
+        if (res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
             self.logger.error(f"1: Received data instead of an error:{res}")
             return False
 
@@ -435,7 +433,7 @@ class BaseTestHelper:
         # Doing this ensures that we're not somehow aliasing the CASE sessions.
         #
         res = await self.devCtrl.ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntry):
+        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntryStruct):
             self.logger.error(f"2: Received something other than data:{res}")
             return False
 
@@ -444,42 +442,42 @@ class BaseTestHelper:
         # under-neath.
         #
         res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
+        if (res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
             self.logger.error(f"3: Received data instead of an error:{res}")
             return False
 
         #
         # Grant the new controller admin privileges. Reading out the ACL cluster should now yield data.
         #
-        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[0], privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=nodeid)
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[0], privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister, targetNodeId=nodeid)
         res = await newControllers[0].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntry):
+        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntryStruct):
             self.logger.error(f"4: Received something other than data:{res}")
             return False
 
         #
         # Grant the second new controller admin privileges as well. Reading out the ACL cluster should now yield data.
         #
-        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[1], privilege=Clusters.AccessControl.Enums.Privilege.kAdminister, targetNodeId=nodeid)
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[1], privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister, targetNodeId=nodeid)
         res = await newControllers[1].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntry):
+        if (type(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl][0]) != Clusters.AccessControl.Structs.AccessControlEntryStruct):
             self.logger.error(f"5: Received something other than data:{res}")
             return False
 
         #
         # Grant the second new controller just view privilege. Reading out the ACL cluster should return no data.
         #
-        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[1], privilege=Clusters.AccessControl.Enums.Privilege.kView, targetNodeId=nodeid)
+        await CommissioningBuildingBlocks.GrantPrivilege(adminCtrl=self.devCtrl, grantedCtrl=newControllers[1], privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView, targetNodeId=nodeid)
         res = await newControllers[1].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.AccessControl.Attributes.Acl)])
-        if(res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
+        if (res[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl].Reason.status != IM.Status.UnsupportedAccess):
             self.logger.error(f"6: Received data5 instead of an error:{res}")
             return False
 
         #
         # Read the Basic cluster from the 2nd controller. This is possible with just view privileges.
         #
-        res = await newControllers[1].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.Basic.Attributes.ClusterRevision)])
-        if (type(res[0][Clusters.Basic][Clusters.Basic.Attributes.ClusterRevision]) != Clusters.Basic.Attributes.ClusterRevision.attribute_type.Type):
+        res = await newControllers[1].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.BasicInformation.Attributes.ClusterRevision)])
+        if (type(res[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.ClusterRevision]) != Clusters.BasicInformation.Attributes.ClusterRevision.attribute_type.Type):
             self.logger.error(f"7: Received something other than data:{res}")
             return False
 
@@ -556,7 +554,7 @@ class BaseTestHelper:
         #
         for x in range(minimumSupportedFabrics * minimumCASESessionsPerFabric * 2):
             self.devCtrl.CloseSession(nodeid)
-            await self.devCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)])
+            await self.devCtrl.ReadAttribute(nodeid, [(Clusters.BasicInformation.Attributes.ClusterRevision)])
 
         self.logger.info("Testing CASE defunct logic")
 
@@ -615,7 +613,7 @@ class BaseTestHelper:
 
         for x in range(minimumSupportedFabrics * minimumCASESessionsPerFabric * 2):
             self.devCtrl2.CloseSession(nodeid)
-            await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)])
+            await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.BasicInformation.Attributes.ClusterRevision)])
 
         #
         # Now write the attribute from fabric2, give it some time before checking if the report
@@ -641,7 +639,7 @@ class BaseTestHelper:
 
         for x in range(minimumSupportedFabrics * minimumCASESessionsPerFabric * 2):
             self.devCtrl.CloseSession(nodeid)
-            await self.devCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)])
+            await self.devCtrl.ReadAttribute(nodeid, [(Clusters.BasicInformation.Attributes.ClusterRevision)])
 
         await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.Int8u(4))])
         time.sleep(2)
@@ -903,7 +901,7 @@ class BaseTestHelper:
             async with cv:
                 cv.notify()
 
-        subscription = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)], reportInterval=(0, 5))
+        subscription = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.BasicInformation.Attributes.ClusterRevision)], reportInterval=(0, 5))
 
         #
         # Register async callbacks that will fire when a re-sub is attempted or succeeds.
@@ -919,7 +917,7 @@ class BaseTestHelper:
         subscription.OverrideLivenessTimeoutMs(100)
 
         async with cv:
-            if (not(resubAttempted) or not(resubSucceeded)):
+            if (not (resubAttempted) or not (resubSucceeded)):
                 res = await asyncio.wait_for(cv.wait(), 3)
                 if not res:
                     self.logger.error("Timed out waiting for resubscription to succeed")
@@ -1035,7 +1033,7 @@ class BaseTestHelper:
         failed_zcl = {}
         for basic_attr, expected_value in basic_cluster_attrs.items():
             try:
-                res = self.devCtrl.ZCLReadAttribute(cluster="Basic",
+                res = self.devCtrl.ZCLReadAttribute(cluster="BasicInformation",
                                                     attribute=basic_attr,
                                                     nodeid=nodeid,
                                                     endpoint=endpoint,
@@ -1058,8 +1056,8 @@ class BaseTestHelper:
             expected_status: IM.Status = IM.Status.Success
 
         requests = [
-            AttributeWriteRequest("Basic", "NodeLabel", "Test"),
-            AttributeWriteRequest("Basic", "Location",
+            AttributeWriteRequest("BasicInformation", "NodeLabel", "Test"),
+            AttributeWriteRequest("BasicInformation", "Location",
                                   "a pretty loooooooooooooog string", IM.Status.ConstraintError),
         ]
         failed_zcl = []

@@ -155,15 +155,15 @@ tests:
       command: "AddGroup"
       arguments:
           values:
-              - name: "GroupId"
+              - name: "GroupID"
                 value: 0x0101
               - name: "GroupName"
                 value: "Group #1"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "GroupId"
+              - name: "GroupID"
                 value: 0x0101
 
     - label: "Add Group 2"
@@ -172,15 +172,15 @@ tests:
       command: "AddGroup"
       arguments:
           values:
-              - name: "GroupId"
+              - name: "GroupID"
                 value: 0x0102
               - name: "GroupName"
                 value: "Group #2"
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "GroupId"
+              - name: "GroupID"
                 value: 0x0102
 
     - label: "Read GroupTable"
@@ -246,13 +246,13 @@ tests:
       command: "RemoveGroup"
       arguments:
           values:
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "groupId"
+              - name: "GroupID"
                 value: 0x0101
 
     - label: "Read GroupTable 2"
@@ -295,3 +295,77 @@ tests:
                 value: 0x01a2
       response:
           error: NOT_FOUND
+
+    - label: "KeySet Write 1"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        EpochStartTime2: 1110002,
+                    }
+
+    - label: "KeySet Write 2"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a2,
+                        GroupKeySecurityPolicy: 1,
+                        EpochKey0: "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
+                        EpochStartTime0: 2110000,
+                        EpochKey1: "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",
+                        EpochStartTime1: 2110001,
+                        EpochKey2: "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        EpochStartTime2: 2110002,
+                    }
+
+    - label: "Map Group 1 and Group 2 to KeySet 1 and group 2 to KeySet 2"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a1 },
+              ]
+
+    - label: "Remove keyset 1"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x01a1
+
+    - label: "TH verifies GroupKeyMap entries for KeySet 1 have been removed"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "GroupKeyMap"
+      response:
+          value: [{ FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 }]
+    - label: "Remove keyset 2"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x01a2
+
+    - label: "TH verifies GroupKeyMap entries for KeySet 2 have been removed"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "GroupKeyMap"
+      response:
+          value: []

@@ -234,6 +234,21 @@ public:
             aEventNumber.ClearValue();
             return CHIP_NO_ERROR;
         }
+
+        /**
+         * OnUnsolicitedMessageFromPublisher will be called for a subscription
+         * ReadClient when any incoming message is received from a matching
+         * node on the fabric.
+         *
+         * This callback will be called:
+         *   - When receiving any unsolicited communication from the node
+         *   - Even for disconnected subscriptions.
+         *
+         * Callee MUST not synchronously destroy ReadClients in this callback.
+         *
+         * @param[in] apReadClient the ReadClient for the subscription.
+         */
+        virtual void OnUnsolicitedMessageFromPublisher(ReadClient * apReadClient) {}
     };
 
     enum class InteractionType : uint8_t
@@ -287,6 +302,20 @@ public:
     CHIP_ERROR SendRequest(ReadPrepareParams & aReadPrepareParams);
 
     void OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+
+    void OnUnsolicitedMessageFromPublisher()
+    {
+        // accelerate resubscription if scheduled
+        if (mIsResubscriptionScheduled)
+        {
+            ChipLogDetail(DataManagement, "%s ReadClient[%p] resubscribe on unsolicited message", __func__, this);
+            CancelResubscribeTimer();
+            OnResubscribeTimerCallback(nullptr, this);
+        }
+
+        // Then notify callbacks
+        mpCallback.OnUnsolicitedMessageFromPublisher(this);
+    }
 
     auto GetSubscriptionId() const
     {
@@ -501,7 +530,8 @@ private:
     InteractionType mInteractionType = InteractionType::Read;
     Timestamp mEventTimestamp;
 
-    bool mForceCaseOnNextResub = true;
+    bool mForceCaseOnNextResub      = true;
+    bool mIsResubscriptionScheduled = false;
 
     chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;

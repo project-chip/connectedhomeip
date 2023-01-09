@@ -15,29 +15,29 @@
 import os
 import re
 from itertools import combinations
-from typing import List, Any, Optional
-
-from .target import BuildTarget, TargetPart
+from typing import Any, List, Optional
 
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidApp, AndroidBoard, AndroidBuilder
+from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
 from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App, cc13x2x7_26x2x7Builder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
 from builders.esp32 import Esp32App, Esp32Board, Esp32Builder
+from builders.genio import GenioApp, GenioBuilder
 from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary
+from builders.imx import IMXApp, IMXBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
 from builders.k32w import K32WApp, K32WBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
+from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
-from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
-from builders.imx import IMXApp, IMXBuilder
-from builders.genio import GenioApp, GenioBuilder
-from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder
+
+from .target import BuildTarget, TargetPart
 
 
 def BuildHostTestRunnerTarget():
@@ -67,8 +67,8 @@ def BuildHostFakeTarget():
         TargetPart('tests', app=HostApp.TESTS),
     ])
 
-    target.AppendModifier("mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-mbedtls')
-    target.AppendModifier("boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-boringssl')
+    target.AppendModifier("mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
+    target.AppendModifier("boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-mbedtls')
     target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
     target.AppendModifier("ubsan", use_ubsan=True)
@@ -136,8 +136,8 @@ def BuildHostTarget():
     target.AppendModifier("no-ble", enable_ble=False)
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("no-thread", enable_thread=False)
-    target.AppendModifier("mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-mbedtls')
-    target.AppendModifier("boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-boringssl')
+    target.AppendModifier("mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
+    target.AppendModifier("boringssl", crypto_library=HostCryptoLibrary.BORINGSSL).ExceptIfRe('-mbedtls')
     target.AppendModifier("asan", use_asan=True).ExceptIfRe("-tsan")
     target.AppendModifier("tsan", use_tsan=True).ExceptIfRe("-asan")
     target.AppendModifier("ubsan", use_ubsan=True)
@@ -527,6 +527,7 @@ def BuildTelinkTarget():
     target.AppendFixedTargets([
         TargetPart('all-clusters', app=TelinkApp.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=TelinkApp.ALL_CLUSTERS_MINIMAL),
+        TargetPart('contact-sensor', app=TelinkApp.CONTACT_SENSOR),
         TargetPart('light', app=TelinkApp.LIGHT),
         TargetPart('light-switch', app=TelinkApp.SWITCH),
         TargetPart('ota-requestor', app=TelinkApp.OTA_REQUESTOR),

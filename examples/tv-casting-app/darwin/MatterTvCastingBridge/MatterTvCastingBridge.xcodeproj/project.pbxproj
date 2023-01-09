@@ -26,6 +26,7 @@
 		3CCB8742286A593700771BAD /* ConversionUtils.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3CCB873C286A593700771BAD /* ConversionUtils.hpp */; };
 		3CCB8743286A593700771BAD /* CastingServerBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CCB873D286A593700771BAD /* CastingServerBridge.mm */; };
 		3CCB8744286A593700771BAD /* ConversionUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CCB873E286A593700771BAD /* ConversionUtils.mm */; };
+		3CE868F42946D76200FCB92B /* CommissionableDataProviderImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CE868F32946D76200FCB92B /* CommissionableDataProviderImpl.mm */; };
 		3CF8532728E37F1000F07B9F /* MatterError.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3CF8532628E37F1000F07B9F /* MatterError.mm */; };
 /* End PBXBuildFile section */
 
@@ -59,6 +60,7 @@
 		3CCB873C286A593700771BAD /* ConversionUtils.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ConversionUtils.hpp; sourceTree = "<group>"; };
 		3CCB873D286A593700771BAD /* CastingServerBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CastingServerBridge.mm; sourceTree = "<group>"; };
 		3CCB873E286A593700771BAD /* ConversionUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ConversionUtils.mm; sourceTree = "<group>"; };
+		3CE868F32946D76200FCB92B /* CommissionableDataProviderImpl.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CommissionableDataProviderImpl.mm; sourceTree = "<group>"; };
 		3CF8532528E37ED800F07B9F /* MatterError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MatterError.h; sourceTree = "<group>"; };
 		3CF8532628E37F1000F07B9F /* MatterError.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MatterError.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -125,6 +127,7 @@
 				3C26AC8B2926FE0C00BA6881 /* DeviceAttestationCredentialsProviderImpl.hpp */,
 				3C26AC8F2927008900BA6881 /* DeviceAttestationCredentialsProviderImpl.mm */,
 				3C0D9CDF2920A30C00D3332B /* CommissionableDataProviderImpl.hpp */,
+				3CE868F32946D76200FCB92B /* CommissionableDataProviderImpl.mm */,
 			);
 			path = MatterTvCastingBridge;
 			sourceTree = "<group>";
@@ -241,6 +244,7 @@
 				3CCB8744286A593700771BAD /* ConversionUtils.mm in Sources */,
 				3C4E53B028E4F28100F293E8 /* MediaPlaybackTypes.mm in Sources */,
 				3C66FBFC290327BB00B63FE7 /* AppParameters.mm in Sources */,
+				3CE868F42946D76200FCB92B /* CommissionableDataProviderImpl.mm in Sources */,
 				3C26AC9329282B8100BA6881 /* DeviceAttestationCredentialsHolder.m in Sources */,
 				3C26AC902927008900BA6881 /* DeviceAttestationCredentialsProviderImpl.mm in Sources */,
 				3CCB873F286A593700771BAD /* DiscoveredNodeData.mm in Sources */,

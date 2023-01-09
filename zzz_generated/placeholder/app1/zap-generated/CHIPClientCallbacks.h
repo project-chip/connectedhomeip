@@ -30,6 +30,8 @@
 #include <lib/support/Span.h>
 
 // List specific responses
+typedef void (*LocalizationConfigurationSupportedLocalesListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
 typedef void (*GeneralCommissioningGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*GeneralCommissioningAcceptedCommandListListAttributeCallback)(
@@ -48,6 +50,9 @@ typedef void (*OperationalCredentialsFabricsListAttributeCallback)(
         chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & data);
 typedef void (*OperationalCredentialsTrustedRootCertificatesListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
+typedef void (*FixedLabelLabelListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & data);
 typedef void (*ModeSelectSupportedModesListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & data);

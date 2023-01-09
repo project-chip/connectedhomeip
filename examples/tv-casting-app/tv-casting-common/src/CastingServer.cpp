@@ -130,6 +130,7 @@ CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(chip::Transport::
 
 CHIP_ERROR CastingServer::SendUserDirectedCommissioningRequest(Dnssd::DiscoveredNodeData * selectedCommissioner)
 {
+    mUdcInProgress = true;
     // Send User Directed commissioning request
     ReturnErrorOnFailure(SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
         selectedCommissioner->resolutionData.ipAddress[0], selectedCommissioner->resolutionData.port,
@@ -320,23 +321,91 @@ CastingServer::ContentLauncherLaunchURL(TargetEndpointInfo * endpoint, const cha
 
 void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
+    bool runPostCommissioning           = false;
+    chip::NodeId targetPeerNodeId       = 0;
+    chip::FabricIndex targetFabricIndex = 0;
     if (event->Type == DeviceLayer::DeviceEventType::kBindingsChangedViaCluster)
     {
+        ChipLogProgress(AppServer, "CastingServer::DeviceEventCallback kBindingsChangedViaCluster received");
         if (CastingServer::GetInstance()->GetActiveTargetVideoPlayer()->IsInitialized())
         {
+            ChipLogProgress(AppServer,
+                            "CastingServer::DeviceEventCallback already connected to video player, reading server clusters");
             CastingServer::GetInstance()->ReadServerClustersForNode(
                 CastingServer::GetInstance()->GetActiveTargetVideoPlayer()->GetNodeId());
+        }
+        else if (CastingServer::GetInstance()->mUdcInProgress)
+        {
+            ChipLogProgress(AppServer,
+                            "CastingServer::DeviceEventCallback UDC is in progress while handling kBindingsChangedViaCluster");
+            CastingServer::GetInstance()->mUdcInProgress = false;
+            if (CastingServer::GetInstance()->mTargetVideoPlayerNumIPs > 0)
+            {
+                TargetVideoPlayerInfo * connectableVideoPlayerList =
+                    CastingServer::GetInstance()->ReadCachedTargetVideoPlayerInfos();
+                if (connectableVideoPlayerList == nullptr || !connectableVideoPlayerList[0].IsInitialized())
+                {
+                    ChipLogError(AppServer, "CastingServer::DeviceEventCallback No cached video players found");
+                    CastingServer::GetInstance()->mCommissioningCompleteCallback(CHIP_ERROR_INCORRECT_STATE);
+                    return;
+                }
+
+                for (size_t i = 0; i < kMaxCachedVideoPlayers && connectableVideoPlayerList[i].IsInitialized(); i++)
+                {
+                    if (connectableVideoPlayerList[i].IsSameAs(CastingServer::GetInstance()->mTargetVideoPlayerDeviceName,
+                                                               CastingServer::GetInstance()->mTargetVideoPlayerNumIPs,
+                                                               CastingServer::GetInstance()->mTargetVideoPlayerIpAddress))
+                    {
+                        ChipLogProgress(AppServer,
+                                        "CastingServer::DeviceEventCallback found the video player to initialize/connect to");
+                        targetPeerNodeId     = connectableVideoPlayerList[i].GetNodeId();
+                        targetFabricIndex    = connectableVideoPlayerList[i].GetFabricIndex();
+                        runPostCommissioning = true;
+                    }
+                }
+
+                if (targetPeerNodeId == 0 && runPostCommissioning == false)
+                {
+                    ChipLogError(AppServer,
+                                 "CastingServer::DeviceEventCallback did NOT find the video player to initialize/connect to");
+                    CastingServer::GetInstance()->mCommissioningCompleteCallback(CHIP_ERROR_INCORRECT_STATE);
+                    return;
+                }
+            }
         }
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
+        ChipLogProgress(AppServer, "CastingServer::DeviceEventCallback kCommissioningComplete received");
+        CastingServer::GetInstance()->mUdcInProgress = false;
+        targetPeerNodeId                             = event->CommissioningComplete.nodeId;
+        targetFabricIndex                            = event->CommissioningComplete.fabricIndex;
+        runPostCommissioning                         = true;
+    }
+
+    if (runPostCommissioning)
+    {
+        ChipLogProgress(AppServer,
+                        "CastingServer::DeviceEventCallback will connect with nodeId=0x" ChipLogFormatX64 " fabricIndex=%d",
+                        ChipLogValueX64(targetPeerNodeId), targetFabricIndex);
         CHIP_ERROR err = CastingServer::GetInstance()->GetActiveTargetVideoPlayer()->Initialize(
-            event->CommissioningComplete.nodeId, event->CommissioningComplete.fabricIndex,
-            CastingServer::GetInstance()->mOnConnectionSuccessClientCallback,
+            targetPeerNodeId, targetFabricIndex, CastingServer::GetInstance()->mOnConnectionSuccessClientCallback,
             CastingServer::GetInstance()->mOnConnectionFailureClientCallback,
             CastingServer::GetInstance()->mTargetVideoPlayerVendorId, CastingServer::GetInstance()->mTargetVideoPlayerProductId,
             CastingServer::GetInstance()->mTargetVideoPlayerDeviceType, CastingServer::GetInstance()->mTargetVideoPlayerDeviceName,
             CastingServer::GetInstance()->mTargetVideoPlayerNumIPs, CastingServer::GetInstance()->mTargetVideoPlayerIpAddress);
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to initialize target video player");
+        }
+
+        err = CastingServer::GetInstance()->mPersistenceManager.AddVideoPlayer(
+            &CastingServer::GetInstance()->mActiveTargetVideoPlayerInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "AddVideoPlayer(ToCache) error: %" CHIP_ERROR_FORMAT, err.Format());
+        }
 
         CastingServer::GetInstance()->mCommissioningCompleteCallback(err);
     }
@@ -553,6 +622,27 @@ CHIP_ERROR CastingServer::LevelControl_SubscribeToMaxLevel(
     ReturnErrorOnFailure(mMaxLevelSubscriber.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
     return mMaxLevelSubscriber.SubscribeAttribute(context, successFn, failureFn, minInterval, maxInterval,
                                                   onSubscriptionEstablished);
+}
+
+/**
+ * @brief OnOff cluster
+ */
+CHIP_ERROR CastingServer::OnOff_On(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mOnCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mOnCommand.Invoke(responseCallback);
+}
+
+CHIP_ERROR CastingServer::OnOff_Off(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mOffCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mOffCommand.Invoke(responseCallback);
+}
+
+CHIP_ERROR CastingServer::OnOff_Toggle(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mToggleCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mToggleCommand.Invoke(responseCallback);
 }
 
 /**

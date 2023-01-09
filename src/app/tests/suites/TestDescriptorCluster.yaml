@@ -32,7 +32,7 @@ tests:
       command: "readAttribute"
       attribute: "DeviceTypeList"
       response:
-          value: [{ type: 22, revision: 1 }]
+          value: [{ DeviceType: 22, Revision: 1 }]
 
     - label: "Read attribute Server list"
       command: "readAttribute"

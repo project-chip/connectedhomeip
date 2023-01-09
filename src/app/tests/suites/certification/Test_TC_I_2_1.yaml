@@ -32,8 +32,9 @@ tests:
                 value: nodeId
 
     - label: "TH reads the IdentifyTime attribute from the DUT"
+      PICS: I.S.A0000
       command: "readAttribute"
-      attribute: "identify time"
+      attribute: "IdentifyTime"
       response:
           constraints:
               type: int16u
@@ -41,8 +42,9 @@ tests:
               maxValue: 65535
 
     - label: "TH reads the IdentifyType attribute from the DUT"
+      PICS: I.S.A0001
       command: "readAttribute"
-      attribute: "identify type"
+      attribute: "IdentifyType"
       response:
           constraints:
               type: enum8

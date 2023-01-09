@@ -24,11 +24,9 @@ Uses the conditions defined in `check_includes_config.py`.
 
 import re
 import sys
-
 from typing import Iterable, Pattern
 
 import check_includes_config as config
-
 
 # The input comes from `grep -n` and has the form
 #   filename:line:include-directive

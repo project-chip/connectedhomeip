@@ -13,22 +13,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
-import coloredlogs
-import enum
 import logging
 import os
 import sys
 
-from typing import List, Optional
+import click
+import coloredlogs
 
 try:
-    from idl import matter_idl_parser
-except:
-    sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-    from idl import matter_idl_parser
+    from matter_idl import matter_idl_parser
+except ImportError:
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'py_matter_idl')))
+    from matter_idl import matter_idl_parser
 
-import idl.lint
+# isort: off
+import matter_idl.lint
+
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
@@ -64,7 +64,7 @@ def main(log_level, rules, idl_path):
 
     lint_rules = []
     logging.info("Loading rules from %s" % rules)
-    lint_rules.extend(idl.lint.CreateParser(rules).parse())
+    lint_rules.extend(matter_idl.lint.CreateParser(rules).parse())
 
     logging.info("Parsing idl from %s" % idl_path)
     idl_tree = matter_idl_parser.CreateParser().parse(open(idl_path, "rt").read(), file_name=idl_path)

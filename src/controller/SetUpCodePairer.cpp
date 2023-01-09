@@ -272,6 +272,12 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj)
 
     mWaitingForDiscovery[kBLETransport] = false;
 
+    // In order to not wait for all the possible addresses discovered over mdns to
+    // be tried before trying to connect over BLE, the discovered connection object is
+    // inserted at the beginning of the list.
+    //
+    // It makes it the 'next' thing to try to connect to if there are already some
+    // discovered parameters in the list.
     mDiscoveredParameters.emplace_front(connObj);
     ConnectToDiscoveredDevice();
 }
@@ -485,7 +491,8 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
     if (CHIP_ERROR_TIMEOUT == error && mCurrentPASEParameters.HasValue())
     {
         const auto & params = mCurrentPASEParameters.Value();
-        auto & ip           = params.GetPeerAddress().GetIPAddress();
+        const auto & peer   = params.GetPeerAddress();
+        const auto & ip     = peer.GetIPAddress();
         auto err            = Dnssd::Resolver::Instance().ReconfirmRecord(params.mHostName, ip, params.mInterfaceId);
         if (CHIP_NO_ERROR != err && CHIP_ERROR_NOT_IMPLEMENTED != err)
         {

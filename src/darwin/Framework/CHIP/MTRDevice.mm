@@ -113,9 +113,10 @@ class SubscriptionCallback final : public MTRBaseSubscriptionCallback {
 public:
     SubscriptionCallback(DataReportCallback attributeReportCallback, DataReportCallback eventReportCallback,
         ErrorCallback errorCallback, MTRDeviceResubscriptionScheduledHandler resubscriptionCallback,
-        SubscriptionEstablishedHandler subscriptionEstablishedHandler, OnDoneHandler onDoneHandler)
+        SubscriptionEstablishedHandler subscriptionEstablishedHandler, OnDoneHandler onDoneHandler,
+        UnsolicitedMessageFromPublisherHandler unsolicitedMessageFromPublisherHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
-            subscriptionEstablishedHandler, onDoneHandler)
+            subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler)
     {
     }
 
@@ -162,7 +163,8 @@ private:
         _nodeID = [nodeID copy];
         _fabricIndex = controller.fabricIndex;
         _deviceController = controller;
-        _queue = dispatch_queue_create("com.apple.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL);
+        _queue
+            = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _readCache = [NSMutableDictionary dictionary];
         _expectedValueCache = [NSMutableDictionary dictionary];
         _asyncCallbackWorkQueue = [[MTRAsyncCallbackWorkQueue alloc] initWithContext:self queue:_queue];
@@ -210,6 +212,19 @@ private:
     os_unfair_lock_unlock(&self->_lock);
 }
 
+// assume lock is held
+- (void)_changeState:(MTRDeviceState)state
+{
+    MTRDeviceState lastState = _state;
+    _state = state;
+    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
+    if (delegate && (lastState != state)) {
+        dispatch_async(_delegateQueue, ^{
+            [delegate device:self stateChanged:state];
+        });
+    }
+}
+
 - (void)_handleSubscriptionEstablished
 {
     os_unfair_lock_lock(&self->_lock);
@@ -217,13 +232,7 @@ private:
     // reset subscription attempt wait time when subscription succeeds
     _lastSubscriptionAttemptWait = 0;
 
-    _state = MTRDeviceStateReachable;
-    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (delegate) {
-        dispatch_async(_delegateQueue, ^{
-            [delegate device:self stateChanged:MTRDeviceStateReachable];
-        });
-    }
+    [self _changeState:MTRDeviceStateReachable];
 
     os_unfair_lock_unlock(&self->_lock);
 }
@@ -235,12 +244,7 @@ private:
     _subscriptionActive = NO;
     _unreportedEvents = nil;
 
-    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (delegate) {
-        dispatch_async(_delegateQueue, ^{
-            [delegate device:self stateChanged:MTRDeviceStateUnreachable];
-        });
-    }
+    [self _changeState:MTRDeviceStateUnreachable];
 
     os_unfair_lock_unlock(&self->_lock);
 }
@@ -249,14 +253,7 @@ private:
 {
     os_unfair_lock_lock(&self->_lock);
 
-    _state = MTRDeviceStateUnknown;
-
-    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (delegate) {
-        dispatch_async(_delegateQueue, ^{
-            [delegate device:self stateChanged:MTRDeviceStateUnknown];
-        });
-    }
+    [self _changeState:MTRDeviceStateUnknown];
 
     os_unfair_lock_unlock(&self->_lock);
 }
@@ -298,6 +295,26 @@ private:
         [self _setupSubscription];
         os_unfair_lock_unlock(&self->_lock);
     });
+
+    os_unfair_lock_unlock(&self->_lock);
+}
+
+- (void)_handleUnsolicitedMessageFromPublisher
+{
+    os_unfair_lock_lock(&self->_lock);
+
+    [self _changeState:MTRDeviceStateReachable];
+
+    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
+    if (delegate && [delegate respondsToSelector:@selector(didReceiveCommunicationFromDevice:)]) {
+        dispatch_async(_delegateQueue, ^{
+            [delegate didReceiveCommunicationFromDevice:self];
+        });
+    }
+
+    // in case this is called dyring exponential back off of subscription
+    // reestablishment, this starts the attempt right away
+    [self _setupSubscription];
 
     os_unfair_lock_unlock(&self->_lock);
 }
@@ -442,6 +459,13 @@ private:
                                           dispatch_async(self.queue, ^{
                                               // OnDone
                                               [self _handleSubscriptionReset];
+                                          });
+                                      },
+                                      ^(void) {
+                                          MTR_LOG_INFO("%@ got unsolicited message from publisher", self);
+                                          dispatch_async(self.queue, ^{
+                                              // OnUnsolicitedMessageFromPublisher
+                                              [self _handleUnsolicitedMessageFromPublisher];
                                           });
                                       });
 

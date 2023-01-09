@@ -72,6 +72,10 @@ public class AppPlatformService {
     registerContentAppUpdatesReceiver();
   }
 
+  public void addSelfVendorAsAdmin() {
+    mAppPlatform.addSelfVendorAsAdmin();
+  }
+
   private void initializeContentAppEndpoints() {
 
     // Read the metadada of previously discovered endpoints.
