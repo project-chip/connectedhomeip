@@ -430,8 +430,6 @@
     257, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
-    4166, /* Cluster: Client Monitoring, Command: RegisterClientMonitoring, Privilege: manage */ \
-    4166, /* Cluster: Client Monitoring, Command: UnregisterClientMonitoring, Privilege: manage */ \
     4294048774, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     4294048774, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
@@ -484,8 +482,6 @@
     34, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     36, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     38, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
-    0, /* Cluster: Client Monitoring, Command: RegisterClientMonitoring, Privilege: manage */ \
-    1, /* Cluster: Client Monitoring, Command: UnregisterClientMonitoring, Privilege: manage */ \
     0, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     1, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
@@ -538,8 +534,6 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Client Monitoring, Command: RegisterClientMonitoring, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Client Monitoring, Command: UnregisterClientMonitoring, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
