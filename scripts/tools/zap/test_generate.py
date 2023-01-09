@@ -22,6 +22,7 @@ import sys
 import unittest
 from dataclasses import dataclass, field
 from typing import List, Optional
+
 import yaml
 
 TESTS_DIR = os.path.join(os.path.dirname(__file__), "tests")
