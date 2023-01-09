@@ -82,7 +82,7 @@ def _hardcoded_python_yaml_tests():
     for name in currently_supported_yaml_tests:
         yaml_test_path = _FindYamlTestPath(name)
         if not yaml_test_path:
-            continue
+            raise FileNotFoundError(f"Could not find YAML test {name}")
 
         target = target_for_name(name)
 

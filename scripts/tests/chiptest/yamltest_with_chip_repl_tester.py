@@ -1,4 +1,5 @@
-#
+#!/usr/bin/env -S python3 -B
+
 #    Copyright (c) 2022 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -64,50 +65,51 @@ def _sort_with_global_attribute_first(a, b):
     help='Node ID to use when commissioning device')
 def main(setup_code, yaml_path, node_id):
     # Setting up python enviroment for running YAML CI tests using python parser.
-    chip_stack_storage = tempfile.NamedTemporaryFile()
-    chip.native.Init()
-    chip_stack = ChipStack(chip_stack_storage.name)
-    certificate_authority_manager = chip.CertificateAuthority.CertificateAuthorityManager(chip_stack, chipStack.GetStorageManager())
-    certificate_authority_manager.LoadAuthoritiesFromStorage()
+    with tempfile.NamedTemporaryFile() as chip_stack_storage:
+        chip.native.Init()
+        chip_stack = ChipStack(chip_stack_storage.name)
+        certificate_authority_manager = chip.CertificateAuthority.CertificateAuthorityManager(
+            chip_stack, chipStack.GetStorageManager())
+        certificate_authority_manager.LoadAuthoritiesFromStorage()
 
-    if len(certificate_authority_manager.activeCaList) == 0:
-        ca = certificate_authority_manager.NewCertificateAuthority()
-        ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
-    elif len(certificate_authority_manager.activeCaList[0].adminList) == 0:
-        certificate_authority_manager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
+        if len(certificate_authority_manager.activeCaList) == 0:
+            ca = certificate_authority_manager.NewCertificateAuthority()
+            ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
+        elif len(certificate_authority_manager.activeCaList[0].adminList) == 0:
+            certificate_authority_manager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
 
-    ca_list = certificate_authority_manager.activeCaList
+        ca_list = certificate_authority_manager.activeCaList
 
-    # Creating and commissioning to a single controller to match what is currently done when
-    # running.
-    dev_ctrl = ca_list[0].adminList[0].NewController()
-    dev_ctrl.CommissionWithCode(setup_code, node_id)
+        # Creating and commissioning to a single controller to match what is currently done when
+        # running.
+        dev_ctrl = ca_list[0].adminList[0].NewController()
+        dev_ctrl.CommissionWithCode(setup_code, node_id)
 
-    # Creating Cluster definition.
-    cluster_xml_filenames = glob.glob(_CLUSTER_XML_DIRECOTRY_PATH + '/*/*.xml', recursive=False)
-    cluster_xml_filenames.sort(key=functools.cmp_to_key(_sort_with_global_attribute_first))
-    sources = [ParseSource(source=name) for name in cluster_xml_filenames]
-    clusters_definitions = SpecDefinitions(sources)
+        # Creating Cluster definition.
+        cluster_xml_filenames = glob.glob(_CLUSTER_XML_DIRECOTRY_PATH + '/*/*.xml', recursive=False)
+        cluster_xml_filenames.sort(key=functools.cmp_to_key(_sort_with_global_attribute_first))
+        sources = [ParseSource(source=name) for name in cluster_xml_filenames]
+        clusters_definitions = SpecDefinitions(sources)
 
-    # Parsing YAML test and setting up chip-repl yamltests runner.
-    yaml = TestParser(yaml_path, None, clusters_definitions)
-    runner = ReplTestRunner(clusters_definitions, dev_ctrl)
+        # Parsing YAML test and setting up chip-repl yamltests runner.
+        yaml = TestParser(yaml_path, None, clusters_definitions)
+        runner = ReplTestRunner(clusters_definitions, dev_ctrl)
 
-    # Executing and validating test
-    for test_step in yaml.tests:
-        test_action = runner.encode(test_step)
-        # TODO is test_action is None we should see if it is a pseudo cluster.
-        if test_action is not None:
-            response = runner.execute(test_action)
-            decoded_response = runner.decode(response)
-            post_processing_result = test_step.post_process_response(decoded_response)
-            if not post_processing_result.is_success():
-                # TODO figure out how we error out here
-                pass
+        # Executing and validating test
+        for test_step in yaml.tests:
+            test_action = runner.encode(test_step)
+            # TODO if test_action is None we should see if it is a pseudo cluster.
+            if test_action is not None:
+                response = runner.execute(test_action)
+                decoded_response = runner.decode(response)
+                post_processing_result = test_step.post_process_response(decoded_response)
+                if not post_processing_result.is_success():
+                    # TODO figure out how we error out here
+                    pass
 
-    # Tearing down chip stack. If not done in the correct order test will fail.
-    certificate_authority_manager.Shutdown()
-    chip_stack.Shutdown()
+        # Tearing down chip stack. If not done in the correct order test will fail.
+        certificate_authority_manager.Shutdown()
+        chip_stack.Shutdown()
 
 
 if __name__ == '__main__':
