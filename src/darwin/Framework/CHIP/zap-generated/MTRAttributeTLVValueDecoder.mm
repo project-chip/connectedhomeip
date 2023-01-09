@@ -6897,13 +6897,13 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 auto iter_0 = cppValue.begin();
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
-                    MTROperationalCredentialsClusterFabricDescriptor * newElement_0;
-                    newElement_0 = [MTROperationalCredentialsClusterFabricDescriptor new];
+                    MTROperationalCredentialsClusterFabricDescriptorStruct * newElement_0;
+                    newElement_0 = [MTROperationalCredentialsClusterFabricDescriptorStruct new];
                     newElement_0.rootPublicKey = [NSData dataWithBytes:entry_0.rootPublicKey.data()
                                                                 length:entry_0.rootPublicKey.size()];
-                    newElement_0.vendorId = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.vendorId)];
-                    newElement_0.fabricId = [NSNumber numberWithUnsignedLongLong:entry_0.fabricId];
-                    newElement_0.nodeId = [NSNumber numberWithUnsignedLongLong:entry_0.nodeId];
+                    newElement_0.vendorID = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.vendorID)];
+                    newElement_0.fabricID = [NSNumber numberWithUnsignedLongLong:entry_0.fabricID];
+                    newElement_0.nodeID = [NSNumber numberWithUnsignedLongLong:entry_0.nodeID];
                     newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                                   length:entry_0.label.size()
                                                                 encoding:NSUTF8StringEncoding];

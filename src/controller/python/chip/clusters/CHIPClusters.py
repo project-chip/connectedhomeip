@@ -3154,7 +3154,7 @@ class ChipClusters:
                     "commandId": 0x0000000B,
                     "commandName": "AddTrustedRootCertificate",
                     "args": {
-                        "rootCertificate": "bytes",
+                        "rootCACertificate": "bytes",
                     },
                 },
             },

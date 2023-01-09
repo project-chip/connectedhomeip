@@ -3399,13 +3399,14 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(byte[] AttestationElements, byte[] Signature) {
+    public void onSuccess(byte[] AttestationElements, byte[] AttestationSignature) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo AttestationElementsResponseValue =
           new CommandResponseInfo("AttestationElements", "byte[]");
       responseValues.put(AttestationElementsResponseValue, AttestationElements);
-      CommandResponseInfo SignatureResponseValue = new CommandResponseInfo("Signature", "byte[]");
-      responseValues.put(SignatureResponseValue, Signature);
+      CommandResponseInfo AttestationSignatureResponseValue =
+          new CommandResponseInfo("AttestationSignature", "byte[]");
+      responseValues.put(AttestationSignatureResponseValue, AttestationSignature);
       callback.onSuccess(responseValues);
     }
 
@@ -3538,11 +3539,11 @@ public class ClusterInfoMapping {
 
     @Override
     public void onSuccess(
-        List<ChipStructs.OperationalCredentialsClusterFabricDescriptor> valueList) {
+        List<ChipStructs.OperationalCredentialsClusterFabricDescriptorStruct> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
-              "valueList", "List<ChipStructs.OperationalCredentialsClusterFabricDescriptor>");
+              "valueList", "List<ChipStructs.OperationalCredentialsClusterFabricDescriptorStruct>");
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
@@ -9559,11 +9560,11 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> operationalCredentialsaddTrustedRootCertificateCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo
-        operationalCredentialsaddTrustedRootCertificaterootCertificateCommandParameterInfo =
-            new CommandParameterInfo("rootCertificate", byte[].class, byte[].class);
+        operationalCredentialsaddTrustedRootCertificaterootCACertificateCommandParameterInfo =
+            new CommandParameterInfo("rootCACertificate", byte[].class, byte[].class);
     operationalCredentialsaddTrustedRootCertificateCommandParams.put(
-        "rootCertificate",
-        operationalCredentialsaddTrustedRootCertificaterootCertificateCommandParameterInfo);
+        "rootCACertificate",
+        operationalCredentialsaddTrustedRootCertificaterootCACertificateCommandParameterInfo);
 
     InteractionInfo operationalCredentialsaddTrustedRootCertificateInteractionInfo =
         new InteractionInfo(
@@ -9571,7 +9572,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.OperationalCredentialsCluster) cluster)
                   .addTrustedRootCertificate(
                       (DefaultClusterCallback) callback,
-                      (byte[]) commandArguments.get("rootCertificate"));
+                      (byte[]) commandArguments.get("rootCACertificate"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             operationalCredentialsaddTrustedRootCertificateCommandParams);

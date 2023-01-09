@@ -3307,7 +3307,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _attestationElements = [NSData data];
 
-        _signature = [NSData data];
+        _attestationSignature = [NSData data];
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -3318,7 +3318,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTROperationalCredentialsClusterAttestationResponseParams alloc] init];
 
     other.attestationElements = self.attestationElements;
-    other.signature = self.signature;
+    other.attestationSignature = self.attestationSignature;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -3326,12 +3326,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: attestationElements:%@; signature:%@; >", NSStringFromClass([self class]),
-                  [_attestationElements base64EncodedStringWithOptions:0], [_signature base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: attestationElements:%@; attestationSignature:%@; >", NSStringFromClass([self class]),
+        [_attestationElements base64EncodedStringWithOptions:0], [_attestationSignature base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
+@end
+
+@implementation MTROperationalCredentialsClusterAttestationResponseParams (Deprecated)
+
+- (void)setSignature:(NSData * _Nonnull)signature
+{
+    self.attestationSignature = signature;
+}
+
+- (NSData * _Nonnull)signature
+{
+    return self.attestationSignature;
+}
 @end
 @implementation MTROperationalCredentialsClusterCertificateChainRequestParams
 - (instancetype)init
@@ -3631,7 +3644,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _rootCertificate = [NSData data];
+        _rootCACertificate = [NSData data];
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -3641,7 +3654,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTROperationalCredentialsClusterAddTrustedRootCertificateParams alloc] init];
 
-    other.rootCertificate = self.rootCertificate;
+    other.rootCACertificate = self.rootCACertificate;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -3649,11 +3662,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rootCertificate:%@; >", NSStringFromClass([self class]),
-                                             [_rootCertificate base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rootCACertificate:%@; >", NSStringFromClass([self class]),
+                                             [_rootCACertificate base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
+@end
+
+@implementation MTROperationalCredentialsClusterAddTrustedRootCertificateParams (Deprecated)
+
+- (void)setRootCertificate:(NSData * _Nonnull)rootCertificate
+{
+    self.rootCACertificate = rootCertificate;
+}
+
+- (NSData * _Nonnull)rootCertificate
+{
+    return self.rootCACertificate;
+}
 @end
 @implementation MTRGroupKeyManagementClusterKeySetWriteParams
 - (instancetype)init

@@ -10195,7 +10195,8 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.certificateType = params.certificateType.unsignedCharValue;
+                request.certificateType = static_cast<std::remove_reference_t<decltype(request.certificateType)>>(
+                    params.certificateType.unsignedCharValue);
 
                 chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
@@ -10564,7 +10565,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 if (timedInvokeTimeoutMsParam != nil) {
                     timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
                 }
-                request.rootCertificate = [self asByteSpan:params.rootCertificate];
+                request.rootCACertificate = [self asByteSpan:params.rootCACertificate];
 
                 chip::Controller::OperationalCredentialsCluster cppCluster(exchangeManager, session, self->_endpoint);
                 return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);

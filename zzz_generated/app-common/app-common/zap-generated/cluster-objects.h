@@ -11245,13 +11245,13 @@ struct TypeInfo
 } // namespace AdministratorCommissioning
 namespace OperationalCredentials {
 namespace Structs {
-namespace FabricDescriptor {
+namespace FabricDescriptorStruct {
 enum class Fields
 {
     kRootPublicKey = 1,
-    kVendorId      = 2,
-    kFabricId      = 3,
-    kNodeId        = 4,
+    kVendorID      = 2,
+    kFabricID      = 3,
+    kNodeID        = 4,
     kLabel         = 5,
     kFabricIndex   = 254,
 };
@@ -11260,9 +11260,9 @@ struct Type
 {
 public:
     chip::ByteSpan rootPublicKey;
-    chip::VendorId vendorId = static_cast<chip::VendorId>(0);
-    chip::FabricId fabricId = static_cast<chip::FabricId>(0);
-    chip::NodeId nodeId     = static_cast<chip::NodeId>(0);
+    chip::VendorId vendorID = static_cast<chip::VendorId>(0);
+    chip::FabricId fabricID = static_cast<chip::FabricId>(0);
+    chip::NodeId nodeID     = static_cast<chip::NodeId>(0);
     chip::CharSpan label;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
@@ -11283,7 +11283,7 @@ private:
 
 using DecodableType = Type;
 
-} // namespace FabricDescriptor
+} // namespace FabricDescriptorStruct
 namespace NOCStruct {
 enum class Fields
 {
@@ -11420,8 +11420,8 @@ public:
 namespace AttestationResponse {
 enum class Fields
 {
-    kAttestationElements = 0,
-    kSignature           = 1,
+    kAttestationElements  = 0,
+    kAttestationSignature = 1,
 };
 
 struct Type
@@ -11432,7 +11432,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan attestationElements;
-    chip::ByteSpan signature;
+    chip::ByteSpan attestationSignature;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -11448,7 +11448,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::ByteSpan attestationElements;
-    chip::ByteSpan signature;
+    chip::ByteSpan attestationSignature;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AttestationResponse
@@ -11465,7 +11465,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CertificateChainRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
-    uint8_t certificateType = static_cast<uint8_t>(0);
+    CertificateChainTypeEnum certificateType = static_cast<CertificateChainTypeEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -11480,7 +11480,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CertificateChainRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
-    uint8_t certificateType = static_cast<uint8_t>(0);
+    CertificateChainTypeEnum certificateType = static_cast<CertificateChainTypeEnum>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CertificateChainRequest
@@ -11680,7 +11680,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::NOCResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
-    OperationalCertStatus statusCode = static_cast<OperationalCertStatus>(0);
+    NodeOperationalCertStatusEnum statusCode = static_cast<NodeOperationalCertStatusEnum>(0);
     Optional<chip::FabricIndex> fabricIndex;
     Optional<chip::CharSpan> debugText;
 
@@ -11697,7 +11697,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::NOCResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
-    OperationalCertStatus statusCode = static_cast<OperationalCertStatus>(0);
+    NodeOperationalCertStatusEnum statusCode = static_cast<NodeOperationalCertStatusEnum>(0);
     Optional<chip::FabricIndex> fabricIndex;
     Optional<chip::CharSpan> debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11770,7 +11770,7 @@ public:
 namespace AddTrustedRootCertificate {
 enum class Fields
 {
-    kRootCertificate = 0,
+    kRootCACertificate = 0,
 };
 
 struct Type
@@ -11780,7 +11780,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AddTrustedRootCertificate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
-    chip::ByteSpan rootCertificate;
+    chip::ByteSpan rootCACertificate;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -11795,7 +11795,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AddTrustedRootCertificate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
-    chip::ByteSpan rootCertificate;
+    chip::ByteSpan rootCACertificate;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddTrustedRootCertificate
@@ -11820,11 +11820,12 @@ struct TypeInfo
 namespace Fabrics {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type>;
-    using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>;
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType>;
     using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> &;
+        chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Fabrics::Id; }
