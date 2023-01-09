@@ -212,7 +212,7 @@ class ReadAttributeAction(BaseAction):
 
 class AttributeChangeAccumulator:
     def __init__(self, name: str, expected_attribute: Clusters.ClusterAttributeDescriptor,
-                 output_queue: queue.Queue):
+                 output_queue: queue.SimpleQueue):
         self._name = name
         self._expected_attribute = expected_attribute
         self._output_queue = output_queue
@@ -251,12 +251,12 @@ class SubscribeAttributeAction(ReadAttributeAction):
         self._context = context
         if test_step.min_interval is None:
             raise UnexpectedParsingError(
-                f'SubscribeAttribute action does have min_interval {self.label}')
+                f'SubscribeAttribute action does not have min_interval {self.label}')
         self._min_interval = test_step.min_interval
 
         if test_step.max_interval is None:
             raise UnexpectedParsingError(
-                f'SubscribeAttribute action does have max_interval {self.label}')
+                f'SubscribeAttribute action does not have max_interval {self.label}')
         self._max_interval = test_step.max_interval
 
     def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
@@ -372,10 +372,10 @@ class WaitForReportAction(BaseAction):
 
     def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
         try:
-            # This is a blocking call. While there should be a timeout here, the current codegen
-            # version of YAML tests doesn't have a per test step timeout, only a global timeout for
-            # the entire test.
-            item = self._output_queue.get()
+            # While there should be a timeout here provided by the test, the current codegen version
+            # of YAML tests doesn't have a per test step timeout, only a global timeout for the
+            # entire test. For that reason we default to a 30 second timeout.
+            item = self._output_queue.get(block=True, timeout=30)
         except queue.Empty:
             return _ActionResult(status=_ActionStatus.ERROR, response=None)
 
@@ -439,6 +439,9 @@ class ReplTestRunner:
         try:
             return SubscribeAttributeAction(test_step, cluster, self._context)
         except ParsingError:
+            # TODO For now, ParsingErrors are largely issues that will be addressed soon. Once this
+            # runner has matched parity of the codegen YAML test, this exception should be
+            # propogated.
             return None
 
     def _attribute_write_action_factory(self, test_step, cluster: str):
@@ -461,6 +464,9 @@ class ReplTestRunner:
         try:
             return WaitForReportAction(test_step, self._context)
         except ParsingError:
+            # TODO For now, ParsingErrors are largely issues that will be addressed soon. Once this
+            # runner has matched parity of the codegen YAML test, this exception should be
+            # propogated.
             return None
 
     def encode(self, request) -> BaseAction:
