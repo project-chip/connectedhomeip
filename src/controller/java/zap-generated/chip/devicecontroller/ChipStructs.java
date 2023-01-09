@@ -616,7 +616,7 @@ public class ChipStructs {
     }
   }
 
-  public static class GeneralDiagnosticsClusterNetworkInterfaceType {
+  public static class GeneralDiagnosticsClusterNetworkInterface {
     public String name;
     public Boolean isOperational;
     public @Nullable Boolean offPremiseServicesReachableIPv4;
@@ -626,7 +626,7 @@ public class ChipStructs {
     public ArrayList<byte[]> IPv6Addresses;
     public Integer type;
 
-    public GeneralDiagnosticsClusterNetworkInterfaceType(
+    public GeneralDiagnosticsClusterNetworkInterface(
         String name,
         Boolean isOperational,
         @Nullable Boolean offPremiseServicesReachableIPv4,
@@ -648,7 +648,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("GeneralDiagnosticsClusterNetworkInterfaceType {\n");
+      output.append("GeneralDiagnosticsClusterNetworkInterface {\n");
       output.append("\tname: ");
       output.append(name);
       output.append("\n");

@@ -6653,7 +6653,7 @@ public class ChipClusters {
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface NetworkInterfacesAttributeCallback {
-      void onSuccess(List<ChipStructs.GeneralDiagnosticsClusterNetworkInterfaceType> valueList);
+      void onSuccess(List<ChipStructs.GeneralDiagnosticsClusterNetworkInterface> valueList);
 
       void onError(Exception ex);
 
@@ -6744,13 +6744,13 @@ public class ChipClusters {
       subscribeTotalOperationalHoursAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readBootReasonsAttribute(IntegerAttributeCallback callback) {
-      readBootReasonsAttribute(chipClusterPtr, callback);
+    public void readBootReasonAttribute(IntegerAttributeCallback callback) {
+      readBootReasonAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeBootReasonsAttribute(
+    public void subscribeBootReasonAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeBootReasonsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+      subscribeBootReasonAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readActiveHardwareFaultsAttribute(ActiveHardwareFaultsAttributeCallback callback) {
@@ -6861,10 +6861,10 @@ public class ChipClusters {
     private native void subscribeTotalOperationalHoursAttribute(
         long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readBootReasonsAttribute(
+    private native void readBootReasonAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
-    private native void subscribeBootReasonsAttribute(
+    private native void subscribeBootReasonAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readActiveHardwareFaultsAttribute(

@@ -971,7 +971,7 @@ public final class ChipIdLookup {
         return "TotalOperationalHours";
       }
       if (attributeId == 4L) {
-        return "BootReasons";
+        return "BootReason";
       }
       if (attributeId == 5L) {
         return "ActiveHardwareFaults";

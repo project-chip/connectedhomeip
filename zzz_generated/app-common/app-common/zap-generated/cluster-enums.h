@@ -662,8 +662,8 @@ enum class LogsTransferProtocol : uint8_t
 
 namespace GeneralDiagnostics {
 
-// Enum for BootReasonType
-enum class BootReasonType : uint8_t
+// Enum for BootReasonEnum
+enum class BootReasonEnum : uint8_t
 {
     kUnspecified             = 0x00,
     kPowerOnReboot           = 0x01,
@@ -678,8 +678,8 @@ enum class BootReasonType : uint8_t
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for HardwareFaultType
-enum class HardwareFaultType : uint8_t
+// Enum for HardwareFault
+enum class HardwareFault : uint8_t
 {
     kUnspecified            = 0x00,
     kRadio                  = 0x01,
@@ -695,8 +695,8 @@ enum class HardwareFaultType : uint8_t
     kUnknownEnumValue       = 11,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using HardwareFaultType                                                                = EmberAfHardwareFaultType;
-static HardwareFaultType __attribute__((unused)) kHardwareFaultTypekUnknownEnumValue   = static_cast<HardwareFaultType>(11);
+using HardwareFault                                                                    = EmberAfHardwareFault;
+static HardwareFault __attribute__((unused)) kHardwareFaultkUnknownEnumValue           = static_cast<HardwareFault>(11);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
@@ -737,8 +737,8 @@ static NetworkFaultType __attribute__((unused)) kNetworkFaultTypekUnknownEnumVal
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for RadioFaultType
-enum class RadioFaultType : uint8_t
+// Enum for RadioFault
+enum class RadioFault : uint8_t
 {
     kUnspecified      = 0x00,
     kWiFiFault        = 0x01,
@@ -750,8 +750,8 @@ enum class RadioFaultType : uint8_t
     kUnknownEnumValue = 7,
 };
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RadioFaultType                                                                   = EmberAfRadioFaultType;
-static RadioFaultType __attribute__((unused)) kRadioFaultTypekUnknownEnumValue         = static_cast<RadioFaultType>(7);
+using RadioFault                                                                       = EmberAfRadioFault;
+static RadioFault __attribute__((unused)) kRadioFaultkUnknownEnumValue                 = static_cast<RadioFault>(7);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace GeneralDiagnostics
 

@@ -1524,7 +1524,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTotalOperationalHoursID")
     = 0x00000003,
     MTRClusterGeneralDiagnosticsAttributeBootReasonsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonsID")
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonID")
     = 0x00000004,
     MTRClusterGeneralDiagnosticsAttributeActiveHardwareFaultsID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveHardwareFaultsID")
@@ -1559,7 +1559,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeRebootCountID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeUpTimeID MTR_NEWLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeTotalOperationalHoursID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonsID MTR_NEWLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonID MTR_NEWLY_AVAILABLE = 0x00000004,
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveHardwareFaultsID MTR_NEWLY_AVAILABLE = 0x00000005,
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveRadioFaultsID MTR_NEWLY_AVAILABLE = 0x00000006,
     MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeActiveNetworkFaultsID MTR_NEWLY_AVAILABLE = 0x00000007,
