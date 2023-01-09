@@ -921,6 +921,206 @@
           ]
         },
         {
+          "name": "Localization Configuration",
+          "code": 43,
+          "mfgCode": null,
+          "define": "LOCALIZATION_CONFIGURATION_CLUSTER",
+          "side": "client",
+          "enabled": 0,
+          "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Localization Configuration",
+          "code": 43,
+          "mfgCode": null,
+          "define": "LOCALIZATION_CONFIGURATION_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "attributes": [
+            {
+              "name": "ActiveLocale",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "type": "char_string",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "SupportedLocales",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Unit Localization",
+          "code": 45,
+          "mfgCode": null,
+          "define": "UNIT_LOCALIZATION_CLUSTER",
+          "side": "client",
+          "enabled": 0,
+          "attributes": [
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Unit Localization",
+          "code": 45,
+          "mfgCode": null,
+          "define": "UNIT_LOCALIZATION_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "attributes": [
+            {
+              "name": "TemperatureUnit",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "type": "TempUnit",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 1,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
           "name": "Power Source Configuration",
           "code": 46,
           "mfgCode": null,
@@ -2451,206 +2651,6 @@
           ]
         },
         {
-          "name": "Localization Configuration",
-          "code": 43,
-          "mfgCode": null,
-          "define": "LOCALIZATION_CONFIGURATION_CLUSTER",
-          "side": "client",
-          "enabled": 0,
-          "attributes": [
-            {
-              "name": "FeatureMap",
-              "code": 65532,
-              "mfgCode": null,
-              "side": "client",
-              "type": "bitmap32",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "1",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
-          "name": "Localization Configuration",
-          "code": 43,
-          "mfgCode": null,
-          "define": "LOCALIZATION_CONFIGURATION_CLUSTER",
-          "side": "server",
-          "enabled": 1,
-          "attributes": [
-            {
-              "name": "ActiveLocale",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "type": "char_string",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "SupportedLocales",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "type": "array",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "FeatureMap",
-              "code": 65532,
-              "mfgCode": null,
-              "side": "server",
-              "type": "bitmap32",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "1",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
-          "name": "Unit Localization",
-          "code": 45,
-          "mfgCode": null,
-          "define": "UNIT_LOCALIZATION_CLUSTER",
-          "side": "client",
-          "enabled": 0,
-          "attributes": [
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "1",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
-          "name": "Unit Localization",
-          "code": 45,
-          "mfgCode": null,
-          "define": "UNIT_LOCALIZATION_CLUSTER",
-          "side": "server",
-          "enabled": 1,
-          "attributes": [
-            {
-              "name": "temperature unit",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "type": "TempUnit",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 1,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "FeatureMap",
-              "code": 65532,
-              "mfgCode": null,
-              "side": "server",
-              "type": "bitmap32",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "1",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
           "name": "WiFi Network Diagnostics",
           "code": 54,
           "mfgCode": null,
@@ -3209,7 +3209,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "number of positions",
+              "name": "NumberOfPositions",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -3225,7 +3225,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current position",
+              "name": "CurrentPosition",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -3241,7 +3241,7 @@
               "reportableChange": 0
             },
             {
-              "name": "multi press max",
+              "name": "MultiPressMax",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -3763,7 +3763,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "LabelList",
+              "name": "label list",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8589,7 +8589,7 @@
           ]
         },
         {
-          "name": "Occupancy Sensor",
+          "name": "Occupancy Sensing",
           "code": 1030,
           "mfgCode": null,
           "define": "OCCUPANCY_SENSING_CLUSTER",
@@ -8613,9 +8613,9 @@
               "reportableChange": 0
             }
           ]
-        },        
+        },
         {
-          "name": "Occupancy Sensor",
+          "name": "Occupancy Sensing",
           "code": 1030,
           "mfgCode": null,
           "define": "OCCUPANCY_SENSING_CLUSTER",
@@ -8623,7 +8623,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "Occupancy",
+              "name": "occupancy",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8639,7 +8639,7 @@
               "reportableChange": 0
             },
             {
-              "name": "OccupancySensorType",
+              "name": "occupancy sensor type",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -8655,7 +8655,7 @@
               "reportableChange": 0
             },
             {
-              "name": "OccupancySensorTypeBitmap",
+              "name": "occupancy sensor type bitmap",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -8671,7 +8671,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PIROccupiedToUnoccupiedDelay",
+              "name": "PIR occupied to unoccupied delay",
               "code": 16,
               "mfgCode": null,
               "side": "server",
@@ -8687,7 +8687,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PIRUnoccupiedToOccupiedDelay",
+              "name": "PIR unoccupied to occupied delay",
               "code": 17,
               "mfgCode": null,
               "side": "server",
@@ -8703,11 +8703,11 @@
               "reportableChange": 0
             },
             {
-              "name": "PIRUnoccupiedToOccupiedThreshold",
+              "name": "PIR unoccupied to occupied threshold",
               "code": 18,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "int8u",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -8719,7 +8719,7 @@
               "reportableChange": 0
             },
             {
-              "name": "UltrasonicOccupiedToUnoccupiedDelay",
+              "name": "ultrasonic occupied to unoccupied delay",
               "code": 32,
               "mfgCode": null,
               "side": "server",
@@ -8735,7 +8735,7 @@
               "reportableChange": 0
             },
             {
-              "name": "UltrasonicUnoccupiedToOccupiedDelay",
+              "name": "ultrasonic unoccupied to occupied delay",
               "code": 33,
               "mfgCode": null,
               "side": "server",
@@ -8751,7 +8751,7 @@
               "reportableChange": 0
             },
             {
-              "name": "UltrasonicUnoccupiedToOccupiedThreshold",
+              "name": "ultrasonic unoccupied to occupied threshold",
               "code": 34,
               "mfgCode": null,
               "side": "server",
@@ -8767,7 +8767,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PhysicalContactOccupiedToUnoccupiedDelay",
+              "name": "physical contact occupied to unoccupied delay",
               "code": 48,
               "mfgCode": null,
               "side": "server",
@@ -8783,7 +8783,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PhysicalContactUnoccupiedToOccupiedDelay",
+              "name": "physical contact unoccupied to occupied delay",
               "code": 49,
               "mfgCode": null,
               "side": "server",
@@ -8799,7 +8799,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PhysicalContactUnoccupiedToOccupiedThreshold",
+              "name": "physical contact unoccupied to occupied threshold",
               "code": 50,
               "mfgCode": null,
               "side": "server",
@@ -8813,7 +8813,7 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
-            },            
+            },
             {
               "name": "GeneratedCommandList",
               "code": 65528,
