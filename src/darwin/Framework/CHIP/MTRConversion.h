@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,16 +14,22 @@
  *    limitations under the License.
  */
 
-#import "MTRDeviceAttestationDelegate.h"
+#import "NSDataSpanConversion.h"
+#import "NSStringSpanConversion.h"
+
+#import <Foundation/Foundation.h>
+
+#include <lib/core/Optional.h>
+#include <type_traits>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MTRDeviceAttestationDeviceInfo ()
-
-- (instancetype)initWithDACCertificate:(MTRCertificateDERBytes)dacCertificate
-                     dacPAICertificate:(MTRCertificateDERBytes)dacPAICertificate
-                certificateDeclaration:(NSData *)certificateDeclaration;
-
-@end
+template <typename T>
+inline std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value || std::is_enum<T>::value,
+    NSNumber * _Nullable>
+AsNumber(chip::Optional<T> optional)
+{
+    return (optional.HasValue()) ? @(optional.Value()) : nil;
+}
 
 NS_ASSUME_NONNULL_END
