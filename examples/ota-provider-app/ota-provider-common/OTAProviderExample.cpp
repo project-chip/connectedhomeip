@@ -25,7 +25,7 @@
 #include <app/util/af.h>
 #include <credentials/FabricTable.h>
 #include <crypto/RandUtils.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CHIPMemString.h>
 #include <protocols/bdx/BdxUri.h>
 

@@ -28,8 +28,8 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLVTags.h>
-#include <lib/core/CHIPTLVTypes.h>
+#include <lib/core/TLVTags.h>
+#include <lib/core/TLVTypes.h>
 
 #include <lib/support/BitFlags.h>
 #include <lib/support/BitMask.h>
@@ -2266,7 +2266,7 @@ protected:
     void SetCloseContainerReserved(bool aCloseContainerReserved) { mCloseContainerReserved = aCloseContainerReserved; }
 
 #if CONFIG_HAVE_VCBPRINTF
-    static void CHIPTLVWriterPutcharCB(uint8_t c, void * appState);
+    static void TLVWriterPutcharCB(uint8_t c, void * appState);
 #endif
     CHIP_ERROR WriteElementHead(TLVElementType elemType, Tag tag, uint64_t lenOrVal);
     CHIP_ERROR WriteElementWithData(TLVType type, Tag tag, const uint8_t * data, uint32_t dataLen);
@@ -2316,7 +2316,7 @@ private:
  * Semantically, the TLVUpdater object functions like a union of the TLVReader and TLVWriter. The
  * TLVUpdater methods have more or less similar meanings as similarly named counterparts in
  * TLVReader/TLVWriter. Where there are differences in the semantics, the differences are clearly
- * documented in the function's comment section in CHIPTLVUpdater.cpp.
+ * documented in the function's comment section in TLVUpdater.cpp.
  *
  * One particularly important note about the TLVUpdater's PutBytes() and PutString() methods is that
  * it can leave the encoding in a corrupt state with only the element header written when an
