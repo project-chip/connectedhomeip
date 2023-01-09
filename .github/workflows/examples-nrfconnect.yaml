@@ -83,9 +83,9 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
-            - name: Update nRF Connect SDK revision to the currently recommended.
+            - name: Check nRF Connect SDK revision.
               timeout-minutes: 15
-              run: scripts/run_in_build_env.sh "python3 scripts/setup/nrfconnect/update_ncs.py --update --shallow"
+              run: scripts/run_in_build_env.sh "python3 scripts/setup/nrfconnect/update_ncs.py --check"
             - name: Run unit tests of factory data generation script
               timeout-minutes: 15
               run: scripts/run_in_build_env.sh "./scripts/tools/nrfconnect/tests/test_generate_factory_data.py"
