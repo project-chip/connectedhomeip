@@ -344,7 +344,7 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
     {
         // Toggle Dimming of light between 2 fixed levels
         uint8_t val = 0x0;
-        val         = LightingMgr().GetLevel() == 0x40 ? 0xff : 0x40;
+        val         = LightingMgr().GetLevel() == 0x40 ? 0xfe : 0x40;
         action      = LightingManager::LEVEL_ACTION;
 
         sAppTask.mSyncClusterToButtonAction = true;
