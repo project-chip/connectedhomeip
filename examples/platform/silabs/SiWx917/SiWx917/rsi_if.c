@@ -58,10 +58,10 @@ StaticTask_t driverRsiTaskBuffer;
 StaticEventGroup_t rsiDriverEventGroup;
 
 /* Declare a flag to differentiate between after boot-up first IP connection or reconnection */
-bool is_wifi_disconnection_event = false;
+static bool is_wifi_disconnection_event = false;
 
 /* Declare a variable to hold connection time intervals */
-uint32_t retryInterval = WLAN_MIN_RETRY_TIMER_MS;
+static uint32_t retryInterval = WLAN_MIN_RETRY_TIMER_MS;
 
 bool hasNotifiedIPV6 = false;
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
@@ -185,6 +185,8 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
 #endif
         wfx_rsi.join_retries = 0;
         retryInterval        = WLAN_MIN_RETRY_TIMER_MS;
+        if (is_wifi_disconnection_event)
+            is_wifi_disconnection_event = false;
     }
 }
 
