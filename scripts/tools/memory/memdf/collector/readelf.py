@@ -17,18 +17,15 @@
 
 import io
 import re
-
 from typing import Dict, List
 
 import elftools.elf.constants  # type: ignore
-import pandas as pd  # type: ignore
-
 import memdf.name
 import memdf.util.subprocess
-
+import pandas as pd  # type: ignore
 from memdf.collector.util import simplify_source
+from memdf.df import DFs, SectionDF, SegmentDF, SymbolDF, SymbolSourceDF
 from memdf.util.config import Config, ConfigDescription
-from memdf.df import DFs, SegmentDF, SectionDF, SymbolDF, SymbolSourceDF
 
 NM_CONFIG: ConfigDescription = {
     'tool.nm': {

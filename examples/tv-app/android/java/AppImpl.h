@@ -60,6 +60,8 @@ EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const cha
 EndpointId RemoveContentApp(EndpointId epId);
 void ReportAttributeChange(EndpointId epId, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
+void AddSelfVendorAsAdmin();
+
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 namespace chip {

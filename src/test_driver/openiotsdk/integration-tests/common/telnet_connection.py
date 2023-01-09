@@ -14,10 +14,9 @@
 # limitations under the License.
 
 import logging
-from time import sleep
 import re
-
 from telnetlib import Telnet
+from time import sleep
 
 log = logging.getLogger(__name__)
 

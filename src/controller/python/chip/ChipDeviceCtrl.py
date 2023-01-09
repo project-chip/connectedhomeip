@@ -25,33 +25,36 @@
 """Chip Device Controller interface
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
+# Needed to use types in type hints before they are fully defined.
+from __future__ import absolute_import, annotations, print_function
+
 import asyncio
+import builtins
+import copy
+import ctypes
+import enum
+import json
+import threading
+import time
+import typing
 from ctypes import *
 from dataclasses import dataclass
 
+import dacite
+
+from . import FabricAdmin
+from . import clusters as Clusters
+from . import discovery
 from .ChipStack import *
-from .interaction_model import InteractionModelError, delegate as im
-from .exceptions import *
-from .clusters import Command as ClusterCommand
 from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
+from .clusters import Command as ClusterCommand
 from .clusters import Objects as GeneratedObjects
 from .clusters.CHIPClusters import *
-from . import clusters as Clusters
-from .FabricAdmin import FabricAdmin
-from . import discovery
+from .exceptions import *
+from .interaction_model import InteractionModelError
+from .interaction_model import delegate as im
 from .native import PyChipError
-import enum
-import threading
-import typing
-import builtins
-import ctypes
-import copy
-import json
-import time
-import dacite
 
 __all__ = ["ChipDeviceController"]
 
@@ -201,7 +204,9 @@ DiscoveryFilterType = discovery.FilterType
 class ChipDeviceController():
     activeList = set()
 
-    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int, catTags: typing.List[int] = [], paaTrustStorePath: str = "", useTestCommissioner: bool = False, fabricAdmin: FabricAdmin = None, name: str = None):
+    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int,
+                 catTags: typing.List[int] = [], paaTrustStorePath: str = "", useTestCommissioner: bool = False,
+                 fabricAdmin: FabricAdmin.FabricAdmin = None, name: str = None):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
         self._ChipStack = builtins.chipStack
@@ -295,7 +300,7 @@ class ChipDeviceController():
         ChipDeviceController.activeList.add(self)
 
     @property
-    def fabricAdmin(self) -> FabricAdmin:
+    def fabricAdmin(self) -> FabricAdmin.FabricAdmin:
         return self._fabricAdmin
 
     @property

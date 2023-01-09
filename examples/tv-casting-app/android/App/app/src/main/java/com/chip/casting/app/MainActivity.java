@@ -52,6 +52,11 @@ public class MainActivity extends AppCompatActivity
   }
 
   @Override
+  public void handleCertTestLauncherSelected() {
+    showFragment(CertTestFragment.newInstance(tvCastingApp));
+  }
+
+  @Override
   public void handleMediaPlaybackSelected() {
     showFragment(MediaPlaybackFragment.newInstance(tvCastingApp));
   }

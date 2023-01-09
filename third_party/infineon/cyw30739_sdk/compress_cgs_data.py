@@ -29,9 +29,7 @@ import pathlib
 import re
 import subprocess
 import sys
-
 from collections import namedtuple
-
 
 Item = namedtuple('Item', 'line type nested_data')
 Entry = namedtuple('Entry', 'items name remark')

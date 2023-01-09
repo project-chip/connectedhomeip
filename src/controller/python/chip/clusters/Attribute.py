@@ -17,27 +17,26 @@
 
 # Needed to use types in type hints before they are fully defined.
 from __future__ import annotations
-from asyncio import events
 
-from asyncio.futures import Future
+import builtins
 import ctypes
+import inspect
+import logging
+import sys
+from asyncio.futures import Future
+from ctypes import CFUNCTYPE, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, py_object
 from dataclasses import dataclass, field
-from typing import Tuple, Type, Union, List, Any, Callable, Dict, Set, Optional
-from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_void_p, c_uint64, c_uint32,  c_uint16, c_uint8, py_object, c_uint64
-import construct
-from rich.pretty import pprint
+from enum import Enum, unique
+from typing import Any, Callable, Dict, List, Optional, Union
 
-from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEvent
 import chip.exceptions
 import chip.interaction_model
 import chip.tlv
+import construct
 from chip.native import PyChipError
-from enum import Enum, unique
-import inspect
-import sys
-import logging
-import threading
-import builtins
+from rich.pretty import pprint
+
+from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEvent
 
 
 @unique

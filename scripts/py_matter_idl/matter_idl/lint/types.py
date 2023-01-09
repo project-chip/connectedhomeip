@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from matter_idl.matter_idl_types import Idl, ParseMetaData, ClusterSide
 from abc import ABC, abstractmethod
-from typing import List, Optional
 from dataclasses import dataclass, field
+from typing import List, Optional
+
+from matter_idl.matter_idl_types import ClusterSide, Idl, ParseMetaData
 
 
 @dataclass

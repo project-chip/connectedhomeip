@@ -19,9 +19,9 @@
 #      Component makefile for building CHIP within the ESP32 ESP-IDF environment.
 #
 
+import argparse
 import json
 import os
-import argparse
 
 # Parse the build's compile_commands.json to generate
 # final args file for CHIP build.

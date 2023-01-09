@@ -14,8 +14,8 @@
 # limitations under the License.
 import argparse
 import os
-from subprocess import PIPE, Popen
 import platform
+from subprocess import PIPE, Popen
 
 
 def run_command(command):

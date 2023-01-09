@@ -42,25 +42,9 @@ namespace Internal {
 // *** CAUTION ***: Changing the names or namespaces of these values will *break* existing devices.
 
 // NVS namespaces used to store device configuration information.
-const char AmebaConfig::kConfigNamespace_ChipFactory[]              = "chip-factory";
-const char AmebaConfig::kConfigNamespace_ChipConfig[]               = "chip-config";
-const char AmebaConfig::kConfigNamespace_ChipCounters[]             = "chip-counters";
-const char AmebaConfig::kConfigNamespace_ChipFabric1[]              = "chip-fabric-1";
-const char AmebaConfig::kConfigNamespace_ChipFabric2[]              = "chip-fabric-2";
-const char AmebaConfig::kConfigNamespace_ChipFabric3[]              = "chip-fabric-3";
-const char AmebaConfig::kConfigNamespace_ChipFabric4[]              = "chip-fabric-4";
-const char AmebaConfig::kConfigNamespace_ChipFabric5[]              = "chip-fabric-5";
-const char AmebaConfig::kConfigNamespace_ChipACL[]                  = "chip-acl";
-const char AmebaConfig::kConfigNamespace_ChipGroupMessageCounters[] = "chip-groupmsgcounters";
-const char AmebaConfig::kConfigNamespace_ChipAttributes[]           = "chip-attributes";
-const char AmebaConfig::kConfigNamespace_ChipBindingTable[]         = "chip-bindingtable";
-const char AmebaConfig::kConfigNamespace_ChipOTA[]                  = "chip-ota";
-const char AmebaConfig::kConfigNamespace_ChipFailSafe[]             = "chip-failsafe";
-const char AmebaConfig::kConfigNamespace_ChipSessionResumption[]    = "chip-sessionresumption";
-const char AmebaConfig::kConfigNamespace_ChipDeviceInfoProvider[]   = "chip-deviceinfoprovider";
-const char AmebaConfig::kConfigNamespace_ChipGroupDataProvider[]    = "chip-groupdataprovider";
-const char AmebaConfig::kConfigNamespace_ChipOthers[]               = "chip-others";
-const char AmebaConfig::kConfigNamespace_ChipOthers2[]              = "chip-others2";
+const char AmebaConfig::kConfigNamespace_ChipFactory[]  = "chip-factory";
+const char AmebaConfig::kConfigNamespace_ChipConfig[]   = "chip-config";
+const char AmebaConfig::kConfigNamespace_ChipCounters[] = "chip-counters";
 
 // Keys stored in the chip-factory namespace
 const AmebaConfig::Key AmebaConfig::kConfigKey_SerialNum             = { kConfigNamespace_ChipFactory, "serial-num" };
@@ -333,40 +317,39 @@ bool AmebaConfig::ConfigValueExists(Key key)
     return checkExist(key.Namespace, key.Name);
 }
 
-CHIP_ERROR AmebaConfig::EnsureNamespace(const char * ns)
+CHIP_ERROR AmebaConfig::InitNamespace()
 {
     int32_t success = -1;
 
-    success = registerPref(ns);
+    success = registerPref();
     if (success != 0)
     {
-        ChipLogError(DeviceLayer, "dct_register_module failed\n");
+        ChipLogError(DeviceLayer, "DCT modules registration failed");
+    }
+
+    success = registerPref2();
+    if (success != 0)
+    {
+        ChipLogError(DeviceLayer, "DCT2 modules registration failed");
     }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AmebaConfig::EnsureNamespace2(const char * ns)
+CHIP_ERROR AmebaConfig::ClearNamespace()
 {
     int32_t success = -1;
 
-    success = registerPref2(ns);
+    success = clearPref();
     if (success != 0)
     {
-        ChipLogError(DeviceLayer, "dct_register_module2 failed\n");
+        ChipLogError(DeviceLayer, "DCT modules unregistration failed\n");
     }
 
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR AmebaConfig::ClearNamespace(const char * ns)
-{
-    int32_t success = -1;
-
-    success = clearPref(ns);
+    success = clearPref2();
     if (success != 0)
     {
-        ChipLogError(DeviceLayer, "ClearNamespace failed\n");
+        ChipLogError(DeviceLayer, "DCT2 modules unregistration failed\n");
     }
 
     return CHIP_NO_ERROR;

@@ -21,4 +21,9 @@
 #
 
 """Provides commissioning building blocks Python APIs for CHIP."""
+
 from . import CommissioningBuildingBlocks
+
+__all__ = [
+    'CommissioningBuildingBlocks',
+]

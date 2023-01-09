@@ -20,16 +20,17 @@ import base64
 import binascii
 import csv
 import json
+import logging as logger
 import os
 import random
 import shutil
 import subprocess
-import logging as logger
 import sys
+
+import cbor2 as cbor
 import cryptography.hazmat.backends
 import cryptography.x509
 import pyqrcode
-import cbor2 as cbor
 from intelhex import IntelHex
 
 TOOLS = {

@@ -7,7 +7,7 @@ steps:
           - "--recursive"
       id: Submodules
 
-    - name: "connectedhomeip/chip-build:0.6.27"
+    - name: "connectedhomeip/chip-build:0.6.30"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -22,7 +22,7 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "connectedhomeip/chip-build:0.6.27"
+    - name: "connectedhomeip/chip-build:0.6.30"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
