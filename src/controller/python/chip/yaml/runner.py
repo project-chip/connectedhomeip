@@ -194,6 +194,41 @@ class ReadAttributeAction(BaseAction):
         return _ActionResult(status=_ActionStatus.SUCCESS, response=return_val)
 
 
+class WaitForCommissioneeAction(BaseAction):
+    ''' Wait for commissionee action to be executed.'''
+
+    def __init__(self, test_step, context: _ExecutionContext):
+        super().__init__(test_step.label)
+        self._endpoint = test_step.endpoint
+        self._node_id = test_step.node_id
+        self._expire_existing_session = False
+        # This is the default when no timeout is provided.
+        _DEFAULT_TIMEOUT_MS = 10 * 1000
+        self._timeout_ms = _DEFAULT_TIMEOUT_MS
+
+        if test_step.arguments is None:
+            # Nothing left for us to do the default values are what we want
+            return
+
+        args = test_step.arguments['values']
+        request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
+
+        self._expire_existing_session = request_data_as_dict.get('expireExistingSession', False)
+        if 'timeout' in request_data_as_dict:
+            # Timeout is provided in seconds we need to conver to milliseconds.
+            self._timeout_ms = request_data_as_dict['timeout'] * 1000
+
+    def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
+        try:
+            if self._expire_existing_session:
+                dev_ctrl.ExpireSessions(self._node_id)
+            dev_ctrl.GetConnectedDeviceSync(self._node_id, timeoutMs=self._timeout_ms)
+        except TimeoutError:
+            return _ActionResult(status=_ActionStatus.ERROR, response=None)
+
+        return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
+
+
 class WriteAttributeAction(BaseAction):
     '''Single write attribute action to be executed.'''
 
@@ -317,13 +352,21 @@ class ReplTestRunner:
         except ParsingError:
             return None
 
+    def _wait_for_commissionee_action_factory(self, test_step):
+        try:
+            return WaitForCommissioneeAction(test_step, self._context)
+        except ParsingError:
+            return None
+
     def encode(self, request) -> BaseAction:
         action = None
         cluster = request.cluster.replace(' ', '').replace('/', '')
         command = request.command
         # Some of the tests contain 'cluster over-rides' that refer to a different
         # cluster than that specified in 'config'.
-        if command == 'writeAttribute':
+        if cluster == 'DelayCommands' and command == 'WaitForCommissionee':
+            action = self._wait_for_commissionee_action_factory(request)
+        elif command == 'writeAttribute':
             action = self._attribute_write_action_factory(request, cluster)
         elif command == 'readAttribute':
             action = self._attribute_read_action_factory(request, cluster)
