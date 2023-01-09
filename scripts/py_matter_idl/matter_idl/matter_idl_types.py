@@ -1,8 +1,8 @@
 import enum
-from lark.tree import Meta
-
 from dataclasses import dataclass, field
-from typing import List, Set, Optional, Union
+from typing import List, Optional, Set, Union
+
+from lark.tree import Meta
 
 
 # Information about parsing location for specific items

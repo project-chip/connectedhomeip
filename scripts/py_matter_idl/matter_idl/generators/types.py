@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import enum
-
-from matter_idl.matter_idl_types import DataType
-from matter_idl import matter_idl_types  # to explicitly say 'Enum'
-
-from typing import Union, List, Optional
 from dataclasses import dataclass
+from typing import List, Optional, Union
+
+from matter_idl import matter_idl_types  # to explicitly say 'Enum'
+from matter_idl.matter_idl_types import DataType
 
 
 def ToPowerOfTwo(bits: int) -> int:
@@ -104,7 +102,7 @@ class FundamentalType(enum.Enum):
 class IdlEnumType:
     """
     An enumeration type. Enumerations are constants with an underlying
-    base type that is an interger. 
+    base type that is an interger.
     """
     idl_name: str
     base_type: BasicInteger
@@ -145,9 +143,9 @@ class IdlItemType(enum.Enum):
 @dataclass
 class IdlType:
     """
-    A type defined within the IDL. 
+    A type defined within the IDL.
 
-    IDLs would generally only define structures as all other types are 
+    IDLs would generally only define structures as all other types are
     described in other things like enums/bitmaps/basic types etc.
 
     However since IDL parsing is not yet codegen just syntactically, we allow

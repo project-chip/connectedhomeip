@@ -19,9 +19,10 @@ import subprocess
 
 from enum import Enum, auto
 
-from .types import InputIdlFile, IdlFileType
+from .types import IdlFileType, InputIdlFile
 
-CODEGEN_PY_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'codegen.py'))
+CODEGEN_PY_PATH = os.path.abspath(os.path.join(
+    os.path.dirname(__file__), '..', 'codegen.py'))
 
 
 class CodegenTarget:
@@ -34,14 +35,17 @@ class CodegenTarget:
         self.runner = runner
 
         if idl.file_type != IdlFileType.MATTER:
-            raise Exception(f"Can only code generate for `*.matter` input files, not for {idl}")
+            raise Exception(
+                f"Can only code generate for `*.matter` input files, not for {idl}")
 
     def Generate(self, output_root: str):
         '''Runs codegen.py to generate in the specified directory'''
 
-        output_dir = os.path.join(output_root, self.idl.pregen_subdir, self.generator)
+        output_dir = os.path.join(
+            output_root, self.idl.pregen_subdir, self.generator)
 
-        logging.info(f"Generating: {self.generator}:{self.idl.relative_path} into {output_dir}")
+        logging.info(
+            f"Generating: {self.generator}:{self.idl.relative_path} into {output_dir}")
 
         cmd = [
             CODEGEN_PY_PATH,

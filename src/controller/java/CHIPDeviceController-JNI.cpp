@@ -23,6 +23,7 @@
  */
 #include "AndroidCallbacks.h"
 #include "AndroidCommissioningWindowOpener.h"
+#include "AndroidCurrentFabricRemover.h"
 #include "AndroidDeviceControllerWrapper.h"
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
@@ -678,6 +679,23 @@ JNI_METHOD(void, unpairDevice)(JNIEnv * env, jobject self, jlong handle, jlong d
     ChipLogProgress(Controller, "unpairDevice() called with device ID");
 
     err = wrapper->Controller()->UnpairDevice(deviceId);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to unpair the device.");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+
+JNI_METHOD(void, unpairDeviceCallback)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    ChipLogProgress(Controller, "unpairDeviceCallback() called with device ID and callback object");
+
+    err = AndroidCurrentFabricRemover::RemoveCurrentFabric(wrapper->Controller(), static_cast<NodeId>(deviceId), callback);
 
     if (err != CHIP_NO_ERROR)
     {

@@ -3955,16 +3955,16 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                                      completion:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
 
-- (void)readAttributeBootReasonsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeBootReasonWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
-- (void)subscribeAttributeBootReasonsWithParams:(MTRSubscribeParams *)params
-                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeBootReasonWithParams:(MTRSubscribeParams *)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
     MTR_NEWLY_AVAILABLE;
-+ (void)readAttributeBootReasonsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
-                                             endpoint:(NSNumber *)endpoint
-                                                queue:(dispatch_queue_t)queue
-                                           completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
++ (void)readAttributeBootReasonWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                            endpoint:(NSNumber *)endpoint
+                                               queue:(dispatch_queue_t)queue
+                                          completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     MTR_NEWLY_AVAILABLE;
 
 - (void)readAttributeActiveHardwareFaultsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
@@ -15350,6 +15350,155 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 /**
+ * Cluster Client Monitoring
+ *
+ * Client Monitoring allows for ensuring that listed clients meet the required monitoring conditions on the server.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRBaseClusterClientMonitoring : MTRCluster
+
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
+
+/**
+ * Command RegisterClientMonitoring
+ *
+ * Register a client to the end device
+ */
+- (void)registerClientMonitoringWithParams:(MTRClientMonitoringClusterRegisterClientMonitoringParams *)params
+                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+/**
+ * Command UnregisterClientMonitoring
+ *
+ * Unregister a client from an end device
+ */
+- (void)unregisterClientMonitoringWithParams:(MTRClientMonitoringClusterUnregisterClientMonitoringParams *)params
+                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+/**
+ * Command StayAwakeRequest
+ *
+ * Request the end device to stay in Active Mode for an additional ActiveModeThreshold
+ */
+- (void)stayAwakeRequestWithParams:(MTRClientMonitoringClusterStayAwakeRequestParams * _Nullable)params
+                        completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)stayAwakeRequestWithCompletion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeIdleModeIntervalWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeIdleModeIntervalWithParams:(MTRSubscribeParams *)params
+                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+    MTR_NEWLY_AVAILABLE;
++ (void)readAttributeIdleModeIntervalWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                                completion:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeActiveModeIntervalWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeActiveModeIntervalWithParams:(MTRSubscribeParams *)params
+                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                         reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                           NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
++ (void)readAttributeActiveModeIntervalWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                                    endpoint:(NSNumber *)endpoint
+                                                       queue:(dispatch_queue_t)queue
+                                                  completion:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeActiveModeThresholdWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeActiveModeThresholdWithParams:(MTRSubscribeParams *)params
+                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                          reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
++ (void)readAttributeActiveModeThresholdWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                                     endpoint:(NSNumber *)endpoint
+                                                        queue:(dispatch_queue_t)queue
+                                                   completion:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeExpectedClientsWithParams:(MTRReadParams * _Nullable)params
+                                    completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeExpectedClientsWithParams:(MTRSubscribeParams *)params
+                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+    MTR_NEWLY_AVAILABLE;
++ (void)readAttributeExpectedClientsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                                 endpoint:(NSNumber *)endpoint
+                                                    queue:(dispatch_queue_t)queue
+                                               completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
+                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                           reportHandler:(void (^)(NSArray * _Nullable value,
+                                                             NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
++ (void)readAttributeGeneratedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                                      endpoint:(NSNumber *)endpoint
+                                                         queue:(dispatch_queue_t)queue
+                                                    completion:(void (^)(NSArray * _Nullable value,
+                                                                   NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeAcceptedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeAcceptedCommandListWithParams:(MTRSubscribeParams *)params
+                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                          reportHandler:(void (^)(NSArray * _Nullable value,
+                                                            NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
++ (void)readAttributeAcceptedCommandListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                                     endpoint:(NSNumber *)endpoint
+                                                        queue:(dispatch_queue_t)queue
+                                                   completion:(void (^)(NSArray * _Nullable value,
+                                                                  NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeAttributeListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeAttributeListWithParams:(MTRSubscribeParams *)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+    MTR_NEWLY_AVAILABLE;
++ (void)readAttributeAttributeListWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                               endpoint:(NSNumber *)endpoint
+                                                  queue:(dispatch_queue_t)queue
+                                             completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeFeatureMapWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeFeatureMapWithParams:(MTRSubscribeParams *)params
+                       subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+    MTR_NEWLY_AVAILABLE;
++ (void)readAttributeFeatureMapWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                            endpoint:(NSNumber *)endpoint
+                                               queue:(dispatch_queue_t)queue
+                                          completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+
+- (void)readAttributeClusterRevisionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeClusterRevisionWithParams:(MTRSubscribeParams *)params
+                            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+    MTR_NEWLY_AVAILABLE;
++ (void)readAttributeClusterRevisionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                                 endpoint:(NSNumber *)endpoint
+                                                    queue:(dispatch_queue_t)queue
+                                               completion:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+/**
  * Cluster Unit Testing
  *
  * The Test Cluster is meant to validate the generated code
@@ -17559,32 +17708,91 @@ typedef NS_ENUM(uint8_t, MTRDiagnosticLogsLogsTransferProtocol) {
     MTRDiagnosticLogsLogsTransferProtocolBDX API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsBootReason) {
+    MTRGeneralDiagnosticsBootReasonUnspecified MTR_NEWLY_AVAILABLE = 0x00,
+    MTRGeneralDiagnosticsBootReasonPowerOnReboot MTR_NEWLY_AVAILABLE = 0x01,
+    MTRGeneralDiagnosticsBootReasonBrownOutReset MTR_NEWLY_AVAILABLE = 0x02,
+    MTRGeneralDiagnosticsBootReasonSoftwareWatchdogReset MTR_NEWLY_AVAILABLE = 0x03,
+    MTRGeneralDiagnosticsBootReasonHardwareWatchdogReset MTR_NEWLY_AVAILABLE = 0x04,
+    MTRGeneralDiagnosticsBootReasonSoftwareUpdateCompleted MTR_NEWLY_AVAILABLE = 0x05,
+    MTRGeneralDiagnosticsBootReasonSoftwareReset MTR_NEWLY_AVAILABLE = 0x06,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsBootReasonType) {
-    MTRGeneralDiagnosticsBootReasonTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRGeneralDiagnosticsBootReasonTypePowerOnReboot API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRGeneralDiagnosticsBootReasonTypeBrownOutReset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRGeneralDiagnosticsBootReasonTypeSoftwareWatchdogReset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRGeneralDiagnosticsBootReasonTypeHardwareWatchdogReset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
+    MTRGeneralDiagnosticsBootReasonTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsBootReasonUnspecified")
+    = 0x00,
+    MTRGeneralDiagnosticsBootReasonTypePowerOnReboot API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsBootReasonPowerOnReboot")
+    = 0x01,
+    MTRGeneralDiagnosticsBootReasonTypeBrownOutReset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsBootReasonBrownOutReset")
+    = 0x02,
+    MTRGeneralDiagnosticsBootReasonTypeSoftwareWatchdogReset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsBootReasonSoftwareWatchdogReset")
+    = 0x03,
+    MTRGeneralDiagnosticsBootReasonTypeHardwareWatchdogReset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsBootReasonHardwareWatchdogReset")
+    = 0x04,
     MTRGeneralDiagnosticsBootReasonTypeSoftwareUpdateCompleted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsBootReasonSoftwareUpdateCompleted")
     = 0x05,
-    MTRGeneralDiagnosticsBootReasonTypeSoftwareReset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRGeneralDiagnosticsBootReasonTypeSoftwareReset API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsBootReasonSoftwareReset")
+    = 0x06,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsBootReason");
+
+typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsHardwareFault) {
+    MTRGeneralDiagnosticsHardwareFaultUnspecified MTR_NEWLY_AVAILABLE = 0x00,
+    MTRGeneralDiagnosticsHardwareFaultRadio MTR_NEWLY_AVAILABLE = 0x01,
+    MTRGeneralDiagnosticsHardwareFaultSensor MTR_NEWLY_AVAILABLE = 0x02,
+    MTRGeneralDiagnosticsHardwareFaultResettableOverTemp MTR_NEWLY_AVAILABLE = 0x03,
+    MTRGeneralDiagnosticsHardwareFaultNonResettableOverTemp MTR_NEWLY_AVAILABLE = 0x04,
+    MTRGeneralDiagnosticsHardwareFaultPowerSource MTR_NEWLY_AVAILABLE = 0x05,
+    MTRGeneralDiagnosticsHardwareFaultVisualDisplayFault MTR_NEWLY_AVAILABLE = 0x06,
+    MTRGeneralDiagnosticsHardwareFaultAudioOutputFault MTR_NEWLY_AVAILABLE = 0x07,
+    MTRGeneralDiagnosticsHardwareFaultUserInterfaceFault MTR_NEWLY_AVAILABLE = 0x08,
+    MTRGeneralDiagnosticsHardwareFaultNonVolatileMemoryError MTR_NEWLY_AVAILABLE = 0x09,
+    MTRGeneralDiagnosticsHardwareFaultTamperDetected MTR_NEWLY_AVAILABLE = 0x0A,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsHardwareFaultType) {
-    MTRGeneralDiagnosticsHardwareFaultTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRGeneralDiagnosticsHardwareFaultTypeRadio API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRGeneralDiagnosticsHardwareFaultTypeSensor API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRGeneralDiagnosticsHardwareFaultTypeResettableOverTemp API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
+    MTRGeneralDiagnosticsHardwareFaultTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultUnspecified")
+    = 0x00,
+    MTRGeneralDiagnosticsHardwareFaultTypeRadio API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultRadio")
+    = 0x01,
+    MTRGeneralDiagnosticsHardwareFaultTypeSensor API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultSensor")
+    = 0x02,
+    MTRGeneralDiagnosticsHardwareFaultTypeResettableOverTemp API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultResettableOverTemp")
+    = 0x03,
     MTRGeneralDiagnosticsHardwareFaultTypeNonResettableOverTemp API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultNonResettableOverTemp")
     = 0x04,
-    MTRGeneralDiagnosticsHardwareFaultTypePowerSource API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
-    MTRGeneralDiagnosticsHardwareFaultTypeVisualDisplayFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
-    MTRGeneralDiagnosticsHardwareFaultTypeAudioOutputFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x07,
-    MTRGeneralDiagnosticsHardwareFaultTypeUserInterfaceFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x08,
+    MTRGeneralDiagnosticsHardwareFaultTypePowerSource API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultPowerSource")
+    = 0x05,
+    MTRGeneralDiagnosticsHardwareFaultTypeVisualDisplayFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultVisualDisplayFault")
+    = 0x06,
+    MTRGeneralDiagnosticsHardwareFaultTypeAudioOutputFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultAudioOutputFault")
+    = 0x07,
+    MTRGeneralDiagnosticsHardwareFaultTypeUserInterfaceFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultUserInterfaceFault")
+    = 0x08,
     MTRGeneralDiagnosticsHardwareFaultTypeNonVolatileMemoryError API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultNonVolatileMemoryError")
     = 0x09,
-    MTRGeneralDiagnosticsHardwareFaultTypeTamperDetected API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x0A,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRGeneralDiagnosticsHardwareFaultTypeTamperDetected API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFaultTamperDetected")
+    = 0x0A,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsHardwareFault");
 
 typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsInterfaceType) {
     MTRGeneralDiagnosticsInterfaceTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
@@ -17601,15 +17809,40 @@ typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsNetworkFaultType) {
     MTRGeneralDiagnosticsNetworkFaultTypeConnectionFailed API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsRadioFault) {
+    MTRGeneralDiagnosticsRadioFaultUnspecified MTR_NEWLY_AVAILABLE = 0x00,
+    MTRGeneralDiagnosticsRadioFaultWiFiFault MTR_NEWLY_AVAILABLE = 0x01,
+    MTRGeneralDiagnosticsRadioFaultCellularFault MTR_NEWLY_AVAILABLE = 0x02,
+    MTRGeneralDiagnosticsRadioFaultThreadFault MTR_NEWLY_AVAILABLE = 0x03,
+    MTRGeneralDiagnosticsRadioFaultNFCFault MTR_NEWLY_AVAILABLE = 0x04,
+    MTRGeneralDiagnosticsRadioFaultBLEFault MTR_NEWLY_AVAILABLE = 0x05,
+    MTRGeneralDiagnosticsRadioFaultEthernetFault MTR_NEWLY_AVAILABLE = 0x06,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsRadioFaultType) {
-    MTRGeneralDiagnosticsRadioFaultTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRGeneralDiagnosticsRadioFaultTypeWiFiFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRGeneralDiagnosticsRadioFaultTypeCellularFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRGeneralDiagnosticsRadioFaultTypeThreadFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRGeneralDiagnosticsRadioFaultTypeNFCFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTRGeneralDiagnosticsRadioFaultTypeBLEFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
-    MTRGeneralDiagnosticsRadioFaultTypeEthernetFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRGeneralDiagnosticsRadioFaultTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFaultUnspecified")
+    = 0x00,
+    MTRGeneralDiagnosticsRadioFaultTypeWiFiFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFaultWiFiFault")
+    = 0x01,
+    MTRGeneralDiagnosticsRadioFaultTypeCellularFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFaultCellularFault")
+    = 0x02,
+    MTRGeneralDiagnosticsRadioFaultTypeThreadFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFaultThreadFault")
+    = 0x03,
+    MTRGeneralDiagnosticsRadioFaultTypeNFCFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFaultNFCFault")
+    = 0x04,
+    MTRGeneralDiagnosticsRadioFaultTypeBLEFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFaultBLEFault")
+    = 0x05,
+    MTRGeneralDiagnosticsRadioFaultTypeEthernetFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFaultEthernetFault")
+    = 0x06,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFault");
 
 typedef NS_OPTIONS(uint32_t, MTRSoftwareDiagnosticsFeature) {
     MTRSoftwareDiagnosticsFeatureWaterMarks API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
@@ -17708,18 +17941,52 @@ typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsWiFiVersionType) {
     = 0x05,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTREthernetNetworkDiagnosticsPHYRate) {
+    MTREthernetNetworkDiagnosticsPHYRateRate10M MTR_NEWLY_AVAILABLE = 0x00,
+    MTREthernetNetworkDiagnosticsPHYRateRate100M MTR_NEWLY_AVAILABLE = 0x01,
+    MTREthernetNetworkDiagnosticsPHYRateRate1G MTR_NEWLY_AVAILABLE = 0x02,
+    MTREthernetNetworkDiagnosticsPHYRateRate25G MTR_NEWLY_AVAILABLE = 0x03,
+    MTREthernetNetworkDiagnosticsPHYRateRate5G MTR_NEWLY_AVAILABLE = 0x04,
+    MTREthernetNetworkDiagnosticsPHYRateRate10G MTR_NEWLY_AVAILABLE = 0x05,
+    MTREthernetNetworkDiagnosticsPHYRateRate40G MTR_NEWLY_AVAILABLE = 0x06,
+    MTREthernetNetworkDiagnosticsPHYRateRate100G MTR_NEWLY_AVAILABLE = 0x07,
+    MTREthernetNetworkDiagnosticsPHYRateRate200G MTR_NEWLY_AVAILABLE = 0x08,
+    MTREthernetNetworkDiagnosticsPHYRateRate400G MTR_NEWLY_AVAILABLE = 0x09,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTREthernetNetworkDiagnosticsPHYRateType) {
-    MTREthernetNetworkDiagnosticsPHYRateType10M API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTREthernetNetworkDiagnosticsPHYRateType100M API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTREthernetNetworkDiagnosticsPHYRateType1000M API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTREthernetNetworkDiagnosticsPHYRateType25G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTREthernetNetworkDiagnosticsPHYRateType5G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-    MTREthernetNetworkDiagnosticsPHYRateType10G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
-    MTREthernetNetworkDiagnosticsPHYRateType40G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x06,
-    MTREthernetNetworkDiagnosticsPHYRateType100G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x07,
-    MTREthernetNetworkDiagnosticsPHYRateType200G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x08,
-    MTREthernetNetworkDiagnosticsPHYRateType400G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x09,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTREthernetNetworkDiagnosticsPHYRateType10M API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate10M")
+    = 0x00,
+    MTREthernetNetworkDiagnosticsPHYRateType100M API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate100M")
+    = 0x01,
+    MTREthernetNetworkDiagnosticsPHYRateType1000M API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate1G")
+    = 0x02,
+    MTREthernetNetworkDiagnosticsPHYRateType25G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate25G")
+    = 0x03,
+    MTREthernetNetworkDiagnosticsPHYRateType5G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate5G")
+    = 0x04,
+    MTREthernetNetworkDiagnosticsPHYRateType10G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate10G")
+    = 0x05,
+    MTREthernetNetworkDiagnosticsPHYRateType40G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate40G")
+    = 0x06,
+    MTREthernetNetworkDiagnosticsPHYRateType100G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate100G")
+    = 0x07,
+    MTREthernetNetworkDiagnosticsPHYRateType200G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate200G")
+    = 0x08,
+    MTREthernetNetworkDiagnosticsPHYRateType400G API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRateRate400G")
+    = 0x09,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTREthernetNetworkDiagnosticsPHYRate");
 
 typedef NS_ENUM(uint8_t, MTRTimeSynchronizationGranularity) {
     MTRTimeSynchronizationGranularityNoTimeGranularity API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
@@ -24327,21 +24594,21 @@ typedef NS_ENUM(uint8_t, MTRFaultInjectionFaultType) {
 - (void)readAttributeBootReasonsWithCompletionHandler:
     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use readAttributeBootReasonsWithCompletion:");
+        MTR_NEWLY_DEPRECATED("Please use readAttributeBootReasonWithCompletion:");
 - (void)subscribeAttributeBootReasonsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                          maxInterval:(NSNumber * _Nonnull)maxInterval
                                               params:(MTRSubscribeParams * _Nullable)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeBootReasonsWithParams:subscriptionEstablished:");
+        MTR_NEWLY_DEPRECATED("Please use subscribeAttributeBootReasonWithParams:subscriptionEstablished:");
 + (void)readAttributeBootReasonsWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                           endpoint:(NSNumber *)endpoint
                                              queue:(dispatch_queue_t)queue
                                  completionHandler:
                                      (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
     API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use readAttributeBootReasonsWithAttributeCache:endpoint:queue:completion:");
+        MTR_NEWLY_DEPRECATED("Please use readAttributeBootReasonWithAttributeCache:endpoint:queue:completion:");
 
 - (void)readAttributeActiveHardwareFaultsWithCompletionHandler:
     (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler

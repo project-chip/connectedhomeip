@@ -10,7 +10,7 @@
 - ContentLaunchStatus
 - ContentLaunchStreamingType
 - EnhancedColorMode
-- HardwareFaultType
+- HardwareFault
 - HueDirection
 - HueMoveMode
 - HueStepMode
@@ -25,8 +25,8 @@
 - OnOffDelayedAllOffEffectVariant
 - OnOffDyingLightEffectVariant
 - OnOffEffectIdentifier
-- PHYRateType
-- RadioFaultType
+- PHYRate
+- RadioFault
 - RoutingRole
 - SaturationMoveMode
 - SaturationStepMode

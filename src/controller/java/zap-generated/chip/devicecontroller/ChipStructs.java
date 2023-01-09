@@ -616,7 +616,7 @@ public class ChipStructs {
     }
   }
 
-  public static class GeneralDiagnosticsClusterNetworkInterfaceType {
+  public static class GeneralDiagnosticsClusterNetworkInterface {
     public String name;
     public Boolean isOperational;
     public @Nullable Boolean offPremiseServicesReachableIPv4;
@@ -626,7 +626,7 @@ public class ChipStructs {
     public ArrayList<byte[]> IPv6Addresses;
     public Integer type;
 
-    public GeneralDiagnosticsClusterNetworkInterfaceType(
+    public GeneralDiagnosticsClusterNetworkInterface(
         String name,
         Boolean isOperational,
         @Nullable Boolean offPremiseServicesReachableIPv4,
@@ -648,7 +648,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("GeneralDiagnosticsClusterNetworkInterfaceType {\n");
+      output.append("GeneralDiagnosticsClusterNetworkInterface {\n");
       output.append("\tname: ");
       output.append(name);
       output.append("\n");
@@ -1821,6 +1821,36 @@ public class ChipStructs {
       output.append("\n");
       output.append("\tapplicationId: ");
       output.append(applicationId);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class ClientMonitoringClusterMonitoringRegistration {
+    public Long clientNodeId;
+    public Long ICid;
+    public Integer fabricIndex;
+
+    public ClientMonitoringClusterMonitoringRegistration(
+        Long clientNodeId, Long ICid, Integer fabricIndex) {
+      this.clientNodeId = clientNodeId;
+      this.ICid = ICid;
+      this.fabricIndex = fabricIndex;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("ClientMonitoringClusterMonitoringRegistration {\n");
+      output.append("\tclientNodeId: ");
+      output.append(clientNodeId);
+      output.append("\n");
+      output.append("\tICid: ");
+      output.append(ICid);
+      output.append("\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
       output.append("\n");
       output.append("}\n");
       return output.toString();

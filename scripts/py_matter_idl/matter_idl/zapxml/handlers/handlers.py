@@ -13,13 +13,13 @@
 # limitations under the License.
 
 import logging
+from typing import List, Optional, Union
 
 from matter_idl.matter_idl_types import *
-from typing import Optional, Union, List
 
+from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
-from .parsing import ParseInt, AttrsToAccessPrivilege, AttrsToAttribute
-from .base import HandledDepth, BaseHandler
+from .parsing import AttrsToAccessPrivilege, AttrsToAttribute, ParseInt
 
 
 class ClusterNameHandler(BaseHandler):

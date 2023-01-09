@@ -13,22 +13,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
-import coloredlogs
-import enum
 import logging
 import os
 import sys
 
-from typing import List, Optional
+import click
+import coloredlogs
 
 try:
     from matter_idl import matter_idl_parser
-except:
+except ImportError:
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'py_matter_idl')))
     from matter_idl import matter_idl_parser
 
+# isort: off
 import matter_idl.lint
+
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants

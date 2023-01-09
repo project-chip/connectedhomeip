@@ -14,11 +14,12 @@
 #    limitations under the License.
 
 import copy
-import yaml
 from enum import Enum
 
-from .constraints import get_constraints
+import yaml
+
 from . import fixes
+from .constraints import get_constraints
 
 _TESTS_SECTION = [
     'name',

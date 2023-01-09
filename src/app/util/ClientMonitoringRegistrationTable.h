@@ -32,6 +32,9 @@ namespace chip {
  *
  *        This class can only manage one fabric at a time. The flow is load a fabric, execute necessary operations,
  *        save it if there are any changes and load another fabric.
+ *
+ *        Issue to refactor the class to use one entry for the entire table
+ *        https://github.com/project-chip/connectedhomeip/issues/24288
  */
 class ClientMonitoringRegistrationTable
 {
@@ -44,7 +47,6 @@ public:
     };
 
     ClientMonitoringRegistrationTable(PersistentStorageDelegate & storage);
-    ~ClientMonitoringRegistrationTable(){};
 
     /**
      * @brief Function saves the mRegisteredClient attribute to persitant storage
@@ -61,6 +63,22 @@ public:
      * @return CHIP_ERROR
      */
     CHIP_ERROR LoadFromStorage(FabricIndex fabricIndex);
+
+    /**
+     * @brief Function deletes a client registration entry from persistent storage for a single fabric
+     *
+     * @param[in] fabricIndex fabric index to delete from storage
+     * @return CHIP_ERROR
+     */
+    CHIP_ERROR DeleteFromStorage(FabricIndex fabricIndex);
+
+    /**
+     * @brief Function check if a client registration entry is stored for a single fabric
+     *
+     * @param[in] fabricIndex fabric index to check
+     * @return CHIP_ERROR
+     */
+    bool HasValueForFabric(FabricIndex fabric);
 
     /**
      * @brief Accessor function that returns the client registration entry that was loaded for a fabric from persistant storage.

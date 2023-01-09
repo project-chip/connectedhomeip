@@ -23,8 +23,8 @@ import subprocess
 import sys
 import time
 
-from pathlib import Path
 from dataclasses import dataclass
+from pathlib import Path
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
@@ -163,7 +163,8 @@ def getGlobalTemplatesTargets():
                 'zzz_generated', 'placeholder', example_name, 'zap-generated')
             template = 'examples/placeholder/templates/templates.json'
 
-            targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir, template="src/app/zap-templates/matter-idl.json"))
+            targets.append(ZAPGenerateTarget(
+                filepath, output_dir=output_dir, template="src/app/zap-templates/matter-idl.json"))
             targets.append(
                 ZAPGenerateTarget(filepath, output_dir=output_dir, template=template))
             continue
@@ -187,7 +188,8 @@ def getGlobalTemplatesTargets():
         # a name like <zap-generated/foo.h>
         output_dir = os.path.join(
             'zzz_generated', generate_subdir, 'zap-generated')
-        targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir, template="src/app/zap-templates/matter-idl.json"))
+        targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir,
+                       template="src/app/zap-templates/matter-idl.json"))
 
     targets.append(ZAPGenerateTarget(
         'src/controller/data_model/controller-clusters.zap',
@@ -300,7 +302,8 @@ def main():
     if not args.dry_run:
 
         if args.run_bootstrap:
-            subprocess.check_call(os.path.join(CHIP_ROOT_DIR, "scripts/tools/zap/zap_bootstrap.sh"), shell=True)
+            subprocess.check_call(os.path.join(
+                CHIP_ROOT_DIR, "scripts/tools/zap/zap_bootstrap.sh"), shell=True)
 
         timings = []
         if args.parallel:
@@ -326,7 +329,8 @@ def main():
 
             print(" %8d | %50s | %50s" % (
                 timing.generate_time,
-                ".." + timing.config[len(timing.config) - 48:] if len(timing.config) > 50 else timing.config,
+                ".." + timing.config[len(timing.config) -
+                                     48:] if len(timing.config) > 50 else timing.config,
                 ".." + tmpl[len(tmpl) - 48:] if len(tmpl) > 50 else tmpl,
             ))
 
