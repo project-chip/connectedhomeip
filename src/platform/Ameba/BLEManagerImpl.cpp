@@ -867,6 +867,41 @@ void BLEManagerImpl::HandleRXCharWrite(uint8_t * p_value, uint16_t len, uint8_t 
 }
 
 #if defined(CONFIG_MATTER_BLEMGR_ADAPTER) && CONFIG_MATTER_BLEMGR_ADAPTER
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+void BLEManagerImpl::HandleC3CharRead(uint8_t ** pp_value, uint16_t * p_len)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    PacketBufferHandle bufferHandle;
+    BitFlags<AdditionalDataFields> additionalDataFields;
+    AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    uint8_t rotatingDeviceIdUniqueId[ConfigurationManager::kRotatingDeviceIDUniqueIDLength] = {};
+    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
+
+    err = DeviceLayer::GetDeviceInstanceInfoProvider()->GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
+    SuccessOrExit(err);
+    err = ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter);
+    SuccessOrExit(err);
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
+    additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
+#endif /* CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID) */
+
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(additionalDataPayloadParams, bufferHandle,
+                                                                         additionalDataFields);
+    SuccessOrExit(err);
+    *pp_value = bufferHandle->Start();
+    *p_len    = bufferHandle->DataLength();
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data (%s)", __func__);
+    }
+    return;
+}
+#endif /* CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING */
+
 CHIP_ERROR BLEManagerImpl::matter_blemgr_gap_connect_cb(uint8_t conn_id)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -927,6 +962,18 @@ CHIP_ERROR BLEManagerImpl::matter_blemgr_tx_complete_cb(uint8_t conn_id)
     return err;
 }
 
+void BLEManagerImpl::matter_blemgr_c3_char_read_cb(uint8_t ** pp_value, uint16_t * p_len)
+{
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    sInstance.HandleC3CharRead(pp_value, p_len);
+#else
+    *pp_value = NULL;
+    *p_len    = 0;
+#endif
+
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+}
+
 int BLEManagerImpl::matter_blemgr_callback_dispatcher(void * param, T_MATTER_BLEMGR_CALLBACK_TYPE cb_type, void * p_cb_data)
 {
     BLEManagerImpl * blemgr = static_cast<BLEManagerImpl *>(param);
@@ -962,13 +1009,17 @@ int BLEManagerImpl::matter_blemgr_callback_dispatcher(void * param, T_MATTER_BLE
         blemgr->matter_blemgr_tx_complete_cb(tx_complete_cb_arg->conn_id);
     }
     break;
+    case MATTER_BLEMGR_C3_CHAR_READ_CB: {
+        T_MATTER_BLEMGR_C3_CHAR_READ_CB_ARG * c3_char_read_cb_arg = (T_MATTER_BLEMGR_C3_CHAR_READ_CB_ARG *) p_cb_data;
+        blemgr->matter_blemgr_c3_char_read_cb(c3_char_read_cb_arg->pp_value, c3_char_read_cb_arg->p_len);
+    }
     default:
         break;
     }
 
     return 0;
 }
-#else
+#else // not defined(CONFIG_MATTER_BLEMGR_ADAPTER) && CONFIG_MATTER_BLEMGR_ADAPTER
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 void BLEManagerImpl::HandleC3CharRead(TBTCONFIG_CALLBACK_DATA * p_data)
 {
@@ -1156,7 +1207,7 @@ int BLEManagerImpl::ble_callback_dispatcher(void * param, void * p_cb_data, int 
     }
     return 0;
 }
-#endif
+#endif // defined(CONFIG_MATTER_BLEMGR_ADAPTER) && CONFIG_MATTER_BLEMGR_ADAPTER
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
