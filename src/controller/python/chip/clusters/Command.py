@@ -15,24 +15,21 @@
 #    limitations under the License.
 #
 
-from asyncio.futures import Future
+import builtins
 import ctypes
+import inspect
+import logging
+import sys
+from asyncio.futures import Future
+from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_uint8, c_uint16, c_uint32, c_void_p, py_object
 from dataclasses import dataclass
 from typing import Type
-from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_void_p, c_uint32, c_uint16, c_uint8, py_object
 
-from construct.core import ValidationError
-
-from .ClusterObjects import ClusterCommand
 import chip.exceptions
 import chip.interaction_model
 from chip.native import PyChipError
 
-import inspect
-import sys
-import builtins
-import logging
-
+from .ClusterObjects import ClusterCommand
 
 logger = logging.getLogger('chip.cluster.Command')
 logger.setLevel(logging.ERROR)

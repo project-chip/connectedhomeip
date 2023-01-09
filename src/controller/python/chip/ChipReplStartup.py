@@ -1,22 +1,17 @@
-from rich import print
-from rich.pretty import pprint
-from rich import pretty
-from rich import inspect
-from rich.console import Console
-import logging
-from chip import ChipDeviceCtrl
-import chip.clusters as Clusters
-from chip.ChipStack import *
-import coloredlogs
-import chip.logging
 import argparse
-import builtins
-import chip.FabricAdmin
-import chip.CertificateAuthority
-import chip.native
-import chip.discovery
-from chip.utils import CommissioningBuildingBlocks
 import atexit
+import builtins
+import logging
+
+import chip.CertificateAuthority
+import chip.discovery
+import chip.FabricAdmin
+import chip.logging
+import chip.native
+import coloredlogs
+from chip.ChipStack import *
+from rich import inspect, pretty
+from rich.console import Console
 
 _fabricAdmins = None
 
@@ -33,14 +28,14 @@ def ReplInit(debug):
     console.rule('Matter REPL')
     console.print('''
             [bold blue]
-    
+
             Welcome to the Matter Python REPL!
-    
+
             For help, please type [/][bold green]matterhelp()[/][bold blue]
-    
+
             To get more information on a particular object/class, you can pass
             that into [bold green]matterhelp()[/][bold blue] as well.
-    
+
             ''')
     console.rule()
 

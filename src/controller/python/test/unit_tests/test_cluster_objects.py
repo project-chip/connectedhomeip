@@ -1,11 +1,10 @@
 import typing
 import unittest
-
 from dataclasses import dataclass
 
+import chip.ChipUtility
 from chip.clusters import ClusterObjects
 from chip.tlv import TLVReader, TLVWriter, uint
-import chip.ChipUtility
 
 '''
 This file contains tests for checking if the cluster object can generate correct TLV data.

@@ -14,9 +14,9 @@
 
 import enum
 
-from matter_idl.generators.java import JavaGenerator
 from matter_idl.generators.bridge import BridgeGenerator
 from matter_idl.generators.cpp.application import CppApplicationGenerator
+from matter_idl.generators.java import JavaGenerator
 
 
 class CodeGenerator(enum.Enum):
