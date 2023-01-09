@@ -1,26 +1,24 @@
 #pragma once
 
-#include <new>
 #include "bridge/OnOff.h"
+#include <new>
 
 namespace clusters {
 
 struct ClusterInfo
 {
-  chip::ClusterId id;
-  const char *name;
-  uint16_t size;
-  GeneratedCluster* (*ctor)(void*);
+    chip::ClusterId id;
+    const char * name;
+    uint16_t size;
+    GeneratedCluster * (*ctor)(void *);
 } static const kKnownClusters[] = {
 
-  {
-    6,
-    "OnOff",
-    sizeof(OnOffCluster),
-    [](void *mem) -> GeneratedCluster* {
-      return new(mem) OnOffCluster();
+    {
+        6,
+        "OnOff",
+        sizeof(OnOffCluster),
+        [](void * mem) -> GeneratedCluster * { return new (mem) OnOffCluster(); },
     },
-  },
 };
 
-}
+} // namespace clusters

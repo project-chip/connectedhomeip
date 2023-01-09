@@ -224,7 +224,7 @@ CHIP_ERROR WriteValueToBuffer(const bool & value, uint8_t * buffer, const uint16
 {
     if (maxReadLength != 1)
     {
-       return CHIP_ERROR_BUFFER_TOO_SMALL;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
     *buffer = value ? 1 : 0;
     return CHIP_NO_ERROR;
@@ -280,8 +280,8 @@ CHIP_ERROR ReadOrWriteBuffer(std::vector<uint8_t> * data, uint8_t * buffer, uint
     return err;
 }
 
-CHIP_ERROR ReadOrWriteBufferForType(std::vector<uint8_t> * data, uint8_t * buffer, EmberAfAttributeType type, uint16_t maxReadLength,
-                              bool read)
+CHIP_ERROR ReadOrWriteBufferForType(std::vector<uint8_t> * data, uint8_t * buffer, EmberAfAttributeType type,
+                                    uint16_t maxReadLength, bool read)
 {
     switch (type)
     {
@@ -377,7 +377,8 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     if (err != CHIP_NO_ERROR)
     {
         printChipError(err);
-        ChipLogError(DeviceLayer, "Attribute access interface failed to read attribute %d, for endpoint %d cluster %d", attributeMetadata->attributeId, endpoint, clusterId);
+        ChipLogError(DeviceLayer, "Attribute access interface failed to read attribute %d, for endpoint %d cluster %d",
+                     attributeMetadata->attributeId, endpoint, clusterId);
         return EMBER_ZCL_STATUS_FAILURE;
     }
     writer.Finalize();
@@ -388,7 +389,8 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     if (err != CHIP_NO_ERROR)
     {
         printChipError(err);
-        ChipLogError(DeviceLayer, "Failed to write attribute to buffer. Endpoint %d, Cluster %d, Attribute %d", endpoint, clusterId, attributeMetadata->attributeId);
+        ChipLogError(DeviceLayer, "Failed to write attribute to buffer. Endpoint %d, Cluster %d, Attribute %d", endpoint, clusterId,
+                     attributeMetadata->attributeId);
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
@@ -423,7 +425,8 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
     if (err != CHIP_NO_ERROR)
     {
         printChipError(err);
-        ChipLogError(DeviceLayer, "Failed to read value from buffer: Endpoint %d, Cluster %d, Attribute %d", endpoint, clusterId, attributeMetadata->attributeId);
+        ChipLogError(DeviceLayer, "Failed to read value from buffer: Endpoint %d, Cluster %d, Attribute %d", endpoint, clusterId,
+                     attributeMetadata->attributeId);
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
@@ -437,7 +440,9 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
     if (err != CHIP_NO_ERROR)
     {
         printChipError(err);
-        ChipLogError(DeviceLayer, "Attribute access interface failed to write attribute value. Endpoint %d, Cluster %d, Attribute %d", endpoint, clusterId, attributeMetadata->attributeId);
+        ChipLogError(DeviceLayer,
+                     "Attribute access interface failed to write attribute value. Endpoint %d, Cluster %d, Attribute %d", endpoint,
+                     clusterId, attributeMetadata->attributeId);
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
