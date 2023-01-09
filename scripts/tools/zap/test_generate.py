@@ -16,17 +16,17 @@
 import glob
 import logging
 import os
+import shutil
 import subprocess
 import sys
 import unittest
-import yaml
-import shutil
-
-from typing import List, Optional
 from dataclasses import dataclass, field
+from typing import List, Optional
+import yaml
 
 TESTS_DIR = os.path.join(os.path.dirname(__file__), "tests")
-CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
+CHIP_ROOT = os.path.abspath(os.path.join(
+    os.path.dirname(__file__), "../../.."))
 
 
 @dataclass
@@ -105,7 +105,8 @@ class GeneratorTest:
                     name[len(output_directory)+1:] for name in glob.glob(f"{output_directory}/**/*", recursive=True)
                 ])
 
-                checker.assertEqual(expected_files, actual_files, msg="Expected and actual generated file list MUST be identical.")
+                checker.assertEqual(
+                    expected_files, actual_files, msg="Expected and actual generated file list MUST be identical.")
 
                 # All files exist, ready to do the compare
                 for entry in test.outputs:
@@ -116,7 +117,8 @@ class GeneratorTest:
                         subprocess.check_call(["diff", actual, expected])
                     except:
                         if self.context.regenerate_golden:
-                            print(f"Copying updated golden image from {actual} to {expected}")
+                            print(
+                                f"Copying updated golden image from {actual} to {expected}")
                             subprocess.check_call(["cp", actual, expected])
                         else:
                             raise

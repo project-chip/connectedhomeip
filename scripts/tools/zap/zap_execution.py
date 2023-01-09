@@ -16,8 +16,6 @@ import os
 import re
 import subprocess
 import sys
-import yaml
-
 from typing import Tuple
 
 # The version MUST be of the form `YYYY.MM.YY'

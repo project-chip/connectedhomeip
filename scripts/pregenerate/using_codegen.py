@@ -16,7 +16,6 @@ import logging
 import os
 import shlex
 import subprocess
-
 from enum import Enum, auto
 
 from .types import IdlFileType, InputIdlFile
