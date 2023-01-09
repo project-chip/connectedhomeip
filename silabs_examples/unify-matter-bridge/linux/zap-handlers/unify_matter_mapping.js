@@ -56,8 +56,8 @@ const bitmaps_unify_to_matter = {
     "ThermostatThermostatProgrammingOperationMode" : "",  // FIXME
     "ThermostatThermostatRunningState" : "ThermostatRunningState",
     "TimeTimeStatus" : "TimeStatusMask",
-    "TstatScheduleDOW" : "",  // FIXME
-    "TstatScheduleMode" : "",  // FIXME
+    "TstatScheduleDOW" : "DayOfWeek",
+    "TstatScheduleMode" : "ModeForSequence",
     "WindowCoveringConfigOrStatus" : "ConfigStatus",
     "WindowCoveringMode" : "Mode",
     "map16" : "",  // FIXME

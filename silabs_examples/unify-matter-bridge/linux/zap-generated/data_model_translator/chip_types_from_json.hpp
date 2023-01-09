@@ -826,22 +826,22 @@ template <>
 inline std::optional<chip::BitMask<Thermostat::DayOfWeek>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<Thermostat::DayOfWeek> r;
-    r.SetField(Thermostat::DayOfWeek::kSunday, obj.value("Sunday FIXME", false));
-    r.SetField(Thermostat::DayOfWeek::kMonday, obj.value("Monday FIXME", false));
-    r.SetField(Thermostat::DayOfWeek::kTuesday, obj.value("Tuesday FIXME", false));
-    r.SetField(Thermostat::DayOfWeek::kWednesday, obj.value("Wednesday FIXME", false));
-    r.SetField(Thermostat::DayOfWeek::kThursday, obj.value("Thursday FIXME", false));
-    r.SetField(Thermostat::DayOfWeek::kFriday, obj.value("Friday FIXME", false));
-    r.SetField(Thermostat::DayOfWeek::kSaturday, obj.value("Saturday FIXME", false));
-    r.SetField(Thermostat::DayOfWeek::kAwayOrVacation, obj.value("AwayOrVacation FIXME", false));
+    r.SetField(Thermostat::DayOfWeek::kSunday, obj.value("Sunday", false));
+    r.SetField(Thermostat::DayOfWeek::kMonday, obj.value("Monday", false));
+    r.SetField(Thermostat::DayOfWeek::kTuesday, obj.value("Tuesday", false));
+    r.SetField(Thermostat::DayOfWeek::kWednesday, obj.value("Wednesday", false));
+    r.SetField(Thermostat::DayOfWeek::kThursday, obj.value("Thursday", false));
+    r.SetField(Thermostat::DayOfWeek::kFriday, obj.value("Friday", false));
+    r.SetField(Thermostat::DayOfWeek::kSaturday, obj.value("Saturday", false));
+    r.SetField(Thermostat::DayOfWeek::kAwayOrVacation, obj.value("AwayOrVacation", false));
     return r;
 }
 template <>
 inline std::optional<chip::BitMask<Thermostat::ModeForSequence>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<Thermostat::ModeForSequence> r;
-    r.SetField(Thermostat::ModeForSequence::kHeatSetpointFieldPresent, obj.value("HeatSetpointFieldPresent FIXME", false));
-    r.SetField(Thermostat::ModeForSequence::kCoolSetpointFieldPresent, obj.value("CoolSetpointFieldPresent FIXME", false));
+    r.SetField(Thermostat::ModeForSequence::kHeatSetpointFieldPresent, obj.value("Heat", false));
+    r.SetField(Thermostat::ModeForSequence::kCoolSetpointFieldPresent, obj.value("Cool", false));
     return r;
 }
 template <>

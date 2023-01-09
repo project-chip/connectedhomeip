@@ -896,14 +896,14 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermosta
 {
     using namespace chip::app::Clusters::Thermostat;
     nlohmann::json obj;
-    obj["Sunday FIXME"] = static_cast<bool>(value.GetField(DayOfWeek::kSunday));
-    obj["Monday FIXME"] = static_cast<bool>(value.GetField(DayOfWeek::kMonday));
-    obj["Tuesday FIXME"] = static_cast<bool>(value.GetField(DayOfWeek::kTuesday));
-    obj["Wednesday FIXME"] = static_cast<bool>(value.GetField(DayOfWeek::kWednesday));
-    obj["Thursday FIXME"] = static_cast<bool>(value.GetField(DayOfWeek::kThursday));
-    obj["Friday FIXME"] = static_cast<bool>(value.GetField(DayOfWeek::kFriday));
-    obj["Saturday FIXME"] = static_cast<bool>(value.GetField(DayOfWeek::kSaturday));
-    obj["AwayOrVacation FIXME"] = static_cast<bool>(value.GetField(DayOfWeek::kAwayOrVacation));
+    obj["Sunday"] = static_cast<bool>(value.GetField(DayOfWeek::kSunday));
+    obj["Monday"] = static_cast<bool>(value.GetField(DayOfWeek::kMonday));
+    obj["Tuesday"] = static_cast<bool>(value.GetField(DayOfWeek::kTuesday));
+    obj["Wednesday"] = static_cast<bool>(value.GetField(DayOfWeek::kWednesday));
+    obj["Thursday"] = static_cast<bool>(value.GetField(DayOfWeek::kThursday));
+    obj["Friday"] = static_cast<bool>(value.GetField(DayOfWeek::kFriday));
+    obj["Saturday"] = static_cast<bool>(value.GetField(DayOfWeek::kSaturday));
+    obj["AwayOrVacation"] = static_cast<bool>(value.GetField(DayOfWeek::kAwayOrVacation));
     return obj;
 }
 template <>
@@ -911,8 +911,8 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermosta
 {
     using namespace chip::app::Clusters::Thermostat;
     nlohmann::json obj;
-    obj["HeatSetpointFieldPresent FIXME"] = static_cast<bool>(value.GetField(ModeForSequence::kHeatSetpointFieldPresent));
-    obj["CoolSetpointFieldPresent FIXME"] = static_cast<bool>(value.GetField(ModeForSequence::kCoolSetpointFieldPresent));
+    obj["Heat"] = static_cast<bool>(value.GetField(ModeForSequence::kHeatSetpointFieldPresent));
+    obj["Cool"] = static_cast<bool>(value.GetField(ModeForSequence::kCoolSetpointFieldPresent));
     return obj;
 }
 template <>
