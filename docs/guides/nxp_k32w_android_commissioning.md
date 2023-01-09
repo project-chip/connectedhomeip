@@ -3,25 +3,23 @@
 This article describes how to use
 [CHIPTool](../../examples/android/CHIPTool/README.md) for Android smartphones to
 commission an NXP K32W061 DK6 running
-[NXP K32W Lock/Light Example Application](../../examples/lock-light-app/k32w/README.md)
+[NXP K32W Lock/Light Example Application](#building-and-programming-nxp-k32w-locklight-example-application)
 onto a CHIP-enabled Thread network.
 
 <hr>
 
 -   [Overview](#overview)
 -   [Requirements](#requirements)
--   [Building and programming OpenThread RCP firmware](#building-rcp-firmware)
--   [Configuring PC as Thread Border Router](#configuring-pc)
--   [Building and programming NXP K32W Lock/Light Example Application](#building-example)
--   [Building and installing Android CHIPTool](#building-chiptool)
--   [Forming a Thread network on the Border Router](#form-thread)
--   [Preparing accessory device](#preparing-accessory)
--   [Commissioning accessory device](#commissioning-accessory)
+-   [Building and programming OpenThread RCP firmware](#building-and-programming-openthread-rcp-firmware)
+-   [Configuring PC as Thread Border Router](#configuring-pc-as-a-thread-border-router)
+-   [Building and programming NXP K32W Lock/Light Example Application](#building-and-programming-nxp-k32w-locklight-example-application)
+-   [Building and installing Android CHIPTool](#building-and-installing-android-chiptool)
+-   [Forming a Thread network on the Border Router](#forming-a-thread-network-on-the-border-router)
+-   [Preparing accessory device](#preparing-accessory-device)
+-   [Commissioning accessory device](#commissioning-accessory-device)
 -   [Sending CHIP commands](#sending-chip-commands)
 
 <hr>
-
-<a name="overview"></a>
 
 ## Overview
 
@@ -49,11 +47,9 @@ The following diagram shows the connectivity between network components required
 to allow communication between devices running the CHIPTool and Lock/Light
 applications:
 
-![nxp_hw_connectivity](../../examples/platform/k32w/doc/images/nxp_hw_connectivity.JPG)
+![nxp_hw_connectivity](../../examples/platform/nxp/k32w/k32w0/doc/images/nxp_hw_connectivity.JPG)
 
 <hr>
-
-<a name="requirements"></a>
 
 ## Requirements
 
@@ -76,8 +72,6 @@ While this page references Ubuntu 20.04, all the procedures can be completed
 using other popular operating systems.
 
 <hr>
-
-<a name="building-rcp-firmware"></a>
 
 ## Building and programming OpenThread RCP firmware
 
@@ -122,8 +116,6 @@ the RCP firmware onto an K32W061 DK6:
 7.  Plug-in the K32W061 DK6 to the PC.
 
 <hr>
-
-<a name="configuring-pc"></a>
 
 ## Configuring PC as a Thread Border Router
 
@@ -353,8 +345,6 @@ To make your PC work as a Thread Border Router, complete the following tasks:
 
 <hr>
 
-<a name="building-example"></a>
-
 ## Building and programming NXP K32W Lock/Light Example Application
 
 See
@@ -366,8 +356,6 @@ See
 to learn how to build and program the light example onto an K32W061 DK6.
 
 <hr>
-
-<a name="building-chiptool"></a>
 
 ## Building and installing Android CHIPTool
 
@@ -403,8 +391,6 @@ CHIPTool is now ready to be used for commissioning.
 
 <hr>
 
-<a name="form-thread"></a>
-
 ## Forming a Thread network on the Border Router
 
 1.  On the mobile phone connect to the _OT-BR_ Wi-Fi network.
@@ -414,7 +400,7 @@ CHIPTool is now ready to be used for commissioning.
 
 3.  Navigate to the _Form_ tab then push the _Form_ button using the default
     parameters:
-    ![nxp_form_nwk](../../examples/platform/k32w/doc/images/form_web.JPG)
+    ![nxp_form_nwk](../../examples/platform/nxp/k32w/k32w0/doc/images/form_web.JPG)
 
 4.  The message _Form operation is successful_ should be display after a few
     seconds.
@@ -448,7 +434,7 @@ To prepare the accessory device for commissioning, complete the following steps:
 
 1.  Make sure that JP4 and JP7 jumpers are in leftmost position and a mini-USB
     cable is connected between the LPC connector and PC
-    ![nxp_connectors](../../examples/platform/k32w/doc/images/k32w-dk6-connectors.jpg)
+    ![nxp_connectors](../../examples/platform/nxp/k32w/k32w0/doc/images/k32w-dk6-connectors.jpg)
 
 2.  Use a terminal emulator (e.g.: Putty) to connect to the UART console of the
     accessory device. Use a baudrate of 115200.
@@ -468,13 +454,11 @@ To prepare the accessory device for commissioning, complete the following steps:
 
 <hr>
 
-<a name="commissioning-accessory"></a>
-
 ## Commissioning accessory device
 
 To commission the accessory device onto the Thread network created in the
-[Forming Thread network](#Forming-a-Thread-network) section, complete the
-following steps:
+[Forming Thread network](#forming-a-thread-network-on-the-border-router)
+section, complete the following steps:
 
 1. Enable _Bluetooth_ and _Location_ services on your smartphone;
 2. Connect the smartphone to _OT-BR_ WiFi network;
@@ -486,18 +470,16 @@ following steps:
    progress with scanning, connection, and pairing. At the end of this process,
    the Thread network settings screen appears.
 
-    ![chiptool_main_screen](../../examples/platform/k32w/doc/images/chiptool_main_screen.png)
+    ![chiptool_main_screen](../../examples/platform/nxp/k32w/k32w0/doc/images/chiptool_main_screen.png)
 
 6. In the Thread network settings screen, use the default settings and tap the
    _SAVE NETWORK_ button to send a Thread provisioning message to the accessory
    device. You will see the "Network provisioning completed" message when the
    accessory device successfully joins the Thread network.
 
-    ![chiptool_credentials](../../examples/platform/k32w/doc/images/thread_credentials.png)
+    ![chiptool_credentials](../../examples/platform/nxp/k32w/k32w0/doc/images/thread_credentials.png)
 
 <hr>
-
-<a name="sending-commands"></a>
 
 ## Sending CHIP commands
 
@@ -505,7 +487,7 @@ following steps:
    the provisioning is completed successfully and you are connected to the
    device.
 
-    ![on_off_cluster.png](../../examples/platform/k32w/doc/images/on_off_cluster.png)
+    ![on_off_cluster.png](../../examples/platform/nxp/k32w/k32w0/doc/images/on_off_cluster.png)
 
 2. Verify that the text box on the screen is not empty and contains the IPv6
    address of the accessory device.

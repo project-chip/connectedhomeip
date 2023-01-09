@@ -19,14 +19,13 @@ Instruments CC13XX_26XX family of Wireless MCUs.
         -   [Provisioning](#provisioning)
             -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
             -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
-        -   [Matter Remote Commands](#matter-remote-commands)
     -   [TI Support](#ti-support)
 
 ---
 
 ## Introduction
 
-![CC1352R1_LAUNCHXL](doc/images/cc1352r1_launchxl.jpg)
+![CC1352R1_LAUNCHXL](../../pump-app/cc13x2x7_26x2x7/doc/images/cc1352r1_launchxl.jpg)
 
 The CC13XX_26XX all clusters example application provides the basis to query and
 run commands for all currently implemented Matter clusters. This uses the

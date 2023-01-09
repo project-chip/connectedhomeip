@@ -27,8 +27,6 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
 > release with added tools and documentation.
 > [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases)
 
-<a name="intro"></a>
-
 ## Introduction
 
 The EFR32 lock example provides a baseline demonstration of a door lock control
@@ -47,8 +45,6 @@ Rendez-vous procedure.
 The lighting example is intended to serve both as a means to explore the
 workings of Matter as well as a template for creating real products based on the
 Silicon Labs platform.
-
-<a name="building"></a>
 
 ## Building
 
@@ -189,16 +185,12 @@ Mac OS X
           $ ninja -C out/debug
           ```
 
-    [Running Pigweed RPC console](#running-pigweed-rpc-console)
-
 For more build options, help is provided when running the build script without
 arguments
 
          ```
          ./scripts/examples/gn_efr32_example.sh
          ```
-
-<a name="flashing"></a>
 
 ## Flashing the Application
 
@@ -210,8 +202,6 @@ arguments
           ```
 
 -   Or with the Ozone debugger, just load the .out file.
-
-<a name="view-logging"></a>
 
 ## Viewing Logging Output
 
@@ -270,8 +260,6 @@ combination with JLinkRTTClient as follows:
           ```
           $ JLinkRTTClient
           ```
-
-<a name="running-complete-example"></a>
 
 ## Running the Complete Example
 
@@ -413,7 +401,7 @@ tracking code inside the `trackAlloc` and `trackFree` function
 
 For the description of Software Update process with EFR32 example applications
 see
-[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+[EFR32 OTA Software Update](../../../../docs/guides/silabs_efr32_software_update.md)
 
 ## Building options
 
