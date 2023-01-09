@@ -32,8 +32,6 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
 > release with added tools and documentation.
 > [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases)
 
-<a name="intro"></a>
-
 ## Introduction
 
 The EFR32 Thermostat example provides a baseline demonstration of a thermostat
@@ -52,8 +50,6 @@ Rendez-vous procedure.
 The light switch example is intended to serve both as a means to explore the
 workings of Matter as well as a template for creating real products based on the
 Silicon Labs platform.
-
-<a name="building"></a>
 
 ## Building
 
@@ -181,14 +177,10 @@ Silicon Labs platform.
           $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
           $ ninja -C out/debug
 
-    [Running Pigweed RPC console](#running-pigweed-rpc-console)
-
 For more build options, help is provided when running the build script without
 arguments
 
     ./scripts/examples/gn_efr32_example.sh
-
-<a name="flashing"></a>
 
 ## Flashing the Application
 
@@ -198,8 +190,6 @@ arguments
           $ python3 out/debug/chip-efr32-thermostat-switch-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
-
-<a name="view-logging"></a>
 
 ## Viewing Logging Output
 
@@ -248,8 +238,6 @@ combination with JLinkRTTClient as follows:
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
           $ JLinkRTTClient
-
-<a name="running-complete-example"></a>
 
 ## Running the Complete Example
 
@@ -333,8 +321,6 @@ combination with JLinkRTTClient as follows:
 
 #Add Ipv6 route on PC(Linux) \$ sudo ip route add <Thread global ipv6 prefix>/64
 via 2002::2
-
-<a name="running-pigweed-rpc-console"></a>
 
 ## Running RPC console
 
