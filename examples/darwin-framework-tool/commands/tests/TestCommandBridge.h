@@ -589,19 +589,19 @@ NS_ASSUME_NONNULL_BEGIN
     using namespace chip::app::Clusters::OperationalCredentials;
 
     if (CHIP_ERROR_INVALID_PUBLIC_KEY == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidPublicKey));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidPublicKey));
     }
     if (CHIP_ERROR_WRONG_NODE_ID == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNodeOpId));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidNodeOpId));
     }
     if (CHIP_ERROR_UNSUPPORTED_CERT_FORMAT == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNOC));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidNOC));
     }
     if (CHIP_ERROR_FABRIC_EXISTS == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kFabricConflict));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kFabricConflict));
     }
     if (CHIP_ERROR_INVALID_FABRIC_INDEX == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidFabricIndex));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidFabricIndex));
     }
 
     return StatusIB(err);
