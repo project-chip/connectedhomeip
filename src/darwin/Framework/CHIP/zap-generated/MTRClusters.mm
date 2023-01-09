@@ -25636,6 +25636,324 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 @end
 
+@implementation MTRClusterClientMonitoring
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
+{
+    if (self = [super initWithQueue:queue]) {
+        if (device == nil) {
+            return nil;
+        }
+
+        _endpoint = [endpointID unsignedShortValue];
+        _device = device;
+    }
+    return self;
+}
+
+- (void)registerClientMonitoringWithParams:(MTRClientMonitoringClusterRegisterClientMonitoringParams *)params
+                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                completion:(MTRStatusCompletion)completion
+{
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeClientMonitoringID,
+                                     (unsigned int) MTRCommandIDTypeClusterClientMonitoringCommandRegisterClientMonitoringID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.device.queue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ClientMonitoring::Commands::RegisterClientMonitoring::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                }
+                request.clientNodeId = params.clientNodeId.unsignedLongLongValue;
+                request.ICid = params.iCid.unsignedLongLongValue;
+
+                chip::Controller::ClientMonitoringCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
+            });
+        std::move(*bridge).DispatchAction(baseDevice);
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (void)unregisterClientMonitoringWithParams:(MTRClientMonitoringClusterUnregisterClientMonitoringParams *)params
+                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                       expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                  completion:(MTRStatusCompletion)completion
+{
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeClientMonitoringID,
+                                     (unsigned int) MTRCommandIDTypeClusterClientMonitoringCommandUnregisterClientMonitoringID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.device.queue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ClientMonitoring::Commands::UnregisterClientMonitoring::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                }
+                request.clientNodeId = params.clientNodeId.unsignedLongLongValue;
+                request.ICid = params.iCid.unsignedLongLongValue;
+
+                chip::Controller::ClientMonitoringCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
+            });
+        std::move(*bridge).DispatchAction(baseDevice);
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (void)stayAwakeRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                completion:(MTRStatusCompletion)completion
+{
+    [self stayAwakeRequestWithParams:nil
+                      expectedValues:expectedValues
+               expectedValueInterval:expectedValueIntervalMs
+                          completion:completion];
+}
+- (void)stayAwakeRequestWithParams:(MTRClientMonitoringClusterStayAwakeRequestParams * _Nullable)params
+                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+             expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                        completion:(MTRStatusCompletion)completion
+{
+    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex,
+                                     _endpoint, (unsigned int) MTRClusterIDTypeClientMonitoringID,
+                                     (unsigned int) MTRCommandIDTypeClusterClientMonitoringCommandStayAwakeRequestID];
+    // Make a copy of params before we go async.
+    params = [params copy];
+    NSNumber * timedInvokeTimeoutMsParam = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMsParam) {
+        timedInvokeTimeoutMsParam = MTRClampedNumber(timedInvokeTimeoutMsParam, @(1), @(UINT16_MAX));
+    }
+    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
+    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+        MTRBaseDevice * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID
+                                                                controller:self.device.deviceController];
+        auto * bridge = new MTRCommandSuccessCallbackBridge(
+            self.device.queue,
+            ^(id _Nullable value, NSError * _Nullable error) {
+                MTRClustersLogCompletion(logPrefix, value, error);
+                dispatch_async(self.callbackQueue, ^{
+                    completion(error);
+                });
+                [workItem endWork];
+            },
+            ^(ExchangeManager & exchangeManager, const SessionHandle & session, CommandSuccessCallbackType successCb,
+                MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+                chip::Optional<uint16_t> timedInvokeTimeoutMs;
+                ListFreer listFreer;
+                ClientMonitoring::Commands::StayAwakeRequest::Type request;
+                if (timedInvokeTimeoutMsParam != nil) {
+                    timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+                }
+
+                chip::Controller::ClientMonitoringCluster cppCluster(exchangeManager, session, self->_endpoint);
+                return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
+            });
+        std::move(*bridge).DispatchAction(baseDevice);
+    };
+    workItem.readyHandler = readyHandler;
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
+    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+
+    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
+        expectedValues = nil;
+    } else {
+        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    }
+    if (expectedValues) {
+        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
+    }
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeIdleModeIntervalWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeClientMonitoringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterClientMonitoringAttributeIdleModeIntervalID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeActiveModeIntervalWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeClientMonitoringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterClientMonitoringAttributeActiveModeIntervalID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeActiveModeThresholdWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeClientMonitoringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterClientMonitoringAttributeActiveModeThresholdID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeExpectedClientsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeClientMonitoringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterClientMonitoringAttributeExpectedClientsID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeClientMonitoringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterClientMonitoringAttributeGeneratedCommandListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeClientMonitoringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterClientMonitoringAttributeAcceptedCommandListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeClientMonitoringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterClientMonitoringAttributeAttributeListID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeClientMonitoringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterClientMonitoringAttributeFeatureMapID)
+                                             params:params];
+}
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeClientMonitoringID)
+                                        attributeID:@(MTRAttributeIDTypeClusterClientMonitoringAttributeClusterRevisionID)
+                                             params:params];
+}
+
+@end
+
+@implementation MTRClusterClientMonitoring (Deprecated)
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpoint:(uint16_t)endpoint queue:(dispatch_queue_t)queue
+{
+    return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
+}
+
+- (void)registerClientMonitoringWithParams:(MTRClientMonitoringClusterRegisterClientMonitoringParams *)params
+                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                         completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self registerClientMonitoringWithParams:params
+                              expectedValues:expectedDataValueDictionaries
+                       expectedValueInterval:expectedValueIntervalMs
+                                  completion:completionHandler];
+}
+- (void)unregisterClientMonitoringWithParams:(MTRClientMonitoringClusterUnregisterClientMonitoringParams *)params
+                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                           completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self unregisterClientMonitoringWithParams:params
+                                expectedValues:expectedDataValueDictionaries
+                         expectedValueInterval:expectedValueIntervalMs
+                                    completion:completionHandler];
+}
+- (void)stayAwakeRequestWithParams:(MTRClientMonitoringClusterStayAwakeRequestParams * _Nullable)params
+                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                 completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self stayAwakeRequestWithParams:params
+                      expectedValues:expectedDataValueDictionaries
+               expectedValueInterval:expectedValueIntervalMs
+                          completion:completionHandler];
+}
+- (void)stayAwakeRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                         completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self stayAwakeRequestWithParams:nil
+                      expectedValues:expectedValues
+               expectedValueInterval:expectedValueIntervalMs
+                   completionHandler:completionHandler];
+}
+@end
+
 @implementation MTRClusterUnitTesting
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue

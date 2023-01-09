@@ -5868,6 +5868,56 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 /**
+ * Cluster Client Monitoring
+ *    Client Monitoring allows for ensuring that listed clients meet the required monitoring conditions on the server.
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRClusterClientMonitoring : MTRCluster
+
+- (instancetype _Nullable)initWithDevice:(MTRDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_NEWLY_AVAILABLE;
+
+- (void)registerClientMonitoringWithParams:(MTRClientMonitoringClusterRegisterClientMonitoringParams *)params
+                            expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                     expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)unregisterClientMonitoringWithParams:(MTRClientMonitoringClusterUnregisterClientMonitoringParams *)params
+                              expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+                       expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                                  completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)stayAwakeRequestWithParams:(MTRClientMonitoringClusterStayAwakeRequestParams * _Nullable)params
+                    expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries
+             expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs
+                        completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)stayAwakeRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues
+                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeIdleModeIntervalWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeActiveModeIntervalWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeActiveModeThresholdWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeExpectedClientsWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+/**
  * Cluster Unit Testing
  *    The Test Cluster is meant to validate the generated code
  */

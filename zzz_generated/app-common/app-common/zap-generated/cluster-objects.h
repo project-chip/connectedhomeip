@@ -25341,6 +25341,11 @@ struct Type;
 struct DecodableType;
 } // namespace RegisterClientMonitoring
 
+namespace UnregisterClientMonitoring {
+struct Type;
+struct DecodableType;
+} // namespace UnregisterClientMonitoring
+
 namespace StayAwakeRequest {
 struct Type;
 struct DecodableType;
@@ -25384,6 +25389,41 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RegisterClientMonitoring
+namespace UnregisterClientMonitoring {
+enum class Fields
+{
+    kClientNodeId = 0,
+    kICid         = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::UnregisterClientMonitoring::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+
+    chip::NodeId clientNodeId = static_cast<chip::NodeId>(0);
+    uint64_t ICid             = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::UnregisterClientMonitoring::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ClientMonitoring::Id; }
+
+    chip::NodeId clientNodeId = static_cast<chip::NodeId>(0);
+    uint64_t ICid             = static_cast<uint64_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UnregisterClientMonitoring
 namespace StayAwakeRequest {
 enum class Fields
 {

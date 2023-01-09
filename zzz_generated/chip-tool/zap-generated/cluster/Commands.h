@@ -7306,7 +7306,8 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * RegisterClientMonitoring                                          |   0x00 |
-| * StayAwakeRequest                                                  |   0x01 |
+| * UnregisterClientMonitoring                                        |   0x01 |
+| * StayAwakeRequest                                                  |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * IdleModeInterval                                                  | 0x0000 |
@@ -7355,14 +7356,16 @@ private:
 };
 
 /*
- * Command StayAwakeRequest
+ * Command UnregisterClientMonitoring
  */
-class ClientMonitoringStayAwakeRequest : public ClusterCommand
+class ClientMonitoringUnregisterClientMonitoring : public ClusterCommand
 {
 public:
-    ClientMonitoringStayAwakeRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("stay-awake-request", credsIssuerConfig)
+    ClientMonitoringUnregisterClientMonitoring(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("unregister-client-monitoring", credsIssuerConfig)
     {
+        AddArgument("ClientNodeId", 0, UINT64_MAX, &mRequest.clientNodeId);
+        AddArgument("ICid", 0, UINT64_MAX, &mRequest.ICid);
         ClusterCommand::AddArguments();
     }
 
@@ -7378,6 +7381,36 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00001046, 0x00000001, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ClientMonitoring::Commands::UnregisterClientMonitoring::Type mRequest;
+};
+
+/*
+ * Command StayAwakeRequest
+ */
+class ClientMonitoringStayAwakeRequest : public ClusterCommand
+{
+public:
+    ClientMonitoringStayAwakeRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("stay-awake-request", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000002) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00001046, 0x00000002, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000002) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00001046, 0x00000002, mRequest);
     }
 
 private:
@@ -13013,9 +13046,10 @@ void registerClusterClientMonitoring(Commands & commands, CredentialIssuerComman
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                       //
-        make_unique<ClientMonitoringRegisterClientMonitoring>(credsIssuerConfig), //
-        make_unique<ClientMonitoringStayAwakeRequest>(credsIssuerConfig),         //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                         //
+        make_unique<ClientMonitoringRegisterClientMonitoring>(credsIssuerConfig),   //
+        make_unique<ClientMonitoringUnregisterClientMonitoring>(credsIssuerConfig), //
+        make_unique<ClientMonitoringStayAwakeRequest>(credsIssuerConfig),           //
         //
         // Attributes
         //

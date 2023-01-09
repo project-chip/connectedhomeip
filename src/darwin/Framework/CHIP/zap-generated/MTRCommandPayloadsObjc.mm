@@ -7195,6 +7195,38 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+@implementation MTRClientMonitoringClusterUnregisterClientMonitoringParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clientNodeId = @(0);
+
+        _iCid = @(0);
+        _timedInvokeTimeoutMs = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRClientMonitoringClusterUnregisterClientMonitoringParams alloc] init];
+
+    other.clientNodeId = self.clientNodeId;
+    other.iCid = self.iCid;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: clientNodeId:%@; iCid:%@; >", NSStringFromClass([self class]), _clientNodeId, _iCid];
+    return descriptionString;
+}
+
+@end
 @implementation MTRClientMonitoringClusterStayAwakeRequestParams
 - (instancetype)init
 {

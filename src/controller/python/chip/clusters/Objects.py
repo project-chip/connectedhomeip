@@ -26941,9 +26941,27 @@ class ClientMonitoring(Cluster):
             ICid: 'uint' = 0
 
         @dataclass
-        class StayAwakeRequest(ClusterCommand):
+        class UnregisterClientMonitoring(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x1046
             command_id: typing.ClassVar[int] = 0x0001
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="clientNodeId", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="ICid", Tag=1, Type=uint),
+                    ])
+
+            clientNodeId: 'uint' = 0
+            ICid: 'uint' = 0
+
+        @dataclass
+        class StayAwakeRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x1046
+            command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
 

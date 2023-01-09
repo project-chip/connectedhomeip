@@ -1074,6 +1074,16 @@ typedef void (*ElectricalMeasurementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ElectricalMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ClientMonitoringExpectedClientsListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::DecodableType> & data);
+typedef void (*ClientMonitoringGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ClientMonitoringAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ClientMonitoringAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*UnitTestingBitmap8AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>);
 typedef void (*UnitTestingBitmap16AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>);
 typedef void (*UnitTestingBitmap32AttributeCallback)(void *, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>);
@@ -10229,6 +10239,140 @@ public:
     void OnSubscriptionEstablished();
     using MTRElectricalMeasurementAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRElectricalMeasurementAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRClientMonitoringExpectedClientsListAttributeCallbackBridge
+    : public MTRCallbackBridge<ClientMonitoringExpectedClientsListAttributeCallback>
+{
+public:
+    MTRClientMonitoringExpectedClientsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ClientMonitoringExpectedClientsListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRClientMonitoringExpectedClientsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<ClientMonitoringExpectedClientsListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::DecodableType> & value);
+};
+
+class MTRClientMonitoringExpectedClientsListAttributeCallbackSubscriptionBridge
+    : public MTRClientMonitoringExpectedClientsListAttributeCallbackBridge
+{
+public:
+    MTRClientMonitoringExpectedClientsListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRClientMonitoringExpectedClientsListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRClientMonitoringExpectedClientsListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRClientMonitoringExpectedClientsListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRClientMonitoringGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ClientMonitoringGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRClientMonitoringGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ClientMonitoringGeneratedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRClientMonitoringGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<ClientMonitoringGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRClientMonitoringGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRClientMonitoringGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRClientMonitoringGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRClientMonitoringGeneratedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRClientMonitoringGeneratedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRClientMonitoringGeneratedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRClientMonitoringAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ClientMonitoringAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRClientMonitoringAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ClientMonitoringAcceptedCommandListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRClientMonitoringAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<ClientMonitoringAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRClientMonitoringAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRClientMonitoringAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRClientMonitoringAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRClientMonitoringAcceptedCommandListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRClientMonitoringAcceptedCommandListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRClientMonitoringAcceptedCommandListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRClientMonitoringAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<ClientMonitoringAttributeListListAttributeCallback>
+{
+public:
+    MTRClientMonitoringAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ClientMonitoringAttributeListListAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRClientMonitoringAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action) :
+        MTRCallbackBridge<ClientMonitoringAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRClientMonitoringAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRClientMonitoringAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRClientMonitoringAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action,
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRClientMonitoringAttributeListListAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRClientMonitoringAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRClientMonitoringAttributeListListAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

@@ -6596,7 +6596,8 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
 
     // Cluster ClientMonitoring commands
     MTRCommandIDTypeClusterClientMonitoringCommandRegisterClientMonitoringID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterClientMonitoringCommandStayAwakeRequestID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterClientMonitoringCommandUnregisterClientMonitoringID MTR_NEWLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterClientMonitoringCommandStayAwakeRequestID MTR_NEWLY_AVAILABLE = 0x00000002,
 
     // Cluster TestCluster deprecated command id names
     MTRClusterTestClusterCommandTestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
