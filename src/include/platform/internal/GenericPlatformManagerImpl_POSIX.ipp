@@ -59,15 +59,11 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     ReturnErrorOnFailure(GenericPlatformManagerImpl<ImplClass>::_InitChipStack());
 
-    mShouldRunEventLoop.store(true, std::memory_order_relaxed);
-
     int ret = pthread_cond_init(&mEventQueueStoppedCond, nullptr);
     VerifyOrReturnError(ret == 0, CHIP_ERROR_POSIX(ret));
 
     ret = pthread_mutex_init(&mStateLock, nullptr);
     VerifyOrReturnError(ret == 0, CHIP_ERROR_POSIX(ret));
-
-    mHasValidChipTask = false;
 
     return CHIP_NO_ERROR;
 }
@@ -117,7 +113,11 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack()
 template <class ImplClass>
 bool GenericPlatformManagerImpl_POSIX<ImplClass>::_IsChipStackLockedByCurrentThread() const
 {
-    return !mHasValidChipTask || (mChipStackIsLocked && (pthread_equal(pthread_self(), mChipStackLockOwnerThread)));
+    // If no Matter thread is currently running we do not have to worry about
+    // locking. Hence, this function always returns true in that case.
+    if (mState.load(std::memory_order_relaxed) == State::kStopped)
+        return true;
+    return mChipStackIsLocked && (pthread_equal(pthread_self(), mChipStackLockOwnerThread));
 }
 #endif
 
@@ -153,18 +153,16 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
     pthread_mutex_lock(&mStateLock);
 
     //
-    // If we haven't set mHasValidChipTask by now, it means that the application did not call StartEventLoopTask
-    // and consequently, are running the event loop from their own, externally managed task.
-    // Let's track his appropriately since we need this info later when stopping the event queues.
+    // If we haven't set mInternallyManagedChipTask by now, it means that the application did not call
+    // StartEventLoopTask and consequently, are running the event loop from their own, externally managed
+    // task.
     //
-    if (!mHasValidChipTask)
+    if (!mInternallyManagedChipTask)
     {
-        mHasValidChipTask = true;
-        mChipTask         = pthread_self();
-        mTaskType         = kExternallyManagedTask;
+        mChipTask = pthread_self();
+        mState.store(State::kRunning, std::memory_order_relaxed);
     }
 
-    mEventQueueHasStopped = false;
     pthread_mutex_unlock(&mStateLock);
 
     Impl()->LockChipStack();
@@ -187,7 +185,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
     Impl()->UnlockChipStack();
 
     pthread_mutex_lock(&mStateLock);
-    mEventQueueHasStopped = true;
+    mState.store(State::kStopping, std::memory_order_relaxed);
     pthread_mutex_unlock(&mStateLock);
 
     //
@@ -195,6 +193,13 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
     // StopEventLoopTask().
     //
     pthread_cond_signal(&mEventQueueStoppedCond);
+
+    //
+    // Mark event loop as truly stopped. After that line, we can not use any
+    // non-simple type member variables, because they can be destroyed by the
+    // Shutdown() method.
+    //
+    mState.store(State::kStopped, std::memory_order_relaxed);
 }
 
 template <class ImplClass>
@@ -230,8 +235,8 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask()
     err = pthread_create(&mChipTask, &mChipTaskAttr, EventLoopTaskMain, this);
     if (err == 0)
     {
-        mHasValidChipTask = true;
-        mTaskType         = kInternallyManagedTask;
+        mInternallyManagedChipTask = true;
+        mState.store(State::kRunning, std::memory_order_relaxed);
     }
 
     pthread_mutex_unlock(&mStateLock);
@@ -255,7 +260,8 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
     // If we're calling this from a different thread than the one running chip, then
     // we need to wait till the event queue has completely stopped before proceeding.
     //
-    if (mHasValidChipTask && (pthread_equal(pthread_self(), mChipTask) == 0))
+    auto isRunning = mState.load(std::memory_order_relaxed) == State::kRunning;
+    if (isRunning && (pthread_equal(pthread_self(), mChipTask) == 0))
     {
         pthread_mutex_unlock(&mStateLock);
 
@@ -269,7 +275,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
 
         pthread_mutex_lock(&mStateLock);
 
-        while (!mEventQueueHasStopped)
+        while (mState.load(std::memory_order_relaxed) == State::kRunning)
         {
             err = pthread_cond_wait(&mEventQueueStoppedCond, &mStateLock);
             VerifyOrExit(err == 0, );
@@ -280,7 +286,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
         //
         // Wait further for the thread to terminate if we had previously created it.
         //
-        if (mTaskType == kInternallyManagedTask)
+        if (mInternallyManagedChipTask)
         {
             err = pthread_join(mChipTask, nullptr);
             VerifyOrExit(err == 0, );
@@ -292,13 +298,19 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
     }
 
 exit:
-    mHasValidChipTask = false;
     return CHIP_ERROR_POSIX(err);
 }
 
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
 {
+    //
+    // We cannot shutdown the stack while the event loop is still running. This can lead
+    // to use after free errors - here we are destroying mutex and condition variable that
+    // are still in use by the event loop!
+    //
+    VerifyOrDie(mState.load(std::memory_order_relaxed) == State::kStopped);
+
     pthread_mutex_destroy(&mStateLock);
     pthread_cond_destroy(&mEventQueueStoppedCond);
 

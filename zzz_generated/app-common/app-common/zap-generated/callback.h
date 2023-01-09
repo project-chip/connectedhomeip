@@ -130,13 +130,13 @@ void emberAfAccessControlClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfActionsClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Basic Cluster Init
+/** @brief Basic Information Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBasicClusterInitCallback(chip::EndpointId endpoint);
+void emberAfBasicInformationClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief OTA Software Update Provider Cluster Init
  *
@@ -1769,34 +1769,34 @@ void emberAfActionsClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfActionsClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Basic Cluster
+// Basic Information Cluster
 //
 
-/** @brief Basic Cluster Server Init
+/** @brief Basic Information Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfBasicInformationClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief Basic Cluster Client Init
+/** @brief Basic Information Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBasicClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfBasicInformationClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief Basic Cluster Server Attribute Changed
+/** @brief Basic Information Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-void MatterBasicClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterBasicInformationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief Basic Cluster Server Message Sent
+/** @brief Basic Information Cluster Server Message Sent
  *
  * Server Message Sent
  *
@@ -1806,10 +1806,11 @@ void MatterBasicClusterServerAttributeChangedCallback(const chip::app::ConcreteA
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfBasicClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                  uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfBasicInformationClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                             EmberStatus status);
 
-/** @brief Basic Cluster Client Message Sent
+/** @brief Basic Information Cluster Client Message Sent
  *
  * Client Message Sent
  *
@@ -1819,10 +1820,11 @@ void emberAfBasicClusterServerMessageSentCallback(const chip::MessageSendDestina
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfBasicClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                  uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfBasicInformationClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                             EmberStatus status);
 
-/** @brief Basic Cluster Server Pre Attribute Changed
+/** @brief Basic Information Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -1832,10 +1834,10 @@ void emberAfBasicClusterClientMessageSentCallback(const chip::MessageSendDestina
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterBasicClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                    EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+MatterBasicInformationClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Basic Cluster Client Pre Attribute Changed
+/** @brief Basic Information Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -1845,24 +1847,24 @@ MatterBasicClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAtt
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterBasicClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                    EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+MatterBasicInformationClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Basic Cluster Server Tick
+/** @brief Basic Information Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfBasicClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfBasicInformationClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief Basic Cluster Client Tick
+/** @brief Basic Information Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfBasicClusterClientTickCallback(chip::EndpointId endpoint);
+void emberAfBasicInformationClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // OTA Software Update Provider Cluster
@@ -7578,8 +7580,8 @@ bool emberAfGroupsClusterAddGroupCallback(chip::app::CommandHandler * commandObj
 /**
  * @brief Groups Cluster AddGroupResponse Command callback (from server)
  */
-bool emberAfGroupsClusterAddGroupResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t status,
-                                                  chip::GroupId groupId);
+bool emberAfGroupsClusterAddGroupResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t Status,
+                                                  chip::GroupId GroupID);
 /**
  * @brief Groups Cluster ViewGroup Command callback (from client)
  */
@@ -7589,8 +7591,8 @@ bool emberAfGroupsClusterViewGroupCallback(chip::app::CommandHandler * commandOb
 /**
  * @brief Groups Cluster ViewGroupResponse Command callback (from server)
  */
-bool emberAfGroupsClusterViewGroupResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t status,
-                                                   chip::GroupId groupId, chip::CharSpan groupName);
+bool emberAfGroupsClusterViewGroupResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t Status,
+                                                   chip::GroupId GroupID, chip::CharSpan GroupName);
 /**
  * @brief Groups Cluster GetGroupMembership Command callback (from client)
  */
@@ -7601,8 +7603,8 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(
  * @brief Groups Cluster GetGroupMembershipResponse Command callback (from server)
  */
 bool emberAfGroupsClusterGetGroupMembershipResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                            uint8_t capacity,
-                                                            /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
+                                                            uint8_t Capacity,
+                                                            /* TYPE WARNING: array array defaults to */ uint8_t * GroupList);
 /**
  * @brief Groups Cluster RemoveGroup Command callback (from client)
  */
@@ -7613,7 +7615,7 @@ bool emberAfGroupsClusterRemoveGroupCallback(chip::app::CommandHandler * command
  * @brief Groups Cluster RemoveGroupResponse Command callback (from server)
  */
 bool emberAfGroupsClusterRemoveGroupResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                     uint8_t status, chip::GroupId groupId);
+                                                     uint8_t Status, chip::GroupId GroupID);
 /**
  * @brief Groups Cluster RemoveAllGroups Command callback (from client)
  */
@@ -7895,11 +7897,11 @@ bool emberAfActionsClusterDisableActionWithDurationCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Actions::Commands::DisableActionWithDuration::DecodableType & commandData);
 /**
- * @brief Basic Cluster MfgSpecificPing Command callback (from client)
+ * @brief Basic Information Cluster MfgSpecificPing Command callback (from client)
  */
-bool emberAfBasicClusterMfgSpecificPingCallback(
+bool emberAfBasicInformationClusterMfgSpecificPingCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Basic::Commands::MfgSpecificPing::DecodableType & commandData);
+    const chip::app::Clusters::BasicInformation::Commands::MfgSpecificPing::DecodableType & commandData);
 /**
  * @brief OTA Software Update Provider Cluster QueryImage Command callback (from client)
  */
@@ -7910,9 +7912,9 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
  * @brief OTA Software Update Provider Cluster QueryImageResponse Command callback (from server)
  */
 bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(
-    chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t status, uint32_t delayedActionTime,
-    chip::CharSpan imageURI, uint32_t softwareVersion, chip::CharSpan softwareVersionString, chip::ByteSpan updateToken,
-    bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
+    chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t Status, uint32_t DelayedActionTime,
+    chip::CharSpan ImageURI, uint32_t SoftwareVersion, chip::CharSpan SoftwareVersionString, chip::ByteSpan UpdateToken,
+    bool UserConsentNeeded, chip::ByteSpan MetadataForRequestor);
 /**
  * @brief OTA Software Update Provider Cluster ApplyUpdateRequest Command callback (from client)
  */
@@ -7923,8 +7925,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
  * @brief OTA Software Update Provider Cluster ApplyUpdateResponse Command callback (from server)
  */
 bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback(chip::EndpointId endpoint,
-                                                                        chip::app::CommandSender * commandObj, uint8_t action,
-                                                                        uint32_t delayedActionTime);
+                                                                        chip::app::CommandSender * commandObj, uint8_t Action,
+                                                                        uint32_t DelayedActionTime);
 /**
  * @brief OTA Software Update Provider Cluster NotifyUpdateApplied Command callback (from client)
  */
@@ -7932,11 +7934,11 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData);
 /**
- * @brief OTA Software Update Requestor Cluster AnnounceOtaProvider Command callback (from client)
+ * @brief OTA Software Update Requestor Cluster AnnounceOTAProvider Command callback (from client)
  */
-bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
+bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOTAProviderCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData);
+    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData);
 /**
  * @brief General Commissioning Cluster ArmFailSafe Command callback (from client)
  */
@@ -7947,7 +7949,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(
  * @brief General Commissioning Cluster ArmFailSafeResponse Command callback (from server)
  */
 bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                   uint8_t errorCode, chip::CharSpan debugText);
+                                                                   uint8_t ErrorCode, chip::CharSpan DebugText);
 /**
  * @brief General Commissioning Cluster SetRegulatoryConfig Command callback (from client)
  */
@@ -7958,8 +7960,8 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(
  * @brief General Commissioning Cluster SetRegulatoryConfigResponse Command callback (from server)
  */
 bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(chip::EndpointId endpoint,
-                                                                           chip::app::CommandSender * commandObj, uint8_t errorCode,
-                                                                           chip::CharSpan debugText);
+                                                                           chip::app::CommandSender * commandObj, uint8_t ErrorCode,
+                                                                           chip::CharSpan DebugText);
 /**
  * @brief General Commissioning Cluster CommissioningComplete Command callback (from client)
  */
@@ -7971,7 +7973,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
  */
 bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(chip::EndpointId endpoint,
                                                                              chip::app::CommandSender * commandObj,
-                                                                             uint8_t errorCode, chip::CharSpan debugText);
+                                                                             uint8_t ErrorCode, chip::CharSpan DebugText);
 /**
  * @brief Network Commissioning Cluster ScanNetworks Command callback (from client)
  */
@@ -8039,8 +8041,8 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(
  * @brief Diagnostic Logs Cluster RetrieveLogsResponse Command callback (from server)
  */
 bool emberAfDiagnosticLogsClusterRetrieveLogsResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                              uint8_t status, chip::ByteSpan content, uint32_t timeStamp,
-                                                              uint32_t timeSinceBoot);
+                                                              uint8_t Status, chip::ByteSpan LogContent, uint32_t UTCTimeStamp,
+                                                              uint32_t TimeSinceBoot);
 /**
  * @brief General Diagnostics Cluster TestEventTrigger Command callback (from client)
  */

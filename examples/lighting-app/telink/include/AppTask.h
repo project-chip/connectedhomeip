@@ -19,8 +19,8 @@
 #pragma once
 
 #include "AppEvent.h"
+#include "LEDWidget.h"
 #include "LightingManager.h"
-
 #include <platform/CHIPDeviceLayer.h>
 
 #if CONFIG_CHIP_FACTORY_DATA
@@ -65,6 +65,7 @@ private:
     void DispatchEvent(AppEvent * event);
 
     static void UpdateStatusLED();
+    static void LEDStateUpdateHandler(LEDWidget * ledWidget);
     static void LightingActionButtonEventHandler(void);
     static void FactoryResetButtonEventHandler(void);
     static void StartThreadButtonEventHandler(void);
@@ -72,10 +73,14 @@ private:
 
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
+    static void FactoryResetTimerTimeoutCallback(k_timer * timer);
+
+    static void FactoryResetTimerEventHandler(AppEvent * aEvent);
     static void FactoryResetHandler(AppEvent * aEvent);
     static void StartThreadHandler(AppEvent * aEvent);
     static void LightingActionEventHandler(AppEvent * aEvent);
     static void StartBleAdvHandler(AppEvent * aEvent);
+    static void UpdateLedStateEventHandler(AppEvent * aEvent);
 
     static void ButtonEventHandler(ButtonId_t btnId, bool btnPressed);
     static void InitButtons(void);

@@ -24,10 +24,10 @@ limitations under the License.
   </struct>
 
   <cluster singleton="true">
-    <name>Basic</name>
+    <name>Basic Information</name>
     <domain>CHIP</domain>
     <code>0x0028</code>
-    <define>BASIC_CLUSTER</define>
+    <define>BASIC_INFORMATION_CLUSTER</define>
     <description>This cluster provides attributes and events for determining basic information about Nodes, which supports both
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location.</description>

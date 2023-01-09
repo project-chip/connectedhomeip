@@ -330,10 +330,10 @@ public:
     void FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
         // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
-        for (auto endpoint : EnabledEndpointsWithServerCluster(Basic::Id))
+        for (auto endpoint : EnabledEndpointsWithServerCluster(BasicInformation::Id))
         {
             // If Basic cluster is implemented on this endpoint
-            Basic::Events::Leave::Type event;
+            BasicInformation::Events::Leave::Type event;
             event.fabricIndex = fabricIndex;
             EventNumber eventNumber;
 

@@ -137,7 +137,7 @@ bool Cmd_ResignCert(int argc, char * argv[])
 {
     bool res = true;
     CertFormat inCertFmt;
-    std::unique_ptr<X509, void (*)(X509 *)> cert(X509_new(), &X509_free);
+    std::unique_ptr<X509, void (*)(X509 *)> cert(nullptr, &X509_free);
     std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> caKey(EVP_PKEY_new(), &EVP_PKEY_free);
 
     if (argc == 1)
@@ -192,7 +192,7 @@ bool Cmd_ResignCert(int argc, char * argv[])
     res = InitOpenSSL();
     VerifyTrueOrExit(res);
 
-    res = ReadCert(gInCertFileNameOrStr, cert.get(), inCertFmt);
+    res = ReadCert(gInCertFileNameOrStr, cert, inCertFmt);
     VerifyTrueOrExit(res);
 
     res = ReadKey(gCAKeyFileNameOrStr, caKey);
@@ -200,9 +200,9 @@ bool Cmd_ResignCert(int argc, char * argv[])
 
     if (!gSelfSign)
     {
-        std::unique_ptr<X509, void (*)(X509 *)> caCert(X509_new(), &X509_free);
+        std::unique_ptr<X509, void (*)(X509 *)> caCert(nullptr, &X509_free);
 
-        res = ReadCert(gCACertFileNameOrStr, caCert.get());
+        res = ReadCert(gCACertFileNameOrStr, caCert);
         VerifyTrueOrExit(res);
 
         res = ResignCert(cert.get(), caCert.get(), caKey.get());

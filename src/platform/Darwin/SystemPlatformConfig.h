@@ -44,3 +44,4 @@ struct ChipDeviceEvent;
 #define CHIP_SYSTEM_CONFIG_PLATFORM_LOG_INCLUDE <platform/Darwin/Logging.h>
 
 // ========== Platform-specific Configuration Overrides =========
+#define CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS 5

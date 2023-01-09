@@ -23,6 +23,7 @@
  */
 #include "AndroidCallbacks.h"
 #include "AndroidCommissioningWindowOpener.h"
+#include "AndroidCurrentFabricRemover.h"
 #include "AndroidDeviceControllerWrapper.h"
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
@@ -74,6 +75,7 @@ using namespace chip::Credentials;
 #define CDC_JNI_CALLBACK_LOCAL_REF_COUNT 256
 
 static void * IOThreadMain(void * arg);
+static CHIP_ERROR StopIOThread();
 static CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jbyteArray pakeVerifier, jobject & outParams);
 static CHIP_ERROR N2J_NetworkLocation(JNIEnv * env, jstring ipAddress, jint port, jint interfaceIndex, jobject & outLocation);
 static CHIP_ERROR GetChipPathIdValue(jobject chipPathId, uint32_t wildcardValue, uint32_t & outValue);
@@ -147,14 +149,10 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(Controller, "JNI_OnUnload() called");
 
-    // If the IO thread has been started, shut it down and wait for it to exit.
-    if (sIOThread != PTHREAD_NULL)
-    {
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-
-        chip::DeviceLayer::StackUnlock unlock;
-        pthread_join(sIOThread, NULL);
-    }
+    // If the IO thread has not been stopped yet, shut it down now.
+    // TODO(arkq): Maybe we should just assert here, as the IO thread
+    //             should be stopped before the library is unloaded.
+    StopIOThread();
 
     sJVM = NULL;
 
@@ -689,6 +687,23 @@ JNI_METHOD(void, unpairDevice)(JNIEnv * env, jobject self, jlong handle, jlong d
     }
 }
 
+JNI_METHOD(void, unpairDeviceCallback)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    ChipLogProgress(Controller, "unpairDeviceCallback() called with device ID and callback object");
+
+    err = AndroidCurrentFabricRemover::RemoveCurrentFabric(wrapper->Controller(), static_cast<NodeId>(deviceId), callback);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to unpair the device.");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+
 JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     chip::DeviceLayer::StackLock lock;
@@ -1020,6 +1035,10 @@ JNI_METHOD(void, shutdownCommissioning)
 (JNIEnv * env, jobject self, jlong handle)
 {
     chip::DeviceLayer::StackLock lock;
+
+    // Stop the IO thread, so that the controller can be safely shut down.
+    StopIOThread();
+
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
     wrapper->Controller()->Shutdown();
 }
@@ -1408,6 +1427,23 @@ void * IOThreadMain(void * arg)
     sJVM->DetachCurrentThread();
 
     return NULL;
+}
+
+// NOTE: This function SHALL be called with the stack lock held.
+CHIP_ERROR StopIOThread()
+{
+    if (sIOThread != PTHREAD_NULL)
+    {
+        ChipLogProgress(Controller, "IO thread stopping");
+        chip::DeviceLayer::StackUnlock unlock;
+
+        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+
+        pthread_join(sIOThread, NULL);
+        sIOThread = PTHREAD_NULL;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jbyteArray paseVerifier, jobject & outParams)

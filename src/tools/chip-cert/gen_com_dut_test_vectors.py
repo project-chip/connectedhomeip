@@ -690,7 +690,7 @@ class DevCertBuilder:
 
     def make_certs_and_keys(self) -> None:
         """Creates the PEM and DER certs and keyfiles"""
-        error_type_flag = ' -I -E' + self.error_type
+        error_type_flag = ' -I -E ' + self.error_type
         subject_name = self.custom_cn_attribute
         vid_flag = ' -V 0x{:X}'.format(self.vid)
         pid_flag = ' -P 0x{:X}'.format(self.pid)
@@ -793,7 +793,7 @@ def main():
     argparser.add_argument('-d', '--cd', dest='cdpath',
                            default='credentials/test/certification-declaration/Chip-Test-CD-Signing-',
                            help='CD Signing Key/Cert to use')
-    argparser.add_argument('-c', '--chip-cert_dir', dest='chipcertdir',
+    argparser.add_argument('-c', '--chip-cert-dir', dest='chipcertdir',
                            default='out/debug/linux_x64_clang/', help='Directory where chip-cert tool is located')
 
     args = argparser.parse_args()

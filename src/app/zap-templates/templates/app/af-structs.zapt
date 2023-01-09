@@ -15,6 +15,7 @@
 
 {{#zcl_structs}}
 
+{{#if (isLegacyStruct (asUnderlyingType label))}}
 {{#if itemCnt}}
 // Struct for {{label}}
 typedef struct _{{asType label}} {
@@ -26,5 +27,6 @@ typedef struct _{{asType label}} {
 // Void typedef for {{asUnderlyingType label}} which is empty.
 // this will result in all the references to the data being as uint8_t*
 typedef uint8_t {{asUnderlyingType label}};
+{{/if}}
 {{/if}}
 {{/zcl_structs}}
