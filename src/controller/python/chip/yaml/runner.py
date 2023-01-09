@@ -356,6 +356,9 @@ class ReplTestRunner:
         try:
             return WaitForCommissioneeAction(test_step, self._context)
         except ParsingError:
+            # TODO For now, ParsingErrors are largely issues that will be addressed soon. Once this
+            # runner has matched parity of the codegen YAML test, this exception should be
+            # propogated.
             return None
 
     def encode(self, request) -> BaseAction:
