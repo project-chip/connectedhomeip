@@ -45,6 +45,15 @@
 #include <transport/SecureMessageCodec.h>
 #include <transport/TransportMgr.h>
 
+/**
+ * Accepts receipt of invalid privacy flag usage that affected some early SVE2 test event implementations.
+ * When SVE2 started, group messages would be sent with the privacy flag enabled, but without privacy encrypting the message header.
+ * The issue was subsequently corrected in master, the 1.0 branch, and the SVE2 branch.
+ * This is a temporary workaround for interoperability with those early-SVE2 implementations.
+ * TODO: Remove this workaround once interoperability is no longer required.
+ */
+#define FEATURE_PRIVACY_ACCEPT_NONSPEC_SVE2 1
+
 // Global object
 chip::Transport::GroupPeerTable mGroupPeerMsgCounter;
 
@@ -755,6 +764,59 @@ void SessionManager::SecureUnicastMessageDispatch(PacketHeader & packetHeader, c
     }
 }
 
+/**
+ * Helper function to implement a single attempt to decrypt a groupcast message
+ * using the given group key and privacy setting.
+ *
+ * @param[in] packetHeader
+ * @param[out] packetHeaderCopy
+ * @param[out] payloadHeader
+ * @param[in] applyPrivacy
+ * @param[out] msgCopy
+ * @param[in] mac
+ * @param[in] groupContext
+ * @return true
+ * @return false
+ */
+static bool GroupKeyDecryptAttempt(PacketHeader & packetHeader, PacketHeader & packetHeaderCopy, PayloadHeader & payloadHeader,
+                                   bool applyPrivacy, System::PacketBufferHandle & msgCopy, MessageAuthenticationCode & mac,
+                                   Credentials::GroupDataProvider::GroupSession & groupContext)
+{
+    bool decrypted = false;
+    CryptoContext context(groupContext.keyContext);
+
+    if (applyPrivacy)
+    {
+        // Perform privacy deobfuscation, if applicable.
+        uint8_t * privacyHeader = msgCopy->Start() + PacketHeader::kPrivacyHeaderOffset;
+        size_t privacyLength    = packetHeader.PrivacyHeaderLength();
+        if (CHIP_NO_ERROR != context.PrivacyDecrypt(privacyHeader, privacyLength, privacyHeader, packetHeader, mac))
+        {
+            return false;
+        }
+    }
+
+    if (packetHeaderCopy.DecodeAndConsume(msgCopy) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Inet, "Failed to decode Groupcast packet header. Discarding.");
+        return false;
+    }
+
+    // Optimization to reduce number of decryption attempts
+    GroupId groupId = packetHeaderCopy.GetDestinationGroupId().Value();
+    if (groupId != groupContext.group_id)
+    {
+        return false;
+    }
+
+    CryptoContext::NonceStorage nonce;
+    CryptoContext::BuildNonce(nonce, packetHeaderCopy.GetSecurityFlags(), packetHeaderCopy.GetMessageCounter(),
+                              packetHeaderCopy.GetSourceNodeId().Value());
+    decrypted = (CHIP_NO_ERROR == SecureMessageCodec::Decrypt(context, nonce, payloadHeader, packetHeaderCopy, msgCopy));
+
+    return decrypted;
+}
+
 void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                                 System::PacketBufferHandle && msg)
 {
@@ -808,35 +870,25 @@ void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, con
             return;
         }
 
-        if (packetHeader.HasPrivacyFlag())
+        bool privacy = packetHeader.HasPrivacyFlag();
+        decrypted    = GroupKeyDecryptAttempt(packetHeader, packetHeaderCopy, payloadHeader, privacy, msgCopy, mac, groupContext);
+
+#if FEATURE_PRIVACY_ACCEPT_NONSPEC_SVE2
+        if (privacy && !decrypted)
         {
-            // Perform privacy deobfuscation, if applicable.
-            uint8_t * privacyHeader = msgCopy->Start() + PacketHeader::kPrivacyHeaderOffset;
-            size_t privacyLength    = packetHeader.PrivacyHeaderLength();
-            ReturnOnFailure(context.PrivacyDecrypt(privacyHeader, privacyLength, privacyHeader, packetHeader, mac));
+            // Try processing the P=1 message again without privacy as a work-around for invalid early-SVE2 nodes.
+            msgCopy = msg.CloneData();
+            if (msgCopy.IsNull())
+            {
+                ChipLogError(Inet, "Failed to clone Groupcast message buffer. Discarding.");
+                return;
+            }
+            decrypted = GroupKeyDecryptAttempt(packetHeader, packetHeaderCopy, payloadHeader, false, msgCopy, mac, groupContext);
         }
-
-        ReturnOnFailure(packetHeaderCopy.DecodeAndConsume(msgCopy));
-
-        if (msgCopy.IsNull())
-        {
-            ChipLogError(Inet, "Secure transport received Groupcast with NULL payload. Discarding.");
-            return;
-        }
-
-        // Optimization to reduce number of decryption attempts
-        GroupId groupId = packetHeaderCopy.GetDestinationGroupId().Value();
-        if (groupId != groupContext.group_id)
-        {
-            continue;
-        }
-
-        CryptoContext::NonceStorage nonce;
-        CryptoContext::BuildNonce(nonce, packetHeaderCopy.GetSecurityFlags(), packetHeaderCopy.GetMessageCounter(),
-                                  packetHeaderCopy.GetSourceNodeId().Value());
-        decrypted = (CHIP_NO_ERROR == SecureMessageCodec::Decrypt(context, nonce, payloadHeader, packetHeaderCopy, msgCopy));
+#endif // FEATURE_PRIVACY_ACCEPT_NONSPEC_SVE2
     }
     iter->Release();
+
     if (!decrypted)
     {
         ChipLogError(Inet, "Failed to decrypt group message. Discarding everything");
