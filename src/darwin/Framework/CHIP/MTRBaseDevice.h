@@ -358,8 +358,7 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
                                  params:(MTRSubscribeParams * _Nullable)params
                                   queue:(dispatch_queue_t)queue
                           reportHandler:(MTRDeviceResponseHandler)reportHandler
-                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-    MTR_NEWLY_AVAILABLE;
+                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished MTR_NEWLY_AVAILABLE;
 @end
 
 /**

@@ -1697,10 +1697,8 @@ private:
                        id valueObject = data.GetDecodedObject();
                        app::ConcreteEventPath pathCopy = eventPath;
                        dispatch_async(queue, ^{
-                           reportHandler(@[ @ {
-                               MTREventPathKey : [[MTREventPath alloc] initWithPath:pathCopy],
-                               MTRDataKey : valueObject
-                           } ],
+                           reportHandler(
+                               @[ @ { MTREventPathKey : [[MTREventPath alloc] initWithPath:pathCopy], MTRDataKey : valueObject } ],
                                nil);
                        });
                    };
@@ -2028,9 +2026,9 @@ private:
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTREventPath> endpoint %u cluster %u event %u",
-                     (uint16_t) self.endpoint.unsignedShortValue, (uint32_t) self.cluster.unsignedLongValue,
-                     (uint32_t)_event.unsignedLongValue];
+    return
+        [NSString stringWithFormat:@"<MTREventPath> endpoint %u cluster %u event %u", (uint16_t) self.endpoint.unsignedShortValue,
+                  (uint32_t) self.cluster.unsignedLongValue, (uint32_t) _event.unsignedLongValue];
 }
 
 + (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID

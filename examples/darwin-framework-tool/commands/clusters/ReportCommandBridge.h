@@ -221,8 +221,7 @@ public:
             params.resubscribeIfLost = mAutoResubscribe.Value();
         }
 
-        if (mClusterId != chip::kInvalidAttributeId)
-        {
+        if (mClusterId != chip::kInvalidAttributeId) {
             NSNumber * eventMin = (mEventNumber.HasValue()) ? [NSNumber numberWithUnsignedLongLong:mEventNumber.Value()] : nil;
             NSNumber * isUrgent = (mIsUrgent.HasValue()) ? [NSNumber numberWithBool:mIsUrgent.Value()] : nil;
 
@@ -244,9 +243,7 @@ public:
                 subscriptionEstablished:^() {
                     mSubscriptionEstablished = YES;
                 }];
-        }
-        else
-        {
+        } else {
             [device subscribeWithQueue:callbackQueue
                 params:params
                 clusterStateCacheContainer:nil
