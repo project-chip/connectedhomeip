@@ -15,13 +15,14 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-import sys
-import enum
 import argparse
+import enum
+import sys
+
+import Base38
 from bitarray import bitarray
 from bitarray.util import ba2int
 from stdnum.verhoeff import calc_check_digit
-import Base38
 
 # See section 5.1.4.1 Manual Pairing Code in the Matter specification v1.0
 MANUAL_DISCRIMINATOR_LEN = 4
