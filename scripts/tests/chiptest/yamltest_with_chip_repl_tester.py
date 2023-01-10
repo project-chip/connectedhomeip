@@ -20,8 +20,8 @@ import os
 import tempfile
 
 
-from chip import ChipDeviceCtrl  # noqa # needed before chip.FabricAdmin
-import chip.FabricAdmin  # noqa # needed before chip.CertificateAuthority
+from chip import ChipDeviceCtrl  # isort: skip # needed before chip.FabricAdmin
+import chip.FabricAdmin  # isort: skip # needed before chip.CertificateAuthority
 import chip.CertificateAuthority
 import chip.native
 import click
