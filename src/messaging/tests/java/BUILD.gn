@@ -24,12 +24,8 @@ if (!build_java_matter_controller) {
 shared_library("jni") {
   output_name = "libCHIPMessaging"
 
-  sources = [
-    "MessagingContext-JNI.cpp",
-  ]
-  deps = [
-    "${chip_root}/src/messaging/tests:helpers",
-  ]
+  sources = [ "MessagingContext-JNI.cpp" ]
+  deps = [ "${chip_root}/src/messaging/tests:helpers" ]
 
   public_configs = [ "${chip_root}/src:includes" ]
 
@@ -58,9 +54,7 @@ android_library("java") {
 
   data_deps = [ ":jni" ]
 
-  sources = [
-    "src/chip/testing/MessagingContext.java",
-  ]
+  sources = [ "src/chip/testing/MessagingContext.java" ]
 
   if (build_java_matter_controller) {
     deps += [

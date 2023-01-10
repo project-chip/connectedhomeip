@@ -88,9 +88,7 @@ shared_library("jni") {
 }
 
 shared_library("jni_for_test") {
-  sources = [
-    "AndroidCallbacks-ForTestJNI.cpp"
-  ]
+  sources = [ "AndroidCallbacks-ForTestJNI.cpp" ]
   output_name = "libCHIPForTestController"
 
   public_configs = [ "${chip_root}/src:includes" ]
@@ -193,11 +191,13 @@ android_library("java_for_test") {
 
   deps = [ "${chip_root}/third_party/java_deps:annotation" ]
 
-  data_deps = [ ":jni", ":jni_for_test" ]
-
-  sources = [
-    "src/chip/devicecontroller/GetConnectedDeviceCallbackForTestJni.java",
+  data_deps = [
+    ":jni",
+    ":jni_for_test",
   ]
+
+  sources =
+      [ "src/chip/devicecontroller/GetConnectedDeviceCallbackForTestJni.java" ]
 
   if (build_java_matter_controller) {
     deps += [
@@ -221,8 +221,8 @@ android_library("tests") {
 
   deps = [
     ":java_for_test",
-    "${chip_root}/third_party/java_deps:annotation",
     "${chip_root}/src/messaging/tests/java",
+    "${chip_root}/third_party/java_deps:annotation",
   ]
 
   data_deps = [
@@ -231,9 +231,8 @@ android_library("tests") {
     "${chip_root}/src/messaging/tests/java:jni",
   ]
 
-  sources = [
-    "tests/chip/devicecontroller/GetConnectedDeviceCallbackJniTest.java",
-  ]
+  sources =
+      [ "tests/chip/devicecontroller/GetConnectedDeviceCallbackJniTest.java" ]
 
   if (build_java_matter_controller) {
     deps += [
