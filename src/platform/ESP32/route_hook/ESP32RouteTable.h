@@ -12,6 +12,8 @@
 extern "C" {
 #endif
 
+#define TAG "ROUTE_HOOK"
+
 /**
  * @brief Route table entry
  *

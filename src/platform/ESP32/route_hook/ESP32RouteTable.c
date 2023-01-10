@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "esp_route_table.h"
+#include <platform/ESP32/route_hook/ESP32RouteTable.h>
 
 #include <string.h>
 
@@ -16,8 +16,6 @@
 
 #define MAX_RIO_ROUTE 20
 #define MAX_RIO_TIMEOUT UINT32_MAX / (1000 * 4) // lwIP defined reasonable timeout value
-
-#define TAG "ROUTE_HOOK"
 
 static esp_route_entry_t s_route_entries[MAX_RIO_ROUTE];
 
