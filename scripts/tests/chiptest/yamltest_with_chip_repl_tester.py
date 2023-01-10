@@ -14,22 +14,21 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-import click
 import functools
 import glob
 import os
 import tempfile
 
-from chip import ChipDeviceCtrl
-from chip.ChipStack import *
-import chip.FabricAdmin
+
+from chip import ChipDeviceCtrl  # noqa # needed before chip.FabricAdmin
+import chip.FabricAdmin  # noqa # needed before chip.CertificateAuthority
 import chip.CertificateAuthority
 import chip.native
+import click
+from chip.ChipStack import *
 from chip.yaml.runner import ReplTestRunner
-
 from matter_yamltests.definitions import ParseSource, SpecDefinitions
 from matter_yamltests.parser import TestParser
-
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))

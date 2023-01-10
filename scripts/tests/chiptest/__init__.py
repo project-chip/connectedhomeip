@@ -14,13 +14,12 @@
 #    limitations under the License.
 #
 
-import subprocess
 import os
+import subprocess
 from pathlib import Path
 
 from . import linux, runner
 from .test_definition import ApplicationPaths, TestDefinition, TestTarget
-
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
