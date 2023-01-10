@@ -675,6 +675,18 @@ bool emberAfContainsServer(EndpointId endpoint, ClusterId clusterId)
     return (emberAfFindServerCluster(endpoint, clusterId) != nullptr);
 }
 
+// Returns whether the given endpoint has the client of the given cluster on it.
+bool emberAfContainsClient(EndpointId endpoint, ClusterId clusterId)
+{
+    uint16_t ep = emberAfIndexFromEndpoint(endpoint);
+    if (ep == kEmberInvalidEndpointIndex)
+    {
+        return false;
+    }
+
+    return (emberAfFindClusterInType(emAfEndpoints[ep].endpointType, clusterId, CLUSTER_MASK_CLIENT) != nullptr);
+}
+
 // This will find the first server that has the clusterId given from the index of endpoint.
 bool emberAfContainsServerFromIndex(uint16_t index, ClusterId clusterId)
 {
