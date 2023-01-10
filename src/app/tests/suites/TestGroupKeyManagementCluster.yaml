@@ -136,9 +136,9 @@ tests:
           value:
               [
                   { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
-                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a2 },
-                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a1 },
                   { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a2 },
               ]
 
     - label: "Read Group Keys"
@@ -148,9 +148,9 @@ tests:
           value:
               [
                   { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
-                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a2 },
-                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a1 },
                   { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a2 },
               ]
 
     - label: "Add Group 1"
