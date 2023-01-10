@@ -622,6 +622,15 @@ public:
     ~ElectricalMeasurementCluster() {}
 };
 
+class DLL_EXPORT ClientMonitoringCluster : public ClusterBase
+{
+public:
+    ClientMonitoringCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::ClientMonitoring::Id, endpoint)
+    {}
+    ~ClientMonitoringCluster() {}
+};
+
 class DLL_EXPORT UnitTestingCluster : public ClusterBase
 {
 public:

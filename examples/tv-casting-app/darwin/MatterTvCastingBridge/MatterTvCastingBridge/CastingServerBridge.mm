@@ -510,15 +510,20 @@
     });
 }
 
-- (void)startMatterServer
+- (void)startMatterServer:(dispatch_queue_t _Nonnull)clientQueue
+    startMatterServerCompletionCallback:(nullable void (^)(MatterError * _Nonnull))startMatterServerCompletionCallback
 {
     ChipLogProgress(AppServer, "CastingServerBridge().startMatterServer() called");
 
-    dispatch_sync(_chipWorkQueue, ^{
+    dispatch_async(_chipWorkQueue, ^{
         // Initialize the Matter server
         CHIP_ERROR err = chip::Server::GetInstance().Init(*self->_serverInitParams);
         if (err != CHIP_NO_ERROR) {
             ChipLogError(AppServer, "chip::Server init failed: %s", ErrorStr(err));
+            dispatch_async(clientQueue, ^{
+                startMatterServerCompletionCallback(
+                    [[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
+            });
             return;
         }
 
@@ -527,8 +532,28 @@
             ChipLogProgress(
                 AppServer, "CastingServerBridge().startMatterServer() reconnecting to previously connected VideoPlayer...");
             err = CastingServer::GetInstance()->VerifyOrEstablishConnection(
-                *(self->_previouslyConnectedVideoPlayer), [](TargetVideoPlayerInfo * cppTargetVideoPlayerInfo) {},
-                [](CHIP_ERROR err) {}, [](TargetEndpointInfo * cppTargetEndpointInfo) {});
+                *(self->_previouslyConnectedVideoPlayer),
+                [clientQueue, startMatterServerCompletionCallback](TargetVideoPlayerInfo * cppTargetVideoPlayerInfo) {
+                    dispatch_async(clientQueue, ^{
+                        startMatterServerCompletionCallback(
+                            [[MatterError alloc] initWithCode:CHIP_NO_ERROR.AsInteger()
+                                                      message:[NSString stringWithUTF8String:CHIP_NO_ERROR.AsString()]]);
+                    });
+                },
+                [clientQueue, startMatterServerCompletionCallback](CHIP_ERROR err) {
+                    dispatch_async(clientQueue, ^{
+                        startMatterServerCompletionCallback(
+                            [[MatterError alloc] initWithCode:err.AsInteger()
+                                                      message:[NSString stringWithUTF8String:err.AsString()]]);
+                    });
+                },
+                [](TargetEndpointInfo * cppTargetEndpointInfo) {});
+        } else {
+            dispatch_async(clientQueue, ^{
+                startMatterServerCompletionCallback(
+                    [[MatterError alloc] initWithCode:CHIP_NO_ERROR.AsInteger()
+                                              message:[NSString stringWithUTF8String:CHIP_NO_ERROR.AsString()]]);
+            });
         }
     });
 }

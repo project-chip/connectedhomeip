@@ -14,15 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-import subprocess
 import logging
+import subprocess
+import sys
 import time
-import click
-from pathlib import Path
 from dataclasses import dataclass
 from enum import Enum
-from multiprocessing.connection import Listener, Client
+from multiprocessing.connection import Client, Listener
+from pathlib import Path
+
+import click
 
 log = logging.getLogger()
 log.setLevel(logging.DEBUG)

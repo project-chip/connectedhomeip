@@ -14,30 +14,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import enum
 import logging
 import os
-import xml.sax
-import xml.sax.handler
 
 try:
-    from matter_idl.matter_idl_types import Idl
-except:
+    from matter_idl.zapxml import ParseSource, ParseXmls
+except ImportError:
     import sys
 
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from matter_idl.matter_idl_types import Idl
-
-from matter_idl.zapxml import ParseSource, ParseXmls
+    from matter_idl.zapxml import ParseSource, ParseXmls
 
 
 if __name__ == '__main__':
     # This Parser is generally not intended to be run as a stand-alone binary.
     # The ability to run is for debug and to print out the parsed AST.
+    import pprint
+
     import click
     import coloredlogs
-    import pprint
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants

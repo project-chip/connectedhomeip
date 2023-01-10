@@ -17,10 +17,11 @@
 #
 
 import argparse
-import subprocess
 import base64
 import logging
 import os
+import subprocess
+
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import load_der_private_key
 

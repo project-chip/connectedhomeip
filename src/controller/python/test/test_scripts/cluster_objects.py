@@ -15,17 +15,16 @@
 #    limitations under the License.
 #
 
-import pprint
-import chip.clusters as Clusters
-import chip.exceptions
-import logging
-from chip.clusters.Attribute import AttributePath, AttributeReadResult, AttributeStatus, ValueDecodeFailure, TypedAttributePath, SubscriptionTransaction, DataVersion
-import chip.interaction_model
 import asyncio
-import time
-import sys
+import logging
+import pprint
 
 import base
+import chip.clusters as Clusters
+import chip.exceptions
+import chip.interaction_model
+from chip.clusters.Attribute import (AttributePath, AttributeStatus, DataVersion, SubscriptionTransaction, TypedAttributePath,
+                                     ValueDecodeFailure)
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -143,9 +142,9 @@ class ClusterObjectTests:
                                            ])
         expectedRes = [
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
-                            AttributeId=5), Status=chip.interaction_model.Status.Success),
+                                               AttributeId=5), Status=chip.interaction_model.Status.Success),
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
-                            AttributeId=6), Status=chip.interaction_model.Status.ConstraintError)
+                                               AttributeId=6), Status=chip.interaction_model.Status.ConstraintError)
         ]
 
         logger.info(f"Received WriteResponse: {res}")

@@ -167,10 +167,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::NetworkCommissi
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterface::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type & request);
+static void Finalize(chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterface::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::Type & request,
                         Json::Value & value);
 
@@ -246,10 +246,10 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type & request);
+static void Finalize(chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::Type & request,
                         Json::Value & value);
 

@@ -24,7 +24,7 @@
 #include "secure_channel/Decoder.h"
 #include "udc/Decoder.h"
 
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/BytesToHex.h>
 #include <protocols/Protocols.h>
 

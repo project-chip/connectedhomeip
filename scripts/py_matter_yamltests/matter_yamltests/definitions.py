@@ -13,11 +13,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from typing import List
 import enum
+from typing import List
 
-from matter_idl.zapxml import ParseSource, ParseXmls
 from matter_idl.matter_idl_types import *
+from matter_idl.zapxml import ParseSource, ParseXmls
 
 
 class _ItemType(enum.Enum):

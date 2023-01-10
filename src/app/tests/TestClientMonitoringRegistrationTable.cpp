@@ -120,6 +120,26 @@ void TestSaveAllInvalidRegistrationValues(nlTestSuite * aSuite, void * context)
     NL_TEST_ASSERT(aSuite, err == CHIP_ERROR_INCORRECT_STATE);
 }
 
+void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
+{
+    chip::TestPersistentStorageDelegate testStorage;
+    ClientMonitoringRegistrationTable table(testStorage);
+
+    table.GetClientRegistrationEntry().clientNodeId = kTestClientNodeId;
+    table.GetClientRegistrationEntry().ICid         = kTestICid;
+    table.GetClientRegistrationEntry().fabricIndex  = kTestFabricIndex;
+
+    CHIP_ERROR err = table.SaveToStorage();
+    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(aSuite, table.HasValueForFabric(kTestFabricIndex));
+
+    err = table.DeleteFromStorage(kTestFabricIndex);
+    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(aSuite, !table.HasValueForFabric(kTestFabricIndex));
+}
+
 } // namespace
 
 int TestClientMonitoringRegistrationTable()
@@ -130,6 +150,7 @@ int TestClientMonitoringRegistrationTable()
                                NL_TEST_DEF("TestSaveAllInvalidRegistrationValues", TestSaveAllInvalidRegistrationValues),
                                NL_TEST_DEF("TestSaveLoadRegistrationValueForMultipleFabrics",
                                            TestSaveLoadRegistrationValueForMultipleFabrics),
+                               NL_TEST_DEF("TestDeleteValidEntryFromStorage", TestDeleteValidEntryFromStorage),
                                NL_TEST_SENTINEL() };
 
     nlTestSuite cmSuite = { "TestClientMonitoringRegistrationTable", &sTests[0], nullptr, nullptr };

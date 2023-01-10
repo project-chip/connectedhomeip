@@ -15,18 +15,16 @@
 #    limitations under the License.
 #
 
-import asyncio
 import logging
 import os
+import typing
 
 import chip.clusters as Clusters
-import chip.tlv
-from chip.clusters import OperationalCredentials as opCreds
-from chip.clusters import GeneralCommissioning as generalCommissioning
-from chip.FabricAdmin import FabricAdmin as FabricAdmin
-import typing
 from chip.ChipDeviceCtrl import ChipDeviceController as ChipDeviceController
+from chip.clusters import GeneralCommissioning as generalCommissioning
+from chip.clusters import OperationalCredentials as opCreds
 from chip.clusters.Types import *
+from chip.FabricAdmin import FabricAdmin as FabricAdmin
 
 _UINT16_MAX = 65535
 
@@ -91,7 +89,7 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
                 break
 
         # Step 3: If there isn't an existing entry to add to, make a new one.
-        if (not(addedPrivilege)):
+        if (not (addedPrivilege)):
             if len(currentAcls) >= 3:
                 raise ValueError(
                     f"Cannot add another ACL entry to grant privilege to existing count of {currentAcls} ACLs -- will exceed minimas!")

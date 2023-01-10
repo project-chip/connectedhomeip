@@ -257,6 +257,7 @@ list(
     -DCHIP_HAVE_CONFIG_H
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
     -DCHIP_SHELL_MAX_TOKENS=11
+    -DCONFIG_ENABLE_AMEBA_FACTORY_DATA=0
 )
 
 if (matter_enable_persistentstorage_audit)

@@ -13,10 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
 import io
-
-from typing import Optional, Union, List
+import unittest
+from typing import List, Optional, Union
 
 try:
     from matter_idl.matter_idl_types import *

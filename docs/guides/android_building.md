@@ -203,7 +203,7 @@ or
 ## Building Android CHIPTest from scripts
 
 Currently, the CHIPTest can only be built from scripts. The steps are similar to
-[building CHIPTool from scripts](#building-scripts).
+[building CHIPTool from scripts](#building-android-chiptool-from-scripts).
 
 ```shell
 ./scripts/build/build_examples.py --target android-arm64-chip-test build

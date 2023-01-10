@@ -1,4 +1,4 @@
-#CHIP EFR32 Persistent Storage Example
+# CHIP EFR32 Persistent Storage Example
 
 An example testing and demonstrating the key value storage API.
 
@@ -13,8 +13,6 @@ An example testing and demonstrating the key value storage API.
 
 <hr>
 
-<a name="intro"></a>
-
 ## Introduction
 
 This example serves to both test the key value storage implementation and API as
@@ -24,13 +22,9 @@ to use the API.
 In the future this example can be moved into a unit test when available on all
 platforms.
 
-<a name="EFR32"></a>
-
 ## EFR32
 
 The EFR32 platform KVS is fully implemented
-
-<a name="building"></a>
 
 ### Building
 
@@ -101,8 +95,6 @@ OR use GN/Ninja directly
           $ cd ~/connectedhomeip/examples/persistent-storage/efr32
           $ rm -rf out/
 
-<a name="flashing"></a>
-
 ### Flashing the Application
 
 -   On the command line:
@@ -111,8 +103,6 @@ OR use GN/Ninja directly
           $ python3 out/debug/chip-efr32-persistent_storage-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
-
-<a name="view-logging"></a>
 
 ### Viewing Logging Output
 

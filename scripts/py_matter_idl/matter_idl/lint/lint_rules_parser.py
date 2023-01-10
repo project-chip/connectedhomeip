@@ -2,23 +2,25 @@
 
 import logging
 import os
-import xml.etree.ElementTree
-
-from dataclasses import dataclass, field
-from typing import List, Optional, Mapping
-from lark import Lark
-from lark.visitors import Transformer, v_args, Discard
-import stringcase
 import traceback
+import xml.etree.ElementTree
+from dataclasses import dataclass, field
+from typing import List, Mapping, Optional
+
+import stringcase
+from lark import Lark
+from lark.visitors import Discard, Transformer, v_args
 
 try:
-    from .types import RequiredAttributesRule, AttributeRequirement, ClusterRequirement, RequiredCommandsRule, ClusterCommandRequirement
+    from .types import (AttributeRequirement, ClusterCommandRequirement, ClusterRequirement, RequiredAttributesRule,
+                        RequiredCommandsRule)
 except:
     import sys
 
     sys.path.append(os.path.join(os.path.abspath(
         os.path.dirname(__file__)), "..", ".."))
-    from matter_idl.lint.types import RequiredAttributesRule, AttributeRequirement, ClusterRequirement, RequiredCommandsRule, ClusterCommandRequirement
+    from matter_idl.lint.types import (AttributeRequirement, ClusterCommandRequirement, ClusterRequirement, RequiredAttributesRule,
+                                       RequiredCommandsRule)
 
 
 def parseNumberString(n):

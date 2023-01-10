@@ -15,20 +15,22 @@
 #    limitations under the License.
 #
 
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from chip import ChipDeviceCtrl
-from enum import Enum
-import stringcase
-import chip.interaction_model
 import asyncio as asyncio
 import queue
 import logging
-from chip.yaml.errors import ParsingError, UnexpectedParsingError
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from enum import Enum
+
+import chip.interaction_model
+import chip.yaml.format_converter as Converter
+import stringcase
+from chip import ChipDeviceCtrl
 from chip.clusters.Attribute import (
     AttributeStatus, ValueDecodeFailure, TypedAttributePath, SubscriptionTransaction)
+from chip.yaml.errors import ParsingError, UnexpectedParsingError
+
 from .data_model_lookup import *
-import chip.yaml.format_converter as Converter
 
 logger = logging.getLogger('YamlParser')
 

@@ -15,10 +15,11 @@
 #    limitations under the License.
 #
 
-import typing
-from chip.clusters.Types import Nullable, NullValue
-from chip.tlv import uint, float32
 import enum
+import typing
+
+from chip.clusters.Types import Nullable, NullValue
+from chip.tlv import float32, uint
 from chip.yaml.errors import ValidationError
 
 
@@ -165,10 +166,10 @@ def convert_to_data_model_type(field_value, field_type):
             return_field_value[field_descriptor.Label] = convert_to_data_model_type(
                 field_value[item], field_descriptor.Type)
         return return_field_value
-    elif(type(field_value) is float):
+    elif (type(field_value) is float):
         return float32(field_value)
     # list represents a data model list
-    elif(type(field_value) is list):
+    elif (type(field_value) is list):
         list_element_type = typing.get_args(field_type)[0]
 
         # The field type passed in is the type of the list element and not list[T].
