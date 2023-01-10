@@ -18,5 +18,5 @@ nrf-{nrf5340dk,nrf52840dk,nrf52840dongle}-{all-clusters,all-clusters-minimal,loc
 nrf-native-posix-64-tests
 qpg-qpg6105-{lock,light,shell,persistent-storage}
 tizen-arm-{all-clusters,all-clusters-minimal,chip-tool,light}[-no-ble][-no-wifi][-asan][-ubsan]
-telink-tlsr9518adk80d-{all-clusters,all-clusters-minimal,light,light-switch,ota-requestor,thermostat}
+telink-tlsr9518adk80d-{all-clusters,all-clusters-minimal,contact-sensor,light,light-switch,ota-requestor,thermostat}
 openiotsdk-{shell,lock}

@@ -50,6 +50,12 @@ __pycache__
 # Doxygen outputs
 docs/html
 
+# Python venv
+.venv
+
+# Documentation
+docs/_build
+
 # VSCode java extensions
 .project
 

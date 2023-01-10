@@ -37,11 +37,11 @@
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
-#include <bluetooth/addr.h>
-#include <bluetooth/gatt.h>
-#include <random/rand32.h>
-#include <sys/byteorder.h>
-#include <sys/util.h>
+#include <zephyr/bluetooth/addr.h>
+#include <zephyr/bluetooth/gatt.h>
+#include <zephyr/random/rand32.h>
+#include <zephyr/sys/byteorder.h>
+#include <zephyr/sys/util.h>
 
 using namespace ::chip;
 using namespace ::chip::Ble;

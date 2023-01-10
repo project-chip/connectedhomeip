@@ -47,7 +47,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.18
+            image: connectedhomeip/chip-build:0.6.30
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -105,7 +105,7 @@ jobs:
               #       things.
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/idl/xml_parser.py \
+                    "./scripts/py_matter_idl/matter_idl/xml_parser.py \
                       --no-print \
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
@@ -287,7 +287,7 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Build Apps
-              timeout-minutes: 60
+              timeout-minutes: 75
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -352,7 +352,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.18
+            image: connectedhomeip/chip-build:0.6.30
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -426,7 +426,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.18
+            image: connectedhomeip/chip-build:0.6.30
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -462,7 +462,19 @@ jobs:
                       --target linux-x64-java-matter-controller \
                       build \
                    "
-            - name: Run Tests
+            - name: Run Discover Tests
+              timeout-minutes: 65
+              run: |
+                  scripts/run_in_build_env.sh \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "discover" \
+                     --tool-args "commissionables" \
+                     --factoryreset \
+                  '
+            - name: Run Pairing Tests
               timeout-minutes: 65
               run: |
                   scripts/run_in_build_env.sh \

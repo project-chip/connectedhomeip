@@ -14,14 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
+import enum
+import itertools
 import logging
 import multiprocessing
-import itertools
-import enum
 import os
 import sys
 
+import click
 
 try:
     from pregenerate import FindPregenerationTargets

@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "lib/core/CHIPTLV.h"
+#include "lib/core/TLV.h"
 #include "system/SystemPacketBuffer.h"
 #include "system/TLVPacketBufferBackingStore.h"
 #include <app/AttributePathParams.h>
@@ -107,6 +107,12 @@ private:
     {
         return mCallback.GetHighestReceivedEventNumber(aEventNumber);
     }
+
+    void OnUnsolicitedMessageFromPublisher(ReadClient * apReadClient) override
+    {
+        return mCallback.OnUnsolicitedMessageFromPublisher(apReadClient);
+    }
+
     /*
      * Given a reader positioned at a list element, allocate a packet buffer, copy the list item where
      * the reader is positioned into that buffer and add it to our buffered list for tracking.

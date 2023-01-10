@@ -399,7 +399,13 @@ public class TvCastingApp {
   public native boolean applicationBasic_readApplicationVersion(
       ContentApp contentApp,
       SuccessCallback<String> readSuccessHandler,
-      FailureCallback readFailureHandlerr);
+      FailureCallback readFailureHandler);
+
+  public native boolean onOff_on(ContentApp contentApp, Object responseHandler);
+
+  public native boolean onOff_off(ContentApp contentApp, Object responseHandler);
+
+  public native boolean onOff_toggle(ContentApp contentApp, Object responseHandler);
 
   static {
     System.loadLibrary("TvCastingApp");

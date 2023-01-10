@@ -104,11 +104,6 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 {
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
-        wifi_config_t stationConfig;
-
-        memset(&stationConfig, 0, sizeof(stationConfig));
-        esp_wifi_set_config(WIFI_IF_STA, &stationConfig);
-
         DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
         DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);

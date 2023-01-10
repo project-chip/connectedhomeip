@@ -144,7 +144,7 @@ tests:
 
     - label: "Send an announce OTA provider command to the requestor"
       cluster: "OTA Software Update Requestor"
-      command: "AnnounceOtaProvider"
+      command: "AnnounceOTAProvider"
       arguments:
           values:
               - name: "providerNodeId"

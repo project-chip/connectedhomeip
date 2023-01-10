@@ -15,10 +15,11 @@
 #
 
 import ctypes
-from typing import Generator
 from dataclasses import dataclass
-from chip.ble.library_handle import _GetBleLibraryHandle
 from queue import Queue
+from typing import Generator
+
+from chip.ble.library_handle import _GetBleLibraryHandle
 from chip.ble.types import DeviceScannedCallback, ScanDoneCallback
 
 

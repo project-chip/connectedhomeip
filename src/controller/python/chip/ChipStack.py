@@ -24,30 +24,26 @@
 """Chip Stack interface
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
-import sys
-import os
-import time
-import glob
-import platform
-import logging
-from threading import Lock, Event, Condition
-from ctypes import *
-from .ChipUtility import ChipUtility
-from .storage import *
-from .exceptions import *
-import builtins
+from __future__ import absolute_import, print_function
 
-from .interaction_model import InteractionModelError, delegate as im
-from .clusters import Command as ClusterCommand
-from .clusters import Attribute as ClusterAttribute
-from .clusters import ClusterObjects as ClusterObjects
-from .clusters import Objects as GeneratedObjects
-from .clusters.CHIPClusters import *
+import builtins
+import logging
+import os
+import sys
+import time
+from ctypes import *
+from threading import Condition, Event, Lock
 
 import chip.native
 from chip.native import PyChipError
+
+from .ChipUtility import ChipUtility
+from .clusters import Attribute as ClusterAttribute
+from .clusters import Command as ClusterCommand
+from .clusters.CHIPClusters import *
+from .exceptions import *
+from .interaction_model import delegate as im
+from .storage import *
 
 __all__ = [
     "DeviceStatusStruct",
@@ -328,7 +324,10 @@ class ChipStack(object):
             self._ChipStackLib.pychip_Stack_SetLogFunct(logFunct)
 
     def Shutdown(self):
-        self.Call(lambda: self._ChipStackLib.pychip_DeviceController_StackShutdown()).raise_on_error()
+        #
+        # Terminate Matter thread and shutdown the stack.
+        #
+        self._ChipStackLib.pychip_DeviceController_StackShutdown()
 
         #
         # We only shutdown the persistent storage layer AFTER we've shut down the stack,

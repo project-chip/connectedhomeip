@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "../common/CustomStringPrefix.h"
+
 #include <json/json.h>
 #include <lib/core/Optional.h>
 

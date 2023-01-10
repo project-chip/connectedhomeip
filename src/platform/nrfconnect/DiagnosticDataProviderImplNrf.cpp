@@ -71,9 +71,7 @@ CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiChannelNumber(uint16_t & channe
     WiFiManager::WiFiInfo info;
     CHIP_ERROR err = WiFiManager::Instance().GetWiFiInfo(info);
     channelNumber  = info.mChannel;
-    (void) err;
-    // above will return 0 until the wpa_supplicant driver API implementation is refined
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiRssi(int8_t & rssi)
@@ -81,9 +79,7 @@ CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiRssi(int8_t & rssi)
     WiFiManager::WiFiInfo info;
     CHIP_ERROR err = WiFiManager::Instance().GetWiFiInfo(info);
     rssi           = info.mRssi;
-    (void) err;
-    // above will return -128 until the wpa_supplicant driver API implementation is refined
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    return err;
 }
 
 // below will be implemented when the WiFi driver exposes Zephyr NET_STATISTICS API

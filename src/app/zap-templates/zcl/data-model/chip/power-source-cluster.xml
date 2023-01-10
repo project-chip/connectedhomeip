@@ -59,22 +59,23 @@ limitations under the License.
     <attribute side="server" code="0x001D" define="POWER_SOURCE_BAT_CHARGING_CURRENT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">BatChargingCurrent</attribute>
     <attribute side="server" code="0x001E" define="POWER_SOURCE_ACTIVE_BAT_CHARGE_FAULTS" type="ARRAY" entryType="BatChargeFault" length="16" writable="false" optional="true">ActiveBatChargeFaults</attribute>
 
-    <!-- TODO: Do events work?
-    <event code="0x0000" name="WiredFaultChange" priority="info" side="server">
+    <event code="0x0000" name="WiredFaultChange" priority="info" side="server" optional="true">
       <description>The WiredFaultChange Event SHALL indicate a change in the set of wired faults currently detected by the Node on this wired power source.</description>
-      <field id="1" name="WiredFaultChangeType" type="WiredFaultChangeType"/>
+      <field id="0" name="Current" type="WiredFault" array="true" length="8"/>
+      <field id="1" name="Previous" type="WiredFault" array="true" length="8"/>
     </event>
 
-    <event code="0x0001" name="BatFaultChange" priority="info" side="server">
+    <event code="0x0001" name="BatFaultChange" priority="info" side="server" optional="true">
       <description>The BatFaultChange Event SHALL indicate a change in the set of battery faults currently detected by the Node on this battery power source.</description>
-      <field id="1" name="BatFaultChangeType" type="BatFaultChangeType"/>
+      <field id="0" name="Current" type="BatFault" array="true" length="8"/>
+      <field id="1" name="Previous" type="BatFault" array="true" length="8"/>
     </event>
 
-    <event code="0x0002" name="BatChargeFaultChange" priority="info" side="server">
+    <event code="0x0002" name="BatChargeFaultChange" priority="info" side="server" optional="true">
       <description>The BatChargeFaultChange Event SHALL indicate a change in the set of charge faults currently detected by the Node on this battery power source.</description>
-      <field id="1" name="BatChargeFaultChangeType" type="BatChargeFaultChangeType"/>
+      <field id="0" name="Current" type="BatChargeFault" array="true" length="16"/>
+      <field id="1" name="Previous" type="BatChargeFault" array="true" length="16"/>
     </event>
-    -->
 
   </cluster>
 
@@ -131,7 +132,7 @@ limitations under the License.
 
   <enum name="BatChargeLevel" type="ENUM8">
     <cluster code="0x002F"/>
-    <item name="Ok" value="0x00"/>
+    <item name="OK" value="0x00"/>
     <item name="Warning" value="0x01"/>
     <item name="Critical" value="0x02"/>
   </enum>
@@ -152,6 +153,8 @@ limitations under the License.
     <item name="IsNotCharging" value="0x03"/>
   </enum>
 
+  <!-- TODO: These structs *ChangeType structs should just be removed, after a
+       brief deprecation period. -->
   <struct name="WiredFaultChangeType">
     <cluster code="0x002F"/>
     <item name="current" type="WiredFault" array="true" length="8"/>

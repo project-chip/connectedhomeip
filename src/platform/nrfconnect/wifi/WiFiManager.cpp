@@ -22,33 +22,35 @@
 
 #include "WiFiManager.h"
 
+#include <crypto/RandUtils.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPointImplSockets.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Zephyr/InetUtils.h>
 
-#include <net/net_stats.h>
-#include <zephyr.h>
+#include <zephyr/kernel.h>
+#include <zephyr/net/net_event.h>
+#include <zephyr/net/net_if.h>
+#include <zephyr/net/net_stats.h>
 
 extern "C" {
 #include <common/defs.h>
 #include <wpa_supplicant/config.h>
 #include <wpa_supplicant/driver_i.h>
 #include <wpa_supplicant/scan.h>
-#include <zephyr/net/wifi_mgmt.h>
+
+// extern function to obtain bssid from status buffer
+// It is defined in zephyr/subsys/net/ip/utils.c
+extern char * net_sprint_ll_addr_buf(const uint8_t * ll, uint8_t ll_len, char * buf, int buflen);
 }
-
-extern struct wpa_global * global;
-
-static struct wpa_supplicant * wpa_s;
 
 namespace chip {
 namespace DeviceLayer {
 
 namespace {
 
-NetworkCommissioning::WiFiScanResponse ToScanResponse(wifi_scan_result * result)
+NetworkCommissioning::WiFiScanResponse ToScanResponse(const wifi_scan_result * result)
 {
     NetworkCommissioning::WiFiScanResponse response = {};
 
@@ -73,49 +75,50 @@ NetworkCommissioning::WiFiScanResponse ToScanResponse(wifi_scan_result * result)
 
 } // namespace
 
-// These enums shall reflect the overall ordered disconnected->connected flow
-const Map<wpa_states, WiFiManager::StationStatus, 10>
-    WiFiManager::sStatusMap({ { WPA_DISCONNECTED, WiFiManager::StationStatus::DISCONNECTED },
-                              { WPA_INTERFACE_DISABLED, WiFiManager::StationStatus::DISABLED },
-                              { WPA_INACTIVE, WiFiManager::StationStatus::DISABLED },
-                              { WPA_SCANNING, WiFiManager::StationStatus::SCANNING },
-                              { WPA_AUTHENTICATING, WiFiManager::StationStatus::CONNECTING },
-                              { WPA_ASSOCIATING, WiFiManager::StationStatus::CONNECTING },
-                              { WPA_ASSOCIATED, WiFiManager::StationStatus::CONNECTED },
-                              { WPA_4WAY_HANDSHAKE, WiFiManager::StationStatus::PROVISIONING },
-                              { WPA_GROUP_HANDSHAKE, WiFiManager::StationStatus::PROVISIONING },
-                              { WPA_COMPLETED, WiFiManager::StationStatus::FULLY_PROVISIONED } });
+const Map<wifi_iface_state, WiFiManager::StationStatus, 10>
+    WiFiManager::sStatusMap({ { WIFI_STATE_DISCONNECTED, WiFiManager::StationStatus::DISCONNECTED },
+                              { WIFI_STATE_INTERFACE_DISABLED, WiFiManager::StationStatus::DISABLED },
+                              { WIFI_STATE_INACTIVE, WiFiManager::StationStatus::DISABLED },
+                              { WIFI_STATE_SCANNING, WiFiManager::StationStatus::SCANNING },
+                              { WIFI_STATE_AUTHENTICATING, WiFiManager::StationStatus::CONNECTING },
+                              { WIFI_STATE_ASSOCIATING, WiFiManager::StationStatus::CONNECTING },
+                              { WIFI_STATE_ASSOCIATED, WiFiManager::StationStatus::CONNECTED },
+                              { WIFI_STATE_4WAY_HANDSHAKE, WiFiManager::StationStatus::PROVISIONING },
+                              { WIFI_STATE_GROUP_HANDSHAKE, WiFiManager::StationStatus::PROVISIONING },
+                              { WIFI_STATE_COMPLETED, WiFiManager::StationStatus::FULLY_PROVISIONED } });
 
-// Map WiFi center frequency to the corresponding channel number
-const Map<uint16_t, uint8_t, 42> WiFiManager::sFreqChannelMap(
-    { { 4915, 183 }, { 4920, 184 }, { 4925, 185 }, { 4935, 187 }, { 4940, 188 }, { 4945, 189 }, { 4960, 192 },
-      { 4980, 196 }, { 5035, 7 },   { 5040, 8 },   { 5045, 9 },   { 5055, 11 },  { 5060, 12 },  { 5080, 16 },
-      { 5170, 34 },  { 5180, 36 },  { 5190, 38 },  { 5200, 40 },  { 5210, 42 },  { 5220, 44 },  { 5230, 46 },
-      { 5240, 48 },  { 5260, 52 },  { 5280, 56 },  { 5300, 60 },  { 5320, 64 },  { 5500, 100 }, { 5520, 104 },
-      { 5540, 108 }, { 5560, 112 }, { 5580, 116 }, { 5600, 120 }, { 5620, 124 }, { 5640, 128 }, { 5660, 132 },
-      { 5680, 136 }, { 5700, 140 }, { 5745, 149 }, { 5765, 153 }, { 5785, 157 }, { 5805, 161 }, { 5825, 165 } });
+const Map<uint32_t, WiFiManager::NetEventHandler, 4>
+    WiFiManager::sEventHandlerMap({ { NET_EVENT_WIFI_SCAN_RESULT, WiFiManager::ScanResultHandler },
+                                    { NET_EVENT_WIFI_SCAN_DONE, WiFiManager::ScanDoneHandler },
+                                    { NET_EVENT_WIFI_CONNECT_RESULT, WiFiManager::ConnectHandler },
+                                    { NET_EVENT_WIFI_DISCONNECT_RESULT, WiFiManager::DisconnectHandler } });
+
+void WiFiManager::WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface)
+{
+    if (0 == strcmp(iface->if_dev->dev->name, "wlan0"))
+    {
+        Platform::UniquePtr<uint8_t> eventData(new uint8_t[cb->info_length]);
+        VerifyOrReturn(eventData);
+        memcpy(eventData.get(), cb->info, cb->info_length);
+        CHIP_ERROR status = SystemLayer().ScheduleLambda([data = eventData.get(), mgmtEvent]() {
+            if (data)
+            {
+                sEventHandlerMap[mgmtEvent](data);
+                // cleanup
+                delete[] data;
+            }
+        });
+
+        if (CHIP_NO_ERROR == status)
+        {
+            // the ownership has been transferred to the worker thread - release the buffer
+            eventData.release();
+        }
+    }
+}
 
 CHIP_ERROR WiFiManager::Init()
 {
-    // wpa_supplicant instance is initialized in dedicated supplicant thread, so wait until
-    // the initialization is completed.
-    // TODO: fix thread-safety of the solution.
-    constexpr size_t kInitTimeoutMs = 5000;
-    const int64_t initStartTime     = k_uptime_get();
-    // TODO: Handle multiple VIFs
-    const char * ifname = "wlan0";
-
-    while (!global || !(wpa_s = wpa_supplicant_get_iface(global, ifname)))
-    {
-        if (k_uptime_get() > initStartTime + kInitTimeoutMs)
-        {
-            ChipLogError(DeviceLayer, "wpa_supplicant is not initialized!");
-            return CHIP_ERROR_INTERNAL;
-        }
-
-        k_msleep(200);
-    }
-
     // TODO: consider moving these to ConnectivityManagerImpl to be prepared for handling multiple interfaces on a single device.
     Inet::UDPEndPointImplSockets::SetJoinMulticastGroupHandler([](Inet::InterfaceId interfaceId, const Inet::IPAddress & address) {
         const in6_addr addr = InetUtils::ToZephyrAddr(address);
@@ -145,286 +148,119 @@ CHIP_ERROR WiFiManager::Init()
         return CHIP_NO_ERROR;
     });
 
-    ChipLogDetail(DeviceLayer, "wpa_supplicant has been initialized");
+    net_mgmt_init_event_callback(&mWiFiMgmtClbk, WifiMgmtEventHandler, kWifiManagementEvents);
+    net_mgmt_add_event_callback(&mWiFiMgmtClbk);
+
+    ChipLogDetail(DeviceLayer, "WiFiManager has been initialized");
 
     return CHIP_NO_ERROR;
 }
-
-CHIP_ERROR WiFiManager::AddNetwork(const ByteSpan & ssid, const ByteSpan & credentials)
+CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanResultCallback resultCallback, ScanDoneCallback doneCallback,
+                             bool internalScan)
 {
-    ChipLogDetail(DeviceLayer, "Adding WiFi network");
-    mpWpaNetwork = wpa_supplicant_add_network(wpa_s);
-    if (mpWpaNetwork)
+    net_if * iface = InetUtils::GetInterface();
+    VerifyOrReturnError(nullptr != iface, CHIP_ERROR_INTERNAL);
+
+    mInternalScan       = internalScan;
+    mScanResultCallback = resultCallback;
+    mScanDoneCallback   = doneCallback;
+    mWiFiState          = WIFI_STATE_SCANNING;
+
+    if (net_mgmt(NET_REQUEST_WIFI_SCAN, iface, NULL, 0))
     {
-        static constexpr size_t kMaxSsidLen{ 32 };
-        mpWpaNetwork->ssid = (u8 *) k_malloc(kMaxSsidLen);
-
-        if (mpWpaNetwork->ssid)
-        {
-            memcpy(mpWpaNetwork->ssid, ssid.data(), ssid.size());
-            mpWpaNetwork->ssid_len    = ssid.size();
-            mpWpaNetwork->key_mgmt    = WPA_KEY_MGMT_NONE;
-            mpWpaNetwork->disabled    = 1;
-            wpa_s->conf->filter_ssids = 1;
-
-            return AddPsk(credentials);
-        }
+        ChipLogError(DeviceLayer, "Scan request failed");
+        return CHIP_ERROR_INTERNAL;
     }
 
-    return CHIP_ERROR_INTERNAL;
-}
-
-CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanCallback callback)
-{
-    const StationStatus stationStatus = GetStationStatus();
-    VerifyOrReturnError(stationStatus != StationStatus::DISABLED && stationStatus != StationStatus::SCANNING &&
-                            stationStatus != StationStatus::CONNECTING,
-                        CHIP_ERROR_INCORRECT_STATE);
-
-    net_if * const iface = InetUtils::GetInterface();
-    VerifyOrReturnError(iface != nullptr, CHIP_ERROR_INTERNAL);
-
-    const device * dev = net_if_get_device(iface);
-    VerifyOrReturnError(dev != nullptr, CHIP_ERROR_INTERNAL);
-
-    const net_wifi_mgmt_offload * ops = static_cast<const net_wifi_mgmt_offload *>(dev->api);
-    VerifyOrReturnError(ops != nullptr, CHIP_ERROR_INTERNAL);
-
-    mScanCallback = callback;
-
-    // TODO: Use saner API once such exists.
-    // TODO: Take 'ssid' into account.
-    VerifyOrReturnError(ops->scan(dev,
-                                  [](net_if *, int status, wifi_scan_result * result) {
-                                      VerifyOrReturn(Instance().mScanCallback != nullptr);
-                                      NetworkCommissioning::WiFiScanResponse response = ToScanResponse(result);
-                                      Instance().mScanCallback(status, result != nullptr ? &response : nullptr);
-                                  }) == 0,
-                        CHIP_ERROR_INTERNAL);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR WiFiManager::Connect(const ByteSpan & ssid, const ByteSpan & credentials, const ConnectionHandling & handling)
-{
-    ChipLogDetail(DeviceLayer, "Connecting to WiFi network");
-
-    mConnectionSuccessClbk = handling.mOnConnectionSuccess;
-    mConnectionFailedClbk  = handling.mOnConnectionFailed;
-    mConnectionTimeoutMs   = handling.mConnectionTimeoutMs;
-
-    CHIP_ERROR err = AddNetwork(ssid, credentials);
-    if (CHIP_NO_ERROR == err)
-    {
-        EnableStation(true);
-        wpa_supplicant_select_network(wpa_s, mpWpaNetwork);
-        WaitForConnectionAsync();
-    }
-    else
-    {
-        OnConnectionFailed();
-    }
-    return err;
-}
-
-void WiFiManager::OnConnectionSuccess()
-{
-    if (mConnectionSuccessClbk)
-        mConnectionSuccessClbk();
-}
-
-void WiFiManager::OnConnectionFailed()
-{
-    if (mConnectionFailedClbk)
-        mConnectionFailedClbk();
-}
-
-CHIP_ERROR WiFiManager::AddPsk(const ByteSpan & credentials)
-{
-    mpWpaNetwork->key_mgmt = WPA_KEY_MGMT_PSK;
-    str_clear_free(mpWpaNetwork->passphrase);
-    mpWpaNetwork->passphrase = dup_binstr(credentials.data(), credentials.size());
-
-    if (mpWpaNetwork->passphrase)
-    {
-        wpa_config_update_psk(mpWpaNetwork);
-        return CHIP_NO_ERROR;
-    }
-
-    return CHIP_ERROR_INTERNAL;
-}
-
-WiFiManager::StationStatus WiFiManager::GetStationStatus() const
-{
-    if (wpa_s)
-    {
-        return StatusFromWpaStatus(wpa_s->wpa_state);
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "wpa_supplicant is not initialized!");
-        return StationStatus::NONE;
-    }
-}
-
-WiFiManager::StationStatus WiFiManager::StatusFromWpaStatus(const wpa_states & status)
-{
-    ChipLogDetail(DeviceLayer, "WPA internal status: %d", static_cast<int>(status));
-    return WiFiManager::sStatusMap[status];
-}
-
-CHIP_ERROR WiFiManager::EnableStation(bool enable)
-{
-    VerifyOrReturnError(nullptr != wpa_s && nullptr != mpWpaNetwork, CHIP_ERROR_INTERNAL);
-    if (enable)
-    {
-        wpa_supplicant_enable_network(wpa_s, mpWpaNetwork);
-    }
-    else
-    {
-        wpa_supplicant_disable_network(wpa_s, mpWpaNetwork);
-    }
+    ChipLogDetail(DeviceLayer, "WiFi scanning started...");
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WiFiManager::ClearStationProvisioningData()
 {
-    VerifyOrReturnError(nullptr != wpa_s && nullptr != mpWpaNetwork, CHIP_ERROR_INTERNAL);
-    wpa_supplicant_cancel_scan(wpa_s);
-    wpa_clear_keys(wpa_s, mpWpaNetwork->bssid);
-    str_clear_free(mpWpaNetwork->passphrase);
-    wpa_config_update_psk(mpWpaNetwork);
-    wpa_supplicant_set_state(wpa_s, WPA_INACTIVE);
-
+    mWiFiParams.mRssi = std::numeric_limits<int8_t>::min();
+    memset(&mWiFiParams.mParams, 0, sizeof(mWiFiParams.mParams));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WiFiManager::DisconnectStation()
+CHIP_ERROR WiFiManager::Connect(const ByteSpan & ssid, const ByteSpan & credentials, const ConnectionHandling & handling)
 {
-    VerifyOrReturnError(nullptr != wpa_s, CHIP_ERROR_INTERNAL);
-    wpa_supplicant_cancel_scan(wpa_s);
-    wpas_request_disconnection(wpa_s);
+    ChipLogDetail(DeviceLayer, "Connecting to WiFi network: %*s", ssid.size(), ssid.data());
 
-    return CHIP_NO_ERROR;
+    mHandling.mOnConnectionSuccess = handling.mOnConnectionSuccess;
+    mHandling.mOnConnectionFailed  = handling.mOnConnectionFailed;
+    mHandling.mConnectionTimeout   = handling.mConnectionTimeout;
+
+    mWiFiState = WIFI_STATE_ASSOCIATING;
+
+    // Store SSID and credentials and perform the scan to detect the security mode supported by the AP.
+    // Zephyr WiFi connect request will be issued in the callback when we have the SSID match.
+    mWantedNetwork.Erase();
+    memcpy(mWantedNetwork.ssid, ssid.data(), ssid.size());
+    memcpy(mWantedNetwork.pass, credentials.data(), credentials.size());
+    mWantedNetwork.ssidLen = ssid.size();
+    mWantedNetwork.passLen = credentials.size();
+
+    return Scan(ssid, nullptr, nullptr, true /* internal scan */);
 }
 
-void WiFiManager::WaitForConnectionAsync()
+CHIP_ERROR WiFiManager::Disconnect()
 {
-    chip::DeviceLayer::SystemLayer().StartTimer(
-        static_cast<System::Clock::Timeout>(1000), [](System::Layer *, void *) { Instance().PollTimerCallback(); }, nullptr);
-}
+    net_if * iface = InetUtils::GetInterface();
+    VerifyOrReturnError(nullptr != iface, CHIP_ERROR_INTERNAL);
 
-void WiFiManager::PollTimerCallback()
-{
-    const uint32_t kMaxRetriesNumber{ mConnectionTimeoutMs.count() / 1000 };
-    static uint32_t retriesNumber{ 0 };
+    int status = net_mgmt(NET_REQUEST_WIFI_DISCONNECT, iface, NULL, 0);
 
-    if (WiFiManager::StationStatus::FULLY_PROVISIONED == GetStationStatus())
+    if (status)
     {
-        retriesNumber = 0;
-        OnConnectionSuccess();
-    }
-    else
-    {
-        if (retriesNumber++ < kMaxRetriesNumber)
+        if (status == -EALREADY)
         {
-            // wait more time
-            WaitForConnectionAsync();
+            ChipLogDetail(DeviceLayer, "Already disconnected");
         }
         else
         {
-            // connection timeout
-            retriesNumber = 0;
-            OnConnectionFailed();
+            ChipLogDetail(DeviceLayer, "Disconnect request failed");
+            return CHIP_ERROR_INTERNAL;
         }
     }
+    else
+    {
+        ChipLogDetail(DeviceLayer, "Disconnect requested");
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WiFiManager::GetWiFiInfo(WiFiInfo & info) const
 {
-    VerifyOrReturnError(nullptr != wpa_s, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(nullptr != mpWpaNetwork, CHIP_ERROR_INTERNAL);
+    net_if * iface = InetUtils::GetInterface();
+    VerifyOrReturnError(nullptr != iface, CHIP_ERROR_INTERNAL);
+    struct wifi_iface_status status = { 0 };
 
-    static uint8_t sBssid[ETH_ALEN];
-    if (WiFiManager::StationStatus::CONNECTED <= GetStationStatus())
+    if (net_mgmt(NET_REQUEST_WIFI_IFACE_STATUS, iface, &status, sizeof(struct wifi_iface_status)))
     {
-        memcpy(sBssid, wpa_s->bssid, ETH_ALEN);
-        info.mBssId        = ByteSpan(sBssid, ETH_ALEN);
-        info.mSecurityType = GetSecurityType();
-        // TODO: this should reflect the real connection compliance
-        // i.e. the AP might support WiFi 5 only even though the station
-        // is WiFi 6 ready (so the connection is WiFi 5 effectively).
-        // For now just return what the station supports.
-        info.mWiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11AX;
+        ChipLogError(DeviceLayer, "Status request failed");
+        return CHIP_ERROR_INTERNAL;
+    }
 
-        wpa_signal_info signalInfo{};
-        if (0 == wpa_drv_signal_poll(wpa_s, &signalInfo))
-        {
-            info.mRssi    = signalInfo.current_signal; // dBm
-            info.mChannel = FrequencyToChannel(signalInfo.frequency);
-        }
-        else
-        {
-            // this values should be nullable according to the Matter spec
-            info.mRssi    = std::numeric_limits<decltype(info.mRssi)>::min();
-            info.mChannel = std::numeric_limits<decltype(info.mChannel)>::min();
-        }
-
-        memcpy(info.mSsid, mpWpaNetwork->ssid, mpWpaNetwork->ssid_len);
-        info.mSsidLen = mpWpaNetwork->ssid_len;
+    if (status.state >= WIFI_STATE_ASSOCIATED)
+    {
+        uint8_t mac_string_buf[sizeof("xx:xx:xx:xx:xx:xx")];
+        net_sprint_ll_addr_buf(reinterpret_cast<const uint8_t *>(status.bssid), WIFI_MAC_ADDR_LEN,
+                               reinterpret_cast<char *>(mac_string_buf), sizeof(mac_string_buf));
+        info.mBssId        = ByteSpan(mac_string_buf, sizeof(mac_string_buf));
+        info.mSecurityType = static_cast<uint8_t>(status.security);
+        info.mWiFiVersion  = static_cast<uint8_t>(status.link_mode);
+        info.mRssi         = status.rssi;
+        info.mChannel      = status.channel;
+        info.mSsidLen      = status.ssid_len;
+        memcpy(info.mSsid, status.ssid, status.ssid_len);
 
         return CHIP_NO_ERROR;
     }
 
     return CHIP_ERROR_INTERNAL;
-}
-
-uint8_t WiFiManager::GetSecurityType() const
-{
-    VerifyOrReturnValue(nullptr != mpWpaNetwork, EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED);
-
-    if ((mpWpaNetwork->key_mgmt & WPA_KEY_MGMT_NONE) || !wpa_key_mgmt_wpa_any(mpWpaNetwork->key_mgmt))
-    {
-        return EMBER_ZCL_SECURITY_TYPE_NONE;
-    }
-    else if (wpa_key_mgmt_wpa_psk_no_sae(mpWpaNetwork->key_mgmt))
-    {
-        return (mpWpaNetwork->pairwise_cipher & (WPA_CIPHER_TKIP | WPA_CIPHER_CCMP)) ? EMBER_ZCL_SECURITY_TYPE_WPA2
-                                                                                     : EMBER_ZCL_SECURITY_TYPE_WPA3;
-    }
-    else if (wpa_key_mgmt_sae(mpWpaNetwork->key_mgmt))
-    {
-        return EMBER_ZCL_SECURITY_TYPE_WPA3;
-    }
-    else
-    {
-        return EMBER_ZCL_SECURITY_TYPE_WEP;
-    }
-
-    return EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED;
-}
-
-uint8_t WiFiManager::FrequencyToChannel(uint16_t freq)
-{
-    static constexpr uint16_t k24MinFreq{ 2401 };
-    static constexpr uint16_t k24MaxFreq{ 2484 };
-    static constexpr uint8_t k24FreqConstDiff{ 5 };
-
-    if (freq >= k24MinFreq && freq < k24MaxFreq)
-    {
-        return static_cast<uint8_t>((freq - k24MinFreq) / k24FreqConstDiff + 1);
-    }
-    else if (freq == k24MaxFreq)
-    {
-        return 14;
-    }
-    else if (freq > k24MaxFreq)
-    {
-        // assume we are in 5GH band
-        return sFreqChannelMap[freq];
-    }
-    return 0;
 }
 
 CHIP_ERROR WiFiManager::GetNetworkStatistics(NetworkStatistics & stats) const
@@ -441,6 +277,160 @@ CHIP_ERROR WiFiManager::GetNetworkStatistics(NetworkStatistics & stats) const
     stats.mOverruns               = 0; // TODO: clarify if this can be queried from mgmt API (e.g. data.tx_dropped)
 
     return CHIP_NO_ERROR;
+}
+
+void WiFiManager::ScanResultHandler(uint8_t * data)
+{
+    const struct wifi_scan_result * scanResult = reinterpret_cast<const struct wifi_scan_result *>(data);
+
+    if (Instance().mInternalScan &&
+        Instance().mWantedNetwork.GetSsidSpan().data_equal(ByteSpan(scanResult->ssid, scanResult->ssid_length)))
+    {
+        // Prepare the connection parameters
+        // In case there are many networks with the same SSID choose the one with the best RSSI
+        if (scanResult->rssi > Instance().mWiFiParams.mRssi)
+        {
+            Instance().ClearStationProvisioningData();
+            Instance().mWiFiParams.mParams.ssid_length = Instance().mWantedNetwork.ssidLen;
+            Instance().mWiFiParams.mParams.ssid        = Instance().mWantedNetwork.ssid;
+            // Fallback to the WIFI_SECURITY_TYPE_PSK if the security is unknown
+            Instance().mWiFiParams.mParams.security =
+                scanResult->security <= WIFI_SECURITY_TYPE_MAX ? scanResult->security : WIFI_SECURITY_TYPE_PSK;
+            Instance().mWiFiParams.mParams.psk_length = Instance().mWantedNetwork.passLen;
+
+            // If the security is none, WiFi driver expects the psk to be nullptr
+            if (Instance().mWiFiParams.mParams.security == WIFI_SECURITY_TYPE_NONE)
+            {
+                Instance().mWiFiParams.mParams.psk = nullptr;
+            }
+            else
+            {
+                Instance().mWiFiParams.mParams.psk = Instance().mWantedNetwork.pass;
+            }
+
+            Instance().mWiFiParams.mParams.timeout = Instance().mHandling.mConnectionTimeout.count();
+            Instance().mWiFiParams.mParams.channel = scanResult->channel;
+            Instance().mWiFiParams.mRssi           = scanResult->rssi;
+        }
+    }
+
+    if (Instance().mScanResultCallback && !Instance().mInternalScan)
+    {
+        Instance().mScanResultCallback(ToScanResponse(scanResult));
+    }
+}
+
+void WiFiManager::ScanDoneHandler(uint8_t * data)
+{
+    const wifi_status * status      = reinterpret_cast<const wifi_status *>(data);
+    WiFiRequestStatus requestStatus = static_cast<WiFiRequestStatus>(status->status);
+
+    if (Instance().mScanDoneCallback && !Instance().mInternalScan)
+    {
+        Instance().mScanDoneCallback(requestStatus);
+    }
+
+    if (requestStatus == WiFiRequestStatus::FAILURE)
+    {
+        ChipLogDetail(DeviceLayer, "Scan request failed (%d)", status->status);
+    }
+    else
+    {
+        ChipLogDetail(DeviceLayer, "Scan request done (%d)", status->status);
+
+        // Internal scan is supposed to be followed by connection request
+        if (Instance().mInternalScan)
+        {
+            Instance().mWiFiState = WIFI_STATE_ASSOCIATING;
+            net_if * iface        = InetUtils::GetInterface();
+            VerifyOrReturn(nullptr != iface, CHIP_ERROR_INTERNAL);
+
+            if (net_mgmt(NET_REQUEST_WIFI_CONNECT, iface, &(Instance().mWiFiParams.mParams), sizeof(wifi_connect_req_params)))
+            {
+                ChipLogError(DeviceLayer, "Connection request failed");
+                if (Instance().mHandling.mOnConnectionFailed)
+                {
+                    Instance().mHandling.mOnConnectionFailed();
+                }
+                return;
+            }
+            ChipLogError(DeviceLayer, "Connection to %*s requested", Instance().mWiFiParams.mParams.ssid_length,
+                         Instance().mWiFiParams.mParams.ssid);
+            Instance().mInternalScan = false;
+        }
+    }
+}
+
+void WiFiManager::SendRouterSolicitation(System::Layer * layer, void * param)
+{
+    net_if * iface = InetUtils::GetInterface();
+    if (iface && iface->if_dev->link_addr.type == NET_LINK_ETHERNET)
+    {
+        net_if_start_rs(iface);
+        Instance().mRouterSolicitationCounter++;
+        if (Instance().mRouterSolicitationCounter < kRouterSolicitationMaxCount)
+        {
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kRouterSolicitationIntervalMs),
+                                                  SendRouterSolicitation, nullptr);
+        }
+        else
+        {
+            Instance().mRouterSolicitationCounter = 0;
+        }
+    }
+}
+
+void WiFiManager::ConnectHandler(uint8_t * data)
+{
+    const wifi_status * status      = reinterpret_cast<const wifi_status *>(data);
+    WiFiRequestStatus requestStatus = static_cast<WiFiRequestStatus>(status->status);
+
+    if (requestStatus == WiFiRequestStatus::FAILURE || requestStatus == WiFiRequestStatus::TERMINATED)
+    {
+        ChipLogDetail(DeviceLayer, "Connection to WiFi network failed or was terminated by another request");
+        Instance().mWiFiState = WIFI_STATE_DISCONNECTED;
+        if (Instance().mHandling.mOnConnectionFailed)
+        {
+            Instance().mHandling.mOnConnectionFailed();
+        }
+    }
+    else
+    {
+        // Workaround needed until sending Router Solicitation after connect will be done by the driver.
+        DeviceLayer::SystemLayer().StartTimer(
+            System::Clock::Milliseconds32(chip::Crypto::GetRandU16() % kMaxInitialRouterSolicitationDelayMs),
+            SendRouterSolicitation, nullptr);
+
+        ChipLogDetail(DeviceLayer, "Connected to WiFi network");
+        Instance().mWiFiState = WIFI_STATE_COMPLETED;
+        if (Instance().mHandling.mOnConnectionSuccess)
+        {
+            Instance().mHandling.mOnConnectionSuccess();
+        }
+        Instance().PostConnectivityStatusChange(kConnectivity_Established);
+    }
+    // cleanup the provisioning data as it is configured per each connect request
+    Instance().ClearStationProvisioningData();
+}
+
+void WiFiManager::DisconnectHandler(uint8_t * data)
+{
+    ChipLogDetail(DeviceLayer, "WiFi station disconnected");
+    Instance().mWiFiState = WIFI_STATE_DISCONNECTED;
+    Instance().PostConnectivityStatusChange(kConnectivity_Lost);
+}
+
+WiFiManager::StationStatus WiFiManager::GetStationStatus() const
+{
+    return WiFiManager::sStatusMap[mWiFiState];
+}
+
+void WiFiManager::PostConnectivityStatusChange(ConnectivityChange changeType)
+{
+    ChipDeviceEvent networkEvent{};
+    networkEvent.Type                          = DeviceEventType::kWiFiConnectivityChange;
+    networkEvent.WiFiConnectivityChange.Result = changeType;
+    PlatformMgr().PostEventOrDie(&networkEvent);
 }
 
 } // namespace DeviceLayer

@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
-import coloredlogs
 import logging
 import os
 import pathlib
@@ -26,9 +24,13 @@ import shlex
 import signal
 import subprocess
 import sys
+
+import click
+import coloredlogs
+from colorama import Fore, Style
 from java.base import DumpProgramOutputToQueue
 from java.commissioning_test import CommissioningTest
-from colorama import Fore, Style
+from java.discover_test import DiscoverTest
 
 
 @click.command()
@@ -87,10 +89,20 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
         logging.info("Testing pairing cluster")
 
         test = CommissioningTest(log_cooking_threads, log_queue, command, tool_args)
-        controller_exit_code = test.RunTest()
+        try:
+            test.RunTest()
+        except Exception as e:
+            logging.error(e)
+            sys.exit(1)
+    elif tool_cluster == 'discover':
+        logging.info("Testing discover cluster")
 
-        if controller_exit_code != 0:
-            logging.error("Test script exited with error %r" % test_script_exit_code)
+        test = DiscoverTest(log_cooking_threads, log_queue, command, tool_args)
+        try:
+            test.RunTest()
+        except Exception as e:
+            logging.error(e)
+            sys.exit(1)
 
     app_exit_code = 0
     if app_process:
@@ -103,11 +115,8 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
     for thread in log_cooking_threads:
         thread.join()
 
-    if controller_exit_code != 0:
-        sys.exit(controller_exit_code)
-    else:
-        # We expect both app and controller should exit with 0
-        sys.exit(app_exit_code)
+    # We expect app should exit with 0
+    sys.exit(app_exit_code)
 
 
 if __name__ == '__main__':

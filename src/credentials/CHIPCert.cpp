@@ -37,7 +37,7 @@
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -875,11 +875,11 @@ CHIP_ERROR ChipDN::DecodeFromTLV(TLVReader & reader)
             ReturnErrorOnFailure(reader.Get(chipAttr));
             if (attrOID == chip::ASN1::kOID_AttributeType_MatterNodeId)
             {
-                VerifyOrReturnError(IsOperationalNodeId(attrOID), CHIP_ERROR_WRONG_NODE_ID);
+                VerifyOrReturnError(IsOperationalNodeId(chipAttr), CHIP_ERROR_WRONG_NODE_ID);
             }
             else if (attrOID == chip::ASN1::kOID_AttributeType_MatterFabricId)
             {
-                VerifyOrReturnError(IsValidFabricId(attrOID), CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(IsValidFabricId(chipAttr), CHIP_ERROR_INVALID_ARGUMENT);
             }
             ReturnErrorOnFailure(AddAttribute(attrOID, chipAttr));
         }

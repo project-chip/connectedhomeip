@@ -21,7 +21,6 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "ButtonManager.h"
-#include "LEDWidget.h"
 #include "binding-handler.h"
 
 #include "ThreadUtil.h"
@@ -54,10 +53,10 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 namespace {
-
-constexpr int kAppEventQueueSize      = 10;
-constexpr uint8_t kButtonPushEvent    = 1;
-constexpr uint8_t kButtonReleaseEvent = 0;
+constexpr int kFactoryResetTriggerTimeout = 2000;
+constexpr int kAppEventQueueSize          = 10;
+constexpr uint8_t kButtonPushEvent        = 1;
+constexpr uint8_t kButtonReleaseEvent     = 0;
 
 // NOTE! This key is for test/certification only and should not be available in production devices!
 // If CONFIG_CHIP_FACTORY_DATA is enabled, this value is read from the factory data.
@@ -65,6 +64,7 @@ uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] =
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
+k_timer sFactoryResetTimer;
 
 LEDWidget sStatusLED;
 
@@ -73,10 +73,11 @@ Button sSwitchButton;
 Button sThreadStartButton;
 Button sBleAdvStartButton;
 
-bool sIsThreadProvisioned = false;
-bool sIsThreadEnabled     = false;
-bool sIsThreadAttached    = false;
-bool sHaveBLEConnections  = false;
+bool sIsThreadProvisioned       = false;
+bool sIsThreadEnabled           = false;
+bool sIsThreadAttached          = false;
+bool sHaveBLEConnections        = false;
+bool sIsFactoryResetTimerActive = false;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
@@ -115,20 +116,35 @@ Identify sIdentify = {
 
 AppTask AppTask::sAppTask;
 
+class AppFabricTableDelegate : public FabricTable::Delegate
+{
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+    {
+        if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
+        {
+            chip::Server::GetInstance().ScheduleFactoryReset();
+        }
+    }
+};
+
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err;
 
-    LOG_INF("Current Software Version: %u, %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION,
-            CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+    LOG_INF("SW Version: %u, %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
     // Initialize status LED
     LEDWidget::InitGpio(SYSTEM_STATE_LED_PORT);
+    LEDWidget::SetStateUpdateCallback(LEDStateUpdateHandler);
     sStatusLED.Init(SYSTEM_STATE_LED_PIN);
 
     UpdateStatusLED();
 
     InitButtons();
+
+    // Initialize function button timer
+    k_timer_init(&sFactoryResetTimer, &AppTask::FactoryResetTimerTimeoutCallback, nullptr);
+    k_timer_user_data_set(&sFactoryResetTimer, this);
 
     // Initialize CHIP server
 #if CONFIG_CHIP_FACTORY_DATA
@@ -166,7 +182,7 @@ CHIP_ERROR AppTask::Init()
     err = InitBindingHandler();
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("InitBindingHandler() failed");
+        LOG_ERR("InitBindingHandler fail");
         return err;
     }
 
@@ -180,10 +196,18 @@ CHIP_ERROR AppTask::Init()
     err = ConnectivityMgr().SetBLEDeviceName("TelinkSwitch");
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("Fail to set BLE device name");
+        LOG_ERR("SetBLEDeviceName fail");
+        return err;
     }
 
-    return err;
+    err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(new AppFabricTableDelegate);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("AppFabricTableDelegate fail");
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AppTask::StartApp()
@@ -192,7 +216,7 @@ CHIP_ERROR AppTask::StartApp()
 
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("AppTask.Init() failed");
+        LOG_ERR("AppTask Init fail");
         return err;
     }
 
@@ -207,8 +231,6 @@ CHIP_ERROR AppTask::StartApp()
             DispatchEvent(&event);
             ret = k_msgq_get(&sAppEventQueue, &event, K_NO_WAIT);
         }
-
-        sStatusLED.Animate();
     }
 }
 
@@ -246,8 +268,16 @@ void AppTask::FactoryResetButtonEventHandler(void)
 
 void AppTask::FactoryResetHandler(AppEvent * aEvent)
 {
-    LOG_INF("Factory Reset triggered.");
-    chip::Server::GetInstance().ScheduleFactoryReset();
+    if (!sIsFactoryResetTimerActive)
+    {
+        k_timer_start(&sFactoryResetTimer, K_MSEC(kFactoryResetTriggerTimeout), K_NO_WAIT);
+        sIsFactoryResetTimerActive = true;
+    }
+    else
+    {
+        k_timer_stop(&sFactoryResetTimer);
+        sIsFactoryResetTimerActive = false;
+    }
 }
 
 void AppTask::StartThreadButtonEventHandler(void)
@@ -262,18 +292,17 @@ void AppTask::StartThreadButtonEventHandler(void)
 
 void AppTask::StartThreadHandler(AppEvent * aEvent)
 {
-
+    LOG_INF("StartThreadHandler");
     if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
         // Switch context from BLE to Thread
         Internal::BLEManagerImpl sInstance;
         sInstance.SwitchToIeee802154();
         StartDefaultThreadNetwork();
-        LOG_INF("Device is not commissioned to a Thread network. Starting with the default configuration.");
     }
     else
     {
-        LOG_INF("Device is commissioned to a Thread network.");
+        LOG_INF("Device already commissioned");
     }
 }
 
@@ -289,25 +318,42 @@ void AppTask::StartBleAdvButtonEventHandler(void)
 
 void AppTask::StartBleAdvHandler(AppEvent * aEvent)
 {
-    LOG_INF("BLE advertising start button pressed");
+    LOG_INF("StartBleAdvHandler");
 
     // Don't allow on starting Matter service BLE advertising after Thread provisioning.
     if (ConnectivityMgr().IsThreadProvisioned())
     {
-        LOG_INF("Matter service BLE advertising not started - device is commissioned to a Thread network.");
+        LOG_INF("Device already commissioned");
         return;
     }
 
     if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
-        LOG_INF("BLE advertising is already enabled");
+        LOG_INF("BLE adv already enabled");
         return;
     }
 
     if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
     {
-        LOG_ERR("OpenBasicCommissioningWindow() failed");
+        LOG_ERR("OpenBasicCommissioningWindow fail");
     }
+}
+
+void AppTask::UpdateLedStateEventHandler(AppEvent * aEvent)
+{
+    if (aEvent->Type == AppEvent::kEventType_UpdateLedState)
+    {
+        aEvent->UpdateLedStateEvent.LedWidget->UpdateState();
+    }
+}
+
+void AppTask::LEDStateUpdateHandler(LEDWidget * ledWidget)
+{
+    AppEvent event;
+    event.Type                          = AppEvent::kEventType_UpdateLedState;
+    event.Handler                       = UpdateLedStateEventHandler;
+    event.UpdateLedStateEvent.LedWidget = ledWidget;
+    sAppTask.PostEvent(&event);
 }
 
 void AppTask::UpdateStatusLED()
@@ -370,7 +416,7 @@ void AppTask::PostEvent(AppEvent * aEvent)
 {
     if (k_msgq_put(&sAppEventQueue, aEvent, K_NO_WAIT) != 0)
     {
-        LOG_INF("Failed to post event to app task event queue");
+        LOG_INF("PostEvent fail");
     }
 }
 
@@ -382,18 +428,43 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
     else
     {
-        LOG_INF("Event received with no handler. Dropping event.");
+        LOG_INF("Dropping event without handler");
     }
 }
 
 void AppTask::UpdateClusterState() {}
 
+void AppTask::FactoryResetTimerTimeoutCallback(k_timer * timer)
+{
+    if (!timer)
+    {
+        return;
+    }
+
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_Timer;
+    event.Handler = FactoryResetTimerEventHandler;
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::FactoryResetTimerEventHandler(AppEvent * aEvent)
+{
+    if (aEvent->Type != AppEvent::kEventType_Timer)
+    {
+        return;
+    }
+
+    sIsFactoryResetTimerActive = false;
+    LOG_INF("FactoryResetHandler");
+    chip::Server::GetInstance().ScheduleFactoryReset();
+}
+
 void AppTask::InitButtons(void)
 {
-    sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
-    sSwitchButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, SwitchActionButtonEventHandler);
-    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
-    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, StartBleAdvButtonEventHandler);
+    sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, true, FactoryResetButtonEventHandler);
+    sSwitchButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, false, SwitchActionButtonEventHandler);
+    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, false, StartThreadButtonEventHandler);
+    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, false, StartBleAdvButtonEventHandler);
 
     ButtonManagerInst().AddButton(sFactoryResetButton);
     ButtonManagerInst().AddButton(sSwitchButton);

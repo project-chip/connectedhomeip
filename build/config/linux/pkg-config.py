@@ -32,9 +32,9 @@ from __future__ import print_function
 
 import json
 import os
+import re
 import subprocess
 import sys
-import re
 from optparse import OptionParser
 
 # This script runs pkg-config, optionally filtering out some results, and

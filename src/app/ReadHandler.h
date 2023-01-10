@@ -37,7 +37,7 @@
 #include <app/MessageDef/EventPathIBs.h>
 #include <app/ObjectList.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -252,6 +252,8 @@ private:
      *  @retval #Others If fails to send report data
      *  @retval #CHIP_NO_ERROR On success.
      *
+     *  If an error is returned, the ReadHandler guarantees that it is not in
+     *  a state where it's waiting for a response.
      */
     CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool aMoreChunks);
 

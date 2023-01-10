@@ -15,17 +15,16 @@
 #    limitations under the License.
 #
 
-import pprint
-import chip.clusters as Clusters
-import chip.exceptions
-import logging
-from chip.clusters.Attribute import AttributePath, AttributeReadResult, AttributeStatus, ValueDecodeFailure, TypedAttributePath, SubscriptionTransaction, DataVersion
-import chip.interaction_model
 import asyncio
-import time
-import sys
+import logging
+import pprint
 
 import base
+import chip.clusters as Clusters
+import chip.exceptions
+import chip.interaction_model
+from chip.clusters.Attribute import (AttributePath, AttributeStatus, DataVersion, SubscriptionTransaction, TypedAttributePath,
+                                     ValueDecodeFailure)
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -136,16 +135,16 @@ class ClusterObjectTests:
         logger.info("1: Trivial writes (multiple attributes)")
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
-                                               (0, Clusters.Basic.Attributes.NodeLabel(
+                                               (0, Clusters.BasicInformation.Attributes.NodeLabel(
                                                    "Test")),
-                                               (0, Clusters.Basic.Attributes.Location(
+                                               (0, Clusters.BasicInformation.Attributes.Location(
                                                    "A loooong string"))
                                            ])
         expectedRes = [
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
-                            AttributeId=5), Status=chip.interaction_model.Status.Success),
+                                               AttributeId=5), Status=chip.interaction_model.Status.Success),
             AttributeStatus(Path=AttributePath(EndpointId=0, ClusterId=40,
-                            AttributeId=6), Status=chip.interaction_model.Status.ConstraintError)
+                                               AttributeId=6), Status=chip.interaction_model.Status.ConstraintError)
         ]
 
         logger.info(f"Received WriteResponse: {res}")
@@ -243,12 +242,12 @@ class ClusterObjectTests:
 
         logger.info("1: Reading Ex Cx Ax")
         req = [
-            (0, Clusters.Basic.Attributes.VendorName),
-            (0, Clusters.Basic.Attributes.ProductID),
-            (0, Clusters.Basic.Attributes.HardwareVersion),
+            (0, Clusters.BasicInformation.Attributes.VendorName),
+            (0, Clusters.BasicInformation.Attributes.ProductID),
+            (0, Clusters.BasicInformation.Attributes.HardwareVersion),
         ]
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
-        if ((0 not in res) or (Clusters.Basic not in res[0]) or (len(res[0][Clusters.Basic]) != 4)):
+        if ((0 not in res) or (Clusters.BasicInformation not in res[0]) or (len(res[0][Clusters.BasicInformation]) != 4)):
             # 3 attribute data + DataVersion
             raise AssertionError(
                 f"Got back {len(res)} data items instead of 3")
@@ -256,7 +255,7 @@ class ClusterObjectTests:
 
         logger.info("2: Reading Ex Cx A*")
         req = [
-            (0, Clusters.Basic),
+            (0, Clusters.BasicInformation),
         ]
         VerifyDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
@@ -286,7 +285,7 @@ class ClusterObjectTests:
 
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, returnClusterObject=True)
         logger.info(
-            f"Basic Cluster - Label: {res[0][Clusters.Basic].productLabel}")
+            f"Basic Cluster - Label: {res[0][Clusters.BasicInformation].productLabel}")
         # TestCluster will be ValueDecodeError here, so we comment out the log below.
         # Values are not expected to be ValueDecodeError for real clusters.
         # logger.info(
@@ -488,18 +487,18 @@ class ClusterObjectTests:
     async def TestReadWriteAttributeRequestsWithVersion(cls, devCtrl):
         logger.info("TestReadWriteAttributeRequestsWithVersion")
         req = [
-            (0, Clusters.Basic.Attributes.VendorName)
+            (0, Clusters.BasicInformation.Attributes.VendorName)
         ]
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
         VerifyDecodeSuccess(res)
-        data_version = res[0][Clusters.Basic][DataVersion]
+        data_version = res[0][Clusters.BasicInformation][DataVersion]
 
         logger.info(res)
         logger.info(data_version)
 
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
-                                               (0, Clusters.Basic.Attributes.NodeLabel(
+                                               (0, Clusters.BasicInformation.Attributes.NodeLabel(
                                                    "Test"))
                                            ])
         expectedRes = [
@@ -515,20 +514,20 @@ class ClusterObjectTests:
             raise AssertionError("Write returned unexpected result.")
 
         req = [
-            (0, Clusters.Basic.Attributes.VendorName),
+            (0, Clusters.BasicInformation.Attributes.VendorName),
         ]
-        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, dataVersionFilters=[(0, Clusters.Basic, data_version)])
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, dataVersionFilters=[(0, Clusters.BasicInformation, data_version)])
         VerifyDecodeSuccess(res)
-        new_data_version = res[0][Clusters.Basic][DataVersion]
+        new_data_version = res[0][Clusters.BasicInformation][DataVersion]
         if (data_version + 1) != new_data_version:
             raise AssertionError("Version mistmatch happens.")
 
-        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, dataVersionFilters=[(0, Clusters.Basic, new_data_version)])
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, dataVersionFilters=[(0, Clusters.BasicInformation, new_data_version)])
         VerifyDecodeSuccess(res)
 
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
-                                               (0, Clusters.Basic.Attributes.NodeLabel(
+                                               (0, Clusters.BasicInformation.Attributes.NodeLabel(
                                                    "Test"), new_data_version)
                                            ])
 
@@ -546,7 +545,7 @@ class ClusterObjectTests:
 
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
-                                               (0, Clusters.Basic.Attributes.NodeLabel(
+                                               (0, Clusters.BasicInformation.Attributes.NodeLabel(
                                                    "Test"), new_data_version)
                                            ])
 
@@ -567,11 +566,11 @@ class ClusterObjectTests:
     async def TestMixedReadAttributeAndEvents(cls, devCtrl):
         def attributePathPossibilities():
             yield ('Ex Cx Ax', [
-                (0, Clusters.Basic.Attributes.VendorName),
-                (0, Clusters.Basic.Attributes.ProductID),
-                (0, Clusters.Basic.Attributes.HardwareVersion),
+                (0, Clusters.BasicInformation.Attributes.VendorName),
+                (0, Clusters.BasicInformation.Attributes.ProductID),
+                (0, Clusters.BasicInformation.Attributes.HardwareVersion),
             ])
-            yield ('Ex Cx A*', [(0, Clusters.Basic)])
+            yield ('Ex Cx A*', [(0, Clusters.BasicInformation)])
             yield ('E* Cx A*', [Clusters.Descriptor.Attributes.ServerList])
             yield ('E* A* A*', ['*'])
 

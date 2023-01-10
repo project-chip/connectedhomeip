@@ -69,7 +69,7 @@ namespace chip {
 namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
-static ConnectivityManager::WiFiStationState ConnectivityManagerImpl::mWiFiStationState =
+ConnectivityManager::WiFiStationState ConnectivityManagerImpl::mWiFiStationState =
     ConnectivityManager::kWiFiStationState_NotConnected;
 
 void ConnectivityManagerImpl::WifiStationStateChange(void)
@@ -86,8 +86,6 @@ void ConnectivityManagerImpl::WifiStationStateChange(void)
 
 void ConnectivityManagerImpl::DriveStationState()
 {
-
-exit:
     return;
 }
 
@@ -101,7 +99,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
-exit:
+
     return err;
 }
 

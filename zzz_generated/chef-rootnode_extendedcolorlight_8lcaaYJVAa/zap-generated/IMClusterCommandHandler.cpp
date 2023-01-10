@@ -805,13 +805,13 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
     {
         switch (aCommandPath.mCommandId)
         {
-        case Commands::AnnounceOtaProvider::Id: {
-            Commands::AnnounceOtaProvider::DecodableType commandData;
+        case Commands::AnnounceOTAProvider::Id: {
+            Commands::AnnounceOTAProvider::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled =
-                    emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(apCommandObj, aCommandPath, commandData);
+                    emberAfOtaSoftwareUpdateRequestorClusterAnnounceOTAProviderCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }

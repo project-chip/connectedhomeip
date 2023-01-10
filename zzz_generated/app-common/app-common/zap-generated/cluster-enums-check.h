@@ -206,14 +206,29 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(LevelControl::StepMode 
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AuthMode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessControlEntryAuthModeEnum val)
 {
-    using EnumType = AccessControl::AuthMode;
+    using EnumType = AccessControl::AccessControlEntryAuthModeEnum;
     switch (val)
     {
     case EnumType::kPase:
     case EnumType::kCase:
     case EnumType::kGroup:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessControlEntryPrivilegeEnum val)
+{
+    using EnumType = AccessControl::AccessControlEntryPrivilegeEnum;
+    switch (val)
+    {
+    case EnumType::kView:
+    case EnumType::kProxyView:
+    case EnumType::kOperate:
+    case EnumType::kManage:
+    case EnumType::kAdminister:
         return val;
     default:
         return static_cast<EnumType>(0);
@@ -230,21 +245,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::ChangeTy
         return val;
     default:
         return static_cast<EnumType>(3);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::Privilege val)
-{
-    using EnumType = AccessControl::Privilege;
-    switch (val)
-    {
-    case EnumType::kView:
-    case EnumType::kProxyView:
-    case EnumType::kOperate:
-    case EnumType::kManage:
-    case EnumType::kAdminister:
-        return val;
-    default:
-        return static_cast<EnumType>(0);
     }
 }
 
@@ -668,9 +668,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DiagnosticLogs::LogsTra
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::BootReasonType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::BootReasonEnum val)
 {
-    using EnumType = GeneralDiagnostics::BootReasonType;
+    using EnumType = GeneralDiagnostics::BootReasonEnum;
     switch (val)
     {
     case EnumType::kUnspecified:
@@ -685,9 +685,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Boo
         return static_cast<EnumType>(7);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::HardwareFaultType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::HardwareFault val)
 {
-    using EnumType = GeneralDiagnostics::HardwareFaultType;
+    using EnumType = GeneralDiagnostics::HardwareFault;
     switch (val)
     {
 // Need to convert consumers to using the new enum classes, so we
@@ -705,17 +705,17 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Har
     case EnumType::kNonVolatileMemoryError:
     case EnumType::kTamperDetected:
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_HARDWARE_FAULT_TYPE_UNSPECIFIED:
-    case EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO:
-    case EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR:
-    case EMBER_ZCL_HARDWARE_FAULT_TYPE_RESETTABLE_OVER_TEMP:
-    case EMBER_ZCL_HARDWARE_FAULT_TYPE_NON_RESETTABLE_OVER_TEMP:
-    case EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE:
-    case EMBER_ZCL_HARDWARE_FAULT_TYPE_VISUAL_DISPLAY_FAULT:
-    case EMBER_ZCL_HARDWARE_FAULT_TYPE_AUDIO_OUTPUT_FAULT:
-    case EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT:
-    case EMBER_ZCL_HARDWARE_FAULT_TYPE_NON_VOLATILE_MEMORY_ERROR:
-    case EMBER_ZCL_HARDWARE_FAULT_TYPE_TAMPER_DETECTED:
+    case EMBER_ZCL_HARDWARE_FAULT_UNSPECIFIED:
+    case EMBER_ZCL_HARDWARE_FAULT_RADIO:
+    case EMBER_ZCL_HARDWARE_FAULT_SENSOR:
+    case EMBER_ZCL_HARDWARE_FAULT_RESETTABLE_OVER_TEMP:
+    case EMBER_ZCL_HARDWARE_FAULT_NON_RESETTABLE_OVER_TEMP:
+    case EMBER_ZCL_HARDWARE_FAULT_POWER_SOURCE:
+    case EMBER_ZCL_HARDWARE_FAULT_VISUAL_DISPLAY_FAULT:
+    case EMBER_ZCL_HARDWARE_FAULT_AUDIO_OUTPUT_FAULT:
+    case EMBER_ZCL_HARDWARE_FAULT_USER_INTERFACE_FAULT:
+    case EMBER_ZCL_HARDWARE_FAULT_NON_VOLATILE_MEMORY_ERROR:
+    case EMBER_ZCL_HARDWARE_FAULT_TAMPER_DETECTED:
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
@@ -770,9 +770,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Net
         return static_cast<EnumType>(4);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::RadioFaultType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::RadioFault val)
 {
-    using EnumType = GeneralDiagnostics::RadioFaultType;
+    using EnumType = GeneralDiagnostics::RadioFault;
     switch (val)
     {
 // Need to convert consumers to using the new enum classes, so we
@@ -786,13 +786,13 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Rad
     case EnumType::kBLEFault:
     case EnumType::kEthernetFault:
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_RADIO_FAULT_TYPE_UNSPECIFIED:
-    case EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_TYPE_CELLULAR_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_TYPE_NFC_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_TYPE_BLE_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_TYPE_ETHERNET_FAULT:
+    case EMBER_ZCL_RADIO_FAULT_UNSPECIFIED:
+    case EMBER_ZCL_RADIO_FAULT_WI_FI_FAULT:
+    case EMBER_ZCL_RADIO_FAULT_CELLULAR_FAULT:
+    case EMBER_ZCL_RADIO_FAULT_THREAD_FAULT:
+    case EMBER_ZCL_RADIO_FAULT_NFC_FAULT:
+    case EMBER_ZCL_RADIO_FAULT_BLE_FAULT:
+    case EMBER_ZCL_RADIO_FAULT_ETHERNET_FAULT:
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
@@ -800,6 +800,18 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Rad
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(ThreadNetworkDiagnostics::ConnectionStatusEnum val)
+{
+    using EnumType = ThreadNetworkDiagnostics::ConnectionStatusEnum;
+    switch (val)
+    {
+    case EnumType::kConnected:
+    case EnumType::kNotConnected:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(ThreadNetworkDiagnostics::NetworkFault val)
 {
     using EnumType = ThreadNetworkDiagnostics::NetworkFault;
@@ -841,18 +853,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ThreadNetworkDiagnostic
         return val;
     default:
         return static_cast<EnumType>(7);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(ThreadNetworkDiagnostics::ThreadConnectionStatus val)
-{
-    using EnumType = ThreadNetworkDiagnostics::ThreadConnectionStatus;
-    switch (val)
-    {
-    case EnumType::kConnected:
-    case EnumType::kNotConnected:
-        return val;
-    default:
-        return static_cast<EnumType>(2);
     }
 }
 
@@ -917,19 +917,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(WiFiNetworkDiagnostics:
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EnumType::k80211a:
-    case EnumType::k80211b:
-    case EnumType::k80211g:
-    case EnumType::k80211n:
-    case EnumType::k80211ac:
-    case EnumType::k80211ax:
+    case EnumType::kA:
+    case EnumType::kB:
+    case EnumType::kG:
+    case EnumType::kN:
+    case EnumType::kAc:
+    case EnumType::kAx:
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_WI_FI_VERSION_TYPE_802__11A:
-    case EMBER_ZCL_WI_FI_VERSION_TYPE_802__11B:
-    case EMBER_ZCL_WI_FI_VERSION_TYPE_802__11G:
-    case EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N:
-    case EMBER_ZCL_WI_FI_VERSION_TYPE_802__11AC:
-    case EMBER_ZCL_WI_FI_VERSION_TYPE_802__11AX:
+    case EMBER_ZCL_WI_FI_VERSION_TYPE_A:
+    case EMBER_ZCL_WI_FI_VERSION_TYPE_B:
+    case EMBER_ZCL_WI_FI_VERSION_TYPE_G:
+    case EMBER_ZCL_WI_FI_VERSION_TYPE_N:
+    case EMBER_ZCL_WI_FI_VERSION_TYPE_AC:
+    case EMBER_ZCL_WI_FI_VERSION_TYPE_AX:
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
@@ -937,35 +937,35 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(WiFiNetworkDiagnostics:
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(EthernetNetworkDiagnostics::PHYRateType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(EthernetNetworkDiagnostics::PHYRate val)
 {
-    using EnumType = EthernetNetworkDiagnostics::PHYRateType;
+    using EnumType = EthernetNetworkDiagnostics::PHYRate;
     switch (val)
     {
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EnumType::k10m:
-    case EnumType::k100m:
-    case EnumType::k1000m:
-    case EnumType::k25g:
-    case EnumType::k5g:
-    case EnumType::k10g:
-    case EnumType::k40g:
-    case EnumType::k100g:
-    case EnumType::k200g:
-    case EnumType::k400g:
+    case EnumType::kRate10M:
+    case EnumType::kRate100M:
+    case EnumType::kRate1G:
+    case EnumType::kRate25g:
+    case EnumType::kRate5G:
+    case EnumType::kRate10G:
+    case EnumType::kRate40G:
+    case EnumType::kRate100G:
+    case EnumType::kRate200G:
+    case EnumType::kRate400G:
 #else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_PHY_RATE_TYPE_10_M:
-    case EMBER_ZCL_PHY_RATE_TYPE_100_M:
-    case EMBER_ZCL_PHY_RATE_TYPE_1000_M:
-    case EMBER_ZCL_PHY_RATE_TYPE_2__5_G:
-    case EMBER_ZCL_PHY_RATE_TYPE_5_G:
-    case EMBER_ZCL_PHY_RATE_TYPE_10_G:
-    case EMBER_ZCL_PHY_RATE_TYPE_40_G:
-    case EMBER_ZCL_PHY_RATE_TYPE_100_G:
-    case EMBER_ZCL_PHY_RATE_TYPE_200_G:
-    case EMBER_ZCL_PHY_RATE_TYPE_400_G:
+    case EMBER_ZCL_PHY_RATE_RATE10_M:
+    case EMBER_ZCL_PHY_RATE_RATE100_M:
+    case EMBER_ZCL_PHY_RATE_RATE1_G:
+    case EMBER_ZCL_PHY_RATE_RATE2_5_G:
+    case EMBER_ZCL_PHY_RATE_RATE5_G:
+    case EMBER_ZCL_PHY_RATE_RATE10_G:
+    case EMBER_ZCL_PHY_RATE_RATE40_G:
+    case EMBER_ZCL_PHY_RATE_RATE100_G:
+    case EMBER_ZCL_PHY_RATE_RATE200_G:
+    case EMBER_ZCL_PHY_RATE_RATE400_G:
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:

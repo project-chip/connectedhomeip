@@ -14,10 +14,10 @@
 #    limitations under the License.
 #
 
-from chip.logging.library_handle import _GetLoggingLibraryHandle
-from chip.logging.types import LogRedirectCallback_t
 import logging
 
+from chip.logging.library_handle import _GetLoggingLibraryHandle
+from chip.logging.types import LogRedirectCallback_t
 
 # Defines match support/logging/Constants.h (LogCategory enum)
 ERROR_CATEGORY_NONE = 0

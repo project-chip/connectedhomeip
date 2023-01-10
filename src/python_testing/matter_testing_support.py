@@ -16,34 +16,31 @@
 #
 
 import argparse
-from binascii import unhexlify, hexlify
+import asyncio
+import builtins
+import json
 import logging
-from chip import ChipDeviceCtrl
+import os
+import pathlib
+import re
+import sys
+import uuid
+from binascii import hexlify, unhexlify
+from dataclasses import asdict as dataclass_asdict
+from dataclasses import dataclass, field
+from typing import List, Optional, Tuple
+
+import chip.CertificateAuthority
 import chip.clusters as Clusters
-from chip.ChipStack import *
-from chip.storage import PersistentStorage
+import chip.FabricAdmin
 import chip.logging
 import chip.native
-import chip.FabricAdmin
-import chip.CertificateAuthority
+from chip import ChipDeviceCtrl
+from chip.ChipStack import *
+from chip.storage import PersistentStorage
 from chip.utils import CommissioningBuildingBlocks
-import builtins
-from typing import Optional, List, Tuple
-from dataclasses import dataclass, field
-from dataclasses import asdict as dataclass_asdict
-import re
-import os
-import sys
-import pathlib
-import json
-import uuid
-import asyncio
-
-from mobly import base_test
-from mobly.config_parser import TestRunConfig, ENV_MOBLY_LOGPATH
-from mobly import logger
-from mobly import signals
-from mobly import utils
+from mobly import base_test, logger, signals, utils
+from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
 
 # TODO: Add utility to commission a device if needed

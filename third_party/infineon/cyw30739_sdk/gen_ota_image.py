@@ -27,9 +27,9 @@ import pathlib
 import subprocess
 import sys
 import zlib
+from struct import pack, pack_into
 
 from intelhex import IntelHex
-from struct import pack, pack_into
 
 
 def main():

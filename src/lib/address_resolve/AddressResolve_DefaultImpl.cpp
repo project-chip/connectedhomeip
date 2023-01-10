@@ -30,41 +30,27 @@ void NodeLookupHandle::ResetForLookup(System::Clock::Timestamp now, const NodeLo
 {
     mRequestStartTime = now;
     mRequest          = request;
-    mBestResult       = ResolveResult();
-    mBestAddressScore = Dnssd::IPAddressSorter::IpScore::kInvalid;
+    mResults          = NodeLookupResults();
 }
 
 void NodeLookupHandle::LookupResult(const ResolveResult & result)
 {
+    auto score = Dnssd::IPAddressSorter::ScoreIpAddress(result.address.GetIPAddress(), result.address.GetInterface());
+    [[maybe_unused]] bool success = mResults.UpdateResults(result, score);
+
 #if CHIP_PROGRESS_LOGGING
     char addr_string[Transport::PeerAddress::kMaxToStringSize];
     result.address.ToString(addr_string);
-#endif
 
-    auto newScore = Dnssd::IPAddressSorter::ScoreIpAddress(result.address.GetIPAddress(), result.address.GetInterface());
-    if (to_underlying(newScore) > to_underlying(mBestAddressScore))
+    if (success)
     {
-        mBestResult       = result;
-        mBestAddressScore = newScore;
-
-        if (!mBestResult.address.GetIPAddress().IsIPv6LinkLocal())
-        {
-            // Only use the DNS-SD resolution's InterfaceID for addresses that are IPv6 LLA.
-            // For all other addresses, we should rely on the device's routing table to route messages sent.
-            // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
-            // mDNS advertisements are not usually received on the same interface the peer is reachable on.
-            mBestResult.address.SetInterface(Inet::InterfaceId::Null());
-            ChipLogDetail(Discovery, "Lookup clearing interface for non LL address");
-        }
-
-#if CHIP_PROGRESS_LOGGING
-        ChipLogProgress(Discovery, "%s: new best score: %u", addr_string, to_underlying(mBestAddressScore));
+        ChipLogProgress(Discovery, "%s: new best score: %u", addr_string, to_underlying(score));
     }
     else
     {
-        ChipLogProgress(Discovery, "%s: score has not improved: %u", addr_string, to_underlying(newScore));
-#endif
+        ChipLogProgress(Discovery, "%s: score has not improved: %u", addr_string, to_underlying(score));
     }
+#endif
 }
 
 System::Clock::Timeout NodeLookupHandle::NextEventTimeout(System::Clock::Timestamp now)
@@ -98,9 +84,10 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
     }
 
     // Minimal time to search reached. If any IP available, ready to return it.
-    if (mBestAddressScore != Dnssd::IPAddressSorter::IpScore::kInvalid)
+    if (HasLookupResult())
     {
-        return NodeLookupAction::Success(mBestResult);
+        auto result = TakeLookupResult();
+        return NodeLookupAction::Success(result);
     }
 
     // Give up if the maximum search time has been reached
@@ -112,6 +99,63 @@ NodeLookupAction NodeLookupHandle::NextAction(System::Clock::Timestamp now)
     return NodeLookupAction::KeepSearching();
 }
 
+bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd::IPAddressSorter::IpScore newScore)
+{
+    uint8_t insertAtIndex = 0;
+    for (; insertAtIndex < kNodeLookupResultsLen; insertAtIndex++)
+    {
+        if (insertAtIndex >= count)
+        {
+            // This is a new entry.
+            break;
+        }
+
+        auto & oldAddress = results[insertAtIndex].address;
+        auto oldScore     = Dnssd::IPAddressSorter::ScoreIpAddress(oldAddress.GetIPAddress(), oldAddress.GetInterface());
+        if (newScore > oldScore)
+        {
+            // This is a score update, it will replace a previous entry.
+            break;
+        }
+    }
+
+    if (insertAtIndex == kNodeLookupResultsLen)
+    {
+        return false;
+    }
+
+    // Move the following valid entries one level down.
+    for (auto i = count; i > insertAtIndex; i--)
+    {
+        if (i >= kNodeLookupResultsLen)
+        {
+            continue;
+        }
+
+        results[i] = results[i - 1];
+    }
+
+    // If the number of valid entries is less than the size of the array there is an additional entry.
+    if (count < kNodeLookupResultsLen)
+    {
+        count++;
+    }
+
+    auto & updatedResult = results[insertAtIndex];
+    updatedResult        = result;
+    if (!updatedResult.address.GetIPAddress().IsIPv6LinkLocal())
+    {
+        // Only use the DNS-SD resolution's InterfaceID for addresses that are IPv6 LLA.
+        // For all other addresses, we should rely on the device's routing table to route messages sent.
+        // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
+        // mDNS advertisements are not usually received on the same interface the peer is reachable on.
+        updatedResult.address.SetInterface(Inet::InterfaceId::Null());
+        ChipLogDetail(Discovery, "Lookup clearing interface for non LL address");
+    }
+
+    return true;
+}
+
 CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle)
 {
     VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -121,6 +165,24 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
     mActiveLookups.PushBack(&handle);
     ReArmTimer();
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Resolver::TryNextResult(Impl::NodeLookupHandle & handle)
+{
+    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mActiveLookups.Contains(&handle), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(handle.HasLookupResult(), CHIP_ERROR_WELL_EMPTY);
+
+    return mSystemLayer->ScheduleWork(&OnTryNextResult, static_cast<void *>(&handle));
+}
+
+void Resolver::OnTryNextResult(System::Layer * layer, void * context)
+{
+    auto handle   = static_cast<Impl::NodeLookupHandle *>(context);
+    auto listener = handle->GetListener();
+    auto peerId   = handle->GetRequest().GetPeerId();
+    auto result   = handle->TakeLookupResult();
+    listener->OnNodeAddressResolved(peerId, result);
 }
 
 CHIP_ERROR Resolver::CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method)

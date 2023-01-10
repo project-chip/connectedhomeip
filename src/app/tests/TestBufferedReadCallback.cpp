@@ -17,7 +17,7 @@
  */
 
 #include "app-common/zap-generated/ids/Attributes.h"
-#include "lib/core/CHIPTLVTags.h"
+#include "lib/core/TLVTags.h"
 #include "protocols/interaction_model/Constants.h"
 #include "system/SystemPacketBuffer.h"
 #include "system/TLVPacketBufferBackingStore.h"

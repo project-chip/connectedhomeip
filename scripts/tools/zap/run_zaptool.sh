@@ -34,6 +34,8 @@ CHIP_ROOT="${SCRIPT_PATH%/scripts/tools/zap/run_zaptool.sh}"
 if [ ! -z "$ZAP_DEVELOPMENT_PATH" ]; then
     WORKING_DIR=$ZAP_DEVELOPMENT_PATH
     ZAP_CMD="node src-script/zap-start.js"
+    # Make sure we don't try to munge the package.json in the ZAP repo.
+    export ZAP_SKIP_REAL_VERSION=1
 
     "$CHIP_ROOT"/scripts/tools/zap/zap_bootstrap.sh
 elif [ ! -z "$ZAP_INSTALL_PATH" ]; then
