@@ -111,7 +111,7 @@ class RunContext:
     '--run-yamltests-with-chip-repl',
     default=False,
     is_flag=True,
-    help='Run YAML tests using chip-repl based python parser')
+    help='Run additional YAML tests using chip-repl based python parser')
 @click.option(
     '--chip-tool',
     help='Binary path of chip tool app to use to run the test')
