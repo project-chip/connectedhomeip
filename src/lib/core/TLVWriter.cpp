@@ -25,7 +25,7 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
@@ -284,7 +284,7 @@ CHIP_ERROR TLVWriter::PutStringF(Tag tag, const char * fmt, ...)
 // emits a single character.  The callback performs a function
 // identical to putchar.
 
-void TLVWriter::CHIPTLVWriterPutcharCB(uint8_t c, void * appState)
+void TLVWriter::TLVWriterPutcharCB(uint8_t c, void * appState)
 {
     TLVWriter * w = static_cast<TLVWriter *>(appState);
     w->WriteData(&c, sizeof(c));
@@ -379,7 +379,7 @@ CHIP_ERROR TLVWriter::VPutStringF(Tag tag, const char * fmt, va_list ap)
 
     va_copy(aq, ap);
 
-    vcbprintf(CHIPTLVWriterPutcharCB, this, dataLen, fmt, aq);
+    vcbprintf(TLVWriterPutcharCB, this, dataLen, fmt, aq);
 
     va_end(aq);
 
@@ -414,7 +414,7 @@ CHIP_ERROR TLVWriter::CopyElement(TLVReader & reader)
     return CopyElement(reader.GetTag(), reader);
 }
 
-const size_t kCHIPTLVCopyChunkSize = 16;
+const size_t kTLVCopyChunkSize = 16;
 
 CHIP_ERROR TLVWriter::CopyElement(Tag tag, TLVReader & reader)
 {
@@ -422,7 +422,7 @@ CHIP_ERROR TLVWriter::CopyElement(Tag tag, TLVReader & reader)
     uint64_t elemLenOrVal   = reader.mElemLenOrVal;
     TLVReader readerHelper; // used to figure out the length of the element and read data of the element
     uint32_t copyDataLen;
-    uint8_t chunk[kCHIPTLVCopyChunkSize];
+    uint8_t chunk[kTLVCopyChunkSize];
 
     VerifyOrReturnError(elemType != TLVElementType::NotSpecified && elemType != TLVElementType::EndOfContainer,
                         CHIP_ERROR_INCORRECT_STATE);
@@ -442,7 +442,7 @@ CHIP_ERROR TLVWriter::CopyElement(Tag tag, TLVReader & reader)
 
     while (copyDataLen > 0)
     {
-        uint32_t chunkSize = copyDataLen > kCHIPTLVCopyChunkSize ? kCHIPTLVCopyChunkSize : copyDataLen;
+        uint32_t chunkSize = copyDataLen > kTLVCopyChunkSize ? kTLVCopyChunkSize : copyDataLen;
         ReturnErrorOnFailure(readerHelper.ReadData(chunk, chunkSize));
 
         ReturnErrorOnFailure(WriteData(chunk, chunkSize));

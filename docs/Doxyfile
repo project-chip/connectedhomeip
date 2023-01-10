@@ -830,7 +830,7 @@ INPUT                  = README.md \
                          docs/guides/BUILDING.md \
                          docs/VSCODE_DEVELOPMENT.md \
                          docs/PROJECT_FLOW.md \
-                         docs/STYLE_GUIDE.md \
+                         docs/style/style_guide.md \
                          src/ble \
                          src/controller \
                          src/crypto \

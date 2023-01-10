@@ -76,8 +76,7 @@ steps:
               --target k32w-shell
               build
               --create-archives /workspace/artifacts/
-    # TODO: update this to connectedhomeip/chip-build-vscode:0.6.30 once we can compile with latest NRF
-    - name: "connectedhomeip/chip-build-vscode:0.6.18"
+    - name: "connectedhomeip/chip-build-vscode:0.6.30"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:

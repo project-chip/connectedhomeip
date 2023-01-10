@@ -28,10 +28,10 @@
 
 #include <lib/core/CHIPCircularTLVBuffer.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/CHIPTLVData.hpp>
-#include <lib/core/CHIPTLVDebug.hpp>
-#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/core/TLV.h>
+#include <lib/core/TLVData.h>
+#include <lib/core/TLVDebug.h>
+#include <lib/core/TLVUtilities.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -1788,7 +1788,7 @@ static CHIP_ERROR FindContainerWithElement(const TLVReader & aReader, size_t aDe
 /**
  *  Test CHIP TLV Utilities
  */
-void CheckCHIPTLVUtilities(nlTestSuite * inSuite, void * inContext)
+void CheckTLVUtilities(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t buf[2048];
     TLVWriter writer;
@@ -1881,7 +1881,7 @@ void CheckCHIPTLVUtilities(nlTestSuite * inSuite, void * inContext)
 /**
  *  Test CHIP TLV Empty Find
  */
-void CheckCHIPTLVEmptyFind(nlTestSuite * inSuite, void * inContext)
+void CheckTLVEmptyFind(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t buf[30];
     TLVWriter writer;
@@ -2616,7 +2616,7 @@ void CheckCircularTLVBufferEdge(nlTestSuite * inSuite, void * inContext)
 
     TestEnd<TLVReader>(inSuite, reader);
 }
-void CheckCHIPTLVPutStringF(nlTestSuite * inSuite, void * inContext)
+void CheckTLVPutStringF(nlTestSuite * inSuite, void * inContext)
 {
     const size_t bufsize = 24;
     char strBuffer[bufsize];
@@ -2646,7 +2646,7 @@ void CheckCHIPTLVPutStringF(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, bufsize) == 0);
 }
 
-void CheckCHIPTLVPutStringSpan(nlTestSuite * inSuite, void * inContext)
+void CheckTLVPutStringSpan(nlTestSuite * inSuite, void * inContext)
 {
     const size_t bufsize    = 24;
     char strBuffer[bufsize] = "Sample string";
@@ -2695,7 +2695,7 @@ void CheckCHIPTLVPutStringSpan(nlTestSuite * inSuite, void * inContext)
     }
 }
 
-void CheckCHIPTLVPutStringFCircular(nlTestSuite * inSuite, void * inContext)
+void CheckTLVPutStringFCircular(nlTestSuite * inSuite, void * inContext)
 {
     const size_t bufsize = 40;
     char strBuffer[bufsize];
@@ -2760,7 +2760,7 @@ void CheckCHIPTLVPutStringFCircular(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, bufsize) == 0);
 }
 
-void CheckCHIPTLVByteSpan(nlTestSuite * inSuite, void * inContext)
+void CheckTLVByteSpan(nlTestSuite * inSuite, void * inContext)
 {
     const size_t bufSize  = 14;
     uint8_t bytesBuffer[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05 };
@@ -2789,7 +2789,7 @@ void CheckCHIPTLVByteSpan(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, memcmp(readerSpan.data(), bytesBuffer, sizeof(bytesBuffer)) == 0);
 }
 
-void CheckCHIPTLVSkipCircular(nlTestSuite * inSuite, void * inContext)
+void CheckTLVSkipCircular(nlTestSuite * inSuite, void * inContext)
 {
     const size_t bufsize = 40; // large enough s.t. 2 elements fit, 3rd causes eviction
     uint8_t backingStore[bufsize];
@@ -2912,7 +2912,7 @@ void CheckStrictAliasing(nlTestSuite * inSuite, void * inContext)
 /**
  *  Test CHIP TLV Writer Copy Container
  */
-void TestCHIPTLVWriterCopyContainer(nlTestSuite * inSuite)
+void TestTLVWriterCopyContainer(nlTestSuite * inSuite)
 {
     uint8_t buf[2048];
 
@@ -2958,7 +2958,7 @@ void TestCHIPTLVWriterCopyContainer(nlTestSuite * inSuite)
 /**
  *  Test CHIP TLV Writer Copy Element
  */
-void TestCHIPTLVWriterCopyElement(nlTestSuite * inSuite)
+void TestTLVWriterCopyElement(nlTestSuite * inSuite)
 {
     CHIP_ERROR err;
     uint8_t expectedBuf[2048], testBuf[2048];
@@ -3094,7 +3094,7 @@ void PreserveSizeWrite(nlTestSuite * inSuite, TLVWriter & writer, bool preserveS
 /**
  *  Test CHIP TLV Writer with Preserve Size
  */
-void TestCHIPTLVWriterPreserveSize(nlTestSuite * inSuite)
+void TestTLVWriterPreserveSize(nlTestSuite * inSuite)
 {
     uint8_t buf[2048];
     TLVWriter writer;
@@ -3111,7 +3111,7 @@ void TestCHIPTLVWriterPreserveSize(nlTestSuite * inSuite)
 /**
  *  Test error handling of CHIP TLV Writer
  */
-void TestCHIPTLVWriterErrorHandling(nlTestSuite * inSuite)
+void TestTLVWriterErrorHandling(nlTestSuite * inSuite)
 {
     CHIP_ERROR err;
     uint8_t buf[2048];
@@ -3160,7 +3160,7 @@ void TestCHIPTLVWriterErrorHandling(nlTestSuite * inSuite)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
-void TestCHIPTLVEmptyString(nlTestSuite * inSuite)
+void TestTLVEmptyString(nlTestSuite * inSuite)
 {
     uint8_t buf[2];
     TLVWriter writer;
@@ -3192,17 +3192,17 @@ void TestCHIPTLVEmptyString(nlTestSuite * inSuite)
 /**
  *  Test CHIP TLV Writer
  */
-void CheckCHIPTLVWriter(nlTestSuite * inSuite, void * inContext)
+void CheckTLVWriter(nlTestSuite * inSuite, void * inContext)
 {
-    TestCHIPTLVWriterCopyContainer(inSuite);
+    TestTLVWriterCopyContainer(inSuite);
 
-    TestCHIPTLVWriterCopyElement(inSuite);
+    TestTLVWriterCopyElement(inSuite);
 
-    TestCHIPTLVWriterPreserveSize(inSuite);
+    TestTLVWriterPreserveSize(inSuite);
 
-    TestCHIPTLVWriterErrorHandling(inSuite);
+    TestTLVWriterErrorHandling(inSuite);
 
-    TestCHIPTLVEmptyString(inSuite);
+    TestTLVEmptyString(inSuite);
 }
 
 void SkipNonContainer(nlTestSuite * inSuite)
@@ -3265,7 +3265,7 @@ void NextContainer(nlTestSuite * inSuite)
 /**
  *  Test CHIP TLV Reader Skip functions
  */
-void TestCHIPTLVReaderSkip(nlTestSuite * inSuite)
+void TestTLVReaderSkip(nlTestSuite * inSuite)
 {
     SkipNonContainer(inSuite);
 
@@ -3277,7 +3277,7 @@ void TestCHIPTLVReaderSkip(nlTestSuite * inSuite)
 /**
  *  Test CHIP TLV Reader Dup functions
  */
-void TestCHIPTLVReaderDup(nlTestSuite * inSuite)
+void TestTLVReaderDup(nlTestSuite * inSuite)
 {
     TLVReader reader;
 
@@ -3407,7 +3407,7 @@ void TestCHIPTLVReaderDup(nlTestSuite * inSuite)
 /**
  *  Test error handling of CHIP TLV Reader
  */
-void TestCHIPTLVReaderErrorHandling(nlTestSuite * inSuite)
+void TestTLVReaderErrorHandling(nlTestSuite * inSuite)
 {
     CHIP_ERROR err;
     uint8_t buf[2048] = { 0 };
@@ -3477,7 +3477,7 @@ void TestCHIPTLVReaderErrorHandling(nlTestSuite * inSuite)
  *  Test that CHIP TLV reader returns an error when a read is requested that
  *  would truncate the output.
  */
-void TestCHIPTLVReaderTruncatedReads(nlTestSuite * inSuite)
+void TestTLVReaderTruncatedReads(nlTestSuite * inSuite)
 {
     uint8_t buf[2048];
     TLVWriter writer;
@@ -3507,7 +3507,7 @@ void TestCHIPTLVReaderTruncatedReads(nlTestSuite * inSuite)
 /**
  *  Test CHIP TLV Reader in a use case
  */
-void TestCHIPTLVReaderInPractice(nlTestSuite * inSuite)
+void TestTLVReaderInPractice(nlTestSuite * inSuite)
 {
     uint8_t buf[2048];
     TLVWriter writer;
@@ -3536,7 +3536,7 @@ void TestCHIPTLVReaderInPractice(nlTestSuite * inSuite)
                      static_cast<float>(1.0));
 }
 
-void TestCHIPTLVReader_NextOverContainer_ProcessElement(nlTestSuite * inSuite, TLVReader & reader, void * context)
+void TestTLVReader_NextOverContainer_ProcessElement(nlTestSuite * inSuite, TLVReader & reader, void * context)
 {
     CHIP_ERROR err, nextRes1, nextRes2;
     TLVType outerContainerType;
@@ -3571,17 +3571,17 @@ void TestCHIPTLVReader_NextOverContainer_ProcessElement(nlTestSuite * inSuite, T
 /**
  * Test using CHIP TLV Reader Next() method to skip over containers.
  */
-void TestCHIPTLVReader_NextOverContainer(nlTestSuite * inSuite)
+void TestTLVReader_NextOverContainer(nlTestSuite * inSuite)
 {
     TLVReader reader;
 
     reader.Init(Encoding1);
     reader.ImplicitProfileId = TestProfile_2;
 
-    ForEachElement(inSuite, reader, nullptr, TestCHIPTLVReader_NextOverContainer_ProcessElement);
+    ForEachElement(inSuite, reader, nullptr, TestTLVReader_NextOverContainer_ProcessElement);
 }
 
-void TestCHIPTLVReader_SkipOverContainer_ProcessElement(nlTestSuite * inSuite, TLVReader & reader, void * context)
+void TestTLVReader_SkipOverContainer_ProcessElement(nlTestSuite * inSuite, TLVReader & reader, void * context)
 {
     CHIP_ERROR err;
     TLVType outerContainerType;
@@ -3613,34 +3613,34 @@ void TestCHIPTLVReader_SkipOverContainer_ProcessElement(nlTestSuite * inSuite, T
 /**
  * Test using CHIP TLV Reader Skip() method to skip over containers.
  */
-void TestCHIPTLVReader_SkipOverContainer(nlTestSuite * inSuite)
+void TestTLVReader_SkipOverContainer(nlTestSuite * inSuite)
 {
     TLVReader reader;
 
     reader.Init(Encoding1);
     reader.ImplicitProfileId = TestProfile_2;
 
-    ForEachElement(inSuite, reader, nullptr, TestCHIPTLVReader_SkipOverContainer_ProcessElement);
+    ForEachElement(inSuite, reader, nullptr, TestTLVReader_SkipOverContainer_ProcessElement);
 }
 
 /**
  *  Test CHIP TLV Reader
  */
-void CheckCHIPTLVReader(nlTestSuite * inSuite, void * inContext)
+void CheckTLVReader(nlTestSuite * inSuite, void * inContext)
 {
-    TestCHIPTLVReaderSkip(inSuite);
+    TestTLVReaderSkip(inSuite);
 
-    TestCHIPTLVReaderDup(inSuite);
+    TestTLVReaderDup(inSuite);
 
-    TestCHIPTLVReaderErrorHandling(inSuite);
+    TestTLVReaderErrorHandling(inSuite);
 
-    TestCHIPTLVReaderTruncatedReads(inSuite);
+    TestTLVReaderTruncatedReads(inSuite);
 
-    TestCHIPTLVReaderInPractice(inSuite);
+    TestTLVReaderInPractice(inSuite);
 
-    TestCHIPTLVReader_NextOverContainer(inSuite);
+    TestTLVReader_NextOverContainer(inSuite);
 
-    TestCHIPTLVReader_SkipOverContainer(inSuite);
+    TestTLVReader_SkipOverContainer(inSuite);
 }
 
 /**
@@ -3767,7 +3767,7 @@ static void TestContainers(nlTestSuite * inSuite, void * inContext)
 /**
  *  Test CHIP TLV Basics
  */
-static void CheckCHIPTLVBasics(nlTestSuite * inSuite, void * inContext)
+static void CheckTLVBasics(nlTestSuite * inSuite, void * inContext)
 {
     TestItems(inSuite, inContext);
     TestContainers(inSuite, inContext);
@@ -4391,7 +4391,7 @@ static void CheckGetByteView(nlTestSuite * inSuite, void * inContext)
     }
 }
 
-static void CheckCHIPTLVScopedBuffer(nlTestSuite * inSuite, void * inContext)
+static void CheckTLVScopedBuffer(nlTestSuite * inSuite, void * inContext)
 {
     Platform::ScopedMemoryBuffer<uint8_t> buf;
     CHIP_ERROR err;
@@ -4451,22 +4451,22 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Pretty Octet String Print Test",      CheckOctetStringPrettyPrinter),
     NL_TEST_DEF("Data Macro Test",                     CheckDataMacro),
     NL_TEST_DEF("Strict Aliasing Test",                CheckStrictAliasing),
-    NL_TEST_DEF("CHIP TLV Basics",                     CheckCHIPTLVBasics),
-    NL_TEST_DEF("CHIP TLV Writer",                     CheckCHIPTLVWriter),
-    NL_TEST_DEF("CHIP TLV Reader",                     CheckCHIPTLVReader),
-    NL_TEST_DEF("CHIP TLV Utilities",                  CheckCHIPTLVUtilities),
+    NL_TEST_DEF("CHIP TLV Basics",                     CheckTLVBasics),
+    NL_TEST_DEF("CHIP TLV Writer",                     CheckTLVWriter),
+    NL_TEST_DEF("CHIP TLV Reader",                     CheckTLVReader),
+    NL_TEST_DEF("CHIP TLV Utilities",                  CheckTLVUtilities),
     NL_TEST_DEF("CHIP TLV Updater",                    CheckCHIPUpdater),
-    NL_TEST_DEF("CHIP TLV Empty Find",                 CheckCHIPTLVEmptyFind),
+    NL_TEST_DEF("CHIP TLV Empty Find",                 CheckTLVEmptyFind),
     NL_TEST_DEF("CHIP Circular TLV buffer, simple",    CheckCircularTLVBufferSimple),
     NL_TEST_DEF("CHIP Circular TLV buffer, mid-buffer start", CheckCircularTLVBufferStartMidway),
     NL_TEST_DEF("CHIP Circular TLV buffer, straddle",  CheckCircularTLVBufferEvictStraddlingEvent),
     NL_TEST_DEF("CHIP Circular TLV buffer, edge",      CheckCircularTLVBufferEdge),
-    NL_TEST_DEF("CHIP TLV Printf",                     CheckCHIPTLVPutStringF),
-    NL_TEST_DEF("CHIP TLV String Span",                CheckCHIPTLVPutStringSpan),
-    NL_TEST_DEF("CHIP TLV Printf, Circular TLV buf",   CheckCHIPTLVPutStringFCircular),
-    NL_TEST_DEF("CHIP TLV Skip non-contiguous",        CheckCHIPTLVSkipCircular),
-    NL_TEST_DEF("CHIP TLV ByteSpan",                   CheckCHIPTLVByteSpan),
-    NL_TEST_DEF("CHIP TLV Scoped Buffer",              CheckCHIPTLVScopedBuffer),
+    NL_TEST_DEF("CHIP TLV Printf",                     CheckTLVPutStringF),
+    NL_TEST_DEF("CHIP TLV String Span",                CheckTLVPutStringSpan),
+    NL_TEST_DEF("CHIP TLV Printf, Circular TLV buf",   CheckTLVPutStringFCircular),
+    NL_TEST_DEF("CHIP TLV Skip non-contiguous",        CheckTLVSkipCircular),
+    NL_TEST_DEF("CHIP TLV ByteSpan",                   CheckTLVByteSpan),
+    NL_TEST_DEF("CHIP TLV Scoped Buffer",              CheckTLVScopedBuffer),
     NL_TEST_DEF("CHIP TLV Check reserve",              CheckCloseContainerReserve),
     NL_TEST_DEF("CHIP TLV Reader Fuzz Test",           TLVReaderFuzzTest),
     NL_TEST_DEF("CHIP TLV GetStringView Test",         CheckGetStringView),
@@ -4480,7 +4480,7 @@ static const nlTest sTests[] =
 /**
  *  Set up the test suite.
  */
-int TestCHIPTLV_Setup(void * inContext)
+int TestTLV_Setup(void * inContext)
 {
     CHIP_ERROR error = chip::Platform::MemoryInit();
     if (error != CHIP_NO_ERROR)
@@ -4491,25 +4491,25 @@ int TestCHIPTLV_Setup(void * inContext)
 /**
  *  Tear down the test suite.
  */
-int TestCHIPTLV_Teardown(void * inContext)
+int TestTLV_Teardown(void * inContext)
 {
     chip::Platform::MemoryShutdown();
     return SUCCESS;
 }
 
-int TestCHIPTLV()
+int TestTLV()
 {
     // clang-format off
     nlTestSuite theSuite =
     {
         "chip-tlv",
         &sTests[0],
-        TestCHIPTLV_Setup,
-        TestCHIPTLV_Teardown
+        TestTLV_Setup,
+        TestTLV_Teardown
     };
     // clang-format on
 
     return chip::ExecuteTestsWithContext<TestTLVContext>(&theSuite, &theSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestCHIPTLV)
+CHIP_REGISTER_TEST_SUITE(TestTLV)

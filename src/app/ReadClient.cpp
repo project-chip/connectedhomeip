@@ -28,7 +28,7 @@
 #include <app/ReadClient.h>
 #include <app/StatusResponse.h>
 #include <assert.h>
-#include <lib/core/CHIPTLVTypes.h>
+#include <lib/core/TLVTypes.h>
 #include <lib/support/FibonacciUtils.h>
 #include <messaging/ReliableMessageMgr.h>
 

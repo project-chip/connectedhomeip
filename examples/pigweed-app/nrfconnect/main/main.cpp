@@ -19,7 +19,7 @@
 #include "LEDWidget.h"
 #include "PigweedLoggerMutex.h"
 #include "pigweed/RpcService.h"
-#include <kernel.h>
+#include <zephyr/kernel.h>
 
 #include "pw_rpc/echo_service_nanopb.h"
 #include "pw_sys_io/sys_io.h"

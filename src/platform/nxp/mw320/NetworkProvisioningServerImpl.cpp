@@ -22,7 +22,7 @@
 #include <platform/internal/GenericNetworkProvisioningServerImpl.cpp>
 #include <platform/internal/NetworkProvisioningServer.h>
 
-#include <core/CHIPTLV.h>
+#include <core/TLV.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
 namespace chip {

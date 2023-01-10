@@ -23,8 +23,8 @@
  *
  */
 
-#include <lib/core/CHIPTLVDebug.hpp>
-#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/core/TLVDebug.h>
+#include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {

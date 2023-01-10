@@ -347,7 +347,7 @@ class BaseTestHelper:
             "Attempting to open enhanced commissioning window - this should fail since the failsafe is armed")
         try:
             res = asyncio.run(self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
-                commissioningTimeout=180, PAKEVerifier=verifier, discriminator=discriminator, iterations=iterations, salt=salt), timedRequestTimeoutMs=10000))
+                commissioningTimeout=180, PAKEPasscodeVerifier=verifier, discriminator=discriminator, iterations=iterations, salt=salt), timedRequestTimeoutMs=10000))
             # we actually want the exception here because we want to see a failure, so return False here
             self.logger.error(
                 'Incorrectly succeeded in opening enhanced commissioning window')

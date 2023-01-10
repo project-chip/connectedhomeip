@@ -17,7 +17,7 @@
  */
 
 #include <credentials/GroupDataProviderImpl.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
