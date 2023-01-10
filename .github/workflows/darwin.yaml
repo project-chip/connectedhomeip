@@ -34,8 +34,8 @@ jobs:
         env:
           # NOTE: zap version should be kept in sync with the image used by 
             # Docker, currently connectedhomeip/chip-build:0.6.17 
-            ZAP_VERSION: v2023.01.06-nightly
-            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.06-nightly
+            ZAP_VERSION: v2023.01.09-nightly
+            ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.09-nightly
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.36

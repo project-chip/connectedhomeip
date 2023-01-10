@@ -25,8 +25,8 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPEncoding.h>
-#include <lib/core/CHIPTLVTypes.h>
 #include <lib/core/Optional.h>
+#include <lib/core/TLVTypes.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConnectivityManager.h>

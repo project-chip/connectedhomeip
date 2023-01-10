@@ -178,6 +178,7 @@ RUN set -x \
 
 # Install a known ZAP release
 # Only keep the cli version, since `zap` is 143MB and not usable (UI)
+<<<<<<< HEAD
 #
 # If you change this, make sure you also change (once used)
 #   - scripts/tools/zap/zap_execution.py
@@ -186,8 +187,7 @@ RUN set -x \
 #   - .github/workflows/darwin.yaml
 #   - .github/workflows/fuzzing-build.yaml
 #   - .github/workflows/tests.yaml
-ENV ZAP_VERSION=v2023.01.06-nightly
-
+ENV ZAP_VERSION=v2023.01.09-nightly
 RUN set -x \
     && mkdir -p /opt/zap-${ZAP_VERSION} \
     && cd /opt/zap-${ZAP_VERSION} \

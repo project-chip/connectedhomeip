@@ -20,12 +20,14 @@
 
 #include "commands/common/Commands.h"
 #include "commands/delay/SleepCommand.h"
+#include "commands/delay/WaitForCommissioneeCommand.h"
 
 void registerCommandsDelay(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     const char * clusterName      = "Delay";
     commands_list clusterCommands = {
-        make_unique<SleepCommand>(credsIssuerConfig), //
+        make_unique<SleepCommand>(credsIssuerConfig),               //
+        make_unique<WaitForCommissioneeCommand>(credsIssuerConfig), //
     };
 
     commands.Register(clusterName, clusterCommands);
