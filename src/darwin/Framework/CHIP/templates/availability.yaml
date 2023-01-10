@@ -3135,6 +3135,11 @@
               - DoorLockSetPinOrIdStatus
               - DoorLockUserStatus
               - DoorLockUserType
+              # UserTypeEnum and UserStatusEnum use the same generated name as
+              # DoorLockUserStatus and DoorLockUserType, so need to be
+              # considered as introduced at the same time.
+              - UserStatusEnum
+              - UserTypeEnum
           WindowCovering:
               - EndProductType
               - Type
@@ -3695,6 +3700,22 @@
                   - OccupiedDisabled
                   - NotSupported
               DoorLockUserType:
+                  - Unrestricted
+                  - YearDayScheduleUser
+                  - WeekDayScheduleUser
+                  - MasterUser
+                  - NonAccessUser
+                  - NotSupported
+              # UserTypeEnum and UserStatusEnum use the same generated name as
+              # DoorLockUserStatus and DoorLockUserType, so need to be
+              # considered as introduced at the same time, with the enum value
+              # names that match DoorLockUserStatus and DoorLockUserType.
+              UserStatusEnum:
+                  - Available
+                  - OccupiedEnabled
+                  - OccupiedDisabled
+                  - NotSupported
+              UserTypeEnum:
                   - Unrestricted
                   - YearDayScheduleUser
                   - WeekDayScheduleUser
@@ -4983,6 +5004,11 @@
                   - attestationSignature
               AddTrustedRootCertificate:
                   - rootCACertificate
+          DoorLock:
+              SetUser:
+                  - userUniqueID
+              GetUserResponse:
+                  - userUniqueID
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -5009,6 +5035,8 @@
               - SemanticTagStruct
           OperationalCredentials:
               - FabricDescriptorStruct
+          DoorLock:
+              - CredentialStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5120,6 +5148,10 @@
                   - vendorId
                   - fabricId
                   - nodeId
+          DoorLock:
+              CredentialStruct:
+                  - credentialType
+                  - credentialIndex
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5217,6 +5249,17 @@
           OperationalCredentials:
               - NodeOperationalCertStatusEnum
               - CertificateChainTypeEnum
+          DoorLock:
+              - AlarmCodeEnum
+              - CredentialRuleEnum
+              - CredentialTypeEnum
+              - DataOperationTypeEnum
+              - DoorStateEnum
+              - LockDataTypeEnum
+              - LockOperationTypeEnum
+              - OperationErrorEnum
+              - OperatingModeEnum
+              - OperationSourceEnum
       enum values:
           OTASoftwareUpdateProvider:
               OTAApplyUpdateAction:
@@ -5345,6 +5388,84 @@
               CertificateChainTypeEnum:
                   - DACCertificate
                   - PAICertificate
+          DoorLock:
+              AlarmCodeEnum:
+                  - LockJammed
+                  - LockFactoryReset
+                  - LockRadioPowerCycled
+                  - WrongCodeEntryLimit
+                  - FrontEsceutcheonRemoved
+                  - DoorForcedOpen
+                  - DoorAjar
+                  - ForcedUser
+              CredentialRuleEnum:
+                  - Single
+                  - Dual
+                  - Tri
+              CredentialTypeEnum:
+                  - ProgrammingPIN
+                  - PIN
+                  - RFID
+                  - Fingerprint
+                  - FingerVein
+                  - Face
+              DataOperationTypeEnum:
+                  - Add
+                  - Clear
+                  - Modify
+              DoorStateEnum:
+                  - DoorOpen
+                  - DoorClosed
+                  - DoorJammed
+                  - DoorForcedOpen
+                  - DoorUnspecifiedError
+                  - DoorAjar
+              LockDataTypeEnum:
+                  - Unspecified
+                  - ProgrammingCode
+                  - UserIndex
+                  - WeekDaySchedule
+                  - YearDaySchedule
+                  - HolidaySchedule
+                  - PIN
+                  - RFID
+                  - Fingerprint
+              LockOperationTypeEnum:
+                  - Lock
+                  - Unlock
+                  - NonAccessUserEvent
+                  - ForcedUserEvent
+              OperationErrorEnum:
+                  - Unspecified
+                  - InvalidCredential
+                  - DisabledUserDenied
+                  - Restricted
+                  - InsufficientBattery
+              OperatingModeEnum:
+                  - Normal
+                  - Vacation
+                  - Privacy
+                  - NoRemoteLockUnlock
+                  - Passage
+              OperationSourceEnum:
+                  - Unspecified
+                  - Manual
+                  - ProprietaryRemote
+                  - Keypad
+                  - Auto
+                  - Button
+                  - Schedule
+                  - Remote
+                  - RFID
+                  - Biometric
+              UserTypeEnum:
+                  - UnrestrictedUser
+                  - ProgrammingUser
+                  - ForcedUser
+                  - DisposableUser
+                  - ExpiringUser
+                  - ScheduleRestrictedUser
+                  - RemoteOnlyUser
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5354,6 +5475,8 @@
               - SimpleBitmap
           LevelControl:
               - LevelControlOptions
+          DoorLock:
+              - DaysMaskMap
       bitmap values:
           UnitTesting:
               Bitmap8MaskMap:
@@ -5393,6 +5516,23 @@
           PressureMeasurement:
               PressureFeature:
                   - Extended
+          DoorLock:
+              DaysMaskMap:
+                  - Sunday
+                  - Monday
+                  - Tuesday
+                  - Wednesday
+                  - Thursday
+                  - Friday
+                  - Saturday
+              DoorLockFeature:
+                  - PINCredential
+                  - RFIDCredential
+                  - WeekDayAccessSchedules
+                  - CredentialsOverTheAirAccess
+                  - User
+                  - Notification
+                  - YearDayAccessSchedules
   deprecated:
       clusters:
           - OtaSoftwareUpdateProvider
@@ -5448,6 +5588,11 @@
                   - signature
               AddTrustedRootCertificate:
                   - rootCertificate
+          DoorLock:
+              SetUser:
+                  - userUniqueId
+              GetUserResponse:
+                  - userUniqueId
       structs:
           Descriptor:
               - DeviceType
@@ -5466,6 +5611,8 @@
               - SemanticTag
           OperationalCredentials:
               - FabricDescriptor
+          DoorLock:
+              - DlCredential
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5493,6 +5640,33 @@
               - BootReasonType
           OperationalCredentials:
               - OperationalCertStatus
+          DoorLock:
+              - DlAlarmCode
+              - DlCredentialRule
+              - DlCredentialType
+              - DlDataOperationType
+              - DlDoorState
+              - DlLockDataType
+              - DlLockOperationType
+              - DlOperationError
+              - DlOperatingMode
+              - DlOperationSource
+              - DlUserStatus
+              - DlUserType
+              # The enums after this come from the silabs types.xml, not the
+              # door lock cluster XML
+              #
+              # DoorLockUserStatus is not marked deprecated here because the
+              # UserStatusEnum from the spec ends up with the same enum name
+              # (MTRDoorLockUserStatus) but is missing one of the values
+              # compared to DoorLockUserStatus.  So we have to keep
+              # DoorLockUserStatus for now and just deprecate its one extra name.
+              - DoorLockUserStatus
+              - DoorLockUserType
+              - DoorLockDayOfWeek
+              - DoorLockSetPinOrIdStatus
+              - DoorLockOperationEventCode
+              - DoorLockProgrammingEventCode
       enum values:
           GeneralCommissioning:
               CommissioningError:
@@ -5508,6 +5682,16 @@
                   - 80211n
                   - 80211ac
                   - 80211ax
+          DoorLock:
+              UserStatusEnum:
+                  - NotSupported
+              UserTypeEnum:
+                  - NotSupported
+                  - Unrestricted
+                  - MasterUser
+      bitmaps:
+          DoorLock:
+              - DlDaysMaskMap
       bitmap values:
           NetworkCommissioning:
               WiFiSecurity:
@@ -5518,6 +5702,15 @@
           PressureMeasurement:
               PressureFeature:
                   - EXT
+          DoorLock:
+              DoorLockFeature:
+                  - PINCredentials
+                  - RFIDCredentials
+                  - WeekDaySchedules
+                  - CredentialsOTA
+                  - UsersManagement
+                  - Notifications
+                  - YearDaySchedules
       apis:
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
@@ -5528,6 +5721,13 @@
       commands:
           BasicInformation:
               - MfgSpecificPing
+      enums:
+          # DoorLockUserStatus (non-spec) and UserStatusEnum (from the spec) end
+          # up with the same enum name (MTRDoorLockUserStatus), so just remove
+          # the non-spec one.
+          DoorLock:
+              - DoorLockUserStatus
+              - DoorLockUserType
       enum values:
           EthernetNetworkDiagnostics:
               # Both the enum and the values got renamed, so don't output the
@@ -5563,6 +5763,14 @@
                   - SUCCESS
               OperationalCertStatus:
                   - OK
+          DoorLock:
+              # Both the enum and the values got renamed, so don't output the
+              # new values with the old enum name or the old values with the
+              # new enum name.
+              DlCredentialRule:
+                  - Dual
+              CredentialRuleEnum:
+                  - Double
   renames:
       clusters:
           UnitTesting: TestCluster
@@ -5632,6 +5840,11 @@
                   attestationSignature: signature
               AddTrustedRootCertificate:
                   rootCACertificate: rootCertificate
+          DoorLock:
+              SetUser:
+                  userUniqueID: userUniqueId
+              GetUserResponse:
+                  userUniqueID: userUniqueId
       structs:
           AccessControl:
               AccessControlEntryStruct: AccessControlEntry
@@ -5644,6 +5857,8 @@
               SemanticTagStruct: SemanticTag
           OperationalCredentials:
               FabricDescriptorStruct: FabricDescriptor
+          DoorLock:
+              CredentialStruct: DlCredential
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5671,6 +5886,19 @@
               BootReasonEnum: BootReasonType
           OperationalCredentials:
               NodeOperationalCertStatusEnum: OperationalCertStatus
+          DoorLock:
+              AlarmCodeEnum: DlAlarmCode
+              CredentialRuleEnum: DlCredentialRule
+              CredentialTypeEnum: DlCredentialType
+              DataOperationTypeEnum: DlDataOperationType
+              DoorStateEnum: DlDoorState
+              LockDataTypeEnum: DlLockDataType
+              LockOperationTypeEnum: DlLockOperationType
+              OperationErrorEnum: DlOperationError
+              OperatingModeEnum: DlOperatingMode
+              OperationSourceEnum: DlOperationSource
+              UserStatusEnum: DlUserStatus
+              UserTypeEnum: DlUserType
       enum values:
           GeneralCommissioning:
               CommissioningError:
@@ -5714,6 +5942,15 @@
                   OK: SUCCESS
               OperationalCertStatus:
                   OK: SUCCESS
+          DoorLock:
+              CredentialRuleEnum:
+                  Dual: Double
+              UserTypeEnum:
+                  UnrestrictedUser: Unrestricted
+                  ProgrammingUser: MasterUser
+      bitmaps:
+          DoorLock:
+              DaysMaskMap: DlDaysMaskMap
       bitmap values:
           NetworkCommissioning:
               WiFiSecurity:
@@ -5724,3 +5961,12 @@
           PressureMeasurement:
               PressureFeature:
                   Extended: EXT
+          DoorLock:
+              DoorLockFeature:
+                  PINCredential: PINCredentials
+                  RFIDCredential: RFIDCredentials
+                  WeekDayAccessSchedules: WeekDaySchedules
+                  CredentialsOverTheAirAccess: CredentialsOTA
+                  User: UsersManagement
+                  Notification: Notifications
+                  YearDayAccessSchedules: YearDaySchedules
