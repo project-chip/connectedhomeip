@@ -1244,7 +1244,7 @@ void DeviceCommissioner::OnOperationalCertificateSigningRequest(
 }
 
 void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
-                                                    const ByteSpan & rcac, Optional<AesCcm128KeySpan> ipk,
+                                                    const ByteSpan & rcac, Optional<IdentityProtectionKeySpan> ipk,
                                                     Optional<NodeId> adminSubject)
 {
     MATTER_TRACE_EVENT_SCOPE("OnDeviceNOCChainGeneration", "DeviceCommissioner");
@@ -1271,7 +1271,7 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
 
     // TODO - Verify that the generated root cert matches with commissioner's root cert
     CommissioningDelegate::CommissioningReport report;
-    report.Set<NocChain>(NocChain(noc, icac, rcac, ipk.HasValue() ? ipk.Value() : AesCcm128KeySpan(placeHolderIpk),
+    report.Set<NocChain>(NocChain(noc, icac, rcac, ipk.HasValue() ? ipk.Value() : IdentityProtectionKeySpan(placeHolderIpk),
                                   adminSubject.HasValue() ? adminSubject.Value() : commissioner->GetNodeId()));
     commissioner->CommissioningStageComplete(status, report);
 }
@@ -1325,8 +1325,9 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf,
-                                                          const Optional<ByteSpan> & icaCertBuf, const AesCcm128KeySpan ipk,
-                                                          const NodeId adminSubject, Optional<System::Clock::Timeout> timeout)
+                                                          const Optional<ByteSpan> & icaCertBuf,
+                                                          const IdentityProtectionKeySpan ipk, const NodeId adminSubject,
+                                                          Optional<System::Clock::Timeout> timeout)
 {
     MATTER_TRACE_EVENT_SCOPE("SendOperationalCertificate", "DeviceCommissioner");
 
