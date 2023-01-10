@@ -142,6 +142,7 @@ class {{filename}}: public TestCommandBridge
         return {{command}}("{{identity}}", value);
         {{else}}
         MTRBaseDevice * device = GetDevice("{{identity}}");
+        commissionerNodeId = mCommissionerNodeId.ValueOr(0);
         __auto_type * cluster = [[MTRBaseCluster{{>cluster}} alloc] initWithDevice:device endpointID:@({{endpoint}}) queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 

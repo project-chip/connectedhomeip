@@ -221,7 +221,16 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    MTRBaseDevice * _Nullable GetDevice(const char * _Nullable identity) { return mConnectedDevices[identity]; }
+    MTRBaseDevice * _Nullable GetDevice(const char * _Nullable identity)
+    {
+        MTRDeviceController * controller = GetCommissioner(identity);
+
+        SetIdentity(identity);
+        if (controller != nil && controller.controllerNodeId != nil) {
+            mCommissionerNodeId.SetValue([controller.controllerNodeId unsignedLongLongValue]);
+        }
+        return mConnectedDevices[identity];
+    }
 
     // PairingDeleted and PairingComplete need to be public so our pairing
     // delegate can call them.
