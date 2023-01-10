@@ -15,9 +15,9 @@
 #    limitations under the License.
 #
 
-from dataclasses import dataclass
 import enum
 import typing
+from dataclasses import dataclass
 
 from chip.clusters.Types import Nullable, NullValue
 from chip.tlv import float32, uint
