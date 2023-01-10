@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.30
+            image: connectedhomeip/chip-build:0.6.31
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -138,7 +138,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.30
+            image: connectedhomeip/chip-build:0.6.31
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -316,7 +316,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.30
+            image: connectedhomeip/chip-build:0.6.31
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -366,7 +366,7 @@ jobs:
         
         env:
             # NOTE: zap version should be kept in sync with the image used by 
-            # Docker, currently connectedhomeip/chip-build:0.6.25 
+            # Docker, currently connectedhomeip/chip-build:0.6.31 
             ZAP_VERSION: v2023.01.09-nightly
             ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.09-nightly
 

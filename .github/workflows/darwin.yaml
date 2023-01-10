@@ -33,7 +33,7 @@ jobs:
 
         env:
           # NOTE: zap version should be kept in sync with the image used by 
-            # Docker, currently connectedhomeip/chip-build:0.6.17 
+            # Docker, currently connectedhomeip/chip-build:0.6.31 
             ZAP_VERSION: v2023.01.09-nightly
             ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.09-nightly
 

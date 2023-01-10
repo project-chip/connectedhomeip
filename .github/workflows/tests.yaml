@@ -47,7 +47,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.30
+            image: connectedhomeip/chip-build:0.6.31
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -243,7 +243,7 @@ jobs:
             TSAN_OPTIONS: "halt_on_error=1"
             LSAN_OPTIONS: detect_leaks=1 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
             # NOTE: zap version should be kept in sync with the image used by 
-            # Docker, currently connectedhomeip/chip-build:0.6.17 
+            # Docker, currently connectedhomeip/chip-build:0.6.31 
             ZAP_VERSION: v2023.01.09-nightly
             ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.09-nightly
 
@@ -365,7 +365,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.30
+            image: connectedhomeip/chip-build:0.6.31
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -439,7 +439,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.30
+            image: connectedhomeip/chip-build:0.6.31
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -527,7 +527,7 @@ jobs:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"
             # NOTE: zap version should be kept in sync with the image used by 
-            # Docker, currently connectedhomeip/chip-build:0.6.25 
+            # Docker, currently connectedhomeip/chip-build:0.6.31 
             ZAP_VERSION: v2023.01.09-nightly
             ZAP_INSTALL_PATH: /usr/local/zap/zap-v2023.01.09-nightly
 
