@@ -26,6 +26,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/bindings/bindings.h>
+#include <app/util/af-types.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -67,11 +68,14 @@ bool IsValidBinding(const EndpointId localEndpoint, const TargetStructType & ent
         if (entry.cluster.HasValue())
         {
             // Determine if the client cluster is available on the endpoint
-            if (emberAfFindClusterInType(emberAfFindEndpointType(localEndpoint), entry.cluster.Value(), CLUSTER_MASK_CLIENT) !=
-                nullptr)
+            const EmberAfEndpointType * emberEndpointType = emberAfFindEndpointType(localEndpoint);
+            if (emberEndpointType != nullptr)
             {
-                // Valid node/endpoint/cluster binding
-                isValid = true;
+                if (emberAfFindClusterInType(emberEndpointType, entry.cluster.Value(), CLUSTER_MASK_CLIENT) != nullptr)
+                {
+                    // Valid node/endpoint/cluster binding
+                    isValid = true;
+                }
             }
         }
         else
