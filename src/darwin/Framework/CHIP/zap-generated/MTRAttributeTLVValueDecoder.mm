@@ -7750,9 +7750,9 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                         auto iter_2 = entry_0.semanticTags.begin();
                         while (iter_2.Next()) {
                             auto & entry_2 = iter_2.GetValue();
-                            MTRModeSelectClusterSemanticTag * newElement_2;
-                            newElement_2 = [MTRModeSelectClusterSemanticTag new];
-                            newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:entry_2.mfgCode];
+                            MTRModeSelectClusterSemanticTagStruct * newElement_2;
+                            newElement_2 = [MTRModeSelectClusterSemanticTagStruct new];
+                            newElement_2.mfgCode = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_2.mfgCode)];
                             newElement_2.value = [NSNumber numberWithUnsignedShort:entry_2.value];
                             [array_2 addObject:newElement_2];
                         }

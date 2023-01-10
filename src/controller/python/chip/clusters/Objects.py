@@ -13058,7 +13058,7 @@ class ModeSelect(Cluster):
 
     class Structs:
         @dataclass
-        class SemanticTag(ClusterObject):
+        class SemanticTagStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -13078,12 +13078,12 @@ class ModeSelect(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="label", Tag=0, Type=str),
                             ClusterObjectFieldDescriptor(Label="mode", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="semanticTags", Tag=2, Type=typing.List[ModeSelect.Structs.SemanticTag]),
+                            ClusterObjectFieldDescriptor(Label="semanticTags", Tag=2, Type=typing.List[ModeSelect.Structs.SemanticTagStruct]),
                     ])
 
             label: 'str' = ""
             mode: 'uint' = 0
-            semanticTags: 'typing.List[ModeSelect.Structs.SemanticTag]' = field(default_factory=lambda: [])
+            semanticTags: 'typing.List[ModeSelect.Structs.SemanticTagStruct]' = field(default_factory=lambda: [])
 
 
 
