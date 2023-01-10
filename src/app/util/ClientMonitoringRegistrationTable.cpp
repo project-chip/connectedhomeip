@@ -66,4 +66,14 @@ ClientMonitoringRegistrationTable::ClientRegistrationEntry & ClientMonitoringReg
     return mRegisteredClient;
 }
 
+CHIP_ERROR ClientMonitoringRegistrationTable::DeleteFromStorage(FabricIndex fabric)
+{
+    return mStorage.SyncDeleteKeyValue(DefaultStorageKeyAllocator::ClientMonitoringTableEntry(fabric).KeyName());
+}
+
+bool ClientMonitoringRegistrationTable::HasValueForFabric(FabricIndex fabric)
+{
+    return mStorage.SyncDoesKeyExist(DefaultStorageKeyAllocator::ClientMonitoringTableEntry(fabric).KeyName());
+}
+
 } // namespace chip

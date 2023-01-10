@@ -37,6 +37,15 @@
             android:layout_below="@id/selectContentLauncherButton"/>
 
         <Button
+            android:id="@+id/selectCertTestButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_cert_test_button_text"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:layout_marginRight="10sp"
+            android:layout_below="@id/selectMediaPlaybackButton"/>
+
+        <Button
             android:id="@+id/disconnectButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

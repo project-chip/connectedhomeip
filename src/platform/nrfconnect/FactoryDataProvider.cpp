@@ -24,7 +24,7 @@
 #include <platform/Zephyr/ZephyrConfig.h>
 #endif
 
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 
 namespace chip {
 namespace {

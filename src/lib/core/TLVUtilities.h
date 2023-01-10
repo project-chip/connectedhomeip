@@ -23,14 +23,13 @@
  *
  */
 
-#ifndef CHIPTLVUTILITIES_HPP
-#define CHIPTLVUTILITIES_HPP
+#pragma once
 
 #include <stddef.h>
 #include <stdint.h>
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 
 namespace chip {
 
@@ -64,5 +63,3 @@ extern CHIP_ERROR Find(const TLVReader & aReader, IterateHandler aHandler, void 
 } // namespace TLV
 
 } // namespace chip
-
-#endif // CHIPTLVUTILITIES_HPP

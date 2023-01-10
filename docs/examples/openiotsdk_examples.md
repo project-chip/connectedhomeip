@@ -18,8 +18,8 @@ $ git submodule update --init
 
 The VSCode devcontainer has all dependencies pre-installed. Using the VSCode
 devcontainer is the recommended way to interact with Open IoT SDK port of the
-Matter Project. Please read this
-[README.md](../../..//docs/VSCODE_DEVELOPMENT.md) for more information.
+Matter Project. Please read this [README.md](../VSCODE_DEVELOPMENT.md) for more
+information.
 
 ### Networking setup
 

@@ -14,9 +14,14 @@
  *    limitations under the License.
  */
 
+#include <zephyr/dt-bindings/ipc_service/static_vrings.h>
+
 / {
 	chosen {
 		nordic,pm-ext-flash = &mx25r64;
 	};
+};
 
+&ipc0 {
+    zephyr,priority = <0 PRIO_COOP>;
 };

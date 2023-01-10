@@ -1176,9 +1176,9 @@ namespace TotalOperationalHours {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace TotalOperationalHours
 
-namespace BootReasons {
+namespace BootReason {
 static constexpr AttributeId Id = 0x00000004;
-} // namespace BootReasons
+} // namespace BootReason
 
 namespace ActiveHardwareFaults {
 static constexpr AttributeId Id = 0x00000005;

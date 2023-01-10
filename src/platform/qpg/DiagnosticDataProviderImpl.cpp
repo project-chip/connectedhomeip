@@ -145,10 +145,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveHardwareFaults(GeneralFaults<kMa
     ChipLogProgress(DeviceLayer, "GetActiveHardwareFaults");
 
 #if CHIP_CONFIG_TEST
-    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
-    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR));
-    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
-    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT));
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_RADIO));
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_SENSOR));
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_POWER_SOURCE));
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_USER_INTERFACE_FAULT));
 #endif
 
     return CHIP_NO_ERROR;
@@ -158,8 +158,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveRadioFaults(GeneralFaults<kMaxRa
 {
     ChipLogProgress(DeviceLayer, "GetActiveRadioFaults");
 #if CHIP_CONFIG_TEST
-    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
-    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_BLE_FAULT));
+    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_THREAD_FAULT));
+    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_BLE_FAULT));
 #endif
 
     return CHIP_NO_ERROR;

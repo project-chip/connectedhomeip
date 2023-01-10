@@ -1260,27 +1260,27 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::NetworkCommissioning::
     ComplexArgumentParser::Finalize(request.connected);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type & request,
+                                        chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterface::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.name", "name", value.isMember("name")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.isOperational", "isOperational",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterface.name", "name", value.isMember("name")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterface.isOperational", "isOperational",
                                                                   value.isMember("isOperational")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.offPremiseServicesReachableIPv4",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterface.offPremiseServicesReachableIPv4",
                                                                   "offPremiseServicesReachableIPv4",
                                                                   value.isMember("offPremiseServicesReachableIPv4")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.offPremiseServicesReachableIPv6",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterface.offPremiseServicesReachableIPv6",
                                                                   "offPremiseServicesReachableIPv6",
                                                                   value.isMember("offPremiseServicesReachableIPv6")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.hardwareAddress", "hardwareAddress",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterface.hardwareAddress", "hardwareAddress",
                                                                   value.isMember("hardwareAddress")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.IPv4Addresses", "IPv4Addresses",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterface.IPv4Addresses", "IPv4Addresses",
                                                                   value.isMember("IPv4Addresses")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.IPv6Addresses", "IPv6Addresses",
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterface.IPv6Addresses", "IPv6Addresses",
                                                                   value.isMember("IPv6Addresses")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterfaceType.type", "type", value.isMember("type")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("NetworkInterface.type", "type", value.isMember("type")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
@@ -1312,7 +1312,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterface::Type & request)
 {
     ComplexArgumentParser::Finalize(request.name);
     ComplexArgumentParser::Finalize(request.isOperational);

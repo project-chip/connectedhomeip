@@ -2,10 +2,10 @@
 """Parses a ZAP input file and outputs directories to compile."""
 
 import argparse
-import pathlib
 import json
-import typing
+import pathlib
 import sys
+import typing
 
 # List of directories in src/app/clusters to build for server clusters.
 SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {

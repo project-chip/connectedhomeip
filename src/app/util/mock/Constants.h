@@ -25,8 +25,8 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/TLV.h>
 
 namespace chip {
 namespace Test {

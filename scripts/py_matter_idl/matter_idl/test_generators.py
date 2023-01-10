@@ -16,26 +16,25 @@
 
 import os
 import unittest
-import yaml
-import logging
-from typing import List
 from dataclasses import dataclass, field
+from typing import List
+
+import yaml
 
 try:
     from matter_idl.matter_idl_parser import CreateParser
-except:
+except ImportError:
     import sys
 
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
     from matter_idl.matter_idl_parser import CreateParser
 
-from matter_idl.matter_idl_types import Idl
-from matter_idl.generators.java import JavaGenerator
+from matter_idl.generators import GeneratorStorage
 from matter_idl.generators.bridge import BridgeGenerator
 from matter_idl.generators.cpp.application import CppApplicationGenerator
-from matter_idl.generators import GeneratorStorage
-
+from matter_idl.generators.java import JavaGenerator
+from matter_idl.matter_idl_types import Idl
 
 TESTS_DIR = os.path.join(os.path.dirname(__file__), "tests")
 REGENERATE_GOLDEN_IMAGES = False
