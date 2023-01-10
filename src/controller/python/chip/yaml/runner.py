@@ -214,9 +214,8 @@ class ReadAttributeAction(BaseAction):
 class WaitForCommissioneeAction(BaseAction):
     ''' Wait for commissionee action to be executed.'''
 
-    def __init__(self, test_step, context: _ExecutionContext):
+    def __init__(self, test_step):
         super().__init__(test_step.label)
-        self._endpoint = test_step.endpoint
         self._node_id = test_step.node_id
         self._expire_existing_session = False
         # This is the default when no timeout is provided.
@@ -498,7 +497,7 @@ class ReplTestRunner:
 
     def _wait_for_commissionee_action_factory(self, test_step):
         try:
-            return WaitForCommissioneeAction(test_step, self._context)
+            return WaitForCommissioneeAction(test_step)
         except ParsingError:
             # TODO For now, ParsingErrors are largely issues that will be addressed soon. Once this
             # runner has matched parity of the codegen YAML test, this exception should be
