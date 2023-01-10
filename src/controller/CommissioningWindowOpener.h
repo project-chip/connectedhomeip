@@ -126,7 +126,8 @@ private:
     static void OnVIDPIDReadFailureResponse(void * context, CHIP_ERROR error);
     static void OnOpenCommissioningWindowSuccess(void * context, const app::DataModel::NullObjectType &);
     static void OnOpenCommissioningWindowFailure(void * context, CHIP_ERROR error);
-    static void OnDeviceConnectedCallback(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
+    static void OnDeviceConnectedCallback(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                          const SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureCallback(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     DeviceController * const mController = nullptr;
