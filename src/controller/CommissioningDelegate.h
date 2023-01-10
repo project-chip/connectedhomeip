@@ -415,10 +415,10 @@ public:
         return *this;
     }
 
-    Optional<bool> GetNonConcurrentCommissioning() const { return mNonConcurrentCommissioning; }
+    bool GetNonConcurrentCommissioning() const { return mNonConcurrentCommissioning; }
     CommissioningParameters & SetNonConcurrentCommissioning(bool nonConcurrentCommissioning)
     {
-        mNonConcurrentCommissioning = MakeOptional(nonConcurrentCommissioning);
+        mNonConcurrentCommissioning = nonConcurrentCommissioning;
         return *this;
     }
 
@@ -464,7 +464,7 @@ private:
     Optional<bool> mAttemptWiFiNetworkScan;
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
     Optional<bool> mSkipCommissioningComplete;
-    Optional<bool> mNonConcurrentCommissioning;
+    bool mNonConcurrentCommissioning = false;
     bool mCheckForMatchingFabric = false;
 };
 

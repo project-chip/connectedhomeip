@@ -142,7 +142,9 @@ public:
         }
 
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-        AddArgument("non-concurrent", 0, 1, &mNonConcurrent);
+        AddArgument("non-concurrent", 0, 1, &mNonConcurrent,
+                    "Enable Non-concurrent commissioning flow. ChipTool will terminal the commissioning channel after the device "
+                    "is connected to the operational network if enabling this Option");
     }
 
     /////////// CHIPCommand Interface /////////

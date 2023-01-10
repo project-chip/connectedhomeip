@@ -1644,8 +1644,7 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
     MATTER_TRACE_EVENT_SCOPE("CommissioningStageComplete", "DeviceCommissioner");
     NodeId nodeId       = kUndefinedNodeId;
     DeviceProxy * proxy = nullptr;
-    if (mCommissioningDelegate != nullptr &&
-        mCommissioningDelegate->GetCommissioningParameters().GetNonConcurrentCommissioning().ValueOr(false))
+    if (mCommissioningDelegate != nullptr && mCommissioningDelegate->GetCommissioningParameters().GetNonConcurrentCommissioning())
     {
         if (mDeviceBeingCommissioned != nullptr)
         {
@@ -1661,10 +1660,11 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
                  mCommissioningDelegate->GetCommissioningParameters().GetRemoteNodeId().HasValue())
         {
             nodeId = mCommissioningDelegate->GetCommissioningParameters().GetRemoteNodeId().Value();
-            proxy  = nullptr;
         }
         else
         {
+            // If mDeviceBeingCommissioned is null and the commissioning stage is not kFindOperational and we cannot get the
+            // nodeId from commissioning parameters, we should return since it is in an invalid state.
             return;
         }
     }
@@ -1724,7 +1724,7 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, Messaging::Exchange
     {
         return;
     }
-    if (commissioner->mCommissioningDelegate->GetCommissioningParameters().GetNonConcurrentCommissioning().ValueOr(false))
+    if (commissioner->mCommissioningDelegate->GetCommissioningParameters().GetNonConcurrentCommissioning())
     {
         auto remoteId = commissioner->mCommissioningDelegate->GetCommissioningParameters().GetRemoteNodeId();
         if (!remoteId.HasValue() || remoteId.Value() != sessionHandle->GetPeer().GetNodeId())
@@ -2485,7 +2485,27 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     break;
     case CommissioningStage::kFindOperational: {
         // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
-        auto scopedPeerId = GetPeerScopedId(params.GetRemoteNodeId().Value());
+        NodeId remoteId = kUndefinedNodeId;
+        if (params.GetRemoteNodeId().HasValue())
+        {
+            remoteId = params.GetRemoteNodeId().Value();
+        }
+        if (proxy)
+        {
+            if (remoteId != kUndefinedNodeId && proxy->GetDeviceId() != remoteId)
+            {
+                ChipLogError(Controller, "Device Proxy's NodeId is different from the nodeId in commissioning parameters");
+                CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
+                return;
+            }
+            remoteId = proxy->GetDeviceId();
+        }
+        if (remoteId == kUndefinedNodeId)
+        {
+            ChipLogError(Controller, "Failed to get the remote node ID");
+            CommissioningStageComplete(CHIP_ERROR_INTERNAL);
+        }
+        auto scopedPeerId = GetPeerScopedId(remoteId);
         mSystemState->CASESessionMgr()->FindOrEstablishSession(scopedPeerId, &mOnDeviceConnectedCallback,
                                                                &mOnDeviceConnectionFailureCallback);
     }

@@ -154,11 +154,8 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         mParams.SetSkipCommissioningComplete(params.GetSkipCommissioningComplete().Value());
     }
 
-    if (params.GetNonConcurrentCommissioning().HasValue())
-    {
-        ChipLogProgress(Controller, "Setting Non-Concurrent commissioning from parameters");
-        mParams.SetNonConcurrentCommissioning(params.GetNonConcurrentCommissioning().Value());
-    }
+    ChipLogProgress(Controller, "Setting Non-Concurrent commissioning from parameters");
+    mParams.SetNonConcurrentCommissioning(params.GetNonConcurrentCommissioning());
 
     return CHIP_NO_ERROR;
 }
@@ -438,7 +435,7 @@ Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(DeviceProxy
         break;
     }
 
-    if (!mParams.GetNonConcurrentCommissioning().ValueOr(false))
+    if (device)
     {
         // Adjust the timeout for our session transport latency, if we have access
         // to a session.
@@ -626,7 +623,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                                      report.Get<NocChain>().ipk, report.Get<NocChain>().adminSubject);
         case CommissioningStage::kWiFiNetworkEnable:
         case CommissioningStage::kThreadNetworkEnable:
-            if (mParams.GetNonConcurrentCommissioning().ValueOr(false))
+            if (mParams.GetNonConcurrentCommissioning())
             {
                 mCommissioneeDeviceProxy = nullptr;
             }
@@ -677,7 +674,7 @@ DeviceProxy * AutoCommissioner::GetDeviceProxyForStep(CommissioningStage nextSta
 CHIP_ERROR AutoCommissioner::PerformStep(CommissioningStage nextStage)
 {
     DeviceProxy * proxy = GetDeviceProxyForStep(nextStage);
-    if ((!mParams.GetNonConcurrentCommissioning().ValueOr(false) || nextStage != CommissioningStage::kFindOperational) &&
+    if ((!mParams.GetNonConcurrentCommissioning() || nextStage != CommissioningStage::kFindOperational) &&
         proxy == nullptr)
     {
         ChipLogError(Controller, "Invalid device for commissioning");
