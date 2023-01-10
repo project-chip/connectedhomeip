@@ -49,10 +49,6 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
-    // Initialize the generic implementation base class.
-    // err = Internal::GenericConfigurationManagerImpl<SILABSConfig>::Init();
-    // VerifyOrReturnError(err == CHIP_NO_ERROR, err);
-
     // TODO: Initialize the global GroupKeyStore object here (#1626)
 
     IncreaseBootCount();
