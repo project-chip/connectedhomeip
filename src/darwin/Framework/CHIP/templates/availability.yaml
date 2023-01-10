@@ -4949,6 +4949,9 @@
               RetrieveLogsResponse:
                   - logContent
                   - utcTimeStamp
+          AdministratorCommissioning:
+              OpenCommissioningWindow:
+                  - pakePasscodeVerifier
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -5354,6 +5357,9 @@
               RetrieveLogsResponse:
                   - content
                   - timeStamp
+          AdministratorCommissioning:
+              OpenCommissioningWindow:
+                  - pakeVerifier
       structs:
           Descriptor:
               - DeviceType
@@ -5504,6 +5510,9 @@
               RetrieveLogsResponse:
                   logContent: content
                   utcTimeStamp: timeStamp
+          AdministratorCommissioning:
+              OpenCommissioningWindow:
+                  pakePasscodeVerifier: pakeVerifier
       structs:
           AccessControl:
               AccessControlEntryStruct: AccessControlEntry

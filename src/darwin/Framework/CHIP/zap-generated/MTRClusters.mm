@@ -9816,7 +9816,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                     timedInvokeTimeoutMs.SetValue(10000);
                 }
                 request.commissioningTimeout = params.commissioningTimeout.unsignedShortValue;
-                request.PAKEVerifier = [self asByteSpan:params.pakeVerifier];
+                request.PAKEPasscodeVerifier = [self asByteSpan:params.pakePasscodeVerifier];
                 request.discriminator = params.discriminator.unsignedShortValue;
                 request.iterations = params.iterations.unsignedIntValue;
                 request.salt = [self asByteSpan:params.salt];

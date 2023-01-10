@@ -11271,7 +11271,7 @@ class AdministratorCommissioning(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="commissioningTimeout", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="PAKEVerifier", Tag=1, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="PAKEPasscodeVerifier", Tag=1, Type=bytes),
                             ClusterObjectFieldDescriptor(Label="discriminator", Tag=2, Type=uint),
                             ClusterObjectFieldDescriptor(Label="iterations", Tag=3, Type=uint),
                             ClusterObjectFieldDescriptor(Label="salt", Tag=4, Type=bytes),
@@ -11282,7 +11282,7 @@ class AdministratorCommissioning(Cluster):
                 return True
 
             commissioningTimeout: 'uint' = 0
-            PAKEVerifier: 'bytes' = b""
+            PAKEPasscodeVerifier: 'bytes' = b""
             discriminator: 'uint' = 0
             iterations: 'uint' = 0
             salt: 'bytes' = b""

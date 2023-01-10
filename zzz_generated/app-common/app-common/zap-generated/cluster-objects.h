@@ -11051,7 +11051,7 @@ namespace OpenCommissioningWindow {
 enum class Fields
 {
     kCommissioningTimeout = 0,
-    kPAKEVerifier         = 1,
+    kPAKEPasscodeVerifier = 1,
     kDiscriminator        = 2,
     kIterations           = 3,
     kSalt                 = 4,
@@ -11065,7 +11065,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
 
     uint16_t commissioningTimeout = static_cast<uint16_t>(0);
-    chip::ByteSpan PAKEVerifier;
+    chip::ByteSpan PAKEPasscodeVerifier;
     uint16_t discriminator = static_cast<uint16_t>(0);
     uint32_t iterations    = static_cast<uint32_t>(0);
     chip::ByteSpan salt;
@@ -11084,7 +11084,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
 
     uint16_t commissioningTimeout = static_cast<uint16_t>(0);
-    chip::ByteSpan PAKEVerifier;
+    chip::ByteSpan PAKEPasscodeVerifier;
     uint16_t discriminator = static_cast<uint16_t>(0);
     uint32_t iterations    = static_cast<uint32_t>(0);
     chip::ByteSpan salt;
