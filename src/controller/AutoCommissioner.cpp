@@ -674,8 +674,7 @@ DeviceProxy * AutoCommissioner::GetDeviceProxyForStep(CommissioningStage nextSta
 CHIP_ERROR AutoCommissioner::PerformStep(CommissioningStage nextStage)
 {
     DeviceProxy * proxy = GetDeviceProxyForStep(nextStage);
-    if ((!mParams.GetNonConcurrentCommissioning() || nextStage != CommissioningStage::kFindOperational) &&
-        proxy == nullptr)
+    if ((!mParams.GetNonConcurrentCommissioning() || nextStage != CommissioningStage::kFindOperational) && proxy == nullptr)
     {
         ChipLogError(Controller, "Invalid device for commissioning");
         return CHIP_ERROR_INCORRECT_STATE;

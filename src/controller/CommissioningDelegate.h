@@ -465,7 +465,7 @@ private:
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
     Optional<bool> mSkipCommissioningComplete;
     bool mNonConcurrentCommissioning = false;
-    bool mCheckForMatchingFabric = false;
+    bool mCheckForMatchingFabric     = false;
 };
 
 struct RequestedCertificate
