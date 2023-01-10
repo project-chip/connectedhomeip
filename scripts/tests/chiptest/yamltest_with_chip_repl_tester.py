@@ -107,6 +107,7 @@ def main(setup_code, yaml_path, node_id):
                     # TODO figure out how we error out here
                     pass
 
+        runner.shutdown()
         # Tearing down chip stack. If not done in the correct order test will fail.
         certificate_authority_manager.Shutdown()
         chip_stack.Shutdown()
