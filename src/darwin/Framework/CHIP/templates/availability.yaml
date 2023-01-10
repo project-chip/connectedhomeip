@@ -4949,6 +4949,9 @@
               RetrieveLogsResponse:
                   - logContent
                   - utcTimeStamp
+          AdministratorCommissioning:
+              OpenCommissioningWindow:
+                  - pakePasscodeVerifier
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -4971,6 +4974,8 @@
               - ThreadMetricsStruct
           GeneralDiagnostics:
               - NetworkInterface
+          ModeSelect:
+              - SemanticTagStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5065,6 +5070,10 @@
                   - iPv4Addresses
                   - iPv6Addresses
                   - type
+          ModeSelect:
+              SemanticTagStruct:
+                  - mfgCode
+                  - value
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5354,6 +5363,9 @@
               RetrieveLogsResponse:
                   - content
                   - timeStamp
+          AdministratorCommissioning:
+              OpenCommissioningWindow:
+                  - pakeVerifier
       structs:
           Descriptor:
               - DeviceType
@@ -5368,6 +5380,8 @@
               - ThreadMetrics
           GeneralDiagnostics:
               - NetworkInterfaceType
+          ModeSelect:
+              - SemanticTag
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5504,6 +5518,9 @@
               RetrieveLogsResponse:
                   logContent: content
                   utcTimeStamp: timeStamp
+          AdministratorCommissioning:
+              OpenCommissioningWindow:
+                  pakePasscodeVerifier: pakeVerifier
       structs:
           AccessControl:
               AccessControlEntryStruct: AccessControlEntry
@@ -5512,6 +5529,8 @@
               ThreadMetricsStruct: ThreadMetrics
           GeneralDiagnostics:
               NetworkInterface: NetworkInterfaceType
+          ModeSelect:
+              SemanticTagStruct: SemanticTag
       struct fields:
           Descriptor:
               DeviceTypeStruct:
