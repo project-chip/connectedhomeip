@@ -123,6 +123,11 @@ public class ChipDeviceController {
     setDeviceAttestationDelegate(deviceControllerPtr, failSafeExpiryTimeoutSecs, failureCallback);
   }
 
+  public void setAttestationTrustStoreDelegate(
+      AttestationTrustStoreDelegate attestationTrustStoreDelegate) {
+    setAttestationTrustStoreDelegate(deviceControllerPtr, attestationTrustStoreDelegate);
+  }
+
   public void pairDevice(
       BluetoothGatt bleServer,
       int connId,
@@ -673,6 +678,9 @@ public class ChipDeviceController {
 
   private native void setDeviceAttestationDelegate(
       long deviceControllerPtr, int failSafeExpiryTimeoutSecs, DeviceAttestationDelegate delegate);
+
+  private native void setAttestationTrustStoreDelegate(
+      long deviceControllerPtr, AttestationTrustStoreDelegate delegate);
 
   private native void pairDevice(
       long deviceControllerPtr,

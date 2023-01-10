@@ -333,28 +333,21 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAdminSubject", "()J", &getAdminSubject);
     SuccessOrExit(err);
 
-    jmethodID getAttestationTrustStoreDelegate;
-    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAttestationTrustStoreDelegate",
-                                                        "()Lchip/devicecontroller/AttestationTrustStoreDelegate;",
-                                                        &getAttestationTrustStoreDelegate);
-    SuccessOrExit(err);
-
     {
-        uint64_t fabricId                     = env->CallLongMethod(controllerParams, getFabricId);
-        uint16_t listenPort                   = env->CallIntMethod(controllerParams, getUdpListenPort);
-        uint16_t controllerVendorId           = env->CallIntMethod(controllerParams, getControllerVendorId);
-        jobject keypairDelegate               = env->CallObjectMethod(controllerParams, getKeypairDelegate);
-        jbyteArray rootCertificate            = (jbyteArray) env->CallObjectMethod(controllerParams, getRootCertificate);
-        jbyteArray intermediateCertificate    = (jbyteArray) env->CallObjectMethod(controllerParams, getIntermediateCertificate);
-        jbyteArray operationalCertificate     = (jbyteArray) env->CallObjectMethod(controllerParams, getOperationalCertificate);
-        jbyteArray ipk                        = (jbyteArray) env->CallObjectMethod(controllerParams, getIpk);
-        uint16_t failsafeTimerSeconds         = env->CallIntMethod(controllerParams, getFailsafeTimerSeconds);
-        uint16_t caseFailsafeTimerSeconds     = env->CallIntMethod(controllerParams, getCASEFailsafeTimerSeconds);
-        bool attemptNetworkScanWiFi           = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanWiFi);
-        bool attemptNetworkScanThread         = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanThread);
-        bool skipCommissioningComplete        = env->CallBooleanMethod(controllerParams, getSkipCommissioningComplete);
-        uint64_t adminSubject                 = env->CallLongMethod(controllerParams, getAdminSubject);
-        jobject attestationTrustStoreDelegate = env->CallObjectMethod(controllerParams, getAttestationTrustStoreDelegate);
+        uint64_t fabricId                  = env->CallLongMethod(controllerParams, getFabricId);
+        uint16_t listenPort                = env->CallIntMethod(controllerParams, getUdpListenPort);
+        uint16_t controllerVendorId        = env->CallIntMethod(controllerParams, getControllerVendorId);
+        jobject keypairDelegate            = env->CallObjectMethod(controllerParams, getKeypairDelegate);
+        jbyteArray rootCertificate         = (jbyteArray) env->CallObjectMethod(controllerParams, getRootCertificate);
+        jbyteArray intermediateCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getIntermediateCertificate);
+        jbyteArray operationalCertificate  = (jbyteArray) env->CallObjectMethod(controllerParams, getOperationalCertificate);
+        jbyteArray ipk                     = (jbyteArray) env->CallObjectMethod(controllerParams, getIpk);
+        uint16_t failsafeTimerSeconds      = env->CallIntMethod(controllerParams, getFailsafeTimerSeconds);
+        uint16_t caseFailsafeTimerSeconds  = env->CallIntMethod(controllerParams, getCASEFailsafeTimerSeconds);
+        bool attemptNetworkScanWiFi        = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanWiFi);
+        bool attemptNetworkScanThread      = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanThread);
+        bool skipCommissioningComplete     = env->CallBooleanMethod(controllerParams, getSkipCommissioningComplete);
+        uint64_t adminSubject              = env->CallLongMethod(controllerParams, getAdminSubject);
 
 #ifdef JAVA_MATTER_CONTROLLER_TEST
         std::unique_ptr<chip::Controller::ExampleOperationalCredentialsIssuer> opCredsIssuer(
@@ -367,8 +360,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
             sJVM, self, kLocalDeviceId, fabricId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(),
             DeviceLayer::TCPEndPointManager(), DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate,
             rootCertificate, intermediateCertificate, operationalCertificate, ipk, listenPort, controllerVendorId,
-            failsafeTimerSeconds, attemptNetworkScanWiFi, attemptNetworkScanThread, skipCommissioningComplete,
-            attestationTrustStoreDelegate, &err);
+            failsafeTimerSeconds, attemptNetworkScanWiFi, attemptNetworkScanThread, skipCommissioningComplete, &err);
         SuccessOrExit(err);
 
         if (caseFailsafeTimerSeconds > 0)
@@ -440,6 +432,36 @@ JNI_METHOD(void, setDeviceAttestationDelegate)
         VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
         wrapper->SetDeviceAttestationDelegateBridge(deviceAttestationDelegateBridge);
     }
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to set device attestation delegate.");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+
+JNI_METHOD(void, setAttestationTrustStoreDelegate)
+(JNIEnv * env, jobject self, jlong handle, jobject attestationTrustStoreDelegate)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    ChipLogProgress(Controller, "setAttestationTrustStoreDelegate() called");
+
+    if (attestationTrustStoreDelegate != nullptr)
+    {
+        jobject attestationTrustStoreDelegateRef = env->NewGlobalRef(attestationTrustStoreDelegate);
+
+        wrapper->SetAttestationTrustStoreBridge(new AttestationTrustStoreBridge(attestationTrustStoreDelegateRef));
+        VerifyOrExit(wrapper->GetAttestationTrustStoreBridge() != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+        wrapper->SetDeviceAttestationVerifier(new Credentials::DefaultDACVerifier(wrapper->GetAttestationTrustStoreBridge()));
+        VerifyOrExit(wrapper->GetDeviceAttestationVerifier() != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+        wrapper->Controller()->SetDeviceAttestationVerifier(wrapper->GetDeviceAttestationVerifier());
+    }
+
 exit:
     if (err != CHIP_NO_ERROR)
     {

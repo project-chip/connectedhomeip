@@ -170,7 +170,7 @@ public:
                 jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate,
                 jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId,
                 uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread,
-                bool skipCommissioningComplete, jobject attestationTrustStoreDelegate, CHIP_ERROR * errInfoOnFailure);
+                bool skipCommissioningComplete, CHIP_ERROR * errInfoOnFailure);
 
 #ifdef JAVA_MATTER_CONTROLLER_TEST
     chip::Controller::ExampleOperationalCredentialsIssuer * GetAndroidOperationalCredentialsIssuer()
@@ -187,6 +187,20 @@ public:
     }
 
     DeviceAttestationDelegateBridge * GetDeviceAttestationDelegateBridge() { return mDeviceAttestationDelegateBridge; }
+
+    void SetAttestationTrustStoreBridge(AttestationTrustStoreBridge * attestationTrustStoreBridge)
+    {
+        mAttestationTrustStoreBridge = attestationTrustStoreBridge;
+    }
+
+    AttestationTrustStoreBridge * GetAttestationTrustStoreBridge() { return mAttestationTrustStoreBridge; }
+
+    void SetDeviceAttestationVerifier(chip::Credentials::DeviceAttestationVerifier * deviceAttestationVerifier)
+    {
+        mDeviceAttestationVerifier = deviceAttestationVerifier;
+    }
+
+    chip::Credentials::DeviceAttestationVerifier * GetDeviceAttestationVerifier() { return mDeviceAttestationVerifier; }
 
     void ClearDeviceAttestationDelegateBridge()
     {
