@@ -1726,13 +1726,15 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ThreadNetworkDiagnosti
     ComplexArgumentParser::Finalize(request.rotationTime);
     ComplexArgumentParser::Finalize(request.flags);
 }
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::ModeSelect::Structs::SemanticTag::Type & request,
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SemanticTag.mfgCode", "mfgCode", value.isMember("mfgCode")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SemanticTag.value", "value", value.isMember("value")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("SemanticTagStruct.mfgCode", "mfgCode", value.isMember("mfgCode")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SemanticTagStruct.value", "value", value.isMember("value")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "mfgCode");
@@ -1744,7 +1746,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::ModeSelect::Structs::SemanticTag::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.mfgCode);
     ComplexArgumentParser::Finalize(request.value);

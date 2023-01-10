@@ -2466,7 +2466,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRModeSelectClusterSemanticTag
+@implementation MTRModeSelectClusterSemanticTagStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2480,7 +2480,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRModeSelectClusterSemanticTag alloc] init];
+    auto other = [[MTRModeSelectClusterSemanticTagStruct alloc] init];
 
     other.mfgCode = self.mfgCode;
     other.value = self.value;
@@ -2495,6 +2495,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRModeSelectClusterSemanticTag : MTRModeSelectClusterSemanticTagStruct
 @end
 
 @implementation MTRModeSelectClusterModeOptionStruct

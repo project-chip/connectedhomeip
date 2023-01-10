@@ -4974,6 +4974,8 @@
               - ThreadMetricsStruct
           GeneralDiagnostics:
               - NetworkInterface
+          ModeSelect:
+              - SemanticTagStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5068,6 +5070,10 @@
                   - iPv4Addresses
                   - iPv6Addresses
                   - type
+          ModeSelect:
+              SemanticTagStruct:
+                  - mfgCode
+                  - value
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5374,6 +5380,8 @@
               - ThreadMetrics
           GeneralDiagnostics:
               - NetworkInterfaceType
+          ModeSelect:
+              - SemanticTag
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5521,6 +5529,8 @@
               ThreadMetricsStruct: ThreadMetrics
           GeneralDiagnostics:
               NetworkInterface: NetworkInterfaceType
+          ModeSelect:
+              SemanticTagStruct: SemanticTag
       struct fields:
           Descriptor:
               DeviceTypeStruct:
