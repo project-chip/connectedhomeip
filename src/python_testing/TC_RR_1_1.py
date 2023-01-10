@@ -455,9 +455,9 @@ class TC_RR_1_1(MatterBaseTest):
         ]
 
         view_acl_entry = Clusters.AccessControl.Structs.AccessControlEntryStruct(privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
-                                                                                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                                                                                    subjects=view_subjects,
-                                                                                    targets=view_targets)
+                                                                                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                                                                                 subjects=view_subjects,
+                                                                                 targets=view_targets)
         acl.append(view_acl_entry)
 
         return acl
