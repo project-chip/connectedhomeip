@@ -26,6 +26,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/bindings/bindings.h>
+#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/logging/CHIPLogging.h>
 using namespace chip;
