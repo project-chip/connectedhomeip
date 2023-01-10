@@ -161,9 +161,8 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
 
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
 {
-    CHIP_ERROR err = CurrentCommissioner().UnpairDevice(remoteId);
-    SetCommandExitStatus(err);
-    return err;
+    mCurrentFabricRemover = Platform::MakeUnique<Controller::CurrentFabricRemover>(&CurrentCommissioner());
+    return mCurrentFabricRemover->RemoveCurrentFabric(remoteId, &mCurrentFabricRemoveCallback);
 }
 
 void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
@@ -264,4 +263,21 @@ void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & 
     {
         SetCommandExitStatus(err);
     }
+}
+
+void PairingCommand::OnCurrentFabricRemove(void * context, NodeId nodeId, CHIP_ERROR err)
+{
+    PairingCommand * command = reinterpret_cast<PairingCommand *>(context);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnCurrentFabricRemove: context is null"));
+
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(chipTool, "Device unpair completed with success: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    }
+    else
+    {
+        ChipLogProgress(chipTool, "Device unpair Failure: " ChipLogFormatX64 " %s", ChipLogValueX64(nodeId), ErrorStr(err));
+    }
+
+    command->SetCommandExitStatus(err);
 }

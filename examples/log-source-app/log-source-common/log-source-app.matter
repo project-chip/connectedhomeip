@@ -300,8 +300,8 @@ server cluster DiagnosticLogs = 50 {
 
   response struct RetrieveLogsResponse = 1 {
     LogsStatus status = 0;
-    OCTET_STRING content = 1;
-    epoch_s timeStamp = 2;
+    OCTET_STRING logContent = 1;
+    epoch_s UTCTimeStamp = 2;
     INT32U timeSinceBoot = 3;
   }
 

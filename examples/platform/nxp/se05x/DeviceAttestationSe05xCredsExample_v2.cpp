@@ -20,10 +20,10 @@
 #include <credentials/examples/ExamplePAI.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/CHIPTLVTags.h>
-#include <lib/core/CHIPTLVTypes.h>
-#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/core/TLV.h>
+#include <lib/core/TLVTags.h>
+#include <lib/core/TLVTypes.h>
+#include <lib/core/TLVUtilities.hpp>
 #include <lib/support/Span.h>
 
 #if CHIP_CRYPTO_HSM
@@ -279,4 +279,4 @@ DeviceAttestationCredentialsProvider * GetExampleSe05xDACProviderv2()
 } // namespace Credentials
 } // namespace chip
 
-#endif //#ifdef ENABLE_HSM_DEVICE_ATTESTATION
+#endif // #ifdef ENABLE_HSM_DEVICE_ATTESTATION

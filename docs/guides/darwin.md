@@ -216,8 +216,7 @@ Example:
 
 1. Checkout and setup
    [Matter repo](https://github.com/project-chip/connectedhomeip.git) as per the
-   instructions
-   [above](#ensuring-your-matter-accessory-works-with-iosipadostvos)
+   instructions above.
 2. Follow
    [these](https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/esp32)
    instructions to initialize your development environment, compile the firmware
@@ -229,8 +228,7 @@ Example:
 
 1. Checkout and setup
    [Matter repo](https://github.com/project-chip/connectedhomeip.git) as per the
-   instructions
-   [above](#ensuring-your-matter-accessory-works-with-iosipadostvos)
+   instructions above.
 
 2. Follow
    [these instructions](https://github.com/project-chip/connectedhomeip/tree/master/examples/lighting-app/nrfconnect#readme)
@@ -245,18 +243,16 @@ Example:
 
 1. Checkout and setup
    [Matter repo](https://github.com/project-chip/connectedhomeip.git) as per the
-   instructions
-   [above](#ensuring-your-matter-accessory-works-with-iosipadostvos)
+   instructions above.
 2. Find and edit one of the platform
    [examples](https://github.com/project-chip/connectedhomeip/tree/master/examples)
-   to support the fixed device types
-   [above](#ensuring-your-matter-accessory-works-with-iosipadostvos)
-3. Read the [platform guides](.) on how set up the hardware
+   to support the fixed device types above.
+3. Read the [platform guides](README.md) on how set up the hardware
 
 ##### Guides
 
--   [Bouffalo Lab](/examples/lighting-app/bouffalolab/bl602/README.md)
--   [EFR32 Window Covering](/examples/window-app/efr32/README.md)
+-   [Bouffalo Lab](/examples/lighting-app/bouffalolab/README.md)
+-   [EFR32 Window Covering](/examples/window-app/silabs/efr32/README.md)
 -   [ESP32 All Clusters](/examples/all-clusters-app/esp32/README.md)
 -   [ESP32 Lighting](/examples/lighting-app/esp32/README.md)
 -   [ESP32 Temperature Sensor](/examples/temperature-measurement-app/esp32/README.md)

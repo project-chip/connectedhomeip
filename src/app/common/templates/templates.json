@@ -9,7 +9,8 @@
         "templates/chip/helper.js"
     ],
     "resources": {
-        "weak-enum-list": "weak-enum-list.yaml"
+        "weak-enum-list": "weak-enum-list.yaml",
+        "legacy-struct-list": "legacy-struct-list.yaml"
     },
     "override": "../../zap-templates/common/override.js",
     "partials": [

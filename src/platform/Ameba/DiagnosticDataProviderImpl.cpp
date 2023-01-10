@@ -273,7 +273,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wifiVersion)
 {
     // Support 802.11a/n Wi-Fi in AmebaD chipset
-    wifiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N;
+    wifiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_N;
     return CHIP_NO_ERROR;
 }
 

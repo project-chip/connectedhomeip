@@ -14,13 +14,13 @@
 #   limitations under the License.
 #
 
-import subprocess
-import sys
 import argparse
-import struct
 import base64
 import datetime
 import os
+import struct
+import subprocess
+import sys
 
 
 class FactoryDataWriter:
@@ -141,24 +141,24 @@ class FactoryDataWriter:
         self._args = arguments
 
         if self._args.rotating_id:
-            assert(len(bytearray.fromhex(self._args.rotating_id)) == kUniqueIDLength), "Provide a 16 bytes rotating id"
+            assert (len(bytearray.fromhex(self._args.rotating_id)) == kUniqueIDLength), "Provide a 16 bytes rotating id"
         if self._args.product_name:
-            assert(len(self._args.product_name) <= kMaxProductNameLength), "Product name exceeds the size limit"
+            assert (len(self._args.product_name) <= kMaxProductNameLength), "Product name exceeds the size limit"
         if self._args.vendor_name:
-            assert(len(self._args.vendor_name) <= kMaxVendorNameLength), "Vendor name exceeds the size limit"
+            assert (len(self._args.vendor_name) <= kMaxVendorNameLength), "Vendor name exceeds the size limit"
         if self._args.hw_version_str:
-            assert(len(self._args.hw_version_str) <= kMaxHardwareVersionStringLength), "Hardware version string exceeds the size limit"
+            assert (len(self._args.hw_version_str) <= kMaxHardwareVersionStringLength), "Hardware version string exceeds the size limit"
         if self._args.serial_number:
-            assert(len(self._args.serial_number) <= kMaxSerialNumberLength), "Serial number exceeds the size limit"
+            assert (len(self._args.serial_number) <= kMaxSerialNumberLength), "Serial number exceeds the size limit"
         if self._args.manufacturing_date:
             try:
                 datetime.datetime.strptime(self._args.manufacturing_date, '%Y-%m-%d')
             except ValueError:
                 raise ValueError("Incorrect manufacturing data format, should be YYYY-MM-DD")
         if self._args.commissioning_flow:
-            assert(self._args.commissioning_flow <= 3), "Invalid commissioning flow value"
+            assert (self._args.commissioning_flow <= 3), "Invalid commissioning flow value"
         if self._args.rendezvous_flag:
-            assert(self._args.rendezvous_flag <= 7), "Invalid rendez-vous flag value"
+            assert (self._args.rendezvous_flag <= 7), "Invalid rendez-vous flag value"
         if self._args.gen_spake2p_path:
             self._args.spake2_verifier = self.generate_spake2p_verifier()
 

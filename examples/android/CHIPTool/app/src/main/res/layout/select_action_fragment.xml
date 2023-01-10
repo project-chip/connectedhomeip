@@ -104,6 +104,14 @@
             android:layout_marginTop="8dp"
             android:text="@string/cluster_interaction_tool" />
 
+        <Button
+            android:id="@+id/unpairDeviceBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/unpair_device_btn_text" />
+
     </LinearLayout>
 
 </ScrollView>

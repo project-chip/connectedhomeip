@@ -1786,28 +1786,28 @@ void CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback::CallbackFn(
                                                   "(Ljava/lang/Integer;[BLjava/lang/Long;Ljava/lang/Long;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject status;
-    std::string statusClassName     = "java/lang/Integer";
-    std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
-                                                                  static_cast<uint8_t>(dataResponse.status), status);
-    jobject content;
-    jbyteArray contentByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.content.size()));
-    env->SetByteArrayRegion(contentByteArray, 0, static_cast<jsize>(dataResponse.content.size()),
-                            reinterpret_cast<const jbyte *>(dataResponse.content.data()));
-    content = contentByteArray;
-    jobject timeStamp;
-    std::string timeStampClassName     = "java/lang/Long";
-    std::string timeStampCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(timeStampClassName.c_str(), timeStampCtorSignature.c_str(),
-                                                                   dataResponse.timeStamp, timeStamp);
-    jobject timeSinceBoot;
-    std::string timeSinceBootClassName     = "java/lang/Long";
-    std::string timeSinceBootCtorSignature = "(J)V";
+    jobject Status;
+    std::string StatusClassName     = "java/lang/Integer";
+    std::string StatusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(StatusClassName.c_str(), StatusCtorSignature.c_str(),
+                                                                  static_cast<uint8_t>(dataResponse.status), Status);
+    jobject LogContent;
+    jbyteArray LogContentByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.logContent.size()));
+    env->SetByteArrayRegion(LogContentByteArray, 0, static_cast<jsize>(dataResponse.logContent.size()),
+                            reinterpret_cast<const jbyte *>(dataResponse.logContent.data()));
+    LogContent = LogContentByteArray;
+    jobject UTCTimeStamp;
+    std::string UTCTimeStampClassName     = "java/lang/Long";
+    std::string UTCTimeStampCtorSignature = "(J)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(UTCTimeStampClassName.c_str(), UTCTimeStampCtorSignature.c_str(),
+                                                                   dataResponse.UTCTimeStamp, UTCTimeStamp);
+    jobject TimeSinceBoot;
+    std::string TimeSinceBootClassName     = "java/lang/Long";
+    std::string TimeSinceBootCtorSignature = "(J)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
-        timeSinceBootClassName.c_str(), timeSinceBootCtorSignature.c_str(), dataResponse.timeSinceBoot, timeSinceBoot);
+        TimeSinceBootClassName.c_str(), TimeSinceBootCtorSignature.c_str(), dataResponse.timeSinceBoot, TimeSinceBoot);
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, status, content, timeStamp, timeSinceBoot);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, Status, LogContent, UTCTimeStamp, TimeSinceBoot);
 }
 CHIPOperationalCredentialsClusterAttestationResponseCallback::CHIPOperationalCredentialsClusterAttestationResponseCallback(
     jobject javaCallback) :

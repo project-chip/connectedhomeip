@@ -92,6 +92,8 @@ set(CHIP_GN_ROOT_TARGET ${CHIP_ROOT}/config/nrfconnect/chip-gn)
 
 # Prepare compiler flags
 
+list(APPEND CHIP_CFLAGS -D_DEFAULT_SOURCE)
+
 if (CONFIG_ARM)
     list(APPEND CHIP_CFLAGS_C
         --specs=nosys.specs
@@ -309,6 +311,7 @@ add_dependencies(chip-gn kernel)
 
 zephyr_interface_library_named(chip)
 target_compile_definitions(chip INTERFACE CHIP_HAVE_CONFIG_H)
+target_compile_definitions(chip INTERFACE _DEFAULT_SOURCE)
 target_include_directories(chip INTERFACE
     ${CHIP_ROOT}/src
     ${CHIP_ROOT}/src/include

@@ -14,8 +14,6 @@ cluster requests to a Matter device
 
 <hr>
 
-<a name="requirements"></a>
-
 ## Requirements for building
 
 You need to have the following two software installed on your Ubuntu system:
@@ -57,8 +55,6 @@ export JAVA_PATH=[JDK path]
 
 <hr>
 
-<a name="preparing"></a>
-
 ## Preparing for build
 
 Complete the following steps to prepare the Matter build:
@@ -70,8 +66,6 @@ Complete the following steps to prepare the Matter build:
     ```shell
     source scripts/bootstrap.sh
     ```
-
-<a name="building-running"></a>
 
 ## Building & Running the app
 

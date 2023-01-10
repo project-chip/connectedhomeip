@@ -990,10 +990,9 @@ exit:
     return res;
 }
 
-CHIP_ERROR MakeCertChipTLV(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey,
-                           const struct tm & validFrom, uint32_t validDays, int pathLen, const FutureExtensionWithNID * futureExts,
-                           uint8_t futureExtsCount, X509 * x509Cert, EVP_PKEY * newKey, CertStructConfig & certConfig,
-                           MutableByteSpan & chipCert)
+CHIP_ERROR MakeCertTLV(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom,
+                       uint32_t validDays, int pathLen, const FutureExtensionWithNID * futureExts, uint8_t futureExtsCount,
+                       X509 * x509Cert, EVP_PKEY * newKey, CertStructConfig & certConfig, MutableByteSpan & chipCert)
 {
     TLVWriter writer;
     TLVType containerType;

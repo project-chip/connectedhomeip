@@ -1332,7 +1332,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType & value)
+                          const chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterface::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2283,8 +2283,9 @@ CHIP_ERROR DataModelLogger::LogValue(
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3891,8 +3892,8 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("content", indent + 1, value.content));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("timeStamp", indent + 1, value.timeStamp));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("logContent", indent + 1, value.logContent));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("UTCTimeStamp", indent + 1, value.UTCTimeStamp));
     ReturnErrorOnFailure(DataModelLogger::LogValue("timeSinceBoot", indent + 1, value.timeSinceBoot));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
@@ -5600,8 +5601,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case GeneralDiagnostics::Attributes::NetworkInterfaces::Id: {
-            chip::app::DataModel::DecodableList<
-                chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType>
+            chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterface::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NetworkInterfaces", 1, value);
@@ -5621,23 +5621,23 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TotalOperationalHours", 1, value);
         }
-        case GeneralDiagnostics::Attributes::BootReasons::Id: {
-            uint8_t value;
+        case GeneralDiagnostics::Attributes::BootReason::Id: {
+            chip::app::Clusters::GeneralDiagnostics::BootReasonEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BootReasons", 1, value);
+            return DataModelLogger::LogValue("BootReason", 1, value);
         }
         case GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id: {
-            chip::app::DataModel::DecodableList<uint8_t> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFault> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveHardwareFaults", 1, value);
         }
         case GeneralDiagnostics::Attributes::ActiveRadioFaults::Id: {
-            chip::app::DataModel::DecodableList<uint8_t> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFault> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveRadioFaults", 1, value);
         }
         case GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id: {
-            chip::app::DataModel::DecodableList<uint8_t> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveNetworkFaults", 1, value);
         }
@@ -5678,7 +5678,8 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case SoftwareDiagnostics::Attributes::ThreadMetrics::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType>
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ThreadMetrics", 1, value);
@@ -5732,7 +5733,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ThreadNetworkDiagnostics::Attributes::Channel::Id: {
             chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("channel", 1, value);
+            return DataModelLogger::LogValue("Channel", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::RoutingRole::Id: {
             chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole> value;
@@ -5764,18 +5765,18 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OverrunCount", 1, value);
         }
-        case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id: {
+        case ThreadNetworkDiagnostics::Attributes::NeighborTable::Id: {
             chip::app::DataModel::DecodableList<
                 chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("NeighborTableList", 1, value);
+            return DataModelLogger::LogValue("NeighborTable", 1, value);
         }
-        case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id: {
+        case ThreadNetworkDiagnostics::Attributes::RouteTable::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("RouteTableList", 1, value);
+            return DataModelLogger::LogValue("RouteTable", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::PartitionId::Id: {
             chip::app::DataModel::Nullable<uint32_t> value;
@@ -5785,7 +5786,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case ThreadNetworkDiagnostics::Attributes::Weighting::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("weighting", 1, value);
+            return DataModelLogger::LogValue("Weighting", 1, value);
         }
         case ThreadNetworkDiagnostics::Attributes::DataVersion::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
@@ -6084,7 +6085,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case WiFiNetworkDiagnostics::Attributes::Bssid::Id: {
             chip::app::DataModel::Nullable<chip::ByteSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("bssid", 1, value);
+            return DataModelLogger::LogValue("BSSID", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::SecurityType::Id: {
             chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType> value;
@@ -6104,7 +6105,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case WiFiNetworkDiagnostics::Attributes::Rssi::Id: {
             chip::app::DataModel::Nullable<int8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Rssi", 1, value);
+            return DataModelLogger::LogValue("RSSI", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id: {
             chip::app::DataModel::Nullable<uint32_t> value;
@@ -6178,7 +6179,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case EthernetNetworkDiagnostics::Attributes::PHYRate::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PHYRate", 1, value);
         }
@@ -6362,17 +6363,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         case Switch::Attributes::NumberOfPositions::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("number of positions", 1, value);
+            return DataModelLogger::LogValue("NumberOfPositions", 1, value);
         }
         case Switch::Attributes::CurrentPosition::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("current position", 1, value);
+            return DataModelLogger::LogValue("CurrentPosition", 1, value);
         }
         case Switch::Attributes::MultiPressMax::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("multi press max", 1, value);
+            return DataModelLogger::LogValue("MultiPressMax", 1, value);
         }
         case Switch::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -9670,6 +9671,59 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
         case ElectricalMeasurement::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
+    case ClientMonitoring::Id: {
+        switch (path.mAttributeId)
+        {
+        case ClientMonitoring::Attributes::IdleModeInterval::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("IdleModeInterval", 1, value);
+        }
+        case ClientMonitoring::Attributes::ActiveModeInterval::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveModeInterval", 1, value);
+        }
+        case ClientMonitoring::Attributes::ActiveModeThreshold::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveModeThreshold", 1, value);
+        }
+        case ClientMonitoring::Attributes::ExpectedClients::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ExpectedClients", 1, value);
+        }
+        case ClientMonitoring::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case ClientMonitoring::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case ClientMonitoring::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case ClientMonitoring::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case ClientMonitoring::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);

@@ -1009,10 +1009,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace TotalOperationalHours
 
-namespace BootReasons {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace BootReasons
+namespace BootReason {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::GeneralDiagnostics::BootReasonEnum * value); // BootReasonEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::GeneralDiagnostics::BootReasonEnum value);
+} // namespace BootReason
 
 namespace TestEventTriggersEnabled {
 EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
@@ -1517,11 +1517,11 @@ namespace Attributes {
 
 namespace PHYRate {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType> & value); // PHYRateType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType value);
+                  DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate> & value); // PHYRate
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint,
-                  const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType> & value);
+                  const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRate> & value);
 } // namespace PHYRate
 
 namespace FullDuplex {

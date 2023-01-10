@@ -141,7 +141,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Messaging:
 
         AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
         request.commissioningTimeout = mCommissioningWindowTimeout.count();
-        request.PAKEVerifier         = serializedVerifierSpan;
+        request.PAKEPasscodeVerifier = serializedVerifierSpan;
         request.discriminator        = mSetupPayload.discriminator.GetLongValue();
         request.iterations           = mPBKDFIterations;
         request.salt                 = mPBKDFSalt;

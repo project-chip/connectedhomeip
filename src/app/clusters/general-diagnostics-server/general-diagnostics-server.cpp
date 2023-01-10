@@ -197,7 +197,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
     case TotalOperationalHours::Id: {
         return ReadIfSupported(&DiagnosticDataProvider::GetTotalOperationalHours, aEncoder);
     }
-    case BootReasons::Id: {
+    case BootReason::Id: {
         return ReadIfSupported(&DiagnosticDataProvider::GetBootReason, aEncoder);
     }
     case TestEventTriggersEnabled::Id: {
@@ -242,11 +242,11 @@ GeneralDiagnosticsServer & GeneralDiagnosticsServer::Instance()
 }
 
 // Gets called when the device has been rebooted.
-void GeneralDiagnosticsServer::OnDeviceReboot(BootReasonType bootReason)
+void GeneralDiagnosticsServer::OnDeviceReboot(BootReasonEnum bootReason)
 {
     ChipLogDetail(Zcl, "GeneralDiagnostics: OnDeviceReboot");
 
-    ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::BootReasons::Id);
+    ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::BootReason::Id);
 
     // GeneralDiagnostics cluster should exist only for endpoint 0.
     if (emberAfContainsServer(0, GeneralDiagnostics::Id))
@@ -276,10 +276,9 @@ void GeneralDiagnosticsServer::OnHardwareFaultsDetect(const GeneralFaults<kMaxHa
 
         // Record HardwareFault event
         EventNumber eventNumber;
-        DataModel::List<const HardwareFaultType> currentList(reinterpret_cast<const HardwareFaultType *>(current.data()),
-                                                             current.size());
-        DataModel::List<const HardwareFaultType> previousList(reinterpret_cast<const HardwareFaultType *>(previous.data()),
-                                                              previous.size());
+        DataModel::List<const HardwareFault> currentList(reinterpret_cast<const HardwareFault *>(current.data()), current.size());
+        DataModel::List<const HardwareFault> previousList(reinterpret_cast<const HardwareFault *>(previous.data()),
+                                                          previous.size());
         Events::HardwareFaultChange::Type event{ currentList, previousList };
 
         if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
@@ -303,9 +302,8 @@ void GeneralDiagnosticsServer::OnRadioFaultsDetect(const GeneralFaults<kMaxRadio
 
         // Record RadioFault event
         EventNumber eventNumber;
-        DataModel::List<const RadioFaultType> currentList(reinterpret_cast<const RadioFaultType *>(current.data()), current.size());
-        DataModel::List<const RadioFaultType> previousList(reinterpret_cast<const RadioFaultType *>(previous.data()),
-                                                           previous.size());
+        DataModel::List<const RadioFault> currentList(reinterpret_cast<const RadioFault *>(current.data()), current.size());
+        DataModel::List<const RadioFault> previousList(reinterpret_cast<const RadioFault *>(previous.data()), previous.size());
         Events::RadioFaultChange::Type event{ currentList, previousList };
 
         if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber))
@@ -383,7 +381,7 @@ bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * c
 
 void MatterGeneralDiagnosticsPluginServerInitCallback()
 {
-    BootReasonType bootReason;
+    BootReasonEnum bootReason;
 
     registerAttributeAccessOverride(&gAttrAccess);
     ConnectivityMgr().SetDelegate(&gDiagnosticDelegate);

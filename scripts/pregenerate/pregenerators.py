@@ -17,7 +17,7 @@ import os
 import shlex
 import subprocess
 
-from .types import InputIdlFile, IdlFileType
+from .types import IdlFileType, InputIdlFile
 
 CODEGEN_PY_PATH = os.path.join(os.path.dirname(__file__), '..', 'codegen.py')
 

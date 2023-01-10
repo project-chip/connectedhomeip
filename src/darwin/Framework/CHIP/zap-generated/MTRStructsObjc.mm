@@ -1164,7 +1164,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRGeneralDiagnosticsClusterNetworkInterfaceType
+@implementation MTRGeneralDiagnosticsClusterNetworkInterface
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1190,7 +1190,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRGeneralDiagnosticsClusterNetworkInterfaceType alloc] init];
+    auto other = [[MTRGeneralDiagnosticsClusterNetworkInterface alloc] init];
 
     other.name = self.name;
     other.isOperational = self.isOperational;
@@ -1214,6 +1214,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRGeneralDiagnosticsClusterNetworkInterfaceType : MTRGeneralDiagnosticsClusterNetworkInterface
 @end
 
 @implementation MTRGeneralDiagnosticsClusterHardwareFaultChangeEvent
@@ -1337,7 +1340,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRSoftwareDiagnosticsClusterThreadMetrics
+@implementation MTRSoftwareDiagnosticsClusterThreadMetricsStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1357,7 +1360,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRSoftwareDiagnosticsClusterThreadMetrics alloc] init];
+    auto other = [[MTRSoftwareDiagnosticsClusterThreadMetricsStruct alloc] init];
 
     other.id = self.id;
     other.name = self.name;
@@ -1376,6 +1379,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRSoftwareDiagnosticsClusterThreadMetrics : MTRSoftwareDiagnosticsClusterThreadMetricsStruct
 @end
 
 @implementation MTRSoftwareDiagnosticsClusterSoftwareFaultEvent

@@ -2581,7 +2581,7 @@ private:
 | * RebootCount                                                       | 0x0001 |
 | * UpTime                                                            | 0x0002 |
 | * TotalOperationalHours                                             | 0x0003 |
-| * BootReasons                                                       | 0x0004 |
+| * BootReason                                                        | 0x0004 |
 | * ActiveHardwareFaults                                              | 0x0005 |
 | * ActiveRadioFaults                                                 | 0x0006 |
 | * ActiveNetworkFaults                                               | 0x0007 |
@@ -2696,8 +2696,8 @@ private:
 | * ExtendedPanId                                                     | 0x0004 |
 | * MeshLocalPrefix                                                   | 0x0005 |
 | * OverrunCount                                                      | 0x0006 |
-| * NeighborTableList                                                 | 0x0007 |
-| * RouteTableList                                                    | 0x0008 |
+| * NeighborTable                                                     | 0x0007 |
+| * RouteTable                                                        | 0x0008 |
 | * PartitionId                                                       | 0x0009 |
 | * Weighting                                                         | 0x000A |
 | * DataVersion                                                       | 0x000B |
@@ -3058,7 +3058,7 @@ public:
         ClusterCommand("open-commissioning-window", credsIssuerConfig)
     {
         AddArgument("CommissioningTimeout", 0, UINT16_MAX, &mRequest.commissioningTimeout);
-        AddArgument("PAKEVerifier", &mRequest.PAKEVerifier);
+        AddArgument("PAKEPasscodeVerifier", &mRequest.PAKEPasscodeVerifier);
         AddArgument("Discriminator", 0, UINT16_MAX, &mRequest.discriminator);
         AddArgument("Iterations", 0, UINT32_MAX, &mRequest.iterations);
         AddArgument("Salt", &mRequest.salt);
@@ -7306,7 +7306,8 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * RegisterClientMonitoring                                          |   0x00 |
-| * StayAwakeRequest                                                  |   0x01 |
+| * UnregisterClientMonitoring                                        |   0x01 |
+| * StayAwakeRequest                                                  |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * IdleModeInterval                                                  | 0x0000 |
@@ -7355,14 +7356,16 @@ private:
 };
 
 /*
- * Command StayAwakeRequest
+ * Command UnregisterClientMonitoring
  */
-class ClientMonitoringStayAwakeRequest : public ClusterCommand
+class ClientMonitoringUnregisterClientMonitoring : public ClusterCommand
 {
 public:
-    ClientMonitoringStayAwakeRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("stay-awake-request", credsIssuerConfig)
+    ClientMonitoringUnregisterClientMonitoring(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("unregister-client-monitoring", credsIssuerConfig)
     {
+        AddArgument("ClientNodeId", 0, UINT64_MAX, &mRequest.clientNodeId);
+        AddArgument("ICid", 0, UINT64_MAX, &mRequest.ICid);
         ClusterCommand::AddArguments();
     }
 
@@ -7378,6 +7381,36 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000001) on Group %u", groupId);
 
         return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00001046, 0x00000001, mRequest);
+    }
+
+private:
+    chip::app::Clusters::ClientMonitoring::Commands::UnregisterClientMonitoring::Type mRequest;
+};
+
+/*
+ * Command StayAwakeRequest
+ */
+class ClientMonitoringStayAwakeRequest : public ClusterCommand
+{
+public:
+    ClientMonitoringStayAwakeRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("stay-awake-request", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000002) on endpoint %u", endpointIds.at(0));
+
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00001046, 0x00000002, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00001046) command (0x00000002) on Group %u", groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00001046, 0x00000002, mRequest);
     }
 
 private:
@@ -9588,7 +9621,7 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         make_unique<ReadAttribute>(Id, "reboot-count", Attributes::RebootCount::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "up-time", Attributes::UpTime::Id, credsIssuerConfig),                                //
         make_unique<ReadAttribute>(Id, "total-operational-hours", Attributes::TotalOperationalHours::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "boot-reasons", Attributes::BootReasons::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "boot-reason", Attributes::BootReason::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "active-hardware-faults", Attributes::ActiveHardwareFaults::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "active-radio-faults", Attributes::ActiveRadioFaults::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),     //
@@ -9605,7 +9638,7 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         make_unique<SubscribeAttribute>(Id, "reboot-count", Attributes::RebootCount::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "up-time", Attributes::UpTime::Id, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, "total-operational-hours", Attributes::TotalOperationalHours::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "boot-reasons", Attributes::BootReasons::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "boot-reason", Attributes::BootReason::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "active-hardware-faults", Attributes::ActiveHardwareFaults::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "active-radio-faults", Attributes::ActiveRadioFaults::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "active-network-faults", Attributes::ActiveNetworkFaults::Id, credsIssuerConfig),     //
@@ -9705,8 +9738,8 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands, CredentialIssu
         make_unique<ReadAttribute>(Id, "extended-pan-id", Attributes::ExtendedPanId::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "mesh-local-prefix", Attributes::MeshLocalPrefix::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "overrun-count", Attributes::OverrunCount::Id, credsIssuerConfig),                       //
-        make_unique<ReadAttribute>(Id, "neighbor-table-list", Attributes::NeighborTableList::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "route-table-list", Attributes::RouteTableList::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "neighbor-table", Attributes::NeighborTable::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "route-table", Attributes::RouteTable::Id, credsIssuerConfig),                           //
         make_unique<ReadAttribute>(Id, "partition-id", Attributes::PartitionId::Id, credsIssuerConfig),                         //
         make_unique<ReadAttribute>(Id, "weighting", Attributes::Weighting::Id, credsIssuerConfig),                              //
         make_unique<ReadAttribute>(Id, "data-version", Attributes::DataVersion::Id, credsIssuerConfig),                         //
@@ -9782,8 +9815,8 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands, CredentialIssu
         make_unique<SubscribeAttribute>(Id, "extended-pan-id", Attributes::ExtendedPanId::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "mesh-local-prefix", Attributes::MeshLocalPrefix::Id, credsIssuerConfig),             //
         make_unique<SubscribeAttribute>(Id, "overrun-count", Attributes::OverrunCount::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "neighbor-table-list", Attributes::NeighborTableList::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "route-table-list", Attributes::RouteTableList::Id, credsIssuerConfig),               //
+        make_unique<SubscribeAttribute>(Id, "neighbor-table", Attributes::NeighborTable::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "route-table", Attributes::RouteTable::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "partition-id", Attributes::PartitionId::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "weighting", Attributes::Weighting::Id, credsIssuerConfig),                           //
         make_unique<SubscribeAttribute>(Id, "data-version", Attributes::DataVersion::Id, credsIssuerConfig),                      //
@@ -13013,9 +13046,10 @@ void registerClusterClientMonitoring(Commands & commands, CredentialIssuerComman
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                       //
-        make_unique<ClientMonitoringRegisterClientMonitoring>(credsIssuerConfig), //
-        make_unique<ClientMonitoringStayAwakeRequest>(credsIssuerConfig),         //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                         //
+        make_unique<ClientMonitoringRegisterClientMonitoring>(credsIssuerConfig),   //
+        make_unique<ClientMonitoringUnregisterClientMonitoring>(credsIssuerConfig), //
+        make_unique<ClientMonitoringStayAwakeRequest>(credsIssuerConfig),           //
         //
         // Attributes
         //

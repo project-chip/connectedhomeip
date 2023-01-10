@@ -33,11 +33,11 @@
 #
 
 
-import itertools
 import functools
+import itertools
 import json
-import posixpath
 import os
+import posixpath
 import string
 import sys
 
