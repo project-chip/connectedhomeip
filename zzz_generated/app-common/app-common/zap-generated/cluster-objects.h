@@ -12785,7 +12785,7 @@ public:
 } // namespace BooleanState
 namespace ModeSelect {
 namespace Structs {
-namespace SemanticTag {
+namespace SemanticTagStruct {
 enum class Fields
 {
     kMfgCode = 0,
@@ -12795,8 +12795,8 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t mfgCode = static_cast<uint16_t>(0);
-    uint16_t value   = static_cast<uint16_t>(0);
+    chip::VendorId mfgCode = static_cast<chip::VendorId>(0);
+    uint16_t value         = static_cast<uint16_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -12807,7 +12807,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace SemanticTag
+} // namespace SemanticTagStruct
 namespace ModeOptionStruct {
 enum class Fields
 {
@@ -12821,7 +12821,7 @@ struct Type
 public:
     chip::CharSpan label;
     uint8_t mode = static_cast<uint8_t>(0);
-    DataModel::List<const Structs::SemanticTag::Type> semanticTags;
+    DataModel::List<const Structs::SemanticTagStruct::Type> semanticTags;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -12833,7 +12833,7 @@ struct DecodableType
 public:
     chip::CharSpan label;
     uint8_t mode = static_cast<uint8_t>(0);
-    DataModel::DecodableList<Structs::SemanticTag::DecodableType> semanticTags;
+    DataModel::DecodableList<Structs::SemanticTagStruct::DecodableType> semanticTags;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
