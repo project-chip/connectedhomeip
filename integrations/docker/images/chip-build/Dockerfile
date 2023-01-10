@@ -178,7 +178,6 @@ RUN set -x \
 
 # Install a known ZAP release
 # Only keep the cli version, since `zap` is 143MB and not usable (UI)
-<<<<<<< HEAD
 #
 # If you change this, make sure you also change (once used)
 #   - scripts/tools/zap/zap_execution.py
