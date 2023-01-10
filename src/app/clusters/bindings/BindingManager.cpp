@@ -207,39 +207,4 @@ exit:
     return error;
 }
 
-CHIP_ERROR BindingManager::NotifyBoundClusterAtIndexChanged(EndpointId endpoint, ClusterId cluster, uint8_t bindingIndex,
-                                                            void * context)
-{
-    VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mBoundDeviceChangedHandler, CHIP_NO_ERROR);
-
-    CHIP_ERROR error      = CHIP_NO_ERROR;
-    auto * bindingContext = mPendingNotificationMap.NewPendingNotificationContext(context);
-    VerifyOrReturnError(bindingContext != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    bindingContext->IncrementConsumersNumber();
-
-    EmberBindingTableEntry entry = BindingTable::GetInstance().GetAt(bindingIndex);
-
-    if (entry.local == endpoint && (!entry.clusterId.HasValue() || entry.clusterId.Value() == cluster))
-    {
-        if (entry.type == EMBER_UNICAST_BINDING)
-        {
-            error = mPendingNotificationMap.AddPendingNotification(bindingIndex, bindingContext);
-            SuccessOrExit(error);
-            error = EstablishConnection(ScopedNodeId(entry.nodeId, entry.fabricIndex));
-            SuccessOrExit(error);
-        }
-        else if (entry.type == EMBER_MULTICAST_BINDING)
-        {
-            mBoundDeviceChangedHandler(entry, nullptr, bindingContext->GetContext());
-        }
-    }
-
-exit:
-    bindingContext->DecrementConsumersNumber();
-
-    return error;
-}
-
 } // namespace chip
