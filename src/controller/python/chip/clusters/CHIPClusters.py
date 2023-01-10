@@ -3543,14 +3543,14 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "LockDoor",
                     "args": {
-                        "pinCode": "bytes",
+                        "PINCode": "bytes",
                     },
                 },
             0x00000001: {
                     "commandId": 0x00000001,
                     "commandName": "UnlockDoor",
                     "args": {
-                        "pinCode": "bytes",
+                        "PINCode": "bytes",
                     },
                 },
             0x00000003: {
@@ -3558,7 +3558,7 @@ class ChipClusters:
                     "commandName": "UnlockWithTimeout",
                     "args": {
                         "timeout": "int",
-                        "pinCode": "bytes",
+                        "PINCode": "bytes",
                     },
                 },
             0x0000000B: {
@@ -3647,7 +3647,7 @@ class ChipClusters:
                         "operationType": "int",
                         "userIndex": "int",
                         "userName": "str",
-                        "userUniqueId": "int",
+                        "userUniqueID": "int",
                         "userStatus": "int",
                         "userType": "int",
                         "credentialRule": "int",

@@ -3800,7 +3800,7 @@ class DoorLockLockDoor : public ClusterCommand
 public:
     DoorLockLockDoor(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("lock-door", credsIssuerConfig)
     {
-        AddArgument("PinCode", &mRequest.pinCode);
+        AddArgument("PINCode", &mRequest.PINCode);
         ClusterCommand::AddArguments();
     }
 
@@ -3830,7 +3830,7 @@ class DoorLockUnlockDoor : public ClusterCommand
 public:
     DoorLockUnlockDoor(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("unlock-door", credsIssuerConfig)
     {
-        AddArgument("PinCode", &mRequest.pinCode);
+        AddArgument("PINCode", &mRequest.PINCode);
         ClusterCommand::AddArguments();
     }
 
@@ -3862,7 +3862,7 @@ public:
         ClusterCommand("unlock-with-timeout", credsIssuerConfig)
     {
         AddArgument("Timeout", 0, UINT16_MAX, &mRequest.timeout);
-        AddArgument("PinCode", &mRequest.pinCode);
+        AddArgument("PINCode", &mRequest.PINCode);
         ClusterCommand::AddArguments();
     }
 
@@ -4190,7 +4190,7 @@ public:
         AddArgument("OperationType", 0, UINT8_MAX, &mRequest.operationType);
         AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
         AddArgument("UserName", &mRequest.userName);
-        AddArgument("UserUniqueId", 0, UINT32_MAX, &mRequest.userUniqueId);
+        AddArgument("UserUniqueID", 0, UINT32_MAX, &mRequest.userUniqueID);
         AddArgument("UserStatus", 0, UINT8_MAX, &mRequest.userStatus);
         AddArgument("UserType", 0, UINT8_MAX, &mRequest.userType);
         AddArgument("CredentialRule", 0, UINT8_MAX, &mRequest.credentialRule);
@@ -4309,7 +4309,7 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::SetCredential::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::DoorLock::Structs::DlCredential::Type> mComplex_Credential;
+    TypedComplexArgument<chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type> mComplex_Credential;
 };
 
 /*
@@ -4341,7 +4341,7 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::DoorLock::Structs::DlCredential::Type> mComplex_Credential;
+    TypedComplexArgument<chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type> mComplex_Credential;
 };
 
 /*
@@ -4373,7 +4373,7 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::ClearCredential::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::Structs::DlCredential::Type>>
+    TypedComplexArgument<chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type>>
         mComplex_Credential;
 };
 
@@ -10755,7 +10755,7 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<WriteAttribute<uint32_t>>(Id, "auto-relock-time", 0, UINT32_MAX, Attributes::AutoRelockTime::Id,
                                               credsIssuerConfig),                                                               //
         make_unique<WriteAttribute<uint8_t>>(Id, "sound-volume", 0, UINT8_MAX, Attributes::SoundVolume::Id, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::DoorLock::DlOperatingMode>>(
+        make_unique<WriteAttribute<chip::app::Clusters::DoorLock::OperatingModeEnum>>(
             Id, "operating-mode", 0, UINT8_MAX, Attributes::OperatingMode::Id, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "enable-local-programming", 0, 1, Attributes::EnableLocalProgramming::Id,
                                           credsIssuerConfig), //

@@ -2034,11 +2034,11 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 
 namespace DoorState {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value); // DlDoorState
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlDoorState value);
+                  DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum> & value); // DoorStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DoorStateEnum value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint,
-                  const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value);
+                  const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum> & value);
 } // namespace DoorState
 
 namespace DoorOpenEvents {
@@ -2138,8 +2138,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace SoundVolume
 
 namespace OperatingMode {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlOperatingMode * value); // DlOperatingMode
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::DlOperatingMode value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::OperatingModeEnum * value); // OperatingModeEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DoorLock::OperatingModeEnum value);
 } // namespace OperatingMode
 
 namespace SupportedOperatingModes {

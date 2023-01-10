@@ -4433,7 +4433,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userName = nil;
 
-        _userUniqueId = nil;
+        _userUniqueID = nil;
 
         _userStatus = nil;
 
@@ -4452,7 +4452,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.operationType = self.operationType;
     other.userIndex = self.userIndex;
     other.userName = self.userName;
-    other.userUniqueId = self.userUniqueId;
+    other.userUniqueID = self.userUniqueID;
     other.userStatus = self.userStatus;
     other.userType = self.userType;
     other.credentialRule = self.credentialRule;
@@ -4465,12 +4465,25 @@ NS_ASSUME_NONNULL_BEGIN
 {
     NSString * descriptionString = [NSString
         stringWithFormat:
-            @"<%@: operationType:%@; userIndex:%@; userName:%@; userUniqueId:%@; userStatus:%@; userType:%@; credentialRule:%@; >",
-        NSStringFromClass([self class]), _operationType, _userIndex, _userName, _userUniqueId, _userStatus, _userType,
+            @"<%@: operationType:%@; userIndex:%@; userName:%@; userUniqueID:%@; userStatus:%@; userType:%@; credentialRule:%@; >",
+        NSStringFromClass([self class]), _operationType, _userIndex, _userName, _userUniqueID, _userStatus, _userType,
         _credentialRule];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRDoorLockClusterSetUserParams (Deprecated)
+
+- (void)setUserUniqueId:(NSNumber * _Nullable)userUniqueId
+{
+    self.userUniqueID = userUniqueId;
+}
+
+- (NSNumber * _Nullable)userUniqueId
+{
+    return self.userUniqueID;
+}
 @end
 @implementation MTRDoorLockClusterGetUserParams
 - (instancetype)init
@@ -4509,7 +4522,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userName = nil;
 
-        _userUniqueId = nil;
+        _userUniqueID = nil;
 
         _userStatus = nil;
 
@@ -4535,7 +4548,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.userIndex = self.userIndex;
     other.userName = self.userName;
-    other.userUniqueId = self.userUniqueId;
+    other.userUniqueID = self.userUniqueID;
     other.userStatus = self.userStatus;
     other.userType = self.userType;
     other.credentialRule = self.credentialRule;
@@ -4551,13 +4564,26 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: userIndex:%@; userName:%@; userUniqueId:%@; userStatus:%@; userType:%@; credentialRule:%@; "
+        stringWithFormat:@"<%@: userIndex:%@; userName:%@; userUniqueID:%@; userStatus:%@; userType:%@; credentialRule:%@; "
                          @"credentials:%@; creatorFabricIndex:%@; lastModifiedFabricIndex:%@; nextUserIndex:%@; >",
-        NSStringFromClass([self class]), _userIndex, _userName, _userUniqueId, _userStatus, _userType, _credentialRule,
+        NSStringFromClass([self class]), _userIndex, _userName, _userUniqueID, _userStatus, _userType, _credentialRule,
         _credentials, _creatorFabricIndex, _lastModifiedFabricIndex, _nextUserIndex];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRDoorLockClusterGetUserResponseParams (Deprecated)
+
+- (void)setUserUniqueId:(NSNumber * _Nullable)userUniqueId
+{
+    self.userUniqueID = userUniqueId;
+}
+
+- (NSNumber * _Nullable)userUniqueId
+{
+    return self.userUniqueID;
+}
 @end
 @implementation MTRDoorLockClusterClearUserParams
 - (instancetype)init
@@ -4594,7 +4620,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _operationType = @(0);
 
-        _credential = [MTRDoorLockClusterDlCredential new];
+        _credential = [MTRDoorLockClusterCredentialStruct new];
 
         _credentialData = [NSData data];
 
@@ -4673,7 +4699,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _credential = [MTRDoorLockClusterDlCredential new];
+        _credential = [MTRDoorLockClusterCredentialStruct new];
         _timedInvokeTimeoutMs = nil;
     }
     return self;

@@ -8246,9 +8246,9 @@ bool emberAfDoorLockClusterGetWeekDayScheduleCallback(
  * @brief Door Lock Cluster GetWeekDayScheduleResponse Command callback (from server)
  */
 bool emberAfDoorLockClusterGetWeekDayScheduleResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                              uint8_t weekDayIndex, uint16_t userIndex, uint8_t status,
-                                                              uint8_t daysMask, uint8_t startHour, uint8_t startMinute,
-                                                              uint8_t endHour, uint8_t endMinute);
+                                                              uint8_t WeekDayIndex, uint16_t UserIndex, uint8_t Status,
+                                                              uint8_t DaysMask, uint8_t StartHour, uint8_t StartMinute,
+                                                              uint8_t EndHour, uint8_t EndMinute);
 /**
  * @brief Door Lock Cluster ClearWeekDaySchedule Command callback (from client)
  */
@@ -8271,8 +8271,8 @@ bool emberAfDoorLockClusterGetYearDayScheduleCallback(
  * @brief Door Lock Cluster GetYearDayScheduleResponse Command callback (from server)
  */
 bool emberAfDoorLockClusterGetYearDayScheduleResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                              uint8_t yearDayIndex, uint16_t userIndex, uint8_t status,
-                                                              uint32_t localStartTime, uint32_t localEndTime);
+                                                              uint8_t YearDayIndex, uint16_t UserIndex, uint8_t Status,
+                                                              uint32_t LocalStartTime, uint32_t LocalEndTime);
 /**
  * @brief Door Lock Cluster ClearYearDaySchedule Command callback (from client)
  */
@@ -8295,8 +8295,8 @@ bool emberAfDoorLockClusterGetHolidayScheduleCallback(
  * @brief Door Lock Cluster GetHolidayScheduleResponse Command callback (from server)
  */
 bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                              uint8_t holidayIndex, uint8_t status, uint32_t localStartTime,
-                                                              uint32_t localEndTime, uint8_t operatingMode);
+                                                              uint8_t HolidayIndex, uint8_t Status, uint32_t LocalStartTime,
+                                                              uint32_t LocalEndTime, uint8_t OperatingMode);
 /**
  * @brief Door Lock Cluster ClearHolidaySchedule Command callback (from client)
  */
@@ -8319,11 +8319,11 @@ bool emberAfDoorLockClusterGetUserCallback(chip::app::CommandHandler * commandOb
  * @brief Door Lock Cluster GetUserResponse Command callback (from server)
  */
 bool emberAfDoorLockClusterGetUserResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                   uint16_t userIndex, chip::CharSpan userName, uint32_t userUniqueId,
-                                                   uint8_t userStatus, uint8_t userType, uint8_t credentialRule,
-                                                   /* TYPE WARNING: array array defaults to */ uint8_t * credentials,
-                                                   chip::FabricIndex creatorFabricIndex, chip::FabricIndex lastModifiedFabricIndex,
-                                                   uint16_t nextUserIndex);
+                                                   uint16_t UserIndex, chip::CharSpan UserName, uint32_t UserUniqueID,
+                                                   uint8_t UserStatus, uint8_t UserType, uint8_t CredentialRule,
+                                                   /* TYPE WARNING: array array defaults to */ uint8_t * Credentials,
+                                                   chip::FabricIndex CreatorFabricIndex, chip::FabricIndex LastModifiedFabricIndex,
+                                                   uint16_t NextUserIndex);
 /**
  * @brief Door Lock Cluster ClearUser Command callback (from client)
  */
@@ -8340,7 +8340,7 @@ bool emberAfDoorLockClusterSetCredentialCallback(
  * @brief Door Lock Cluster SetCredentialResponse Command callback (from server)
  */
 bool emberAfDoorLockClusterSetCredentialResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                         uint8_t status, uint16_t userIndex, uint16_t nextCredentialIndex);
+                                                         uint8_t Status, uint16_t UserIndex, uint16_t NextCredentialIndex);
 /**
  * @brief Door Lock Cluster GetCredentialStatus Command callback (from client)
  */
@@ -8351,10 +8351,10 @@ bool emberAfDoorLockClusterGetCredentialStatusCallback(
  * @brief Door Lock Cluster GetCredentialStatusResponse Command callback (from server)
  */
 bool emberAfDoorLockClusterGetCredentialStatusResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                               bool credentialExists, uint16_t userIndex,
-                                                               chip::FabricIndex creatorFabricIndex,
-                                                               chip::FabricIndex lastModifiedFabricIndex,
-                                                               uint16_t nextCredentialIndex);
+                                                               bool CredentialExists, uint16_t UserIndex,
+                                                               chip::FabricIndex CreatorFabricIndex,
+                                                               chip::FabricIndex LastModifiedFabricIndex,
+                                                               uint16_t NextCredentialIndex);
 /**
  * @brief Door Lock Cluster ClearCredential Command callback (from client)
  */

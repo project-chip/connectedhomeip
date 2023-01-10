@@ -10440,7 +10440,7 @@ namespace Events {} // namespace Events
 } // namespace ModeSelect
 namespace DoorLock {
 namespace Structs {
-namespace DlCredential {
+namespace CredentialStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -10483,7 +10483,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace DlCredential
+} // namespace CredentialStruct
 } // namespace Structs
 
 namespace Commands {
@@ -10492,7 +10492,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPinCode)), pinCode));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPINCode)), PINCode));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -10511,8 +10511,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kPinCode):
-            ReturnErrorOnFailure(DataModel::Decode(reader, pinCode));
+        case to_underlying(Fields::kPINCode):
+            ReturnErrorOnFailure(DataModel::Decode(reader, PINCode));
             break;
         default:
             break;
@@ -10529,7 +10529,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPinCode)), pinCode));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPINCode)), PINCode));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -10548,8 +10548,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kPinCode):
-            ReturnErrorOnFailure(DataModel::Decode(reader, pinCode));
+        case to_underlying(Fields::kPINCode):
+            ReturnErrorOnFailure(DataModel::Decode(reader, PINCode));
             break;
         default:
             break;
@@ -10567,7 +10567,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTimeout)), timeout));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPinCode)), pinCode));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kPINCode)), PINCode));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -10589,8 +10589,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kTimeout):
             ReturnErrorOnFailure(DataModel::Decode(reader, timeout));
             break;
-        case to_underlying(Fields::kPinCode):
-            ReturnErrorOnFailure(DataModel::Decode(reader, pinCode));
+        case to_underlying(Fields::kPINCode):
+            ReturnErrorOnFailure(DataModel::Decode(reader, PINCode));
             break;
         default:
             break;
@@ -11178,7 +11178,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOperationType)), operationType));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserIndex)), userIndex));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserName)), userName));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserUniqueId)), userUniqueId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserUniqueID)), userUniqueID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserStatus)), userStatus));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserType)), userType));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCredentialRule)), credentialRule));
@@ -11209,8 +11209,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kUserName):
             ReturnErrorOnFailure(DataModel::Decode(reader, userName));
             break;
-        case to_underlying(Fields::kUserUniqueId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, userUniqueId));
+        case to_underlying(Fields::kUserUniqueID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, userUniqueID));
             break;
         case to_underlying(Fields::kUserStatus):
             ReturnErrorOnFailure(DataModel::Decode(reader, userStatus));
@@ -11275,7 +11275,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserIndex)), userIndex));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserName)), userName));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserUniqueId)), userUniqueId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserUniqueID)), userUniqueID));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserStatus)), userStatus));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUserType)), userType));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kCredentialRule)), credentialRule));
@@ -11309,8 +11309,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kUserName):
             ReturnErrorOnFailure(DataModel::Decode(reader, userName));
             break;
-        case to_underlying(Fields::kUserUniqueId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, userUniqueId));
+        case to_underlying(Fields::kUserUniqueID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, userUniqueID));
             break;
         case to_underlying(Fields::kUserStatus):
             ReturnErrorOnFailure(DataModel::Decode(reader, userStatus));

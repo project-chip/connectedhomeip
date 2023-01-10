@@ -1097,9 +1097,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::Gro
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlAlarmCode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::AlarmCodeEnum val)
 {
-    using EnumType = DoorLock::DlAlarmCode;
+    using EnumType = DoorLock::AlarmCodeEnum;
     switch (val)
     {
     case EnumType::kLockJammed:
@@ -1115,22 +1115,22 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlAlarmCode v
         return static_cast<EnumType>(2);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlCredentialRule val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::CredentialRuleEnum val)
 {
-    using EnumType = DoorLock::DlCredentialRule;
+    using EnumType = DoorLock::CredentialRuleEnum;
     switch (val)
     {
     case EnumType::kSingle:
-    case EnumType::kDouble:
+    case EnumType::kDual:
     case EnumType::kTri:
         return val;
     default:
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlCredentialType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::CredentialTypeEnum val)
 {
-    using EnumType = DoorLock::DlCredentialType;
+    using EnumType = DoorLock::CredentialTypeEnum;
     switch (val)
     {
     case EnumType::kProgrammingPIN:
@@ -1144,9 +1144,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlCredentialT
         return static_cast<EnumType>(6);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlDataOperationType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DataOperationTypeEnum val)
 {
-    using EnumType = DoorLock::DlDataOperationType;
+    using EnumType = DoorLock::DataOperationTypeEnum;
     switch (val)
     {
     case EnumType::kAdd:
@@ -1155,55 +1155,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlDataOperati
         return val;
     default:
         return static_cast<EnumType>(3);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlDoorState val)
-{
-    using EnumType = DoorLock::DlDoorState;
-    switch (val)
-    {
-    case EnumType::kDoorOpen:
-    case EnumType::kDoorClosed:
-    case EnumType::kDoorJammed:
-    case EnumType::kDoorForcedOpen:
-    case EnumType::kDoorUnspecifiedError:
-    case EnumType::kDoorAjar:
-        return val;
-    default:
-        return static_cast<EnumType>(6);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlLockDataType val)
-{
-    using EnumType = DoorLock::DlLockDataType;
-    switch (val)
-    {
-    case EnumType::kUnspecified:
-    case EnumType::kProgrammingCode:
-    case EnumType::kUserIndex:
-    case EnumType::kWeekDaySchedule:
-    case EnumType::kYearDaySchedule:
-    case EnumType::kHolidaySchedule:
-    case EnumType::kPin:
-    case EnumType::kRfid:
-    case EnumType::kFingerprint:
-        return val;
-    default:
-        return static_cast<EnumType>(9);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlLockOperationType val)
-{
-    using EnumType = DoorLock::DlLockOperationType;
-    switch (val)
-    {
-    case EnumType::kLock:
-    case EnumType::kUnlock:
-    case EnumType::kNonAccessUserEvent:
-    case EnumType::kForcedUserEvent:
-        return val;
-    default:
-        return static_cast<EnumType>(4);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlLockState val)
@@ -1240,56 +1191,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlLockType va
         return static_cast<EnumType>(11);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlOperatingMode val)
-{
-    using EnumType = DoorLock::DlOperatingMode;
-    switch (val)
-    {
-    case EnumType::kNormal:
-    case EnumType::kVacation:
-    case EnumType::kPrivacy:
-    case EnumType::kNoRemoteLockUnlock:
-    case EnumType::kPassage:
-        return val;
-    default:
-        return static_cast<EnumType>(5);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlOperationError val)
-{
-    using EnumType = DoorLock::DlOperationError;
-    switch (val)
-    {
-    case EnumType::kUnspecified:
-    case EnumType::kInvalidCredential:
-    case EnumType::kDisabledUserDenied:
-    case EnumType::kRestricted:
-    case EnumType::kInsufficientBattery:
-        return val;
-    default:
-        return static_cast<EnumType>(5);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlOperationSource val)
-{
-    using EnumType = DoorLock::DlOperationSource;
-    switch (val)
-    {
-    case EnumType::kUnspecified:
-    case EnumType::kManual:
-    case EnumType::kProprietaryRemote:
-    case EnumType::kKeypad:
-    case EnumType::kAuto:
-    case EnumType::kButton:
-    case EnumType::kSchedule:
-    case EnumType::kRemote:
-    case EnumType::kRfid:
-    case EnumType::kBiometric:
-        return val;
-    default:
-        return static_cast<EnumType>(10);
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlStatus val)
 {
     using EnumType = DoorLock::DlStatus;
@@ -1305,39 +1206,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlStatus val)
         return val;
     default:
         return static_cast<EnumType>(4);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlUserStatus val)
-{
-    using EnumType = DoorLock::DlUserStatus;
-    switch (val)
-    {
-    case EnumType::kAvailable:
-    case EnumType::kOccupiedEnabled:
-    case EnumType::kOccupiedDisabled:
-        return val;
-    default:
-        return static_cast<EnumType>(2);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlUserType val)
-{
-    using EnumType = DoorLock::DlUserType;
-    switch (val)
-    {
-    case EnumType::kUnrestrictedUser:
-    case EnumType::kYearDayScheduleUser:
-    case EnumType::kWeekDayScheduleUser:
-    case EnumType::kProgrammingUser:
-    case EnumType::kNonAccessUser:
-    case EnumType::kForcedUser:
-    case EnumType::kDisposableUser:
-    case EnumType::kExpiringUser:
-    case EnumType::kScheduleRestrictedUser:
-    case EnumType::kRemoteOnlyUser:
-        return val;
-    default:
-        return static_cast<EnumType>(10);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DoorLockOperationEventCode val)
@@ -1424,6 +1292,138 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DoorLockUserT
         return val;
     default:
         return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DoorStateEnum val)
+{
+    using EnumType = DoorLock::DoorStateEnum;
+    switch (val)
+    {
+    case EnumType::kDoorOpen:
+    case EnumType::kDoorClosed:
+    case EnumType::kDoorJammed:
+    case EnumType::kDoorForcedOpen:
+    case EnumType::kDoorUnspecifiedError:
+    case EnumType::kDoorAjar:
+        return val;
+    default:
+        return static_cast<EnumType>(6);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockDataTypeEnum val)
+{
+    using EnumType = DoorLock::LockDataTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUnspecified:
+    case EnumType::kProgrammingCode:
+    case EnumType::kUserIndex:
+    case EnumType::kWeekDaySchedule:
+    case EnumType::kYearDaySchedule:
+    case EnumType::kHolidaySchedule:
+    case EnumType::kPin:
+    case EnumType::kRfid:
+    case EnumType::kFingerprint:
+        return val;
+    default:
+        return static_cast<EnumType>(9);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockOperationTypeEnum val)
+{
+    using EnumType = DoorLock::LockOperationTypeEnum;
+    switch (val)
+    {
+    case EnumType::kLock:
+    case EnumType::kUnlock:
+    case EnumType::kNonAccessUserEvent:
+    case EnumType::kForcedUserEvent:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::OperatingModeEnum val)
+{
+    using EnumType = DoorLock::OperatingModeEnum;
+    switch (val)
+    {
+    case EnumType::kNormal:
+    case EnumType::kVacation:
+    case EnumType::kPrivacy:
+    case EnumType::kNoRemoteLockUnlock:
+    case EnumType::kPassage:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::OperationErrorEnum val)
+{
+    using EnumType = DoorLock::OperationErrorEnum;
+    switch (val)
+    {
+    case EnumType::kUnspecified:
+    case EnumType::kInvalidCredential:
+    case EnumType::kDisabledUserDenied:
+    case EnumType::kRestricted:
+    case EnumType::kInsufficientBattery:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::OperationSourceEnum val)
+{
+    using EnumType = DoorLock::OperationSourceEnum;
+    switch (val)
+    {
+    case EnumType::kUnspecified:
+    case EnumType::kManual:
+    case EnumType::kProprietaryRemote:
+    case EnumType::kKeypad:
+    case EnumType::kAuto:
+    case EnumType::kButton:
+    case EnumType::kSchedule:
+    case EnumType::kRemote:
+    case EnumType::kRfid:
+    case EnumType::kBiometric:
+        return val;
+    default:
+        return static_cast<EnumType>(10);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::UserStatusEnum val)
+{
+    using EnumType = DoorLock::UserStatusEnum;
+    switch (val)
+    {
+    case EnumType::kAvailable:
+    case EnumType::kOccupiedEnabled:
+    case EnumType::kOccupiedDisabled:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::UserTypeEnum val)
+{
+    using EnumType = DoorLock::UserTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUnrestrictedUser:
+    case EnumType::kYearDayScheduleUser:
+    case EnumType::kWeekDayScheduleUser:
+    case EnumType::kProgrammingUser:
+    case EnumType::kNonAccessUser:
+    case EnumType::kForcedUser:
+    case EnumType::kDisposableUser:
+    case EnumType::kExpiringUser:
+    case EnumType::kScheduleRestrictedUser:
+    case EnumType::kRemoteOnlyUser:
+        return val;
+    default:
+        return static_cast<EnumType>(10);
     }
 }
 

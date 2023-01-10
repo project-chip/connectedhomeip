@@ -14968,7 +14968,7 @@ CHIPDoorLockDoorStateAttributeCallback::~CHIPDoorLockDoorStateAttributeCallback(
 }
 
 void CHIPDoorLockDoorStateAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
