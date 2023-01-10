@@ -1,5 +1,4 @@
 #!/usr/bin/env -S python3 -B
-# isort: skip_file # Needed for import order and `isort: skip` is not sufficient.
 
 #    Copyright (c) 2022 Project CHIP Authors
 #
@@ -20,9 +19,13 @@ import glob
 import os
 import tempfile
 
+# isort: off
 
 from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
 import chip.FabricAdmin  # Needed before chip.CertificateAuthority
+
+# isort: on
+
 import chip.CertificateAuthority
 import chip.native
 import click
