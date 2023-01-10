@@ -40,7 +40,7 @@
     49, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
-    /* Cluster: User Label, Attribute: label list, Privilege: view */ \
+    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
@@ -80,7 +80,7 @@
     5, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
     6, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     7, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
-    /* Cluster: User Label, Attribute: label list, Privilege: view */ \
+    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
@@ -120,7 +120,7 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
-    /* Cluster: User Label, Attribute: label list, Privilege: view */ \
+    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
@@ -157,7 +157,7 @@
     40, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
-    65, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
+    65, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     258, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
     512, /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: manage */ \
     512, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
@@ -192,7 +192,7 @@
     16, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
-    0, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
+    0, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     23, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
     21, /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: manage */ \
     23, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
@@ -227,7 +227,7 @@
     kMatterAccessPrivilegeManage, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
-    kMatterAccessPrivilegeManage, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Window Covering, Attribute: Mode, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: manage */ \
