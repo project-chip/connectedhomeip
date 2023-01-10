@@ -66,7 +66,9 @@ bool IsValidBinding(const EndpointId localEndpoint, const TargetStructType & ent
     {
         if (entry.cluster.HasValue())
         {
-            if (emberAfContainsClient(localEndpoint, entry.cluster.Value()))
+            // Determine if the client cluster is available on the endpoint
+            if (emberAfFindClusterInType(emberAfFindEndpointType(localEndpoint), entry.cluster.Value(), CLUSTER_MASK_CLIENT) !=
+                nullptr)
             {
                 // Valid node/endpoint/cluster binding
                 isValid = true;
