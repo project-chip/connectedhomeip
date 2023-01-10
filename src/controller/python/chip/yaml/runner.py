@@ -26,8 +26,7 @@ import chip.interaction_model
 import chip.yaml.format_converter as Converter
 import stringcase
 from chip import ChipDeviceCtrl
-from chip.clusters.Attribute import (
-    AttributeStatus, SubscriptionTransaction, TypedAttributePath, ValueDecodeFailure)
+from chip.clusters.Attribute import AttributeStatus, SubscriptionTransaction, TypedAttributePath, ValueDecodeFailure
 from chip.yaml.errors import ParsingError, UnexpectedParsingError
 
 from .data_model_lookup import *
