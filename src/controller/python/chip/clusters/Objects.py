@@ -26,7 +26,7 @@
 
 import typing
 from dataclasses import dataclass, field
-from enum import IntEnum
+from aenum import IntEnum
 
 from chip import ChipUtility
 from chip.tlv import float32, uint
@@ -27293,6 +27293,8 @@ class UnitTesting(Cluster):
             kValueA = 0x01
             kValueB = 0x02
             kValueC = 0x03
+            # kUnknownEnumValue will be generated the same way it is generated for .h by zap codegen
+            kUnknownEnumValue = 0x04  
 
 
     class Structs:
