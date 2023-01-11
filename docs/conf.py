@@ -1,7 +1,7 @@
 # Configuration file for the Sphinx documentation builder.
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 # -- Paths -------------------------------------------------------------------
 
@@ -29,7 +29,6 @@ exclude_patterns = [
     "examples/ota-requestor-app/efr32/README.md",
     "**/android/App/app/libs*",
     "examples/providers/README.md",
-    "examples/platform/nxp/doc/manufacturing_flow.md",
     "examples/thermostat/nxp/linux-se05x/README.md",
 ]
 
@@ -72,7 +71,5 @@ external_content_link_prefixes = [
     "CONTRIBUTING",
     "scripts/",
     "examples/android/",
-    "examples/platform/",
-    "platform",
 ]
 external_content_link_extensions = [".md", ".png", ".jpg", ".svg"]
