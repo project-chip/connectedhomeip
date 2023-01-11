@@ -160,5 +160,13 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
-    // No additional init currently - startup state handled by cluster.
+    bool onOffValue = false;
+
+    EmberAfStatus status = OnOff::Attributes::OnOff::Get(1, &onOffValue);
+
+    if (status == EMBER_ZCL_STATUS_SUCCESS)
+    {
+        LightingMgr().InitiateAction(onOffValue ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, 0, 1,
+                                     (uint8_t *) onOffValue);
+    }
 }
