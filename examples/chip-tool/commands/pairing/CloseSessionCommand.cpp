@@ -71,7 +71,7 @@ CHIP_ERROR CloseSessionCommand::CloseSession(Messaging::ExchangeManager & exchan
 }
 
 void CloseSessionCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                              SessionHandle & sessionHandle)
+                                              const SessionHandle & sessionHandle)
 {
     auto * command = reinterpret_cast<CloseSessionCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));
