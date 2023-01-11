@@ -289,7 +289,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::SaveSubscriptions(const ScopedNo
     }
 
     ReturnErrorOnFailure(writer.EndContainer(arrayType));
-    
+
     const auto len = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
 
