@@ -60,10 +60,13 @@ constexpr uint8_t kButtonReleaseEvent     = 0;
 constexpr uint8_t kDefaultMinLevel        = 0;
 constexpr uint8_t kDefaultMaxLevel        = 254;
 
+const struct pwm_dt_spec sLightPwmDevice = LIGHTING_PWM_SPEC;
+
+#if CONFIG_CHIP_FACTORY_DATA
 // NOTE! This key is for test/certification only and should not be available in production devices!
-// If CONFIG_CHIP_FACTORY_DATA is enabled, this value is read from the factory data.
 uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+#endif
 
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 k_timer sFactoryResetTimer;
@@ -153,13 +156,13 @@ CHIP_ERROR AppTask::Init()
     uint8_t maxLightLevel = kDefaultMaxLevel;
     Clusters::LevelControl::Attributes::MaxLevel::Get(1, &maxLightLevel);
 
-    CHIP_ERROR err = LightingMgr().Init(LIGHTING_PWM_DEVICE, LIGHTING_PWM_CHANNEL, minLightLevel, maxLightLevel, maxLightLevel);
+    CHIP_ERROR err = sAppTask.GetPWMDevice().Init(&sLightPwmDevice, minLightLevel, maxLightLevel, maxLightLevel);
     if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("LightingMgr Init fail");
         return err;
     }
-    LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+    sAppTask.GetPWMDevice().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Initialize CHIP server
 #if CONFIG_CHIP_FACTORY_DATA
@@ -253,21 +256,21 @@ void AppTask::LightingActionButtonEventHandler(void)
 
 void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {
-    LightingManager::Action_t action = LightingManager::INVALID_ACTION;
+    PWMDevice::Action_t action = PWMDevice::INVALID_ACTION;
     int32_t actor                    = 0;
 
     if (aEvent->Type == AppEvent::kEventType_Lighting)
     {
-        action = static_cast<LightingManager::Action_t>(aEvent->LightingEvent.Action);
+        action = static_cast<PWMDevice::Action_t>(aEvent->LightingEvent.Action);
         actor  = aEvent->LightingEvent.Actor;
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        action = LightingMgr().IsTurnedOn() ? LightingManager::OFF_ACTION : LightingManager::ON_ACTION;
+        action = sAppTask.GetPWMDevice().IsTurnedOn() ? PWMDevice::OFF_ACTION : PWMDevice::ON_ACTION;
         actor  = AppEvent::kEventType_Button;
     }
 
-    if (action != LightingManager::INVALID_ACTION && !LightingMgr().InitiateAction(action, actor, 0, NULL))
+    if (action != PWMDevice::INVALID_ACTION && !sAppTask.GetPWMDevice().InitiateAction(action, actor, NULL))
     {
         LOG_INF("Action is in progress or active");
     }
@@ -419,33 +422,33 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
     }
 }
 
-void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionInitiated(PWMDevice::Action_t aAction, int32_t aActor)
 {
-    if (aAction == LightingManager::ON_ACTION)
+    if (aAction == PWMDevice::ON_ACTION)
     {
         LOG_INF("ON_ACTION initiated");
     }
-    else if (aAction == LightingManager::OFF_ACTION)
+    else if (aAction == PWMDevice::OFF_ACTION)
     {
         LOG_INF("OFF_ACTION initiated");
     }
-    else if (aAction == LightingManager::LEVEL_ACTION)
+    else if (aAction == PWMDevice::LEVEL_ACTION)
     {
         LOG_INF("LEVEL_ACTION initiated");
     }
 }
 
-void AppTask::ActionCompleted(LightingManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionCompleted(PWMDevice::Action_t aAction, int32_t aActor)
 {
-    if (aAction == LightingManager::ON_ACTION)
+    if (aAction == PWMDevice::ON_ACTION)
     {
         LOG_INF("ON_ACTION completed");
     }
-    else if (aAction == LightingManager::OFF_ACTION)
+    else if (aAction == PWMDevice::OFF_ACTION)
     {
         LOG_INF("OFF_ACTION completed");
     }
-    else if (aAction == LightingManager::LEVEL_ACTION)
+    else if (aAction == PWMDevice::LEVEL_ACTION)
     {
         LOG_INF("LEVEL_ACTION completed");
     }
@@ -454,15 +457,6 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction, int32_t aActor)
     {
         sAppTask.UpdateClusterState();
     }
-}
-
-void AppTask::PostLightingActionRequest(LightingManager::Action_t aAction)
-{
-    AppEvent event;
-    event.Type                 = AppEvent::kEventType_Lighting;
-    event.LightingEvent.Action = aAction;
-    event.Handler              = LightingActionEventHandler;
-    PostEvent(&event);
 }
 
 void AppTask::PostEvent(AppEvent * aEvent)
@@ -488,14 +482,14 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 void AppTask::UpdateClusterState()
 {
     // write the new on/off value
-    EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(1, LightingMgr().IsTurnedOn());
+    EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(1, sAppTask.GetPWMDevice().IsTurnedOn());
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         LOG_ERR("Update OnOff fail: %x", status);
     }
 
-    status = Clusters::LevelControl::Attributes::CurrentLevel::Set(1, LightingMgr().GetLevel());
+    status = Clusters::LevelControl::Attributes::CurrentLevel::Set(1, sAppTask.GetPWMDevice().GetLevel());
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {

@@ -17,7 +17,7 @@
  */
 
 #include "AppTask.h"
-#include "LightingManager.h"
+#include "PWMDevice.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -38,16 +38,17 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
     {
         ChipLogProgress(Zcl, "Cluster OnOff: attribute OnOff set to %u", *value);
-        LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION,
-                                     AppEvent::kEventType_Lighting, size, value);
+        GetAppTask().GetPWMDevice().InitiateAction(*value ? PWMDevice::ON_ACTION : PWMDevice::OFF_ACTION,
+                                                   static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
     }
     else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::CurrentLevel::Id)
     {
         ChipLogProgress(Zcl, "Cluster LevelControl: attribute CurrentLevel set to %u", *value);
 
-        if (LightingMgr().IsTurnedOn())
+        if (GetAppTask().GetPWMDevice().IsTurnedOn())
         {
-            LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, AppEvent::kEventType_Lighting, size, value);
+            GetAppTask().GetPWMDevice().InitiateAction(PWMDevice::LEVEL_ACTION,
+                                                       static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
         }
         else
         {
@@ -75,7 +76,7 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
         // Set actual state to stored before reboot
-        LightingMgr().Set(storedValue);
+        GetAppTask().GetPWMDevice().Set(storedValue);
     }
 
     GetAppTask().UpdateClusterState();
