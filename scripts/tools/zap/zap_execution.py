@@ -28,7 +28,7 @@ from typing import Tuple
 # Potentially also change:
 #    - integrations/docker/images/chip-cert-bins/Dockerfile (in case new cert
 #      binaries also require a zap update)
-MIN_ZAP_VERSION = '2022.12.20'
+MIN_ZAP_VERSION = '2021.1.9'
 
 
 class ZapTool:
