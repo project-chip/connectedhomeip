@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "../clusters/DataModelLogger.h"
 #include "../common/CHIPCommand.h"
 #include "../common/Commands.h"
 
@@ -35,7 +36,7 @@ public:
     /////////// CHIPCommand Interface /////////
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(0); }
 
-    bool ParseCommand(char * command);
+    bool ParseCommand(char * command, int * status);
 
 private:
     Commands * mHandler = nullptr;
@@ -52,7 +53,7 @@ public:
     CHIP_ERROR RunCommand() override;
 };
 
-class InteractiveServerCommand : public InteractiveCommand, public WebSocketServerDelegate
+class InteractiveServerCommand : public InteractiveCommand, public WebSocketServerDelegate, public DataModelLoggerJSONDelegate
 {
 public:
     InteractiveServerCommand(Commands * commandsHandler, CredentialIssuerCommands * credsIssuerConfig) :
@@ -66,6 +67,9 @@ public:
 
     /////////// WebSocketServerDelegate Interface /////////
     bool OnWebSocketMessageReceived(char * msg) override;
+
+    /////////// DataModelLoggerJSONDelegate interface /////////
+    CHIP_ERROR LogJSON(const char * json) override;
 
 private:
     WebSocketServer mWebSocketServer;

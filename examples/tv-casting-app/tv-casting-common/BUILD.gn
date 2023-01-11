@@ -85,6 +85,7 @@ chip_data_model("tv-casting-common") {
 
   deps = [
     "${chip_root}/src/app/tests/suites/commands/interaction_model",
+    "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/jsoncpp",
   ]
