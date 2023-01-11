@@ -561,7 +561,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         BOOL usePartialDACVerifier = NO;
         if (operationalCertificateIssuer != nil) {
             self->_operationalCredentialsDelegate->SetOperationalCertificateIssuer(operationalCertificateIssuer, queue);
-            usePartialDACVerifier = operationalCertificateIssuer.skipTrustAnchorDeviceAttestationChecks;
+            usePartialDACVerifier = operationalCertificateIssuer.shouldSkipAttestationCertificateValidation;
         }
         if (usePartialDACVerifier) {
             self->_cppCommissioner->SetDeviceAttestationVerifier(self->_partialDACVerifier);
@@ -925,7 +925,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
  */
 @interface MTROperationalCertificateChainIssuerShim : NSObject <MTROperationalCertificateIssuer>
 @property (nonatomic, readonly) id<MTRNOCChainIssuer> nocChainIssuer;
-@property (nonatomic, readonly) BOOL skipTrustAnchorDeviceAttestationChecks;
+@property (nonatomic, readonly) BOOL shouldSkipAttestationCertificateValidation;
 - (instancetype)initWithIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer;
 @end
 
@@ -934,7 +934,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 {
     if (self = [super init]) {
         _nocChainIssuer = nocChainIssuer;
-        _skipTrustAnchorDeviceAttestationChecks = YES;
+        _shouldSkipAttestationCertificateValidation = YES;
     }
     return self;
 }

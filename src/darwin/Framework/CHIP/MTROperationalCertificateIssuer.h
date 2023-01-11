@@ -100,7 +100,7 @@ MTR_NEWLY_AVAILABLE
  * This will be read on an arbitrary queue and must not block or call any
  * Matter APIs.
  */
-@property (nonatomic, readonly) BOOL skipTrustAnchorDeviceAttestationChecks;
+@property (nonatomic, readonly) BOOL shouldSkipAttestationCertificateValidation;
 
 @end
 
