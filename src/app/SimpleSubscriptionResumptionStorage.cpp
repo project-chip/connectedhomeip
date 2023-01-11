@@ -132,16 +132,18 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::LoadIndex(SubscriptionIndex & in
 
 CHIP_ERROR SimpleSubscriptionResumptionStorage::FindByScopedNodeId(ScopedNodeId node, std::vector<SubscriptionInfo> & subscriptions)
 {
-    std::array<uint8_t, MaxStateSize()> buf;
-    uint16_t len = static_cast<uint16_t>(buf.size());
+    Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
+    backingBuffer.Calloc(MaxIndexSize());
+    VerifyOrReturnError(backingBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    if (mStorage->SyncGetKeyValue(GetStorageKey(node).KeyName(), buf.data(), len) != CHIP_NO_ERROR)
+    uint16_t len = static_cast<uint16_t>(MaxIndexSize());
+
+    if (mStorage->SyncGetKeyValue(GetStorageKey(node).KeyName(), backingBuffer.Get(), len) != CHIP_NO_ERROR)
     {
         return CHIP_NO_ERROR;
     }
 
-    TLV::ContiguousBufferTLVReader reader;
-    reader.Init(buf.data(), len);
+    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), len);
 
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
     TLV::TLVType arrayType;
@@ -239,10 +241,11 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::FindByScopedNodeId(ScopedNodeId 
 CHIP_ERROR SimpleSubscriptionResumptionStorage::SaveSubscriptions(const ScopedNodeId & node,
                                                                   const std::vector<SubscriptionInfo> & subscriptions)
 {
-    // Generate new state
-    std::array<uint8_t, MaxSubscriptionSize()> buf;
-    TLV::TLVWriter writer;
-    writer.Init(buf);
+    Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
+    backingBuffer.Calloc(MaxIndexSize());
+    VerifyOrReturnError(backingBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), MaxIndexSize());
 
     TLV::TLVType arrayType;
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
@@ -286,11 +289,13 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::SaveSubscriptions(const ScopedNo
     }
 
     ReturnErrorOnFailure(writer.EndContainer(arrayType));
-
+    
     const auto len = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(GetStorageKey(node).KeyName(), buf.data(), static_cast<uint16_t>(len)));
+    writer.Finalize(backingBuffer);
+
+    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(GetStorageKey(node).KeyName(), backingBuffer.Get(), static_cast<uint16_t>(len)));
 
     return CHIP_NO_ERROR;
 }
