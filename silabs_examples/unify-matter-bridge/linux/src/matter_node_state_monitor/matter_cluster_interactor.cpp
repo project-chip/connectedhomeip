@@ -53,8 +53,8 @@ static void append_bridged_clusters(unify::matter_bridge::matter_endpoint_builde
 } // namespace
 
 namespace unify::matter_bridge {
-cluster_interactor::cluster_interactor(const device_translator & _translator, matter_endpoint_builder & _endpoint_builder) :
-    endpoint_builder(_endpoint_builder), translator(_translator) 
+cluster_interactor::cluster_interactor(ClusterEmulator& _emulator,const device_translator & _translator, matter_endpoint_builder & _endpoint_builder) :
+     endpoint_builder(_endpoint_builder),emulator(_emulator),translator(_translator)
 {}
 
 void cluster_interactor::build_matter_cluster(const std::unordered_map<std::string, node_state_monitor::cluster> & clusters)
@@ -119,10 +119,8 @@ void cluster_interactor::build_matter_cluster(const std::unordered_map<std::stri
             cluster_builder.attributes.emplace_back(
                 EmberAfAttributeMetadata{ ZCL_REACHABLE_ATTRIBUTE_ID, ZCL_BOOLEAN_ATTRIBUTE_TYPE, 1, 0, ZAP_EMPTY_DEFAULT() });
         }
-        cluster_builder.attributes.push_back(EmberAfAttributeMetadata{
-                ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID, ZCL_BITMAP32_ATTRIBUTE_TYPE, 4, 0, ZAP_EMPTY_DEFAULT() });
-        cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{ ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID,
-                                                                          ZCL_INT16U_ATTRIBUTE_TYPE, 2, 0, ZAP_EMPTY_DEFAULT() });
+        
+        emulator.add_emulated_commands_and_attributes(clusters, cluster_builder);
 
     }
     if (!basic_cluster_is_supported)

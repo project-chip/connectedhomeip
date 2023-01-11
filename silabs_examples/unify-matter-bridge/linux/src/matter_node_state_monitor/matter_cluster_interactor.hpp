@@ -21,6 +21,8 @@
 #include "unify_node_state_monitor.hpp"
 #include "matter_device_translator.hpp"
 #include "matter_endpoint_builder.hpp"
+#include "cluster_emulator.hpp"
+
 namespace unify::matter_bridge
 {
 // class device_translator;
@@ -29,7 +31,9 @@ namespace unify::matter_bridge
 class cluster_interactor
 {
   public:
-  cluster_interactor(const device_translator &_translator,
+  cluster_interactor(
+      ClusterEmulator &_emulator,
+      const device_translator &_translator,
                      matter_endpoint_builder &_endpoint_builder);
                      
   std::optional<uint16_t> get_matter_type() const;
@@ -41,6 +45,7 @@ class cluster_interactor
   matter_endpoint_builder &endpoint_builder;
 
   private:
+  ClusterEmulator& emulator;
   const device_translator &translator;
 };
 }  // namespace unify::matter_bridge

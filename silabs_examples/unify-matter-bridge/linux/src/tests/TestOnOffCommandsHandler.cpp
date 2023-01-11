@@ -20,6 +20,8 @@ using namespace unify::matter_bridge;
 
 static UnifyEmberInterface ember_interface = UnifyEmberInterface();
 static device_translator dev_translator    = device_translator();
+static ClusterEmulator emulator;
+
 class MockCommandHandlerCallback : public chip::app::CommandHandler::Callback
 {
 public:
@@ -39,7 +41,7 @@ void TestOnOffClusterCommandHandler(nlTestSuite * inSuite, void * aContext)
 {
     // 1
     // Execute command ON with onoff device
-    Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator, ember_interface);
+    Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator,emulator, ember_interface);
     Test::MockUnifyMqtt mqtt_publish_test;
     Test::MockMatterDataStorage mock_data_storage;
     group_translator test_group_translator(mock_data_storage);

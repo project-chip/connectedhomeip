@@ -9,6 +9,7 @@
 #include <string>
 
 #include "attribute_translator.hpp"
+
 // Mocks
 #include "MockNodeStateMonitor.hpp"
 #include "MockUnifyMqtt.hpp"
@@ -19,11 +20,11 @@ using namespace unify::matter_bridge;
 
 static UnifyEmberInterface ember_interface = UnifyEmberInterface();
 static device_translator dev_translator    = device_translator();
-
+static ClusterEmulator emulator;
 
 static void TestClusterTranslatorRevision(nlTestSuite * inSuite, void * aContext)
 {
-    Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator, ember_interface);
+    Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator,emulator, ember_interface);
     Test::MockUnifyMqtt mqtt_publish_test;
     // testing Identify Cluster revision
     IdentifyAttributeAccess test_identify_attribute_handler(test_matter_node_state_monitor, mqtt_publish_test);

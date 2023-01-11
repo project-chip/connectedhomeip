@@ -2,7 +2,7 @@
 #include "matter_cluster_interactor.hpp"
 #include "matter_device_translator.hpp"
 #include "matter_device_types_clusters_list.inc"
-
+#include "cluster_emulator.hpp"
 // Chip components
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -30,7 +30,8 @@ device_translator obj;
 std::string getFirstPrioritizedDevice(std::unordered_map<std::string, unify_monitor::cluster> input_clusters)
 {
     matter_endpoint_builder builder;
-    cluster_interactor cluster_interactor(obj, builder);
+    ClusterEmulator emulator;
+    cluster_interactor cluster_interactor(emulator,obj, builder);
     cluster_interactor.build_matter_cluster(input_clusters);
 
     std::vector<chip::DeviceTypeId> device_types_id = obj.get_device_types(cluster_interactor.endpoint_builder.clusters);
@@ -70,7 +71,8 @@ void TestMatterDeviceScore(nlTestSuite * inSuite, void * aContext)
     };
 
     matter_endpoint_builder builder;
-    cluster_interactor cluster_interactor(obj, builder);
+    ClusterEmulator emulator;
+    cluster_interactor cluster_interactor(emulator,obj, builder);
     cluster_interactor.build_matter_cluster(clusters);
 
     std::vector<cluster_score> scores = compute_device_type_match_score(cluster_interactor.endpoint_builder.clusters);

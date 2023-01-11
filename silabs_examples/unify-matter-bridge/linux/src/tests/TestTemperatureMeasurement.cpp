@@ -15,7 +15,6 @@
 // Mocks
 #include "MockNodeStateMonitor.hpp"
 #include "MockUnifyMqtt.hpp"
-
 // Third party library
 #include <iostream>
 #include <nlunit-test.h>
@@ -27,6 +26,7 @@ using namespace unify::matter_bridge;
 
 static UnifyEmberInterface ember_interface = UnifyEmberInterface();
 static device_translator dev_translator    = device_translator();
+static ClusterEmulator emulator = ClusterEmulator();
 
 chip::app::AttributeValueEncoder setupEncoder(chip::EndpointId endpoint, chip::app::ConcreteAttributePath & path,
                                               chip::DataVersion & dataVersion)
@@ -44,7 +44,7 @@ void TestTemperatureMeasurementAttributes(nlTestSuite * inSuite, void * aContext
 {
 
     // 1
-    Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator, ember_interface);
+    Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator,emulator, ember_interface);
     Test::MockUnifyMqtt test_unify_mqtt;
 
     unify::matter_bridge::TemperatureMeasurementAttributeAccess test_temperature_measurement_attributes(
@@ -94,7 +94,7 @@ void TestTemperatureMeasurementReadFailures(nlTestSuite * inSuite, void * aConte
 {
 
     // Setup
-    Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator, ember_interface);
+    Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator,emulator, ember_interface);
     Test::MockUnifyMqtt test_unify_mqtt;
 
     unify::matter_bridge::TemperatureMeasurementAttributeAccess test_temperature_measurement_attributes(

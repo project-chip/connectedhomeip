@@ -23,7 +23,7 @@
 // Application library
 #include "bridged_device_basic_info_attribute_translator.hpp"
 #include "command_translator.hpp"
-#include "feature_map_attr_override.hpp"
+#include "attribute_translator.hpp"
 #include "group_command_translator.hpp"
 #include "matter_bridge_cli.hpp"
 #include "matter_bridge_config.h"
@@ -31,6 +31,8 @@
 #include "matter_device_translator.hpp"
 #include "matter_node_state_monitor.hpp"
 #include "matter_bridge_qrcode_publisher.hpp"
+#include "cluster_emulator.hpp"
+
 
 extern "C" {
 // Unify library
@@ -129,7 +131,8 @@ int main(int argc, char * argv[])
 
     device_translator matter_device_translator;
     UnifyEmberInterface ember_interface;
-    matter_node_state_monitor node_state_monitor(matter_device_translator, ember_interface);
+    ClusterEmulator emulator;
+    matter_node_state_monitor node_state_monitor(matter_device_translator, emulator, ember_interface);
     UnifyMqtt unify_mqtt_handler;
     group_translator m_group_translator(matter_data_storage::instance());
     set_mapping_display_instance(node_state_monitor, m_group_translator);
@@ -142,7 +145,7 @@ int main(int argc, char * argv[])
 
     // Initializing OnOff command handler
     OnOffClusterCommandHandler on_cmd_handler(node_state_monitor, unify_mqtt_handler, m_group_translator);
-    OnOffAttributeAccessOverride on_off_attribute_handler(node_state_monitor, unify_mqtt_handler);
+    OnOffAttributeAccess on_off_attribute_handler(node_state_monitor, unify_mqtt_handler);
 
     // Initializing Identify Cluster Commands handler
     IdentifyClusterCommandHandler identify_cluster_commands_handler(node_state_monitor, unify_mqtt_handler, m_group_translator);
@@ -150,11 +153,11 @@ int main(int argc, char * argv[])
 
     // Initializing Level Cluster handler
     LevelControlClusterCommandHandler level_cluster_commands_handler(node_state_monitor, unify_mqtt_handler, m_group_translator);
-    LevelControlAttributeAccessOverride level_attribute_handler(node_state_monitor, unify_mqtt_handler);
+    LevelControlAttributeAccess level_attribute_handler(node_state_monitor, unify_mqtt_handler);
 
     // Initializing color controller cluster command handler
     ColorControlClusterCommandHandler color_control_commands_handler(node_state_monitor, unify_mqtt_handler, m_group_translator);
-    ColorControlAttributeAccessOverride color_control_attribute_handler(node_state_monitor, unify_mqtt_handler);
+    ColorControlAttributeAccess color_control_attribute_handler(node_state_monitor, unify_mqtt_handler);
 
     // Initializing OccupancySensing command handler
     OccupancySensingClusterCommandHandler occupancy_sensing_command_handler(node_state_monitor, unify_mqtt_handler,

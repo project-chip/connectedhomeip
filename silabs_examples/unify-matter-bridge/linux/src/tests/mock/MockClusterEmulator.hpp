@@ -11,26 +11,16 @@
  *
  *****************************************************************************/
 
-#ifndef MOCK_NODE_STATE_MONITOR_HPP
-#define MOCK_NODE_STATE_MONITOR_HPP
-
-#include "matter_node_state_monitor.hpp"
-#include "cluster_emulator.hpp"
-
+#ifndef MOCK_CLUSTER_EMULATOR_HPP
+#define MOCK_CLUSTER_EMULATOR_HPP
 namespace unify::matter_bridge {
 namespace Test {
 
-class MockNodeStateMonitor : public unify::matter_bridge::matter_node_state_monitor
+class MockClusterEmulator  : public ClusterEmulator
 {
-public:
-    MockNodeStateMonitor(const unify::matter_bridge::device_translator & device_translator,ClusterEmulator & emulator, UnifyEmberInterface & ember_interface) :
-        unify::matter_bridge::matter_node_state_monitor(device_translator,emulator, ember_interface)
-    {}
 
-    void call_on_unify_node_added(const unify::node_state_monitor::node & node) { this->on_unify_node_added(node); }
 };
 
-} // namespace Test
-} // namespace unify::matter_bridge
-
+}
+}
 #endif

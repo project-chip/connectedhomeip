@@ -19,6 +19,7 @@
 #include <sstream>
 #include "sl_log.h"
 #include "chip_types_to_json.hpp"
+#include "cluster_emulator.hpp"
 
 using namespace chip;
 using namespace chip::app;
@@ -43,6 +44,11 @@ void {{asUpperCamelCase label}}ClusterCommandHandler::InvokeCommand(
 
   std::string cmd;
   nlohmann::json payload     = {};
+
+  if( m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath) ) {
+    m_node_state_monitor.emulator().invoke_command(ctxt);
+    return;
+  }
 
   switch (ctxt.mRequestPath.mCommandId) {
     {{#zcl_commands_source_client}}

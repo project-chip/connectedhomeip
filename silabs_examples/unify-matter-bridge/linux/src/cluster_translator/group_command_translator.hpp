@@ -39,7 +39,7 @@ public:
 
 private:
     void RemoveAllGroups(chip::FabricIndex fabric_index);
-    group_translator &m_group_translator;
+    group_translator & m_group_translator;
 };
 
 } // namespace unify::matter_bridge

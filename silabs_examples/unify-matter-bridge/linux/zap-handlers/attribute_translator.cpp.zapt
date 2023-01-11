@@ -22,6 +22,8 @@
 #include <attribute_state_cache.hpp>
 #include "attribute_translator.hpp"
 #include "matter_device_translator.hpp"
+#include "cluster_emulator.hpp"
+
 #include "uic_mqtt.h"
 #include "sl_log.h"
 #include "app-common/zap-generated/attributes/Accessors.h"
@@ -35,19 +37,6 @@ using namespace unify::matter_bridge;
 #include "chip_types_to_json.hpp"
 #include "chip_types_from_json.hpp"
 #include "unify_accessors.hpp"
-
-// ZCL cluster revision
-{{#zcl_clusters}}
-{{#if (unifySupportedCluster code)}}
-{{#global_attribute_default code="0xFFFD"}}
-{{#if defaultValue}}
-constexpr uint16_t ZCL_{{asDelimitedMacro parent.label}}_REVISION = {{defaultValue}};
-{{else}}
-constexpr uint16_t ZCL_{{asDelimitedMacro parent.label}}_REVISION = 0;
-{{/if}}
-{{/global_attribute_default}}
-{{/if}}
-{{/zcl_clusters}}
 
 {{#zcl_clusters}}
 {{#if (unifySupportedCluster code)}}
@@ -64,6 +53,12 @@ CHIP_ERROR
   ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId,
                                                         aPath.mClusterId,
                                                         aPath.mAttributeId);
+
+  
+  if( m_node_state_monitor.emulator().is_attribute_emulated(aPath) ) {
+    return m_node_state_monitor.emulator().read_attribute(aPath,aEncoder);
+  }
+  
   try {
     switch (aPath.mAttributeId) {
     {{#zcl_attributes_server}}
@@ -71,13 +66,7 @@ CHIP_ERROR
     {{else if (canHaveSimpleAccessors this)}}
     case MN::{{asUpperCamelCase label}}::Id: {     // type is {{type}}
       MN::{{asUpperCamelCase label}}::TypeInfo::Type value;
-      {{#if (isStrEqual (asUpperCamelCase label) "FeatureMap")  }}
-      value = get_feature_map_settings(aPath);
-      {{else if (isStrEqual (asUpperCamelCase label) "ClusterRevision") }}
-      value = ZCL_{{asDelimitedMacro parent.label}}_REVISION;
-      {{else}}
       UN::{{asUpperCamelCase label}}::Get(atr_path, value);
-      {{/if}}
       return aEncoder.Encode(value);
     }
     {{/if_is_struct}}
@@ -109,6 +98,10 @@ CHIP_ERROR {{asUpperCamelCase label}}AttributeAccess::Write(const ConcreteDataAt
 
   std::string attribute_name;
   nlohmann::json jsn;
+
+  if( m_node_state_monitor.emulator().is_attribute_emulated(aPath) ) {
+    return m_node_state_monitor.emulator().write_attribute(aPath,aDecoder);
+  }
 
   switch (aPath.mAttributeId) {
   {{#zcl_attributes_server}}

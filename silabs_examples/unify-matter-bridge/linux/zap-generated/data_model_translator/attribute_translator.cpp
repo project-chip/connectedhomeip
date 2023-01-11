@@ -19,12 +19,14 @@
 #include <sstream>
 #include <type_traits>
 
-#include "app-common/zap-generated/attributes/Accessors.h"
 #include "attribute_translator.hpp"
+#include "cluster_emulator.hpp"
 #include "matter_device_translator.hpp"
+#include <attribute_state_cache.hpp>
+
+#include "app-common/zap-generated/attributes/Accessors.h"
 #include "sl_log.h"
 #include "uic_mqtt.h"
-#include <attribute_state_cache.hpp>
 #define LOG_TAG "attribute_translator"
 
 using namespace chip;
@@ -36,25 +38,6 @@ using namespace unify::matter_bridge;
 #include "chip_types_to_json.hpp"
 #include "unify_accessors.hpp"
 
-// ZCL cluster revision
-constexpr uint16_t ZCL_IDENTIFY_REVISION = 4;
-constexpr uint16_t ZCL_GROUPS_REVISION = 3;
-constexpr uint16_t ZCL_SCENES_REVISION = 4;
-constexpr uint16_t ZCL_ON_OFF_REVISION = 4;
-constexpr uint16_t ZCL_LEVEL_CONTROL_REVISION = 5;
-constexpr uint16_t ZCL_DOOR_LOCK_REVISION = 6;
-constexpr uint16_t ZCL_BARRIER_CONTROL_REVISION = 0;
-constexpr uint16_t ZCL_THERMOSTAT_REVISION = 5;
-constexpr uint16_t ZCL_FAN_CONTROL_REVISION = 0;
-constexpr uint16_t ZCL_THERMOSTAT_USER_INTERFACE_CONFIGURATION_REVISION = 0;
-constexpr uint16_t ZCL_COLOR_CONTROL_REVISION = 5;
-constexpr uint16_t ZCL_ILLUMINANCE_MEASUREMENT_REVISION = 3;
-constexpr uint16_t ZCL_TEMPERATURE_MEASUREMENT_REVISION = 0;
-constexpr uint16_t ZCL_PRESSURE_MEASUREMENT_REVISION = 3;
-constexpr uint16_t ZCL_RELATIVE_HUMIDITY_MEASUREMENT_REVISION = 3;
-constexpr uint16_t ZCL_OCCUPANCY_SENSING_REVISION = 2;
-constexpr uint16_t ZCL_ELECTRICAL_MEASUREMENT_REVISION = 3;
-
 CHIP_ERROR
 IdentifyAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
 {
@@ -65,6 +48,11 @@ IdentifyAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeV
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().read_attribute(aPath, aEncoder);
+    }
+
     try {
         switch (aPath.mAttributeId) {
         case MN::IdentifyTime::Id: { // type is int16u
@@ -79,12 +67,12 @@ IdentifyAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeV
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            value = get_feature_map_settings(aPath);
+            UN::FeatureMap::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            value = ZCL_IDENTIFY_REVISION;
+            UN::ClusterRevision::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         }
@@ -113,6 +101,10 @@ CHIP_ERROR IdentifyAttributeAccess::Write(const ConcreteDataAttributePath& aPath
 
     std::string attribute_name;
     nlohmann::json jsn;
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().write_attribute(aPath, aDecoder);
+    }
 
     switch (aPath.mAttributeId) {
     case Attributes::IdentifyTime::Id: {
@@ -189,6 +181,11 @@ GroupsAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeVal
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().read_attribute(aPath, aEncoder);
+    }
+
     try {
         switch (aPath.mAttributeId) {
         case MN::NameSupport::Id: { // type is bitmap8
@@ -198,12 +195,12 @@ GroupsAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeVal
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            value = get_feature_map_settings(aPath);
+            UN::FeatureMap::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            value = ZCL_GROUPS_REVISION;
+            UN::ClusterRevision::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         }
@@ -232,6 +229,10 @@ CHIP_ERROR GroupsAttributeAccess::Write(const ConcreteDataAttributePath& aPath, 
 
     std::string attribute_name;
     nlohmann::json jsn;
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().write_attribute(aPath, aDecoder);
+    }
 
     switch (aPath.mAttributeId) {
         // NameSupport is not supported by UCL
@@ -300,6 +301,11 @@ ScenesAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeVal
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().read_attribute(aPath, aEncoder);
+    }
+
     try {
         switch (aPath.mAttributeId) {
         case MN::SceneCount::Id: { // type is int8u
@@ -334,12 +340,12 @@ ScenesAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeVal
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            value = get_feature_map_settings(aPath);
+            UN::FeatureMap::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            value = ZCL_SCENES_REVISION;
+            UN::ClusterRevision::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         }
@@ -368,6 +374,10 @@ CHIP_ERROR ScenesAttributeAccess::Write(const ConcreteDataAttributePath& aPath, 
 
     std::string attribute_name;
     nlohmann::json jsn;
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().write_attribute(aPath, aDecoder);
+    }
 
     switch (aPath.mAttributeId) {
         // SceneCount is not supported by UCL
@@ -501,6 +511,11 @@ OnOffAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValu
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().read_attribute(aPath, aEncoder);
+    }
+
     try {
         switch (aPath.mAttributeId) {
         case MN::OnOff::Id: { // type is boolean
@@ -530,12 +545,12 @@ OnOffAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValu
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            value = get_feature_map_settings(aPath);
+            UN::FeatureMap::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            value = ZCL_ON_OFF_REVISION;
+            UN::ClusterRevision::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         }
@@ -564,6 +579,10 @@ CHIP_ERROR OnOffAttributeAccess::Write(const ConcreteDataAttributePath& aPath, A
 
     std::string attribute_name;
     nlohmann::json jsn;
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().write_attribute(aPath, aDecoder);
+    }
 
     switch (aPath.mAttributeId) {
     // OnOff is not supported by UCL
@@ -705,6 +724,11 @@ LevelControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attrib
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().read_attribute(aPath, aEncoder);
+    }
+
     try {
         switch (aPath.mAttributeId) {
         case MN::CurrentLevel::Id: { // type is int8u
@@ -779,12 +803,12 @@ LevelControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attrib
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            value = get_feature_map_settings(aPath);
+            UN::FeatureMap::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            value = ZCL_LEVEL_CONTROL_REVISION;
+            UN::ClusterRevision::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         }
@@ -813,6 +837,10 @@ CHIP_ERROR LevelControlAttributeAccess::Write(const ConcreteDataAttributePath& a
 
     std::string attribute_name;
     nlohmann::json jsn;
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().write_attribute(aPath, aDecoder);
+    }
 
     switch (aPath.mAttributeId) {
     // CurrentLevel is not supported by UCL
@@ -1099,6 +1127,11 @@ DoorLockAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeV
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().read_attribute(aPath, aEncoder);
+    }
+
     try {
         switch (aPath.mAttributeId) {
         case MN::LockState::Id: { // type is DlLockState
@@ -1283,12 +1316,12 @@ DoorLockAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeV
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            value = get_feature_map_settings(aPath);
+            UN::FeatureMap::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            value = ZCL_DOOR_LOCK_REVISION;
+            UN::ClusterRevision::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         }
@@ -1317,6 +1350,10 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath& aPath
 
     std::string attribute_name;
     nlohmann::json jsn;
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().write_attribute(aPath, aDecoder);
+    }
 
     switch (aPath.mAttributeId) {
     // LockState is not supported by UCL
@@ -1910,6 +1947,11 @@ BarrierControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attr
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().read_attribute(aPath, aEncoder);
+    }
+
     try {
         switch (aPath.mAttributeId) {
         case MN::BarrierMovingState::Id: { // type is enum8
@@ -1964,12 +2006,12 @@ BarrierControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attr
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            value = get_feature_map_settings(aPath);
+            UN::FeatureMap::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            value = ZCL_BARRIER_CONTROL_REVISION;
+            UN::ClusterRevision::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         }
@@ -1998,6 +2040,10 @@ CHIP_ERROR BarrierControlAttributeAccess::Write(const ConcreteDataAttributePath&
 
     std::string attribute_name;
     nlohmann::json jsn;
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().write_attribute(aPath, aDecoder);
+    }
 
     switch (aPath.mAttributeId) {
     // barrier moving state is not supported by UCL
@@ -2227,6 +2273,11 @@ ThermostatAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().read_attribute(aPath, aEncoder);
+    }
+
     try {
         switch (aPath.mAttributeId) {
         case MN::LocalTemperature::Id: { // type is int16s
@@ -2476,12 +2527,12 @@ ThermostatAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            value = get_feature_map_settings(aPath);
+            UN::FeatureMap::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            value = ZCL_THERMOSTAT_REVISION;
+            UN::ClusterRevision::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         }
@@ -2510,6 +2561,10 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath& aPa
 
     std::string attribute_name;
     nlohmann::json jsn;
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().write_attribute(aPath, aDecoder);
+    }
 
     switch (aPath.mAttributeId) {
     // LocalTemperature is not supported by UCL
@@ -3401,6 +3456,11 @@ FanControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().read_attribute(aPath, aEncoder);
+    }
+
     try {
         switch (aPath.mAttributeId) {
         case MN::FanMode::Id: { // type is FanModeType
@@ -3460,12 +3520,12 @@ FanControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            value = get_feature_map_settings(aPath);
+            UN::FeatureMap::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            value = ZCL_FAN_CONTROL_REVISION;
+            UN::ClusterRevision::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         }
@@ -3494,6 +3554,10 @@ CHIP_ERROR FanControlAttributeAccess::Write(const ConcreteDataAttributePath& aPa
 
     std::string attribute_name;
     nlohmann::json jsn;
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().write_attribute(aPath, aDecoder);
+    }
 
     switch (aPath.mAttributeId) {
     case Attributes::FanMode::Id: {
@@ -3594,6 +3658,11 @@ ThermostatUserInterfaceConfigurationAttributeAccess::Read(const ConcreteReadAttr
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().read_attribute(aPath, aEncoder);
+    }
+
     try {
         switch (aPath.mAttributeId) {
         case MN::TemperatureDisplayMode::Id: { // type is enum8
@@ -3613,12 +3682,12 @@ ThermostatUserInterfaceConfigurationAttributeAccess::Read(const ConcreteReadAttr
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            value = get_feature_map_settings(aPath);
+            UN::FeatureMap::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            value = ZCL_THERMOSTAT_USER_INTERFACE_CONFIGURATION_REVISION;
+            UN::ClusterRevision::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         }
@@ -3648,6 +3717,10 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationAttributeAccess::Write(const Conc
 
     std::string attribute_name;
     nlohmann::json jsn;
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().write_attribute(aPath, aDecoder);
+    }
 
     switch (aPath.mAttributeId) {
     case Attributes::TemperatureDisplayMode::Id: {
@@ -3767,6 +3840,11 @@ ColorControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attrib
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().read_attribute(aPath, aEncoder);
+    }
+
     try {
         switch (aPath.mAttributeId) {
         case MN::CurrentHue::Id: { // type is int8u
@@ -4031,12 +4109,12 @@ ColorControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attrib
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            value = get_feature_map_settings(aPath);
+            UN::FeatureMap::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            value = ZCL_COLOR_CONTROL_REVISION;
+            UN::ClusterRevision::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         }
@@ -4065,6 +4143,10 @@ CHIP_ERROR ColorControlAttributeAccess::Write(const ConcreteDataAttributePath& a
 
     std::string attribute_name;
     nlohmann::json jsn;
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().write_attribute(aPath, aDecoder);
+    }
 
     switch (aPath.mAttributeId) {
     // CurrentHue is not supported by UCL
@@ -4894,6 +4976,11 @@ IlluminanceMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPa
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().read_attribute(aPath, aEncoder);
+    }
+
     try {
         switch (aPath.mAttributeId) {
         case MN::MeasuredValue::Id: { // type is int16u
@@ -4923,12 +5010,12 @@ IlluminanceMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPa
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            value = get_feature_map_settings(aPath);
+            UN::FeatureMap::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            value = ZCL_ILLUMINANCE_MEASUREMENT_REVISION;
+            UN::ClusterRevision::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         }
@@ -4957,6 +5044,10 @@ CHIP_ERROR IlluminanceMeasurementAttributeAccess::Write(const ConcreteDataAttrib
 
     std::string attribute_name;
     nlohmann::json jsn;
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().write_attribute(aPath, aDecoder);
+    }
 
     switch (aPath.mAttributeId) {
         // MeasuredValue is not supported by UCL
@@ -5081,6 +5172,11 @@ TemperatureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPa
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().read_attribute(aPath, aEncoder);
+    }
+
     try {
         switch (aPath.mAttributeId) {
         case MN::MeasuredValue::Id: { // type is int16s
@@ -5105,12 +5201,12 @@ TemperatureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPa
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            value = get_feature_map_settings(aPath);
+            UN::FeatureMap::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            value = ZCL_TEMPERATURE_MEASUREMENT_REVISION;
+            UN::ClusterRevision::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         }
@@ -5139,6 +5235,10 @@ CHIP_ERROR TemperatureMeasurementAttributeAccess::Write(const ConcreteDataAttrib
 
     std::string attribute_name;
     nlohmann::json jsn;
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().write_attribute(aPath, aDecoder);
+    }
 
     switch (aPath.mAttributeId) {
         // MeasuredValue is not supported by UCL
@@ -5249,6 +5349,11 @@ PressureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPath,
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().read_attribute(aPath, aEncoder);
+    }
+
     try {
         switch (aPath.mAttributeId) {
         case MN::MeasuredValue::Id: { // type is int16s
@@ -5298,12 +5403,12 @@ PressureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPath,
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            value = get_feature_map_settings(aPath);
+            UN::FeatureMap::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            value = ZCL_PRESSURE_MEASUREMENT_REVISION;
+            UN::ClusterRevision::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         }
@@ -5332,6 +5437,10 @@ CHIP_ERROR PressureMeasurementAttributeAccess::Write(const ConcreteDataAttribute
 
     std::string attribute_name;
     nlohmann::json jsn;
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().write_attribute(aPath, aDecoder);
+    }
 
     switch (aPath.mAttributeId) {
         // MeasuredValue is not supported by UCL
@@ -5507,6 +5616,11 @@ RelativeHumidityMeasurementAttributeAccess::Read(const ConcreteReadAttributePath
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().read_attribute(aPath, aEncoder);
+    }
+
     try {
         switch (aPath.mAttributeId) {
         case MN::MeasuredValue::Id: { // type is int16u
@@ -5531,12 +5645,12 @@ RelativeHumidityMeasurementAttributeAccess::Read(const ConcreteReadAttributePath
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            value = get_feature_map_settings(aPath);
+            UN::FeatureMap::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            value = ZCL_RELATIVE_HUMIDITY_MEASUREMENT_REVISION;
+            UN::ClusterRevision::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         }
@@ -5566,6 +5680,10 @@ CHIP_ERROR RelativeHumidityMeasurementAttributeAccess::Write(const ConcreteDataA
 
     std::string attribute_name;
     nlohmann::json jsn;
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().write_attribute(aPath, aDecoder);
+    }
 
     switch (aPath.mAttributeId) {
         // measured value is not supported by UCL
@@ -5677,6 +5795,11 @@ OccupancySensingAttributeAccess::Read(const ConcreteReadAttributePath& aPath, At
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().read_attribute(aPath, aEncoder);
+    }
+
     try {
         switch (aPath.mAttributeId) {
         case MN::Occupancy::Id: { // type is bitmap8
@@ -5741,12 +5864,12 @@ OccupancySensingAttributeAccess::Read(const ConcreteReadAttributePath& aPath, At
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            value = get_feature_map_settings(aPath);
+            UN::FeatureMap::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            value = ZCL_OCCUPANCY_SENSING_REVISION;
+            UN::ClusterRevision::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         }
@@ -5775,6 +5898,10 @@ CHIP_ERROR OccupancySensingAttributeAccess::Write(const ConcreteDataAttributePat
 
     std::string attribute_name;
     nlohmann::json jsn;
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().write_attribute(aPath, aDecoder);
+    }
 
     switch (aPath.mAttributeId) {
     // occupancy is not supported by UCL
@@ -6060,6 +6187,11 @@ ElectricalMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPat
     }
 
     ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().read_attribute(aPath, aEncoder);
+    }
+
     try {
         switch (aPath.mAttributeId) {
         case MN::MeasurementType::Id: { // type is bitmap32
@@ -6704,12 +6836,12 @@ ElectricalMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPat
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
-            value = get_feature_map_settings(aPath);
+            UN::FeatureMap::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
-            value = ZCL_ELECTRICAL_MEASUREMENT_REVISION;
+            UN::ClusterRevision::Get(atr_path, value);
             return aEncoder.Encode(value);
         }
         }
@@ -6738,6 +6870,10 @@ CHIP_ERROR ElectricalMeasurementAttributeAccess::Write(const ConcreteDataAttribu
 
     std::string attribute_name;
     nlohmann::json jsn;
+
+    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
+        return m_node_state_monitor.emulator().write_attribute(aPath, aDecoder);
+    }
 
     switch (aPath.mAttributeId) {
     // measurement type is not supported by UCL

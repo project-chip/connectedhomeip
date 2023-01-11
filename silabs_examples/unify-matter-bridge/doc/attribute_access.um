@@ -1,0 +1,35 @@
+@startuml
+title Bridged Attribute Access 
+
+matter_attribute_access_interface.read -.-> attribute_translator.interface_interface.read
+
+if "emualtor.is_attribute_emulated" then
+  --> [true] emulator.read
+else
+  --> [false] zap_attribute_handler.read
+endif
+
+zap_attribute_handler.read -->[direct translation] attribute_state_cache.read
+emulator.read -->custom_read_actions
+
+
+note left: Typically attribute_state_cache read call,\n but in a non-standard way
+
+mqtt_subscribe_callback -->[Reported value update] attribute_translator.reported_updated
+attribute_translator.reported_updated --> zap_attribute_handler.reported_updated
+zap_attribute_handler.reported_updated --> attribute_state_cache.write
+
+
+matter_attribute_access_interface.write -.-> attribute_translator.interface_interface.write
+
+if "emualtor.is_attribute_emulated" then
+  --> [true] emulator.write
+else
+  --> [false] zap_attribute_handler.write
+endif
+
+zap_attribute_handler.write -->[publish desired] mqtt_publish
+emulator.write -->custom_write_actions
+
+
+@enduml

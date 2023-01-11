@@ -24,6 +24,7 @@
 
 namespace unify::matter_bridge {
 class device_translator;
+class ClusterEmulator;
 
 /**
  * @brief definition of a bridged endpoint
@@ -81,7 +82,15 @@ struct bridged_endpoint
 class matter_node_state_monitor : private unify::node_state_monitor::node_state_monitor_interface
 {
 public:
-    matter_node_state_monitor(const device_translator & matter_device_translator, UnifyEmberInterface & ember_interface);
+    /**
+     * @brief Construct a new matter node state monitor object
+     *
+     * @param matter_device_translator Device translator used to calculate the matter device type
+     * @param cluster_emulator         Cluster Emulator used to extend the endpoint descriptor with emulated clusters
+     * @param ember_interface          A class which wraps the ember interface for the node state monitor.
+     */
+    matter_node_state_monitor(const device_translator & matter_device_translator, ClusterEmulator & cluster_emulator,
+                              UnifyEmberInterface & ember_interface);
 
     /**
      * @brief Get the bridged endpoint by object from unify addresses
@@ -125,7 +134,7 @@ public:
      * @brief Get the supported cluster from matter endpoint id
      *
      * @param endpoint
-     * @return std::set<chip::ClusterId> 
+     * @return std::set<chip::ClusterId>
      */
     std::set<chip::ClusterId> get_supported_cluster(chip::EndpointId endpoint);
 
@@ -134,6 +143,13 @@ public:
      * @param std::ostream
      */
     void display_map(std::ostream & os);
+
+    /**
+     * @brief Convenience getter for the cluster emulator
+     *
+     * @return ClusterEmulator&
+     */
+    ClusterEmulator & emulator() const { return cluster_emulator; }
 
 protected:
     /**
@@ -198,26 +214,6 @@ protected:
     const device_translator & matter_device_translator;
 
     /**
-     * @brief Unify ember interface
-     *
-     * A class which wraps the ember interface for the node state monitor.
-     * Initialize and set in the constructor stage
-     */
-    UnifyEmberInterface & unify_ember_interface;
-
-    /** @brief map containing all bridged endpoints which are currently registered
-    the node state monitor. If an entry is dropped from this list any associated
-    resources which might be in use by matter will released as well
-    */
-    std::multimap<std::string, struct bridged_endpoint> bridged_endpoints;
-
-    /**
-     * @brief Event listeners
-     *
-     */
-    std::vector<event_listener_t> event_listeners;
-
-    /**
      * @brief Erase matter endpoint in bridged endpoints if it exsits
      *
      */
@@ -227,6 +223,15 @@ protected:
      * @brief registers a bridged_endpoint to matter.
      */
     void register_dynamic_endpoint(const struct bridged_endpoint & bridge);
+
+    /** @brief map containing all bridged endpoints which are currently registered
+    the node state monitor. If an entry is dropped from this list any associated
+    resources which might be in use by matter will released as well
+    */
+    std::multimap<std::string, struct bridged_endpoint> bridged_endpoints;
+    std::vector<event_listener_t> event_listeners;
+    ClusterEmulator & cluster_emulator;
+    UnifyEmberInterface & unify_ember_interface;
 };
 } // namespace unify::matter_bridge
 

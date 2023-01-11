@@ -62,7 +62,7 @@ matter_cluster_builder
     this->owned_ember_endpoint.add_lifetime(std::move(attributes));
     this->owned_ember_endpoint.add_lifetime(std::move(incoming_commands));
     this->owned_ember_endpoint.add_lifetime(std::move(outgoing_commands));
-  };
+  };  
   return matter_cluster_builder(on_done);
 }
 

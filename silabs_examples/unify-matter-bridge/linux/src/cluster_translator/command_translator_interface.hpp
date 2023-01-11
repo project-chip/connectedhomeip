@@ -20,6 +20,7 @@
 #include "matter_node_state_monitor.hpp"
 #include "sl_log.h"
 #include "unify_mqtt_wrapper.hpp"
+#include "cluster_emulator.hpp"
 
 namespace unify::matter_bridge {
 

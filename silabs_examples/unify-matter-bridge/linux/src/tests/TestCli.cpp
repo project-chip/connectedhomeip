@@ -19,6 +19,7 @@ using namespace unify::matter_bridge;
 
 static UnifyEmberInterface ember_interface = UnifyEmberInterface();
 static device_translator dev_translator    = device_translator();
+static ClusterEmulator emulator;
 
 /* uic stdin mocks start */
 static command_map_t commands;
@@ -63,7 +64,7 @@ sl_status_t uic_stdin_handle_command(const char *command)
 /* uic stdin mocks end */
 static void TestCliSetMatterNodeStateMonitor(nlTestSuite * inSuite, void * aContext)
 {
-    Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator, ember_interface);
+    Test::MockNodeStateMonitor test_matter_node_state_monitor(dev_translator,emulator, ember_interface);
     matter_data_storage m_matter_data_storage;
     Test::MockGroupTranslator mGroupTranslator(m_matter_data_storage);
     set_mapping_display_instance(test_matter_node_state_monitor, mGroupTranslator);

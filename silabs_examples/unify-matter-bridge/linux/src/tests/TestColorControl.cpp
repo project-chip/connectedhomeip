@@ -1,6 +1,6 @@
 #include "ClusterTestContext.h"
 #include "command_translator.hpp"
-#include "feature_map_attr_override.hpp"
+#include "attribute_translator.hpp"
 
 // Chip components
 #include <lib/support/UnitTestContext.h>
@@ -11,7 +11,7 @@
 
 using namespace unify::matter_bridge;
 using namespace chip::app;
-using TestContext = Test::ClusterContext<ColorControlAttributeAccessOverride, ColorControlClusterCommandHandler>;
+using TestContext = Test::ClusterContext<ColorControlAttributeAccess, ColorControlClusterCommandHandler>;
 
 static int Initialize(void * context)
 {

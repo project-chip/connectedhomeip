@@ -1,7 +1,7 @@
 // Unify bridge components
 #include "matter_device_translator.hpp"
 #include "matter_node_state_monitor.hpp"
-
+#include "cluster_emulator.hpp"
 // Mocks
 #include "MockUnifyEmberInterface.hpp"
 
@@ -53,8 +53,9 @@ class WrapNodeStateMonitor : public unify::matter_bridge::matter_node_state_moni
 {
 public:
     WrapNodeStateMonitor(unify::matter_bridge::device_translator & device_translator,
+                         unify::matter_bridge::ClusterEmulator & emulator,
                          unify::matter_bridge::Test::MockUnifyEmberInterface & ember_interface) :
-        matter_node_state_monitor(device_translator, ember_interface){};
+        matter_node_state_monitor(device_translator,emulator, ember_interface){};
 
     void call_on_unify_node_added(const unify::node_state_monitor::node & node) { this->on_unify_node_added(node); }
 
@@ -64,7 +65,8 @@ public:
 
     long unsigned int listeners_count() { return this->event_listeners.size(); }
 
-    long unsigned int bridged_endpoints_count() { return this->bridged_endpoints.size(); }
+    long unsigned int bridged_endpoints_count() { return this->bridged_endpoints.size(); 
+    }
 };
 
 static void TestNodeStateMonitorAddingNode(nlTestSuite * inSuite, void * aContext)
@@ -76,8 +78,10 @@ static void TestNodeStateMonitorAddingNode(nlTestSuite * inSuite, void * aContex
 
     // Initialize the node state monitor
     unify::matter_bridge::device_translator matter_device_translator;
+    unify::matter_bridge::ClusterEmulator emulator;
     MockUnifyEmberInterface unify_ember_interface;
-    WrapNodeStateMonitor node_state_monitor(matter_device_translator, unify_ember_interface);
+    
+    WrapNodeStateMonitor node_state_monitor(matter_device_translator,emulator, unify_ember_interface);
 
     node_state_monitor.register_event_listener(unify_node_state_update);
     NL_TEST_ASSERT(inSuite, node_state_monitor.listeners_count() == 1);
@@ -133,8 +137,11 @@ static void TestNodeStateMonitoringStateChangingNode(nlTestSuite * inSuite, void
 
     // Initialize the node state monitor
     unify::matter_bridge::device_translator matter_device_translator;
+    unify::matter_bridge::ClusterEmulator emulator;
     MockUnifyEmberInterface unify_ember_interface;
-    WrapNodeStateMonitor node_state_monitor(matter_device_translator, unify_ember_interface);
+    
+    WrapNodeStateMonitor node_state_monitor(matter_device_translator,emulator, unify_ember_interface);
+
     node_state_monitor.register_event_listener(unify_node_state_update);
 
     // Create a node with OnOff Cluster endpoint
@@ -169,8 +176,10 @@ static void TestOnNodeRemoved(nlTestSuite * inSuite, void * aContext)
     // Setup
     // Initialize the node state monitor
     unify::matter_bridge::device_translator matter_device_translator;
-    MockUnifyEmberInterface unify_ember_interface;
-    WrapNodeStateMonitor node_state_monitor(matter_device_translator, unify_ember_interface);
+    unify::matter_bridge::ClusterEmulator emulator;
+    MockUnifyEmberInterface unify_ember_interface;    
+    WrapNodeStateMonitor node_state_monitor(matter_device_translator,emulator, unify_ember_interface);
+
     node_state_monitor.register_event_listener(unify_node_state_update);
 
     // Create a node with OnOff Cluster endpoint
@@ -218,10 +227,13 @@ static void TestMultipleListeners(nlTestSuite * inSuite, void * aContext)
     using namespace unify::matter_bridge::Test;
     reset_test_data();
     // Setup
+
     // Initialize the node state monitor
     unify::matter_bridge::device_translator matter_device_translator;
-    MockUnifyEmberInterface unify_ember_interface;
-    WrapNodeStateMonitor node_state_monitor(matter_device_translator, unify_ember_interface);
+    unify::matter_bridge::ClusterEmulator emulator;
+    MockUnifyEmberInterface unify_ember_interface;    
+    WrapNodeStateMonitor node_state_monitor(matter_device_translator,emulator, unify_ember_interface);
+
 
     // Create a node with OnOff Cluster endpoint
     const std::string node_id = "unid-node-3";
@@ -269,10 +281,12 @@ static void TestEmberInterfaceNodeAdded(nlTestSuite * inSuite, void * aContext)
     reset_test_data();
 
     // Setup
+
     // Initialize the node state monitor
     unify::matter_bridge::device_translator matter_device_translator;
-    MockUnifyEmberInterface unify_ember_interface;
-    WrapNodeStateMonitor node_state_monitor(matter_device_translator, unify_ember_interface);
+    unify::matter_bridge::ClusterEmulator emulator;
+    MockUnifyEmberInterface unify_ember_interface;    
+    WrapNodeStateMonitor node_state_monitor(matter_device_translator,emulator, unify_ember_interface);
     node_state_monitor.register_event_listener(unify_node_state_update);
 
     // Create a node with clustr endpoints resembling a dimmable light.

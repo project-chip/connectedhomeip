@@ -80,6 +80,11 @@
             "path": "device-type-mapper/matter_id_model.inc.zapt",
             "name": "Matter IDs Mapping Data Model",
             "output": "device-type-mapper/matter_id_model.inc"
+        },
+        {
+            "path": "cluster_revision_table.hpp.zapt",
+            "name": "Table of supported cluster revision",
+            "output": "cluster_revision_table.hpp"
         }
     ]
 }

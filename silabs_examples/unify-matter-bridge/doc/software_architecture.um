@@ -1,0 +1,94 @@
+ 
+
+@startuml
+
+class matter_node_state_monitor {
+  get_bridge_endpoint(unid, unify_ep)
+  get_bridge_endpoint(matter_ep)
+}
+
+struct bridge_endpoint {
+  - matter_ep
+  - unify_ep
+  - unid
+  - descriptor
+}
+
+class unify_node_state_monitor {
+  onNodeAdded()
+  onNodeDeleted()
+  onNodeStateChanged()
+}
+
+class device_type_translator {
+    vector get_device_types(clusters* )
+}
+
+class matter_app_interface {
+  register_dynamic_endpoint()
+  enable_dynamic_endpoint()
+  registerAttributeAccessOverride()
+  RegisterCommandHandler()
+}
+
+class data_storage {
+  store_data<>(data)
+  recall_data()
+ }
+
+
+
+class unify_matter_bridge {
+  LinuxAppMain()
+}
+
+class uic_mqtt_interface {
+  publish(topic, message)
+  subscribe(topic, callback)
+}
+
+class cluster_attribute_interface {
+  read()
+  write()
+}
+
+
+class zap_cluster_attribute_interface {
+  ZAP_GENERATED
+}
+
+class cluster_command_handler {
+  Invoke()
+}
+
+class zap_cluster_command_handler {
+  ZAP_GENERATED
+}
+
+unify_matter_bridge -- matter_node_state_monitor
+unify_matter_bridge -- zap_cluster_command_handler
+unify_matter_bridge -- zap_cluster_attribute_interface
+unify_matter_bridge -- basic_bridged_cluster_attribute_interface
+unify_matter_bridge -- group_cluster_command_handler
+
+matter_node_state_monitor <-- unify_node_state_monitor
+matter_node_state_monitor -- matter_app_interface
+matter_node_state_monitor -- device_type_translator
+matter_node_state_monitor -- bridge_endpoint
+matter_node_state_monitor -- data_storage
+
+zap_cluster_command_handler --> cluster_command_handler
+zap_cluster_attribute_interface --> cluster_attribute_interface
+
+group_cluster_command_handler --> cluster_command_handler
+basic_bridged_cluster_attribute_interface --> cluster_attribute_interface
+
+cluster_command_handler -- uic_mqtt_interface
+cluster_attribute_interface -- uic_mqtt_interface
+unify_node_state_monitor -- uic_mqtt_interface
+
+
+cluster_command_handler -- matter_app_interface
+cluster_attribute_interface -- matter_app_interface
+
+@enduml

@@ -5,6 +5,7 @@
 #include "matter_cluster_interactor.hpp"
 #include "matter_device_translator.hpp"
 #include "matter_endpoint_builder.hpp"
+#include "cluster_emulator.hpp"
 
 // Chip components
 #include <lib/support/UnitTestContext.h>
@@ -18,10 +19,11 @@
 static void TestClusterInteractorNotYetBuilt(nlTestSuite * inSuite, void * aContext)
 {
     // Initialize the cluster interactor
+    unify::matter_bridge::ClusterEmulator emulator;
     unify::matter_bridge::device_translator matter_device_translator;
     unify::matter_bridge::matter_endpoint_builder builder;
     unify::matter_bridge::cluster_interactor cluster_interactor =
-        unify::matter_bridge::cluster_interactor(matter_device_translator, builder);
+        unify::matter_bridge::cluster_interactor(emulator,matter_device_translator, builder);
 
     const char * dt = matter_device_type_vs_clusters_map.find(cluster_interactor.get_matter_type().value())->second.device_type_name;
     std::string device_type(dt);
@@ -33,8 +35,10 @@ static void TestClusterInteractorEmpty(nlTestSuite * inSuite, void * aContext)
     // Initialize the cluster interactor
     unify::matter_bridge::device_translator matter_device_translator;
     unify::matter_bridge::matter_endpoint_builder builder;
+    unify::matter_bridge::ClusterEmulator emulator;
+
     unify::matter_bridge::cluster_interactor cluster_interactor =
-        unify::matter_bridge::cluster_interactor(matter_device_translator, builder);
+        unify::matter_bridge::cluster_interactor(emulator,matter_device_translator, builder);
 
     std::unordered_map<std::string, unify::node_state_monitor::cluster> clusters = {};
     cluster_interactor.build_matter_cluster(clusters);
@@ -48,8 +52,10 @@ static void TestClusterInteractorDoorLock(nlTestSuite * inSuite, void * aContext
     // Initialize the cluster interactor
     unify::matter_bridge::device_translator matter_device_translator;
     unify::matter_bridge::matter_endpoint_builder builder;
+    unify::matter_bridge::ClusterEmulator emulator;
+
     unify::matter_bridge::cluster_interactor cluster_interactor =
-        unify::matter_bridge::cluster_interactor(matter_device_translator, builder);
+        unify::matter_bridge::cluster_interactor(emulator,matter_device_translator, builder);
 
     std::unordered_map<std::string, unify::node_state_monitor::cluster> clusters = {
         { "Basic", unify::node_state_monitor::cluster("Basic") },
@@ -73,10 +79,11 @@ static void TestClusterInteractorDoorLock(nlTestSuite * inSuite, void * aContext
 static void TestClusterInteractorOccupancySensor(nlTestSuite * inSuite, void * aContext)
 {
     // Initialize the cluster interactor
+    unify::matter_bridge::ClusterEmulator emulator;
     unify::matter_bridge::device_translator matter_device_translator;
     unify::matter_bridge::matter_endpoint_builder builder;
     unify::matter_bridge::cluster_interactor cluster_interactor =
-        unify::matter_bridge::cluster_interactor(matter_device_translator, builder);
+        unify::matter_bridge::cluster_interactor(emulator,matter_device_translator, builder);
 
     std::unordered_map<std::string, unify::node_state_monitor::cluster> clusters = {
         { "Basic", unify::node_state_monitor::cluster("Basic") },

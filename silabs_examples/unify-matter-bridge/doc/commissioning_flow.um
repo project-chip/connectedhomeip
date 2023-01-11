@@ -1,0 +1,13 @@
+@startuml
+title Adding a node
+
+partition unify_node_state_monitor {
+
+mqtt -->["Publish Callback"]  unify_node_state_monitor 
+unify_node_state_monitor --> [NodeAdded(UnifyNodeDescriptor)] cluster_translator 
+cluster_translator --> [PreliminaryDescriptor] cluster_emulator 
+cluster_emulator --> [ExtendedDescriptor] device_type_mapper
+device_type_mapper --> [FullDescriptor] ember_interface::add_dynmic_endpoint
+}
+
+@enduml

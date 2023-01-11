@@ -28,6 +28,7 @@
 #include "MockGroupTranslator.hpp"
 #include "MockNodeStateMonitor.hpp"
 #include "MockUnifyMqtt.hpp"
+#include "MockClusterEmulator.hpp"
 
 // Third party library
 #include <nlunit-test.h>
@@ -48,7 +49,7 @@ class UnifyBridgeContext : public chip::Test::AppContext
 
 public:
     UnifyBridgeContext() :
-        mMqttHandler(), mNodeStateMonitor(mDeviceTranslator, mEmberInterface), mGroupTranslator(m_matter_data_storage)
+        mMqttHandler(), mNodeStateMonitor(mDeviceTranslator,mEmulator, mEmberInterface), mGroupTranslator(m_matter_data_storage)
     {}
 
     /// Initialize the underlying layers.
@@ -63,6 +64,7 @@ public:
     Test::MockUnifyMqtt mMqttHandler;
     Test::MockNodeStateMonitor mNodeStateMonitor;
     Test::MockGroupTranslator mGroupTranslator;
+    Test::MockClusterEmulator mEmulator;
 };
 
 } // namespace Test

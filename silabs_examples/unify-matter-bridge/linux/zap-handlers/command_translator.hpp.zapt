@@ -36,7 +36,8 @@ class {{asUpperCamelCase label}}ClusterCommandHandler : public command_translato
 {
   public:
   {{asUpperCamelCase label}}ClusterCommandHandler(
-    const matter_node_state_monitor &node_state_monitor, UnifyMqtt &unify_mqtt, group_translator &group_translator_m) :
+    const matter_node_state_monitor &node_state_monitor, 
+    UnifyMqtt &unify_mqtt, group_translator &group_translator_m) :
     command_translator_interface(node_state_monitor,
                                  chip::app::Clusters::{{asUpperCamelCase label}}::Id,"{{unifyClusterName code}}", unify_mqtt, group_translator_m)
   {}

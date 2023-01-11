@@ -1,0 +1,16 @@
+@startuml
+
+matter_app_handler -.-> command_handler_interface.invoke 
+
+if "emualtor.is_command_emulated" then
+  --> [true] emulator.invoke
+else
+  --> [false] zap_handler.invoke
+endif
+
+zap_handler.invoke -->[direct translation] mqtt.publish
+emulator.invoke -->custom_actions
+
+note left: this may lead to an mqtt publish,\n but does not have to
+
+@enduml

@@ -15,6 +15,7 @@
 
 #include "command_translator.hpp"
 #include "chip_types_to_json.hpp"
+#include "cluster_emulator.hpp"
 #include "sl_log.h"
 #include <iostream>
 #include <sstream>
@@ -40,6 +41,11 @@ void IdentifyClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
 
     std::string cmd;
     nlohmann::json payload = {};
+
+    if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
+        m_node_state_monitor.emulator().invoke_command(ctxt);
+        return;
+    }
 
     switch (ctxt.mRequestPath.mCommandId) {
     case Commands::Identify::Id: {
@@ -93,6 +99,11 @@ void GroupsClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
 
     std::string cmd;
     nlohmann::json payload = {};
+
+    if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
+        m_node_state_monitor.emulator().invoke_command(ctxt);
+        return;
+    }
 
     switch (ctxt.mRequestPath.mCommandId) {
     case Commands::AddGroup::Id: {
@@ -190,6 +201,11 @@ void ScenesClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
 
     std::string cmd;
     nlohmann::json payload = {};
+
+    if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
+        m_node_state_monitor.emulator().invoke_command(ctxt);
+        return;
+    }
 
     switch (ctxt.mRequestPath.mCommandId) {
     case Commands::AddScene::Id: {
@@ -419,6 +435,11 @@ void OnOffClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerC
     std::string cmd;
     nlohmann::json payload = {};
 
+    if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
+        m_node_state_monitor.emulator().invoke_command(ctxt);
+        return;
+    }
+
     switch (ctxt.mRequestPath.mCommandId) {
     case Commands::Off::Id: {
         Commands::Off::DecodableType data;
@@ -505,6 +526,11 @@ void LevelControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::H
 
     std::string cmd;
     nlohmann::json payload = {};
+
+    if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
+        m_node_state_monitor.emulator().invoke_command(ctxt);
+        return;
+    }
 
     switch (ctxt.mRequestPath.mCommandId) {
     case Commands::MoveToLevel::Id: {
@@ -740,6 +766,11 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
 
     std::string cmd;
     nlohmann::json payload = {};
+
+    if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
+        m_node_state_monitor.emulator().invoke_command(ctxt);
+        return;
+    }
 
     switch (ctxt.mRequestPath.mCommandId) {
     case Commands::LockDoor::Id: {
@@ -1026,6 +1057,11 @@ void BarrierControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface:
     std::string cmd;
     nlohmann::json payload = {};
 
+    if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
+        m_node_state_monitor.emulator().invoke_command(ctxt);
+        return;
+    }
+
     switch (ctxt.mRequestPath.mCommandId) {
     case Commands::BarrierControlGoToPercent::Id: {
         Commands::BarrierControlGoToPercent::DecodableType data;
@@ -1068,6 +1104,11 @@ void ThermostatClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Han
 
     std::string cmd;
     nlohmann::json payload = {};
+
+    if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
+        m_node_state_monitor.emulator().invoke_command(ctxt);
+        return;
+    }
 
     switch (ctxt.mRequestPath.mCommandId) {
     case Commands::SetpointRaiseLower::Id: {
@@ -1159,6 +1200,11 @@ void FanControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Han
     std::string cmd;
     nlohmann::json payload = {};
 
+    if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
+        m_node_state_monitor.emulator().invoke_command(ctxt);
+        return;
+    }
+
     switch (ctxt.mRequestPath.mCommandId) {
     }
 
@@ -1185,6 +1231,11 @@ void ThermostatUserInterfaceConfigurationClusterCommandHandler::InvokeCommand(Co
     std::string cmd;
     nlohmann::json payload = {};
 
+    if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
+        m_node_state_monitor.emulator().invoke_command(ctxt);
+        return;
+    }
+
     switch (ctxt.mRequestPath.mCommandId) {
     }
 
@@ -1210,6 +1261,11 @@ void ColorControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::H
 
     std::string cmd;
     nlohmann::json payload = {};
+
+    if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
+        m_node_state_monitor.emulator().invoke_command(ctxt);
+        return;
+    }
 
     switch (ctxt.mRequestPath.mCommandId) {
     case Commands::MoveToHue::Id: {
@@ -1806,6 +1862,11 @@ void IlluminanceMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerIn
     std::string cmd;
     nlohmann::json payload = {};
 
+    if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
+        m_node_state_monitor.emulator().invoke_command(ctxt);
+        return;
+    }
+
     switch (ctxt.mRequestPath.mCommandId) {
     }
 
@@ -1831,6 +1892,11 @@ void TemperatureMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerIn
 
     std::string cmd;
     nlohmann::json payload = {};
+
+    if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
+        m_node_state_monitor.emulator().invoke_command(ctxt);
+        return;
+    }
 
     switch (ctxt.mRequestPath.mCommandId) {
     }
@@ -1858,6 +1924,11 @@ void PressureMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInter
     std::string cmd;
     nlohmann::json payload = {};
 
+    if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
+        m_node_state_monitor.emulator().invoke_command(ctxt);
+        return;
+    }
+
     switch (ctxt.mRequestPath.mCommandId) {
     }
 
@@ -1883,6 +1954,11 @@ void RelativeHumidityMeasurementClusterCommandHandler::InvokeCommand(CommandHand
 
     std::string cmd;
     nlohmann::json payload = {};
+
+    if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
+        m_node_state_monitor.emulator().invoke_command(ctxt);
+        return;
+    }
 
     switch (ctxt.mRequestPath.mCommandId) {
     }
@@ -1910,6 +1986,11 @@ void OccupancySensingClusterCommandHandler::InvokeCommand(CommandHandlerInterfac
     std::string cmd;
     nlohmann::json payload = {};
 
+    if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
+        m_node_state_monitor.emulator().invoke_command(ctxt);
+        return;
+    }
+
     switch (ctxt.mRequestPath.mCommandId) {
     }
 
@@ -1935,6 +2016,11 @@ void ElectricalMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInt
 
     std::string cmd;
     nlohmann::json payload = {};
+
+    if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
+        m_node_state_monitor.emulator().invoke_command(ctxt);
+        return;
+    }
 
     switch (ctxt.mRequestPath.mCommandId) {
     case Commands::GetProfileInfoCommand::Id: {
