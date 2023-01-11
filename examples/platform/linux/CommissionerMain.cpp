@@ -357,7 +357,8 @@ void PairingCommand::OnReadCommissioningInfo(const ReadCommissioningInfo & info)
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-void PairingCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
+void PairingCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                         const SessionHandle & sessionHandle)
 {
     ChipLogProgress(Controller, "OnDeviceConnectedFn");
     CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
