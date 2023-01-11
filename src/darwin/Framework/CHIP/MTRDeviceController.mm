@@ -558,8 +558,12 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     }
 
     auto block = ^{
+        BOOL usePartialDACVerifier = NO;
         if (operationalCertificateIssuer != nil) {
             self->_operationalCredentialsDelegate->SetOperationalCertificateIssuer(operationalCertificateIssuer, queue);
+            usePartialDACVerifier = [operationalCertificateIssuer skipTrustAnchorDeviceAttestationChecks];
+        }
+        if (usePartialDACVerifier) {
             self->_cppCommissioner->SetDeviceAttestationVerifier(self->_partialDACVerifier);
         } else {
             // TODO: Once we are not supporting setNocChainIssuer this
@@ -969,6 +973,11 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                 *error = nil;
             }
         }];
+}
+
+- (BOOL)skipTrustAnchorDeviceAttestationChecks
+{
+    return YES;
 }
 
 @end
