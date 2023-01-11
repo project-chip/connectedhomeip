@@ -114,7 +114,7 @@ public:
      *
      */
     CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
-                    CASESessionManager * apCASESessionMgr = nullptr);
+                    CASESessionManager * apCASESessionMgr = nullptr, SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr);
 
     void Shutdown();
 
@@ -291,6 +291,10 @@ public:
 
     // virtual method from FabricTable::Delegate
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+
+    SubscriptionResumptionStorage * GetSubscriptionResumptionStorage() { return mpSubscriptionResumptionStorage; };
+
+    CHIP_ERROR ResumeSubscriptions();
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //
@@ -595,6 +599,8 @@ private:
     FabricTable * mpFabricTable;
 
     CASESessionManager * mpCASESessionMgr = nullptr;
+
+    SubscriptionResumptionStorage * mpSubscriptionResumptionStorage = nullptr;
 
     // A magic number for tracking values between stack Shutdown()-s and Init()-s.
     // An ObjectHandle is valid iff. its magic equals to this one.

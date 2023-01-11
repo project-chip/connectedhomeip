@@ -36,6 +36,7 @@
 #include <app/MessageDef/EventFilterIBs.h>
 #include <app/MessageDef/EventPathIBs.h>
 #include <app/ObjectList.h>
+#include <app/SubscriptionResumptionStorage.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
@@ -164,6 +165,15 @@ public:
      *
      */
     ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType);
+
+    /**
+     *
+     *  Constructor for resuming a persisted subscription
+     *
+     *  The callback passed in has to outlive this handler object.
+     *
+     */
+    ReadHandler(ManagementCallback & apCallback, SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo);
 
     const ObjectList<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
     const ObjectList<EventPathParams> * GetEventPathList() const { return mpEventPathList; }
@@ -383,6 +393,10 @@ private:
     void SetStateFlag(ReadHandlerFlags aFlag, bool aValue = true);
     void ClearStateFlag(ReadHandlerFlags aFlag);
 
+    // Helpers for continuing the subscription resumption
+    static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
+
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
 
     // The current generation of the reporting engine dirty set the last time we were notified that a path we're interested in was
@@ -461,6 +475,10 @@ private:
     PriorityLevel mCurrentPriority = PriorityLevel::Invalid;
     BitFlags<ReadHandlerFlags> mFlags;
     InteractionType mInteractionType = InteractionType::Read;
+
+    // Callbacks to handle server-initiated session success/failure
+    chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
+    chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 };
 } // namespace app
 } // namespace chip

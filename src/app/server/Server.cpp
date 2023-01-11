@@ -126,10 +126,11 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     chip::Platform::MemoryInit();
 
     // Initialize PersistentStorageDelegate-based storage
-    mDeviceStorage            = initParams.persistentStorageDelegate;
-    mSessionResumptionStorage = initParams.sessionResumptionStorage;
-    mOperationalKeystore      = initParams.operationalKeystore;
-    mOpCertStore              = initParams.opCertStore;
+    mDeviceStorage                 = initParams.persistentStorageDelegate;
+    mSessionResumptionStorage      = initParams.sessionResumptionStorage;
+    mSubscriptionResumptionStorage = initParams.subscriptionResumptionStorage;
+    mOperationalKeystore           = initParams.operationalKeystore;
+    mOpCertStore                   = initParams.opCertStore;
 
     mCertificateValidityPolicy = initParams.certificateValidityPolicy;
 
@@ -304,7 +305,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                     mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), &mCASESessionManager);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), &mCASESessionManager,
+                                                                 mSubscriptionResumptionStorage);
     SuccessOrExit(err);
 
     // This code is necessary to restart listening to existing groups after a reboot
@@ -350,6 +352,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                 reinterpret_cast<intptr_t>(this));
         }
     }
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    err = chip::app::InteractionModelEngine::GetInstance()->ResumeSubscriptions();
+#endif
 
     PlatformMgr().HandleServerStarted();
 

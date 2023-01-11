@@ -26,6 +26,7 @@
 #include <app/DefaultAttributePersistenceProvider.h>
 #include <app/FailSafeContext.h>
 #include <app/OperationalSessionSetupPool.h>
+#include <app/SimpleSubscriptionResumptionStorage.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/server/AclStorage.h>
 #include <app/server/AppDelegate.h>
@@ -105,6 +106,9 @@ struct ServerInitParams
     // Session resumption storage: Optional. Support session resumption when provided.
     // Must be initialized before being provided.
     SessionResumptionStorage * sessionResumptionStorage = nullptr;
+    // Session resumption storage: Optional. Support session resumption when provided.
+    // Must be initialized before being provided.
+    app::SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr;
     // Certificate validity policy: Optional. If none is injected, CHIPCert
     // enforces a default policy.
     Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
@@ -221,6 +225,9 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
         static chip::SimpleSessionResumptionStorage sSessionResumptionStorage;
 #endif
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+        static chip::app::SimpleSubscriptionResumptionStorage sSubscriptionResumptionStorage;
+#endif
         static chip::app::DefaultAclStorage sAclStorage;
 
         // KVS-based persistent storage delegate injection
@@ -273,6 +280,14 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         // embedded systems.
         this->certificateValidityPolicy = &sDefaultCertValidityPolicy;
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+        ChipLogProgress(AppServer, "JEFFTEST: initializing subscription resumption storage...");
+        ReturnErrorOnFailure(sSubscriptionResumptionStorage.Init(this->persistentStorageDelegate));
+        this->subscriptionResumptionStorage = &sSubscriptionResumptionStorage;
+#else
+        ChipLogProgress(AppServer, "JEFFTEST: subscription persistence not supported");
+#endif
+
         return CHIP_NO_ERROR;
     }
 };
@@ -320,6 +335,8 @@ public:
 
     SessionResumptionStorage * GetSessionResumptionStorage() { return mSessionResumptionStorage; }
 
+    app::SubscriptionResumptionStorage * GetSubscriptionResumptionStorage() { return mSubscriptionResumptionStorage; }
+
     TransportMgrBase & GetTransportManager() { return mTransports; }
 
     Credentials::GroupDataProvider * GetGroupDataProvider() { return mGroupsProvider; }
@@ -360,6 +377,8 @@ private:
     static Server sServer;
 
     void InitFailSafe();
+
+    void ResumeSubscriptions();
 
     class GroupDataProviderListener final : public Credentials::GroupDataProvider::GroupListener
     {
@@ -477,6 +496,16 @@ private:
                              "Warning, failed to delete session resumption state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
                              static_cast<unsigned>(fabricIndex), err.Format());
             }
+
+            auto * subscriptionResumptionStorage = mServer->GetSubscriptionResumptionStorage();
+            VerifyOrReturn(subscriptionResumptionStorage != nullptr);
+            err = subscriptionResumptionStorage->DeleteAll(fabricIndex);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer,
+                             "Warning, failed to delete subscription resumption state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
+                             static_cast<unsigned>(fabricIndex), err.Format());
+            }
         }
 
         Server * mServer = nullptr;
@@ -505,6 +534,7 @@ private:
 
     PersistentStorageDelegate * mDeviceStorage;
     SessionResumptionStorage * mSessionResumptionStorage;
+    app::SubscriptionResumptionStorage * mSubscriptionResumptionStorage;
     Credentials::CertificateValidityPolicy * mCertificateValidityPolicy;
     Credentials::GroupDataProvider * mGroupsProvider;
     app::DefaultAttributePersistenceProvider mAttributePersister;

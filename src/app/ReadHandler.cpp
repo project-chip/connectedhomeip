@@ -41,7 +41,8 @@ using Status = Protocols::InteractionModel::Status;
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
                          InteractionType aInteractionType) :
     mExchangeCtx(*this),
-    mManagementCallback(apCallback)
+    mManagementCallback(apCallback), mOnConnectedCallback(HandleDeviceConnected, this),
+    mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {
     VerifyOrDie(apExchangeContext != nullptr);
 
@@ -59,6 +60,51 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
     SetStateFlag(ReadHandlerFlags::PrimingReports);
 
     mSessionHandle.Grab(mExchangeCtx->GetSessionHandle());
+}
+
+ReadHandler::ReadHandler(ManagementCallback & apCallback, SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo) :
+    mExchangeCtx(*this), mManagementCallback(apCallback), mOnConnectedCallback(HandleDeviceConnected, this),
+    mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
+{
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    mSubscriptionId          = subscriptionInfo.mSubscriptionId;
+    mMinIntervalFloorSeconds = subscriptionInfo.mMinInterval;
+    mMaxInterval             = subscriptionInfo.mMaxInterval;
+    SetStateFlag(ReadHandlerFlags::FabricFiltered, subscriptionInfo.mFabricFiltered);
+
+    CHIP_ERROR err;
+    for (auto & attributePathParams : subscriptionInfo.mAttributePaths)
+    {
+        err = InteractionModelEngine::GetInstance()->PushFrontAttributePathList(mpAttributePathList, attributePathParams);
+        if (err != CHIP_NO_ERROR)
+        {
+            Close();
+            return;
+        }
+    }
+    for (auto & eventPathParams : subscriptionInfo.mEventPaths)
+    {
+        err = InteractionModelEngine::GetInstance()->PushFrontEventPathParamsList(mpEventPathList, eventPathParams);
+        if (err != CHIP_NO_ERROR)
+        {
+            Close();
+            return;
+        }
+    }
+
+    // Ask IM engine to start case with
+    auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
+    if (caseSessionManager)
+    {
+        caseSessionManager->FindOrEstablishSession(subscriptionInfo.mNode, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    }
+    else
+    {
+        // TODO: Investigate if need to consider if caseSessionManager does not exist
+        Close();
+    }
+
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 }
 
 ReadHandler::~ReadHandler()
@@ -89,6 +135,16 @@ ReadHandler::~ReadHandler()
 
 void ReadHandler::Close()
 {
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
+    if (subscriptionResumptionStorage)
+    {
+        SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = {
+            .mNode = ScopedNodeId(GetInitiatorNodeId(), GetAccessingFabricIndex()), .mSubscriptionId = mSubscriptionId
+        };
+        subscriptionResumptionStorage->Delete(subscriptionInfo);
+    }
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     MoveToState(HandlerState::AwaitingDestruction);
     mManagementCallback.OnDone(*this);
 }
@@ -306,7 +362,11 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
 {
     ChipLogError(DataManagement, "Time out! failed to receive status response from Exchange: " ChipLogFormatExchange,
                  ChipLogValueExchange(apExchangeContext));
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    // TODO: Have a retry mechanism tied to wake interval for IC devices
+#else
     Close();
+#endif
 }
 
 CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayload)
@@ -652,6 +712,37 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
 
     mExchangeCtx->WillSendMessage();
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
+    if (subscriptionResumptionStorage)
+    {
+        // Persist Subscription
+        // mpEventPathList
+        // mpAttributePathList
+
+        SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = { .mNode           = ScopedNodeId(GetInitiatorNodeId(),
+                                                                                                   GetAccessingFabricIndex()),
+                                                                             .mSubscriptionId = mSubscriptionId,
+                                                                             .mMinInterval    = mMinIntervalFloorSeconds,
+                                                                             .mMaxInterval    = mMaxInterval,
+                                                                             .mFabricFiltered = IsFabricFiltered() };
+        ObjectList<AttributePathParams> * attributePath                  = mpAttributePathList;
+        while (attributePath)
+        {
+            subscriptionInfo.mAttributePaths.push_back(attributePath->mValue);
+            attributePath = attributePath->mpNext;
+        }
+        ObjectList<EventPathParams> * eventPath = mpEventPathList;
+        while (eventPath)
+        {
+            subscriptionInfo.mEventPaths.push_back(eventPath->mValue);
+            eventPath = eventPath->mpNext;
+        }
+
+        err = subscriptionResumptionStorage->Save(subscriptionInfo);
+    }
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
     return CHIP_NO_ERROR;
 }
 
@@ -765,6 +856,28 @@ void ReadHandler::SetStateFlag(ReadHandlerFlags aFlag, bool aValue)
 void ReadHandler::ClearStateFlag(ReadHandlerFlags aFlag)
 {
     SetStateFlag(aFlag, false);
+}
+
+void ReadHandler::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+{
+    ReadHandler * const _this = static_cast<ReadHandler *>(context);
+
+    auto exchange = exchangeMgr.NewContext(sessionHandle, _this);
+    _this->mExchangeCtx.Grab(exchange);
+    _this->mSessionHandle.Grab(sessionHandle);
+
+    _this->MoveToState(HandlerState::GeneratingReports);
+}
+
+void ReadHandler::HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
+{
+    ReadHandler * const _this = static_cast<ReadHandler *>(context);
+    VerifyOrDie(_this != nullptr);
+
+    // TODO: Have a retry mechanism tied to wake interval for IC devices
+    ChipLogError(DataManagement, "Failed to establish CASE for subscription-resumption with error '%" CHIP_ERROR_FORMAT "'",
+                 err.Format());
+    _this->Close();
 }
 
 } // namespace app

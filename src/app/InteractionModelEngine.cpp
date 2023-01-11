@@ -50,14 +50,16 @@ InteractionModelEngine * InteractionModelEngine::GetInstance()
 }
 
 CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
-                                        CASESessionManager * apCASESessionMgr)
+                                        CASESessionManager * apCASESessionMgr,
+                                        SubscriptionResumptionStorage * subscriptionResumptionStorage)
 {
     VerifyOrReturnError(apFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(apExchangeMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mpExchangeMgr    = apExchangeMgr;
-    mpFabricTable    = apFabricTable;
-    mpCASESessionMgr = apCASESessionMgr;
+    mpExchangeMgr                   = apExchangeMgr;
+    mpFabricTable                   = apFabricTable;
+    mpCASESessionMgr                = apCASESessionMgr;
+    mpSubscriptionResumptionStorage = subscriptionResumptionStorage;
 
     ReturnErrorOnFailure(mpFabricTable->AddFabricDelegate(this));
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
@@ -663,6 +665,8 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
         foundSubscription->OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
         return Status::Success;
     }
+
+    ChipLogDetail(InteractionModel, "Received report with invalid subscriptionId %lu", (unsigned long) subscriptionId);
 
     return Status::InvalidSubscription;
 }
@@ -1578,5 +1582,46 @@ void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, Fa
     // the fabric removal, though, so they will fail when they try to actually send their command response
     // and will close at that point.
 }
+
+CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
+{
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    SubscriptionResumptionStorage::SubscriptionIndex subscriberIndex;
+    CHIP_ERROR err = mpSubscriptionResumptionStorage->LoadIndex(subscriberIndex);
+    ChipLogProgress(AppServer, "%zu subscriber nodes to resume.. (error %" CHIP_ERROR_FORMAT ")", subscriberIndex.mSize,
+                    err.Format());
+    for (size_t i = 0; i < subscriberIndex.mSize; i++)
+    {
+        std::vector<SubscriptionResumptionStorage::SubscriptionInfo> subscriptions;
+        err = mpSubscriptionResumptionStorage->FindByScopedNodeId(subscriberIndex.mNodes[i], subscriptions);
+
+        ChipLogProgress(AppServer,
+                        "\tNode " ChipLogFormatScopedNodeId ": Loaded %zu subscriptions.. (error %" CHIP_ERROR_FORMAT ")",
+                        ChipLogValueScopedNodeId(subscriberIndex.mNodes[i]), subscriptions.size(), err.Format());
+
+        for (auto & subscriptionInfo : subscriptions)
+        {
+            auto requestedAttributePathCount = subscriptionInfo.mAttributePaths.size();
+            auto requestedEventPathCount     = subscriptionInfo.mEventPaths.size();
+            if (!EnsureResourceForSubscription(subscriptionInfo.mNode.GetFabricIndex(), requestedAttributePathCount,
+                                               requestedEventPathCount))
+            {
+                ChipLogProgress(InteractionModel, "no resource for Subscription resumption");
+                return CHIP_ERROR_NO_MEMORY;
+            }
+
+            ReadHandler * handler = mReadHandlers.CreateObject(*this, subscriptionInfo);
+            if (handler == nullptr)
+            {
+                ChipLogProgress(InteractionModel, "no resource for ReadHandler creation");
+                return CHIP_ERROR_NO_MEMORY;
+            }
+        }
+    }
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace app
 } // namespace chip

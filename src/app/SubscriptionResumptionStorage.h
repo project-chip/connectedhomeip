@@ -1,0 +1,115 @@
+/*
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/**
+ *    @file
+ *      This file defines the classes corresponding to CHIP Interaction Model Event Generatorr Delegate.
+ *
+ */
+
+#pragma once
+
+#include <app/ReadClient.h>
+#include <lib/core/CHIPCore.h>
+#include <vector>
+
+namespace chip {
+namespace app {
+
+/**
+ * A SubscriptionPersistenceDelegate is used to persist subscriptions when they are established.
+ *
+ * Allows application to append any type of TLV data as part of an event log entry. Events
+ * have a standard header applicable to all events and this class provides the
+ * ability to add additional data past such standard header.
+ */
+class SubscriptionResumptionStorage
+{
+public:
+    /**
+     * Struct to hold information about subscriptions
+     */
+    struct SubscriptionInfo
+    {
+        ScopedNodeId mNode;
+        SubscriptionId mSubscriptionId;
+        uint16_t mMinInterval;
+        uint16_t mMaxInterval;
+        bool mFabricFiltered;
+        std::vector<AttributePathParams> mAttributePaths;
+        std::vector<EventPathParams> mEventPaths;
+    };
+
+    /**
+     * Struct to hold index of all nodes that have persisted subscriptions
+     */
+    struct SubscriptionIndex
+    {
+        size_t mSize;
+        ScopedNodeId mNodes[CHIP_IM_MAX_NUM_SUBSCRIPTIONS];
+    };
+
+    virtual ~SubscriptionResumptionStorage(){};
+
+    /**
+     * Recover fabric-scoped node identities of persisted subscribers.
+     *
+     * @param subscriberIndex the nodes for previously persisted subscribers
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_KEY_NOT_FOUND if no subscription resumption information can be found, else an
+     * appropriate CHIP error on failure
+     */
+    virtual CHIP_ERROR LoadIndex(SubscriptionIndex & subscriberIndex) = 0;
+
+    /**
+     * Recover subscription resumption info for a given fabric-scoped node identity.
+     *
+     * @param node the node for which to recover subscription resumption information
+     * @param subscriptions (out) recovered subscriptions info
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_KEY_NOT_FOUND if no subscription resumption information can be found, else an
+     * appropriate CHIP error on failure
+     */
+    virtual CHIP_ERROR FindByScopedNodeId(ScopedNodeId node, std::vector<SubscriptionInfo> & subscriptions) = 0;
+
+    /**
+     * Save subscription resumption information to storage.
+     *
+     * @param subscriptionInfo the subscription information to save
+     * @return CHIP_NO_ERROR on success, else an appropriate CHIP error on failure
+     */
+    virtual CHIP_ERROR Save(const SubscriptionInfo & subscriptionInfo) = 0;
+
+    /**
+     * Save subscription resumption information to storage.
+     *
+     * @param subscriptionInfo the subscription information to delete - only node and subscriptionId will be used to find the
+     * subscription
+     * @return CHIP_NO_ERROR on success, else an appropriate CHIP error on failure
+     */
+    virtual CHIP_ERROR Delete(const SubscriptionInfo & subscriptionInfo) = 0;
+
+    /**
+     * Remove all subscription resumption information associated with the specified
+     * fabric index.  If no entries for the fabric index exist, this is a no-op
+     * and is considered successful.
+     *
+     * @param fabricIndex the index of the fabric for which to remove subscription resumption information
+     * @return CHIP_NO_ERROR on success, else an appropriate CHIP error on failure
+     */
+    virtual CHIP_ERROR DeleteAll(FabricIndex fabricIndex) = 0;
+};
+} // namespace app
+} // namespace chip

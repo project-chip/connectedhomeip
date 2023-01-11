@@ -814,6 +814,25 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_IM_MAX_NUM_PATH_PER_SUBSCRIPTION
+ *
+ * @brief The maximum number of path per subscription.
+ */
+#ifndef CHIP_IM_MAX_NUM_PATH_PER_SUBSCRIPTION
+#define CHIP_IM_MAX_NUM_PATH_PER_SUBSCRIPTION 3
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_SUBSCRIPTIONS_PER_FABRIC
+ *
+ * @brief Defines the maximum number of ReadHandler for subscriptions per fabric.
+ *
+ */
+#ifndef CHIP_IM_MAX_NUM_SUBSCRIPTIONS_PER_FABRIC
+#define CHIP_IM_MAX_NUM_SUBSCRIPTIONS_PER_FABRIC 3
+#endif
+
+/**
  * @def CHIP_IM_MAX_NUM_SUBSCRIPTIONS
  *
  * @brief Defines the maximum number of ReadHandler for subscriptions, limits the number of active subscription transactions on
@@ -823,7 +842,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *
  */
 #ifndef CHIP_IM_MAX_NUM_SUBSCRIPTIONS
-#define CHIP_IM_MAX_NUM_SUBSCRIPTIONS (CHIP_CONFIG_MAX_FABRICS * 3)
+#define CHIP_IM_MAX_NUM_SUBSCRIPTIONS (CHIP_CONFIG_MAX_FABRICS * CHIP_IM_MAX_NUM_SUBSCRIPTIONS_PER_FABRIC)
 #endif
 
 /**
@@ -853,7 +872,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief The maximum number of path objects for subscriptions, limits the number of attributes being subscribed at the same time.
  */
 #ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS
-#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS (CHIP_IM_MAX_NUM_SUBSCRIPTIONS * 3)
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS (CHIP_IM_MAX_NUM_SUBSCRIPTIONS * CHIP_IM_MAX_NUM_PATH_PER_SUBSCRIPTION)
 #endif
 
 /**
@@ -1339,3 +1358,14 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 /**
  * @}
  */
+
+/**
+ *  @def CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+ *
+ *  @brief
+ *    If asserted (1), suppress definition of the standard error formatting function
+ *
+ */
+#ifndef CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+#define CHIP_CONFIG_PERSIST_SUBSCRIPTIONS 1
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
