@@ -23,6 +23,7 @@ using chip::SessionHandle;
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
 {{#chip_client_clusters includeAll=true}}
+{{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
 @implementation MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
 - (instancetype)initWithDevice:(MTRBaseDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
@@ -117,6 +118,9 @@ MTR{{cluster}}Cluster{{command}}Params
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
+{{! This is used as the implementation for both the new-name and old-name bits, so check for both here. }}
+{{#unless (and (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))
+               (wasRemoved (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name)))}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (void)read{{>attribute}}With
 {{~#if_is_fabric_scoped_struct type~}}
@@ -214,15 +218,21 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 }
 
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 
 @end
+{{/unless}}
 {{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
+{{#unless (wasRemoved (compatClusterNameRemapping name))}}
 
 @implementation MTRBaseCluster{{compatClusterNameRemapping name}}
 @end
 {{/unless}}
+{{/unless}}
 
+{{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping name))
+           (not (wasRemoved (compatClusterNameRemapping name))))}}
 @implementation MTRBaseCluster{{compatClusterNameRemapping name}} (Deprecated)
 
 {{#chip_cluster_commands}}
@@ -255,7 +265,8 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-{{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))}}
+{{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))
+           (not (wasRemoved (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))))}}
 {{#*inline "attribute"}}Attribute{{compatAttributeNameRemapping parent.name name}}{{/inline}}
 - (void)read{{>attribute}}With
 {{~#if_is_fabric_scoped_struct type~}}
@@ -319,6 +330,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 }
 
 @end
+{{/if}}
 
 {{/chip_client_clusters}}
 
