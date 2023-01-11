@@ -97,10 +97,10 @@ MTR_NEWLY_AVAILABLE
  * (4) PAA subject key id extraction: the PAA subject key must match the PAA key referenced in the PAI.
  * (5) CD signature check: make sure a valid CSA CD key is used to sign the CD.
  *
- * This will be called on an arbitrary queue and must not block or call any
+ * This will be read on an arbitrary queue and must not block or call any
  * Matter APIs.
  */
-- (BOOL)skipTrustAnchorDeviceAttestationChecks;
+@property (nonatomic, readonly) BOOL skipTrustAnchorDeviceAttestationChecks;
 
 @end
 
