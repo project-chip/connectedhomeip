@@ -114,7 +114,8 @@ public:
      *
      */
     CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
-                    CASESessionManager * apCASESessionMgr = nullptr, SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr);
+                    CASESessionManager * apCASESessionMgr                         = nullptr,
+                    SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr);
 
     void Shutdown();
 
