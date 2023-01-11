@@ -6,9 +6,9 @@
 
 #include <platform/ESP32/route_hook/ESP32RouteHook.h>
 
+#include <platform/ESP32/route_hook/ESP32RouteTable.h>
 #include <stdint.h>
 #include <string.h>
-#include <platform/ESP32/route_hook/ESP32RouteTable.h>
 
 #include "esp_check.h"
 #include "esp_err.h"

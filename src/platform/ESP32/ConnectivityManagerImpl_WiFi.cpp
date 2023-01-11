@@ -28,8 +28,8 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
-#include <platform/internal/BLEManager.h>
 #include <platform/ESP32/route_hook/ESP32RouteHook.h>
+#include <platform/internal/BLEManager.h>
 
 #include "esp_event.h"
 #include "esp_netif.h"
