@@ -118,6 +118,17 @@ using namespace ::chip::DeviceLayer::Internal;
 
 AppTask AppTask::sAppTask;
 
+class AppFabricTableDelegate : public FabricTable::Delegate
+{
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+    {
+        if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
+        {
+            chip::Server::GetInstance().ScheduleFactoryReset();
+        }
+    }
+};
+
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 CHIP_ERROR AppTask::Init()
@@ -172,6 +183,13 @@ CHIP_ERROR AppTask::Init()
     if (ret != CHIP_NO_ERROR)
     {
         LOG_ERR("Fail to set BLE device name");
+        return ret;
+    }
+
+    ret = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(new AppFabricTableDelegate);
+    if (ret != CHIP_NO_ERROR)
+    {
+        LOG_ERR("AppFabricTableDelegate fail");
         return ret;
     }
 
