@@ -36,7 +36,7 @@ from matter_yamltests.parser import TestParser
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
-_CLUSTER_XML_DIRECOTRY_PATH = os.path.abspath(
+_CLUSTER_XML_DIRECTORY_PATH = os.path.abspath(
     os.path.join(_DEFAULT_CHIP_ROOT, "src/app/zap-templates/zcl/data-model/"))
 
 
@@ -67,7 +67,7 @@ def _sort_with_global_attribute_first(a, b):
     default=0x12344321,
     help='Node ID to use when commissioning device')
 def main(setup_code, yaml_path, node_id):
-    # Setting up python enviroment for running YAML CI tests using python parser.
+    # Setting up python environment for running YAML CI tests using python parser.
     with tempfile.NamedTemporaryFile() as chip_stack_storage:
         chip.native.Init()
         chip_stack = ChipStack(chip_stack_storage.name)
@@ -89,7 +89,7 @@ def main(setup_code, yaml_path, node_id):
         dev_ctrl.CommissionWithCode(setup_code, node_id)
 
         # Creating Cluster definition.
-        cluster_xml_filenames = glob.glob(_CLUSTER_XML_DIRECOTRY_PATH + '/*/*.xml', recursive=False)
+        cluster_xml_filenames = glob.glob(_CLUSTER_XML_DIRECTORY_PATH + '/*/*.xml', recursive=False)
         cluster_xml_filenames.sort(key=functools.cmp_to_key(_sort_with_global_attribute_first))
         sources = [ParseSource(source=name) for name in cluster_xml_filenames]
         clusters_definitions = SpecDefinitions(sources)
