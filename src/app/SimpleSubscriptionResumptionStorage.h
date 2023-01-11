@@ -120,7 +120,7 @@ private:
     //       Min interval
     //       Max interval
     //       Fabric filtered boolean
-    //       Array of: (Paths)
+    //       Path Count x, with these fields repeating x times
     //         Type (attribute, urgent event, non-urgent event)
     //         Endpoint ID
     //         Cluster ID
