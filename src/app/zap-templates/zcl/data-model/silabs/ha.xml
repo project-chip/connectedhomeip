@@ -97,14 +97,15 @@ limitations under the License.
     <define>THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
-    <attribute side="server" code="0x0000" define="TEMPERATURE_DISPLAY_MODE" type="ENUM8" min="0x00" max="0x01" writable="true" default="0x00" optional="false">temperature display mode</attribute>
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
+    <attribute side="server" code="0x0000" define="TEMPERATURE_DISPLAY_MODE" type="ENUM8" min="0x00" max="0x01" writable="true" default="0x00" optional="false">TemperatureDisplayMode</attribute>
     <attribute side="server" code="0x0001" define="KEYPAD_LOCKOUT" type="ENUM8" min="0x00" max="0x05" writable="true" default="0x00" optional="false">
-      <description>keypad lockout</description>
+      <description>KeypadLockout</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
     <attribute side="server" code="0x0002" define="SCHEDULE_PROGRAMMING_VISIBILITY" type="ENUM8" min="0x00" max="0x01" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">
-      <description>schedule programming visibility</description>
+      <description>ScheduleProgrammingVisibility</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
