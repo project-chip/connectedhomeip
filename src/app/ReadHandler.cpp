@@ -67,6 +67,7 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, SubscriptionResumption
     mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    mInteractionType         = InteractionType::Subscribe;
     mSubscriptionId          = subscriptionInfo.mSubscriptionId;
     mMinIntervalFloorSeconds = subscriptionInfo.mMinInterval;
     mMaxInterval             = subscriptionInfo.mMaxInterval;
@@ -862,8 +863,6 @@ void ReadHandler::HandleDeviceConnected(void * context, Messaging::ExchangeManag
 {
     ReadHandler * const _this = static_cast<ReadHandler *>(context);
 
-    auto exchange = exchangeMgr.NewContext(sessionHandle, _this);
-    _this->mExchangeCtx.Grab(exchange);
     _this->mSessionHandle.Grab(sessionHandle);
 
     _this->MoveToState(HandlerState::GeneratingReports);

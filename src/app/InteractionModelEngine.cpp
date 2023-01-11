@@ -1588,14 +1588,14 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     SubscriptionResumptionStorage::SubscriptionIndex subscriberIndex;
     CHIP_ERROR err = mpSubscriptionResumptionStorage->LoadIndex(subscriberIndex);
-    ChipLogProgress(AppServer, "%zu subscriber nodes to resume.. (error %" CHIP_ERROR_FORMAT ")", subscriberIndex.mSize,
+    ChipLogProgress(InteractionModel, "%zu subscriber nodes to resume.. (error %" CHIP_ERROR_FORMAT ")", subscriberIndex.mSize,
                     err.Format());
     for (size_t i = 0; i < subscriberIndex.mSize; i++)
     {
         std::vector<SubscriptionResumptionStorage::SubscriptionInfo> subscriptions;
         err = mpSubscriptionResumptionStorage->FindByScopedNodeId(subscriberIndex.mNodes[i], subscriptions);
 
-        ChipLogProgress(AppServer,
+        ChipLogProgress(InteractionModel,
                         "\tNode " ChipLogFormatScopedNodeId ": Loaded %zu subscriptions.. (error %" CHIP_ERROR_FORMAT ")",
                         ChipLogValueScopedNodeId(subscriberIndex.mNodes[i]), subscriptions.size(), err.Format());
 
