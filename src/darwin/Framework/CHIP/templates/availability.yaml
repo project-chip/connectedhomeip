@@ -4771,6 +4771,7 @@
               - TestEmitTestFabricScopedEventRequest
           ClientMonitoring:
               - RegisterClientMonitoring
+              - UnregisterClientMonitoring
               - StayAwakeRequest
       command fields:
           UnitTesting:
@@ -4925,6 +4926,9 @@
                   - endpoint
           ClientMonitoring:
               RegisterClientMonitoring:
+                  - clientNodeId
+                  - iCid
+              UnregisterClientMonitoring:
                   - clientNodeId
                   - iCid
           Groups:
@@ -5428,6 +5432,9 @@
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
   removed:
+      clusters:
+          # Not ready to be public API yet.
+          - ClientMonitoring
       commands:
           BasicInformation:
               - MfgSpecificPing
