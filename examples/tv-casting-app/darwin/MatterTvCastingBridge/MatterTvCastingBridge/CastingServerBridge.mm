@@ -527,6 +527,16 @@
             return;
         }
 
+        err = CastingServer::GetInstance()->InitBindingHandlers();
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(AppServer, "Binding init failed: %s", ErrorStr(err));
+            dispatch_async(clientQueue, ^{
+                startMatterServerCompletionCallback(
+                    [[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
+            });
+            return;
+        }
+
         // Now reconnect to the VideoPlayer the casting app was previously connected to (if any)
         if (self->_previouslyConnectedVideoPlayer != nil) {
             ChipLogProgress(
