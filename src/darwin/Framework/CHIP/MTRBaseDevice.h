@@ -332,7 +332,6 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
 - (void)readEventsWithEndpointID:(NSNumber * _Nullable)endpointID
                        clusterID:(NSNumber * _Nullable)clusterID
                          eventID:(NSNumber * _Nullable)eventID
-                        eventMin:(NSNumber * _Nullable)eventMin
                           params:(MTRReadParams * _Nullable)params
                            queue:(dispatch_queue_t)queue
                       completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
@@ -353,8 +352,6 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
 - (void)subscribeToEventsWithEndpointID:(NSNumber * _Nullable)endpointID
                               clusterID:(NSNumber * _Nullable)clusterID
                                 eventID:(NSNumber * _Nullable)eventID
-                               eventMin:(NSNumber * _Nullable)eventMin
-                               isUrgent:(NSNumber * _Nullable)isUrgent
                                  params:(MTRSubscribeParams * _Nullable)params
                                   queue:(dispatch_queue_t)queue
                           reportHandler:(MTRDeviceResponseHandler)reportHandler

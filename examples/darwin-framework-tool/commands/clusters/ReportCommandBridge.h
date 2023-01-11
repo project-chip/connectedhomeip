@@ -214,22 +214,23 @@ public:
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
 
         MTRSubscribeParams * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
+        if (mEventNumber.HasValue()) {
+            params.eventMin = [NSNumber numberWithUnsignedLongLong:mEventNumber.Value()];
+        }
         if (mKeepSubscriptions.HasValue()) {
             params.replaceExistingSubscriptions = !mKeepSubscriptions.Value();
+        }
+        if (mIsUrgent.HasValue()) {
+            params.isUrgentEvent = mIsUrgent.Value();
         }
         if (mAutoResubscribe.HasValue()) {
             params.resubscribeIfLost = mAutoResubscribe.Value();
         }
 
-        if (mClusterId != chip::kInvalidAttributeId) {
-            NSNumber * eventMin = (mEventNumber.HasValue()) ? [NSNumber numberWithUnsignedLongLong:mEventNumber.Value()] : nil;
-            NSNumber * isUrgent = (mIsUrgent.HasValue()) ? [NSNumber numberWithBool:mIsUrgent.Value()] : nil;
-
+        if (mClusterId != chip::kInvalidClusterId) {
             [device subscribeToEventsWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
                 clusterID:[NSNumber numberWithUnsignedInteger:mClusterId]
                 eventID:[NSNumber numberWithUnsignedInteger:mEventId]
-                eventMin:eventMin
-                isUrgent:isUrgent
                 params:params
                 queue:callbackQueue
                 reportHandler:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
@@ -290,7 +291,7 @@ protected:
     bool DeferInteractiveCleanup() override { return mSubscriptionEstablished; }
 
 private:
-    chip::ClusterId mClusterId = chip::kInvalidAttributeId;
+    chip::ClusterId mClusterId = chip::kInvalidClusterId;
     chip::EventId mEventId;
 };
 
@@ -314,14 +315,6 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ReadEvent(const char * _Nonnull eventName)
-        : ModelCommand("read-event")
-    {
-        AddArgument("event-name", eventName);
-        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
-        ModelCommand::AddArguments();
-    }
-
     ~ReadEvent() {}
 
     CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
@@ -331,12 +324,13 @@ public:
         if (mFabricFiltered.HasValue()) {
             params.filterByFabric = mFabricFiltered.Value();
         }
-        NSNumber * eventMin = (mEventNumber.HasValue()) ? [NSNumber numberWithUnsignedLongLong:mEventNumber.Value()] : nil;
+        if (mEventNumber.HasValue()) {
+            params.eventMin = [NSNumber numberWithUnsignedLongLong:mEventNumber.Value()];
+        }
 
         [device readEventsWithEndpointID:[NSNumber numberWithUnsignedShort:endpointId]
                                clusterID:[NSNumber numberWithUnsignedInteger:mClusterId]
                                  eventID:[NSNumber numberWithUnsignedInteger:mEventId]
-                                eventMin:eventMin
                                   params:params
                                    queue:callbackQueue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {

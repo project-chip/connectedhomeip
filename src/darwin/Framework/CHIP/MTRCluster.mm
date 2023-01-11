@@ -74,12 +74,16 @@ using namespace ::chip;
 {
     auto other = [[MTRReadParams alloc] init];
     other.filterByFabric = self.filterByFabric;
+    other.eventMin = self.eventMin;
     return other;
 }
 
 - (void)toReadPrepareParams:(chip::app::ReadPrepareParams &)readPrepareParams
 {
     readPrepareParams.mIsFabricFiltered = self.filterByFabric;
+    if (self.eventMin) {
+        readPrepareParams.mEventNumber.SetValue(static_cast<chip::EventNumber>([self.eventMin unsignedLongLongValue]));
+    }
 }
 
 @end
@@ -88,6 +92,7 @@ using namespace ::chip;
 - (instancetype)initWithMinInterval:(NSNumber *)minInterval maxInterval:(NSNumber *)maxInterval
 {
     if (self = [super init]) {
+        _isUrgentEvent = NO;
         _replaceExistingSubscriptions = YES;
         _resubscribeIfLost = YES;
         _minInterval = [minInterval copy];
@@ -100,7 +105,9 @@ using namespace ::chip;
 {
     auto other = [[MTRSubscribeParams alloc] initWithMinInterval:self.minInterval maxInterval:self.maxInterval];
     other.filterByFabric = self.filterByFabric;
+    other.eventMin = self.eventMin;
     other.replaceExistingSubscriptions = self.replaceExistingSubscriptions;
+    other.isUrgentEvent = self.isUrgentEvent;
     other.resubscribeIfLost = self.resubscribeIfLost;
     return other;
 }
@@ -111,6 +118,9 @@ using namespace ::chip;
     readPrepareParams.mMinIntervalFloorSeconds = self.minInterval.unsignedShortValue;
     readPrepareParams.mMaxIntervalCeilingSeconds = self.maxInterval.unsignedShortValue;
     readPrepareParams.mKeepSubscriptions = !self.replaceExistingSubscriptions;
+    if (self.eventMin) {
+        readPrepareParams.mEventNumber.SetValue(static_cast<chip::EventNumber>([self.eventMin unsignedLongLongValue]));
+    }
 }
 
 @end

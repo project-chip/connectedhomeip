@@ -77,7 +77,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * MTRReadParams
- *    This is used to control the behavior of attribute reads and subscribes.
+ *    This is used to control the behavior of attribute/event reads and subscribes.
  *    If not provided (i.e. nil passed for the MTRReadParams argument), will be
  *    treated as if a default-initialized object was passed in.
  */
@@ -94,11 +94,21 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, assign, getter=shouldFilterByFabric) BOOL filterByFabric MTR_NEWLY_AVAILABLE;
 
+/**
+ * Sets the EventMin filed in the EventFilterIB for the read/subscribe for the interaction.
+ *
+ * If nil (the default value), all of the queued events will be reported from lowest to highest event number.
+ *
+ * If not nil, the queued events will be reported except for ones that the event number is less than the EventMin field in the
+ * EventFilterIB.
+ */
+@property (nonatomic, copy, nullable) NSNumber * eventMin MTR_NEWLY_AVAILABLE;
+
 @end
 
 /**
  * MTRSubscribeParams
- *    This is used to control the behavior of attribute subscribes.  If not
+ *    This is used to control the behavior of attribute/event subscribes.  If not
  *    provided (i.e. nil passed for the MTRSubscribeParams argument), will be
  *    treated as if a default-initialized object was passed in.
  */
@@ -143,6 +153,15 @@ NS_ASSUME_NONNULL_BEGIN
  * maxInterval it selects if it needs to (e.g. to meet its power budget).
  */
 @property (nonatomic, copy) NSNumber * maxInterval;
+
+/**
+ * Sets IsUrgent flag of EventPathIB in the Subscribe Request. The default value is NO.
+ *
+ * If YES, the events will be reported as soon as queued.
+ *
+ * If NO, the events will be reported at the maximum interval.
+ */
+@property (nonatomic, assign, getter=isUrgentEvent) BOOL isUrgentEvent;
 
 /**
  * Initialize an MTRSubscribeParams.  Must provide a minInterval and
