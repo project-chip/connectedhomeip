@@ -70,12 +70,9 @@ private:
 
     static constexpr size_t MaxSubscriptionPathsSize()
     {
-        // Not using CHIP_IM_MAX_NUM_PATH_PER_SUBSCRIPTION for the same
-        // reason MaxStateSize() uses CHIP_IM_MAX_NUM_SUBSCRIPTIONS instead
-        // of CHIP_IM_MAX_NUM_SUBSCRIPTIONS_PER_FABRIC
         return TLV::EstimateStructOverhead(
             TLV::EstimateStructOverhead(sizeof(uint8_t), sizeof(EndpointId), sizeof(ClusterId), sizeof(AttributeId)) *
-            CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS);
+            CHIP_IM_MAX_NUM_PATH_PER_SUBSCRIPTION);
     }
 
     static constexpr size_t MaxSubscriptionSize()
