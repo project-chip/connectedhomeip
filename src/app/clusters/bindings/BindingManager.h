@@ -143,7 +143,8 @@ private:
         Callback::Callback<OnDeviceConnectionFailure> * GetOnDeviceConnectionFailure() { return &mOnConnectionFailureCallback; }
 
     private:
-        static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
+        static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                          const SessionHandle & sessionHandle)
         {
             ConnectionCallback * _this = static_cast<ConnectionCallback *>(context);
             _this->mBindingManager.HandleDeviceConnected(exchangeMgr, sessionHandle);
