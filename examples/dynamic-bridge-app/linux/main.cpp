@@ -205,45 +205,45 @@ std::unique_ptr<GeneratedCluster> CreateCluster(chip::ClusterId id)
     return nullptr;
 }
 
-CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const Span<const char> & v)
+CHIP_ERROR TLVWriteValue(chip::TLV::TLVWriter & wr, const Span<const char> & v)
 {
     return wr.PutString(chip::TLV::AnonymousTag(), v);
 }
-CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const bool & v)
+CHIP_ERROR TLVWriteValue(chip::TLV::TLVWriter & wr, const bool & v)
 {
     return wr.PutBoolean(chip::TLV::AnonymousTag(), v);
 }
 
 template <typename T>
-CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const T & v)
+CHIP_ERROR TLVWriteValue(chip::TLV::TLVWriter & wr, const T & v)
 {
     return wr.Put(chip::TLV::AnonymousTag(), v);
 }
 
-CHIP_ERROR WriteValueToBuffer(const bool & value, uint8_t * buffer, const uint16_t & maxReadLength)
+CHIP_ERROR WriteValueToBuffer(const bool & value, chip::Span<uint8_t> buffer)
 {
-    if (maxReadLength != 1)
+    if (buffer.size() != 1)
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
-    *buffer = value ? 1 : 0;
+    *(buffer.data()) = value ? 1 : 0;
     return CHIP_NO_ERROR;
 }
 
 template <typename T>
-CHIP_ERROR WriteValueToBuffer(const T & value, uint8_t * buffer, const uint16_t & maxReadLength)
+CHIP_ERROR WriteValueToBuffer(const T & value, chip::Span<uint8_t> buffer)
 {
     size_t value_size = sizeof(value);
-    if (maxReadLength < value_size)
+    if (buffer.size() < value_size)
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
-    memcpy(buffer, &value, value_size);
+    memcpy(buffer.data(), &value, value_size);
     return CHIP_NO_ERROR;
 }
 
 template <typename T>
-CHIP_ERROR WriteValueToBuffer(chip::TLV::TLVReader & reader, uint8_t * buffer, const uint16_t & maxReadLength)
+CHIP_ERROR WriteValueToBuffer(chip::TLV::TLVReader & reader, chip::Span<uint8_t> buffer)
 {
     T v;
     CHIP_ERROR err = chip::app::DataModel::Decode(reader, v);
@@ -251,53 +251,61 @@ CHIP_ERROR WriteValueToBuffer(chip::TLV::TLVReader & reader, uint8_t * buffer, c
     {
         return err;
     }
-    return WriteValueToBuffer(v, buffer, maxReadLength);
+    return WriteValueToBuffer(v, buffer);
 }
 
-// if `read` is true, read from `buffer`, and write to `data`
-// otherwise, read from `data`, and write to `buffer`
+// Describes a conversion direction between:
+// - A binary buffer (passed from ember internals)
+// - A TLV data buffer (used by TLVWriter and TLVReader)
+enum ConversionDirection {
+    BUFFER_TO_TLV,
+    TLV_TO_BUFFER
+};
+
 template <typename T>
-CHIP_ERROR ReadOrWriteBuffer(std::vector<uint8_t> * data, uint8_t * buffer, uint16_t maxReadLength, bool read)
+CHIP_ERROR PerformTLVBufferConversion(std::vector<uint8_t> * tlvData, chip::Span<uint8_t> buffer, ConversionDirection convert_direction)
 {
     CHIP_ERROR err;
-    if (read)
+    if (convert_direction == BUFFER_TO_TLV)
     {
+	// buffer.size() is ignored here, because it was called from the external write ember callback,
+	// which does not provide a buffer size
         chip::TLV::TLVWriter wr;
-        wr.Init(data->data(), data->size());
+        wr.Init(tlvData->data(), tlvData->size());
         T value;
-        memcpy(&value, buffer, sizeof(T));
-        err = ReadValueFromBuffer(wr, value);
+        memcpy(&value, buffer.data(), sizeof(T));
+        err = TLVWriteValue(wr, value);
         wr.Finalize();
-        data->resize(wr.GetLengthWritten());
+        tlvData->resize(wr.GetLengthWritten());
     }
     else
     {
         chip::TLV::TLVReader rd;
-        rd.Init(data->data(), data->size());
+        rd.Init(tlvData->data(), tlvData->size());
         rd.Next();
-        err = WriteValueToBuffer<T>(rd, buffer, maxReadLength);
+        err = WriteValueToBuffer<T>(rd, buffer);
     }
     return err;
 }
 
-CHIP_ERROR ReadOrWriteBufferForType(std::vector<uint8_t> * data, uint8_t * buffer, EmberAfAttributeType type,
-                                    uint16_t maxReadLength, bool read)
+CHIP_ERROR PerformTLVBufferConversionForType(std::vector<uint8_t> * tlvData, chip::Span<uint8_t> buffer,
+		                             EmberAfAttributeType type, ConversionDirection convert_direction)
 {
     switch (type)
     {
     case ZCL_OCTET_STRING_ATTRIBUTE_TYPE:
     case ZCL_CHAR_STRING_ATTRIBUTE_TYPE:
-        return ReadOrWriteBuffer<Span<const char>>(data, buffer, maxReadLength, read);
+        return PerformTLVBufferConversion<Span<const char>>(tlvData, buffer, convert_direction);
     case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE:
     case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
-        return ReadOrWriteBuffer<ByteSpan>(data, buffer, maxReadLength, read);
+        return PerformTLVBufferConversion<ByteSpan>(tlvData, buffer, convert_direction);
     case ZCL_STRUCT_ATTRIBUTE_TYPE:
         // structs not supported yet
         return CHIP_ERROR_NOT_IMPLEMENTED;
     case ZCL_SINGLE_ATTRIBUTE_TYPE:
-        return ReadOrWriteBuffer<float>(data, buffer, maxReadLength, read);
+        return PerformTLVBufferConversion<float>(tlvData, buffer, convert_direction);
     case ZCL_DOUBLE_ATTRIBUTE_TYPE:
-        return ReadOrWriteBuffer<double>(data, buffer, maxReadLength, read);
+        return PerformTLVBufferConversion<double>(tlvData, buffer, convert_direction);
     case ZCL_INT8S_ATTRIBUTE_TYPE:
     case ZCL_INT16S_ATTRIBUTE_TYPE:
     case ZCL_INT24S_ATTRIBUTE_TYPE:
@@ -306,7 +314,7 @@ CHIP_ERROR ReadOrWriteBufferForType(std::vector<uint8_t> * data, uint8_t * buffe
     case ZCL_INT48S_ATTRIBUTE_TYPE:
     case ZCL_INT56S_ATTRIBUTE_TYPE:
     case ZCL_INT64S_ATTRIBUTE_TYPE:
-        return ReadOrWriteBuffer<int64_t>(data, buffer, maxReadLength, read);
+        return PerformTLVBufferConversion<int64_t>(tlvData, buffer, convert_direction);
     case ZCL_INT8U_ATTRIBUTE_TYPE:
     case ZCL_INT16U_ATTRIBUTE_TYPE:
     case ZCL_INT24U_ATTRIBUTE_TYPE:
@@ -315,14 +323,14 @@ CHIP_ERROR ReadOrWriteBufferForType(std::vector<uint8_t> * data, uint8_t * buffe
     case ZCL_INT48U_ATTRIBUTE_TYPE:
     case ZCL_INT56U_ATTRIBUTE_TYPE:
     case ZCL_INT64U_ATTRIBUTE_TYPE:
-        return ReadOrWriteBuffer<uint64_t>(data, buffer, maxReadLength, read);
+        return PerformTLVBufferConversion<uint64_t>(tlvData, buffer, convert_direction);
     case ZCL_BOOLEAN_ATTRIBUTE_TYPE:
-        return ReadOrWriteBuffer<bool>(data, buffer, maxReadLength, read);
+        return PerformTLVBufferConversion<bool>(tlvData, buffer, convert_direction);
     case ZCL_BITMAP32_ATTRIBUTE_TYPE:
-        return ReadOrWriteBuffer<uint32_t>(data, buffer, maxReadLength, read);
+        return PerformTLVBufferConversion<uint32_t>(tlvData, buffer, convert_direction);
     default:
         // Assume integer
-        return ReadOrWriteBuffer<int64_t>(data, buffer, maxReadLength, read);
+        return PerformTLVBufferConversion<int64_t>(tlvData, buffer, convert_direction);
     }
 }
 
@@ -366,12 +374,14 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     }
 
     // adding 64 bytes as padding to include the staging buffer used by
-    // TLVWriter, which is 17 bytes
-    std::vector<uint8_t> data(attributeMetadata->size + 64);
+    // TLVReader and TLVWriter, which is 17 bytes
+    std::vector<uint8_t> tlvData(attributeMetadata->size + 64);
 
     // read the attribute and write it to `data`
     chip::TLV::TLVWriter writer;
-    writer.Init(data.data(), data.size());
+    writer.Init(tlvData.data(), tlvData.size());
+
+    // this cast is safe because all the registered attribute accessors are of type `CommonAttributeAccessInterface`. See `main()`
     CHIP_ERROR err = static_cast<CommonAttributeAccessInterface *>(accessInterface)
                          ->Read(chip::app::ConcreteDataAttributePath(endpoint, clusterId, attributeMetadata->attributeId), writer);
     if (err != CHIP_NO_ERROR)
@@ -382,10 +392,12 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
         return EMBER_ZCL_STATUS_FAILURE;
     }
     writer.Finalize();
-    data.resize(writer.GetLengthWritten());
+    tlvData.resize(writer.GetLengthWritten());
 
     // read from `data` and write to `buffer`
-    err = ReadOrWriteBufferForType(&data, buffer, attributeMetadata->attributeType, maxReadLength, false);
+
+    // maxReadLength here is the maximum number of bytes to read from the attribute value and to write into the buffer.
+    err = PerformTLVBufferConversionForType(&tlvData, chip::Span<uint8_t>(buffer, maxReadLength), attributeMetadata->attributeType, TLV_TO_BUFFER);
     if (err != CHIP_NO_ERROR)
     {
         printChipError(err);
@@ -417,11 +429,13 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
     }
 
     // adding 64 bytes as padding to include the staging buffer used by
-    // TLVWriter, which is 17 bytes
-    std::vector<uint8_t> data(attributeMetadata->size + 64);
+    // TLVReader and TLVWriter, which is 17 bytes
+    std::vector<uint8_t> tlvData(attributeMetadata->size + 64);
 
     // read from `buffer` and write to `data`
-    CHIP_ERROR err = ReadOrWriteBufferForType(&data, buffer, attributeMetadata->attributeType, 0, true);
+
+    // buffer size will not be used in this code path, so we set it to 0. See `PerformTLVBufferConversion` 
+    CHIP_ERROR err = PerformTLVBufferConversionForType(&tlvData, chip::Span<uint8_t>(buffer, 0), attributeMetadata->attributeType, BUFFER_TO_TLV);
     if (err != CHIP_NO_ERROR)
     {
         printChipError(err);
@@ -432,7 +446,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
 
     // read from `data` and write to attribute
     chip::TLV::TLVReader reader;
-    reader.Init(data.data(), data.size());
+    reader.Init(tlvData.data(), tlvData.size());
     reader.Next();
     chip::app::AttributeValueDecoder decoder(reader, chip::Access::SubjectDescriptor());
     err =
