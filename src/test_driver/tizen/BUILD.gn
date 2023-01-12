@@ -12,18 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-import("//build_overrides/tizen.gni")
-
-import("${chip_root}/build/chip/tools.gni")
-import("${chip_root}/src/app/common_flags.gni")
-import("${tizen_sdk_build_root}/tizen_sdk.gni")
-
-assert(chip_build_tools)
-
-qemu_test("chip-qemu-tests") {
-  deps = [
-    "${chip_root}/examples/all-clusters-app/tizen/:chip-all-clusters-app:test",
-    "${chip_root}/examples/lighting-app/tizen/:chip-lighting-app:test",
-  ]
+group("check") {
+  testonly = true
+  deps = [ "integration_tests/lighting-app:check" ]
 }

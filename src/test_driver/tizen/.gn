@@ -22,5 +22,4 @@ check_system_includes = true
 
 default_args = {
   target_os = "tizen"
-  import("//args.gni")
 }

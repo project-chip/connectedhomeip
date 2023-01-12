@@ -12,14 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
+import("//build_overrides/tizen.gni")
 
-import("${chip_root}/config/standalone/args.gni")
+import("${tizen_sdk_build_root}/tizen_sdk.gni")
+import("../../assets.gni")
 
-chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
-chip_project_config_include = "<CHIPProjectAppConfig.h>"
-chip_system_project_config_include = "<SystemProjectConfig.h>"
+tizen_qemu_mkisofs("test-runner") {
+  runner = "runner.sh"
+  assets = [
+    "${tizen_chip_tool}",
+    "${tizen_lighting_app_tpk}",
+  ]
+}
 
-chip_project_config_include_dirs =
-    [ "${chip_root}/examples/lighting-app/tizen/include" ]
-chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
+tizen_qemu_run("check") {
+  deps = [ ":test-runner" ]
+  mkisofs_outputs = get_target_outputs(":test-runner")
+  iso_image = rebase_path(mkisofs_outputs[0])
+}
