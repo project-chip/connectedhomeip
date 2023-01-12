@@ -103,7 +103,9 @@ protected:
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     CHIP_ERROR _GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
     CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
-    CHIP_ERROR _RequestSEDActiveMode(bool onOff);
+    CHIP_ERROR _RequestSEDActiveMode(bool onOff, bool delayIdle);
+    CHIP_ERROR SEDChangeMode(void);
+    static void RequestSEDModeChange(chip::System::Layer * apSystemLayer, void * apAppState);
 #endif
 
     bool _HaveMeshConnectivity(void);

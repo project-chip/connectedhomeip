@@ -120,6 +120,16 @@
 #define CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL 200_ms32
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD
+ *
+ *  Minimum amount the node SHOULD stay awake after network activity.
+ * Spec section 2.12.5
+ */
+#ifndef CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD
+#define CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD System::Clock::Milliseconds32(4000)
+#endif
+
 // -------------------- Device Identification Configuration --------------------
 
 /**
