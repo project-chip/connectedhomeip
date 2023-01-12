@@ -84,6 +84,45 @@ public class ChipDeviceController {
     nocChainIssuer = issuer;
   }
 
+  /**
+   * If DeviceAttestationCompletionCallback is setted, then it will always be called when device
+   * attestation completes.
+   *
+   * <p>When {@link
+   * DeviceAttestationDelegate.DeviceAttestationCompletionCallback#onDeviceAttestationCompleted(long,
+   * long, AttestationInfo, int)} is received, {@link #continueCommissioning(long, boolean)} must be
+   * called.
+   *
+   * @param failSafeExpiryTimeoutSecs the value to set for the fail-safe timer before
+   *     onDeviceAttestationCompleted is invoked. The unit is seconds.
+   * @param completionCallback the callback will be invoked when deviceattestation completed with
+   *     device info for additional verification.
+   */
+  public void setDeviceAttestationCompletionCallback(
+      int failSafeExpiryTimeoutSecs,
+      DeviceAttestationDelegate.DeviceAttestationCompletionCallback completionCallback) {
+    setDeviceAttestationDelegate(
+        deviceControllerPtr, failSafeExpiryTimeoutSecs, completionCallback);
+  }
+
+  /**
+   * If DeviceAttestationFailureCallback is setted, then it will be called when device attestation
+   * fails, and the client can decide to continue or stop the commissioning.
+   *
+   * <p>When {@link
+   * DeviceAttestationDelegate.DeviceAttestationFailureCallback#onDeviceAttestationFailed(long,
+   * long, int)} is received, {@link #continueCommissioning(long, boolean)} must be called.
+   *
+   * @param failSafeExpiryTimeoutSecs the value to set for the fail-safe timer before
+   *     onDeviceAttestationFailed is invoked. The unit is seconds.
+   * @param failureCallback the callback will be invoked when device attestation failed.
+   */
+  public void setDeviceAttestationFailureCallback(
+      int failSafeExpiryTimeoutSecs,
+      DeviceAttestationDelegate.DeviceAttestationFailureCallback failureCallback) {
+    setDeviceAttestationDelegate(deviceControllerPtr, failSafeExpiryTimeoutSecs, failureCallback);
+  }
+
   public void pairDevice(
       BluetoothGatt bleServer,
       int connId,
@@ -196,6 +235,17 @@ public class ChipDeviceController {
   public void commissionDevice(
       long deviceId, @Nullable byte[] csrNonce, @Nullable NetworkCredentials networkCredentials) {
     commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials);
+  }
+
+  /**
+   * This function instructs the commissioner to proceed to the next stage of commissioning after
+   * attestation is reported.
+   *
+   * @param devicePtr a pointer to the device which is being commissioned.
+   * @param ignoreAttestationFailure whether to ignore device attestation failure.
+   */
+  public void continueCommissioning(long devicePtr, boolean ignoreAttestationFailure) {
+    continueCommissioning(deviceControllerPtr, devicePtr, ignoreAttestationFailure);
   }
 
   /**
@@ -514,7 +564,8 @@ public class ChipDeviceController {
       int maxInterval,
       boolean keepSubscriptions,
       boolean isFabricFiltered) {
-    // TODO: pass resubscriptionAttemptCallback to ReportCallbackJni since jni layer is not ready
+    // TODO: pass resubscriptionAttemptCallback to ReportCallbackJni since jni layer
+    // is not ready
     // for auto-resubscribe
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
@@ -616,6 +667,9 @@ public class ChipDeviceController {
 
   private native long newDeviceController(ControllerParams params);
 
+  private native void setDeviceAttestationDelegate(
+      long deviceControllerPtr, int failSafeExpiryTimeoutSecs, DeviceAttestationDelegate delegate);
+
   private native void pairDevice(
       long deviceControllerPtr,
       long deviceId,
@@ -644,6 +698,9 @@ public class ChipDeviceController {
       long deviceId,
       @Nullable byte[] csrNonce,
       @Nullable NetworkCredentials networkCredentials);
+
+  private native void continueCommissioning(
+      long deviceControllerPtr, long devicePtr, boolean ignoreAttestationFailure);
 
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
 
