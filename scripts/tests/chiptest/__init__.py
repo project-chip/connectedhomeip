@@ -73,8 +73,8 @@ def tests_with_command(chip_tool: str, is_manual: bool):
         )
 
 
-# TODO We will move away from hardcoded list of yamltests to run yamltests parser/runner reaches
-# functionality parity with the code gen version.
+# TODO We will move away from hardcoded list of yamltests to run all file when yamltests
+# parser/runner reaches parity with the code gen version.
 def _hardcoded_python_yaml_tests():
     currently_supported_yaml_tests = ["TestConstraints.yaml"]
 
@@ -91,15 +91,16 @@ def _hardcoded_python_yaml_tests():
 
 
 def AllTests(chip_tool: str, run_yamltests_with_chip_repl: bool):
+    if run_yamltests_with_chip_repl:
+        for test in _hardcoded_python_yaml_tests():
+            yield test
+        return
+
     for test in tests_with_command(chip_tool, is_manual=False):
         yield test
 
     for test in tests_with_command(chip_tool, is_manual=True):
         yield test
-
-    if run_yamltests_with_chip_repl:
-        for test in _hardcoded_python_yaml_tests():
-            yield test
 
 
 __all__ = [
