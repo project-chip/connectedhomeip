@@ -18,4 +18,11 @@
 
 #pragma once
 
-#define LWS_HAVE_SYS_RESOURCE_H
+#include "WebSocketServerDelegate.h"
+
+class WebSocketServerDelegate
+{
+public:
+    virtual ~WebSocketServerDelegate(){};
+    virtual bool OnWebSocketMessageReceived(char * msg) = 0;
+};
