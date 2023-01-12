@@ -7439,10 +7439,10 @@
           ]
         },
         {
-          "name": "Bridged Device Basic",
+          "name": "Bridged Device Basic Information",
           "code": 57,
           "mfgCode": null,
-          "define": "BRIDGED_DEVICE_BASIC_CLUSTER",
+          "define": "BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER",
           "side": "client",
           "enabled": 1,
           "attributes": [
@@ -7465,10 +7465,10 @@
           ]
         },
         {
-          "name": "Bridged Device Basic",
+          "name": "Bridged Device Basic Information",
           "code": 57,
           "mfgCode": null,
-          "define": "BRIDGED_DEVICE_BASIC_CLUSTER",
+          "define": "BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER",
           "side": "server",
           "enabled": 0,
           "attributes": [
