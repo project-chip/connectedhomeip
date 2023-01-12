@@ -14,7 +14,7 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Mapping
 
 from matter_idl.matter_idl_types import ClusterSide, Idl, ParseMetaData
 
@@ -150,12 +150,12 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
         ]
         if not cluster_definition:
             self._AddLintError(
-                "Cluster definition for %s not found" % cluster.name, location)
+                "Cluster definition for %s not found" % name, location)
             return None
 
         if len(cluster_definition) > 1:
             self._AddLintError(
-                "Multiple cluster definitions found for %s" % cluster.name, location)
+                "Multiple cluster definitions found for %s" % name, location)
             return None
 
         return cluster_definition[0]
@@ -221,8 +221,8 @@ class RequiredCommandsRule(ErrorAccumulatingRule):
         super(RequiredCommandsRule, self).__init__(name)
 
         # Maps cluster id to mandatory cluster requirement
-        self._mandatory_commands: Maping[int,
-                                         List[ClusterCommandRequirement]] = {}
+        self._mandatory_commands: Mapping[int,
+                                          List[ClusterCommandRequirement]] = {}
 
     def __repr__(self):
         result = "RequiredCommandsRule{\n"

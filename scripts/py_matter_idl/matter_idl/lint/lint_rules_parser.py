@@ -204,7 +204,7 @@ class LintRulesTransformer(Transformer):
         """Numbers in the grammar are integers or hex numbers.
         """
         if len(tokens) != 1:
-            raise Error("Unexpected argument counts")
+            raise Exception("Unexpected argument counts")
 
         return parseNumberString(tokens[0].value)
 
@@ -220,7 +220,7 @@ class LintRulesTransformer(Transformer):
         """An id is a string containing an identifier
         """
         if len(tokens) != 1:
-            raise Error("Unexpected argument counts")
+            raise Exception("Unexpected argument counts")
         return tokens[0].value
 
     def ESCAPED_STRING(self, s):
