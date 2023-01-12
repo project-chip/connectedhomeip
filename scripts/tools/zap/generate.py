@@ -173,7 +173,7 @@ def runArgumentsParser() -> CmdLineArgs:
     )
 
 
-def extractGeneratedIdl(output_dir, zap_config_path):
+def extractGeneratedIdl(self, output_dir, zap_config_path):
     """Find a file Clusters.matter in the output directory and
        place it along with the input zap file.
 
@@ -187,7 +187,7 @@ def extractGeneratedIdl(output_dir, zap_config_path):
     if not target_path.endswith(".matter"):
         # We expect "something.zap" and don't handle corner cases of
         # multiple extensions. This is to work with existing codebase only
-        raise Error("Unexpected input zap file  %s" % self.zap_config)
+        raise Exception("Unexpected input zap file  %s" % self.zap_config)
 
     shutil.move(idl_path, target_path)
 
@@ -298,9 +298,7 @@ class LockFileSerializer:
             return
 
         fcntl.lockf(self.lock_file, fcntl.LOCK_UN)
-        self.lock_file.close()
-        self.lock_file = None
-
+        self.lock_file = self.lock_file.close()
 
 def main():
     checkPythonVersion()
