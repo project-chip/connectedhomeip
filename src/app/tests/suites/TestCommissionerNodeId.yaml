@@ -118,15 +118,14 @@ tests:
       command: "readAttribute"
       attribute: "ACL"
       response:
-          value:
-              [
+          value: [
                   {
                       FabricIndex: alphaIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ commissionerNodeId ],
+                      Subjects: [commissionerNodeId],
                       Targets: null,
-                  }
+                  },
               ]
 
     - label: "Read the ACL from beta and check commissioner node id"
@@ -134,15 +133,14 @@ tests:
       command: "readAttribute"
       attribute: "ACL"
       response:
-          value:
-              [
+          value: [
                   {
                       FabricIndex: betaIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ commissionerNodeId ],
+                      Subjects: [commissionerNodeId],
                       Targets: null,
-                  }
+                  },
               ]
 
     - label: "Read the ACL from gamma and check commissioner node id"
@@ -150,15 +148,14 @@ tests:
       command: "readAttribute"
       attribute: "ACL"
       response:
-          value:
-              [
+          value: [
                   {
                       FabricIndex: gammaIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ commissionerNodeId ],
+                      Subjects: [commissionerNodeId],
                       Targets: null,
-                  }
+                  },
               ]
 
     - label: "Write the ACL using the commissioner node id value"
@@ -166,15 +163,14 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-              [
+          value: [
                   {
                       FabricIndex: betaIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ commissionerNodeId ],
+                      Subjects: [commissionerNodeId],
                       Targets: null,
-                  }
+                  },
               ]
 
     - label: "Write the ACL using the commissioner node id value"
@@ -182,15 +178,14 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-              [
+          value: [
                   {
                       FabricIndex: betaIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ commissionerNodeId ],
+                      Subjects: [commissionerNodeId],
                       Targets: null,
-                  }
+                  },
               ]
 
     - label: "Read the ACL from beta and check commissioner node id"
@@ -198,15 +193,14 @@ tests:
       command: "readAttribute"
       attribute: "ACL"
       response:
-          value:
-              [
+          value: [
                   {
                       FabricIndex: betaIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ commissionerNodeId ],
+                      Subjects: [commissionerNodeId],
                       Targets: null,
-                  }
+                  },
               ]
 
     - label: "Read the ACL from gamma and check commissioner node id"
@@ -214,15 +208,14 @@ tests:
       command: "readAttribute"
       attribute: "ACL"
       response:
-          value:
-              [
+          value: [
                   {
                       FabricIndex: gammaIndex,
                       Privilege: 5, # administer
                       AuthMode: 2, # case
-                      Subjects: [ commissionerNodeId ],
+                      Subjects: [commissionerNodeId],
                       Targets: null,
-                  }
+                  },
               ]
 
     - label: "Remove beta fabric"
