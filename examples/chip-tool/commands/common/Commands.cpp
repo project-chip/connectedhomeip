@@ -93,7 +93,8 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (!IsGlobalCommand(argv[2]))
+    bool isGlobalCommand = IsGlobalCommand(argv[2]);
+    if (!isGlobalCommand)
     {
         command = GetCommand(cluster->second, argv[2]);
         if (command == nullptr)
@@ -138,7 +139,8 @@ CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)
         }
     }
 
-    if (!command->InitArguments(argc - 3, &argv[3]))
+    int argumentsPosition = isGlobalCommand ? 4 : 3;
+    if (!command->InitArguments(argc - argumentsPosition, &argv[argumentsPosition]))
     {
         ShowCommand(argv[0], argv[1], command);
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -320,6 +322,12 @@ void Commands::ShowCommand(std::string executable, std::string clusterName, Comm
     std::string arguments;
     std::string description;
     arguments += command->GetName();
+
+    if (command->GetReadOnlyGlobalCommandArgument())
+    {
+        arguments += ' ';
+        arguments += command->GetReadOnlyGlobalCommandArgument();
+    }
 
     size_t argumentsCount = command->GetArgumentsCount();
     for (size_t i = 0; i < argumentsCount; i++)

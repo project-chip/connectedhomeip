@@ -31,7 +31,6 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/lighting-app/zap-generated"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/lighting-app/lighting-common/src"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/route_hook"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/ota"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/common"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/shell_extension"
