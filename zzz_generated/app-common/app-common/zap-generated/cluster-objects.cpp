@@ -15257,14 +15257,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::OccupancySensorTypeBitmap::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, occupancySensorTypeBitmap));
         break;
-    case Attributes::PirOccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, pirOccupiedToUnoccupiedDelay));
+    case Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, PIROccupiedToUnoccupiedDelay));
         break;
-    case Attributes::PirUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, pirUnoccupiedToOccupiedDelay));
+    case Attributes::PIRUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, PIRUnoccupiedToOccupiedDelay));
         break;
-    case Attributes::PirUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, pirUnoccupiedToOccupiedThreshold));
+    case Attributes::PIRUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, PIRUnoccupiedToOccupiedThreshold));
         break;
     case Attributes::UltrasonicOccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, ultrasonicOccupiedToUnoccupiedDelay));

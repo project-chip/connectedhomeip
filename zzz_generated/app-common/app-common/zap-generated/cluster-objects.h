@@ -20302,7 +20302,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OccupancySensorTypeBitmap
-namespace PirOccupiedToUnoccupiedDelay {
+namespace PIROccupiedToUnoccupiedDelay {
 struct TypeInfo
 {
     using Type             = uint16_t;
@@ -20310,11 +20310,11 @@ struct TypeInfo
     using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PirOccupiedToUnoccupiedDelay::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PIROccupiedToUnoccupiedDelay::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace PirOccupiedToUnoccupiedDelay
-namespace PirUnoccupiedToOccupiedDelay {
+} // namespace PIROccupiedToUnoccupiedDelay
+namespace PIRUnoccupiedToOccupiedDelay {
 struct TypeInfo
 {
     using Type             = uint16_t;
@@ -20322,11 +20322,11 @@ struct TypeInfo
     using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PirUnoccupiedToOccupiedDelay::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PIRUnoccupiedToOccupiedDelay::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace PirUnoccupiedToOccupiedDelay
-namespace PirUnoccupiedToOccupiedThreshold {
+} // namespace PIRUnoccupiedToOccupiedDelay
+namespace PIRUnoccupiedToOccupiedThreshold {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -20334,10 +20334,10 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PirUnoccupiedToOccupiedThreshold::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PIRUnoccupiedToOccupiedThreshold::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace PirUnoccupiedToOccupiedThreshold
+} // namespace PIRUnoccupiedToOccupiedThreshold
 namespace UltrasonicOccupiedToUnoccupiedDelay {
 struct TypeInfo
 {
@@ -20452,9 +20452,9 @@ struct TypeInfo
         Attributes::Occupancy::TypeInfo::DecodableType occupancy                                       = static_cast<uint8_t>(0);
         Attributes::OccupancySensorType::TypeInfo::DecodableType occupancySensorType                   = static_cast<uint8_t>(0);
         Attributes::OccupancySensorTypeBitmap::TypeInfo::DecodableType occupancySensorTypeBitmap       = static_cast<uint8_t>(0);
-        Attributes::PirOccupiedToUnoccupiedDelay::TypeInfo::DecodableType pirOccupiedToUnoccupiedDelay = static_cast<uint16_t>(0);
-        Attributes::PirUnoccupiedToOccupiedDelay::TypeInfo::DecodableType pirUnoccupiedToOccupiedDelay = static_cast<uint16_t>(0);
-        Attributes::PirUnoccupiedToOccupiedThreshold::TypeInfo::DecodableType pirUnoccupiedToOccupiedThreshold =
+        Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo::DecodableType PIROccupiedToUnoccupiedDelay = static_cast<uint16_t>(0);
+        Attributes::PIRUnoccupiedToOccupiedDelay::TypeInfo::DecodableType PIRUnoccupiedToOccupiedDelay = static_cast<uint16_t>(0);
+        Attributes::PIRUnoccupiedToOccupiedThreshold::TypeInfo::DecodableType PIRUnoccupiedToOccupiedThreshold =
             static_cast<uint8_t>(0);
         Attributes::UltrasonicOccupiedToUnoccupiedDelay::TypeInfo::DecodableType ultrasonicOccupiedToUnoccupiedDelay =
             static_cast<uint16_t>(0);
