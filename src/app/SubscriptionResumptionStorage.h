@@ -76,8 +76,8 @@ public:
      */
     struct SubscriptionInfo
     {
-        FabricIndex mFabricIndex;
         NodeId mNodeId;
+        FabricIndex mFabricIndex;
         SubscriptionId mSubscriptionId;
         uint16_t mMinInterval;
         uint16_t mMaxInterval;

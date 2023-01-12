@@ -1594,7 +1594,6 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
     {
         SubscriptionResumptionStorage::SubscriptionList subscriptions;
 
-        //        std::vector<SubscriptionResumptionStorage::SubscriptionInfo> subscriptions;
         err = mpSubscriptionResumptionStorage->FindByScopedNodeId(subscriberIndex.mNodes[i], subscriptions);
 
         ChipLogProgress(
