@@ -72,7 +72,7 @@ tests:
                 value: TempAccountIdentifier
       response:
           values:
-              - name: "setupPIN"
+              - name: "SetupPIN"
                 saveAs: setupPIN
 
     - label:
@@ -83,9 +83,9 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "tempAccountIdentifier"
+              - name: "TempAccountIdentifier"
                 value: TempAccountIdentifier
-              - name: "setupPIN"
+              - name: "SetupPIN"
                 value: setupPIN
 
     - label:
