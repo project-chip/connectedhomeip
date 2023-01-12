@@ -1164,7 +1164,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRGeneralDiagnosticsClusterNetworkInterfaceType
+@implementation MTRGeneralDiagnosticsClusterNetworkInterface
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1190,7 +1190,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRGeneralDiagnosticsClusterNetworkInterfaceType alloc] init];
+    auto other = [[MTRGeneralDiagnosticsClusterNetworkInterface alloc] init];
 
     other.name = self.name;
     other.isOperational = self.isOperational;
@@ -1214,6 +1214,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRGeneralDiagnosticsClusterNetworkInterfaceType : MTRGeneralDiagnosticsClusterNetworkInterface
 @end
 
 @implementation MTRGeneralDiagnosticsClusterHardwareFaultChangeEvent
@@ -2463,7 +2466,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRModeSelectClusterSemanticTag
+@implementation MTRModeSelectClusterSemanticTagStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2477,7 +2480,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRModeSelectClusterSemanticTag alloc] init];
+    auto other = [[MTRModeSelectClusterSemanticTagStruct alloc] init];
 
     other.mfgCode = self.mfgCode;
     other.value = self.value;
@@ -2492,6 +2495,9 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRModeSelectClusterSemanticTag : MTRModeSelectClusterSemanticTagStruct
 @end
 
 @implementation MTRModeSelectClusterModeOptionStruct
@@ -3684,40 +3690,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: catalogVendorId:%@; applicationId:%@; >",
                                              NSStringFromClass([self class]), _catalogVendorId, _applicationId];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRClientMonitoringClusterMonitoringRegistration
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _clientNodeId = @(0);
-
-        _iCid = @(0);
-
-        _fabricIndex = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRClientMonitoringClusterMonitoringRegistration alloc] init];
-
-    other.clientNodeId = self.clientNodeId;
-    other.iCid = self.iCid;
-    other.fabricIndex = self.fabricIndex;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientNodeId:%@; iCid:%@; fabricIndex:%@; >",
-                                             NSStringFromClass([self class]), _clientNodeId, _iCid, _fabricIndex];
     return descriptionString;
 }
 

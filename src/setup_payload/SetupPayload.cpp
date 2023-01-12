@@ -24,10 +24,10 @@
 #include "SetupPayload.h"
 
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/CHIPTLVData.hpp>
-#include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/TLV.h>
+#include <lib/core/TLVData.h>
+#include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
 #include <utility>
 

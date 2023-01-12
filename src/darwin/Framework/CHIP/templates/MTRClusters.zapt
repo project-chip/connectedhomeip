@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{#chip_client_clusters includeAll=true}}
 
 
+{{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
 /**
  * Cluster {{name}}
  *    {{description}}
@@ -38,6 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
+{{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 {{#*inline "availability"}}
 {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true)}}
@@ -47,6 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs {{> availability}};
 - (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params {{> availability}};
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -54,19 +57,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+{{/unless}}
 {{/chip_client_clusters}}
 
 {{#chip_client_clusters includeAll=true}}
 {{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
+{{#unless (wasRemoved (compatClusterNameRemapping name))}}
 {{availability (compatClusterNameRemapping name) deprecationMessage=(concat "Please use MTRCluster" (asUpperCamelCase name preserveAcronyms=true))}}
 @interface MTRCluster{{compatClusterNameRemapping name}} : MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
 @end
 
 {{/unless}}
+{{/unless}}
 {{/chip_client_clusters}}
 
 {{#chip_client_clusters includeAll=true}}
-{{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping name))}}
+{{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping name))
+           (not (wasRemoved (compatClusterNameRemapping name))))}}
 @interface MTRCluster{{compatClusterNameRemapping name}} (Deprecated)
 
 - (nullable instancetype)initWithDevice:(MTRDevice *)device

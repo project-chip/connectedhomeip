@@ -17,8 +17,8 @@
 
 #include "FactoryDataParser.h"
 
-#include <logging/log.h>
 #include <zcbor_decode.h>
+#include <zephyr/logging/log.h>
 
 #include <ctype.h>
 #include <string.h>

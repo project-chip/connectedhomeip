@@ -496,7 +496,7 @@ tests:
            userlabel subscribe label-list 100 500 1 0
            On TH(chip-tool) verify that  DUT is responds right attribute value for above  command
           [1655896309.160632][1885:1890] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0041 Attribute 0x0000_0000 DataVersion: 3773922725
-          [1655896309.160795][1885:1890] CHIP:TOO:   label list: 0 entries
+          [1655896309.160795][1885:1890] CHIP:TOO:   LabelList: 0 entries
           [1655896309.160851][1885:1890] CHIP:DMG: MoveToState ReadClient[0xffffa0005710]: Moving to [AwaitingSu]
 
           here is an example command the TH can write an attribute in the userlabel cluster in the DUT to change the value that the TH subscribed in the above command.
@@ -504,7 +504,7 @@ tests:
 
           [1655896422.936972][1899:1904] CHIP:DMG: }
           [1655896422.937347][1899:1904] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0041 Attribute 0x0000_0000 DataVersion: 3773922728
-          [1655896422.937478][1899:1904] CHIP:TOO:   label list: 2 entries
+          [1655896422.937478][1899:1904] CHIP:TOO:   LabelList: 2 entries
           [1655896422.937612][1899:1904] CHIP:TOO:     [1]: {
           [1655896422.937658][1899:1904] CHIP:TOO:       Label: room
           [1655896422.937697][1899:1904] CHIP:TOO:       Value: bedroom 1

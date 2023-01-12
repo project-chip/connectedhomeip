@@ -17,7 +17,7 @@
 #pragma once
 
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
 namespace chip {

@@ -152,7 +152,7 @@
             "RebootCount",
             "UpTime",
             "TotalOperationalHours",
-            "BootReasons"
+            "BootReason"
         ],
         "Group Key Management": [
             "ClusterRevision",

@@ -16,11 +16,11 @@
 #
 
 import argparse
-from collections import namedtuple
 import configparser
 import logging
-import subprocess
 import os
+import subprocess
+from collections import namedtuple
 
 CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
