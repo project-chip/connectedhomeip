@@ -368,8 +368,10 @@ private:
     /**
      * Called internally to signal the completion of all work on this objecta and signal to a registered callback that it's
      * safe to release this object.
+     *
+     *  @param    keepPersisted             Keep the subscription persisted in storage for later resumption
      */
-    void Close();
+    void Close(bool keepPersisted = false);
 
     static void OnUnblockHoldReportCallback(System::Layer * apSystemLayer, void * apAppState);
     static void OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState);

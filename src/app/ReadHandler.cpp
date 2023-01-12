@@ -74,8 +74,9 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, SubscriptionResumption
     SetStateFlag(ReadHandlerFlags::FabricFiltered, subscriptionInfo.mFabricFiltered);
 
     CHIP_ERROR err;
-    for (auto & attributePathParams : subscriptionInfo.mAttributePaths)
+    for (size_t i = 0; i < subscriptionInfo.mAttributePaths.AllocatedCount(); i++)
     {
+        AttributePathParams attributePathParams = subscriptionInfo.mAttributePaths[i].GetParams();
         err = InteractionModelEngine::GetInstance()->PushFrontAttributePathList(mpAttributePathList, attributePathParams);
         if (err != CHIP_NO_ERROR)
         {
@@ -83,8 +84,9 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, SubscriptionResumption
             return;
         }
     }
-    for (auto & eventPathParams : subscriptionInfo.mEventPaths)
+    for (size_t i = 0; i < subscriptionInfo.mEventPaths.AllocatedCount(); i++)
     {
+        EventPathParams eventPathParams = subscriptionInfo.mEventPaths[i].GetParams();
         err = InteractionModelEngine::GetInstance()->PushFrontEventPathParamsList(mpEventPathList, eventPathParams);
         if (err != CHIP_NO_ERROR)
         {
@@ -97,7 +99,8 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, SubscriptionResumption
     auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
     if (caseSessionManager)
     {
-        caseSessionManager->FindOrEstablishSession(subscriptionInfo.mNode, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+        ScopedNodeId peerNode = ScopedNodeId(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex);
+        caseSessionManager->FindOrEstablishSession(peerNode, &mOnConnectedCallback, &mOnConnectionFailureCallback);
     }
     else
     {
@@ -134,16 +137,19 @@ ReadHandler::~ReadHandler()
     InteractionModelEngine::GetInstance()->ReleaseDataVersionFilterList(mpDataVersionFilterList);
 }
 
-void ReadHandler::Close()
+void ReadHandler::Close(bool keepPersisted)
 {
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
-    if (subscriptionResumptionStorage)
+    if (!keepPersisted)
     {
-        SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = {
-            .mNode = ScopedNodeId(GetInitiatorNodeId(), GetAccessingFabricIndex()), .mSubscriptionId = mSubscriptionId
-        };
-        subscriptionResumptionStorage->Delete(subscriptionInfo);
+        auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
+        if (subscriptionResumptionStorage)
+        {
+            SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = { .mNodeId         = GetInitiatorNodeId(),
+                                                                                 .mFabricIndex    = GetAccessingFabricIndex(),
+                                                                                 .mSubscriptionId = mSubscriptionId };
+            subscriptionResumptionStorage->Delete(subscriptionInfo);
+        }
     }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     MoveToState(HandlerState::AwaitingDestruction);
@@ -365,6 +371,7 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
                  ChipLogValueExchange(apExchangeContext));
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     // TODO: Have a retry mechanism tied to wake interval for IC devices
+    Close(true);
 #else
     Close();
 #endif
@@ -717,26 +724,39 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
     if (subscriptionResumptionStorage)
     {
-        // Persist Subscription
-        // mpEventPathList
-        // mpAttributePathList
-
-        SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = { .mNode           = ScopedNodeId(GetInitiatorNodeId(),
-                                                                                                   GetAccessingFabricIndex()),
+        SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = { .mNodeId         = GetInitiatorNodeId(),
+                                                                             .mFabricIndex    = GetAccessingFabricIndex(),
                                                                              .mSubscriptionId = mSubscriptionId,
                                                                              .mMinInterval    = mMinIntervalFloorSeconds,
                                                                              .mMaxInterval    = mMaxInterval,
                                                                              .mFabricFiltered = IsFabricFiltered() };
         ObjectList<AttributePathParams> * attributePath                  = mpAttributePathList;
+        size_t attributePathCount                                        = 0;
         while (attributePath)
         {
-            subscriptionInfo.mAttributePaths.push_back(attributePath->mValue);
+            attributePathCount++;
             attributePath = attributePath->mpNext;
         }
+        attributePath = mpAttributePathList;
+        subscriptionInfo.mAttributePaths.Calloc(attributePathCount);
+        for (size_t i = 0; i < attributePathCount; i++)
+        {
+            subscriptionInfo.mAttributePaths[i].SetValues(attributePath->mValue);
+            attributePath = attributePath->mpNext;
+        }
+
         ObjectList<EventPathParams> * eventPath = mpEventPathList;
+        size_t eventPathCount                   = 0;
         while (eventPath)
         {
-            subscriptionInfo.mEventPaths.push_back(eventPath->mValue);
+            eventPathCount++;
+            eventPath = eventPath->mpNext;
+        }
+        eventPath = mpEventPathList;
+        subscriptionInfo.mEventPaths.Calloc(eventPathCount);
+        for (size_t i = 0; i < eventPathCount; i++)
+        {
+            subscriptionInfo.mEventPaths[i].SetValues(eventPath->mValue);
             eventPath = eventPath->mpNext;
         }
 

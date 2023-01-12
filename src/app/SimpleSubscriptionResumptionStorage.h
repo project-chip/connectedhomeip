@@ -48,9 +48,9 @@ public:
 
     CHIP_ERROR LoadIndex(SubscriptionIndex & index) override;
 
-    CHIP_ERROR FindByScopedNodeId(ScopedNodeId node, std::vector<SubscriptionInfo> & subscriptions) override;
+    CHIP_ERROR FindByScopedNodeId(ScopedNodeId node, SubscriptionList & subscriptions) override;
 
-    CHIP_ERROR Save(const SubscriptionInfo & subscriptionInfo) override;
+    CHIP_ERROR Save(SubscriptionInfo & subscriptionInfo) override;
 
     CHIP_ERROR Delete(const SubscriptionInfo & subscriptionInfo) override;
 
@@ -58,7 +58,7 @@ public:
 
 private:
     CHIP_ERROR SaveIndex(const SubscriptionIndex & index);
-    CHIP_ERROR SaveSubscriptions(const ScopedNodeId & node, const std::vector<SubscriptionInfo> & subscriptions);
+    CHIP_ERROR SaveSubscriptions(const ScopedNodeId & node, const SubscriptionList & subscriptions);
 
     static constexpr size_t MaxScopedNodeIdSize() { return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex)); }
 
@@ -99,6 +99,12 @@ private:
         kAttributePath      = 0x1,
         kUrgentEventPath    = 0x2,
         kNonUrgentEventPath = 0x3,
+    };
+
+    enum class EventPathType : uint8_t
+    {
+        kUrgent    = 0x1,
+        kNonUrgent = 0x2,
     };
 
     // TODO: consider alternate storage scheme to optimize space requirement

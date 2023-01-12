@@ -281,11 +281,11 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         this->certificateValidityPolicy = &sDefaultCertValidityPolicy;
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-        ChipLogProgress(AppServer, "JEFFTEST: initializing subscription resumption storage...");
+        ChipLogProgress(AppServer, "Initializing subscription resumption storage...");
         ReturnErrorOnFailure(sSubscriptionResumptionStorage.Init(this->persistentStorageDelegate));
         this->subscriptionResumptionStorage = &sSubscriptionResumptionStorage;
 #else
-        ChipLogProgress(AppServer, "JEFFTEST: subscription persistence not supported");
+        ChipLogProgress(AppServer, "Subscription persistence not supported");
 #endif
 
         return CHIP_NO_ERROR;

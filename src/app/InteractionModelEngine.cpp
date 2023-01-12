@@ -1592,19 +1592,21 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
                     static_cast<unsigned>(subscriberIndex.mSize), err.Format());
     for (size_t i = 0; i < subscriberIndex.mSize; i++)
     {
-        std::vector<SubscriptionResumptionStorage::SubscriptionInfo> subscriptions;
+        SubscriptionResumptionStorage::SubscriptionList subscriptions;
+
+        //        std::vector<SubscriptionResumptionStorage::SubscriptionInfo> subscriptions;
         err = mpSubscriptionResumptionStorage->FindByScopedNodeId(subscriberIndex.mNodes[i], subscriptions);
 
         ChipLogProgress(
             InteractionModel, "\tNode " ChipLogFormatScopedNodeId ": Loaded %u subscriptions.. (error %" CHIP_ERROR_FORMAT ")",
-            ChipLogValueScopedNodeId(subscriberIndex.mNodes[i]), static_cast<unsigned>(subscriptions.size()), err.Format());
+            ChipLogValueScopedNodeId(subscriberIndex.mNodes[i]), static_cast<unsigned>(subscriptions.mSize), err.Format());
 
-        for (auto & subscriptionInfo : subscriptions)
+        for (size_t j = 0; j < subscriptions.mSize; j++)
         {
-            auto requestedAttributePathCount = subscriptionInfo.mAttributePaths.size();
-            auto requestedEventPathCount     = subscriptionInfo.mEventPaths.size();
-            if (!EnsureResourceForSubscription(subscriptionInfo.mNode.GetFabricIndex(), requestedAttributePathCount,
-                                               requestedEventPathCount))
+            SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo = subscriptions.mSubscriptions[j];
+            auto requestedAttributePathCount                                   = subscriptionInfo.mAttributePaths.AllocatedCount();
+            auto requestedEventPathCount                                       = subscriptionInfo.mEventPaths.AllocatedCount();
+            if (!EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, requestedAttributePathCount, requestedEventPathCount))
             {
                 ChipLogProgress(InteractionModel, "no resource for Subscription resumption");
                 return CHIP_ERROR_NO_MEMORY;

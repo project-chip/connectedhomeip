@@ -1363,7 +1363,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *  @def CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
  *
  *  @brief
- *    If asserted (1), suppress definition of the standard error formatting function
+ *    Enable persistence and resumption of subscriptions on servers.
  *
  */
 #ifndef CHIP_CONFIG_PERSIST_SUBSCRIPTIONS

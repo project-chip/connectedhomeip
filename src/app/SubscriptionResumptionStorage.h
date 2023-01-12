@@ -25,7 +25,6 @@
 
 #include <app/ReadClient.h>
 #include <lib/core/CHIPCore.h>
-#include <vector>
 
 namespace chip {
 namespace app {
@@ -40,18 +39,60 @@ namespace app {
 class SubscriptionResumptionStorage
 {
 public:
+    // TODO: Create RAII ScopedMemoryBuffer replacement container that does not require is_trivial elements
+
+    // Structs to hold
+    struct AttributePathParamsValues
+    {
+        EndpointId mEndpointId;   // uint16
+        ClusterId mClusterId;     // uint32
+        AttributeId mAttributeId; // uint32
+        void SetValues(AttributePathParams & params)
+        {
+            mEndpointId  = params.mEndpointId;
+            mClusterId   = params.mClusterId;
+            mAttributeId = params.mAttributeId;
+        }
+        AttributePathParams GetParams() { return AttributePathParams(mEndpointId, mClusterId, mAttributeId); }
+    };
+    struct EventPathParamsValues
+    {
+        EndpointId mEndpointId; // uint16
+        ClusterId mClusterId;   // uint32
+        EventId mEventId;       // uint32
+        bool mIsUrgentEvent;    // uint8
+        void SetValues(EventPathParams & params)
+        {
+            mEndpointId    = params.mEndpointId;
+            mClusterId     = params.mClusterId;
+            mEventId       = params.mEventId;
+            mIsUrgentEvent = params.mIsUrgentEvent;
+        }
+        EventPathParams GetParams() { return EventPathParams(mEndpointId, mClusterId, mEventId, mIsUrgentEvent); }
+    };
+
     /**
      * Struct to hold information about subscriptions
      */
     struct SubscriptionInfo
     {
-        ScopedNodeId mNode;
+        FabricIndex mFabricIndex;
+        NodeId mNodeId;
         SubscriptionId mSubscriptionId;
         uint16_t mMinInterval;
         uint16_t mMaxInterval;
         bool mFabricFiltered;
-        std::vector<AttributePathParams> mAttributePaths;
-        std::vector<EventPathParams> mEventPaths;
+        Platform::ScopedMemoryBufferWithSize<AttributePathParamsValues> mAttributePaths;
+        Platform::ScopedMemoryBufferWithSize<EventPathParamsValues> mEventPaths;
+    };
+
+    /**
+     * Struct to hold list of subscriptions
+     */
+    struct SubscriptionList
+    {
+        size_t mSize;
+        SubscriptionInfo mSubscriptions[CHIP_IM_MAX_NUM_SUBSCRIPTIONS];
     };
 
     /**
@@ -82,15 +123,15 @@ public:
      * @return CHIP_NO_ERROR on success, CHIP_ERROR_KEY_NOT_FOUND if no subscription resumption information can be found, else an
      * appropriate CHIP error on failure
      */
-    virtual CHIP_ERROR FindByScopedNodeId(ScopedNodeId node, std::vector<SubscriptionInfo> & subscriptions) = 0;
+    virtual CHIP_ERROR FindByScopedNodeId(ScopedNodeId node, SubscriptionList & subscriptions) = 0;
 
     /**
      * Save subscription resumption information to storage.
      *
-     * @param subscriptionInfo the subscription information to save
+     * @param subscriptionInfo the subscription information to save - caller should expect the passed in value is consumed
      * @return CHIP_NO_ERROR on success, else an appropriate CHIP error on failure
      */
-    virtual CHIP_ERROR Save(const SubscriptionInfo & subscriptionInfo) = 0;
+    virtual CHIP_ERROR Save(SubscriptionInfo & subscriptionInfo) = 0;
 
     /**
      * Save subscription resumption information to storage.

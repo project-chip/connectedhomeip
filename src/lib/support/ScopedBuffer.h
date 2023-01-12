@@ -153,9 +153,9 @@ public:
         return *this;
     }
 
-    ScopedMemoryBuffer & Alloc(size_t size)
+    ScopedMemoryBuffer & Alloc(size_t elementCount)
     {
-        Base::Alloc(size * sizeof(T));
+        Base::Alloc(elementCount * sizeof(T));
         return *this;
     }
 };
@@ -177,28 +177,31 @@ public:
     {
         if (this != &other)
         {
-            mSize       = other.mSize;
-            other.mSize = 0;
+            mCount       = other.mCount;
+            other.mCount = 0;
         }
         ScopedMemoryBuffer<T>::operator=(std::move(other));
         return *this;
     }
 
-    ~ScopedMemoryBufferWithSize() { mSize = 0; }
+    ~ScopedMemoryBufferWithSize() { mCount = 0; }
 
     // return the size in bytes
-    inline size_t AllocatedSize() const { return mSize; }
+    inline size_t AllocatedSize() const { return mCount * sizeof(T); }
+
+    // return the count
+    inline size_t AllocatedCount() const { return mCount; }
 
     void Free()
     {
-        mSize = 0;
+        mCount = 0;
         ScopedMemoryBuffer<T>::Free();
     }
 
     T * Release()
     {
         T * buffer = ScopedMemoryBuffer<T>::Release();
-        mSize      = 0;
+        mCount     = 0;
         return buffer;
     }
 
@@ -207,23 +210,23 @@ public:
         ScopedMemoryBuffer<T>::Calloc(elementCount);
         if (this->Get() != nullptr)
         {
-            mSize = elementCount * sizeof(T);
+            mCount = elementCount;
         }
         return *this;
     }
 
-    ScopedMemoryBufferWithSize & Alloc(size_t size)
+    ScopedMemoryBufferWithSize & Alloc(size_t elementCount)
     {
-        ScopedMemoryBuffer<T>::Alloc(size);
+        ScopedMemoryBuffer<T>::Alloc(elementCount);
         if (this->Get() != nullptr)
         {
-            mSize = size * sizeof(T);
+            mCount = elementCount;
         }
         return *this;
     }
 
 private:
-    size_t mSize = 0;
+    size_t mCount = 0;
 };
 
 } // namespace Platform
