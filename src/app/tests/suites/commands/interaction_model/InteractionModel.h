@@ -30,6 +30,12 @@
 
 constexpr uint8_t kMaxAllowedPaths = 10;
 
+namespace chip {
+namespace test_utils {
+void BusyWaitMillis(uint16_t busyWaitForMs);
+} // namespace test_utils
+} // namespace chip
+
 class InteractionModelConfig
 {
 public:
@@ -237,6 +243,11 @@ protected:
             ReturnErrorOnFailure(commandSender->SendCommandRequest(device->GetSecureSession().Value()));
             mCommandSender.push_back(std::move(commandSender));
 
+            if (mBusyWaitForMs.HasValue())
+            {
+                chip::test_utils::BusyWaitMillis(mBusyWaitForMs.Value());
+            }
+
             if (mRepeatDelayInMs.HasValue())
             {
                 chip::test_utils::SleepMillis(mRepeatDelayInMs.Value());
@@ -321,18 +332,32 @@ protected:
         return *this;
     }
 
+    InteractionModelCommands & SetBusyWaitForMs(uint16_t busyWaitForMs)
+    {
+        mBusyWaitForMs.SetValue(busyWaitForMs);
+        return *this;
+    }
+
+    InteractionModelCommands & SetBusyWaitForMs(const chip::Optional<uint16_t> & busyWaitForMs)
+    {
+        mBusyWaitForMs = busyWaitForMs;
+        return *this;
+    }
+
     void ResetOptions()
     {
         mTimedInteractionTimeoutMs = chip::NullOptional;
         mSuppressResponse          = chip::NullOptional;
         mRepeatCount               = chip::NullOptional;
         mRepeatDelayInMs           = chip::NullOptional;
+        mBusyWaitForMs             = chip::NullOptional;
     }
 
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
     chip::Optional<bool> mSuppressResponse;
     chip::Optional<uint16_t> mRepeatCount;
     chip::Optional<uint16_t> mRepeatDelayInMs;
+    chip::Optional<uint16_t> mBusyWaitForMs;
 };
 
 class InteractionModelWriter
@@ -369,6 +394,11 @@ protected:
             }
 
             ReturnErrorOnFailure(mWriteClient->SendWriteRequest(device->GetSecureSession().Value()));
+
+            if (mBusyWaitForMs.HasValue())
+            {
+                chip::test_utils::BusyWaitMillis(mBusyWaitForMs.Value());
+            }
 
             if (mRepeatDelayInMs.HasValue())
             {
@@ -487,6 +517,18 @@ protected:
         return *this;
     }
 
+    InteractionModelWriter & SetBusyWaitForMs(uint16_t busyWaitForMs)
+    {
+        mBusyWaitForMs.SetValue(busyWaitForMs);
+        return *this;
+    }
+
+    InteractionModelWriter & SetBusyWaitForMs(const chip::Optional<uint16_t> & busyWaitForMs)
+    {
+        mBusyWaitForMs = busyWaitForMs;
+        return *this;
+    }
+
     void ResetOptions()
     {
         mTimedInteractionTimeoutMs = chip::NullOptional;
@@ -494,6 +536,7 @@ protected:
         mDataVersions              = chip::NullOptional;
         mRepeatCount               = chip::NullOptional;
         mRepeatDelayInMs           = chip::NullOptional;
+        mBusyWaitForMs             = chip::NullOptional;
     }
 
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
@@ -501,6 +544,7 @@ protected:
     chip::Optional<bool> mSuppressResponse;
     chip::Optional<uint16_t> mRepeatCount;
     chip::Optional<uint16_t> mRepeatDelayInMs;
+    chip::Optional<uint16_t> mBusyWaitForMs;
 
 private:
     template <typename T>

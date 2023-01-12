@@ -1241,7 +1241,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(uint8_t & securityType)
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(uint8_t & wiFiVersion)
 {
     // We don't have driect API to get the WiFi version yet, retrun 802.11n on Linux simulation.
-    wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N;
+    wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_N;
 
     return CHIP_NO_ERROR;
 }

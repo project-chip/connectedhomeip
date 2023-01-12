@@ -30,8 +30,6 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
 > release with added tools and documentation.
 > [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases)
 
-<a name="intro"></a>
-
 ## Introduction
 
 The EFR32 lighting example provides a baseline demonstration of a Light control
@@ -50,8 +48,6 @@ Rendez-vous procedure.
 The lighting example is intended to serve both as a means to explore the
 workings of Matter as well as a template for creating real products based on the
 Silicon Labs platform.
-
-<a name="building"></a>
 
 ## Building
 
@@ -171,14 +167,10 @@ Silicon Labs platform.
           $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
           $ ninja -C out/debug
 
-    [Running Pigweed RPC console](#running-pigweed-rpc-console)
-
 For more build options, help is provided when running the build script without
 arguments
 
          ./scripts/examples/gn_efr32_example.sh
-
-<a name="flashing"></a>
 
 ## Flashing the Application
 
@@ -188,8 +180,6 @@ arguments
           $ python3 out/debug/chip-efr32-lighting-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
-
-<a name="view-logging"></a>
 
 ## Viewing Logging Output
 
@@ -238,8 +228,6 @@ combination with JLinkRTTClient as follows:
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
           $ JLinkRTTClient
-
-<a name="running-complete-example"></a>
 
 ## Running the Complete Example
 
@@ -326,8 +314,6 @@ combination with JLinkRTTClient as follows:
     -   Add Ipv6 route on PC(Linux)
         `sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2`
 
-<a name="running-pigweed-rpc-console"></a>
-
 ## Running RPC console
 
 -   As part of building the example with RPCs enabled the chip_rpc python
@@ -379,13 +365,13 @@ tracking code inside the `trackAlloc` and `trackFree` function
 
 For the description of Software Update process with EFR32 example applications
 see
-[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+[EFR32 OTA Software Update](../../../../docs/guides/silabs_efr32_software_update.md)
 
 ## Group Communication (Multicast)
 
 With this lighting example you can also use group communication to send Lighting
 commands to multiples devices at once. Please refer to the
-[chip-tool documentation](../../chip-tool/README.md) _Configuring the server
+[chip-tool documentation](../../../chip-tool/README.md) _Configuring the server
 side for Group Commands_ and _Using the Client to Send Group (Multicast) Matter
 Commands_
 

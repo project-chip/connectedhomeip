@@ -2,7 +2,7 @@
 
 This document contains instructions on how to build, run, and interact with a
 simulated device. All virtual accessories live in
-[examples/placeholder/linux/apps](../../examples/placeholder/linux/apps).
+[examples/placeholder/linux/apps](https://github.com/project-chip/connectedhomeip/tree/master/examples/placeholder/linux/apps).
 
 Each accessory needs to be hosted into a subfolder. It will be the name of the
 application. For example `app1` will create a binary named `chip-app1`.
@@ -86,7 +86,7 @@ Now that the building the app and starting it is complete, you will be able to
 interact with it using chip-tool
 
 1. Follow the instruction to build chip-tool in the
-   [chip-tool readme](../../examples/chip-tool).
+   [chip-tool readme](../../examples/chip-tool/README.md).
 
 2. Run this command to commission.
     ```
@@ -102,7 +102,8 @@ interact with it using chip-tool
     ./out/debug/standalone/chip-tool onoff write on-time 1 0x654321 1
     ```
 
-    See [chip-tool readme](../../examples/chip-tool) for additional commands.
+    See [chip-tool readme](../../examples/chip-tool/README.md) for additional
+    commands.
 
 ## Adding simulated Tests via YAML
 

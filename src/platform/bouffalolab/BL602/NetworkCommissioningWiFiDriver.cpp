@@ -19,9 +19,9 @@
 #include <hal_wifi.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lwip/tcpip.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
-#include <tcpip.h>
 #include <wifi_mgmr_ext.h>
 
 #include <limits>

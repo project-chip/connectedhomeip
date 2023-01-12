@@ -16,11 +16,13 @@
 #
 
 
-from dataclasses import dataclass
 import typing
-from .ClusterObjects import ClusterObjectDescriptor, ClusterCommand
-from chip import ChipUtility
+from dataclasses import dataclass
 from enum import IntEnum
+
+from chip import ChipUtility
+
+from .ClusterObjects import ClusterCommand, ClusterObjectDescriptor
 
 
 @dataclass

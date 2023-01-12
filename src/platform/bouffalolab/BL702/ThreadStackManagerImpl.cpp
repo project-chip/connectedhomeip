@@ -49,8 +49,13 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ot_alarmInit();
+#ifdef OT_THREAD_PORT_1_3
+    otRadio_opt_t opt;
+    opt.byte = 0;
+    ot_radioInit(opt);
+#else
     ot_radioInit();
-
+#endif
     // Initialize the generic implementation base classes.
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
@@ -73,15 +78,18 @@ bool ThreadStackManagerImpl::IsInitialized()
 
 using namespace ::chip::DeviceLayer;
 
-ot_system_event_t ot_system_event_var;
+ot_system_event_t ot_system_event_var = OT_SYSTEM_EVENT_NONE;
 
 void otSysProcessDrivers(otInstance * aInstance)
 {
+#ifdef OT_THREAD_PORT_1_3
+    ot_system_event_t sevent = otrGetNotifyEvent();
+#else
     ot_system_event_t sevent = OT_SYSTEM_EVENT_NONE;
-
     OT_GET_NOTIFY(sevent);
+#endif
+
     ot_alarmTask(sevent);
-    // ot_uartTask(sevent);
     ot_radioTask(sevent);
 }
 
@@ -117,3 +125,51 @@ extern "C" void otPlatFree(void * aPtr)
 {
     free(aPtr);
 }
+
+#ifdef OT_THREAD_PORT_1_3
+extern "C" uint32_t otrEnterCrit(void)
+{
+    if (xPortIsInsideInterrupt())
+    {
+        return taskENTER_CRITICAL_FROM_ISR();
+    }
+    else
+    {
+        taskENTER_CRITICAL();
+        return 0;
+    }
+}
+
+extern "C" void otrExitCrit(uint32_t tag)
+{
+    if (xPortIsInsideInterrupt())
+    {
+        taskEXIT_CRITICAL_FROM_ISR(tag);
+    }
+    else
+    {
+        taskEXIT_CRITICAL();
+    }
+}
+
+extern "C" ot_system_event_t otrGetNotifyEvent(void)
+{
+    ot_system_event_t sevent = OT_SYSTEM_EVENT_NONE;
+
+    taskENTER_CRITICAL();
+    sevent              = ot_system_event_var;
+    ot_system_event_var = OT_SYSTEM_EVENT_NONE;
+    taskEXIT_CRITICAL();
+
+    return sevent;
+}
+
+extern "C" void otrNotifyEvent(ot_system_event_t sevent)
+{
+    uint32_t tag        = otrEnterCrit();
+    ot_system_event_var = (ot_system_event_t)(ot_system_event_var | sevent);
+    otrExitCrit(tag);
+
+    otSysEventSignalPending();
+}
+#endif

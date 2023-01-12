@@ -17,6 +17,7 @@
  */
 #include "CommonDeviceCallbacks.h"
 
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CONFIG_BT_ENABLED
 #include "esp_bt.h"
 #if CONFIG_BT_NIMBLE_ENABLED
@@ -26,11 +27,11 @@
 #include "nimble/nimble_port.h"
 #endif // CONFIG_BT_NIMBLE_ENABLED
 #endif // CONFIG_BT_ENABLED
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include "esp_err.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
-#include "route_hook/esp_route_hook.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app/server/Dnssd.h>
 #include <app/util/util.h>
@@ -78,7 +79,7 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
 
     case DeviceEventType::kCommissioningComplete: {
         ESP_LOGI(TAG, "Commissioning complete");
-#if CONFIG_BT_NIMBLE_ENABLED && CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CONFIG_BT_NIMBLE_ENABLED && CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
 
         if (ble_hs_is_enabled())
         {
@@ -118,10 +119,6 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
             // connectivity. MDNS still wants to refresh its listening interfaces to include the
             // newly selected address.
             chip::app::DnssdServer::Instance().StartServer();
-        }
-        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
-        {
-            ESP_ERROR_CHECK(esp_route_hook_init(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF")));
         }
         break;
     }

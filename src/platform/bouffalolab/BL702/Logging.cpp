@@ -14,21 +14,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <stdio.h>
 
 #include <platform/logging/LogV.h>
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/logging/Constants.h>
 
-#include <stdio.h>
-
-extern "C" {
-#include <blog.h>
-}
-
 #ifdef PW_RPC_ENABLED
 #include "PigweedLogger.h"
 #endif
+
+#include <FreeRTOS.h>
+#include <task.h>
+#include <utils_log.h>
 
 namespace chip {
 namespace Logging {
