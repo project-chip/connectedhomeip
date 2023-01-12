@@ -14827,7 +14827,7 @@
           "enabled": 0,
           "attributes": [
             {
-              "name": "occupancy",
+              "name": "Occupancy",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -14843,7 +14843,7 @@
               "reportableChange": 0
             },
             {
-              "name": "occupancy sensor type",
+              "name": "OccupancySensorType",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -14859,7 +14859,7 @@
               "reportableChange": 0
             },
             {
-              "name": "occupancy sensor type bitmap",
+              "name": "OccupancySensorTypeBitmap",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -14875,7 +14875,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PIR occupied to unoccupied delay",
+              "name": "PIROccupiedToUnoccupiedDelay",
               "code": 16,
               "mfgCode": null,
               "side": "server",
@@ -14891,7 +14891,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PIR unoccupied to occupied delay",
+              "name": "PIRUnoccupiedToOccupiedDelay",
               "code": 17,
               "mfgCode": null,
               "side": "server",
@@ -14907,7 +14907,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PIR unoccupied to occupied threshold",
+              "name": "PIRUnoccupiedToOccupiedThreshold",
               "code": 18,
               "mfgCode": null,
               "side": "server",
@@ -14923,7 +14923,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ultrasonic occupied to unoccupied delay",
+              "name": "UltrasonicOccupiedToUnoccupiedDelay",
               "code": 32,
               "mfgCode": null,
               "side": "server",
@@ -14939,7 +14939,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ultrasonic unoccupied to occupied delay",
+              "name": "UltrasonicUnoccupiedToOccupiedDelay",
               "code": 33,
               "mfgCode": null,
               "side": "server",
@@ -14955,7 +14955,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ultrasonic unoccupied to occupied threshold",
+              "name": "UltrasonicUnoccupiedToOccupiedThreshold",
               "code": 34,
               "mfgCode": null,
               "side": "server",
@@ -14971,7 +14971,7 @@
               "reportableChange": 0
             },
             {
-              "name": "physical contact occupied to unoccupied delay",
+              "name": "PhysicalContactOccupiedToUnoccupiedDelay",
               "code": 48,
               "mfgCode": null,
               "side": "server",
@@ -14987,7 +14987,7 @@
               "reportableChange": 0
             },
             {
-              "name": "physical contact unoccupied to occupied delay",
+              "name": "PhysicalContactUnoccupiedToOccupiedDelay",
               "code": 49,
               "mfgCode": null,
               "side": "server",
@@ -15003,7 +15003,7 @@
               "reportableChange": 0
             },
             {
-              "name": "physical contact unoccupied to occupied threshold",
+              "name": "PhysicalContactUnoccupiedToOccupiedThreshold",
               "code": 50,
               "mfgCode": null,
               "side": "server",
