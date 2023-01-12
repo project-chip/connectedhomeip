@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-from aenum import Enum, extend_enum
+import enum
 import typing
 
 from chip.clusters.Types import Nullable, NullValue
@@ -185,14 +185,8 @@ def convert_to_data_model_type(field_value, field_type):
         value = int(field_value)
         return field_type(value)
     # YAML treats enums as ints. Convert to the typed enum class.
-    elif (issubclass(field_type, Enum)):
-        try:
-            return field_type(field_value)
-        except ValueError:
-            global _dummy_count
-            extend_enum(field_type, F'kDummy{_dummy_count}', field_value)
-            _dummy_count = _dummy_count + 1
-            return field_type(field_value)
+    elif (issubclass(field_type, enum.Enum)):
+        return field_type(field_value)
     # By default, just return the field_value casted to field_type.
     else:
         return field_type(field_value)

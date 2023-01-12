@@ -26,9 +26,9 @@
 
 import typing
 from dataclasses import dataclass, field
-from aenum import IntEnum
 
 from chip import ChipUtility
+from chip.enum import IntEnum
 from chip.tlv import float32, uint
 
 from .ClusterObjects import (Cluster, ClusterAttributeDescriptor, ClusterCommand, ClusterEvent, ClusterObject,
@@ -27294,6 +27294,7 @@ class UnitTesting(Cluster):
             kValueB = 0x02
             kValueC = 0x03
             # kUnknownEnumValue will be generated the same way it is generated for .h by zap codegen
+            # and will be done for all IntEnum types
             kUnknownEnumValue = 0x04  
 
 
@@ -29702,6 +29703,3 @@ class FaultInjection(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: 'uint' = 0
-
-
-
