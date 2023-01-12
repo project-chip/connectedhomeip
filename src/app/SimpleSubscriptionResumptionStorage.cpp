@@ -75,8 +75,8 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::SaveIndex(const SubscriptionInde
 
     writer.Finalize(backingBuffer);
 
-    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionIndex().KeyName(), backingBuffer.Get(),
-                                                   static_cast<uint16_t>(len)));
+    ReturnErrorOnFailure(mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::SubscriptionResumptionIndex().KeyName(),
+                                                   backingBuffer.Get(), static_cast<uint16_t>(len)));
 
     return CHIP_NO_ERROR;
 }
@@ -283,7 +283,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::SaveSubscriptions(const ScopedNo
 
         ReturnErrorOnFailure(
             writer.Put(kPathCountTag, static_cast<uint16_t>(subscriptions.mSubscriptions[i].mEventPaths.AllocatedCount())));
-        for (size_t j = 0; j < subscriptions.mSubscriptions[i].mAttributePaths.AllocatedCount(); j++)
+        for (size_t j = 0; j < subscriptions.mSubscriptions[i].mEventPaths.AllocatedCount(); j++)
         {
             if (subscriptions.mSubscriptions[i].mEventPaths[j].mIsUrgentEvent)
             {
