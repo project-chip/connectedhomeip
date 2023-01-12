@@ -20,7 +20,7 @@ import logging
 import queue
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import Enum, IntEnum
 
 import chip.interaction_model
 import chip.yaml.format_converter as Converter
@@ -37,6 +37,12 @@ logger = logging.getLogger('YamlParser')
 class _ActionStatus(Enum):
     SUCCESS = 'success',
     ERROR = 'error'
+
+
+class _TestFabricId(IntEnum):
+    ALPHA = 1,
+    BETA = 2,
+    GAMMA = 3
 
 
 @dataclass
@@ -68,12 +74,17 @@ class _ExecutionContext:
 class BaseAction(ABC):
     '''Interface for a single YAML action that is to be executed.'''
 
-    def __init__(self, label):
+    def __init__(self, label, identity):
         self._label = label
+        self._identity = identity
 
     @property
     def label(self):
         return self._label
+
+    @property
+    def identity(self):
+        return self._identity
 
     @abstractmethod
     def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
@@ -95,9 +106,10 @@ class InvokeAction(BaseAction):
             action to perform for this write attribute.
           UnexpectedParsingError: Raised if there is an unexpected parsing error.
         '''
-        super().__init__(test_step.label)
+        super().__init__(test_step.label, test_step.identity)
         self._command_name = stringcase.pascalcase(test_step.command)
         self._cluster = cluster
+        self._interation_timeout_ms = test_step.timed_interaction_timeout_ms
         self._request_object = None
         self._expected_response_object = None
         self._endpoint = test_step.endpoint
@@ -128,8 +140,9 @@ class InvokeAction(BaseAction):
 
     def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
         try:
-            resp = asyncio.run(dev_ctrl.SendCommand(self._node_id, self._endpoint,
-                                                    self._request_object))
+            resp = asyncio.run(dev_ctrl.SendCommand(
+                self._node_id, self._endpoint, self._request_object,
+                timedRequestTimeoutMs=self._interation_timeout_ms))
         except chip.interaction_model.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
 
@@ -152,13 +165,17 @@ class ReadAttributeAction(BaseAction):
             action to perform for this read attribute.
           UnexpectedParsingError: Raised if there is an unexpected parsing error.
         '''
-        super().__init__(test_step.label)
+        super().__init__(test_step.label, test_step.identity)
         self._attribute_name = stringcase.pascalcase(test_step.attribute)
         self._cluster = cluster
         self._endpoint = test_step.endpoint
         self._node_id = test_step.node_id
         self._cluster_object = None
         self._request_object = None
+        self._fabric_filtered = True
+
+        if test_step.fabric_filtered is not None:
+            self._fabric_filtered = test_step.fabric_filtered
 
         self._possibly_unsupported = bool(test_step.optional)
 
@@ -185,7 +202,8 @@ class ReadAttributeAction(BaseAction):
     def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
         try:
             raw_resp = asyncio.run(dev_ctrl.ReadAttribute(self._node_id,
-                                                          [(self._endpoint, self._request_object)]))
+                                                          [(self._endpoint, self._request_object)],
+                                                          fabricFiltered=self._fabric_filtered))
         except chip.interaction_model.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
 
@@ -215,7 +233,7 @@ class WaitForCommissioneeAction(BaseAction):
     ''' Wait for commissionee action to be executed.'''
 
     def __init__(self, test_step):
-        super().__init__(test_step.label)
+        super().__init__(test_step.label, test_step.identity)
         self._node_id = test_step.node_id
         self._expire_existing_session = False
         # This is the default when no timeout is provided.
@@ -337,7 +355,7 @@ class WriteAttributeAction(BaseAction):
             action to perform for this write attribute.
           UnexpectedParsingError: Raised if there is an unexpected parsing error.
         '''
-        super().__init__(test_step.label)
+        super().__init__(test_step.label, test_step.identity)
         self._attribute_name = stringcase.pascalcase(test_step.attribute)
         self._cluster = cluster
         self._endpoint = test_step.endpoint
@@ -398,7 +416,7 @@ class WaitForReportAction(BaseAction):
         Raises:
           UnexpectedParsingError: Raised if the expected queue does not exist.
         '''
-        super().__init__(test_step.label)
+        super().__init__(test_step.label, test_step.identity)
         self._attribute_name = stringcase.pascalcase(test_step.attribute)
         self._output_queue = context.subscription_callback_result_queue.get(self._attribute_name,
                                                                             None)
@@ -417,16 +435,50 @@ class WaitForReportAction(BaseAction):
         return item.result
 
 
+class CommissionerCommandAction(BaseAction):
+    '''Single Commissioner Command action to be executed.'''
+
+    def __init__(self, test_step):
+        '''Converts 'test_step' to commissioner command action.
+
+        Args:
+          'test_step': Step containing information required to run wait for report action.
+        Raises:
+          UnexpectedParsingError: Raised if the expected queue does not exist.
+        '''
+        super().__init__(test_step.label, test_step.identity)
+        if test_step.command != 'PairWithCode':
+            raise UnexpectedParsingError(f'Unexpected CommisionerCommand {test_step.command}')
+
+        args = test_step.arguments['values']
+        request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
+        self._setup_payload = request_data_as_dict['payload']
+        self._node_id = request_data_as_dict['nodeId']
+
+    def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
+        resp = dev_ctrl.CommissionWithCode(self._setup_payload, self._node_id)
+
+        if resp:
+            return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
+        else:
+            return _ActionResult(status=_ActionStatus.ERROR, response=None)
+
+
 class ReplTestRunner:
     '''Test runner to encode/decode values from YAML test Parser for executing the TestStep.
 
     Uses ChipDeviceCtrl from chip-repl to execute parsed YAML TestSteps.
     '''
 
-    def __init__(self, test_spec_definition, dev_ctrl):
+    def __init__(self, test_spec_definition, certificate_authority_manager):
         self._test_spec_definition = test_spec_definition
-        self._dev_ctrl = dev_ctrl
         self._context = _ExecutionContext(data_model_lookup=PreDefinedDataModelLookup())
+        self._certificate_authority_manager = certificate_authority_manager
+        self._dev_ctrls = {}
+
+        ca_list = certificate_authority_manager.activeCaList
+        dev_ctrl = ca_list[0].adminList[0].NewController()
+        self._dev_ctrls['alpha'] = dev_ctrl
 
     def _invoke_action_factory(self, test_step, cluster: str):
         '''Creates cluster invoke action command from TestStep.
@@ -513,12 +565,21 @@ class ReplTestRunner:
             # propogated.
             return None
 
+    def _commissioner_command_action_factory(self, test_step):
+        try:
+            return CommissionerCommandAction(test_step)
+        except ParsingError:
+            return None
+
     def encode(self, request) -> BaseAction:
         action = None
         cluster = request.cluster.replace(' ', '').replace('/', '')
         command = request.command
+        if cluster == 'CommissionerCommands':
+            return self._commissioner_command_action_factory(request)
         # Some of the tests contain 'cluster over-rides' that refer to a different
         # cluster than that specified in 'config'.
+
         if cluster == 'DelayCommands' and command == 'WaitForCommissionee':
             action = self._wait_for_commissionee_action_factory(request)
         elif command == 'writeAttribute':
@@ -588,8 +649,33 @@ class ReplTestRunner:
 
         return decoded_response
 
+    def _get_fabric_id(self, id):
+        return _TestFabricId[id.upper()].value
+
+    def _get_dev_ctrl(self, action: BaseAction):
+        if action.identity is not None:
+            dev_ctrl = self._dev_ctrls.get(action.identity, None)
+            if dev_ctrl is None:
+                fabric_id = self._get_fabric_id(action.identity)
+                certificate_authority = self._certificate_authority_manager.activeCaList[0]
+                fabric = None
+                for existing_admin in certificate_authority.adminList:
+                    if existing_admin.fabricId == fabric_id:
+                        fabric = existing_admin
+
+                if fabric is None:
+                    fabric = certificate_authority.NewFabricAdmin(vendorId=0xFFF1,
+                                                                  fabricId=fabric_id)
+                dev_ctrl = fabric.NewController()
+                self._dev_ctrls[action.identity] = dev_ctrl
+        else:
+            dev_ctrl = self._dev_ctrls['alpha']
+
+        return dev_ctrl
+
     def execute(self, action: BaseAction):
-        return action.run_action(self._dev_ctrl)
+        dev_ctrl = self._get_dev_ctrl(action)
+        return action.run_action(dev_ctrl)
 
     def shutdown(self):
         for subscription in self._context.subscriptions:
