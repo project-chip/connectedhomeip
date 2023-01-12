@@ -45,15 +45,6 @@
 #include <transport/SecureMessageCodec.h>
 #include <transport/TransportMgr.h>
 
-/**
- * Accepts receipt of invalid privacy flag usage that affected some early SVE2 test event implementations.
- * When SVE2 started, group messages would be sent with the privacy flag enabled, but without privacy encrypting the message header.
- * The issue was subsequently corrected in master, the 1.0 branch, and the SVE2 branch.
- * This is a temporary workaround for interoperability with those early-SVE2 implementations.
- * TODO: Remove this workaround once interoperability is no longer required.
- */
-#define FEATURE_PRIVACY_ACCEPT_NONSPEC_SVE2 1
-
 // Global object
 chip::Transport::GroupPeerTable mGroupPeerMsgCounter;
 
@@ -873,7 +864,7 @@ void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, con
         bool privacy = packetHeader.HasPrivacyFlag();
         decrypted    = GroupKeyDecryptAttempt(packetHeader, packetHeaderCopy, payloadHeader, privacy, msgCopy, mac, groupContext);
 
-#if FEATURE_PRIVACY_ACCEPT_NONSPEC_SVE2
+#if CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
         if (privacy && !decrypted)
         {
             // Try processing the P=1 message again without privacy as a work-around for invalid early-SVE2 nodes.
@@ -885,7 +876,7 @@ void SessionManager::SecureGroupMessageDispatch(PacketHeader & packetHeader, con
             }
             decrypted = GroupKeyDecryptAttempt(packetHeader, packetHeaderCopy, payloadHeader, false, msgCopy, mac, groupContext);
         }
-#endif // FEATURE_PRIVACY_ACCEPT_NONSPEC_SVE2
+#endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
     }
     iter->Release();
 
