@@ -36,7 +36,7 @@ public final class CommandManager {
     mClusters.put(clusterName, commandsList);
   }
 
-  public final void run(String[] args) {
+  public final void run(String[] args) throws Exception {
     Command command;
 
     if (args.length < 1) {
@@ -102,8 +102,10 @@ public final class CommandManager {
     } catch (IllegalArgumentException e) {
       System.out.println("Run command failed with exception: " + e.getMessage());
       showCommand(args[0], command);
+      throw e;
     } catch (Exception e) {
       logger.log(Level.INFO, "Run command failed with exception: " + e.getMessage());
+      throw e;
     }
   }
 
