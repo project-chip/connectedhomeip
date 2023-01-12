@@ -257,7 +257,7 @@ void AppTask::LightingActionButtonEventHandler(void)
 void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {
     PWMDevice::Action_t action = PWMDevice::INVALID_ACTION;
-    int32_t actor                    = 0;
+    int32_t actor              = 0;
 
     if (aEvent->Type == AppEvent::kEventType_Lighting)
     {

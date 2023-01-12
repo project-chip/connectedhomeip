@@ -47,8 +47,8 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
         if (GetAppTask().GetPWMDevice().IsTurnedOn())
         {
-            GetAppTask().GetPWMDevice().InitiateAction(PWMDevice::LEVEL_ACTION,
-                                                       static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
+            GetAppTask().GetPWMDevice().InitiateAction(PWMDevice::LEVEL_ACTION, static_cast<int32_t>(AppEvent::kEventType_Lighting),
+                                                       value);
         }
         else
         {

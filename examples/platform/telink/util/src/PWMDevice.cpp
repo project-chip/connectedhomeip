@@ -32,11 +32,11 @@ CHIP_ERROR PWMDevice::Init(const pwm_dt_spec * pwmDevice, uint8_t aMinLevel, uin
     // We use a gpioPin instead of a LEDWidget here because we want to use PWM
     // and other features instead of just on/off.
 
-    mState      = kState_On;
-    mMinLevel   = aMinLevel;
-    mMaxLevel   = aMaxLevel;
-    mLevel      = aDefaultLevel;
-    mPwmDevice  = pwmDevice;
+    mState     = kState_On;
+    mMinLevel  = aMinLevel;
+    mMaxLevel  = aMaxLevel;
+    mLevel     = aDefaultLevel;
+    mPwmDevice = pwmDevice;
 
     if (!device_is_ready(mPwmDevice->dev))
     {
@@ -127,5 +127,6 @@ void PWMDevice::UpdateLight()
     const uint8_t maxEffectiveLevel = mMaxLevel - mMinLevel;
     const uint8_t effectiveLevel    = mState == kState_On ? chip::min<uint8_t>(mLevel - mMinLevel, maxEffectiveLevel) : 0;
 
-    pwm_set(mPwmDevice->dev, mPwmDevice->channel, PWM_USEC(kPwmWidthUs), PWM_USEC(kPwmWidthUs * effectiveLevel / maxEffectiveLevel), 0);
+    pwm_set(mPwmDevice->dev, mPwmDevice->channel, PWM_USEC(kPwmWidthUs), PWM_USEC(kPwmWidthUs * effectiveLevel / maxEffectiveLevel),
+            0);
 }
