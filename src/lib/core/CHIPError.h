@@ -2431,7 +2431,7 @@ using CHIP_ERROR = ::chip::ChipError;
  * @def CHIP_ERROR_HANDLER_NOT_SET
  *
  * @brief
- *   The handler is not set
+ *   Callback function or callable object is not set
  */
 #define CHIP_ERROR_HANDLER_NOT_SET                            CHIP_CORE_ERROR(0xe1)
 
