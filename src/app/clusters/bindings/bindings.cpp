@@ -228,7 +228,7 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
             CreateBindingEntry(iter.GetValue(), path.mEndpointId);
         }
 
-        // If this was not caused by a list operation, OnListWriteEnd is not going to be truggered
+        // If this was not caused by a list operation, OnListWriteEnd is not going to be triggered
         // so a notification is sent here.
         if (!path.IsListOperation())
         {
