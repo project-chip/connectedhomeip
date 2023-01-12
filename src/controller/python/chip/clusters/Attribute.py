@@ -515,7 +515,7 @@ class SubscriptionTransaction:
             self._onResubscriptionAttemptedCb = callback
             self._onResubscriptionAttemptedCb_isAsync = isAsync
 
-    def SetResubscriptionSucceededCallback(self, callback: Callback[[SubscriptionTransaction], None], isAsync=False):
+    def SetResubscriptionSucceededCallback(self, callback: Callable[[SubscriptionTransaction], None], isAsync=False):
         '''
         Sets the callback function that gets invoked when a re-subscription attempt succeeds. The callback
         is expected to have the following signature:

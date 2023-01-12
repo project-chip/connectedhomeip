@@ -50,7 +50,7 @@ def GetUnionUnderlyingType(typeToCheck, matchingType=None):
 class ClusterObjectFieldDescriptor:
     Label: str = ''
     Tag: int = None
-    Type: Type = None
+    Type: type = None
 
     def _PutSingleElementToTLV(self, tag, val, elementType, writer: tlv.TLVWriter, debugPath: str = '?'):
         if issubclass(elementType, ClusterObject):

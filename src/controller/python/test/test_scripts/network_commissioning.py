@@ -374,7 +374,7 @@ class NetworkCommissioningTests:
         clusters = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(Clusters.Descriptor.Attributes.ServerList)], returnClusterObject=True)
         if Clusters.NetworkCommissioning.id not in clusters[0][Clusters.Descriptor].serverList:
             logger.info(
-                f"Network commissioning cluster {endpoint} is not enabled on this device.")
+                "Network commissioning cluster is not enabled on this device.")
             return
         endpoints = await self._devCtrl.ReadAttribute(nodeid=self._nodeid, attributes=[(Clusters.NetworkCommissioning.Attributes.FeatureMap)], returnClusterObject=True)
         logger.info(endpoints)
@@ -398,5 +398,5 @@ class NetworkCommissioningTests:
         try:
             await self.Test()
             return True
-        except Exception as ex:
+        except Exception:
             return False

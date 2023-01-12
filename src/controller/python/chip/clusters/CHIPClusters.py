@@ -20,6 +20,7 @@
 '''
 
 import ctypes
+from chip import exceptions
 
 __all__ = ["ChipClusters"]
 
@@ -8217,7 +8218,7 @@ class ChipClusters:
     def GetClusterInfoById(self, cluster_id: int):
         data = ChipClusters._CLUSTER_ID_DICT.get(cluster_id, None)
         if not data:
-            raise UnknownCluster(cluster_id)
+            raise exceptions.UnknownCluster(cluster_id)
         return data
 
     def ListClusterInfo(self):

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import enum
+import logging
 from dataclasses import dataclass
 from typing import List, Optional, Union
 
@@ -109,11 +110,11 @@ class IdlEnumType:
 
     @property
     def byte_count(self):
-        return base_type.byte_count()
+        return self.base_type.byte_count()
 
     @property
     def bits(self):
-        return base_type.bits()
+        return self.base_type.bits()
 
 
 @dataclass
@@ -128,11 +129,11 @@ class IdlBitmapType:
 
     @property
     def byte_count(self):
-        return base_type.byte_count()
+        return self.base_type.byte_count()
 
     @property
     def bits(self):
-        return base_type.bits()
+        return self.base_type.bits()
 
 
 class IdlItemType(enum.Enum):
@@ -399,7 +400,7 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
     if lookup.find_struct(data_type.name):
         result.item_type = IdlItemType.STRUCT
     else:
-        logging.warn(
+        logging.warning(
             "Data type %s is NOT known, but treating it as a generic IDL type." % data_type)
 
     return result
