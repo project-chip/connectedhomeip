@@ -63,24 +63,6 @@ def parse_setup_payload(chip_tool, payload):
     return parsed_params
 
 
-def generate_payload_params():
-    payload_params = payload_param_dict()
-    payload_params['Version'] = 0
-    payload_params['VendorID'] = random.randint(0, 0xFFFF)
-    payload_params['ProductID'] = random.randint(0, 0xFFFF)
-    payload_params['Custom flow'] = random.randint(0, 2)
-    payload_params['Discovery Bitmask'] = random.randint(0, 7)
-    payload_params['Long discriminator'] = random.randint(0, 0x0FFF)
-    payload_params['Short discriminator'] = (payload_params['Long discriminator'] >> 8)
-    payload_params['Passcode'] = random.randint(1, 0x5F5E0FE)
-
-    # Rather than regenerating, just subtracting 5
-    if payload_params['Passcode'] in INVALID_PASSCODES:
-        payload_params['Passcode'] -= 5
-
-    return payload_params
-
-
 def generate_payloads(in_params):
     payloads = SetupPayload(in_params['Long discriminator'], in_params['Passcode'],
                             in_params['Discovery Bitmask'], CommissioningFlow(in_params['Custom flow']),
@@ -90,18 +72,7 @@ def generate_payloads(in_params):
     return manualcode, qrcode
 
 
-def verify_payloads(chip_tool):
-    in_params = generate_payload_params()
-    manualcode, qrcode = generate_payloads(in_params)
-    manualcode_params = parse_setup_payload(chip_tool, manualcode)
-    qrcode_params = parse_setup_payload(chip_tool, qrcode)
-
-    print("Input parameters:", in_params)
-    print("Manualcode:", manualcode)
-    print("QRCode:", qrcode)
-    print("Manualcode parsed by chip-tool:", manualcode_params)
-    print("QRCode parsed by chip-tool:", qrcode_params)
-
+def verify_payloads(in_params, manualcode_params, qrcode_params):
     assert in_params['Version'] == int(manualcode_params['Version'], 0)
     assert in_params['Passcode'] == int(manualcode_params['Passcode'], 0)
     assert in_params['Short discriminator'] == int(manualcode_params['Short discriminator'], 0)
@@ -118,11 +89,48 @@ def verify_payloads(chip_tool):
     assert in_params['Long discriminator'] == int(qrcode_params['Long discriminator'], 0)
 
 
+def get_payload_params(discriminator, passcode, discovery=4, flow=0, vid=0, pid=0, version=0):
+    p = payload_param_dict()
+    p['Version'] = version
+    p['VendorID'] = vid
+    p['ProductID'] = pid
+    p['Custom flow'] = flow
+    p['Discovery Bitmask'] = discovery
+    p['Long discriminator'] = discriminator
+    p['Short discriminator'] = discriminator >> 8
+    p['Passcode'] = passcode
+    return p
+
+
+def run_tests(chip_tool):
+    test_data_set = [
+        get_payload_params(3840, 20202021),
+        get_payload_params(3781, 12349876, flow=1, vid=1, pid=1),
+        get_payload_params(2310, 23005908, flow=2, vid=0xFFF3, pid=0x8098),
+        get_payload_params(3091, 43338551, discovery=2, flow=2, vid=0x1123, pid=0x0012),
+        get_payload_params(80, 54757432, discovery=6, flow=2, vid=0x2345, pid=0x1023),
+        get_payload_params(174, 81235604, discovery=7, flow=1, vid=0x45, pid=0x10),
+    ]
+
+    for test_params in test_data_set:
+        manualcode, qrcode = generate_payloads(test_params)
+        manualcode_params = parse_setup_payload(chip_tool, manualcode)
+        qrcode_params = parse_setup_payload(chip_tool, qrcode)
+
+        print("Input parameters:", test_params)
+        print("Manualcode:", manualcode)
+        print("QRCode:", qrcode)
+        print("Manualcode parsed by chip-tool:", manualcode_params)
+        print("QRCode parsed by chip-tool:", qrcode_params)
+        print("")
+
+        verify_payloads(test_params, manualcode_params, qrcode_params)
+
+
 def main():
     if len(sys.argv) == 2:
         chip_tool = sys.argv[1]
-        for i in range(0, 10):
-            verify_payloads(chip_tool)
+        run_tests(chip_tool)
 
 
 if __name__ == '__main__':
