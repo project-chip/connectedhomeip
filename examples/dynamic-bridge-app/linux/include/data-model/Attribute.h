@@ -62,7 +62,7 @@ struct Attribute : public AttributeInterface
     template <typename T = Type, std::enable_if_t<!chip::app::DataModel::IsList<std::decay_t<T>>::value, bool> = true>
     CHIP_ERROR ReadValue(const chip::app::ConcreteReadAttributePath & aPath, chip::TLV::TLVWriter & writer, Type & value)
     {
-        return chip::app::DataModel::Encode(writer, chip::TLV::Tag(), value);
+        return chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), value);
     }
 
     CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::TLV::TLVWriter & writer) override

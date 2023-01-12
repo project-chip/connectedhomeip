@@ -207,17 +207,17 @@ std::unique_ptr<GeneratedCluster> CreateCluster(chip::ClusterId id)
 
 CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const Span<const char> & v)
 {
-    return wr.PutString(chip::TLV::Tag(), v);
+    return wr.PutString(chip::TLV::AnonymousTag(), v);
 }
 CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const bool & v)
 {
-    return wr.PutBoolean(chip::TLV::Tag(), v);
+    return wr.PutBoolean(chip::TLV::AnonymousTag(), v);
 }
 
 template <typename T>
 CHIP_ERROR ReadValueFromBuffer(chip::TLV::TLVWriter & wr, const T & v)
 {
-    return wr.Put(chip::TLV::Tag(), v);
+    return wr.Put(chip::TLV::AnonymousTag(), v);
 }
 
 CHIP_ERROR WriteValueToBuffer(const bool & value, uint8_t * buffer, const uint16_t & maxReadLength)
