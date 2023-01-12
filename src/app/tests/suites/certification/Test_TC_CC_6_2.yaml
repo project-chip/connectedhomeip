@@ -84,7 +84,7 @@ tests:
       command: "MoveToColorTemperature"
       arguments:
           values:
-              - name: "colorTemperature"
+              - name: "ColorTemperatureMireds"
                 value:
                     ( ColorTempPhysicalMinMiredsValue +
                     ColorTempPhysicalMaxMiredsValue ) / 2

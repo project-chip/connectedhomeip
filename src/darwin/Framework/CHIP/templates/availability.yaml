@@ -5015,6 +5015,9 @@
                   - userUniqueID
               GetUserResponse:
                   - userUniqueID
+          ColorControl:
+              MoveToColorTemperature:
+                  - colorTemperatureMireds
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -5539,6 +5542,9 @@
                   - User
                   - Notification
                   - YearDayAccessSchedules
+          ColorControl:
+              ColorControlFeature:
+                  - HueSaturation
   deprecated:
       clusters:
           - OtaSoftwareUpdateProvider
@@ -5599,6 +5605,9 @@
                   - userUniqueId
               GetUserResponse:
                   - userUniqueId
+          ColorControl:
+              MoveToColorTemperature:
+                  - colorTemperature
       structs:
           Descriptor:
               - DeviceType
@@ -5717,6 +5726,9 @@
                   - UsersManagement
                   - Notifications
                   - YearDaySchedules
+          ColorControl:
+              ColorControlFeature:
+                  - HueAndSaturation
       apis:
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
@@ -5851,6 +5863,9 @@
                   userUniqueID: userUniqueId
               GetUserResponse:
                   userUniqueID: userUniqueId
+          ColorControl:
+              MoveToColorTemperature:
+                  colorTemperatureMireds: colorTemperature
       structs:
           AccessControl:
               AccessControlEntryStruct: AccessControlEntry
@@ -5976,3 +5991,6 @@
                   User: UsersManagement
                   Notification: Notifications
                   YearDayAccessSchedules: YearDaySchedules
+          ColorControl:
+              ColorControlFeature:
+                  HueSaturation: HueAndSaturation
