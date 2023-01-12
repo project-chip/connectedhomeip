@@ -5955,7 +5955,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "measured value",
+              "name": "MeasuredValue",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -5971,7 +5971,7 @@
               "reportableChange": 0
             },
             {
-              "name": "min measured value",
+              "name": "MinMeasuredValue",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -5987,7 +5987,7 @@
               "reportableChange": 0
             },
             {
-              "name": "max measured value",
+              "name": "MaxMeasuredValue",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -6003,7 +6003,7 @@
               "reportableChange": 0
             },
             {
-              "name": "tolerance",
+              "name": "Tolerance",
               "code": 3,
               "mfgCode": null,
               "side": "server",
