@@ -34,17 +34,17 @@ limitations under the License.
     <define>FAN_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <attribute side="server" code="0x0000" define="FAN_MODE" type="FanModeType" min="0" max="6" writable="true" default="0" optional="false">fan mode</attribute>
-    <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="FanModeSequenceType" min="0" max="5" writable="true" default="2" optional="false">fan mode sequence</attribute>
-    <attribute side="server" code="0x0002" define="PERCENT_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" isNullable="true" optional="false">percent setting</attribute>
-    <attribute side="server" code="0x0003" define="PERCENT_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="false">percent current</attribute>
-    <attribute side="server" code="0x0004" define="SPEED_MAX" type="INT8U" min="1" max="100" writable="false" default="1" optional="true">speed max</attribute>
-    <attribute side="server" code="0x0005" define="SPEED_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" isNullable="true" optional="true">speed setting</attribute>
-    <attribute side="server" code="0x0006" define="SPEED_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="true">speed current</attribute>
-    <attribute side="server" code="0x0007" define="ROCK_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">rock support</attribute> 
-    <attribute side="server" code="0x0008" define="ROCK_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">rock setting</attribute>
-    <attribute side="server" code="0x0009" define="WIND_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">wind support</attribute>
-    <attribute side="server" code="0x000A" define="WIND_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">wind setting</attribute>                            
+    <attribute side="server" code="0x0000" define="FAN_MODE" type="FanModeType" min="0" max="6" writable="true" default="0" optional="false">FanMode</attribute>
+    <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="FanModeSequenceType" min="0" max="5" writable="true" default="2" optional="false">FanModeSequence</attribute>
+    <attribute side="server" code="0x0002" define="PERCENT_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" isNullable="true" optional="false">PercentSetting</attribute>
+    <attribute side="server" code="0x0003" define="PERCENT_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="false">PercentCurrent</attribute>
+    <attribute side="server" code="0x0004" define="SPEED_MAX" type="INT8U" min="1" max="100" writable="false" default="1" optional="true">SpeedMax</attribute>
+    <attribute side="server" code="0x0005" define="SPEED_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" isNullable="true" optional="true">SpeedSetting</attribute>
+    <attribute side="server" code="0x0006" define="SPEED_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="true">SpeedCurrent</attribute>
+    <attribute side="server" code="0x0007" define="ROCK_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">RockSupport</attribute>
+    <attribute side="server" code="0x0008" define="ROCK_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">RockSetting</attribute>
+    <attribute side="server" code="0x0009" define="WIND_SUPPORT" type="BITMAP8" writable="false" default="0x00" optional="true">WindSupport</attribute>
+    <attribute side="server" code="0x000A" define="WIND_SETTING" type="BITMAP8" writable="true" default="0x00" optional="true">WindSetting</attribute>
   </cluster>
   <!-- Fan Control Cluster data types -->  
   <enum name="FanModeType" type="ENUM8">
@@ -68,7 +68,7 @@ limitations under the License.
   </enum>  
   <bitmap name="FanControlFeature" type="BITMAP32">
     <cluster code="0x0202" />
-    <field name="MultiSpeed" mask="0x01" />
+    <field name="Multi-Speed" mask="0x01" />
     <field name="Auto" mask="0x02" />
     <field name="Rocking" mask="0x04" />
     <field name="Wind" mask="0x08" />
@@ -81,13 +81,13 @@ limitations under the License.
   </bitmap>
   <bitmap name="WindSupportMask" type="BITMAP8">
       <cluster code="0x0202" />
-      <field name="SleepWind" mask="0x01" />
-      <field name="NaturalWind" mask="0x02" />
+      <field name="Sleep Wind" mask="0x01" />
+      <field name="Natural Wind" mask="0x02" />
   </bitmap>
   <bitmap name="WindSettingMask" type="BITMAP8">
       <cluster code="0x0202" />
-      <field name="SleepWind" mask="0x01" />
-      <field name="NaturalWind" mask="0x02" />
+      <field name="Sleep Wind" mask="0x01" />
+      <field name="Natural Wind" mask="0x02" />
   </bitmap>    
   <cluster>
     <name>Thermostat User Interface Configuration</name>
