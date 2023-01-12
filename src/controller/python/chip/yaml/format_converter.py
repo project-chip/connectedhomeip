@@ -22,8 +22,6 @@ from chip.clusters.Types import Nullable, NullValue
 from chip.tlv import float32, uint
 from chip.yaml.errors import ValidationError
 
-_dummy_count = 0
-
 
 def _case_insensitive_getattr(object, attr_name, default):
     for attr in dir(object):
