@@ -3168,7 +3168,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _commissioningTimeout = @(0);
 
-        _pakeVerifier = [NSData data];
+        _pakePasscodeVerifier = [NSData data];
 
         _discriminator = @(0);
 
@@ -3185,7 +3185,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRAdministratorCommissioningClusterOpenCommissioningWindowParams alloc] init];
 
     other.commissioningTimeout = self.commissioningTimeout;
-    other.pakeVerifier = self.pakeVerifier;
+    other.pakePasscodeVerifier = self.pakePasscodeVerifier;
     other.discriminator = self.discriminator;
     other.iterations = self.iterations;
     other.salt = self.salt;
@@ -3196,13 +3196,26 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: commissioningTimeout:%@; pakeVerifier:%@; discriminator:%@; iterations:%@; salt:%@; >",
-                  NSStringFromClass([self class]), _commissioningTimeout, [_pakeVerifier base64EncodedStringWithOptions:0],
-                  _discriminator, _iterations, [_salt base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: commissioningTimeout:%@; pakePasscodeVerifier:%@; discriminator:%@; iterations:%@; salt:%@; >",
+        NSStringFromClass([self class]), _commissioningTimeout, [_pakePasscodeVerifier base64EncodedStringWithOptions:0],
+        _discriminator, _iterations, [_salt base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRAdministratorCommissioningClusterOpenCommissioningWindowParams (Deprecated)
+
+- (void)setPakeVerifier:(NSData * _Nonnull)pakeVerifier
+{
+    self.pakePasscodeVerifier = pakeVerifier;
+}
+
+- (NSData * _Nonnull)pakeVerifier
+{
+    return self.pakePasscodeVerifier;
+}
 @end
 @implementation MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams
 - (instancetype)init
@@ -7159,95 +7172,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeId:%@; startTime:%@; numberOfIntervals:%@; >",
                                              NSStringFromClass([self class]), _attributeId, _startTime, _numberOfIntervals];
-    return descriptionString;
-}
-
-@end
-@implementation MTRClientMonitoringClusterRegisterClientMonitoringParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _clientNodeId = @(0);
-
-        _iCid = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRClientMonitoringClusterRegisterClientMonitoringParams alloc] init];
-
-    other.clientNodeId = self.clientNodeId;
-    other.iCid = self.iCid;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: clientNodeId:%@; iCid:%@; >", NSStringFromClass([self class]), _clientNodeId, _iCid];
-    return descriptionString;
-}
-
-@end
-@implementation MTRClientMonitoringClusterUnregisterClientMonitoringParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _clientNodeId = @(0);
-
-        _iCid = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRClientMonitoringClusterUnregisterClientMonitoringParams alloc] init];
-
-    other.clientNodeId = self.clientNodeId;
-    other.iCid = self.iCid;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: clientNodeId:%@; iCid:%@; >", NSStringFromClass([self class]), _clientNodeId, _iCid];
-    return descriptionString;
-}
-
-@end
-@implementation MTRClientMonitoringClusterStayAwakeRequestParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRClientMonitoringClusterStayAwakeRequestParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
     return descriptionString;
 }
 

@@ -19,14 +19,19 @@
 package com.google.chip.chiptool.provisioning
 
 import android.bluetooth.BluetoothGatt
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import chip.devicecontroller.AttestationInfo
+import chip.devicecontroller.DeviceAttestationDelegate.DeviceAttestationCompletionCallback
+import chip.devicecontroller.DeviceAttestationDelegate.DeviceAttestationFailureCallback
 import chip.devicecontroller.NetworkCredentials
 import com.google.chip.chiptool.NetworkCredentialsParcelable
 import com.google.chip.chiptool.ChipClient
@@ -38,7 +43,9 @@ import com.google.chip.chiptool.util.DeviceIdUtil
 import com.google.chip.chiptool.util.FragmentUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
+import java.lang.IllegalArgumentException
 
 @ExperimentalCoroutinesApi
 class DeviceProvisioningFragment : Fragment() {
@@ -132,7 +139,32 @@ class DeviceProvisioningFragment : Fragment() {
       if (thread != null) {
         network = NetworkCredentials.forThread(NetworkCredentials.ThreadCredentials(thread.operationalDataset))
       }
-
+      deviceController.setDeviceAttestationFailureCallback(DEVICE_ATTESTATION_FAILED_TIMEOUT
+      ) { devicePtr, errorCode ->
+        Log.i(TAG, "Device attestation errorCode: $errorCode, " +
+                "Look at 'src/credentials/attestation_verifier/DeviceAttestationVerifier.h' " +
+                "AttestationVerificationResult enum to understand the errors")
+        requireActivity().runOnUiThread(Runnable {
+          val alertDialog: AlertDialog? = activity?.let {
+            val builder = AlertDialog.Builder(it)
+            builder.apply {
+              setPositiveButton("Continue",
+                DialogInterface.OnClickListener { dialog, id ->
+                  deviceController.continueCommissioning(devicePtr, true)
+                })
+              setNegativeButton("No",
+                DialogInterface.OnClickListener { dialog, id ->
+                  deviceController.continueCommissioning(devicePtr, false)
+                })
+            }
+            builder.setTitle("Device Attestation")
+            builder.setMessage("Device Attestation failed for device under commissioning. Do you wish to continue pairing?")
+            // Create the AlertDialog
+            builder.create()
+          }
+          alertDialog?.show()
+        })
+      }
       deviceController.pairDevice(gatt, connId, deviceId, deviceInfo.setupPinCode, network)
       DeviceIdUtil.setNextAvailableId(requireContext(), deviceId + 1)
     }
@@ -202,6 +234,13 @@ class DeviceProvisioningFragment : Fragment() {
     private const val ARG_DEVICE_INFO = "device_info"
     private const val ARG_NETWORK_CREDENTIALS = "network_credentials"
     private const val STATUS_PAIRING_SUCCESS = 0
+
+    /**
+     * Set for the fail-safe timer before onDeviceAttestationFailed is invoked.
+     *
+     * This time depends on the Commissioning timeout of your app.
+     */
+    private const val DEVICE_ATTESTATION_FAILED_TIMEOUT = 600
 
     /**
      * Return a new instance of [DeviceProvisioningFragment]. [networkCredentialsParcelable] can be null for

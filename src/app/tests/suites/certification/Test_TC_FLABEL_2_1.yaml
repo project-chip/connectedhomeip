@@ -35,7 +35,7 @@ tests:
     - label: "TH reads LabelList from the DUT"
       PICS: FLABEL.S.A0000
       command: "readAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       response:
           constraints:
               type: list
@@ -45,9 +45,9 @@ tests:
           Test_Label, Value= Test_Value"
       PICS: FLABEL.S.A0000
       command: "writeAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       arguments:
-          value: [{ label: "Test_Label", value: "Test_Value" }]
+          value: [{ Label: "Test_Label", Value: "Test_Value" }]
       response:
           error: UNSUPPORTED_WRITE
 
@@ -58,7 +58,7 @@ tests:
           On TH(all-clusters-app) Verify that the LabelList value is same as value from step 1
 
           [1651124649.820293][2819:2824] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0040 Attribute 0x0000_0000 DataVersion: 3688229931
-          [1651124649.820478][2819:2824] CHIP:TOO:   label list: 4 entries
+          [1651124649.820478][2819:2824] CHIP:TOO:   LabelList: 4 entries
           [1651124649.820534][2819:2824] CHIP:TOO:     [1]: {
           [1651124649.820570][2819:2824] CHIP:TOO:       Label: room
           [1651124649.820602][2819:2824] CHIP:TOO:       Value: bedroom 2

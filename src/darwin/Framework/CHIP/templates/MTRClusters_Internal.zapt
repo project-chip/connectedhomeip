@@ -10,9 +10,11 @@
 
 {{#chip_client_clusters includeAll=true}}
 
+{{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
 @interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} ()
 @property (nonatomic, readonly) uint16_t endpoint;
 @property (nonatomic, readonly) MTRDevice *device;
 @end
+{{/unless}}
 
 {{/chip_client_clusters}}

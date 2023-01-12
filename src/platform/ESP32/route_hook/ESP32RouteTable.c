@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include "esp_route_table.h"
+#include <platform/ESP32/route_hook/ESP32RouteTable.h>
 
 #include <string.h>
 
@@ -14,48 +14,53 @@
 #include "lwip/netif.h"
 #include "lwip/timeouts.h"
 
-#define MAX_RIO_ROUTE 20
 #define MAX_RIO_TIMEOUT UINT32_MAX / (1000 * 4) // lwIP defined reasonable timeout value
 
-#define TAG "ROUTE_HOOK"
-
-static esp_route_entry_t s_route_entries[MAX_RIO_ROUTE];
+static esp_route_entry_t * s_route_entries = NULL;
 
 static esp_route_entry_t * find_route_entry(const esp_route_entry_t * route_entry)
 {
-    for (size_t i = 0; i < LWIP_ARRAYSIZE(s_route_entries); i++)
+    for (esp_route_entry_t * iter = s_route_entries; iter != NULL; iter = iter->next)
     {
-        if (s_route_entries[i].netif == NULL)
+        if (iter->netif == route_entry->netif && iter->prefix_length == route_entry->prefix_length &&
+            memcmp(iter->gateway.addr, route_entry->gateway.addr, sizeof(route_entry->gateway.addr)) == 0 &&
+            memcmp(iter->prefix.addr, route_entry->prefix.addr, route_entry->prefix_length / 8) == 0)
         {
-            break;
-        }
-        if (s_route_entries[i].netif == route_entry->netif && s_route_entries[i].prefix_length == route_entry->prefix_length &&
-            memcmp(s_route_entries[i].gateway.addr, route_entry->gateway.addr, sizeof(route_entry->gateway.addr)) == 0 &&
-            memcmp(s_route_entries[i].prefix.addr, route_entry->prefix.addr, route_entry->prefix_length / 8) == 0)
-        {
-            return &s_route_entries[i];
+            return iter;
         }
     }
+
     return NULL;
 }
 
-static esp_route_entry_t * find_empty_route_entry(void)
+static esp_err_t remove_route_entry(esp_route_entry_t * route_entry)
 {
-    for (size_t i = 0; i < LWIP_ARRAYSIZE(s_route_entries); i++)
+    if (s_route_entries == route_entry)
     {
-        if (s_route_entries[i].netif == NULL)
+        s_route_entries = s_route_entries->next;
+        free(route_entry);
+        return ESP_OK;
+    }
+
+    for (esp_route_entry_t * iter = s_route_entries; iter != NULL; iter = iter->next)
+    {
+        if (iter->next == route_entry)
         {
-            return &s_route_entries[i];
+            iter->next = route_entry->next;
+            free(route_entry);
+            return ESP_OK;
         }
     }
-    return NULL;
+
+    ESP_LOGW(TAG, "The given route entry is not found");
+    return ESP_ERR_NOT_FOUND;
 }
 
 static void route_timeout_handler(void * arg)
 {
     esp_route_entry_t * route = (esp_route_entry_t *) arg;
 
-    esp_route_table_remove_route_entry(route);
+    remove_route_entry(route);
 }
 
 esp_route_entry_t * esp_route_table_add_route_entry(const esp_route_entry_t * route_entry)
@@ -69,16 +74,21 @@ esp_route_entry_t * esp_route_table_add_route_entry(const esp_route_entry_t * ro
 
     if (entry == NULL)
     {
-        entry = find_empty_route_entry();
+        entry = (esp_route_entry_t *) malloc(sizeof(esp_route_entry_t));
         if (entry == NULL)
         {
+            ESP_LOGW(TAG, "Cannot allocate route entry");
             return NULL;
         }
+
         entry->netif   = route_entry->netif;
         entry->gateway = route_entry->gateway;
         ip6_addr_assign_zone(&entry->gateway, IP6_UNICAST, entry->netif);
         entry->prefix        = route_entry->prefix;
         entry->prefix_length = route_entry->prefix_length;
+
+        entry->next     = s_route_entries;
+        s_route_entries = entry;
     }
     else
     {
@@ -90,25 +100,8 @@ esp_route_entry_t * esp_route_table_add_route_entry(const esp_route_entry_t * ro
     {
         sys_timeout(entry->lifetime_seconds * 1000, route_timeout_handler, entry);
     }
-    return entry;
-}
 
-esp_err_t esp_route_table_remove_route_entry(esp_route_entry_t * route_entry)
-{
-    if (route_entry < &s_route_entries[0] || route_entry > &s_route_entries[LWIP_ARRAYSIZE(s_route_entries)])
-    {
-        return ESP_ERR_INVALID_ARG;
-    }
-    route_entry->netif = NULL;
-    for (esp_route_entry_t * moved = route_entry; moved < &s_route_entries[LWIP_ARRAYSIZE(s_route_entries) - 1]; moved++)
-    {
-        *moved = *(moved + 1);
-        if (moved->netif == NULL)
-        {
-            break;
-        }
-    }
-    return ESP_OK;
+    return entry;
 }
 
 static inline bool is_better_route(const esp_route_entry_t * lhs, const esp_route_entry_t * rhs)
@@ -134,15 +127,11 @@ struct netif * lwip_hook_ip6_route(const ip6_addr_t * src, const ip6_addr_t * de
 {
     esp_route_entry_t * route = NULL;
 
-    for (size_t i = 0; i < LWIP_ARRAYSIZE(s_route_entries); i++)
+    for (esp_route_entry_t * iter = s_route_entries; iter != NULL; iter = iter->next)
     {
-        if (s_route_entries[i].netif == NULL)
+        if (route_match(iter, dest) && is_better_route(iter, route))
         {
-            break;
-        }
-        if (route_match(&s_route_entries[i], dest) && is_better_route(&s_route_entries[i], route))
-        {
-            route = &s_route_entries[i];
+            route = iter;
         }
     }
 
@@ -160,16 +149,11 @@ const ip6_addr_t * lwip_hook_nd6_get_gw(struct netif * netif, const ip6_addr_t *
 {
     esp_route_entry_t * route = NULL;
 
-    for (size_t i = 0; i < LWIP_ARRAYSIZE(s_route_entries); i++)
+    for (esp_route_entry_t * iter = s_route_entries; iter != NULL; iter = iter->next)
     {
-        if (s_route_entries[i].netif == NULL)
+        if (iter->netif == netif && route_match(iter, dest) && is_better_route(iter, route))
         {
-            break;
-        }
-        if (s_route_entries[i].netif == netif && route_match(&s_route_entries[i], dest) &&
-            is_better_route(&s_route_entries[i], route))
-        {
-            route = &s_route_entries[i];
+            route = iter;
         }
     }
 
