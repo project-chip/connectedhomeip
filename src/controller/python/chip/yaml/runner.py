@@ -20,7 +20,7 @@ import logging
 import queue
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import Enum, IntEnum
 
 import chip.interaction_model
 import chip.yaml.format_converter as Converter
@@ -37,6 +37,12 @@ logger = logging.getLogger('YamlParser')
 class _ActionStatus(Enum):
     SUCCESS = 'success',
     ERROR = 'error'
+
+
+class _TestFabricId(IntEnum):
+    ALPHA = 1,
+    BETA = 2,
+    GAMMA = 3
 
 
 @dataclass
@@ -221,6 +227,40 @@ class ReadAttributeAction(BaseAction):
         # like cluster id.
         return_val = self._request_object(resp)
         return _ActionResult(status=_ActionStatus.SUCCESS, response=return_val)
+
+
+class WaitForCommissioneeAction(BaseAction):
+    ''' Wait for commissionee action to be executed.'''
+
+    def __init__(self, test_step):
+        super().__init__(test_step.label, test_step.identity)
+        self._node_id = test_step.node_id
+        self._expire_existing_session = False
+        # This is the default when no timeout is provided.
+        _DEFAULT_TIMEOUT_MS = 10 * 1000
+        self._timeout_ms = _DEFAULT_TIMEOUT_MS
+
+        if test_step.arguments is None:
+            # Nothing left for us to do the default values are what we want
+            return
+
+        args = test_step.arguments['values']
+        request_data_as_dict = Converter.convert_list_of_name_value_pair_to_dict(args)
+
+        self._expire_existing_session = request_data_as_dict.get('expireExistingSession', False)
+        if 'timeout' in request_data_as_dict:
+            # Timeout is provided in seconds we need to conver to milliseconds.
+            self._timeout_ms = request_data_as_dict['timeout'] * 1000
+
+    def run_action(self, dev_ctrl: ChipDeviceCtrl) -> _ActionResult:
+        try:
+            if self._expire_existing_session:
+                dev_ctrl.ExpireSessions(self._node_id)
+            dev_ctrl.GetConnectedDeviceSync(self._node_id, timeoutMs=self._timeout_ms)
+        except TimeoutError:
+            return _ActionResult(status=_ActionStatus.ERROR, response=None)
+
+        return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
 
 
 class AttributeChangeAccumulator:
@@ -507,6 +547,15 @@ class ReplTestRunner:
         except ParsingError:
             return None
 
+    def _wait_for_commissionee_action_factory(self, test_step):
+        try:
+            return WaitForCommissioneeAction(test_step)
+        except ParsingError:
+            # TODO For now, ParsingErrors are largely issues that will be addressed soon. Once this
+            # runner has matched parity of the codegen YAML test, this exception should be
+            # propogated.
+            return None
+
     def _wait_for_report_action_factory(self, test_step):
         try:
             return WaitForReportAction(test_step, self._context)
@@ -531,7 +580,9 @@ class ReplTestRunner:
         # Some of the tests contain 'cluster over-rides' that refer to a different
         # cluster than that specified in 'config'.
 
-        if command == 'writeAttribute':
+        if cluster == 'DelayCommands' and command == 'WaitForCommissionee':
+            action = self._wait_for_commissionee_action_factory(request)
+        elif command == 'writeAttribute':
             action = self._attribute_write_action_factory(request, cluster)
         elif command == 'readAttribute':
             action = self._attribute_read_action_factory(request, cluster)
@@ -598,15 +649,8 @@ class ReplTestRunner:
 
         return decoded_response
 
-    def _get_fabric_id(self, identity):
-        if identity == 'alpha':
-            return 1
-        if identity == 'beta':
-            return 2
-        if identity == 'gamma':
-            return 3
-
-        raise ValueError(f'Unknown identity {identity}')
+    def _get_fabric_id(self, id):
+        return _TestFabricId[id.upper()].value
 
     def _get_dev_ctrl(self, action: BaseAction):
         if action.identity is not None:

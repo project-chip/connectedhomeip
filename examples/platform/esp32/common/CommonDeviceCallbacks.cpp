@@ -32,7 +32,6 @@
 #include "esp_err.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
-#include "route_hook/esp_route_hook.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app/server/Dnssd.h>
 #include <app/util/util.h>
@@ -120,10 +119,6 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
             // connectivity. MDNS still wants to refresh its listening interfaces to include the
             // newly selected address.
             chip::app::DnssdServer::Instance().StartServer();
-        }
-        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
-        {
-            ESP_ERROR_CHECK(esp_route_hook_init(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF")));
         }
         break;
     }

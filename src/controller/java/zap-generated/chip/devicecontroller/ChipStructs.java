@@ -1262,11 +1262,11 @@ public class ChipStructs {
     }
   }
 
-  public static class ModeSelectClusterSemanticTag {
+  public static class ModeSelectClusterSemanticTagStruct {
     public Integer mfgCode;
     public Integer value;
 
-    public ModeSelectClusterSemanticTag(Integer mfgCode, Integer value) {
+    public ModeSelectClusterSemanticTagStruct(Integer mfgCode, Integer value) {
       this.mfgCode = mfgCode;
       this.value = value;
     }
@@ -1274,7 +1274,7 @@ public class ChipStructs {
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("ModeSelectClusterSemanticTag {\n");
+      output.append("ModeSelectClusterSemanticTagStruct {\n");
       output.append("\tmfgCode: ");
       output.append(mfgCode);
       output.append("\n");
@@ -1289,12 +1289,12 @@ public class ChipStructs {
   public static class ModeSelectClusterModeOptionStruct {
     public String label;
     public Integer mode;
-    public ArrayList<ChipStructs.ModeSelectClusterSemanticTag> semanticTags;
+    public ArrayList<ChipStructs.ModeSelectClusterSemanticTagStruct> semanticTags;
 
     public ModeSelectClusterModeOptionStruct(
         String label,
         Integer mode,
-        ArrayList<ChipStructs.ModeSelectClusterSemanticTag> semanticTags) {
+        ArrayList<ChipStructs.ModeSelectClusterSemanticTagStruct> semanticTags) {
       this.label = label;
       this.mode = mode;
       this.semanticTags = semanticTags;

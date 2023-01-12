@@ -303,7 +303,6 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeApplicationBasicID MTR_NEWLY_AVAILABLE = 0x0000050D,
     MTRClusterIDTypeAccountLoginID MTR_NEWLY_AVAILABLE = 0x0000050E,
     MTRClusterIDTypeElectricalMeasurementID MTR_NEWLY_AVAILABLE = 0x00000B04,
-    MTRClusterIDTypeClientMonitoringID MTR_NEWLY_AVAILABLE = 0x00001046,
     MTRClusterIDTypeUnitTestingID MTR_NEWLY_AVAILABLE = 0xFFF1FC05,
     MTRClusterIDTypeFaultInjectionID MTR_NEWLY_AVAILABLE = 0xFFF1FC06,
 };
@@ -5190,22 +5189,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterElectricalMeasurementAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
     = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
-    // Cluster ClientMonitoring attributes
-    MTRAttributeIDTypeClusterClientMonitoringAttributeIdleModeIntervalID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterClientMonitoringAttributeActiveModeIntervalID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterClientMonitoringAttributeActiveModeThresholdID MTR_NEWLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterClientMonitoringAttributeExpectedClientsID MTR_NEWLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterClientMonitoringAttributeGeneratedCommandListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterClientMonitoringAttributeAcceptedCommandListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterClientMonitoringAttributeAttributeListID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterClientMonitoringAttributeFeatureMapID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterClientMonitoringAttributeClusterRevisionID MTR_NEWLY_AVAILABLE
-    = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
-
     // Cluster TestCluster deprecated attribute names
     MTRClusterTestClusterAttributeBooleanID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
         MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeClusterUnitTestingAttributeBooleanID")
@@ -6593,11 +6576,6 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterElectricalMeasurementCommandGetProfileInfoCommandID MTR_NEWLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileResponseCommandID MTR_NEWLY_AVAILABLE = 0x00000001,
     MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileCommandID MTR_NEWLY_AVAILABLE = 0x00000001,
-
-    // Cluster ClientMonitoring commands
-    MTRCommandIDTypeClusterClientMonitoringCommandRegisterClientMonitoringID MTR_NEWLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterClientMonitoringCommandUnregisterClientMonitoringID MTR_NEWLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterClientMonitoringCommandStayAwakeRequestID MTR_NEWLY_AVAILABLE = 0x00000002,
 
     // Cluster TestCluster deprecated command id names
     MTRClusterTestClusterCommandTestID API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))

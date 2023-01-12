@@ -86,6 +86,9 @@ static CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndp
 static CHIP_ERROR ParseEventPathList(jobject eventPathList, std::vector<app::EventPathParams> & outEventPathParamsList);
 static CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId);
 static CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard);
+static CHIP_ERROR CreateDeviceAttestationDelegateBridge(JNIEnv * env, jlong handle, jobject deviceAttestationDelegate,
+                                                        jint failSafeExpiryTimeoutSecs,
+                                                        DeviceAttestationDelegateBridge ** deviceAttestationDelegateBridge);
 
 namespace {
 
@@ -410,6 +413,31 @@ exit:
     return result;
 }
 
+JNI_METHOD(void, setDeviceAttestationDelegate)
+(JNIEnv * env, jobject self, jlong handle, jint failSafeExpiryTimeoutSecs, jobject deviceAttestationDelegate)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    ChipLogProgress(Controller, "setDeviceAttestationDelegate() called");
+    if (deviceAttestationDelegate != nullptr)
+    {
+        wrapper->ClearDeviceAttestationDelegateBridge();
+        DeviceAttestationDelegateBridge * deviceAttestationDelegateBridge = nullptr;
+        err = CreateDeviceAttestationDelegateBridge(env, handle, deviceAttestationDelegate, failSafeExpiryTimeoutSecs,
+                                                    &deviceAttestationDelegateBridge);
+        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+        wrapper->SetDeviceAttestationDelegateBridge(deviceAttestationDelegateBridge);
+    }
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to set device attestation delegate.");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+
 JNI_METHOD(void, commissionDevice)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jbyteArray csrNonce, jobject networkCredentials)
 {
@@ -425,7 +453,10 @@ JNI_METHOD(void, commissionDevice)
         err = wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
         VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
     }
-
+    if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
+    {
+        commissioningParams.SetDeviceAttestationDelegate(wrapper->GetDeviceAttestationDelegateBridge());
+    }
     if (csrNonce != nullptr)
     {
         JniByteArray jniCsrNonce(env, csrNonce);
@@ -471,6 +502,10 @@ JNI_METHOD(void, pairDevice)
         JniByteArray jniCsrNonce(env, csrNonce);
         commissioningParams.SetCSRNonce(jniCsrNonce.byteSpan());
     }
+    if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
+    {
+        commissioningParams.SetDeviceAttestationDelegate(wrapper->GetDeviceAttestationDelegateBridge());
+    }
     err = wrapper->Controller()->PairDevice(deviceId, rendezvousParams, commissioningParams);
 
     if (err != CHIP_NO_ERROR)
@@ -509,6 +544,10 @@ JNI_METHOD(void, pairDeviceWithAddress)
     {
         JniByteArray jniCsrNonce(env, csrNonce);
         commissioningParams.SetCSRNonce(jniCsrNonce.byteSpan());
+    }
+    if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
+    {
+        commissioningParams.SetDeviceAttestationDelegate(wrapper->GetDeviceAttestationDelegateBridge());
     }
     err = wrapper->Controller()->PairDevice(deviceId, rendezvousParams, commissioningParams);
 
@@ -572,6 +611,27 @@ JNI_METHOD(void, establishPaseConnectionByAddress)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to establish PASE connection.");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+
+JNI_METHOD(void, continueCommissioning)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jboolean ignoreAttestationFailure)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(Controller, "continueCommissioning() called.");
+    CHIP_ERROR err                                                    = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper                          = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    DeviceAttestationDelegateBridge * deviceAttestationDelegateBridge = wrapper->GetDeviceAttestationDelegateBridge();
+    auto lastAttestationResult = deviceAttestationDelegateBridge ? deviceAttestationDelegateBridge->attestationVerificationResult()
+                                                                 : chip::Credentials::AttestationVerificationResult::kSuccess;
+    chip::DeviceProxy * deviceProxy = reinterpret_cast<chip::DeviceProxy *>(devicePtr);
+    err                             = wrapper->Controller()->ContinueCommissioningAfterDeviceAttestation(
+        deviceProxy, ignoreAttestationFailure ? chip::Credentials::AttestationVerificationResult::kSuccess : lastAttestationResult);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to continue commissioning.");
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
 }
@@ -1484,6 +1544,30 @@ CHIP_ERROR N2J_NetworkLocation(JNIEnv * env, jstring ipAddress, jint port, jint 
     outLocation = (jobject) env->NewObject(locationClass, constructor, ipAddress, port, interfaceIndex);
 
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+exit:
+    return err;
+}
+
+CHIP_ERROR CreateDeviceAttestationDelegateBridge(JNIEnv * env, jlong handle, jobject deviceAttestationDelegate,
+                                                 jint failSafeExpiryTimeoutSecs,
+                                                 DeviceAttestationDelegateBridge ** deviceAttestationDelegateBridge)
+{
+    CHIP_ERROR err                        = CHIP_NO_ERROR;
+    chip::Optional<uint16_t> timeoutSecs  = chip::MakeOptional(static_cast<uint16_t>(failSafeExpiryTimeoutSecs));
+    bool shouldWaitAfterDeviceAttestation = false;
+    jclass completionCallbackCls          = nullptr;
+    jobject deviceAttestationDelegateRef  = env->NewGlobalRef(deviceAttestationDelegate);
+    VerifyOrExit(deviceAttestationDelegateRef != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
+    JniReferences::GetInstance().GetClassRef(
+        env, "chip/devicecontroller/DeviceAttestationDelegate$DeviceAttestationCompletionCallback", completionCallbackCls);
+    VerifyOrExit(completionCallbackCls != nullptr, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+
+    if (env->IsInstanceOf(deviceAttestationDelegate, completionCallbackCls))
+    {
+        shouldWaitAfterDeviceAttestation = true;
+    }
+    *deviceAttestationDelegateBridge =
+        new DeviceAttestationDelegateBridge(deviceAttestationDelegateRef, timeoutSecs, shouldWaitAfterDeviceAttestation);
 exit:
     return err;
 }
