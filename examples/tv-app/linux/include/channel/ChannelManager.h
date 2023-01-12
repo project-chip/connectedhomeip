@@ -25,8 +25,8 @@ using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
 using ChannelDelegate           = chip::app::Clusters::Channel::Delegate;
 using ChangeChannelResponseType = chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type;
-using ChannelInfoType           = chip::app::Clusters::Channel::Structs::ChannelInfo::Type;
-using LineupInfoType            = chip::app::Clusters::Channel::Structs::LineupInfo::Type;
+using ChannelInfoType           = chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type;
+using LineupInfoType            = chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type;
 
 class ChannelManager : public ChannelDelegate
 {

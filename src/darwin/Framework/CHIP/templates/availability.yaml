@@ -5064,6 +5064,9 @@
               - InputInfoStruct
           AudioOutput:
               - OutputInfoStruct
+          Channel:
+              - ChannelInfoStruct
+              - LineupInfoStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5194,6 +5197,18 @@
                   - index
                   - outputType
                   - name
+          Channel:
+              ChannelInfoStruct:
+                  - majorNumber
+                  - minorNumber
+                  - name
+                  - callSign
+                  - affiliateCallSign
+              LineupInfoStruct:
+                  - operatorName
+                  - lineupName
+                  - postalCode
+                  - lineupInfoType
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5523,6 +5538,9 @@
               OutputTypeEnum:
                   - HDMI
                   - BT
+          Channel:
+              LineupInfoTypeEnum:
+                  - MSO
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5698,6 +5716,9 @@
               - InputInfo
           AudioOutput:
               - OutputInfo
+          Channel:
+              - ChannelInfo
+              - LineupInfo
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5784,6 +5805,9 @@
               OutputTypeEnum:
                   - Hdmi
                   - Bt
+          Channel:
+              LineupInfoTypeEnum:
+                  - Mso
       bitmaps:
           DoorLock:
               - DlDaysMaskMap
@@ -5963,6 +5987,9 @@
               InputInfoStruct: InputInfo
           AudioOutput:
               OutputInfoStruct: OutputInfo
+          Channel:
+              ChannelInfoStruct: ChannelInfo
+              LineupInfoStruct: LineupInfo
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -6062,6 +6089,9 @@
               OutputTypeEnum:
                   HDMI: Hdmi
                   BT: Bt
+          Channel:
+              LineupInfoTypeEnum:
+                  MSO: Mso
       bitmaps:
           DoorLock:
               DaysMaskMap: DlDaysMaskMap
