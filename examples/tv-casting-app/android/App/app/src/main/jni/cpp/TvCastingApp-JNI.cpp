@@ -52,6 +52,37 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     return AndroidAppServerJNI_OnUnload(jvm, reserved);
 }
 
+JNI_METHOD(jboolean, preInitJni)(JNIEnv *, jobject, jobject jAppParameters)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "JNI_METHOD preInitJni called");
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (jAppParameters == nullptr)
+    {
+        err = CastingServer::GetInstance()->PreInit();
+    }
+    else
+    {
+        AppParams appParams;
+        err = convertJAppParametersToCppAppParams(jAppParameters, appParams);
+        VerifyOrExit(err == CHIP_NO_ERROR,
+                     ChipLogError(AppServer, "Conversion of AppParameters from jobject to Cpp type failed: %" CHIP_ERROR_FORMAT,
+                                  err.Format()));
+        err = CastingServer::GetInstance()->PreInit(&appParams);
+    }
+    VerifyOrExit(
+        err == CHIP_NO_ERROR,
+        ChipLogError(AppServer, "Call to CastingServer::GetInstance()->PreInit() failed: %" CHIP_ERROR_FORMAT, err.Format()));
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 JNI_METHOD(jboolean, initJni)(JNIEnv *, jobject, jobject jAppParameters)
 {
     chip::DeviceLayer::StackLock lock;

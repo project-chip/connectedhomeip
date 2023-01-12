@@ -53,6 +53,7 @@ public:
     void operator=(const CastingServer &) = delete;
     static CastingServer * GetInstance();
 
+    CHIP_ERROR PreInit(AppParams * AppParams = nullptr);
     CHIP_ERROR Init(AppParams * AppParams = nullptr);
     CHIP_ERROR InitBindingHandlers();
 
@@ -418,6 +419,8 @@ public:
 private:
     static CastingServer * castingServer_;
     CastingServer();
+
+    CHIP_ERROR SetRotatingDeviceIdUniqueId(chip::Optional<chip::ByteSpan> rotatingDeviceIdUniqueId);
 
     static void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     void ReadServerClusters(chip::EndpointId endpointId);
