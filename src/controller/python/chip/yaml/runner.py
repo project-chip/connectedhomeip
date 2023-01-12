@@ -654,8 +654,8 @@ class ReplTestRunner:
         if result.response is None:
             # TODO Once yamltest and idl python packages are properly packaged as a single module
             # the type we are returning will be formalized. For now TestStep.post_process_response
-            # expects this particular case to be sent as a string.
-            return 'success' if result.status == _ActionStatus.SUCCESS else 'failure'
+            # expects this particular case to be sent an empty dict or a dict with an error.
+            return {} if result.status == _ActionStatus.SUCCESS else {'error': 'FAILURE'}
 
         response = result.response
 
