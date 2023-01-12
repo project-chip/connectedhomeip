@@ -172,7 +172,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::FindByScopedNodeId(ScopedNodeId 
         TLV::TLVType subscriptionContainerType;
         ReturnErrorOnFailure(reader.EnterContainer(subscriptionContainerType));
 
-        subscriptions.mSubscriptions[i] = { .mFabricIndex = node.GetFabricIndex(), .mNodeId = node.GetNodeId() };
+        subscriptions.mSubscriptions[i] = { .mNodeId = node.GetNodeId(), .mFabricIndex = node.GetFabricIndex() };
 
         // Subscription ID
         ReturnErrorOnFailure(reader.Next(kSubscriptionIdTag));
