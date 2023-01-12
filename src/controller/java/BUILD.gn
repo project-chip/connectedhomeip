@@ -205,8 +205,9 @@ if (chip_link_tests) {
       ":jni_for_test",
     ]
 
-    sources =
-        [ "src/chip/devicecontroller/GetConnectedDeviceCallbackForTestJni.java" ]
+    sources = [
+      "src/chip/devicecontroller/GetConnectedDeviceCallbackForTestJni.java",
+    ]
 
     if (build_java_matter_controller) {
       deps += [
