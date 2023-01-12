@@ -30,17 +30,22 @@ from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
 
-#import chip.CertificateAuthority
+
+# isort: off
+
+from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
+import chip.FabricAdmin  # Needed before chip.CertificateAuthority
+import chip.CertificateAuthority
+
+# isort: on
 import chip.clusters as Clusters
-import chip.FabricAdmin
 from chip.interaction_model import Status, InteractionModelError
 import chip.logging
 import chip.native
-from chip import ChipDeviceCtrl
 from chip.ChipStack import *
 from chip.storage import PersistentStorage
 from chip.utils import CommissioningBuildingBlocks
-from mobly import assets, base_test, logger, signals, utils
+from mobly import asserts, base_test, logger, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 
 from mobly.test_runner import TestRunner
