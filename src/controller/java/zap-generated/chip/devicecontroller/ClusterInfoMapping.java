@@ -10842,10 +10842,12 @@ public class ClusterInfoMapping {
     colorControlClusterInteractionInfoMap.put("stepColor", colorControlstepColorInteractionInfo);
     Map<String, CommandParameterInfo> colorControlmoveToColorTemperatureCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo colorControlmoveToColorTemperaturecolorTemperatureCommandParameterInfo =
-        new CommandParameterInfo("colorTemperature", Integer.class, Integer.class);
+    CommandParameterInfo
+        colorControlmoveToColorTemperaturecolorTemperatureMiredsCommandParameterInfo =
+            new CommandParameterInfo("colorTemperatureMireds", Integer.class, Integer.class);
     colorControlmoveToColorTemperatureCommandParams.put(
-        "colorTemperature", colorControlmoveToColorTemperaturecolorTemperatureCommandParameterInfo);
+        "colorTemperatureMireds",
+        colorControlmoveToColorTemperaturecolorTemperatureMiredsCommandParameterInfo);
 
     CommandParameterInfo colorControlmoveToColorTemperaturetransitionTimeCommandParameterInfo =
         new CommandParameterInfo("transitionTime", Integer.class, Integer.class);
@@ -10868,7 +10870,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.ColorControlCluster) cluster)
                   .moveToColorTemperature(
                       (DefaultClusterCallback) callback,
-                      (Integer) commandArguments.get("colorTemperature"),
+                      (Integer) commandArguments.get("colorTemperatureMireds"),
                       (Integer) commandArguments.get("transitionTime"),
                       (Integer) commandArguments.get("optionsMask"),
                       (Integer) commandArguments.get("optionsOverride"));

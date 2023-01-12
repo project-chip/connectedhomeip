@@ -14245,7 +14245,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kColorTemperature)), colorTemperature));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kColorTemperatureMireds)), colorTemperatureMireds));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kTransitionTime)), transitionTime));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsMask)), optionsMask));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionsOverride)), optionsOverride));
@@ -14267,8 +14268,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kColorTemperature):
-            ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperature));
+        case to_underlying(Fields::kColorTemperatureMireds):
+            ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMireds));
             break;
         case to_underlying(Fields::kTransitionTime):
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
