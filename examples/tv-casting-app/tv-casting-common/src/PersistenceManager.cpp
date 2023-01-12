@@ -18,7 +18,7 @@
 
 #include "PersistenceManager.h"
 
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <platform/KeyValueStoreManager.h>
 
 using namespace chip;

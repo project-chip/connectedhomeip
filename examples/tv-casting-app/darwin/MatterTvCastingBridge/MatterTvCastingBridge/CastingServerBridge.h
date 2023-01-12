@@ -185,9 +185,15 @@
 - (void)disconnect:(dispatch_queue_t _Nonnull)clientQueue requestSentHandler:(nullable void (^)())requestSentHandler;
 
 /**
- @brief Start the Matter server and reconnect to a previously connected Video Player (if any)
+ @brief Start the Matter server and reconnect to a previously connected Video Player (if any). This API is async
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param startMatterServerCompletionCallback Called after the Matter server has started and connected (or failed to connect) to a
+ previously connected video player (if any) are complete
  */
-- (void)startMatterServer;
+- (void)startMatterServer:(dispatch_queue_t _Nonnull)clientQueue
+    startMatterServerCompletionCallback:(nullable void (^)(MatterError * _Nonnull))startMatterServerCompletionCallback;
 
 /**
  @brief Stop the Matter server

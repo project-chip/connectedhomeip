@@ -23,7 +23,7 @@
 #include <app/ObjectList.h>
 #include <app/util/mock/Constants.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/UnitTestRegistration.h>

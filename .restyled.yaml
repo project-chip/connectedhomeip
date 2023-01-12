@@ -213,10 +213,19 @@ restylers:
           - "**/*.sh"
           - "**/*.bash"
     - name: autopep8
-      image: 'restyled/restyler-autopep8:v1.5.7'
+      image: 'restyled/restyler-autopep8:v2.0.0'
       command:
         - autopep8
         - '--in-place'
+      arguments: []
+      include:
+        - '**/*.py'
+      interpreters:
+        - python
+    - name: isort
+      image: 'restyled/restyler-isort:v5.11.2'
+      command:
+        - isort
       arguments: []
       include:
         - '**/*.py'

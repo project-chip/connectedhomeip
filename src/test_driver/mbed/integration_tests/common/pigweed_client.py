@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import importlib
 import os
 from pathlib import Path
-import importlib
 
 from pw_hdlc.rpc import HdlcRpcClient, default_channels
 

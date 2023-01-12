@@ -27,12 +27,12 @@ limitations under the License.
   </enum>
   <enum name="WiFiVersionType" type="ENUM8">
     <cluster code="0x0036"/>
-    <item name="802.11a" value="0x00"/>
-    <item name="802.11b" value="0x01"/>
-    <item name="802.11g" value="0x02"/>
-    <item name="802.11n" value="0x03"/>
-    <item name="802.11ac" value="0x04"/>
-    <item name="802.11ax" value="0x05"/>    
+    <item name="a" value="0x00"/>
+    <item name="b" value="0x01"/>
+    <item name="g" value="0x02"/>
+    <item name="n" value="0x03"/>
+    <item name="ac" value="0x04"/>
+    <item name="ax" value="0x05"/>    
   </enum>
   <enum name="AssociationFailureCause" type="ENUM8">
     <cluster code="0x0036"/>
@@ -52,11 +52,11 @@ limitations under the License.
     <code>0x0036</code>
     <define>WIFI_NETWORK_DIAGNOSTICS_CLUSTER</define>
     <description>The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.</description>
-    <attribute side="server" code="0x00" define="BSSID" type="OCTET_STRING" length="6" writable="false" isNullable="true" optional="false">bssid</attribute>
+    <attribute side="server" code="0x00" define="BSSID" type="OCTET_STRING" length="6" writable="false" isNullable="true" optional="false">BSSID</attribute>
     <attribute side="server" code="0x01" define="SECURITY_TYPE" type="SecurityType" writable="false" isNullable="true" optional="false">SecurityType</attribute>
     <attribute side="server" code="0x02" define="WIFI_VERSION" type="WiFiVersionType" writable="false" isNullable="true" optional="false">WiFiVersion</attribute>
     <attribute side="server" code="0x03" define="CHANNEL_NUMBER" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" isNullable="true" optional="false">ChannelNumber</attribute>
-    <attribute side="server" code="0x04" define="RSSI" type="INT8S" min="-120" max="0" writable="false" isNullable="true" optional="false">Rssi</attribute>
+    <attribute side="server" code="0x04" define="RSSI" type="INT8S" min="-120" max="0" writable="false" isNullable="true" optional="false">RSSI</attribute>
     <attribute side="server" code="0x05" define="BEACON_LOST_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" isNullable="true" optional="true">BeaconLostCount</attribute>
     <attribute side="server" code="0x06" define="BEACON_RX_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" isNullable="true" optional="true">BeaconRxCount</attribute>
     <attribute side="server" code="0x07" define="PACKET_MULTICAST_RX_COUNT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" isNullable="true" optional="true">PacketMulticastRxCount</attribute>

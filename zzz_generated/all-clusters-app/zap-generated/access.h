@@ -48,7 +48,7 @@
     49, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: label list, Privilege: view */ \
+    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: view */ \
@@ -111,7 +111,7 @@
     7, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     0, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: label list, Privilege: view */ \
+    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: view */ \
@@ -174,7 +174,7 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
     /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: label list, Privilege: view */ \
+    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: view */ \
     /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: view */ \
@@ -230,7 +230,7 @@
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     63, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    65, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
+    65, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     257, /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: manage */ \
     257, /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: manage */ \
     257, /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: manage */ \
@@ -284,7 +284,7 @@
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    0, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
+    0, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     4, /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: manage */ \
     5, /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: manage */ \
     6, /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: manage */ \
@@ -338,7 +338,7 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    kMatterAccessPrivilegeManage, /* Cluster: User Label, Attribute: label list, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: DoorOpenEvents, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: DoorClosedEvents, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Door Lock, Attribute: OpenPeriod, Privilege: manage */ \
@@ -430,6 +430,8 @@
     257, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     257, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    4166, /* Cluster: Client Monitoring, Command: RegisterClientMonitoring, Privilege: manage */ \
+    4166, /* Cluster: Client Monitoring, Command: UnregisterClientMonitoring, Privilege: manage */ \
     4294048774, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     4294048774, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
@@ -482,6 +484,8 @@
     34, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     36, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     38, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    0, /* Cluster: Client Monitoring, Command: RegisterClientMonitoring, Privilege: manage */ \
+    1, /* Cluster: Client Monitoring, Command: UnregisterClientMonitoring, Privilege: manage */ \
     0, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     1, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
@@ -534,6 +538,8 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Client Monitoring, Command: RegisterClientMonitoring, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Client Monitoring, Command: UnregisterClientMonitoring, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }

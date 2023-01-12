@@ -16,22 +16,23 @@
 #    limitations under the License.
 #
 
-import os
-import sys
-import shutil
-import base64
-import logging
 import argparse
-import subprocess
-import cryptography.x509
-from types import SimpleNamespace
+import base64
 import enum
+import logging
+import os
+import shutil
+import subprocess
+import sys
+from types import SimpleNamespace
+
+import cryptography.x509
 from bitarray import bitarray
 from bitarray.util import ba2int
 
 CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('scripts', 'tools'))]
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'scripts', 'tools', 'spake2p'))
-from spake2p import generate_verifier  # noqa: E402
+from spake2p import generate_verifier  # noqa: E402 isort:skip
 
 if os.getenv('IDF_PATH'):
     sys.path.insert(0, os.path.join(os.getenv('IDF_PATH'),

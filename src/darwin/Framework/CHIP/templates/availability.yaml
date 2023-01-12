@@ -36,6 +36,8 @@
 #   * "ids": Can contain clusters, attributes, commands, events as described
 #            above inside it, but just indicates whether the id was
 #            introduced/deprecated, not the construct itself.
+#   * "command payloads": Lists commands only, if we introduced the payload without
+#                         actually exposing API for the command.
 #   * "global attributes": An array of names of global attributes.
 #   * "apis": An array of API labels that codegen can use.
 #
@@ -4715,6 +4717,14 @@
               - AttributeList
               - FeatureMap
               - ClusterRevision
+          ThreadNetworkDiagnostics:
+              - NeighborTable
+              - RouteTable
+          WiFiNetworkDiagnostics:
+              - BSSID
+              - RSSI
+          GeneralDiagnostics:
+              - BootReason
       commands:
           OTASoftwareUpdateProvider:
               - QueryImage
@@ -4761,6 +4771,7 @@
               - TestEmitTestFabricScopedEventRequest
           ClientMonitoring:
               - RegisterClientMonitoring
+              - UnregisterClientMonitoring
               - StayAwakeRequest
       command fields:
           UnitTesting:
@@ -4917,6 +4928,9 @@
               RegisterClientMonitoring:
                   - clientNodeId
                   - iCid
+              UnregisterClientMonitoring:
+                  - clientNodeId
+                  - iCid
           Groups:
               AddGroup:
                   - groupID
@@ -4935,6 +4949,13 @@
           OnOff:
               OffWithEffect:
                   - effectIdentifier
+          DiagnosticLogs:
+              RetrieveLogsResponse:
+                  - logContent
+                  - utcTimeStamp
+          AdministratorCommissioning:
+              OpenCommissioningWindow:
+                  - pakePasscodeVerifier
       structs:
           OTASoftwareUpdateRequestor:
               - ProviderLocation
@@ -4953,6 +4974,12 @@
           AccessControl:
               - AccessControlEntryStruct
               - AccessControlExtensionStruct
+          SoftwareDiagnostics:
+              - ThreadMetricsStruct
+          GeneralDiagnostics:
+              - NetworkInterface
+          ModeSelect:
+              - SemanticTagStruct
       struct fields:
           UnitTesting:
               SimpleStruct:
@@ -5030,6 +5057,27 @@
               AccessControlExtensionStruct:
                   - data
                   - fabricIndex
+          SoftwareDiagnostics:
+              ThreadMetricsStruct:
+                  - id
+                  - name
+                  - stackFreeCurrent
+                  - stackFreeMinimum
+                  - stackSize
+          GeneralDiagnostics:
+              NetworkInterface:
+                  - name
+                  - isOperational
+                  - offPremiseServicesReachableIPv4
+                  - offPremiseServicesReachableIPv6
+                  - hardwareAddress
+                  - iPv4Addresses
+                  - iPv6Addresses
+                  - type
+          ModeSelect:
+              SemanticTagStruct:
+                  - mfgCode
+                  - value
       events:
           OTASoftwareUpdateRequestor:
               - StateTransition
@@ -5106,6 +5154,14 @@
           AccessControl:
               - AccessControlEntryPrivilegeEnum
               - AccessControlEntryAuthModeEnum
+          ThreadNetworkDiagnostics:
+              - ConnectionStatusEnum
+          EthernetNetworkDiagnostics:
+              - PHYRate
+          GeneralDiagnostics:
+              - HardwareFault
+              - RadioFault
+              - BootReasonEnum
       enum values:
           OTASoftwareUpdateProvider:
               OTAApplyUpdateAction:
@@ -5166,6 +5222,59 @@
           PowerSource:
               BatChargeLevel:
                   - OK
+          ThreadNetworkDiagnostics:
+              ConnectionStatusEnum:
+                  - Connected
+                  - NotConnected
+          WiFiNetworkDiagnostics:
+              WiFiVersionType:
+                  - A
+                  - B
+                  - G
+                  - N
+                  - Ac
+                  - Ax
+          EthernetNetworkDiagnostics:
+              PHYRate:
+                  - Rate10M
+                  - Rate100M
+                  - Rate1G
+                  - Rate25G
+                  - Rate5G
+                  - Rate10G
+                  - Rate40G
+                  - Rate100G
+                  - Rate200G
+                  - Rate400G
+          GeneralDiagnostics:
+              HardwareFault:
+                  - Unspecified
+                  - Radio
+                  - Sensor
+                  - ResettableOverTemp
+                  - NonResettableOverTemp
+                  - PowerSource
+                  - VisualDisplayFault
+                  - AudioOutputFault
+                  - UserInterfaceFault
+                  - NonVolatileMemoryError
+                  - TamperDetected
+              RadioFault:
+                  - Unspecified
+                  - WiFiFault
+                  - CellularFault
+                  - ThreadFault
+                  - NFCFault
+                  - BLEFault
+                  - EthernetFault
+              BootReasonEnum:
+                  - Unspecified
+                  - PowerOnReboot
+                  - BrownOutReset
+                  - SoftwareWatchdogReset
+                  - HardwareWatchdogReset
+                  - SoftwareUpdateCompleted
+                  - SoftwareReset
       bitmaps:
           UnitTesting:
               - Bitmap8MaskMap
@@ -5208,6 +5317,9 @@
           NetworkCommissioning:
               WiFiSecurity:
                   - WEP
+                  - WPAPersonal
+                  - WPA2Personal
+                  - WPA3Personal
   deprecated:
       clusters:
           - OtaSoftwareUpdateProvider
@@ -5224,6 +5336,14 @@
               - PirOccupiedToUnoccupiedDelay
               - PirUnoccupiedToOccupiedDelay
               - PirUnoccupiedToOccupiedThreshold
+          ThreadNetworkDiagnostics:
+              - NeighborTableList
+              - RouteTableList
+          WiFiNetworkDiagnostics:
+              - Bssid
+              - Rssi
+          GeneralDiagnostics:
+              - BootReasons
       command fields:
           Groups:
               AddGroup:
@@ -5243,6 +5363,13 @@
           OnOff:
               OffWithEffect:
                   - effectId
+          DiagnosticLogs:
+              RetrieveLogsResponse:
+                  - content
+                  - timeStamp
+          AdministratorCommissioning:
+              OpenCommissioningWindow:
+                  - pakeVerifier
       structs:
           Descriptor:
               - DeviceType
@@ -5253,6 +5380,12 @@
               - WiredFaultChangeType
               - BatFaultChangeType
               - BatChargeFaultChangeType
+          SoftwareDiagnostics:
+              - ThreadMetrics
+          GeneralDiagnostics:
+              - NetworkInterfaceType
+          ModeSelect:
+              - SemanticTag
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5265,6 +5398,14 @@
           AccessControl:
               - Privilege
               - AuthMode
+          ThreadNetworkDiagnostics:
+              - ThreadConnectionStatus
+          EthernetNetworkDiagnostics:
+              - PHYRateType
+          GeneralDiagnostics:
+              - HardwareFaultType
+              - RadioFaultType
+              - BootReasonType
       enum values:
           GeneralCommissioning:
               CommissioningError:
@@ -5272,17 +5413,58 @@
           PowerSource:
               BatChargeLevel:
                   - Ok
+          WiFiNetworkDiagnostics:
+              WiFiVersionType:
+                  - 80211a
+                  - 80211b
+                  - 80211g
+                  - 80211n
+                  - 80211ac
+                  - 80211ax
       bitmap values:
           NetworkCommissioning:
               WiFiSecurity:
                   - WepPersonal
+                  - WpaPersonal
+                  - Wpa2Personal
+                  - Wpa3Personal
       apis:
           - Timed Invoke for server to client commands
           - Deprecated global attribute names
   removed:
+      clusters:
+          # Not ready to be public API yet.
+          - ClientMonitoring
       commands:
           BasicInformation:
               - MfgSpecificPing
+      enum values:
+          EthernetNetworkDiagnostics:
+              # Both the enum and the values got renamed, so don't output the
+              # new values with the old enum name or the old values with the
+              # new enum name.
+              PHYRateType:
+                  - Rate10M
+                  - Rate100M
+                  - Rate1G
+                  - Rate25G
+                  - Rate5G
+                  - Rate10G
+                  - Rate40G
+                  - Rate100G
+                  - Rate200G
+                  - Rate400G
+              PHYRate:
+                  - 10M
+                  - 100M
+                  - 1000M
+                  - 25G
+                  - 5G
+                  - 10G
+                  - 40G
+                  - 100G
+                  - 200G
+                  - 400G
   renames:
       clusters:
           UnitTesting: TestCluster
@@ -5301,6 +5483,14 @@
               PIRUnoccupiedToOccupiedThreshold: PirUnoccupiedToOccupiedThreshold
           OTASoftwareUpdateRequestor:
               DefaultOTAProviders: DefaultOtaProviders
+          ThreadNetworkDiagnostics:
+              NeighborTable: NeighborTableList
+              RouteTable: RouteTableList
+          WiFiNetworkDiagnostics:
+              BSSID: Bssid
+              RSSI: Rssi
+          GeneralDiagnostics:
+              BootReason: BootReasons
       commands:
           OTASoftwareUpdateRequestor:
               AnnounceOTAProvider: AnnounceOtaProvider
@@ -5331,10 +5521,23 @@
           OnOff:
               OffWithEffect:
                   effectIdentifier: effectId
+          DiagnosticLogs:
+              RetrieveLogsResponse:
+                  logContent: content
+                  utcTimeStamp: timeStamp
+          AdministratorCommissioning:
+              OpenCommissioningWindow:
+                  pakePasscodeVerifier: pakeVerifier
       structs:
           AccessControl:
               AccessControlEntryStruct: AccessControlEntry
               AccessControlExtensionStruct: ExtensionEntry
+          SoftwareDiagnostics:
+              ThreadMetricsStruct: ThreadMetrics
+          GeneralDiagnostics:
+              NetworkInterface: NetworkInterfaceType
+          ModeSelect:
+              SemanticTagStruct: SemanticTag
       struct fields:
           Descriptor:
               DeviceTypeStruct:
@@ -5347,6 +5550,14 @@
           AccessControl:
               AccessControlEntryPrivilegeEnum: Privilege
               AccessControlEntryAuthModeEnum: AuthMode
+          ThreadNetworkDiagnostics:
+              ConnectionStatusEnum: ThreadConnectionStatus
+          EthernetNetworkDiagnostics:
+              PHYRate: PHYRateType
+          GeneralDiagnostics:
+              HardwareFault: HardwareFaultType
+              RadioFault: RadioFaultType
+              BootReasonEnum: BootReasonType
       enum values:
           GeneralCommissioning:
               CommissioningError:
@@ -5354,7 +5565,41 @@
           PowerSource:
               BatChargeLevel:
                   OK: Ok
+          WiFiNetworkDiagnostics:
+              WiFiVersionType:
+                  A: 80211a
+                  B: 80211b
+                  G: 80211g
+                  N: 80211n
+                  Ac: 80211ac
+                  Ax: 80211ax
+          EthernetNetworkDiagnostics:
+              PHYRate:
+                  Rate10M: 10M
+                  Rate100M: 100M
+                  Rate1G: 1000M
+                  Rate25G: 25G
+                  Rate5G: 5G
+                  Rate10G: 10G
+                  Rate40G: 40G
+                  Rate100G: 100G
+                  Rate200G: 200G
+                  Rate400G: 400G
+              PHYRateType:
+                  Rate10M: 10M
+                  Rate100M: 100M
+                  Rate1G: 1000M
+                  Rate25G: 25G
+                  Rate5G: 5G
+                  Rate10G: 10G
+                  Rate40G: 40G
+                  Rate100G: 100G
+                  Rate200G: 200G
+                  Rate400G: 400G
       bitmap values:
           NetworkCommissioning:
               WiFiSecurity:
                   WEP: WepPersonal
+                  WPAPersonal: WpaPersonal
+                  WPA2Personal: Wpa2Personal
+                  WPA3Personal: Wpa3Personal

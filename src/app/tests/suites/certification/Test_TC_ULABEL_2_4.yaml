@@ -37,35 +37,35 @@ tests:
     - label: "TH writes LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "writeAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       arguments:
           value:
               [
-                  { label: "room", value: "bedroom 1" },
-                  { label: "Orientation", value: "east" },
+                  { Label: "room", Value: "bedroom 1" },
+                  { Label: "Orientation", Value: "east" },
               ]
 
     - label: "TH reads LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "readAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       response:
           value:
               [
-                  { label: "room", value: "bedroom 1" },
-                  { label: "Orientation", value: "east" },
+                  { Label: "room", Value: "bedroom 1" },
+                  { Label: "Orientation", Value: "east" },
               ]
 
     - label: "TH writes LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "writeAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       arguments:
-          value: [{ label: "", value: "" }]
+          value: [{ Label: "", Value: "" }]
 
     - label: "TH reads LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "readAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       response:
-          value: [{ label: "", value: "" }]
+          value: [{ Label: "", Value: "" }]

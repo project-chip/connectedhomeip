@@ -5448,7 +5448,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 
 @end
-
 @implementation MTRClusterBasic
 @end
 
@@ -5757,7 +5756,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 
 @end
-
 @implementation MTRClusterOtaSoftwareUpdateProvider
 @end
 
@@ -5988,7 +5986,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 
 @end
-
 @implementation MTRClusterOtaSoftwareUpdateRequestor
 @end
 
@@ -8005,11 +8002,11 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeBootReasonsWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeBootReasonWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonsID)
+                                        attributeID:@(MTRAttributeIDTypeClusterGeneralDiagnosticsAttributeBootReasonID)
                                              params:params];
 }
 
@@ -8104,6 +8101,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                       expectedValues:expectedDataValueDictionaries
                expectedValueInterval:expectedValueIntervalMs
                           completion:completionHandler];
+}
+- (NSDictionary<NSString *, id> *)readAttributeBootReasonsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributeBootReasonWithParams:params];
 }
 @end
 
@@ -8426,19 +8427,19 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeNeighborTableListWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeNeighborTableWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableListID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeNeighborTableID)
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeRouteTableListWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeRouteTableWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableListID)
+                                        attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRouteTableID)
                                              params:params];
 }
 
@@ -8960,6 +8961,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
           expectedValueInterval:expectedValueIntervalMs
               completionHandler:completionHandler];
 }
+- (NSDictionary<NSString *, id> *)readAttributeNeighborTableListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributeNeighborTableWithParams:params];
+}
+- (NSDictionary<NSString *, id> *)readAttributeRouteTableListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributeRouteTableWithParams:params];
+}
 @end
 
 @implementation MTRClusterWiFiNetworkDiagnostics
@@ -9042,11 +9051,11 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
     }
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeBssidWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeBSSIDWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBssidID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeBSSIDID)
                                              params:params];
 }
 
@@ -9074,11 +9083,11 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                                              params:params];
 }
 
-- (NSDictionary<NSString *, id> *)readAttributeRssiWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> *)readAttributeRSSIWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)
                                           clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
-                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRssiID)
+                                        attributeID:@(MTRAttributeIDTypeClusterWiFiNetworkDiagnosticsAttributeRSSIID)
                                              params:params];
 }
 
@@ -9218,6 +9227,14 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                  expectedValues:expectedValues
           expectedValueInterval:expectedValueIntervalMs
               completionHandler:completionHandler];
+}
+- (NSDictionary<NSString *, id> *)readAttributeBssidWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributeBSSIDWithParams:params];
+}
+- (NSDictionary<NSString *, id> *)readAttributeRssiWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self readAttributeRSSIWithParams:params];
 }
 @end
 
@@ -9796,7 +9813,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                     timedInvokeTimeoutMs.SetValue(10000);
                 }
                 request.commissioningTimeout = params.commissioningTimeout.unsignedShortValue;
-                request.PAKEVerifier = [self asByteSpan:params.pakeVerifier];
+                request.PAKEPasscodeVerifier = [self asByteSpan:params.pakePasscodeVerifier];
                 request.discriminator = params.discriminator.unsignedShortValue;
                 request.iterations = params.iterations.unsignedIntValue;
                 request.salt = [self asByteSpan:params.salt];
@@ -20579,7 +20596,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 
 @end
-
 @implementation MTRClusterWakeOnLan
 @end
 
@@ -29978,7 +29994,6 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 
 @end
-
 @implementation MTRClusterTestCluster
 @end
 

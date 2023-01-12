@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import os
-from enum import Enum, auto
 import shlex
 import subprocess
+from enum import Enum, auto
 
 from .gn import GnBuilder
 

@@ -46,6 +46,8 @@ static_library("controller") {
       "CommissioningDelegate.cpp",
       "CommissioningWindowOpener.cpp",
       "CommissioningWindowOpener.h",
+      "CurrentFabricRemover.cpp",
+      "CurrentFabricRemover.h",
       "DeviceDiscoveryDelegate.h",
       "DevicePairingDelegate.h",
       "EmptyDataModelHandler.cpp",

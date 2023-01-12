@@ -19,9 +19,10 @@
 
 import argparse
 import base64
-from ecdsa.curves import NIST256p
 import hashlib
 import struct
+
+from ecdsa.curves import NIST256p
 
 # Forbidden passcodes as listed in the "5.1.7.1. Invalid Passcodes" section of the Matter spec
 INVALID_PASSCODES = [00000000,

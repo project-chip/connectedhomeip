@@ -1,4 +1,6 @@
-<a name="manufacturing"></a>
+---
+orphan: true
+---
 
 ## Manufacturing data
 
@@ -112,5 +114,3 @@ possible for a final stage application to generate its own manufacturing data:
         out_dut1.bin/out2_dut2.bin contains the corresponding DACs/PAIs generated using generate_nxp_chip_factory_bin.py script. The discriminator is 14014 and the passcode is 1000.
 
         These demo certificates are working with the CDs installed in CHIPProjectConfig.h.
-
-    <a name="flashdebug"></a>

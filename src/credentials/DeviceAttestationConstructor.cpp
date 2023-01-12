@@ -17,7 +17,7 @@
 #include "DeviceAttestationConstructor.h"
 #include "DeviceAttestationVendorReserved.h"
 
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 

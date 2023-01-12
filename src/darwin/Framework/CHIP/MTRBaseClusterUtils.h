@@ -22,8 +22,8 @@
 #include <app/CommandSender.h>
 #include <app/ReadClient.h>
 #include <app/data-model/NullObject.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
 
 NS_ASSUME_NONNULL_BEGIN
