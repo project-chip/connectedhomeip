@@ -61,6 +61,12 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
         mKeypairBridge = nullptr;
     }
 #endif // JAVA_MATTER_CONTROLLER_TEST
+
+    if (mDeviceAttestationDelegateBridge != nullptr)
+    {
+        delete mDeviceAttestationDelegateBridge;
+        mDeviceAttestationDelegateBridge = nullptr;
+    }
 }
 
 void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)

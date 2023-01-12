@@ -1,6 +1,7 @@
 {
     "include": "../../../../src/app/tests/suites/ciTests.json",
     "disable": [
+        "TestClientMonitoringCluster",
         "Test_TC_SC_4_2",
         "TestClusterComplexTypes",
         "TestEvents",

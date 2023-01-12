@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.util.Log;
 import com.example.contentapp.AttributeHolder;
 import com.example.contentapp.MainActivity;
+import com.example.contentapp.matter.MatterAgentClient;
 import com.matter.tv.app.api.MatterIntentConstants;
 
 public class MatterCommandReceiver extends BroadcastReceiver {
@@ -14,6 +15,9 @@ public class MatterCommandReceiver extends BroadcastReceiver {
 
   @Override
   public void onReceive(Context context, Intent intent) {
+
+    MatterAgentClient.initialize(context.getApplicationContext());
+
     final String intentAction = intent.getAction();
     Log.i(TAG, "Some Intent received from the matter server " + intentAction);
     if (intentAction == null || intentAction.isEmpty()) {

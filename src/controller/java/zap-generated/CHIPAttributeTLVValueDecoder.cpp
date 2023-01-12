@@ -9338,9 +9338,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jobject newElement_2_mfgCode;
                     std::string newElement_2_mfgCodeClassName     = "java/lang/Integer";
                     std::string newElement_2_mfgCodeCtorSignature = "(I)V";
-                    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_2_mfgCodeClassName.c_str(),
-                                                                                   newElement_2_mfgCodeCtorSignature.c_str(),
-                                                                                   entry_2.mfgCode, newElement_2_mfgCode);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                        newElement_2_mfgCodeClassName.c_str(), newElement_2_mfgCodeCtorSignature.c_str(),
+                        static_cast<uint16_t>(entry_2.mfgCode), newElement_2_mfgCode);
                     jobject newElement_2_value;
                     std::string newElement_2_valueClassName     = "java/lang/Integer";
                     std::string newElement_2_valueCtorSignature = "(I)V";
@@ -9348,24 +9348,25 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                    newElement_2_valueCtorSignature.c_str(),
                                                                                    entry_2.value, newElement_2_value);
 
-                    jclass semanticTagStructClass_3;
+                    jclass semanticTagStructStructClass_3;
                     err = chip::JniReferences::GetInstance().GetClassRef(
-                        env, "chip/devicecontroller/ChipStructs$ModeSelectClusterSemanticTag", semanticTagStructClass_3);
+                        env, "chip/devicecontroller/ChipStructs$ModeSelectClusterSemanticTagStruct",
+                        semanticTagStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
                     {
-                        ChipLogError(Zcl, "Could not find class ChipStructs$ModeSelectClusterSemanticTag");
+                        ChipLogError(Zcl, "Could not find class ChipStructs$ModeSelectClusterSemanticTagStruct");
                         return nullptr;
                     }
-                    jmethodID semanticTagStructCtor_3 =
-                        env->GetMethodID(semanticTagStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
-                    if (semanticTagStructCtor_3 == nullptr)
+                    jmethodID semanticTagStructStructCtor_3 =
+                        env->GetMethodID(semanticTagStructStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
+                    if (semanticTagStructStructCtor_3 == nullptr)
                     {
-                        ChipLogError(Zcl, "Could not find ChipStructs$ModeSelectClusterSemanticTag constructor");
+                        ChipLogError(Zcl, "Could not find ChipStructs$ModeSelectClusterSemanticTagStruct constructor");
                         return nullptr;
                     }
 
-                    newElement_2 =
-                        env->NewObject(semanticTagStructClass_3, semanticTagStructCtor_3, newElement_2_mfgCode, newElement_2_value);
+                    newElement_2 = env->NewObject(semanticTagStructStructClass_3, semanticTagStructStructCtor_3,
+                                                  newElement_2_mfgCode, newElement_2_value);
                     chip::JniReferences::GetInstance().AddToList(newElement_0_semanticTags, newElement_2);
                 }
 

@@ -43,6 +43,8 @@ shared_library("jni") {
     "CHIPDefaultCallbacks.cpp",
     "CHIPDefaultCallbacks.h",
     "CHIPDeviceController-JNI.cpp",
+    "DeviceAttestationDelegateBridge.cpp",
+    "DeviceAttestationDelegateBridge.h",
     "zap-generated/CHIPAttributeTLVValueDecoder.cpp",
     "zap-generated/CHIPClustersWrite-JNI.cpp",
     "zap-generated/CHIPEventTLVValueDecoder.cpp",
@@ -108,6 +110,7 @@ android_library("java") {
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
     "src/chip/devicecontroller/ControllerParams.java",
+    "src/chip/devicecontroller/DeviceAttestationDelegate.java",
     "src/chip/devicecontroller/DiscoveredDevice.java",
     "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
     "src/chip/devicecontroller/KeypairDelegate.java",
@@ -151,7 +154,10 @@ android_library("java") {
     data_deps += [ "${chip_root}/build/chip/java:shared_cpplib" ]
   }
 
-  javac_flags = [ "-Xlint:deprecation" ]
+  javac_flags = [
+    "-Xlint:deprecation",
+    "-parameters",  # Store infomation about method parameters
+  ]
 
   # TODO: add classpath support (we likely need to add something like
   #  ..../platforms/android-21/android.jar to access BLE items)

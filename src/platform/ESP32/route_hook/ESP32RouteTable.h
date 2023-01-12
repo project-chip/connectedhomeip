@@ -12,11 +12,13 @@
 extern "C" {
 #endif
 
+#define TAG "ROUTE_HOOK"
+
 /**
  * @brief Route table entry
  *
  */
-typedef struct
+typedef struct esp_route_entry_t
 {
     ip6_addr_t prefix;
     uint8_t prefix_length;
@@ -24,6 +26,7 @@ typedef struct
     int8_t preference;
     uint32_t lifetime_seconds;
     struct netif * netif;
+    struct esp_route_entry_t * next;
 } esp_route_entry_t;
 
 /**
@@ -37,18 +40,6 @@ typedef struct
  *
  */
 esp_route_entry_t * esp_route_table_add_route_entry(const esp_route_entry_t * route_entry);
-
-/**
- * @brief Removes an entry from the route table
- *
- * @param[in] route_entry    The route entry to be removed
- *
- * @return
- *   - ESP_OK
- *   - ESP_ERR_INVALID_ARG  The provided route_entry is not in the route table.
- *
- */
-esp_err_t esp_route_table_remove_route_entry(esp_route_entry_t * route_entry);
 
 /**
  * @brief The lwIP ip6 route hook, called by the lwIP function ip6_route when sending packets.
