@@ -7626,8 +7626,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         }
         break;
     }
-    case app::Clusters::BridgedDeviceBasic::Id: {
-        using namespace app::Clusters::BridgedDeviceBasic;
+    case app::Clusters::BridgedDeviceBasicInformation::Id: {
+        using namespace app::Clusters::BridgedDeviceBasicInformation;
         switch (aPath.mAttributeId)
         {
         case Attributes::VendorName::Id: {

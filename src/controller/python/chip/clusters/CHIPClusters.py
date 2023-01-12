@@ -2826,8 +2826,8 @@ class ChipClusters:
                 },
             },
     }
-    _BRIDGED_DEVICE_BASIC_CLUSTER_INFO = {
-            "clusterName": "BridgedDeviceBasic",
+    _BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_INFO = {
+            "clusterName": "BridgedDeviceBasicInformation",
             "clusterId": 0x00000039,
             "commands": {
             },
@@ -7609,7 +7609,7 @@ class ChipClusters:
     0x00000035: _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
     0x00000036: _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
     0x00000037: _ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
-    0x00000039: _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
+    0x00000039: _BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_INFO,
     0x0000003B: _SWITCH_CLUSTER_INFO,
     0x0000003C: _ADMINISTRATOR_COMMISSIONING_CLUSTER_INFO,
     0x0000003E: _OPERATIONAL_CREDENTIALS_CLUSTER_INFO,
@@ -7678,7 +7678,7 @@ class ChipClusters:
         "ThreadNetworkDiagnostics": _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
         "WiFiNetworkDiagnostics": _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
         "EthernetNetworkDiagnostics": _ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
-        "BridgedDeviceBasic": _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
+        "BridgedDeviceBasicInformation": _BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_INFO,
         "Switch": _SWITCH_CLUSTER_INFO,
         "AdministratorCommissioning": _ADMINISTRATOR_COMMISSIONING_CLUSTER_INFO,
         "OperationalCredentials": _OPERATIONAL_CREDENTIALS_CLUSTER_INFO,

@@ -107,7 +107,7 @@ public final class ChipIdLookup {
       return "EthernetNetworkDiagnostics";
     }
     if (clusterId == 57L) {
-      return "BridgedDeviceBasic";
+      return "BridgedDeviceBasicInformation";
     }
     if (clusterId == 59L) {
       return "Switch";

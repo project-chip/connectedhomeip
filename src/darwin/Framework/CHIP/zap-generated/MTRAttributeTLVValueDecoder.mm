@@ -6282,8 +6282,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
         }
         break;
     }
-    case Clusters::BridgedDeviceBasic::Id: {
-        using namespace Clusters::BridgedDeviceBasic;
+    case Clusters::BridgedDeviceBasicInformation::Id: {
+        using namespace Clusters::BridgedDeviceBasicInformation;
         switch (aPath.mAttributeId) {
         case Attributes::VendorName::Id: {
             using TypeInfo = Attributes::VendorName::TypeInfo;

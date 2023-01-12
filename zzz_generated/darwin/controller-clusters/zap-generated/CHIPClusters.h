@@ -282,13 +282,14 @@ public:
     ~EthernetNetworkDiagnosticsCluster() {}
 };
 
-class DLL_EXPORT BridgedDeviceBasicCluster : public ClusterBase
+class DLL_EXPORT BridgedDeviceBasicInformationCluster : public ClusterBase
 {
 public:
-    BridgedDeviceBasicCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::BridgedDeviceBasic::Id, endpoint)
+    BridgedDeviceBasicInformationCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                         EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::BridgedDeviceBasicInformation::Id, endpoint)
     {}
-    ~BridgedDeviceBasicCluster() {}
+    ~BridgedDeviceBasicInformationCluster() {}
 };
 
 class DLL_EXPORT SwitchCluster : public ClusterBase

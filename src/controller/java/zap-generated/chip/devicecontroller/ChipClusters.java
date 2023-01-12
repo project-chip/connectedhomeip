@@ -9146,10 +9146,10 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
-  public static class BridgedDeviceBasicCluster extends BaseChipCluster {
+  public static class BridgedDeviceBasicInformationCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 57L;
 
-    public BridgedDeviceBasicCluster(long devicePtr, int endpointId) {
+    public BridgedDeviceBasicInformationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 

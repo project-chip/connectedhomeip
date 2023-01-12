@@ -5512,15 +5512,15 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 /**
- * Cluster Bridged Device Basic
+ * Cluster Bridged Device Basic Information
  *
  * This Cluster serves two purposes towards a Node communicating with a Bridge: indicate that the functionality on
           the Endpoint where it is placed (and its Parts) is bridged from a non-CHIP technology; and provide a centralized
           collection of attributes that the Node MAY collect to aid in conveying information regarding the Bridged Device to a user,
           such as the vendor name, the model name, or user-assigned name.
  */
-API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRBaseClusterBridgedDeviceBasic : MTRCluster
+MTR_NEWLY_AVAILABLE
+@interface MTRBaseClusterBridgedDeviceBasicInformation : MTRCluster
 
 - (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
                               endpointID:(NSNumber *)endpointID
@@ -17024,6 +17024,10 @@ MTR_NEWLY_DEPRECATED("Please use MTRBaseClusterOTASoftwareUpdateProvider")
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_NEWLY_DEPRECATED("Please use MTRBaseClusterOTASoftwareUpdateRequestor")
 @interface MTRBaseClusterOtaSoftwareUpdateRequestor : MTRBaseClusterOTASoftwareUpdateRequestor
+@end
+
+API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+@interface MTRBaseClusterBridgedDeviceBasic : MTRBaseClusterBridgedDeviceBasicInformation
 @end
 
 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
