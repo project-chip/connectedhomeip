@@ -66,7 +66,7 @@ void DeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(
     const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
     chip::Credentials::AttestationVerificationResult attestationResult)
 {
-    ChipLogProgress(Controller, "OnDeviceAttestationCompleted with result: %hu", attestationResult);
+    ChipLogProgress(Controller, "OnDeviceAttestationCompleted with result: %hu", static_cast<uint16_t>(attestationResult));
 
     mResult = attestationResult;
     if (mDeviceAttestationDelegate != nullptr)
